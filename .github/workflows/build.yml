@@ -58,15 +58,18 @@ jobs:
       #     run: npm run pree2e && npm run e2e
 
       # Package the app for different operating systems
-      - name: Package app
+      - name: Package App
         run: |
-          if [ "${{ matrix.os }}" == "windows-latest" ]; then
-            npm run package-win
-          elif [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
-            npm run package-linux
-          elif [ "${{ matrix.os }}" == "macOS-latest" ]; then
-            npm run package-mac
-          fi
+          if ($env:RUNNER_OS -eq "Windows") {
+          npm run package-win
+          } elseif ($env:RUNNER_OS -eq "Linux") {
+          npm run package-linux
+          } elseif ($env:RUNNER_OS -eq "macOS") {
+          npm run package-mac
+          }
+        shell: pwsh
+        env:
+          RUNNER_OS: ${{ runner.os }}
 
       # Upload build artifacts
       - name: Upload build artifacts
