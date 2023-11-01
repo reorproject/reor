@@ -1,7 +1,10 @@
-import { app, BrowserWindow, shell, ipcMain } from "electron";
+import { app, BrowserWindow, shell, ipcMain, dialog } from "electron";
 import { release } from "node:os";
 import { join } from "node:path";
 import { update } from "./update";
+import Store from "electron-store";
+import * as path from "path";
+import * as fs from "fs";
 import {
   createEmbeddingFunction,
   setupPipeline,
@@ -34,6 +37,7 @@ import {
 // ├─┬ dist
 // │ └── index.html    > Electron-Renderer
 //
+const store = new Store();
 process.env.DIST_ELECTRON = join(__dirname, "../");
 process.env.DIST = join(process.env.DIST_ELECTRON, "../dist");
 process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
@@ -71,8 +75,8 @@ async function createWindow() {
       // Warning: Enable nodeIntegration and disable contextIsolation is not secure in production
       // Consider using contextBridge.exposeInMainWorld
       // Read more on https://www.electronjs.org/docs/latest/tutorial/context-isolation
-      nodeIntegration: true,
-      contextIsolation: false,
+      // nodeIntegration: true,
+      // contextIsolation: false,
     },
   });
 
@@ -105,64 +109,20 @@ app.whenReady().then(async () => {
 
   // const pipe = await setupPipeline("Xenova/all-MiniLM-L6-v2");
   // console.log(pipe);
-  const uri = "data/sample-lancedb";
-  const db = await lancedb.connect(uri);
-  // db.dropTable("test-table");
-  const table = await GetOrCreateTable(db, "test-table");
-  // // console.log("table schema",)
-  // console.log("CALLING ADD:");
-  table.add([
-    {
-      path: "test-path",
-      content: "test-content",
-      subNoteIndex: 0,
-      // vector: [1.0], //await pipe("test-content", { pooling: "mean", normalize: true }),
-    },
-  ]);
-  // const data = [
+  // const uri = "data/sample-lancedb";
+  // const db = await lancedb.connect(uri);
+  // // db.dropTable("test-table");
+  // const table = await GetOrCreateTable(db, "test-table");
+  // // // console.log("table schema",)
+  // // console.log("CALLING ADD:");
+  // table.add([
   //   {
   //     path: "test-path",
   //     content: "test-content",
   //     subNoteIndex: 0,
   //     // vector: [1.0], //await pipe("test-content", { pooling: "mean", normalize: true }),
   //   },
-  // { id: 1, text: "Cherry", type: "fruit" },
-  // { id: 2, text: "Carrot", type: "vegetable" },
-  // { id: 3, text: "Potato", type: "vegetable" },
-  // { id: 4, text: "Apple", type: "fruit" },
-  // { id: 5, text: "Banana", type: "fruit" },
-  // ];
-  // const schema = new Schema([
-  //   new Field("id", new Float64(), false),
-  //   new Field(
-  //     "vector",
-  //     new FixedSizeList(384, new Field("item", new Float32())),
-  //     false
-  //   ),
-  //   new Field("text", new Utf8(), false),
-  //   new Field("type", new Utf8(), false),
   // ]);
-
-  // // Create the table with the embedding function
-  // const embedFunc = await createEmbeddingFunction(
-  //   "all-MiniLM-L6-v2",
-  //   "content"
-  // );
-  // // const table = await db.createTable({
-  // //   name: "food_table",
-  // //   schema,
-  // //   embeddingFunction: embedFunc,
-  // // });
-  // // table.add(data);
-  // const arrowTable: ArrowTable = await convertToTable(data, embedFunc);
-  // console.log("arrowTable", arrowTable);
-  // console.log("arrowTable", arrowTable.schema);
-  // console.log("arrowTable", arrowTable.schema);
-  // for (const field of arrowTable.schema.fields) {
-  //   console.log(`Field Name: ${field.name}, Type: ${field.type}`);
-  // }
-  // const table = await db.createTable("food_table", data, embedFunc);
-  // console.log("created table: ", table);
 });
 
 app.on("window-all-closed", () => {
@@ -204,65 +164,133 @@ ipcMain.handle("open-win", (_, arg) => {
   }
 });
 
-export async function convertToTable<T>(
-  data: Array<Record<string, unknown>>,
-  embeddings?: lancedb.EmbeddingFunction<T>
-): Promise<ArrowTable> {
-  if (data.length === 0) {
-    throw new Error("At least one record needs to be provided");
-  }
-
-  const columns = Object.keys(data[0]);
-  const records: Record<string, Vector> = {};
-
-  for (const columnsKey of columns) {
-    if (columnsKey === "vector") {
-      const vectorSize = (data[0].vector as any[]).length;
-      const listBuilder = newVectorBuilder(vectorSize);
-      for (const datum of data) {
-        if ((datum[columnsKey] as any[]).length !== vectorSize) {
-          throw new Error(`Invalid vector size, expected ${vectorSize}`);
-        }
-
-        listBuilder.append(datum[columnsKey]);
-      }
-      records[columnsKey] = listBuilder.finish().toVector();
-    } else {
-      const values = [];
-      for (const datum of data) {
-        values.push(datum[columnsKey]);
-      }
-
-      if (columnsKey === embeddings?.sourceColumn) {
-        const vectors = await embeddings.embed(values as T[]);
-        records.vector = vectorFromArray(
-          vectors,
-          newVectorType(vectors[0].length)
-        );
-        console.log("records.vector", records.vector);
-      }
-
-      if (typeof values[0] === "string") {
-        // `vectorFromArray` converts strings into dictionary vectors, forcing it back to a string column
-        records[columnsKey] = vectorFromArray(values, new Utf8());
-      } else {
-        records[columnsKey] = vectorFromArray(values);
-      }
-    }
-  }
-
-  return new ArrowTable(records);
-}
-
-function newVectorBuilder(dim: number): FixedSizeListBuilder<Float32> {
-  return makeBuilder({
-    type: newVectorType(dim),
+ipcMain.handle("open-directory-dialog", async (event) => {
+  const result = await dialog.showOpenDialog({
+    properties: ["openDirectory"],
   });
+
+  if (!result.canceled && result.filePaths.length > 0) {
+    return result.filePaths[0];
+  } else {
+    return null;
+  }
+});
+
+// In this file you can include the rest of your app's specific main process
+// code. You can also put them in separate files and import them here.
+
+// IPC listener
+// ipcMain.on("electron-store-get", async (event, val) => {
+//   event.returnValue = store.get(val);
+// });
+// ipcMain.on("electron-store-set", async (event, key, val) => {
+//   store.set(key, val);
+// });
+
+ipcMain.on("set-user-directory", (event, path: string) => {
+  // Your validation logic for the directory path
+  store.set("user.directory", path);
+  // WatchFiles(path, (filename) => {
+  //   // event.sender.send('file-changed', filename);
+  //   console.log("FILE CHANGED: ", filename);
+  // });
+  event.returnValue = "success";
+});
+
+ipcMain.on("get-user-directory", (event) => {
+  const path = store.get("user.directory");
+  event.returnValue = path;
+});
+
+interface FileInfo {
+  name: string;
+  path: string;
 }
 
-function newVectorType(dim: number): FixedSizeList<Float32> {
-  // Somewhere we always default to have the elements nullable, so we need to set it to true
-  // otherwise we often get schema mismatches because the stored data always has schema with nullable elements
-  const children = new Field<Float32>("item", new Float32(), true);
-  return new FixedSizeList(dim, children);
-}
+ipcMain.handle("get-files", async (): Promise<FileInfo[]> => {
+  const directoryPath: any = store.get("user.directory");
+  if (!directoryPath) return [];
+
+  const files: string[] = fs.readdirSync(directoryPath);
+  return files.map((file: string) => ({
+    name: file,
+    path: path.join(directoryPath, file),
+  }));
+});
+
+ipcMain.handle(
+  "read-file",
+  async (event, filePath: string): Promise<string> => {
+    return fs.readFileSync(filePath, "utf-8");
+  }
+);
+
+ipcMain.handle(
+  "write-file",
+  async (event, filePath: string, content: string): Promise<void> => {
+    fs.writeFileSync(filePath, content, "utf-8");
+  }
+);
+
+// export async function convertToTable<T>(
+//   data: Array<Record<string, unknown>>,
+//   embeddings?: lancedb.EmbeddingFunction<T>
+// ): Promise<ArrowTable> {
+//   if (data.length === 0) {
+//     throw new Error("At least one record needs to be provided");
+//   }
+
+//   const columns = Object.keys(data[0]);
+//   const records: Record<string, Vector> = {};
+
+//   for (const columnsKey of columns) {
+//     if (columnsKey === "vector") {
+//       const vectorSize = (data[0].vector as any[]).length;
+//       const listBuilder = newVectorBuilder(vectorSize);
+//       for (const datum of data) {
+//         if ((datum[columnsKey] as any[]).length !== vectorSize) {
+//           throw new Error(`Invalid vector size, expected ${vectorSize}`);
+//         }
+
+//         listBuilder.append(datum[columnsKey]);
+//       }
+//       records[columnsKey] = listBuilder.finish().toVector();
+//     } else {
+//       const values = [];
+//       for (const datum of data) {
+//         values.push(datum[columnsKey]);
+//       }
+
+//       if (columnsKey === embeddings?.sourceColumn) {
+//         const vectors = await embeddings.embed(values as T[]);
+//         records.vector = vectorFromArray(
+//           vectors,
+//           newVectorType(vectors[0].length)
+//         );
+//         console.log("records.vector", records.vector);
+//       }
+
+//       if (typeof values[0] === "string") {
+//         // `vectorFromArray` converts strings into dictionary vectors, forcing it back to a string column
+//         records[columnsKey] = vectorFromArray(values, new Utf8());
+//       } else {
+//         records[columnsKey] = vectorFromArray(values);
+//       }
+//     }
+//   }
+
+//   return new ArrowTable(records);
+// }
+
+// function newVectorBuilder(dim: number): FixedSizeListBuilder<Float32> {
+//   return makeBuilder({
+//     type: newVectorType(dim),
+//   });
+// }
+
+// function newVectorType(dim: number): FixedSizeList<Float32> {
+//   // Somewhere we always default to have the elements nullable, so we need to set it to true
+//   // otherwise we often get schema mismatches because the stored data always has schema with nullable elements
+//   const children = new Field<Float32>("item", new Float32(), true);
+//   return new FixedSizeList(dim, children);
+// }
