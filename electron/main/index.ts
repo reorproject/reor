@@ -2,7 +2,18 @@ import { app, BrowserWindow, shell, ipcMain } from "electron";
 import { release } from "node:os";
 import { join } from "node:path";
 import { update } from "./update";
-
+import { setupPipeline } from "./embeddings/Transformersjs";
+import * as lancedb from "vectordb";
+import GetOrCreateTable from "./embeddings/Lance";
+import {
+  Schema,
+  Field,
+  Utf8,
+  FixedSizeList,
+  Int16,
+  Int32,
+  Float32,
+} from "apache-arrow";
 // The built directory structure
 //
 // ├─┬ dist-electron
@@ -79,25 +90,16 @@ async function createWindow() {
   update(win);
 }
 
-const setupPipeline = async (modelName: string) => {
-  /*
-    just noting for future explorers that we do a dynamic import because transformers.js is an ESM module,
-    and this repo is not yet and so doing the import at the top pollutes
-    this repo turning it into an ESM repo... super annoying and the whole industry
-    is dealing with this problem now as we transition into ESM.
-    */
-  const { pipeline, env } = await import("@xenova/transformers");
-  env.localModelPath = "";
-  console.log("env is: ", env);
-  return pipeline("feature-extraction", modelName);
-};
-
 app.whenReady().then(async () => {
-  const pipe = await setupPipeline("/Users/sam/Desktop/all-MiniLM-L6-v2");
-  console.log(pipe);
-  const out = await pipe("I love transformers!");
-  console.log("embedding out is: ", out);
   createWindow();
+
+  const pipe = setupPipeline("Xenova/all-MiniLM-L6-v2");
+  console.log(pipe);
+  const uri = "data/sample-lancedb";
+  const db = await lancedb.connect(uri);
+
+  const table = await GetOrCreateTable(db, "test-table");
+  console.log("created table: ", table);
 });
 
 app.on("window-all-closed", () => {

@@ -20,7 +20,9 @@
   },
   "dependencies": {
     "@xenova/transformers": "^2.7.0",
-    "electron-updater": "^6.1.1"
+    "apache-arrow": "^12.0.1",
+    "electron-updater": "^6.1.1",
+    "vectordb": "^0.3.5"
   },
   "devDependencies": {
     "@playwright/test": "^1.37.1",
@@ -28,7 +30,7 @@
     "@types/react-dom": "^18.2.7",
     "@vitejs/plugin-react": "^4.0.4",
     "autoprefixer": "^10.4.16",
-    "electron": "^26.0.0",
+    "electron": "^26.2.1",
     "electron-builder": "^24.6.3",
     "postcss": "^8.4.31",
     "react": "^18.2.0",
