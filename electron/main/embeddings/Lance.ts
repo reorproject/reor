@@ -1,7 +1,7 @@
 import * as lancedb from "vectordb";
 // import { Schema } from 'apache-arrow';
 import CreateRagnoteDBSchema from "./Schema";
-import TransformersJSEmbedFun from "./Transformersjs";
+import { createEmbeddingFunction } from "./Transformers";
 import {
   Schema,
   Field,
@@ -19,14 +19,19 @@ const GetOrCreateTable = async (
 ): Promise<lancedb.Table<string>> => {
   const tableNames = await db.tableNames();
   console.log("tableNames", tableNames);
+  const embedFunc = await createEmbeddingFunction(
+    "all-MiniLM-L6-v2",
+    "content"
+  );
   if (tableNames.includes(name)) {
-    return db.openTable(name);
+    return db.openTable(name, embedFunc);
   }
   console.log("creating table");
-  const newTable = db.createTable({
+
+  const newTable = await db.createTable({
     name,
     schema: CreateRagnoteDBSchema(384),
-    embeddingFunction: TransformersJSEmbedFun,
+    embeddingFunction: embedFunc,
   });
   console.log("newTable", newTable);
   // console.log(newTable)
