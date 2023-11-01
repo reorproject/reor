@@ -1,0 +1,74 @@
+name: Build and Package Electron App
+
+on:
+  push:
+    branches:
+      - main # Change this to the branch you want to build from
+
+jobs:
+  build_and_package:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macOS-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16" # Change this to your preferred Node.js version
+
+      # Cache npm dependencies
+      - name: Cache npm dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      # Cache TypeScript output
+      - name: Cache TypeScript build
+        uses: actions/cache@v2
+        with:
+          path: ./dist
+          key: ${{ runner.os }}-tsc-${{ hashFiles('**/tsconfig.json') }}
+          restore-keys: |
+            ${{ runner.os }}-tsc-
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Build the app
+      - name: Build app
+        run: npm run build # This should run tsc and vite build
+
+      # Run E2E tests
+      - name: Run E2E tests
+        run: npm run pree2e && npm run e2e # This assumes that you have set up Playwright tests correctly
+
+      # Package the app for different operating systems
+      - name: Package app
+        run: |
+          if [ "${{ matrix.os }}" == "windows-latest" ]; then
+            npm run package-win
+          elif [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+            npm run package-linux
+          elif [ "${{ matrix.os }}" == "macOS-latest" ]; then
+            npm run package-mac
+          fi
+
+      # Upload build artifacts
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.os }}-app
+          path: |
+            ./out/**/*.exe
+            ./out/**/*.AppImage
+            ./out/**/*.dmg
