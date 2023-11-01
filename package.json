@@ -4,7 +4,7 @@
   "main": "dist-electron/main/index.js",
   "description": "Electron Vite React boilerplate.",
   "author": "草鞋没号 <308487730@qq.com>",
-  "license": "MIT",
+  "license": "GPL-2.0",
   "private": true,
   "debug": {
     "env": {
