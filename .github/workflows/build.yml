@@ -49,8 +49,13 @@ jobs:
         run: npm run build # This should run tsc and vite build
 
       # Run E2E tests
-      - name: Run E2E tests
-        run: npm run pree2e && npm run e2e # This assumes that you have set up Playwright tests correctly
+      - name: Run E2E tests on Ubuntu
+        if: matrix.os == 'ubuntu-latest'
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e
+
+      - name: Run E2E tests on other OS
+        if: matrix.os != 'ubuntu-latest'
+        run: npm run test:e2e
 
       # Package the app for different operating systems
       - name: Package app
