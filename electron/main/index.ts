@@ -109,21 +109,105 @@ app.whenReady().then(async () => {
 
   // const pipe = await setupPipeline("Xenova/all-MiniLM-L6-v2");
   // console.log(pipe);
-  // const uri = "data/sample-lancedb";
-  // const db = await lancedb.connect(uri);
-  // // db.dropTable("test-table");
-  // const table = await GetOrCreateTable(db, "test-table");
-  // // // console.log("table schema",)
-  // // console.log("CALLING ADD:");
-  // table.add([
-  //   {
-  //     path: "test-path",
-  //     content: "test-content",
-  //     subNoteIndex: 0,
-  //     // vector: [1.0], //await pipe("test-content", { pooling: "mean", normalize: true }),
-  //   },
-  // ]);
+  const uri = "data/sample-lancedb";
+  const db = await lancedb.connect(uri);
+  // db.dropTable("test-table");
+  const table = await GetOrCreateTable(db, "test-table");
+  // // console.log("table schema",)
+  // console.log("CALLING ADD:");
+  const currentTimestamp: Date = new Date();
+  console.log("currentTimestamp", currentTimestamp);
+  table.add([
+    {
+      path: "test-path",
+      content: "test-content",
+      subNoteIndex: 0,
+      timeAdded: currentTimestamp, // Convert current time to nanoseconds since Unix epoch
+      // vector: [1.0], //await pipe("test-content", { pooling: "mean", normalize: true }),
+    },
+  ]);
+  // console.log("STARTING QUERY");
+  // // const query = new lancedb.Query(table);
+  // const results = await table.search("hello").limit(2).execute();
+
+  // // const results = await query.filter("sdfjapsofd").execute();
+  // console.log("results", results);
+  // const search = table.search(null);
 });
+
+// app.whenReady().then(async () => {
+// createWindow();
+
+// const pipe = await setupPipeline("Xenova/all-MiniLM-L6-v2");
+// console.log(pipe);
+// const uri = "data/sample-lancedb";
+// const db = await lancedb.connect(uri);
+// db.dropTable("test-table");
+// const table = await GetOrCreateTable(db, "test-table");
+// // // console.log("table schema",)
+// // console.log("CALLING ADD:");
+// const currentTimestamp: Date = new Date();
+// const currentTimestampInMilliseconds: number = currentTimestamp.getTime();
+
+// console.log("currentTimestamp", currentTimestamp);
+// console.log("currentTimestampInMilliseconds", currentTimestampInMilliseconds);
+// table.add([
+//   {
+//     path: "test-path",
+//     content: "test-content",
+//     subNoteIndex: 0,
+//     timeAdded: currentTimestamp,
+//   },
+// ]);
+// const result = await table.search("h").limit(2).execute();
+// console.log("result", result);
+// const data = [
+//   {
+//     path: "test-path",
+//     content: "test-content",
+//     subNoteIndex: 0,
+//     timeAdded: currentTimestamp, // Convert current time to nanoseconds since Unix epoch
+//     // vector: [1.0], //await pipe("test-content", { pooling: "mean", normalize: true }),
+//   },
+//   // { id: 1, text: "Cherry", type: "fruit" },
+//   // { id: 2, text: "Carrot", type: "vegetable" },
+//   // { id: 3, text: "Potato", type: "vegetable" },
+//   // { id: 4, text: "Apple", type: "fruit" },
+//   // { id: 5, text: "Banana", type: "fruit" },
+// ];
+// const schema = new Schema([
+//   new Field("id", new Float64(), false),
+//   new Field(
+//     "vector",
+//     new FixedSizeList(384, new Field("item", new Float32())),
+//     false
+//   ),
+//   new Field("text", new Utf8(), false),
+//   new Field("type", new Utf8(), false),
+// ]);
+
+// // Create the table with the embedding function
+// const embedFunc = await createEmbeddingFunction(
+//   "all-MiniLM-L6-v2",
+//   "content"
+// );
+// const newTable = await db.createTable({
+//   name: "food_table",
+//   data,
+//   embeddingFunction: embedFunc,
+// });
+// console.log("NEW TABLE", newTable);
+// // table.add(data);
+// const arrowTable: ArrowTable = await convertToTable(data, embedFunc);
+// console.log("arrowTable", arrowTable);
+// console.log("arrowTable", arrowTable.schema);
+// console.log("arrowTable", arrowTable.schema);
+// for (const field of arrowTable.schema.fields) {
+//   console.log(`Field Name: ${field.name}, Type: ${field.type}`);
+// }
+// const table = await db.createTable("food_table", data, embedFunc);
+// console.log("created table: ", table);
+// });
 
 app.on("window-all-closed", () => {
   win = null;
@@ -232,65 +316,65 @@ ipcMain.handle(
   }
 );
 
-// export async function convertToTable<T>(
-//   data: Array<Record<string, unknown>>,
-//   embeddings?: lancedb.EmbeddingFunction<T>
-// ): Promise<ArrowTable> {
-//   if (data.length === 0) {
-//     throw new Error("At least one record needs to be provided");
-//   }
+export async function convertToTable<T>(
+  data: Array<Record<string, unknown>>,
+  embeddings?: lancedb.EmbeddingFunction<T>
+): Promise<ArrowTable> {
+  if (data.length === 0) {
+    throw new Error("At least one record needs to be provided");
+  }
 
-//   const columns = Object.keys(data[0]);
-//   const records: Record<string, Vector> = {};
+  const columns = Object.keys(data[0]);
+  const records: Record<string, Vector> = {};
 
-//   for (const columnsKey of columns) {
-//     if (columnsKey === "vector") {
-//       const vectorSize = (data[0].vector as any[]).length;
-//       const listBuilder = newVectorBuilder(vectorSize);
-//       for (const datum of data) {
-//         if ((datum[columnsKey] as any[]).length !== vectorSize) {
-//           throw new Error(`Invalid vector size, expected ${vectorSize}`);
-//         }
+  for (const columnsKey of columns) {
+    if (columnsKey === "vector") {
+      const vectorSize = (data[0].vector as any[]).length;
+      const listBuilder = newVectorBuilder(vectorSize);
+      for (const datum of data) {
+        if ((datum[columnsKey] as any[]).length !== vectorSize) {
+          throw new Error(`Invalid vector size, expected ${vectorSize}`);
+        }
 
-//         listBuilder.append(datum[columnsKey]);
-//       }
-//       records[columnsKey] = listBuilder.finish().toVector();
-//     } else {
-//       const values = [];
-//       for (const datum of data) {
-//         values.push(datum[columnsKey]);
-//       }
+        listBuilder.append(datum[columnsKey]);
+      }
+      records[columnsKey] = listBuilder.finish().toVector();
+    } else {
+      const values = [];
+      for (const datum of data) {
+        values.push(datum[columnsKey]);
+      }
 
-//       if (columnsKey === embeddings?.sourceColumn) {
-//         const vectors = await embeddings.embed(values as T[]);
-//         records.vector = vectorFromArray(
-//           vectors,
-//           newVectorType(vectors[0].length)
-//         );
-//         console.log("records.vector", records.vector);
-//       }
+      if (columnsKey === embeddings?.sourceColumn) {
+        const vectors = await embeddings.embed(values as T[]);
+        records.vector = vectorFromArray(
+          vectors,
+          newVectorType(vectors[0].length)
+        );
+        console.log("records.vector", records.vector);
+      }
 
-//       if (typeof values[0] === "string") {
-//         // `vectorFromArray` converts strings into dictionary vectors, forcing it back to a string column
-//         records[columnsKey] = vectorFromArray(values, new Utf8());
-//       } else {
-//         records[columnsKey] = vectorFromArray(values);
-//       }
-//     }
-//   }
+      if (typeof values[0] === "string") {
+        // `vectorFromArray` converts strings into dictionary vectors, forcing it back to a string column
+        records[columnsKey] = vectorFromArray(values, new Utf8());
+      } else {
+        records[columnsKey] = vectorFromArray(values);
+      }
+    }
+  }
 
-//   return new ArrowTable(records);
-// }
+  return new ArrowTable(records);
+}
 
-// function newVectorBuilder(dim: number): FixedSizeListBuilder<Float32> {
-//   return makeBuilder({
-//     type: newVectorType(dim),
-//   });
-// }
+function newVectorBuilder(dim: number): FixedSizeListBuilder<Float32> {
+  return makeBuilder({
+    type: newVectorType(dim),
+  });
+}
 
-// function newVectorType(dim: number): FixedSizeList<Float32> {
-//   // Somewhere we always default to have the elements nullable, so we need to set it to true
-//   // otherwise we often get schema mismatches because the stored data always has schema with nullable elements
-//   const children = new Field<Float32>("item", new Float32(), true);
-//   return new FixedSizeList(dim, children);
-// }
+function newVectorType(dim: number): FixedSizeList<Float32> {
+  // Somewhere we always default to have the elements nullable, so we need to set it to true
+  // otherwise we often get schema mismatches because the stored data always has schema with nullable elements
+  const children = new Field<Float32>("item", new Float32(), true);
+  return new FixedSizeList(dim, children);
+}
