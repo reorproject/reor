@@ -27,6 +27,8 @@ import {
   RecordBatchStreamWriter,
   Float64,
 } from "apache-arrow";
+import { DatabaseFields } from "./embeddings/Schema";
+import { RagnoteTable } from "./embeddings/Table";
 // The built directory structure
 //
 // ├─┬ dist-electron
@@ -65,6 +67,9 @@ let win: BrowserWindow | null = null;
 const preload = join(__dirname, "../preload/index.js");
 const url = process.env.VITE_DEV_SERVER_URL;
 const indexHtml = join(process.env.DIST, "index.html");
+
+let dbConnection: lancedb.Connection;
+let dbTable = new RagnoteTable();
 
 async function createWindow() {
   win = new BrowserWindow({
@@ -105,27 +110,30 @@ async function createWindow() {
 }
 
 app.whenReady().then(async () => {
-  createWindow();
-
   // const pipe = await setupPipeline("Xenova/all-MiniLM-L6-v2");
   // console.log(pipe);
-  const uri = "data/sample-lancedb";
-  const db = await lancedb.connect(uri);
+  dbConnection = await lancedb.connect("data/sample-lancedb");
   // db.dropTable("test-table");
-  const table = await GetOrCreateTable(db, "test-table");
+  await dbTable.initialize(dbConnection, "test-table");
+  // dbTable = await GetOrCreateTable(dbConnection, "test-table");
   // // console.log("table schema",)
   // console.log("CALLING ADD:");
   const currentTimestamp: Date = new Date();
   console.log("currentTimestamp", currentTimestamp);
-  table.add([
+  dbTable.add([
     {
-      path: "test-path",
+      notePath: "test-path",
       content: "test-content",
       subNoteIndex: 0,
-      timeAdded: currentTimestamp, // Convert current time to nanoseconds since Unix epoch
-      // vector: [1.0], //await pipe("test-content", { pooling: "mean", normalize: true }),
+      timeAdded: currentTimestamp,
     },
   ]);
+  const result = await dbTable.search("h", 2);
+  console.log("result", result);
+  // const filterResult = await dbTable.filter(
+  //   `${DatabaseFields.NOTE_PATH} = "test-path"`
+  // );
+  // console.log("filterResult", filterResult);
   // console.log("STARTING QUERY");
   // // const query = new lancedb.Query(table);
   // const results = await table.search("hello").limit(2).execute();
@@ -133,6 +141,7 @@ app.whenReady().then(async () => {
   // // const results = await query.filter("sdfjapsofd").execute();
   // console.log("results", results);
   // const search = table.search(null);
+  createWindow();
 });
 
 // app.whenReady().then(async () => {
@@ -312,9 +321,24 @@ ipcMain.handle(
 ipcMain.handle(
   "write-file",
   async (event, filePath: string, content: string): Promise<void> => {
+    console.log("writing file", filePath);
+    // so here we can use the table we've created to add and remove things from the database
+    // updateNoteInDB(dbTable, filePath, content);
     fs.writeFileSync(filePath, content, "utf-8");
   }
 );
+
+// const updateNoteInDB = async (
+//   dbTable: lancedb.Table<string>,
+//   filePath: string,
+//   content: string
+// ): Promise<void> => {
+//   await dbTable.delete(`${DatabaseFields.NOTE_PATH} = "${filePath}"`);
+//   const currentTimestamp: Date = new Date();
+//   await dbTable.add([{
+
+//   }
+// };
 
 export async function convertToTable<T>(
   data: Array<Record<string, unknown>>,

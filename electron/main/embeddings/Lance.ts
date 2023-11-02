@@ -1,16 +1,7 @@
 import * as lancedb from "vectordb";
 // import { Schema } from 'apache-arrow';
-import CreateRagnoteDBSchema from "./Schema";
+import CreateDatabaseSchema from "./Schema";
 import { createEmbeddingFunction } from "./Transformers";
-import {
-  Schema,
-  Field,
-  Utf8,
-  FixedSizeList,
-  Int16,
-  Int32,
-  Float32,
-} from "apache-arrow";
 // get or create a lancedb table
 
 const GetOrCreateTable = async (
@@ -30,7 +21,7 @@ const GetOrCreateTable = async (
 
   const newTable = await db.createTable({
     name,
-    schema: CreateRagnoteDBSchema(384),
+    schema: CreateDatabaseSchema(384),
     embeddingFunction: embedFunc,
   });
   console.log("newTable", newTable);
