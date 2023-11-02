@@ -3,11 +3,11 @@ import GetOrCreateTable from "./Lance";
 import { DatabaseFields } from "./Schema";
 
 interface RagnoteDBEntry {
-  notePath: string;
+  notepath: string;
   vector?: Float32Array;
   content: string;
-  subNoteIndex: number;
-  timeAdded: Date;
+  subnoteindex: number;
+  timeadded: Date;
 }
 
 export class RagnoteTable {
@@ -50,9 +50,9 @@ export class RagnoteTable {
   }
 
   async filter(filterString: string) {
-    // const query = new Query();
+    // const query = new Query("asdf");
     const rawResults = await this.table
-      .search("a")
+      .search("")
       .filter(filterString)
       .execute();
     // query.filter(filterString);
@@ -85,6 +85,7 @@ function convertToRecord(entry: RagnoteDBEntry): Record<string, unknown> {
 function convertToRagnoteDBEntry(
   record: Record<string, unknown>
 ): RagnoteDBEntry | null {
+  console.log("returned record: ", record);
   if (
     DatabaseFields.NOTE_PATH in record &&
     DatabaseFields.VECTOR in record &&

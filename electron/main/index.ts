@@ -120,19 +120,20 @@ app.whenReady().then(async () => {
   // console.log("CALLING ADD:");
   const currentTimestamp: Date = new Date();
   console.log("currentTimestamp", currentTimestamp);
-  dbTable.add([
+  await dbTable.add([
     {
-      notePath: "test-path",
+      notepath: "test-path",
       content: "test-content",
-      subNoteIndex: 0,
-      timeAdded: currentTimestamp,
+      subnoteindex: 0,
+      timeadded: currentTimestamp,
     },
   ]);
   const result = await dbTable.search("h", 2);
   console.log("result", result);
-  // const filterResult = await dbTable.filter(
-  //   `${DatabaseFields.NOTE_PATH} = "test-path"`
-  // );
+  const filterResult = await dbTable.filter(
+    `${DatabaseFields.NOTE_PATH} == "test-path"`
+  );
+  console.log("filterResult", filterResult);
   // console.log("filterResult", filterResult);
   // console.log("STARTING QUERY");
   // // const query = new lancedb.Query(table);

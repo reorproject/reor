@@ -13,11 +13,11 @@ import {
 } from "apache-arrow";
 
 export enum DatabaseFields {
-  NOTE_PATH = "notePath",
+  NOTE_PATH = "notepath",
   VECTOR = "vector",
   CONTENT = "content",
-  SUB_NOTE_INDEX = "subNoteIndex",
-  TIME_ADDED = "timeAdded",
+  SUB_NOTE_INDEX = "subnoteindex",
+  TIME_ADDED = "timeadded",
 }
 
 const CreateDatabaseSchema = (vectorDim: number) => {
