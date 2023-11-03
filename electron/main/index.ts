@@ -83,6 +83,8 @@ async function createWindow() {
       // nodeIntegration: true,
       // contextIsolation: false,
     },
+    width: 1200,
+    height: 800,
   });
 
   if (url) {

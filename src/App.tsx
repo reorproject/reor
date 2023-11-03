@@ -20,6 +20,11 @@ function App() {
     setDirectory(path);
     // so here we need to trigger some kind of setup vector db on directory:
   };
+
+  useEffect(() => {
+    console.log("selected file: ", selectedFile);
+  }, [selectedFile]);
+
   return (
     <>
       {/* <FileViewer directory="/Users/sam/Desktop/electron-forge-react-typescript-tailwind" /> */}

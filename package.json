@@ -23,6 +23,8 @@
     "e2e": "playwright test"
   },
   "dependencies": {
+    "@mdxeditor/editor": "^1.6.0",
+    "@tailwindcss/typography": "^0.5.10",
     "@xenova/transformers": "^2.7.0",
     "apache-arrow": "^12.0.1",
     "electron-store": "^8.1.0",
