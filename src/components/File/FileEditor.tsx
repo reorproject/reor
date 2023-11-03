@@ -230,7 +230,7 @@ export const virtuosoSampleSandpackConfig: SandpackConfig = {
 };
 
 export const ALL_PLUGINS = [
-  toolbarPlugin({ toolbarContents: () => <KitchenSinkToolbar /> }),
+  // toolbarPlugin({ toolbarContents: () => <KitchenSinkToolbar /> }),
   listsPlugin(),
   quotePlugin(),
   headingsPlugin({ allowedHeadingLevels: [1, 2, 3] }),
