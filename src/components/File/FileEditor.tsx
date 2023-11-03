@@ -85,7 +85,8 @@ export const FileEditor: React.FC<FileEditorProps> = ({ filePath }) => {
       {/* <MDXEditor ref={ref} markdown="hello world" onChange={console.log} />{" "} */}
       return{" "}
       <MDXEditor
-        onChange={(md) => console.log(md)}
+        ref={ref}
+        onChange={setContent}
         markdown={markdown}
         plugins={ALL_PLUGINS}
       />
