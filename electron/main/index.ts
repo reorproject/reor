@@ -324,22 +324,30 @@ ipcMain.handle(
   async (event, filePath: string, content: string): Promise<void> => {
     console.log("writing file", filePath);
     // so here we can use the table we've created to add and remove things from the database
-    // updateNoteInDB(dbTable, filePath, content);
+    updateNoteInDB(dbTable, filePath, content);
     fs.writeFileSync(filePath, content, "utf-8");
   }
 );
 
-// const updateNoteInDB = async (
-//   dbTable: lancedb.Table<string>,
-//   filePath: string,
-//   content: string
-// ): Promise<void> => {
-//   await dbTable.delete(`${DatabaseFields.NOTE_PATH} = "${filePath}"`);
-//   const currentTimestamp: Date = new Date();
-//   await dbTable.add([{
-
-//   }
-// };
+const updateNoteInDB = async (
+  dbTable: RagnoteTable,
+  filePath: string,
+  content: string
+): Promise<void> => {
+  // TODO: maybe convert this to have try catch blocks.
+  console.log("deleting from table:");
+  await dbTable.delete(`${DatabaseFields.NOTE_PATH} = "${filePath}"`);
+  const currentTimestamp: Date = new Date();
+  console.log("adding back to table:");
+  await dbTable.add([
+    {
+      notepath: filePath,
+      content: content,
+      subnoteindex: 0,
+      timeadded: currentTimestamp,
+    },
+  ]);
+};
 
 export async function convertToTable<T>(
   data: Array<Record<string, unknown>>,

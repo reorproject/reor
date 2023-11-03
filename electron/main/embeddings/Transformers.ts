@@ -45,7 +45,6 @@ export async function createEmbeddingFunction(
   return {
     sourceColumn,
     embed: async (batch: string[]): Promise<number[][]> => {
-      console.log("CALLING EMBED IN THE ACTUAL PIPELINE!");
       if (pipe === null) {
         throw new Error("Pipeline not initialized");
       }
@@ -56,9 +55,6 @@ export async function createEmbeddingFunction(
             return Array.from(res.data);
           })
         );
-        console.log("RESULT IS: ", result);
-        // shape of result:
-        console.log("SHAPE OF RESULT IS: ", result.length, result[0].length);
         return result;
       } catch (error) {
         console.error(error);
