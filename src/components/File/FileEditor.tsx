@@ -1,6 +1,6 @@
 // FileEditor.tsx
 import "@mdxeditor/editor/style.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   AdmonitionDirectiveDescriptor,
   DiffSourceToggleWrapper,
@@ -45,7 +45,8 @@ const markdown = `
 
 export const FileEditor: React.FC<FileEditorProps> = ({ filePath }) => {
   const [content, setContent] = useState<string>("");
-  const ref = React.useRef<MDXEditorMethods>(null);
+  const ref = useRef<MDXEditorMethods>(null);
+  const lastSavedContentRef = useRef<string>("");
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -54,6 +55,8 @@ export const FileEditor: React.FC<FileEditorProps> = ({ filePath }) => {
         filePath
       );
       setContent(fileContent);
+      ref.current?.setMarkdown(fileContent);
+      lastSavedContentRef.current = fileContent; // Initialize with fetched content
     };
 
     if (filePath) {
@@ -62,8 +65,21 @@ export const FileEditor: React.FC<FileEditorProps> = ({ filePath }) => {
   }, [filePath]);
 
   const saveFile = async () => {
-    await window.ipcRenderer.invoke("write-file", filePath, content);
+    if (content !== lastSavedContentRef.current) {
+      // Check for changes since last save
+      console.log("calling save file:");
+      await window.ipcRenderer.invoke("write-file", filePath, content);
+      lastSavedContentRef.current = content; // Update the ref to the latest saved content
+    }
   };
+
+  useEffect(() => {
+    const saveInterval = setInterval(() => {
+      saveFile();
+    }, 5000); // Every 10 seconds
+
+    return () => clearInterval(saveInterval); // Clear the interval when component unmounts
+  }, [content]); // Dependency on content ensures saveFile has the latest content
 
   useEffect(() => {
     console.log("content: ", content);
@@ -71,11 +87,6 @@ export const FileEditor: React.FC<FileEditorProps> = ({ filePath }) => {
 
   return (
     <div className="p-4">
-      {/* <textarea
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        className="w-full h-64 border p-2"
-      /> */}
       <button onClick={() => ref.current?.setMarkdown("new markdown")}>
         Set new markdown
       </button>
@@ -87,7 +98,7 @@ export const FileEditor: React.FC<FileEditorProps> = ({ filePath }) => {
       <MDXEditor
         ref={ref}
         onChange={setContent}
-        markdown={markdown}
+        markdown={content}
         plugins={ALL_PLUGINS}
       />
       {/* <MDXEditor
