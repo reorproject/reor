@@ -5,6 +5,8 @@ import { update } from "./update";
 import Store from "electron-store";
 import * as path from "path";
 import * as fs from "fs";
+import { StoreKeys, StoreSchema } from "./storeConfig";
+import { ModelLoader, SessionService } from "./llm/nodellamacpp";
 import {
   createEmbeddingFunction,
   setupPipeline,
@@ -29,17 +31,9 @@ import {
 } from "apache-arrow";
 import { DatabaseFields } from "./embeddings/Schema";
 import { RagnoteTable } from "./embeddings/Table";
-// The built directory structure
-//
-// ├─┬ dist-electron
-// │ ├─┬ main
-// │ │ └── index.js    > Electron-Main
-// │ └─┬ preload
-// │   └── index.js    > Preload-Scripts
-// ├─┬ dist
-// │ └── index.html    > Electron-Renderer
-//
-const store = new Store();
+
+const store = new Store<StoreSchema>();
+
 process.env.DIST_ELECTRON = join(__dirname, "../");
 process.env.DIST = join(process.env.DIST_ELECTRON, "../dist");
 process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
@@ -121,7 +115,7 @@ app.whenReady().then(async () => {
   // // console.log("table schema",)
   // console.log("CALLING ADD:");
   const currentTimestamp: Date = new Date();
-  console.log("currentTimestamp", currentTimestamp);
+  // console.log("currentTimestamp", currentTimestamp);
   await dbTable.add([
     {
       notepath: "test-path",
@@ -131,11 +125,11 @@ app.whenReady().then(async () => {
     },
   ]);
   const result = await dbTable.search("h", 2);
-  console.log("result", result);
+  // console.log("result", result);
   const filterResult = await dbTable.filter(
     `${DatabaseFields.NOTE_PATH} == "test-path"`
   );
-  console.log("filterResult", filterResult);
+  // console.log("filterResult", filterResult);
   // console.log("filterResult", filterResult);
   // console.log("STARTING QUERY");
   // // const query = new lancedb.Query(table);
@@ -285,7 +279,7 @@ ipcMain.handle("open-directory-dialog", async (event) => {
 
 ipcMain.on("set-user-directory", (event, path: string) => {
   // Your validation logic for the directory path
-  store.set("user.directory", path);
+  store.set(StoreKeys.UserDirectory, path);
   // WatchFiles(path, (filename) => {
   //   // event.sender.send('file-changed', filename);
   //   console.log("FILE CHANGED: ", filename);
@@ -294,7 +288,7 @@ ipcMain.on("set-user-directory", (event, path: string) => {
 });
 
 ipcMain.on("get-user-directory", (event) => {
-  const path = store.get("user.directory");
+  const path = store.get(StoreKeys.UserDirectory);
   event.returnValue = path;
 });
 
@@ -304,7 +298,7 @@ interface FileInfo {
 }
 
 ipcMain.handle("get-files", async (): Promise<FileInfo[]> => {
-  const directoryPath: any = store.get("user.directory");
+  const directoryPath: any = store.get(StoreKeys.UserDirectory);
   if (!directoryPath) return [];
 
   const files: string[] = fs.readdirSync(directoryPath);
@@ -351,6 +345,44 @@ const updateNoteInDB = async (
     },
   ]);
 };
+
+const modelLoader = new ModelLoader(); // Singleton
+const sessions: { [sessionId: string]: SessionService } = {};
+
+ipcMain.handle("createSession", async (event, sessionId: string) => {
+  if (sessions[sessionId]) {
+    throw new Error(`Session ${sessionId} already exists.`);
+  }
+  // sessionService.webContents = event.sender; // Attach the webContents of the sender to your session service
+  const webContents = event.sender;
+  const sessionService = new SessionService(modelLoader, webContents);
+  sessions[sessionId] = sessionService;
+  return sessionId;
+});
+
+ipcMain.handle("getHello", async (event, sessionId: string) => {
+  const sessionService = sessions[sessionId];
+  if (!sessionService) {
+    throw new Error(`Session ${sessionId} does not exist.`);
+  }
+
+  console.log("getting hello");
+  const getHelloResponse = await sessionService.getHello();
+  console.log("getHelloResponse", getHelloResponse);
+  return getHelloResponse;
+});
+
+ipcMain.handle(
+  "initializeStreamingResponse",
+  async (event, sessionId: string, prompt: string) => {
+    const sessionService = sessions[sessionId];
+    if (!sessionService) {
+      throw new Error(`Session ${sessionId} does not exist.`);
+    }
+
+    return sessionService.streamingPrompt(prompt);
+  }
+);
 
 export async function convertToTable<T>(
   data: Array<Record<string, unknown>>,

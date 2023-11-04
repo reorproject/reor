@@ -9,7 +9,7 @@ const GetOrCreateTable = async (
   name: string
 ): Promise<lancedb.Table<string>> => {
   const tableNames = await db.tableNames();
-  console.log("tableNames", tableNames);
+  // console.log("tableNames", tableNames);
   const embedFunc = await createEmbeddingFunction(
     "all-MiniLM-L6-v2",
     "content"
@@ -17,14 +17,14 @@ const GetOrCreateTable = async (
   if (tableNames.includes(name)) {
     return db.openTable(name, embedFunc);
   }
-  console.log("creating table");
+  // console.log("creating table");
 
   const newTable = await db.createTable({
     name,
     schema: CreateDatabaseSchema(384),
     embeddingFunction: embedFunc,
   });
-  console.log("newTable", newTable);
+  // console.log("newTable", newTable);
   // console.log(newTable)
   return newTable;
 };

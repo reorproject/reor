@@ -85,7 +85,6 @@ function convertToRecord(entry: RagnoteDBEntry): Record<string, unknown> {
 function convertToRagnoteDBEntry(
   record: Record<string, unknown>
 ): RagnoteDBEntry | null {
-  console.log("returned record: ", record);
   if (
     DatabaseFields.NOTE_PATH in record &&
     DatabaseFields.VECTOR in record &&
