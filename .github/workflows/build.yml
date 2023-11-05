@@ -61,6 +61,8 @@ jobs:
         shell: pwsh
         env:
           RUNNER_OS: ${{ runner.os }}
+      - name: Set version as env
+        run: echo "APP_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
       # Upload build artifacts
       - name: Upload build artifacts
@@ -68,6 +70,6 @@ jobs:
         with:
           name: ${{ matrix.os }}-app
           path: |
-            ./release/${{ matrix.os }}/**/*.exe
-            ./release/${{ matrix.os }}/**/*.AppImage
-            ./release/${{ matrix.os }}/**/*.dmg
+            ./release/${{ matrix.os }}/${{ env.APP_VERSION }}/**/*.exe
+            ./release/${{ matrix.os }}/${{ env.APP_VERSION }}/**/*.AppImage
+            ./release/${{ matrix.os }}/${{ env.APP_VERSION }}/**/*.dmg
