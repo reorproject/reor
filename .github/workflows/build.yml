@@ -1,85 +1,43 @@
-name: Build and Package Electron App
-
-on:
-  push:
-    branches:
-      - main
-
+name: Build/release Electron app
+on: [push, pull_request]
 jobs:
-  build_and_package:
+  release:
     runs-on: ${{ matrix.os }}
-    env:
-      NODE_VERSION: 16
-
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest, macOS-latest]
-
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+      - name: Install Node.js
+        uses: actions/setup-node@v3
         with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      # Cache npm dependencies
-      - name: Cache npm dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-npm-
-
-      # Cache TypeScript output
-      - name: Cache TypeScript build
-        uses: actions/cache@v2
-        with:
-          path: ./dist
-          key: ${{ runner.os }}-tsc-${{ hashFiles('**/tsconfig.json') }}
-          restore-keys: |
-            ${{ runner.os }}-tsc-
-
-      # Install dependencies
-      - name: Install dependencies
+          node-version: 16
+      - name: Install Dependencies
         run: npm install
-
-      # Build the app
-      - name: Build app
-        run: npm run build
-
-      # Package the app for different operating systems
-      - name: Package App
-        run: |
-          if ($env:RUNNER_OS -eq "Windows") {
-          npm run package-win
-          } elseif ($env:RUNNER_OS -eq "Linux") {
-          npm run package-linux
-          } elseif ($env:RUNNER_OS -eq "macOS") {
-          npm run package-mac
-          }
-        shell: pwsh
-        env:
-          RUNNER_OS: ${{ runner.os }}
-
-      # Upload build artifacts
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v2
+      - name: build-linux
+        if: matrix.os == 'ubuntu-latest'
+        run: npm run package-linux
+      - name: build-mac
+        if: matrix.os == 'macos-latest'
+        run: npm run package-mac
+      - name: build-win
+        if: matrix.os == 'windows-latest'
+        run: npm run package-win
+      - name: release
+        uses: softprops/action-gh-release@v1
         with:
-          name: ${{ matrix.os }}-app
-          path: |
-            ./out/**/*.exe
-            ./out/**/*.AppImage
-            ./out/**/*.dmg
-
-# Uncomment the below lines if you want to run E2E tests
-#      # Run E2E tests
-#      - name: Run E2E tests on Ubuntu
-#        if: matrix.os == 'ubuntu-latest'
-#        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run pree2e && npm run e2e
-
-#      - name: Run E2E tests on other OS
-#        if: matrix.os != 'ubuntu-latest'
-#        run: npm run pree2e && npm run e2e
+          draft: true
+          files: |
+            dist/*.exe
+            dist/*.zip
+            dist/*.dmg
+            dist/*.AppImage
+            dist/*.snap
+            dist/*.deb
+            dist/*.rpm
+            dist/*.tar.gz
+            dist/*.yml
+            dist/*.blockmap
+        env:
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
