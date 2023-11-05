@@ -1,43 +1,73 @@
-name: Build/release Electron app
-on: [push, pull_request]
+name: Build and Package Electron App
+
+on:
+  push:
+    branches:
+      - main # Change this to the branch you want to build from
+
 jobs:
-  release:
+  build_and_package:
     runs-on: ${{ matrix.os }}
+
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [windows-latest, ubuntu-latest, macOS-latest]
+
     steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v3
-      - name: Install Node.js
-        uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v3 # Updated to the latest version
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3 # Updated to the latest version
         with:
-          node-version: 16
-      - name: Install Dependencies
+          node-version: "18" # Change this to your preferred Node.js version
+
+      # Cache npm dependencies
+      - name: Cache npm dependencies
+        uses: actions/cache@v3 # Updated to the latest version
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      # Cache TypeScript output
+      - name: Cache TypeScript build
+        uses: actions/cache@v3 # Updated to the latest version
+        with:
+          path: ./dist
+          key: ${{ runner.os }}-tsc-${{ hashFiles('**/tsconfig.json') }}
+          restore-keys: |
+            ${{ runner.os }}-tsc-
+
+      # Install dependencies
+      - name: Install dependencies
         run: npm install
-      - name: build-linux
-        if: matrix.os == 'ubuntu-latest'
-        run: npm run package-linux
-      - name: build-mac
-        if: matrix.os == 'macos-latest'
-        run: npm run package-mac
-      - name: build-win
-        if: matrix.os == 'windows-latest'
-        run: npm run package-win
-      - name: release
-        uses: softprops/action-gh-release@v1
-        with:
-          draft: true
-          files: |
-            release/*.exe
-            release/*.zip
-            release/*.dmg
-            release/*.AppImage
-            release/*.snap
-            release/*.deb
-            release/*.rpm
-            release/*.tar.gz
-            release/*.yml
-            release/*.blockmap
+
+      # Build the app
+      - name: Build app
+        run: npm run build # This should run tsc and vite build
+
+      # Package the app for different operating systems
+      - name: Package App
+        run: |
+          if ($env:RUNNER_OS -eq "Windows") {
+          npm run package-win
+          } elseif ($env:RUNNER_OS -eq "Linux") {
+          npm run package-linux
+          } elseif ($env:RUNNER_OS -eq "macOS") {
+          npm run package-mac
+          }
+        shell: pwsh
         env:
-          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          RUNNER_OS: ${{ runner.os }}
+
+      # Upload build artifacts
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3 # Updated to the latest version
+        with:
+          name: ${{ matrix.os }}-app
+          path: |
+            ./out/**/*.exe
+            ./out/**/*.AppImage
+            ./out/**/*.dmg
