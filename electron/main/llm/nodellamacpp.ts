@@ -6,14 +6,24 @@ export class ModelLoader {
 
   constructor() {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    import("node-llama-cpp").then(async (nodeLLamaCpp: any) => {
-      this.model = new nodeLLamaCpp.LlamaModel({
-        modelPath: path.join(
-          "/Users/sam/Downloads/tinyllama-2-1b-miniguanaco.Q2_K.gguf"
-        ),
-        gpuLayers: 0,
+    import("node-llama-cpp")
+      .then((nodeLLamaCpp: any) => {
+        try {
+          this.model = new nodeLLamaCpp.LlamaModel({
+            modelPath: path.join(
+              "/Users/sam/Downloads/tinyllama-2-1b-miniguanaco.Q2_K.gguf"
+            ),
+            gpuLayers: 0,
+          });
+        } catch (error) {
+          console.error("Error initializing LlamaModel:", error);
+          // Handle or throw the error further if needed
+        }
+      })
+      .catch((error) => {
+        console.error("Error importing node-llama-cpp:", error);
+        // Handle or throw the error further if needed
       });
-    });
   }
 
   public async getModel(): Promise<any> {
