@@ -64,10 +64,10 @@ jobs:
 
       # Upload build artifacts
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3 # Updated to the latest version
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}-app
           path: |
-            ./out/**/*.exe
-            ./out/**/*.AppImage
-            ./out/**/*.dmg
+            ./release/${{ matrix.os }}/**/*.exe
+            ./release/${{ matrix.os }}/**/*.AppImage
+            ./release/${{ matrix.os }}/**/*.dmg
