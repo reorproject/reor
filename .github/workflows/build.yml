@@ -3,11 +3,13 @@ name: Build and Package Electron App
 on:
   push:
     branches:
-      - main # Change this to the branch you want to build from
+      - main
 
 jobs:
   build_and_package:
     runs-on: ${{ matrix.os }}
+    env:
+      NODE_VERSION: 16
 
     strategy:
       matrix:
@@ -20,7 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "18" # Change this to your preferred Node.js version
+          node-version: ${{ env.NODE_VERSION }}
 
       # Cache npm dependencies
       - name: Cache npm dependencies
@@ -46,16 +48,7 @@ jobs:
 
       # Build the app
       - name: Build app
-        run: npm run build # This should run tsc and vite build
-
-      # Run E2E tests
-      #   - name: Run E2E tests on Ubuntu
-      #     if: matrix.os == 'ubuntu-latest'
-      #     run: xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run pree2e && npm run e2e
-
-      #   - name: Run E2E tests on other OS
-      #     if: matrix.os != 'ubuntu-latest'
-      #     run: npm run pree2e && npm run e2e
+        run: npm run build
 
       # Package the app for different operating systems
       - name: Package App
@@ -80,3 +73,13 @@ jobs:
             ./out/**/*.exe
             ./out/**/*.AppImage
             ./out/**/*.dmg
+
+# Uncomment the below lines if you want to run E2E tests
+#      # Run E2E tests
+#      - name: Run E2E tests on Ubuntu
+#        if: matrix.os == 'ubuntu-latest'
+#        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run pree2e && npm run e2e
+
+#      - name: Run E2E tests on other OS
+#        if: matrix.os != 'ubuntu-latest'
+#        run: npm run pree2e && npm run e2e
