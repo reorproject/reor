@@ -49,6 +49,9 @@
     "vite-plugin-electron": "^0.13.0-beta.3",
     "vite-plugin-electron-renderer": "^0.14.5"
   },
+  "optionalDependencies": {
+    "@lancedb/vectordb-win32-x64-msvc": "0.3.6"
+  },
   "engines": {
     "node": "^14.18.0 || >=16.0.0"
   }
