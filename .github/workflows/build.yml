@@ -70,6 +70,6 @@ jobs:
         with:
           name: ${{ matrix.os }}-app
           path: |
-            ./release/${{ matrix.os }}/${{ env.APP_VERSION }}/**/*.exe
-            ./release/${{ matrix.os }}/${{ env.APP_VERSION }}/**/*.AppImage
-            ./release/${{ matrix.os }}/${{ env.APP_VERSION }}/**/*.dmg
+            ./release/${{ env.APP_VERSION }}/**/*.exe
+            ./release/${{ env.APP_VERSION }}/**/*.AppImage
+            ./release/${{ env.APP_VERSION }}/**/*.dmg
