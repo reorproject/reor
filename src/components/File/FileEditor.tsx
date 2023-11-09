@@ -33,16 +33,6 @@ interface FileEditorProps {
   filePath: string;
 }
 
-const markdown = `
-  * Item 1
-  * Item 2
-  * Item 3
-    * nested item
-
-  1. Item 1
-  2. Item 2
-`;
-
 export const FileEditor: React.FC<FileEditorProps> = ({ filePath }) => {
   const [content, setContent] = useState<string>("");
   const ref = useRef<MDXEditorMethods>(null);
@@ -50,10 +40,7 @@ export const FileEditor: React.FC<FileEditorProps> = ({ filePath }) => {
 
   useEffect(() => {
     const fetchContent = async () => {
-      const fileContent = await window.ipcRenderer.invoke(
-        "read-file",
-        filePath
-      );
+      const fileContent = await window.files.readFile(filePath);
       setContent(fileContent);
       ref.current?.setMarkdown(fileContent);
       lastSavedContentRef.current = fileContent; // Initialize with fetched content
@@ -68,7 +55,7 @@ export const FileEditor: React.FC<FileEditorProps> = ({ filePath }) => {
     if (content !== lastSavedContentRef.current) {
       // Check for changes since last save
       console.log("calling save file:");
-      await window.ipcRenderer.invoke("write-file", filePath, content);
+      await window.files.writeFile(filePath, content);
       lastSavedContentRef.current = content; // Update the ref to the latest saved content
     }
   };

@@ -15,7 +15,8 @@ export const FileList: React.FC<FileListProps> = ({ onFileSelect }) => {
 
   useEffect(() => {
     const fetchFiles = async () => {
-      const fetchedFiles = await window.ipcRenderer.invoke("get-files");
+      // const fetchedFiles = await window.ipcRenderer.invoke("get-files");
+      const fetchedFiles = await window.files.getFiles();
       setFiles(fetchedFiles);
     };
     fetchFiles();

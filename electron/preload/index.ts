@@ -4,17 +4,22 @@ type ReceiveCallback = (...args: any[]) => void;
 declare global {
   interface Window {
     ipcRenderer: {
-      send: (channel: string, ...args: any[]) => void;
-      sendSync: (channel: string, ...args: any[]) => any;
-      on: (channel: string, listener: (...args: any[]) => void) => void;
-      once: (channel: string, listener: (...args: any[]) => void) => void;
-      invoke: (channel: string, ...args: any[]) => Promise<any>;
+      // send: (channel: string, ...args: any[]) => void;
+      // sendSync: (channel: string, ...args: any[]) => any;
+      // on: (channel: string, listener: (...args: any[]) => void) => void;
+      // once: (channel: string, listener: (...args: any[]) => void) => void;
+      // invoke: (channel: string, ...args: any[]) => Promise<any>;
       removeListener: (
         channel: string,
         listener: (...args: any[]) => void
       ) => void;
-      removeAllListeners: (channel: string) => void;
+      // removeAllListeners: (channel: string) => void;
       receive: (channel: string, callback: ReceiveCallback) => void;
+    };
+    files: {
+      getFiles: () => Promise<any>;
+      writeFile: (filePath: string, content: string) => Promise<any>;
+      readFile: (filePath: string) => Promise<any>;
     };
     llm: {
       createSession: (sessionId: any) => Promise<any>;
@@ -41,15 +46,32 @@ contextBridge.exposeInMainWorld("electronStore", {
 });
 
 contextBridge.exposeInMainWorld("ipcRenderer", {
-  send: ipcRenderer.send,
-  sendSync: ipcRenderer.sendSync,
-  on: ipcRenderer.on,
-  once: ipcRenderer.once,
-  invoke: ipcRenderer.invoke,
+  // send: ipcRenderer.send,
+  // sendSync: ipcRenderer.sendSync,
+  // on: ipcRenderer.on,
+  // once: ipcRenderer.once,
+  // invoke: ipcRenderer.invoke,
   removeListener: ipcRenderer.removeListener,
-  removeAllListeners: ipcRenderer.removeAllListeners,
+  // removeAllListeners: ipcRenderer.removeAllListeners,
   receive: (channel: string, callback: (...args: any[]) => void) => {
     ipcRenderer.on(channel, (event, ...args) => callback(...args));
+  },
+});
+
+contextBridge.exposeInMainWorld("files", {
+  getFiles: async () => {
+    // No need to pass a channel name as a string literal every time, which can be error-prone
+    return ipcRenderer.invoke("get-files");
+  },
+
+  // Write content to a file
+  writeFile: async (filePath: string, content: string) => {
+    return ipcRenderer.invoke("write-file", filePath, content);
+  },
+
+  // Read content from a file
+  readFile: async (filePath: string) => {
+    return ipcRenderer.invoke("read-file", filePath);
   },
 });
 
