@@ -33,3 +33,4 @@ yarn.lock
 /playwright/.cache/
 
 data
+all-mini-model

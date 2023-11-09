@@ -103,35 +103,42 @@ async function downloadAndSaveFile(
 
   // Join the systemFilePath and filePath to create the full path
   const fullPath = path.join(systemFilePath, filePath);
-
+  const directory = path.dirname(fullPath);
+  if (!fs.existsSync(directory)) {
+    fs.mkdirSync(directory, { recursive: true });
+  }
   // Save the Buffer to the full path
   fs.writeFileSync(fullPath, buffer);
 }
 
 export const testDownload = async () => {
   // first let's list the files:
-  const fileList = await listFiles({ repo: "mikaelsouza/msft-smaller-model" });
+  const fileList = await listFiles({
+    repo: "Xenova/all-MiniLM-L6-v2",
+    // path: "onnx",
+    recursive: true,
+  });
   let files = [];
   for await (let file of fileList) {
-    files.push(file);
+    if (file.type === "file") {
+      files.push(file);
+    }
   }
 
-  // Now, the 'files' array contains the list of files
   console.log(files);
   console.log("FILES", files);
-  // const allFiles = await retrieveAllFiles("Xenova/jina-embeddings-v2-base-en");
-  // console.log("ALL FILES", allFiles);
 
-  //   console.log("FILES WE HAVE: ", files);
-  //   console.log("starting download");
-  // const res = await downloadFile({
-  //   repo: "mikaelsouza/msft-smaller-model",
-  //   path: "config.json",
-  // });
-  downloadAndSaveFile(
-    "mikaelsouza/msft-smaller-model",
-    "config.json",
-    "/Users/sam/Desktop/vite-ragnote"
-  );
-  // console.log("DOWNLOAD RES", res);
+  // call downloadAndSaveFile for each file
+  for await (let file of files) {
+    await downloadAndSaveFile(
+      "Xenova/all-MiniLM-L6-v2",
+      file.path,
+      "/Users/sam/Desktop/vite-ragnote/all-mini-model"
+    );
+  }
+  // downloadAndSaveFile(
+  //   "Xenova/jina-embeddings-v2-base-en",
+  //   "config.json",
+  //   "/Users/sam/Desktop/vite-ragnote/testdownloads"
+  // );
 };

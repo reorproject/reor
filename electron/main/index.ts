@@ -111,7 +111,10 @@ app.whenReady().then(async () => {
   // console.log(pipe);
   dbConnection = await lancedb.connect("data/sample-lancedb");
   // db.dropTable("test-table");
+
+  // So we could just try this:
   await dbTable.initialize(dbConnection, "test-table");
+  // if error pipeline not initialized, we tell the frontend what to show...
   // dbTable = await GetOrCreateTable(dbConnection, "test-table");
   // // console.log("table schema",)
   // console.log("CALLING ADD:");
