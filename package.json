@@ -13,11 +13,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
-    "package": "electron-builder",
-    "package-win": "electron-builder build --windows",
-    "package-linux": "electron-builder build --linux",
-    "package-mac": "electron-builder build --mac",
+    "build": "tsc && vite build && electron-builder",
     "preview": "vite preview",
     "pree2e": "vite build --mode=test",
     "e2e": "playwright test"

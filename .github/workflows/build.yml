@@ -49,18 +49,18 @@ jobs:
         run: npm run build # This should run tsc and vite build
 
       # Package the app for different operating systems
-      - name: Package App
-        run: |
-          if ($env:RUNNER_OS -eq "Windows") {
-          npm run package-win
-          } elseif ($env:RUNNER_OS -eq "Linux") {
-          npm run package-linux
-          } elseif ($env:RUNNER_OS -eq "macOS") {
-          npm run package-mac
-          }
-        shell: pwsh
-        env:
-          RUNNER_OS: ${{ runner.os }}
+      # - name: Package App
+      #   run: |
+      #     if ($env:RUNNER_OS -eq "Windows") {
+      #     npm run package-win
+      #     } elseif ($env:RUNNER_OS -eq "Linux") {
+      #     npm run package-linux
+      #     } elseif ($env:RUNNER_OS -eq "macOS") {
+      #     npm run package-mac
+      #     }
+      #   shell: pwsh
+      #   env:
+      #     RUNNER_OS: ${{ runner.os }}
       - name: Set version as env
         run: echo "APP_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
