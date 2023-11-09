@@ -31,6 +31,7 @@ import {
 } from "apache-arrow";
 import { DatabaseFields } from "./embeddings/Schema";
 import { RagnoteTable } from "./embeddings/Table";
+import { testDownload } from "./download/download";
 
 const store = new Store<StoreSchema>();
 
@@ -138,6 +139,8 @@ app.whenReady().then(async () => {
   // // const results = await query.filter("sdfjapsofd").execute();
   // console.log("results", results);
   // const search = table.search(null);
+  testDownload().catch((error) => console.error(error));
+
   createWindow();
 });
 

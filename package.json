@@ -19,6 +19,7 @@
     "e2e": "playwright test"
   },
   "dependencies": {
+    "@huggingface/hub": "^0.12.0",
     "@mdxeditor/editor": "^1.6.0",
     "@tailwindcss/typography": "^0.5.10",
     "@xenova/transformers": "^2.7.0",
