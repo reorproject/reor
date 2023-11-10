@@ -11,8 +11,9 @@ const GetOrCreateTable = async (
   const tableNames = await db.tableNames();
   // console.log("tableNames", tableNames);
   const embedFunc = await createEmbeddingFunction(
-    "all-MiniLM-L6-v2",
-    "content"
+    "Xenova/e5-base-v2",
+    "content",
+    "/Users/sam/Desktop"
   );
   if (tableNames.includes(name)) {
     return db.openTable(name, embedFunc);
@@ -21,7 +22,7 @@ const GetOrCreateTable = async (
 
   const newTable = await db.createTable({
     name,
-    schema: CreateDatabaseSchema(384),
+    schema: CreateDatabaseSchema(768),
     embeddingFunction: embedFunc,
   });
   // console.log("newTable", newTable);

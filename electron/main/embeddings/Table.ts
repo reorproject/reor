@@ -21,6 +21,7 @@ export class RagnoteTable {
   }
 
   async add(data: RagnoteDBEntry[]): Promise<void> {
+    console.log("CALLING ADD METHOD WITH THE FOLLOWING ARGS: ", data);
     const recordEntry: Record<string, unknown>[] = data as unknown as Record<
       string,
       unknown

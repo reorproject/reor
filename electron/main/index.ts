@@ -31,7 +31,7 @@ import {
 } from "apache-arrow";
 import { DatabaseFields } from "./embeddings/Schema";
 import { RagnoteTable } from "./embeddings/Table";
-import { testDownload } from "./download/download";
+// import { testDownload } from "./download/download";
 
 const store = new Store<StoreSchema>();
 
@@ -142,7 +142,7 @@ app.whenReady().then(async () => {
   // // const results = await query.filter("sdfjapsofd").execute();
   // console.log("results", results);
   // const search = table.search(null);
-  testDownload().catch((error) => console.error(error));
+  // testDownload().catch((error) => console.error(error));
 
   createWindow();
 });
@@ -352,43 +352,43 @@ const updateNoteInDB = async (
   ]);
 };
 
-const modelLoader = new ModelLoader(); // Singleton
-const sessions: { [sessionId: string]: SessionService } = {};
+// const modelLoader = new ModelLoader(); // Singleton
+// const sessions: { [sessionId: string]: SessionService } = {};
 
-ipcMain.handle("createSession", async (event, sessionId: string) => {
-  if (sessions[sessionId]) {
-    throw new Error(`Session ${sessionId} already exists.`);
-  }
-  // sessionService.webContents = event.sender; // Attach the webContents of the sender to your session service
-  const webContents = event.sender;
-  const sessionService = new SessionService(modelLoader, webContents);
-  sessions[sessionId] = sessionService;
-  return sessionId;
-});
+// ipcMain.handle("createSession", async (event, sessionId: string) => {
+//   if (sessions[sessionId]) {
+//     throw new Error(`Session ${sessionId} already exists.`);
+//   }
+//   // sessionService.webContents = event.sender; // Attach the webContents of the sender to your session service
+//   const webContents = event.sender;
+//   const sessionService = new SessionService(modelLoader, webContents);
+//   sessions[sessionId] = sessionService;
+//   return sessionId;
+// });
 
-ipcMain.handle("getHello", async (event, sessionId: string) => {
-  const sessionService = sessions[sessionId];
-  if (!sessionService) {
-    throw new Error(`Session ${sessionId} does not exist.`);
-  }
+// ipcMain.handle("getHello", async (event, sessionId: string) => {
+//   const sessionService = sessions[sessionId];
+//   if (!sessionService) {
+//     throw new Error(`Session ${sessionId} does not exist.`);
+//   }
 
-  console.log("getting hello");
-  const getHelloResponse = await sessionService.getHello();
-  console.log("getHelloResponse", getHelloResponse);
-  return getHelloResponse;
-});
+//   console.log("getting hello");
+//   const getHelloResponse = await sessionService.getHello();
+//   console.log("getHelloResponse", getHelloResponse);
+//   return getHelloResponse;
+// });
 
-ipcMain.handle(
-  "initializeStreamingResponse",
-  async (event, sessionId: string, prompt: string) => {
-    const sessionService = sessions[sessionId];
-    if (!sessionService) {
-      throw new Error(`Session ${sessionId} does not exist.`);
-    }
+// ipcMain.handle(
+//   "initializeStreamingResponse",
+//   async (event, sessionId: string, prompt: string) => {
+//     const sessionService = sessions[sessionId];
+//     if (!sessionService) {
+//       throw new Error(`Session ${sessionId} does not exist.`);
+//     }
 
-    return sessionService.streamingPrompt(prompt);
-  }
-);
+//     return sessionService.streamingPrompt(prompt);
+//   }
+// );
 
 export async function convertToTable<T>(
   data: Array<Record<string, unknown>>,

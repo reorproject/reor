@@ -111,34 +111,30 @@ async function downloadAndSaveFile(
   fs.writeFileSync(fullPath, buffer);
 }
 
-export const testDownload = async () => {
-  // first let's list the files:
+export const DownloadModelFilesFromHFRepo = async (
+  repo: string,
+  // path: string,
+  saveDirectory: string
+) => {
+  // List the files:
   const fileList = await listFiles({
-    repo: "Xenova/all-MiniLM-L6-v2",
-    // path: "onnx",
+    repo: repo,
+    // path: path,
     recursive: true,
   });
-  let files = [];
+
+  const files = [];
   for await (let file of fileList) {
     if (file.type === "file") {
       files.push(file);
     }
   }
 
-  console.log(files);
-  console.log("FILES", files);
+  // Create an array of promises for each file download:
+  const downloadPromises = files.map((file) =>
+    downloadAndSaveFile(repo, file.path, saveDirectory)
+  );
 
-  // call downloadAndSaveFile for each file
-  for await (let file of files) {
-    await downloadAndSaveFile(
-      "Xenova/all-MiniLM-L6-v2",
-      file.path,
-      "/Users/sam/Desktop/vite-ragnote/all-mini-model"
-    );
-  }
-  // downloadAndSaveFile(
-  //   "Xenova/jina-embeddings-v2-base-en",
-  //   "config.json",
-  //   "/Users/sam/Desktop/vite-ragnote/testdownloads"
-  // );
+  // Execute all download promises in parallel:
+  await Promise.all(downloadPromises);
 };

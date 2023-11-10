@@ -1,5 +1,7 @@
 import * as lancedb from "vectordb";
 import { Pipeline } from "@xenova/transformers";
+// Import path library:
+import path from "path";
 
 // import { pipeline } from '@xenova/transformers';
 
@@ -30,14 +32,21 @@ const pipe: any = null;
 // );
 
 export async function createEmbeddingFunction(
-  modelName: string, // all-MiniLM-L6-v2
+  repoName: string, // all-MiniLM-L6-v2
   sourceColumn: string
+  // embeddingModelsPath: string
 ): Promise<lancedb.EmbeddingFunction<string>> {
   let pipe: Pipeline;
   try {
+    console.log("SETTING UP EMBEDDING FUNCTION WITH THE FOLLOWING ARGS: ", {
+      repoName,
+      sourceColumn,
+      // embeddingModelsPath,
+    });
+    // const modelPath = path.join(embeddingModelsPath, repoName);
     const { pipeline, env } = await import("@xenova/transformers");
-    env.localModelPath = "/Users/sam/Desktop";
-    pipe = await pipeline("feature-extraction", modelName);
+    // env.localModelPath = embeddingModelsPath;
+    pipe = await pipeline("feature-extraction", repoName);
   } catch (error) {
     console.error("Failed to initialize pipeline", error);
     throw new Error("Pipeline initialization failed");
