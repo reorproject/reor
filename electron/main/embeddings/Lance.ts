@@ -12,8 +12,7 @@ const GetOrCreateTable = async (
   // console.log("tableNames", tableNames);
   const embedFunc = await createEmbeddingFunction(
     "Xenova/e5-base-v2",
-    "content",
-    "/Users/sam/Desktop"
+    "content"
   );
   if (tableNames.includes(name)) {
     return db.openTable(name, embedFunc);
