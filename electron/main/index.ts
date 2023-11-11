@@ -119,7 +119,10 @@ async function createWindow() {
 app.whenReady().then(async () => {
   // const pipe = await setupPipeline("Xenova/all-MiniLM-L6-v2");
   // console.log(pipe);
-  dbConnection = await lancedb.connect("data/sample-lancedb");
+  console.log("PATH IS: ", path.join(app.getPath("userData"), "vectordb"));
+  dbConnection = await lancedb.connect(
+    path.join(app.getPath("userData"), "vectordb")
+  );
   // db.dropTable("test-table");
 
   // So we could just try this:
