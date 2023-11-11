@@ -17,6 +17,7 @@ declare global {
       receive: (channel: string, callback: ReceiveCallback) => void;
     };
     files: {
+      openDirectoryDialog: () => Promise<any>;
       getFiles: () => Promise<any>;
       writeFile: (filePath: string, content: string) => Promise<any>;
       readFile: (filePath: string) => Promise<any>;
@@ -59,6 +60,7 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
 });
 
 contextBridge.exposeInMainWorld("files", {
+  openDirectoryDialog: () => ipcRenderer.invoke("open-directory-dialog"),
   getFiles: async () => {
     // No need to pass a channel name as a string literal every time, which can be error-prone
     return ipcRenderer.invoke("get-files");

@@ -6,7 +6,7 @@ interface Props {
 
 const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
   const handleDirectorySelection = async () => {
-    const path = await window.ipcRenderer.invoke("open-directory-dialog");
+    const path = await window.files.openDirectoryDialog();
     if (path) {
       window.electronStore.setUserDirectory(path);
       onDirectorySelected(path);
