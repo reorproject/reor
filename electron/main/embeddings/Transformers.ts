@@ -49,7 +49,7 @@ export async function createEmbeddingFunction(
     pipe = await pipeline("feature-extraction", repoName);
   } catch (error) {
     console.error("Failed to initialize pipeline", error);
-    throw new Error("Pipeline initialization failed");
+    throw error;
   }
   return {
     sourceColumn,

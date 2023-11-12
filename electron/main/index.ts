@@ -120,19 +120,17 @@ app.whenReady().then(async () => {
   // const pipe = await setupPipeline("Xenova/all-MiniLM-L6-v2");
   // console.log(pipe);
   console.log("PATH IS: ", path.join(app.getPath("userData"), "vectordb"));
+  
+let dbConnection;
+
+try {
   dbConnection = await lancedb.connect(
     path.join(app.getPath("userData"), "vectordb")
   );
-  // db.dropTable("test-table");
 
-  // So we could just try this:
   await dbTable.initialize(dbConnection, "test-table");
-  // if error pipeline not initialized, we tell the frontend what to show...
-  // dbTable = await GetOrCreateTable(dbConnection, "test-table");
-  // // console.log("table schema",)
-  // console.log("CALLING ADD:");
-  const currentTimestamp: Date = new Date();
-  // console.log("currentTimestamp", currentTimestamp);
+
+  const currentTimestamp = new Date();
   await dbTable.add([
     {
       notepath: "test-path",
@@ -141,11 +139,24 @@ app.whenReady().then(async () => {
       timeadded: currentTimestamp,
     },
   ]);
+
   const result = await dbTable.search("h", 2);
-  // console.log("result", result);
   const filterResult = await dbTable.filter(
     `${DatabaseFields.NOTE_PATH} == "test-path"`
   );
+
+  // Add any additional code here to handle the results or further processing
+} catch (error) {
+  console.error("An error occurred:", error);
+
+  // Writing the error to a file
+  const logFilePath = path.join("C:\\Users\\Sam\\Desktop\\ragnote", "errorLog.txt");
+  fs.appendFileSync(logFilePath, `[${new Date().toISOString()}] ${error}\n`, 'utf8');
+
+  // Handle the error appropriately, like notifying the user or rethrowing
+}
+const logFilePath = path.join("C:\\Users\\Sam\\Desktop\\ragnote", "errorLog.txt");
+  fs.appendFileSync(logFilePath, `[${new Date().toISOString()}] hellso\n`, 'utf8');
   // console.log("filterResult", filterResult);
   // console.log("filterResult", filterResult);
   // console.log("STARTING QUERY");
