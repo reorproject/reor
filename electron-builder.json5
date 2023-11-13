@@ -24,6 +24,12 @@
     allowToChangeInstallationDirectory: true,
     deleteAppDataOnUninstall: false,
   },
+  snap: {
+    stagePackages: ["fuse", "libfuse2", "libvips", "libvips-dev"],
+  },
+  linux: {
+    target: ["snap"],
+  },
   publish: {
     provider: "generic",
     channel: "latest",
