@@ -2,6 +2,8 @@ import * as lancedb from "vectordb";
 import { Pipeline } from "@xenova/transformers";
 // Import path library:
 import path from "path";
+import { DownloadModelFilesFromHFRepo } from "../download/download";
+import { app } from "electron";
 
 // import { pipeline } from '@xenova/transformers';
 
@@ -10,17 +12,17 @@ import path from "path";
 
 // const pipe = requireESM('@xenova/transformers');
 
-export const setupPipeline = async (modelName: string) => {
-  /*
-  just noting for future explorers that we do a dynamic import because transformers.js is an ESM module,
-  and this repo is not yet and so doing the import at the top pollutes
-  this repo turning it into an ESM repo... super annoying and the whole industry
-  is dealing with this problem now as we transition into ESM.
-  */
-  const { pipeline } = await import("@xenova/transformers");
-  return pipeline("feature-extraction", modelName);
-};
-const pipe: any = null;
+// export const setupPipeline = async (modelName: string) => {
+//   /*
+//   just noting for future explorers that we do a dynamic import because transformers.js is an ESM module,
+//   and this repo is not yet and so doing the import at the top pollutes
+//   this repo turning it into an ESM repo... super annoying and the whole industry
+//   is dealing with this problem now as we transition into ESM.
+//   */
+//   const { pipeline } = await import("@xenova/transformers");
+//   return pipeline("feature-extraction", modelName);
+// };
+// const pipe: any = null;
 
 // async function initPipe() {
 //   const { pipeline } = await import('@xenova/transformers');
@@ -44,9 +46,19 @@ export async function createEmbeddingFunction(
       // embeddingModelsPath,
     });
     // const modelPath = path.join(embeddingModelsPath, repoName);
+    // await DownloadModelFilesFromHFRepo(repoName, embeddingModelsPath);
     const { pipeline, env } = await import("@xenova/transformers");
     // env.localModelPath = embeddingModelsPath;
-    pipe = await pipeline("feature-extraction", repoName);
+    // env.allowRemoteModels = false;
+    // env.allowLocalModels = true;
+    console.log(
+      "CACHE DIR IS: ",
+      path.join(app.getPath("userData"), "transformers-cache")
+    );
+    env.cacheDir = path.join(app.getPath("userData"), "transformers-cache");
+    pipe = await pipeline("feature-extraction", repoName, {
+      cache_dir: path.join(app.getPath("userData"), "transformers-cache"),
+    });
   } catch (error) {
     console.error("Failed to initialize pipeline", error);
     throw error;

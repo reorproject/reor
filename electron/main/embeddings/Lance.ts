@@ -2,6 +2,8 @@ import * as lancedb from "vectordb";
 // import { Schema } from 'apache-arrow';
 import CreateDatabaseSchema from "./Schema";
 import { createEmbeddingFunction } from "./Transformers";
+import os from "os";
+import path from "path";
 // get or create a lancedb table
 
 const GetOrCreateTable = async (
@@ -12,7 +14,8 @@ const GetOrCreateTable = async (
   // console.log("tableNames", tableNames);
   const embedFunc = await createEmbeddingFunction(
     "Xenova/e5-base-v2",
-    "content"
+    "content",
+    path.join(os.homedir(), "Desktop", "ragnote-embeddings")
   );
   if (tableNames.includes(name)) {
     return db.openTable(name, embedFunc);

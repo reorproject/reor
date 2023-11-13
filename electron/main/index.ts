@@ -7,10 +7,10 @@ import * as path from "path";
 import * as fs from "fs";
 import { StoreKeys, StoreSchema } from "./storeConfig";
 import { ModelLoader, SessionService } from "./llm/nodellamacpp";
-import {
-  createEmbeddingFunction,
-  setupPipeline,
-} from "./embeddings/Transformers";
+// import {
+//   createEmbeddingFunction,
+//   setupPipeline,
+// } from "./embeddings/Transformers";
 import * as lancedb from "vectordb";
 import GetOrCreateTable from "./embeddings/Lance";
 import {
@@ -117,20 +117,20 @@ async function createWindow() {
 }
 
 app.whenReady().then(async () => {
-  // const pipe = await setupPipeline("Xenova/all-MiniLM-L6-v2");
-  // console.log(pipe);
   console.log("PATH IS: ", path.join(app.getPath("userData"), "vectordb"));
-  
-let dbConnection;
-
-try {
   dbConnection = await lancedb.connect(
     path.join(app.getPath("userData"), "vectordb")
   );
+  // db.dropTable("test-table");
 
+  // So we could just try this:
   await dbTable.initialize(dbConnection, "test-table");
-
-  const currentTimestamp = new Date();
+  // if error pipeline not initialized, we tell the frontend what to show...
+  // dbTable = await GetOrCreateTable(dbConnection, "test-table");
+  // // console.log("table schema",)
+  // console.log("CALLING ADD:");
+  const currentTimestamp: Date = new Date();
+  // console.log("currentTimestamp", currentTimestamp);
   await dbTable.add([
     {
       notepath: "test-path",
@@ -139,24 +139,11 @@ try {
       timeadded: currentTimestamp,
     },
   ]);
-
   const result = await dbTable.search("h", 2);
+  // console.log("result", result);
   const filterResult = await dbTable.filter(
     `${DatabaseFields.NOTE_PATH} == "test-path"`
   );
-
-  // Add any additional code here to handle the results or further processing
-} catch (error) {
-  console.error("An error occurred:", error);
-
-  // Writing the error to a file
-  const logFilePath = path.join("C:\\Users\\Sam\\Desktop\\ragnote", "errorLog.txt");
-  fs.appendFileSync(logFilePath, `[${new Date().toISOString()}] ${error}\n`, 'utf8');
-
-  // Handle the error appropriately, like notifying the user or rethrowing
-}
-const logFilePath = path.join("C:\\Users\\Sam\\Desktop\\ragnote", "errorLog.txt");
-  fs.appendFileSync(logFilePath, `[${new Date().toISOString()}] hellso\n`, 'utf8');
   // console.log("filterResult", filterResult);
   // console.log("filterResult", filterResult);
   // console.log("STARTING QUERY");
@@ -376,43 +363,43 @@ const updateNoteInDB = async (
   ]);
 };
 
-// const modelLoader = new ModelLoader(); // Singleton
-// const sessions: { [sessionId: string]: SessionService } = {};
+const modelLoader = new ModelLoader(); // Singleton
+const sessions: { [sessionId: string]: SessionService } = {};
 
-// ipcMain.handle("createSession", async (event, sessionId: string) => {
-//   if (sessions[sessionId]) {
-//     throw new Error(`Session ${sessionId} already exists.`);
-//   }
-//   // sessionService.webContents = event.sender; // Attach the webContents of the sender to your session service
-//   const webContents = event.sender;
-//   const sessionService = new SessionService(modelLoader, webContents);
-//   sessions[sessionId] = sessionService;
-//   return sessionId;
-// });
+ipcMain.handle("createSession", async (event, sessionId: string) => {
+  if (sessions[sessionId]) {
+    throw new Error(`Session ${sessionId} already exists.`);
+  }
+  // sessionService.webContents = event.sender; // Attach the webContents of the sender to your session service
+  const webContents = event.sender;
+  const sessionService = new SessionService(modelLoader, webContents);
+  sessions[sessionId] = sessionService;
+  return sessionId;
+});
 
-// ipcMain.handle("getHello", async (event, sessionId: string) => {
-//   const sessionService = sessions[sessionId];
-//   if (!sessionService) {
-//     throw new Error(`Session ${sessionId} does not exist.`);
-//   }
+ipcMain.handle("getHello", async (event, sessionId: string) => {
+  const sessionService = sessions[sessionId];
+  if (!sessionService) {
+    throw new Error(`Session ${sessionId} does not exist.`);
+  }
 
-//   console.log("getting hello");
-//   const getHelloResponse = await sessionService.getHello();
-//   console.log("getHelloResponse", getHelloResponse);
-//   return getHelloResponse;
-// });
+  console.log("getting hello");
+  const getHelloResponse = await sessionService.getHello();
+  console.log("getHelloResponse", getHelloResponse);
+  return getHelloResponse;
+});
 
-// ipcMain.handle(
-//   "initializeStreamingResponse",
-//   async (event, sessionId: string, prompt: string) => {
-//     const sessionService = sessions[sessionId];
-//     if (!sessionService) {
-//       throw new Error(`Session ${sessionId} does not exist.`);
-//     }
+ipcMain.handle(
+  "initializeStreamingResponse",
+  async (event, sessionId: string, prompt: string) => {
+    const sessionService = sessions[sessionId];
+    if (!sessionService) {
+      throw new Error(`Session ${sessionId} does not exist.`);
+    }
 
-//     return sessionService.streamingPrompt(prompt);
-//   }
-// );
+    return sessionService.streamingPrompt(prompt);
+  }
+);
 
 export async function convertToTable<T>(
   data: Array<Record<string, unknown>>,

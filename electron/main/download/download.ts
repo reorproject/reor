@@ -82,17 +82,17 @@ import * as path from "path";
 
 async function downloadAndSaveFile(
   repo: string,
-  filePath: string,
+  HFFilePath: string,
   systemFilePath: string
 ): Promise<void> {
   // Call the downloadFile function and await its result
   const res = await downloadFile({
     repo: repo,
-    path: filePath,
+    path: HFFilePath,
   });
 
   if (!res) {
-    throw new Error(`Failed to download file from ${repo}/${filePath}`);
+    throw new Error(`Failed to download file from ${repo}/${HFFilePath}`);
   }
 
   // Convert the Response object to an ArrayBuffer
@@ -102,7 +102,7 @@ async function downloadAndSaveFile(
   const buffer = Buffer.from(arrayBuffer);
 
   // Join the systemFilePath and filePath to create the full path
-  const fullPath = path.join(systemFilePath, filePath);
+  const fullPath = path.join(systemFilePath, HFFilePath);
   const directory = path.dirname(fullPath);
   if (!fs.existsSync(directory)) {
     fs.mkdirSync(directory, { recursive: true });
@@ -132,7 +132,7 @@ export const DownloadModelFilesFromHFRepo = async (
 
   // Create an array of promises for each file download:
   const downloadPromises = files.map((file) =>
-    downloadAndSaveFile(repo, file.path, saveDirectory)
+    downloadAndSaveFile(repo, file.path, path.join(saveDirectory, repo))
   );
 
   // Execute all download promises in parallel:
