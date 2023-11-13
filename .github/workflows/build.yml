@@ -43,15 +43,14 @@ jobs:
       # Install dependencies
       - name: Install dependencies
         run: npm install
-
-      # Build the app
-      - name: Build app
-        run: npm run build # This should run tsc and vite build
-
       # Install snapcraft on Linux
       - name: Install snapcraft on Linux
         run: sudo snap install snapcraft --classic
         if: runner.os == 'Linux'
+
+      # Build the app
+      - name: Build app
+        run: npm run build # This should run tsc and vite build
 
       # Set version as env
       - name: Set version as env
