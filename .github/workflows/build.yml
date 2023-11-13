@@ -44,21 +44,23 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-        # Install snapcraft on Linux
-      - name: Install snapcraft on Linux
-        run: sudo snap install snapcraft --classic
-        if: runner.os == 'Linux'
-
-      # Install multipass on Linux
-      - name: Install multipass on Linux
-        run: sudo snap install multipass --classic
-        if: runner.os == 'Linux'
-
-        # Build the app
+      # Build the app
       - name: Build app
         run: npm run build # This should run tsc and vite build
 
-      # Set version as env
+      # Package the app for different operating systems
+      # - name: Package App
+      #   run: |
+      #     if ($env:RUNNER_OS -eq "Windows") {
+      #     npm run package-win
+      #     } elseif ($env:RUNNER_OS -eq "Linux") {
+      #     npm run package-linux
+      #     } elseif ($env:RUNNER_OS -eq "macOS") {
+      #     npm run package-mac
+      #     }
+      #   shell: pwsh
+      #   env:
+      #     RUNNER_OS: ${{ runner.os }}
       - name: Set version as env
         run: echo "APP_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
