@@ -14,8 +14,8 @@ const GetOrCreateTable = async (
   // console.log("tableNames", tableNames);
   const embedFunc = await createEmbeddingFunction(
     "Xenova/e5-base-v2",
-    "content",
-    path.join(os.homedir(), "Desktop", "ragnote-embeddings")
+    "content"
+    // path.join(os.homedir(), "Desktop", "ragnote-embeddings")
   );
   if (tableNames.includes(name)) {
     return db.openTable(name, embedFunc);
