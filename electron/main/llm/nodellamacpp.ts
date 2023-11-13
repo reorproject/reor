@@ -1,4 +1,5 @@
 import path from "path";
+import os from "os";
 // import * as nodeLLamaCpp from "node-llama-cpp";
 
 export class ModelLoader {
@@ -11,7 +12,9 @@ export class ModelLoader {
         try {
           this.model = new nodeLLamaCpp.LlamaModel({
             modelPath: path.join(
-              "/Users/sam/Downloads/tinyllama-2-1b-miniguanaco.Q2_K.gguf"
+              os.homedir(),
+              "Downloads",
+              "tinyllama-2-1b-miniguanaco.Q2_K.gguf"
             ),
             gpuLayers: 0,
           });
