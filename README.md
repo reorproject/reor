@@ -80,6 +80,13 @@ export default {
 ```
 -->
 
+## Ubuntu/Debian install
+The following extra packages are needed to run on Debian-based systems: ```libvips```, ```libvips-dev```, ```fuse```, ```libfuse2```. Run the following:
+```
+sudo apt update
+sudo apt install fuse libfuse2 libvips libvips-dev
+```
+
 ## 🔧 Additional features
 
 1. electron-updater 👉 [see docs](src/components/update/README.md)
