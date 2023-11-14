@@ -29,12 +29,12 @@
     target: [
       {
         target: "deb",
-        arch: ["x64", "ia32", "armv7l", "arm64"], // Specify architectures as needed
+        arch: ["x64", "arm64"], // Specify architectures as needed
         // Additional specific properties can go here
       },
       {
         target: "rpm",
-        arch: ["x64", "ia32", "armv7l", "arm64"], // Specify architectures as needed
+        arch: ["x64", "arm64"], // Specify architectures as needed
         // Additional specific properties can go here
       },
     ],
@@ -45,7 +45,7 @@
     desktop: {
       // Desktop file properties
     },
-   // depends: ["fuse", "libfuse2", "libvips"], // List your dependencies here
+    // depends: ["fuse", "libfuse2", "libvips"], // List your dependencies here
     artifactName: "${productName}_${version}.${ext}",
   },
   publish: {
