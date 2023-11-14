@@ -42,13 +42,11 @@
     synopsis: "Short description of your app",
     description: "Full description of your app",
     // mimeType: ["x-scheme-handler/your-custom-protocol"], // If you have custom URL handlers
-    // Additional desktop entries can be defined here
-  },
-  deb: {
-    depends: ["fuse", "libfuse2", "libvips"], // Dependencies specific to the .deb package
-  },
-  rpm: {
-    requires: ["fuse", "libfuse2", "libvips"], // Dependencies specific to the .rpm package
+    desktop: {
+      // Desktop file properties
+    },
+   // depends: ["fuse", "libfuse2", "libvips"], // List your dependencies here
+    artifactName: "${productName}_${version}.${ext}",
   },
   publish: {
     provider: "generic",
