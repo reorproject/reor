@@ -26,19 +26,26 @@ function App() {
   }, [selectedFile]);
 
   return (
-    <>
+    <div className="min-h-screen min-w-full mt-0">
       {/* <FileViewer directory="/Users/sam/Desktop/electron-forge-react-typescript-tailwind" /> */}
       {directory ? (
-        <div>
-          <h1>Directory is set to: {directory}</h1>
-          <FileList onFileSelect={(path) => setSelectedFile(path)} />
-          {selectedFile && <FileEditor filePath={selectedFile} />}
+        <div className="flex">
+          <div className="w-[300px]">
+            {" "}
+            {/* Replace 300px with the desired fixed width */}
+            <FileList onFileSelect={(path) => setSelectedFile(path)} />
+          </div>
+          {selectedFile && (
+            <div className="flex-grow">
+              <FileEditor filePath={selectedFile} />
+            </div>
+          )}
         </div>
       ) : (
         <DirectoryPicker onDirectorySelected={handleDirectorySelected} />
       )}
-      <LLM />
-    </>
+      {/* <LLM /> */}
+    </div>
   );
 }
 export default App;

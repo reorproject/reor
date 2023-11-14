@@ -15,7 +15,7 @@ export const FileList: React.FC<FileListProps> = ({ onFileSelect }) => {
 
   useEffect(() => {
     const fetchFiles = async () => {
-      // const fetchedFiles = await window.ipcRenderer.invoke("get-files");
+      // Fetch files logic here
       const fetchedFiles = await window.files.getFiles();
       setFiles(fetchedFiles);
     };
@@ -23,16 +23,18 @@ export const FileList: React.FC<FileListProps> = ({ onFileSelect }) => {
   }, []);
 
   return (
-    <div className="p-4">
-      {files.map((file, index) => (
-        <button
-          key={index}
-          onClick={() => onFileSelect(file.path)}
-          className="border p-2 mb-2 w-full"
-        >
-          {file.name}
-        </button>
-      ))}
+    <div className="flex flex-col bg-gray-900 text-white h-screen">
+      <div className="overflow-y-auto">
+        {files.map((file, index) => (
+          <button
+            key={index}
+            onClick={() => onFileSelect(file.path)}
+            className="text-white py-2 border-0 transition-colors duration-150 ease-in-out w-full bg-transparent focus:outline-none hover:bg-gray-800"
+          >
+            <span className="truncate">{file.name}</span>
+          </button>
+        ))}
+      </div>
     </div>
   );
 };

@@ -74,14 +74,13 @@ export const FileEditor: React.FC<FileEditorProps> = ({ filePath }) => {
 
   return (
     <div className="p-4">
-      <button onClick={() => ref.current?.setMarkdown("new markdown")}>
+      {/* <button onClick={() => ref.current?.setMarkdown("new markdown")}>
         Set new markdown
       </button>
       <button onClick={() => console.log(ref.current?.getMarkdown())}>
         Get markdown
-      </button>
+      </button> */}
       {/* <MDXEditor ref={ref} markdown="hello world" onChange={console.log} />{" "} */}
-      return{" "}
       <MDXEditor
         ref={ref}
         onChange={setContent}
