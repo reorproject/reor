@@ -109,9 +109,9 @@ export const FileEditor: React.FC<FileEditorProps> = ({ filePath }) => {
           }),
         ]}
       /> */}
-      <button onClick={saveFile} className="mt-4 bg-blue-500 text-white p-2">
+      {/* <button onClick={saveFile} className="mt-4 bg-blue-500 text-white p-2">
         Save
-      </button>
+      </button> */}
     </div>
   );
 };
