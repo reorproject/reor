@@ -1,6 +1,8 @@
 import { Connection, Table as LanceDBTable, Query } from "vectordb";
 import GetOrCreateTable from "./Lance";
 import { DatabaseFields } from "./Schema";
+import fs from "fs";
+import path from "path";
 
 interface RagnoteDBEntry {
   notepath: string;
@@ -12,10 +14,10 @@ interface RagnoteDBEntry {
 
 export class RagnoteTable {
   // implements Table
-  private table!: LanceDBTable<string>;
+  public table!: LanceDBTable<string>;
   private embeddingModelHFRepo = "Xenova/all-MiniLM-L6-v2";
 
-  async initialize(dbConnection: Connection, tableName: string) {
+  async initialize(dbConnection: Connection) {
     this.table = await GetOrCreateTable(
       dbConnection,
       this.embeddingModelHFRepo
@@ -75,6 +77,71 @@ export class RagnoteTable {
     this.table.countRows;
     return await this.table.countRows();
   }
+}
+
+export const maybeRePopulateDB = async (
+  db: RagnoteTable,
+  directoryPath: string,
+  fileExtensions?: string[]
+) => {
+  const count = await db.countRows();
+  const fileNames = getFilesInDirectory(directoryPath, fileExtensions);
+  if (count !== fileNames.length) {
+    await deleteAllRowsInTable(db);
+    await populateDBWithFilesInDir(db, directoryPath, fileExtensions);
+  }
+};
+
+const deleteAllRowsInTable = async (db: RagnoteTable) => {
+  await db.delete(`${DatabaseFields.CONTENT} != ''`);
+};
+
+const populateDBWithFilesInDir = async (
+  db: RagnoteTable,
+  directoryPath: string,
+  fileExtensions?: string[]
+) => {
+  const fileNames = getFilesInDirectory(directoryPath, fileExtensions);
+  const entries: RagnoteDBEntry[] = await Promise.all(
+    fileNames.map(async (fileName) => {
+      const filePath = path.join(directoryPath, fileName);
+      const content = readFile(filePath);
+      return {
+        notepath: filePath,
+        content: content,
+        subnoteindex: 0,
+        timeadded: new Date(),
+      };
+    })
+  );
+  const filteredEntries = entries.filter((entry) => entry.content !== "");
+  db.add(filteredEntries);
+};
+
+function readFile(filePath: string): string {
+  try {
+    const data = fs.readFileSync(filePath, "utf8");
+    return data;
+  } catch (err) {
+    console.error("An error occurred:", err);
+    return "";
+  }
+}
+
+function getFilesInDirectory(
+  directoryPath: string,
+  extensions?: string[]
+): string[] {
+  const files = fs.readdirSync(directoryPath);
+  if (!extensions) {
+    return files;
+  }
+
+  return files.filter((file) => {
+    const fileExtension = path.extname(file);
+    console.log("fileExtension", fileExtension);
+    return extensions.includes(fileExtension);
+  });
 }
 
 function convertToRecord(entry: RagnoteDBEntry): Record<string, unknown> {
