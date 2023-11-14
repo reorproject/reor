@@ -24,6 +24,18 @@
     allowToChangeInstallationDirectory: true,
     deleteAppDataOnUninstall: false,
   },
+  linux: {
+    target: ["deb", "rpm"],
+    category: "Utility", // Change as appropriate for your app
+    synopsis: "Short description of your app",
+    description: "Full description of your app",
+    // mimeType: ["x-scheme-handler/your-custom-protocol"], // If you have custom URL handlers
+    desktop: {
+      // Desktop file properties
+    },
+    depends: ["fuse", "libfuse2", "libvips"], // List your dependencies here
+    artifactName: "${productName}_${version}.${ext}",
+  },
   publish: {
     provider: "generic",
     channel: "latest",
