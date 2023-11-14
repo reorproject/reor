@@ -73,3 +73,5 @@ jobs:
             ./release/${{ env.APP_VERSION }}/**/*.exe
             ./release/${{ env.APP_VERSION }}/**/*.AppImage
             ./release/${{ env.APP_VERSION }}/**/*.dmg
+            ./release/${{ env.APP_VERSION }}/**/*.deb
+            ./release/${{ env.APP_VERSION }}/**/*.rpm
