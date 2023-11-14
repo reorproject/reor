@@ -13,11 +13,15 @@ interface RagnoteDBEntry {
 export class RagnoteTable {
   // implements Table
   private table!: LanceDBTable<string>;
+  private embeddingModelHFRepo = "Xenova/all-MiniLM-L6-v2";
 
   // private embedFun?: EmbeddingFunction;
 
   async initialize(dbConnection: Connection, tableName: string) {
-    this.table = await GetOrCreateTable(dbConnection, tableName);
+    this.table = await GetOrCreateTable(
+      dbConnection,
+      this.embeddingModelHFRepo
+    );
   }
 
   async add(data: RagnoteDBEntry[]): Promise<void> {

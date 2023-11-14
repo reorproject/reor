@@ -8,22 +8,21 @@ import path from "path";
 
 const GetOrCreateTable = async (
   db: lancedb.Connection,
-  name: string
+  embeddingModelHFRepo: string
 ): Promise<lancedb.Table<string>> => {
-  const tableNames = await db.tableNames();
+  const allTableNames = await db.tableNames();
+  const tableName = generateTableName(embeddingModelHFRepo);
   // console.log("tableNames", tableNames);
   const embedFunc = await createEmbeddingFunction(
-    "Xenova/all-MiniLM-L6-v2",
+    embeddingModelHFRepo,
     "content"
-    // path.join(os.homedir(), "Desktop", "ragnote-embeddings")
   );
-  if (tableNames.includes(name)) {
-    return db.openTable(name, embedFunc);
+  if (allTableNames.includes(tableName)) {
+    return db.openTable(tableName, embedFunc);
   }
-  // console.log("creating table");
 
   const newTable = await db.createTable({
-    name,
+    name: tableName,
     schema: CreateDatabaseSchema(384),
     embeddingFunction: embedFunc,
   });
@@ -83,6 +82,10 @@ const GetOrCreateTable = async (
 //   // console.log(newTable)
 //   return newTable;
 // };
+
+const generateTableName = (embeddingFuncName: string): string => {
+  return `ragnote_table_${embeddingFuncName.replace("/", "_")}`;
+};
 
 export default GetOrCreateTable;
 
