@@ -10,13 +10,13 @@
     target: ["dmg", "zip"],
   },
   win: {
+    artifactName: "${productName}_${version}.${ext}",
     target: [
       {
         target: "nsis",
         arch: ["x64"],
       },
     ],
-    artifactName: "${productName}_${version}.${ext}",
   },
   nsis: {
     oneClick: false,
@@ -25,16 +25,30 @@
     deleteAppDataOnUninstall: false,
   },
   linux: {
-    target: ["deb", "rpm"],
+    artifactName: "${productName}_${version}.${ext}",
+    target: [
+      {
+        target: "deb",
+        arch: ["x64", "ia32", "armv7l", "arm64"], // Specify architectures as needed
+        // Additional specific properties can go here
+      },
+      {
+        target: "rpm",
+        arch: ["x64", "ia32", "armv7l", "arm64"], // Specify architectures as needed
+        // Additional specific properties can go here
+      },
+    ],
     category: "Utility", // Change as appropriate for your app
     synopsis: "Short description of your app",
     description: "Full description of your app",
     // mimeType: ["x-scheme-handler/your-custom-protocol"], // If you have custom URL handlers
-    desktop: {
-      // Desktop file properties
-    },
-    depends: ["fuse", "libfuse2", "libvips"], // List your dependencies here
-    artifactName: "${productName}_${version}.${ext}",
+    // Additional desktop entries can be defined here
+  },
+  deb: {
+    depends: ["fuse", "libfuse2", "libvips"], // Dependencies specific to the .deb package
+  },
+  rpm: {
+    requires: ["fuse", "libfuse2", "libvips"], // Dependencies specific to the .rpm package
   },
   publish: {
     provider: "generic",
