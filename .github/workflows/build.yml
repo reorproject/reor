@@ -3,7 +3,7 @@ name: Build and Package Electron App
 on:
   push:
     branches:
-      - main # Change this to the branch you want to build from
+      - main
 
 jobs:
   build_and_package:
@@ -15,56 +15,43 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3 # Updated to the latest version
+        uses: actions/checkout@v3
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3 # Updated to the latest version
+        uses: actions/setup-node@v3
         with:
-          node-version: "18" # Change this to your preferred Node.js version
+          node-version: "18"
 
-      # Cache npm dependencies
       - name: Cache npm dependencies
-        uses: actions/cache@v3 # Updated to the latest version
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-npm-
 
-      # Cache TypeScript output
       - name: Cache TypeScript build
-        uses: actions/cache@v3 # Updated to the latest version
+        uses: actions/cache@v3
         with:
           path: ./dist
           key: ${{ runner.os }}-tsc-${{ hashFiles('**/tsconfig.json') }}
           restore-keys: |
             ${{ runner.os }}-tsc-
 
-      # Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # Build the app
       - name: Build app
-        run: npm run build # This should run tsc and vite build
+        run: npm run build
 
-      # Package the app for different operating systems
-      # - name: Package App
-      #   run: |
-      #     if ($env:RUNNER_OS -eq "Windows") {
-      #     npm run package-win
-      #     } elseif ($env:RUNNER_OS -eq "Linux") {
-      #     npm run package-linux
-      #     } elseif ($env:RUNNER_OS -eq "macOS") {
-      #     npm run package-mac
-      #     }
-      #   shell: pwsh
-      #   env:
-      #     RUNNER_OS: ${{ runner.os }}
+      # Specific step for Linux builds
+      - name: Run Linux Specific Command
+        if: matrix.os == 'ubuntu-latest'
+        run: npx --no node-llama-cpp download
+
       - name: Set version as env
         run: echo "APP_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
-      # Upload build artifacts
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
