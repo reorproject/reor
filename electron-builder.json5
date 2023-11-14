@@ -27,21 +27,21 @@
   linux: {
     artifactName: "${productName}_${version}.${ext}",
     target: [
-      {
-        target: "deb",
-        arch: ["x64", "arm64"], // Specify architectures as needed
-        // Additional specific properties can go here
-      },
-      {
-        target: "rpm",
-        arch: ["x64", "arm64"], // Specify architectures as needed
-        // Additional specific properties can go here
-      },
       // {
-      //   target: "AppImage",
+      //   target: "deb",
       //   arch: ["x64", "arm64"], // Specify architectures as needed
       //   // Additional specific properties can go here
       // },
+      // {
+      //   target: "rpm",
+      //   arch: ["x64", "arm64"], // Specify architectures as needed
+      //   // Additional specific properties can go here
+      // },
+      {
+        target: "AppImage",
+        arch: ["x64", "arm64"], // Specify architectures as needed
+        // Additional specific properties can go here
+      },
     ],
     category: "Utility", // Change as appropriate for your app
     synopsis: "Short description of your app",
