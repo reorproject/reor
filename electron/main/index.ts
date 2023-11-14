@@ -7,12 +7,7 @@ import * as path from "path";
 import * as fs from "fs";
 import { StoreKeys, StoreSchema } from "./storeConfig";
 import { ModelLoader, SessionService } from "./llm/nodellamacpp";
-// import {
-//   createEmbeddingFunction,
-//   setupPipeline,
-// } from "./embeddings/Transformers";
 import * as lancedb from "vectordb";
-import GetOrCreateTable from "./embeddings/Lance";
 import {
   Field,
   type FixedSizeListBuilder,
@@ -31,7 +26,6 @@ import {
 } from "apache-arrow";
 import { DatabaseFields } from "./embeddings/Schema";
 import { RagnoteTable } from "./embeddings/Table";
-// import { testDownload } from "./download/download";
 
 const store = new Store<StoreSchema>();
 // const user = store.get("user");

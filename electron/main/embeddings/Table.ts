@@ -15,8 +15,6 @@ export class RagnoteTable {
   private table!: LanceDBTable<string>;
   private embeddingModelHFRepo = "Xenova/all-MiniLM-L6-v2";
 
-  // private embedFun?: EmbeddingFunction;
-
   async initialize(dbConnection: Connection, tableName: string) {
     this.table = await GetOrCreateTable(
       dbConnection,
