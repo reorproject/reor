@@ -13,7 +13,7 @@ const GetOrCreateTable = async (
   const tableNames = await db.tableNames();
   // console.log("tableNames", tableNames);
   const embedFunc = await createEmbeddingFunction(
-    "Xenova/e5-base-v2",
+    "Xenova/all-MiniLM-L6-v2",
     "content"
     // path.join(os.homedir(), "Desktop", "ragnote-embeddings")
   );
@@ -24,7 +24,7 @@ const GetOrCreateTable = async (
 
   const newTable = await db.createTable({
     name,
-    schema: CreateDatabaseSchema(768),
+    schema: CreateDatabaseSchema(384),
     embeddingFunction: embedFunc,
   });
   // console.log("newTable", newTable);
