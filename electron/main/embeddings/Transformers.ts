@@ -1,5 +1,5 @@
 import * as lancedb from "vectordb";
-import { Pipeline } from "@xenova/transformers";
+import { Pipeline, PreTrainedTokenizer } from "@xenova/transformers";
 // Import path library:
 import path from "path";
 import { DownloadModelFilesFromHFRepo } from "../download/download";
@@ -33,12 +33,24 @@ import { app } from "electron";
 //   console.error('Failed to initialize pipeline:', error),
 // );
 
+export interface EnhancedEmbeddingFunction<T>
+  extends lancedb.EmbeddingFunction<T> {
+  /**
+   * A method to tokenize the input data before embedding.
+   */
+  name: string;
+  contextLength: number;
+  tokenize: (data: T[]) => string[];
+}
+
 export async function createEmbeddingFunction(
   repoName: string, // all-MiniLM-L6-v2
   sourceColumn: string
   // embeddingModelsPath: string
-): Promise<lancedb.EmbeddingFunction<string>> {
+): Promise<EnhancedEmbeddingFunction<string>> {
   let pipe: Pipeline;
+  let tokenizer: PreTrainedTokenizer;
+  let contextLength: number;
   try {
     console.log("SETTING UP EMBEDDING FUNCTION WITH THE FOLLOWING ARGS: ", {
       repoName,
@@ -47,7 +59,9 @@ export async function createEmbeddingFunction(
     });
     // const modelPath = path.join(embeddingModelsPath, repoName);
     // await DownloadModelFilesFromHFRepo(repoName, embeddingModelsPath);
-    const { pipeline, env } = await import("@xenova/transformers");
+    const { pipeline, env, AutoTokenizer } = await import(
+      "@xenova/transformers"
+    );
     // env.localModelPath = embeddingModelsPath;
     // env.allowRemoteModels = false;
     // env.allowLocalModels = true;
@@ -59,11 +73,16 @@ export async function createEmbeddingFunction(
     pipe = await pipeline("feature-extraction", repoName, {
       cache_dir: path.join(app.getPath("userData"), "transformers-cache"),
     });
+    console.log("MODEL CONFIG IS: ", pipe.model.config.hidden_size);
+    contextLength = pipe.model.config.hidden_size;
+    tokenizer = await AutoTokenizer.from_pretrained(repoName);
   } catch (error) {
     console.error("Failed to initialize pipeline", error);
     throw error;
   }
   return {
+    name: repoName,
+    contextLength: contextLength,
     sourceColumn,
     embed: async (batch: string[]): Promise<number[][]> => {
       if (pipe === null) {
@@ -82,31 +101,6 @@ export async function createEmbeddingFunction(
         return [];
       }
     },
+    tokenize: tokenizer,
   };
 }
-
-// const TransformersJSEmbedFun: lancedb.EmbeddingFunction<string> = {
-//   sourceColumn: "content",
-//   embed: async (batch: string[]): Promise<number[][]> => {
-//     // // eslint-disable-next-line no-new-func
-//     // const TransformersApi = Function('return import("@xenova/transformers")')();
-//     // const { pipe } = await TransformersApi;
-//     if (pipe === null) {
-//       throw new Error("Pipeline not initialized");
-//     }
-//     try {
-//       const result: number[][] = await Promise.all(
-//         batch.map(async (text) => {
-//           const res = await pipe(text, { pooling: "mean", normalize: true });
-//           return Array.from(res.data);
-//         })
-//       );
-//       return result;
-//     } catch (error) {
-//       console.error(error);
-//       return [];
-//     }
-//   },
-// };
-
-// export default TransformersJSEmbedFun;

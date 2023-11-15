@@ -1,8 +1,12 @@
 import { Connection, Table as LanceDBTable, Query } from "vectordb";
-import GetOrCreateTable from "./Lance";
+import GetOrCreateLanceTable from "./Lance";
 import { DatabaseFields } from "./Schema";
 import fs from "fs";
 import path from "path";
+import {
+  EnhancedEmbeddingFunction,
+  createEmbeddingFunction,
+} from "./Transformers";
 
 interface RagnoteDBEntry {
   notepath: string;
@@ -15,22 +19,58 @@ interface RagnoteDBEntry {
 export class RagnoteTable {
   // implements Table
   public table!: LanceDBTable<string>;
-  private embeddingModelHFRepo = "Xenova/all-MiniLM-L6-v2";
+  public embedFun!: EnhancedEmbeddingFunction<string>;
+  // private embeddingModelHFRepo = "Xenova/all-MiniLM-L6-v2";
 
   async initialize(dbConnection: Connection) {
-    this.table = await GetOrCreateTable(
-      dbConnection,
-      this.embeddingModelHFRepo
+    this.embedFun = await createEmbeddingFunction(
+      "Xenova/bge-base-en-v1.5",
+      "content"
     );
+    this.table = await GetOrCreateLanceTable(dbConnection, this.embedFun);
   }
 
   async add(data: RagnoteDBEntry[]): Promise<void> {
-    console.log("CALLING ADD METHOD WITH THE FOLLOWING ARGS: ", data);
     const recordEntry: Record<string, unknown>[] = data as unknown as Record<
       string,
       unknown
     >[];
-    await this.table.add(recordEntry);
+    console.log("CALLING ADD TO DB: ");
+    // split the data into chunks of 100 and add each seperately
+    const chunkSize = 1;
+    const chunks = [];
+    for (let i = 0; i < recordEntry.length; i += chunkSize) {
+      if (i == 1383) {
+        console.log("chunk", recordEntry.slice(i, i + chunkSize));
+      } else {
+        chunks.push(recordEntry.slice(i, i + chunkSize));
+      }
+    }
+    const reversedChunks = [...chunks].reverse();
+    let index = 0;
+    console.log("ROWS IN TABLE BEFORE ADDING: ", await this.table.countRows());
+    // console.log("slice chunks 1380 to 1384: ", chunks.slice(1380, 1384));
+    console.log("INDEX THAT FAILS ON THE WAY THERE: ", chunks[1383]);
+    console.log("INDEX THAT FAILS REVERSED: ", reversedChunks[3481]);
+    console.log("INDEX THAT COULD BE BIG 2078: ", chunks[2078]);
+    console.log("number of chunks: ", chunks.length);
+    // this.
+    for (const chunk of chunks) {
+      console.log("ADDING CHUNK TO DB: ", index++);
+      if (index == 1383) {
+        console.log("chunk", chunk);
+      }
+      try {
+        await this.table.add(chunk);
+      } catch (error) {
+        console.error("Error adding chunk to DB:", error);
+        // Handle the error as needed, e.g., break the loop, retry, etc.
+        // Example: break; // to exit the loop
+      }
+      // sleep for half a second:
+      // await new Promise((r) => setTimeout(r, 500));
+    }
+    console.log("FINISHED CALLING ADD TO DB");
   }
 
   async delete(filter: string): Promise<void> {

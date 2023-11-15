@@ -111,10 +111,9 @@ async function createWindow() {
 }
 
 app.whenReady().then(async () => {
-  console.log("PATH IS: ", path.join(app.getPath("userData"), "vectordb"));
-  dbConnection = await lancedb.connect(
-    path.join(app.getPath("userData"), "vectordb")
-  );
+  const dbPath = path.join(app.getPath("userData"), "vectordb");
+  console.log("PATH IS: ", dbPath);
+  dbConnection = await lancedb.connect(dbPath);
 
   await dbTable.initialize(dbConnection);
   await maybeRePopulateDB(dbTable, store.get(StoreKeys.UserDirectory), [".md"]);
@@ -134,7 +133,7 @@ app.whenReady().then(async () => {
   // const filterResult = await dbTable.filter(
   //   `${DatabaseFields.NOTE_PATH} == "test-path"`
   // );
-  // createWindow();
+  createWindow();
 });
 
 // app.whenReady().then(async () => {
