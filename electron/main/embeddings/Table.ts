@@ -48,6 +48,7 @@ export class RagnoteTable {
     // this.
     for (const chunk of chunks) {
       try {
+        console.log("adding chunk: ", index++);
         await this.table.add(chunk);
       } catch (error) {
         console.error("Error adding chunk to DB:", error);
@@ -113,6 +114,11 @@ export const maybeRePopulateDB = async (
   if (count !== fileNames.length) {
     await deleteAllRowsInTable(db);
     await populateDBWithFilesInDir(db, directoryPath, fileExtensions);
+    console.log("DB has been populated");
+    // get the two counts again and print:
+    const count = await db.countRows();
+    console.log("DB now has", count, "rows");
+    console.log("no of files: ", fileNames.length, "files")
   }
 };
 
@@ -138,8 +144,10 @@ const populateDBWithFilesInDir = async (
       };
     })
   );
-  const filteredEntries = entries.filter((entry) => entry.content !== "");
-  db.add(filteredEntries);
+  // const filteredEntries = entries.filter((entry) => entry.content !== "");
+
+  await db.add(entries);
+
 };
 
 function readFile(filePath: string): string {
