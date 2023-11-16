@@ -35,9 +35,7 @@ export class RagnoteTable {
       string,
       unknown
     >[];
-    console.log("CALLING ADD TO DB: ");
-    // split the data into chunks of 100 and add each seperately
-    const chunkSize = 1;
+    const chunkSize = 50;
     const chunks = [];
     for (let i = 0; i < recordEntry.length; i += chunkSize) {
       if (i == 1383) {
@@ -46,20 +44,9 @@ export class RagnoteTable {
         chunks.push(recordEntry.slice(i, i + chunkSize));
       }
     }
-    const reversedChunks = [...chunks].reverse();
     let index = 0;
-    console.log("ROWS IN TABLE BEFORE ADDING: ", await this.table.countRows());
-    // console.log("slice chunks 1380 to 1384: ", chunks.slice(1380, 1384));
-    console.log("INDEX THAT FAILS ON THE WAY THERE: ", chunks[1383]);
-    console.log("INDEX THAT FAILS REVERSED: ", reversedChunks[3481]);
-    console.log("INDEX THAT COULD BE BIG 2078: ", chunks[2078]);
-    console.log("number of chunks: ", chunks.length);
     // this.
     for (const chunk of chunks) {
-      console.log("ADDING CHUNK TO DB: ", index++);
-      if (index == 1383) {
-        console.log("chunk", chunk);
-      }
       try {
         await this.table.add(chunk);
       } catch (error) {
@@ -67,10 +54,7 @@ export class RagnoteTable {
         // Handle the error as needed, e.g., break the loop, retry, etc.
         // Example: break; // to exit the loop
       }
-      // sleep for half a second:
-      // await new Promise((r) => setTimeout(r, 500));
     }
-    console.log("FINISHED CALLING ADD TO DB");
   }
 
   async delete(filter: string): Promise<void> {
@@ -179,7 +163,6 @@ function getFilesInDirectory(
 
   return files.filter((file) => {
     const fileExtension = path.extname(file);
-    console.log("fileExtension", fileExtension);
     return extensions.includes(fileExtension);
   });
 }

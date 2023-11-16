@@ -75,7 +75,10 @@ export async function createEmbeddingFunction(
     });
     console.log("MODEL CONFIG IS: ", pipe.model.config.hidden_size);
     contextLength = pipe.model.config.hidden_size;
-    tokenizer = await AutoTokenizer.from_pretrained(repoName);
+
+    tokenizer = await AutoTokenizer.from_pretrained(repoName, {
+      cache_dir: path.join(app.getPath("userData"), "transformers-cache"),
+    });
   } catch (error) {
     console.error("Failed to initialize pipeline", error);
     throw error;
@@ -91,7 +94,10 @@ export async function createEmbeddingFunction(
       try {
         const result: number[][] = await Promise.all(
           batch.map(async (text) => {
-            const res = await pipe(text, { pooling: "mean", normalize: true });
+            const res = await pipe(text, {
+              pooling: "mean",
+              normalize: true,
+            });
             return Array.from(res.data);
           })
         );
@@ -101,6 +107,14 @@ export async function createEmbeddingFunction(
         return [];
       }
     },
-    tokenize: tokenizer,
+    tokenize: (data: string[]): any[] => {
+      if (tokenizer === null) {
+        throw new Error("Tokenizer not initialized");
+      }
+      return data.map((text) => {
+        const res = tokenizer(text);
+        return res;
+      });
+    },
   };
 }
