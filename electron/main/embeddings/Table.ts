@@ -66,12 +66,16 @@ export class RagnoteTable {
   async search(
     query: string,
     //   metricType: string,
-    limit: number
+    limit: number,
+    filter?: string
   ): Promise<RagnoteDBEntry[]> {
     const lanceQuery = await this.table
       .search(query)
       // .metricType(metricType)
       .limit(limit);
+    if (filter) {
+      lanceQuery.filter(filter);
+    }
     const rawResults = await lanceQuery.execute();
     const mapped = rawResults.map(convertToRagnoteDBEntry);
     // const filtered = mapped.filter((x) => x !== null);
