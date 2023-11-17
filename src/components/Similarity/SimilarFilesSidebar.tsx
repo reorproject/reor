@@ -19,7 +19,11 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
         fileContent,
         10
       );
-      setSimilarEntries(searchResults);
+      // filter out the current file:
+      const filteredSearchResults = searchResults.filter(
+        (result) => result.notepath !== path
+      );
+      setSimilarEntries(filteredSearchResults);
     } catch (error) {
       console.error("Error:", error);
     } finally {
