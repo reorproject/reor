@@ -28,8 +28,9 @@ import { DatabaseFields } from "./embeddings/Schema";
 import {
   RagnoteDBEntry,
   RagnoteTable,
-  maybeRePopulateDB,
+  maybeRePopulateTable,
 } from "./embeddings/Table";
+import { FileInfo } from "./Files/Types";
 
 const store = new Store<StoreSchema>();
 // const user = store.get("user");
@@ -120,7 +121,9 @@ app.whenReady().then(async () => {
   dbConnection = await lancedb.connect(dbPath);
 
   await dbTable.initialize(dbConnection);
-  await maybeRePopulateDB(dbTable, store.get(StoreKeys.UserDirectory), [".md"]);
+  await maybeRePopulateTable(dbTable, store.get(StoreKeys.UserDirectory), [
+    ".md",
+  ]);
 
   // const currentTimestamp: Date = new Date();
   // // console.log("currentTimestamp", currentTimestamp);
@@ -290,11 +293,6 @@ ipcMain.on("get-user-directory", (event) => {
   const path = store.get(StoreKeys.UserDirectory);
   event.returnValue = path;
 });
-
-interface FileInfo {
-  name: string;
-  path: string;
-}
 
 ipcMain.handle("get-files", async (): Promise<FileInfo[]> => {
   const directoryPath: any = store.get(StoreKeys.UserDirectory);

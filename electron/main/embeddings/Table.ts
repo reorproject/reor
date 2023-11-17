@@ -35,26 +35,24 @@ export class RagnoteTable {
       string,
       unknown
     >[];
-    const chunkSize = 50;
+    const chunkSize = 100;
     const chunks = [];
     for (let i = 0; i < recordEntry.length; i += chunkSize) {
-      if (i == 1383) {
-        console.log("chunk", recordEntry.slice(i, i + chunkSize));
-      } else {
-        chunks.push(recordEntry.slice(i, i + chunkSize));
-      }
+      chunks.push(recordEntry.slice(i, i + chunkSize));
     }
     let index = 0;
+    console.log("50th", chunks[1391]);
     // this.
     for (const chunk of chunks) {
       try {
-        console.log("adding chunk: ", index++);
+        console.log("index is: ", index);
         await this.table.add(chunk);
       } catch (error) {
         console.error("Error adding chunk to DB:", error);
         // Handle the error as needed, e.g., break the loop, retry, etc.
         // Example: break; // to exit the loop
       }
+      index++;
     }
   }
 
@@ -108,26 +106,27 @@ export class RagnoteTable {
   }
 }
 
-export const maybeRePopulateDB = async (
-  db: RagnoteTable,
+export const maybeRePopulateTable = async (
+  table: RagnoteTable,
   directoryPath: string,
   fileExtensions?: string[]
 ) => {
-  const count = await db.countRows();
+  const count = await table.countRows();
   const fileNames = getFilesInDirectory(directoryPath, fileExtensions);
   if (count !== fileNames.length) {
-    await deleteAllRowsInTable(db);
-    await populateDBWithFilesInDir(db, directoryPath, fileExtensions);
+    await deleteAllRowsInTable(table);
+    await populateDBWithFilesInDir(table, directoryPath, fileExtensions);
     console.log("DB has been populated");
     // get the two counts again and print:
-    const count = await db.countRows();
-    console.log("DB now has", count, "rows");
-    console.log("no of files: ", fileNames.length, "files")
   }
 };
-
 const deleteAllRowsInTable = async (db: RagnoteTable) => {
-  await db.delete(`${DatabaseFields.CONTENT} != ''`);
+  try {
+    await db.delete(`${DatabaseFields.CONTENT} != ''`);
+    await db.delete(`${DatabaseFields.CONTENT} = ''`);
+  } catch (error) {
+    console.error("Error deleting rows:", error);
+  }
 };
 
 const populateDBWithFilesInDir = async (
@@ -151,7 +150,6 @@ const populateDBWithFilesInDir = async (
   // const filteredEntries = entries.filter((entry) => entry.content !== "");
 
   await db.add(entries);
-
 };
 
 function readFile(filePath: string): string {
