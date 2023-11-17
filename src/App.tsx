@@ -4,6 +4,7 @@ import { FileList } from "./components/File/FileList";
 import { FileEditor } from "./components/File/FileEditor";
 import LLM from "./components/LLM/LLM";
 import SimilarEntriesComponent from "./components/Similarity/SimilarFilesSidebar";
+import TitleBar from "./components/TitleBar";
 
 function App() {
   const [directory, setDirectory] = useState<string | null>(null);
@@ -27,21 +28,23 @@ function App() {
   }, [selectedFilePath]);
 
   return (
-    <div className="max-h-screen w-full mt-0">
-      {/* <FileViewer directory="/Users/sam/Desktop/electron-forge-react-typescript-tailwind" /> */}
+    <div className="max-h-screen">
+      <TitleBar />
       {directory ? (
-        <div className="flex">
+        <div className="flex" style={{ height: "calc(100vh - 30px)" }}>
           <div className="w-[300px]">
             {" "}
-            {/* Replace 300px with the desired fixed width */}
             <FileList onFileSelect={(path) => setSelectedFilePath(path)} />
           </div>
           {selectedFilePath && (
             <div className="flex">
+              {" "}
               <div className="w-2/3">
+                {" "}
                 <FileEditor filePath={selectedFilePath} />
               </div>
               <div className="w-1/3">
+                {" "}
                 <SimilarEntriesComponent
                   filePath={selectedFilePath}
                   onFileSelect={(path) => setSelectedFilePath(path)}
@@ -53,7 +56,16 @@ function App() {
       ) : (
         <DirectoryPicker onDirectorySelected={handleDirectorySelected} />
       )}
-      {/* <LLM /> */}
+      {/* <div className="flex" style={{ height: "calc(100vh - 30px)" }}>
+        {" "}
+        <div className="h-full bg-black w-1/3 overflow-y-auto">
+          <FileList onFileSelect={(path) => setSelectedFilePath(path)} />
+        </div>
+        <SimilarEntriesComponent
+          filePath={selectedFilePath || ""}
+          onFileSelect={(path) => setSelectedFilePath(path)}
+        />
+      </div> */}
     </div>
   );
 }

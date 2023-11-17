@@ -87,6 +87,13 @@ async function createWindow() {
       // nodeIntegration: true,
       // contextIsolation: false,
     },
+    // frame: false,
+    titleBarStyle: "hidden", // or 'customButtonsOnHover'
+    titleBarOverlay: {
+      color: "#2f3241",
+      symbolColor: "#74b1be",
+      height: 30, // Adjust height as necessary to fit your icons
+    },
     width: 1200,
     height: 800,
   });
