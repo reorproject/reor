@@ -5,16 +5,20 @@ import { HiOutlineSearch } from "react-icons/hi"; // Solid search icon
 
 const TitleBar: React.FC = () => {
   return (
-    <div className="h-[30px] bg-white">
-      <button className="-webkit-app-region-no-drag hover:bg-gray-200 p-1 rounded">
-        <MdSearch className="text-gray-600" size={24} />
-        <HiOutlineSearch className="text-gray-600" size={24} />
-      </button>
-      <HiSearch className="text-gray-600" size={24} />
-
-      <button className="-webkit-app-region-no-drag hover:bg-gray-200 p-1 rounded">
-        <HiOutlinePlusCircle className="text-gray-600" size={24} />
-      </button>
+    <div className="h-[30px] bg-white flex justify-between space-x-2 pr-2 -webkit-app-region-drag">
+      {/* <div className=""></div> */}
+      <div className="ml-[90px] flex space-x-2">
+        {/* <button className="-webkit-app-region-no-drag hover:bg-gray-200 p-1"> */}
+        {/* <button className="-webkit-app-region-no-drag hover:bg-gray-200 p-1 "> */}
+        <MdSearch className="text-gray-600 cursor-pointer" size={24} />
+        {/* </button> */}
+        {/* <button className="-webkit-app-region-no-drag hover:bg-gray-200 p-1"> */}
+        <HiOutlinePlusCircle
+          className="text-gray-600 cursor-pointer"
+          size={24}
+        />
+        {/* </button> */}
+      </div>
     </div>
   );
 };
