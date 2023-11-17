@@ -8,7 +8,7 @@ import {
   createEmbeddingFunction,
 } from "./Transformers";
 
-interface RagnoteDBEntry {
+export interface RagnoteDBEntry {
   notepath: string;
   vector?: Float32Array;
   content: string;

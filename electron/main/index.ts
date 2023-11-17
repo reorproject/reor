@@ -25,7 +25,11 @@ import {
   Float64,
 } from "apache-arrow";
 import { DatabaseFields } from "./embeddings/Schema";
-import { RagnoteTable, maybeRePopulateDB } from "./embeddings/Table";
+import {
+  RagnoteDBEntry,
+  RagnoteTable,
+  maybeRePopulateDB,
+} from "./embeddings/Table";
 
 const store = new Store<StoreSchema>();
 // const user = store.get("user");
@@ -318,6 +322,24 @@ ipcMain.handle(
     await updateNoteInDB(dbTable, filePath, content);
     console.log("content to write", content);
     fs.writeFileSync(filePath, content, "utf-8");
+  }
+);
+
+ipcMain.handle(
+  "search",
+  async (
+    event,
+    query: string,
+    limit: number,
+    filter?: string
+  ): Promise<RagnoteDBEntry[]> => {
+    try {
+      // Assuming 'myDatabase' is your database instance with the 'search' method
+      return await dbTable.search(query, limit, filter);
+    } catch (error) {
+      console.error("Error searching database:", error);
+      throw error;
+    }
   }
 );
 

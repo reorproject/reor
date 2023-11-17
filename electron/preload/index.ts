@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
+import { RagnoteDBEntry } from "electron/main/embeddings/Table";
 type ReceiveCallback = (...args: any[]) => void;
 
 declare global {
@@ -15,6 +16,13 @@ declare global {
       ) => void;
       // removeAllListeners: (channel: string) => void;
       receive: (channel: string, callback: ReceiveCallback) => void;
+    };
+    database: {
+      search: (
+        query: string,
+        limit: number,
+        filter?: string
+      ) => Promise<RagnoteDBEntry[]>;
     };
     files: {
       openDirectoryDialog: () => Promise<any>;
@@ -36,6 +44,12 @@ declare global {
     };
   }
 }
+
+contextBridge.exposeInMainWorld('database', {
+  search: async (query: string, limit: number, filter?: string): Promise<RagnoteDBEntry[]> => {
+    return ipcRenderer.invoke('search', query, limit, filter);
+  },
+});
 
 contextBridge.exposeInMainWorld("electronStore", {
   setUserDirectory: (path: string) => {
