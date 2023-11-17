@@ -15,8 +15,10 @@ export const FileList: React.FC<FileListProps> = ({ onFileSelect }) => {
 
   useEffect(() => {
     const fetchFiles = async () => {
-      // Fetch files logic here
       const fetchedFiles = await window.files.getFiles();
+      fetchedFiles.sort(
+        (a, b) => b.dateModified.getTime() - a.dateModified.getTime()
+      );
       setFiles(fetchedFiles);
     };
     fetchFiles();

@@ -298,11 +298,18 @@ ipcMain.handle("get-files", async (): Promise<FileInfo[]> => {
   const directoryPath: any = store.get(StoreKeys.UserDirectory);
   if (!directoryPath) return [];
 
-  const files: string[] = fs.readdirSync(directoryPath);
-  return files.map((file: string) => ({
-    name: file,
-    path: path.join(directoryPath, file),
-  }));
+  const files: FileInfo[] = fs
+    .readdirSync(directoryPath)
+    .map((file: string) => {
+      const filePath = path.join(directoryPath, file);
+      const stats = fs.statSync(filePath);
+      return {
+        name: file,
+        path: filePath,
+        dateModified: stats.mtime,
+      };
+    });
+  return files;
 });
 
 ipcMain.handle(
