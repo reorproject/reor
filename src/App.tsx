@@ -28,7 +28,6 @@ function App() {
 
   return (
     <div className="h-screen w-full mt-0">
-      HELLO MATE
       {/* <FileViewer directory="/Users/sam/Desktop/electron-forge-react-typescript-tailwind" /> */}
       {directory ? (
         <div className="flex">
