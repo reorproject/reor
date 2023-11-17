@@ -34,7 +34,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   }, [filePath]);
 
   return (
-    <div className="p-4 max-h-screen overflow-auto">
+    <div className="max-h-screen overflow-auto">
       {loading ? (
         <p className="text-center text-gray-600">Loading...</p>
       ) : (

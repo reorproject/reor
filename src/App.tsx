@@ -27,7 +27,7 @@ function App() {
   }, [selectedFilePath]);
 
   return (
-    <div className="h-screen w-full mt-0">
+    <div className="max-h-screen w-full mt-0">
       {/* <FileViewer directory="/Users/sam/Desktop/electron-forge-react-typescript-tailwind" /> */}
       {directory ? (
         <div className="flex">
