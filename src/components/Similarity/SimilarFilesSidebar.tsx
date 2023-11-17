@@ -1,16 +1,5 @@
-import { RagnoteDBEntry } from "electron/main/embeddings/Table";
 import { useEffect, useState } from "react";
-
-// Ok so what is the API for this?
-// Take in a RagnoteDBEntry and then display whatever you want. Or let's spike out which type of data will be passed in. import React, { useState } from 'react';
-
-// interface RagnoteDBEntry {
-//   notepath: string;
-//   content: string;
-//   subnoteindex: number;
-//   timeadded: Date;
-//   // Add any other properties you need
-// }
+import { RagnoteDBEntry } from "electron/main/embeddings/Table";
 
 interface SimilarEntriesComponentProps {
   filePath: string;
@@ -19,7 +8,6 @@ interface SimilarEntriesComponentProps {
 const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   filePath,
 }) => {
-  // const [filePath, setFilePath] = useState<string>('');
   const [similarEntries, setSimilarEntries] = useState<RagnoteDBEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -38,6 +26,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
       setLoading(false);
     }
   };
+
   useEffect(() => {
     if (filePath) {
       handleFileRead(filePath);
@@ -45,16 +34,16 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   }, [filePath]);
 
   return (
-    <div>
+    <div className="p-4 max-h-screen overflow-auto">
       {loading ? (
-        <p>Loading...</p>
+        <p className="text-center text-gray-600">Loading...</p>
       ) : (
-        <div>
+        <div className="space-y-4">
           {similarEntries.map((entry, index) => (
-            <div key={index}>
-              <p>Path: {entry.notepath}</p>
-              <p>Content: {entry.content}</p>
-              <p>Time Added: {entry.timeadded.toString()}</p>
+            <div key={index} className="p-4 bg-white shadow-md rounded-lg">
+              <p className="text-gray-700">
+                <span className="text-gray-500">{entry.content}</span>
+              </p>
             </div>
           ))}
         </div>

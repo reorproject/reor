@@ -37,9 +37,13 @@ function App() {
             <FileList onFileSelect={(path) => setSelectedFilePath(path)} />
           </div>
           {selectedFilePath && (
-            <div className="">
-              <FileEditor filePath={selectedFilePath} />
-              <SimilarEntriesComponent filePath={selectedFilePath} />
+            <div className="flex">
+              <div className="w-2/3">
+                <FileEditor filePath={selectedFilePath} />
+              </div>
+              <div className="w-1/3">
+                <SimilarEntriesComponent filePath={selectedFilePath} />
+              </div>
             </div>
           )}
         </div>
