@@ -3,10 +3,12 @@ import { RagnoteDBEntry } from "electron/main/embeddings/Table";
 
 interface SimilarEntriesComponentProps {
   filePath: string;
+  onFileSelect: (path: string) => void;
 }
 
 const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   filePath,
+  onFileSelect,
 }) => {
   const [similarEntries, setSimilarEntries] = useState<RagnoteDBEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -44,7 +46,11 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
       ) : (
         <div className="space-y-4">
           {similarEntries.map((entry, index) => (
-            <div key={index} className="p-4 bg-white shadow-md rounded-lg">
+            <div
+              key={index}
+              className="p-4 bg-white shadow-md rounded-lg cursor-pointer hover:scale-104 hover:shadow-lg transition-transform duration-300"
+              onClick={() => onFileSelect(entry.notepath)}
+            >
               <p className="text-gray-700">
                 <span className="text-gray-500">{entry.content}</span>
               </p>

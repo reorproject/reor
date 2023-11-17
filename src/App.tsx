@@ -42,7 +42,10 @@ function App() {
                 <FileEditor filePath={selectedFilePath} />
               </div>
               <div className="w-1/3">
-                <SimilarEntriesComponent filePath={selectedFilePath} />
+                <SimilarEntriesComponent
+                  filePath={selectedFilePath}
+                  onFileSelect={(path) => setSelectedFilePath(path)}
+                />
               </div>
             </div>
           )}
