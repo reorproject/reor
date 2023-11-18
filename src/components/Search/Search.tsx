@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 export interface RagnoteDBEntry {
   notepath: string;
@@ -11,6 +11,7 @@ export interface RagnoteDBEntry {
 const SearchComponent: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<RagnoteDBEntry[]>([]);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const handleSearch = async (query: string) => {
     const results: RagnoteDBEntry[] = await window.database.search(query, 10);
@@ -27,8 +28,24 @@ const SearchComponent: React.FC = () => {
     }
   }, [searchQuery]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setSearchResults([]);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className="relative p-4">
+    <div ref={containerRef} className="relative p-4">
       <input
         type="text"
         className="border border-gray-300 p-2 rounded-md w-full"
