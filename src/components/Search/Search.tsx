@@ -8,7 +8,11 @@ export interface RagnoteDBEntry {
   timeadded: Date;
 }
 
-const SearchComponent: React.FC = () => {
+interface SearchComponentProps {
+  onFileSelect: (path: string) => void;
+}
+
+const SearchComponent: React.FC<SearchComponentProps> = ({ onFileSelect }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<RagnoteDBEntry[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -45,17 +49,21 @@ const SearchComponent: React.FC = () => {
   }, []);
 
   return (
-    <div ref={containerRef} className="relative p-4">
+    <div ref={containerRef} className="relative p-0.5">
       <input
         type="text"
-        className="border border-gray-300 p-2 rounded-md w-full"
+        className="border border-gray-300 rounded-md p-2 w-full h-[7px]"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        placeholder="Search..."
+        placeholder="Search"
       />
       <div className="absolute top-14 left-0 z-10 w-full bg-white border border-gray-300 shadow-lg max-h-60 overflow-y-auto">
         {searchResults.map((result, index) => (
-          <div key={index} className="border-b border-gray-300 p-2">
+          <div
+            key={index}
+            className="border-b border-gray-300 p-2 cursor-pointer"
+            onClick={() => onFileSelect(result.notepath)}
+          >
             <p>{result.content}</p>
           </div>
         ))}

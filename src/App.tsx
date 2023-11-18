@@ -29,7 +29,7 @@ function App() {
 
   return (
     <div className="max-h-screen">
-      <TitleBar />
+      <TitleBar onFileSelect={(path) => setSelectedFilePath(path)} />
       {directory ? (
         <div className="flex" style={{ height: "calc(100vh - 30px)" }}>
           <div className="w-[300px]">
