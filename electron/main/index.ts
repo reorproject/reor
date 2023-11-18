@@ -87,7 +87,7 @@ async function createWindow() {
       // nodeIntegration: true,
       // contextIsolation: false,
     },
-    // frame: false,
+    frame: false,
     titleBarStyle: "hidden", // or 'customButtonsOnHover'
     titleBarOverlay: {
       color: "#2f3241",
