@@ -301,6 +301,10 @@ ipcMain.on("get-user-directory", (event) => {
   event.returnValue = path;
 });
 
+ipcMain.handle("join-path", (event, ...args) => {
+  return path.join(...args);
+});
+
 ipcMain.handle("get-files", async (): Promise<FileInfo[]> => {
   const directoryPath: any = store.get(StoreKeys.UserDirectory);
   if (!directoryPath) return [];
@@ -333,7 +337,25 @@ ipcMain.handle(
     // so here we can use the table we've created to add and remove things from the database. And all of the methods can be async to not hold up any threads
     await updateNoteInDB(dbTable, filePath, content);
     console.log("content to write", content);
-    fs.writeFileSync(filePath, content, "utf-8");
+    await fs.writeFileSync(filePath, content, "utf-8");
+    console.log("finished writing file...");
+  }
+);
+
+// create new file handler:
+ipcMain.handle(
+  "create-file",
+  async (event, filePath: string, content: string): Promise<void> => {
+    console.log("Creating file", filePath);
+
+    // Check if the file already exists
+    if (!fs.existsSync(filePath)) {
+      // If the file does not exist, create it
+      fs.writeFileSync(filePath, content, "utf-8");
+    } else {
+      // If the file exists, log a message and do nothing
+      console.log("File already exists:", filePath);
+    }
   }
 );
 

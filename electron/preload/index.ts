@@ -30,6 +30,8 @@ declare global {
       getFiles: () => Promise<FileInfo[]>;
       writeFile: (filePath: string, content: string) => Promise<any>;
       readFile: (filePath: string) => Promise<any>;
+      createFile: (filePath: string, content: string) => Promise<any>;
+      joinPath: (...pathSegments: string[]) => Promise<string>;
     };
     llm: {
       createSession: (sessionId: any) => Promise<any>;
@@ -90,10 +92,16 @@ contextBridge.exposeInMainWorld("files", {
     return ipcRenderer.invoke("write-file", filePath, content);
   },
 
+  createFile: async (filePath: string, content: string) => {
+    return ipcRenderer.invoke("create-file", filePath, content);
+  },
+
   // Read content from a file
   readFile: async (filePath: string) => {
     return ipcRenderer.invoke("read-file", filePath);
   },
+  joinPath: (...pathSegments: string[]) =>
+    ipcRenderer.invoke("join-path", ...pathSegments),
 });
 
 contextBridge.exposeInMainWorld("llm", {

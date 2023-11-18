@@ -3,6 +3,7 @@ import { HiOutlinePlusCircle } from "react-icons/hi"; // Heroicons plus circle
 import { HiSearch } from "react-icons/hi"; // Outlined search icon
 import { HiOutlineSearch } from "react-icons/hi"; // Solid search icon
 import SearchComponent from "./Search/Search";
+import NewNoteComponent from "./File/NewNote";
 
 interface TitleBarProps {
   onFileSelect: (path: string) => void;
@@ -22,6 +23,7 @@ const TitleBar: React.FC<TitleBarProps> = ({ onFileSelect }) => {
         <button className="bg-transparent border-none cursor-pointer">
           <HiOutlinePlusCircle className="text-gray-600" size={24} />
         </button>
+        <NewNoteComponent onFileSelect={onFileSelect} />
       </div>
     </div>
   );
