@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export interface RagnoteDBEntry {
   notepath: string;
@@ -8,46 +8,55 @@ export interface RagnoteDBEntry {
   timeadded: Date;
 }
 
-const SearchComponent = () => {
-  const [searchQuery, setSearchQuery] = useState("");
+const SearchComponent: React.FC = () => {
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<RagnoteDBEntry[]>([]);
 
-  const handleSearch = async () => {
-    const results: RagnoteDBEntry[] = await window.database.search(
-      searchQuery,
-      10
-    );
+  const handleSearch = async (query: string) => {
+    const results: RagnoteDBEntry[] = await window.database.search(query, 10);
     setSearchResults(results);
   };
 
+  const debouncedSearch = debounce((query: string) => handleSearch(query), 300);
+
+  useEffect(() => {
+    if (searchQuery) {
+      debouncedSearch(searchQuery);
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchQuery]);
+
   return (
-    <div className="p-4">
+    <div className="relative p-4">
       <input
         type="text"
-        className="border border-gray-300 p-2 rounded-md"
+        className="border border-gray-300 p-2 rounded-md w-full"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         placeholder="Search..."
       />
-      <button
-        className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-md"
-        onClick={handleSearch}
-      >
-        Search
-      </button>
-      <div className="mt-4">
+      <div className="absolute top-14 left-0 z-10 w-full bg-white border border-gray-300 shadow-lg max-h-60 overflow-y-auto">
         {searchResults.map((result, index) => (
-          <div key={index} className="border-b border-gray-300 py-2">
-            <p className="font-semibold">{result.notepath}</p>
+          <div key={index} className="border-b border-gray-300 p-2">
             <p>{result.content}</p>
-            <p className="text-sm text-gray-600">
-              Added: {result.timeadded.toLocaleDateString()}
-            </p>
           </div>
         ))}
       </div>
     </div>
   );
+};
+
+const debounce = <F extends (...args: any[]) => void>(
+  func: F,
+  delay: number
+): ((...args: Parameters<F>) => void) => {
+  let debounceTimer: NodeJS.Timeout;
+
+  return (...args: Parameters<F>) => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => func(...args), delay);
+  };
 };
 
 export default SearchComponent;
