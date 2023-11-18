@@ -73,7 +73,7 @@ export const FileEditor: React.FC<FileEditorProps> = ({ filePath }) => {
   }, [content]);
 
   return (
-    <div className="p-4">
+    <div className="">
       {/* <button onClick={() => ref.current?.setMarkdown("new markdown")}>
         Set new markdown
       </button>

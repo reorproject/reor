@@ -39,7 +39,7 @@ function App() {
           {selectedFilePath && (
             <div className="flex">
               {" "}
-              <div className="w-2/3">
+              <div className="w-2/3 overflow-auto">
                 {" "}
                 <FileEditor filePath={selectedFilePath} />
               </div>
