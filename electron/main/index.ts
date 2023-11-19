@@ -31,6 +31,7 @@ import {
   maybeRePopulateTable,
 } from "./embeddings/Table";
 import { FileInfo } from "./Files/Types";
+import { FSWatcher } from "fs";
 
 const store = new Store<StoreSchema>();
 // const user = store.get("user");
@@ -74,6 +75,7 @@ const indexHtml = join(process.env.DIST, "index.html");
 
 let dbConnection: lancedb.Connection;
 let dbTable = new RagnoteTable();
+let fileWatcher: FSWatcher | null = null;
 
 async function createWindow() {
   win = new BrowserWindow({
@@ -110,6 +112,8 @@ async function createWindow() {
   // Test actively push message to the Electron-Renderer
   win.webContents.on("did-finish-load", () => {
     win?.webContents.send("main-process-message", new Date().toLocaleString());
+    const files = getFileList(store.get(StoreKeys.UserDirectory));
+    win?.webContents.send("file-updated", files);
   });
 
   // Make all links open with the browser, not with the application
@@ -128,9 +132,13 @@ app.whenReady().then(async () => {
   dbConnection = await lancedb.connect(dbPath);
 
   await dbTable.initialize(dbConnection);
-  await maybeRePopulateTable(dbTable, store.get(StoreKeys.UserDirectory), [
-    ".md",
-  ]);
+  const userDirectory = store.get(StoreKeys.UserDirectory) as string;
+  createWindow();
+
+  if (userDirectory) {
+    await maybeRePopulateTable(dbTable, userDirectory, [".md"]);
+    startWatchingDirectory(store.get(StoreKeys.UserDirectory));
+  }
 
   // const currentTimestamp: Date = new Date();
   // // console.log("currentTimestamp", currentTimestamp);
@@ -147,7 +155,6 @@ app.whenReady().then(async () => {
   // const filterResult = await dbTable.filter(
   //   `${DatabaseFields.NOTE_PATH} == "test-path"`
   // );
-  createWindow();
 });
 
 // app.whenReady().then(async () => {
@@ -286,15 +293,62 @@ ipcMain.handle("open-directory-dialog", async (event) => {
 //   store.set(key, val);
 // });
 
-ipcMain.on("set-user-directory", (event, path: string) => {
-  // Your validation logic for the directory path
-  store.set(StoreKeys.UserDirectory, path);
-  // WatchFiles(path, (filename) => {
-  //   // event.sender.send('file-changed', filename);
-  //   console.log("FILE CHANGED: ", filename);
-  // });
+ipcMain.on("set-user-directory", (event, userDirectory: string) => {
+  store.set("UserDirectory", userDirectory);
+
+  if (fileWatcher) {
+    fileWatcher.close();
+  }
+
+  startWatchingDirectory(userDirectory);
+  updateFileListForRenderer(userDirectory);
+  maybeRePopulateTable(dbTable, userDirectory, [".md"]);
   event.returnValue = "success";
 });
+
+function startWatchingDirectory(directory: string): void {
+  try {
+    fileWatcher = fs.watch(directory, (eventType, filename) => {
+      if (filename) {
+        console.log(`Event type: ${eventType}. File: ${filename}`);
+        updateFileListForRenderer(directory);
+      }
+    });
+  } catch (error) {
+    console.error("Error setting up file watcher:", error);
+  }
+}
+
+function getFileList(directory: string): FileInfo[] {
+  return fs.readdirSync(directory).map((file: string) => {
+    const filePath = path.join(directory, file);
+    const stats = fs.statSync(filePath);
+    return {
+      name: file,
+      path: filePath,
+      dateModified: stats.mtime,
+    };
+  });
+}
+
+function updateFileListForRenderer(directory: string): void {
+  const files = getFileList(directory);
+  if (win) {
+    console.log("sending file-updated", files);
+    win.webContents.send("file-updated", files);
+  }
+}
+// fs.readdir(directory, (err, files) => {
+//   if (err) {
+//     console.error("Error reading directory:", err);
+//     return;
+//   }
+//   if (win) {
+//     // ok so here we'll now need to send the actual details of the files so that they can be consumed by the renderer. Like datmodified
+//     console.log("sending file-updated", files);
+//     win.webContents.send("file-updated", files);
+//   }
+// });
 
 ipcMain.on("get-user-directory", (event) => {
   const path = store.get(StoreKeys.UserDirectory);
@@ -306,7 +360,7 @@ ipcMain.handle("join-path", (event, ...args) => {
 });
 
 ipcMain.handle("get-files", async (): Promise<FileInfo[]> => {
-  const directoryPath: any = store.get(StoreKeys.UserDirectory);
+  const directoryPath: string = store.get(StoreKeys.UserDirectory);
   if (!directoryPath) return [];
 
   const files: FileInfo[] = fs
