@@ -334,21 +334,9 @@ function getFileList(directory: string): FileInfo[] {
 function updateFileListForRenderer(directory: string): void {
   const files = getFileList(directory);
   if (win) {
-    console.log("sending file-updated", files);
     win.webContents.send("file-updated", files);
   }
 }
-// fs.readdir(directory, (err, files) => {
-//   if (err) {
-//     console.error("Error reading directory:", err);
-//     return;
-//   }
-//   if (win) {
-//     // ok so here we'll now need to send the actual details of the files so that they can be consumed by the renderer. Like datmodified
-//     console.log("sending file-updated", files);
-//     win.webContents.send("file-updated", files);
-//   }
-// });
 
 ipcMain.on("get-user-directory", (event) => {
   const path = store.get(StoreKeys.UserDirectory);
@@ -396,6 +384,20 @@ ipcMain.handle(
   }
 );
 
+function writeFileSyncRecursive(
+  filePath: string,
+  content: string,
+  charset: BufferEncoding
+): void {
+  // Ensures that the directory exists. If the directory structure does not exist, it is created.
+  const dirname = path.dirname(filePath);
+  if (!fs.existsSync(dirname)) {
+    fs.mkdirSync(dirname, { recursive: true });
+  }
+
+  fs.writeFileSync(filePath, content, charset);
+}
+
 // create new file handler:
 ipcMain.handle(
   "create-file",
@@ -405,7 +407,7 @@ ipcMain.handle(
     // Check if the file already exists
     if (!fs.existsSync(filePath)) {
       // If the file does not exist, create it
-      fs.writeFileSync(filePath, content, "utf-8");
+      writeFileSyncRecursive(filePath, content, "utf-8");
     } else {
       // If the file exists, log a message and do nothing
       console.log("File already exists:", filePath);
