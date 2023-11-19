@@ -1,10 +1,5 @@
+import { FileInfo } from "electron/main/Files/Types";
 import React, { useEffect, useState } from "react";
-
-interface FileInfo {
-  name: string;
-  path: string;
-  dateModified: Date;
-}
 
 interface FileListProps {
   onFileSelect: (path: string) => void;
@@ -21,12 +16,14 @@ export const FileList: React.FC<FileListProps> = ({ onFileSelect }) => {
       setFiles(updatedFiles);
     };
 
-    window.ipcRenderer.receive("file-updated", handleFileUpdate);
+    window.ipcRenderer.receive("files-list", handleFileUpdate);
 
     return () => {
-      window.ipcRenderer.removeListener("file-updated", handleFileUpdate);
+      window.ipcRenderer.removeListener("files-list", handleFileUpdate);
     };
   }, []);
+
+  // so we also will need to now somehow get access to the user directory and display. Or maybe we shove in relative path as the name instead of name...and see what happens
 
   return (
     <div className="flex flex-col bg-gray-900 text-white h-full overflow-y-auto overflow-x-hidden">
@@ -40,11 +37,12 @@ export const FileList: React.FC<FileListProps> = ({ onFileSelect }) => {
         <button
           key={index}
           onClick={() => {
+            console.log("FILE SELECTED: ", file.path);
             onFileSelect(file.path);
           }}
           className="text-white py-2 border-0 transition-colors duration-150 ease-in-out w-full bg-transparent focus:outline-none hover:bg-gray-800"
         >
-          <span className="truncate">{file.name}</span>
+          <span className="truncate">{file.relativePath}</span>
         </button>
       ))}
     </div>

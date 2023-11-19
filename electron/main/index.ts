@@ -32,6 +32,7 @@ import {
 } from "./embeddings/Table";
 import { FileInfo } from "./Files/Types";
 import { FSWatcher } from "fs";
+import chokidar from "chokidar";
 
 const store = new Store<StoreSchema>();
 // const user = store.get("user");
@@ -113,7 +114,7 @@ async function createWindow() {
   win.webContents.on("did-finish-load", () => {
     win?.webContents.send("main-process-message", new Date().toLocaleString());
     const files = getFileList(store.get(StoreKeys.UserDirectory));
-    win?.webContents.send("file-updated", files);
+    win?.webContents.send("files-list", files);
   });
 
   // Make all links open with the browser, not with the application
@@ -308,33 +309,55 @@ ipcMain.on("set-user-directory", (event, userDirectory: string) => {
 
 function startWatchingDirectory(directory: string): void {
   try {
-    fileWatcher = fs.watch(directory, (eventType, filename) => {
-      if (filename) {
-        console.log(`Event type: ${eventType}. File: ${filename}`);
-        updateFileListForRenderer(directory);
-      }
+    const watcher = chokidar.watch(directory, {
+      ignoreInitial: true, // Skip initial add events for existing files
     });
+
+    watcher.on("add", (path) => {
+      console.log(`File added: ${path}`);
+      updateFileListForRenderer(directory);
+    });
+
+    // Handle other events like 'change', 'unlink' if needed
+
+    // No 'ready' event handler is needed here, as we're ignoring initial scan
   } catch (error) {
     console.error("Error setting up file watcher:", error);
   }
 }
 
-function getFileList(directory: string): FileInfo[] {
-  return fs.readdirSync(directory).map((file: string) => {
-    const filePath = path.join(directory, file);
-    const stats = fs.statSync(filePath);
-    return {
-      name: file,
-      path: filePath,
-      dateModified: stats.mtime,
-    };
+function getFileList(
+  directory: string,
+  parentRelativePath: string = ""
+): FileInfo[] {
+  let fileList: FileInfo[] = [];
+
+  const items = fs.readdirSync(directory);
+
+  items.forEach((item) => {
+    const itemPath = path.join(directory, item);
+    const relativePath = path.join(parentRelativePath, item);
+    const stats = fs.statSync(itemPath);
+
+    if (stats.isDirectory()) {
+      fileList = fileList.concat(getFileList(itemPath, relativePath)); // Recursively get files in subdirectory
+    } else {
+      fileList.push({
+        name: item,
+        path: itemPath,
+        relativePath: relativePath,
+        dateModified: stats.mtime,
+      });
+    }
   });
+
+  return fileList;
 }
 
 function updateFileListForRenderer(directory: string): void {
   const files = getFileList(directory);
   if (win) {
-    win.webContents.send("file-updated", files);
+    win.webContents.send("files-list", files);
   }
 }
 
@@ -351,17 +374,7 @@ ipcMain.handle("get-files", async (): Promise<FileInfo[]> => {
   const directoryPath: string = store.get(StoreKeys.UserDirectory);
   if (!directoryPath) return [];
 
-  const files: FileInfo[] = fs
-    .readdirSync(directoryPath)
-    .map((file: string) => {
-      const filePath = path.join(directoryPath, file);
-      const stats = fs.statSync(filePath);
-      return {
-        name: file,
-        path: filePath,
-        dateModified: stats.mtime,
-      };
-    });
+  const files: FileInfo[] = getFileList(directoryPath);
   return files;
 });
 
