@@ -7,6 +7,8 @@ import {
   EnhancedEmbeddingFunction,
   createEmbeddingFunction,
 } from "./Transformers";
+import { GetFilesInfo } from "../Files/Filesystem";
+import { FileInfo } from "../Files/Types";
 
 export interface RagnoteDBEntry {
   notepath: string;
@@ -53,6 +55,7 @@ export class RagnoteTable {
         // Example: break; // to exit the loop
       }
       index++;
+      // break;
     }
   }
 
@@ -75,7 +78,7 @@ export class RagnoteTable {
       lanceQuery.filter(filter);
     }
     const rawResults = await lanceQuery.execute();
-    const mapped = rawResults.map(convertToRagnoteDBEntry);
+    const mapped = rawResults.map(convertRawDBResultToRagnoteDBEntry);
     // const filtered = mapped.filter((x) => x !== null);
     return mapped as RagnoteDBEntry[];
     // return rawResults;
@@ -89,7 +92,7 @@ export class RagnoteTable {
       .execute();
     // query.filter(filterString);
     // const rawResults = await query.execute();
-    const mapped = rawResults.map(convertToRagnoteDBEntry);
+    const mapped = rawResults.map(convertRawDBResultToRagnoteDBEntry);
     // const filtered = mapped.filter((x) => x !== null);
     return mapped as RagnoteDBEntry[];
 
@@ -112,12 +115,10 @@ export const maybeRePopulateTable = async (
   fileExtensions?: string[]
 ) => {
   const count = await table.countRows();
-  const fileNames = getFilesInDirectory(directoryPath, fileExtensions);
-  if (count !== fileNames.length) {
+  const filesInfo = GetFilesInfo(directoryPath);
+  if (count !== filesInfo.length) {
     await deleteAllRowsInTable(table);
     await populateDBWithFilesInDir(table, directoryPath, fileExtensions);
-    console.log("DB has been populated");
-    // get the two counts again and print:
   }
 };
 const deleteAllRowsInTable = async (db: RagnoteTable) => {
@@ -129,25 +130,25 @@ const deleteAllRowsInTable = async (db: RagnoteTable) => {
   }
 };
 
+// so we want a function to convert files to dbEntry types (which will involve chunking later on)
+const convertFileTypeToDBType = (file: FileInfo): RagnoteDBEntry => {
+  return {
+    notepath: file.path,
+    content: readFile(file.path),
+    subnoteindex: 0,
+    timeadded: new Date(),
+  };
+};
+
 const populateDBWithFilesInDir = async (
   db: RagnoteTable,
   directoryPath: string,
   fileExtensions?: string[]
 ) => {
-  const fileNames = getFilesInDirectory(directoryPath, fileExtensions);
+  const filesInfo = GetFilesInfo(directoryPath); // TODO: deprecate
   const entries: RagnoteDBEntry[] = await Promise.all(
-    fileNames.map(async (fileName) => {
-      const filePath = path.join(directoryPath, fileName);
-      const content = readFile(filePath);
-      return {
-        notepath: filePath,
-        content: content,
-        subnoteindex: 0,
-        timeadded: new Date(),
-      };
-    })
+    filesInfo.map(convertFileTypeToDBType)
   );
-  // const filteredEntries = entries.filter((entry) => entry.content !== "");
 
   await db.add(entries);
 };
@@ -162,20 +163,20 @@ function readFile(filePath: string): string {
   }
 }
 
-function getFilesInDirectory(
-  directoryPath: string,
-  extensions?: string[]
-): string[] {
-  const files = fs.readdirSync(directoryPath);
-  if (!extensions) {
-    return files;
-  }
+// function getFileNamesInDirectory( // TODO: modify this to the tree structure/use the other get files function
+//   directoryPath: string,
+//   extensions?: string[]
+// ): string[] {
+//   const files = fs.readdirSync(directoryPath);
+//   if (!extensions) {
+//     return files;
+//   }
 
-  return files.filter((file) => {
-    const fileExtension = path.extname(file);
-    return extensions.includes(fileExtension);
-  });
-}
+//   return files.filter((file) => {
+//     const fileExtension = path.extname(file);
+//     return extensions.includes(fileExtension);
+//   });
+// }
 
 function convertToRecord(entry: RagnoteDBEntry): Record<string, unknown> {
   const recordEntry: Record<string, unknown> = entry as unknown as Record<
@@ -185,7 +186,7 @@ function convertToRecord(entry: RagnoteDBEntry): Record<string, unknown> {
   return recordEntry;
 }
 
-function convertToRagnoteDBEntry(
+function convertRawDBResultToRagnoteDBEntry(
   record: Record<string, unknown>
 ): RagnoteDBEntry | null {
   if (

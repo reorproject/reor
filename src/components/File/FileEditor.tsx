@@ -68,10 +68,6 @@ export const FileEditor: React.FC<FileEditorProps> = ({ filePath }) => {
     return () => clearInterval(saveInterval); // Clear the interval when component unmounts
   }, [content]); // Dependency on content ensures saveFile has the latest content
 
-  useEffect(() => {
-    console.log("content: ", content);
-  }, [content]);
-
   return (
     <div className="">
       {/* <button onClick={() => ref.current?.setMarkdown("new markdown")}>

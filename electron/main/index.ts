@@ -33,7 +33,7 @@ import {
 import { FileInfo } from "./Files/Types";
 import { FSWatcher } from "fs";
 import chokidar from "chokidar";
-import { getFileList, writeFileSyncRecursive } from "./Files/Filesystem";
+import { GetFilesInfo, writeFileSyncRecursive } from "./Files/Filesystem";
 
 const store = new Store<StoreSchema>();
 // const user = store.get("user");
@@ -114,7 +114,7 @@ async function createWindow() {
   // Test actively push message to the Electron-Renderer
   win.webContents.on("did-finish-load", () => {
     win?.webContents.send("main-process-message", new Date().toLocaleString());
-    const files = getFileList(store.get(StoreKeys.UserDirectory));
+    const files = GetFilesInfo(store.get(StoreKeys.UserDirectory));
     win?.webContents.send("files-list", files);
   });
 
@@ -328,7 +328,7 @@ function startWatchingDirectory(directory: string): void {
 }
 
 function updateFileListForRenderer(directory: string): void {
-  const files = getFileList(directory);
+  const files = GetFilesInfo(directory);
   if (win) {
     win.webContents.send("files-list", files);
   }

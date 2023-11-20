@@ -2,7 +2,7 @@ import path from "path";
 import fs from "fs";
 import { FileInfo } from "./Types";
 
-export function getFileList(
+export function GetFilesInfo(
   directory: string,
   parentRelativePath: string = ""
 ): FileInfo[] {
@@ -16,7 +16,7 @@ export function getFileList(
     const stats = fs.statSync(itemPath);
 
     if (stats.isDirectory()) {
-      const children = getFileList(itemPath, relativePath);
+      const children = GetFilesInfo(itemPath, relativePath);
       fileList.push({
         name: item,
         path: itemPath,
