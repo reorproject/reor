@@ -340,20 +340,28 @@ function getFileList(
     const stats = fs.statSync(itemPath);
 
     if (stats.isDirectory()) {
-      fileList = fileList.concat(getFileList(itemPath, relativePath)); // Recursively get files in subdirectory
+      const children = getFileList(itemPath, relativePath);
+      fileList.push({
+        name: item,
+        path: itemPath,
+        relativePath: relativePath,
+        dateModified: stats.mtime,
+        type: "directory",
+        children: children,
+      });
     } else {
       fileList.push({
         name: item,
         path: itemPath,
         relativePath: relativePath,
         dateModified: stats.mtime,
+        type: "file",
       });
     }
   });
 
   return fileList;
 }
-
 function updateFileListForRenderer(directory: string): void {
   const files = getFileList(directory);
   if (win) {
@@ -370,13 +378,13 @@ ipcMain.handle("join-path", (event, ...args) => {
   return path.join(...args);
 });
 
-ipcMain.handle("get-files", async (): Promise<FileInfo[]> => {
-  const directoryPath: string = store.get(StoreKeys.UserDirectory);
-  if (!directoryPath) return [];
+// ipcMain.handle("get-files", async (): Promise<FileInfo[]> => {
+//   const directoryPath: string = store.get(StoreKeys.UserDirectory);
+//   if (!directoryPath) return [];
 
-  const files: FileInfo[] = getFileList(directoryPath);
-  return files;
-});
+//   const files: FileInfo[] = getFileList(directoryPath);
+//   return files;
+// });
 
 ipcMain.handle(
   "read-file",

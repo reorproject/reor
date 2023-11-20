@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { FileInfo } from "electron/main/Files/Types";
+// import { FileInfo } from "electron/main/Files/Types";
 import { RagnoteDBEntry } from "electron/main/embeddings/Table";
 type ReceiveCallback = (...args: any[]) => void;
 
@@ -27,7 +27,7 @@ declare global {
     };
     files: {
       openDirectoryDialog: () => Promise<any>;
-      getFiles: () => Promise<FileInfo[]>;
+      // getFiles: () => Promise<FileInfo[]>;
       writeFile: (filePath: string, content: string) => Promise<any>;
       readFile: (filePath: string) => Promise<any>;
       createFile: (filePath: string, content: string) => Promise<any>;
@@ -82,10 +82,10 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
 
 contextBridge.exposeInMainWorld("files", {
   openDirectoryDialog: () => ipcRenderer.invoke("open-directory-dialog"),
-  getFiles: async (): Promise<FileInfo[]> => {
-    // No need to pass a channel name as a string literal every time, which can be error-prone
-    return ipcRenderer.invoke("get-files");
-  },
+  // getFiles: async (): Promise<FileInfo[]> => {
+  //   // No need to pass a channel name as a string literal every time, which can be error-prone
+  //   return ipcRenderer.invoke("get-files");
+  // },
 
   // Write content to a file
   writeFile: async (filePath: string, content: string) => {

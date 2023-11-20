@@ -33,7 +33,8 @@ export const FileList: React.FC<FileListProps> = ({ onFileSelect }) => {
       >
         Create New File
       </button> */}
-      {files.map((file, index) => (
+      <FileExplorer files={files} onFileSelect={onFileSelect} />
+      {/* {files.map((file, index) => (
         <button
           key={index}
           onClick={() => {
@@ -44,7 +45,57 @@ export const FileList: React.FC<FileListProps> = ({ onFileSelect }) => {
         >
           <span className="truncate">{file.relativePath}</span>
         </button>
+      ))} */}
+    </div>
+  );
+};
+
+interface FileExplorerProps {
+  files: FileInfo[];
+  onFileSelect: (path: string) => void;
+}
+
+const FileExplorer: React.FC<FileExplorerProps> = ({ files, onFileSelect }) => {
+  return (
+    <div>
+      {files.map((file) => (
+        <FileItem key={file.path} file={file} onFileSelect={onFileSelect} />
       ))}
+    </div>
+  );
+};
+
+interface FileInfoProps {
+  file: FileInfo;
+  onFileSelect: (path: string) => void;
+}
+
+const FileItem: React.FC<FileInfoProps> = ({ file, onFileSelect }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const isDirectory = file.type === "directory";
+
+  const toggle = () => {
+    if (isDirectory) {
+      setIsExpanded(!isExpanded);
+    } else {
+      onFileSelect(file.path);
+    }
+  };
+
+  return (
+    <div>
+      <div
+        onClick={toggle}
+        // style={{ cursor: isDirectory ? "pointer" : "default" }}
+        className="cursor-pointer"
+      >
+        {file.name}
+      </div>
+      {isDirectory && isExpanded && file.children && (
+        <div style={{ paddingLeft: "20px" }}>
+          <FileExplorer files={file.children} onFileSelect={onFileSelect} />
+        </div>
+      )}
     </div>
   );
 };
