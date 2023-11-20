@@ -33,6 +33,7 @@ import {
 import { FileInfo } from "./Files/Types";
 import { FSWatcher } from "fs";
 import chokidar from "chokidar";
+import { getFileList, writeFileSyncRecursive } from "./Files/Filesystem";
 
 const store = new Store<StoreSchema>();
 // const user = store.get("user");
@@ -326,42 +327,6 @@ function startWatchingDirectory(directory: string): void {
   }
 }
 
-function getFileList(
-  directory: string,
-  parentRelativePath: string = ""
-): FileInfo[] {
-  let fileList: FileInfo[] = [];
-
-  const items = fs.readdirSync(directory);
-
-  items.forEach((item) => {
-    const itemPath = path.join(directory, item);
-    const relativePath = path.join(parentRelativePath, item);
-    const stats = fs.statSync(itemPath);
-
-    if (stats.isDirectory()) {
-      const children = getFileList(itemPath, relativePath);
-      fileList.push({
-        name: item,
-        path: itemPath,
-        relativePath: relativePath,
-        dateModified: stats.mtime,
-        type: "directory",
-        children: children,
-      });
-    } else {
-      fileList.push({
-        name: item,
-        path: itemPath,
-        relativePath: relativePath,
-        dateModified: stats.mtime,
-        type: "file",
-      });
-    }
-  });
-
-  return fileList;
-}
 function updateFileListForRenderer(directory: string): void {
   const files = getFileList(directory);
   if (win) {
@@ -405,27 +370,11 @@ ipcMain.handle(
   }
 );
 
-function writeFileSyncRecursive(
-  filePath: string,
-  content: string,
-  charset: BufferEncoding
-): void {
-  // Ensures that the directory exists. If the directory structure does not exist, it is created.
-  const dirname = path.dirname(filePath);
-  if (!fs.existsSync(dirname)) {
-    fs.mkdirSync(dirname, { recursive: true });
-  }
-
-  fs.writeFileSync(filePath, content, charset);
-}
-
 // create new file handler:
 ipcMain.handle(
   "create-file",
   async (event, filePath: string, content: string): Promise<void> => {
     console.log("Creating file", filePath);
-
-    // Check if the file already exists
     if (!fs.existsSync(filePath)) {
       // If the file does not exist, create it
       writeFileSyncRecursive(filePath, content, "utf-8");
