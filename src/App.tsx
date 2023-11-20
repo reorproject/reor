@@ -37,7 +37,7 @@ function App() {
             <FileList onFileSelect={(path) => setSelectedFilePath(path)} />
           </div>
           {selectedFilePath && (
-            <div className="flex">
+            <div className="flex" style={{ width: "calc(100vw - 300px)" }}>
               {" "}
               <div className="w-2/3 overflow-auto">
                 {" "}
