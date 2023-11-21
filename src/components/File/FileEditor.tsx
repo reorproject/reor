@@ -31,11 +31,13 @@ import { LeafDirective } from "mdast-util-directive";
 
 interface FileEditorProps {
   filePath: string;
+  // content: string;
   setContentInParent: (content: string) => void;
 }
 
 export const FileEditor: React.FC<FileEditorProps> = ({
   filePath,
+  // content,
   setContentInParent,
 }) => {
   const [content, setContent] = useState<string>("");
