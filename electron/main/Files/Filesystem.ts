@@ -34,10 +34,16 @@ export function GetFilesInfo(
         children: children,
       });
     } else {
+      const fileExtension = path.extname(item).toLowerCase();
+
       if (
-        !extensions ||
-        extensions.some((ext) => item.toLowerCase().endsWith(ext.toLowerCase()))
+        (extensions && extensions.includes(fileExtension)) ||
+        (!extensions && fileExtension)
       ) {
+        if (item === ".DS_Store") {
+          console.log("DS STORE IN ERE");
+          console.log("extension is: ", fileExtension);
+        }
         fileList.push({
           name: item,
           path: itemPath,
@@ -48,7 +54,7 @@ export function GetFilesInfo(
       }
     }
   });
-
+  console.log("returning this filelist: ", fileList);
   return fileList;
 }
 
@@ -68,17 +74,23 @@ export function writeFileSyncRecursive(
 
 export function startWatchingDirectory(
   win: BrowserWindow,
-  directory: string
+  directory: string,
+  extensions?: string[]
 ): void {
   try {
     const watcher = chokidar.watch(directory, {
-      ignoreInitial: true, // Skip initial add events for existing files
+      ignoreInitial: true,
     });
 
-    // TODO: oh mabe we'll need to monitor far more events on this. like delete, rename, etc.
     watcher.on("add", (path) => {
-      console.log(`File added: ${path}`);
-      updateFileListForRenderer(win, directory);
+      // Check if the file extension is in the provided list (if any)
+      if (
+        !extensions ||
+        extensions.some((ext) => path.toLowerCase().endsWith(ext.toLowerCase()))
+      ) {
+        console.log(`File added: ${path}`);
+        updateFileListForRenderer(win, directory);
+      }
     });
 
     // Handle other events like 'change', 'unlink' if needed
