@@ -83,6 +83,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     destinationPath: string
   ) => {
     e.preventDefault();
+    e.stopPropagation();
     const sourcePath = e.dataTransfer.getData("text/plain"); // This is correct
 
     moveFileDummy(sourcePath, destinationPath);
