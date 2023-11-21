@@ -8,6 +8,7 @@ import TitleBar from "./components/TitleBar";
 
 function App() {
   const [directory, setDirectory] = useState<string | null>(null);
+  const [editorContent, setEditorContent] = useState<string>("");
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
 
   useEffect(() => {
@@ -27,16 +28,29 @@ function App() {
     console.log("selected file: ", selectedFilePath);
   }, [selectedFilePath]);
 
+  useEffect(() => {
+    console.log("editor content in parent: ", editorContent);
+  }, [editorContent]);
+
+  const onFileSelect = async (path: string) => {
+    // so here we can save the actual content too
+    if (selectedFilePath) {
+      await window.files.writeFile(selectedFilePath, editorContent);
+    }
+    setSelectedFilePath(path);
+    // window.ipcRenderer.send("open-file", path);
+  };
+
   return (
     <div className="max-h-screen">
-      <TitleBar onFileSelect={(path) => setSelectedFilePath(path)} />
+      <TitleBar onFileSelect={onFileSelect} />
       {directory ? (
         <div className="flex" style={{ height: "calc(100vh - 30px)" }}>
           <div className="w-[300px]">
             {" "}
             <FileList
               selectedFile={selectedFilePath}
-              onFileSelect={(path) => setSelectedFilePath(path)}
+              onFileSelect={onFileSelect}
             />
           </div>
           {selectedFilePath && (
@@ -44,13 +58,16 @@ function App() {
               {" "}
               <div className="w-2/3 overflow-auto">
                 {" "}
-                <FileEditor filePath={selectedFilePath} />
+                <FileEditor
+                  filePath={selectedFilePath}
+                  setContentInParent={setEditorContent}
+                />
               </div>
               <div className="w-1/3">
                 {" "}
                 <SimilarEntriesComponent
                   filePath={selectedFilePath}
-                  onFileSelect={(path) => setSelectedFilePath(path)}
+                  onFileSelect={onFileSelect}
                 />
               </div>
             </div>
@@ -62,11 +79,11 @@ function App() {
       {/* <div className="flex" style={{ height: "calc(100vh - 30px)" }}>
         {" "}
         <div className="h-full bg-black w-1/3 overflow-y-auto">
-          <FileList onFileSelect={(path) => setSelectedFilePath(path)} />
+          <FileList onFileSelect={onFileSelect} />
         </div>
         <SimilarEntriesComponent
           filePath={selectedFilePath || ""}
-          onFileSelect={(path) => setSelectedFilePath(path)}
+          onFileSelect={onFileSelect}
         />
       </div> */}
     </div>

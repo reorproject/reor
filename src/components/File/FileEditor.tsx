@@ -31,9 +31,13 @@ import { LeafDirective } from "mdast-util-directive";
 
 interface FileEditorProps {
   filePath: string;
+  setContentInParent: (content: string) => void;
 }
 
-export const FileEditor: React.FC<FileEditorProps> = ({ filePath }) => {
+export const FileEditor: React.FC<FileEditorProps> = ({
+  filePath,
+  setContentInParent,
+}) => {
   const [content, setContent] = useState<string>("");
   const ref = useRef<MDXEditorMethods>(null);
   const lastSavedContentRef = useRef<string>("");
@@ -67,6 +71,11 @@ export const FileEditor: React.FC<FileEditorProps> = ({ filePath }) => {
 
     return () => clearInterval(saveInterval); // Clear the interval when component unmounts
   }, [content]); // Dependency on content ensures saveFile has the latest content
+
+  useEffect(() => {
+    console.log("setting content in child: ", content);
+    setContentInParent(content);
+  }, [content]);
 
   return (
     <div className="">
