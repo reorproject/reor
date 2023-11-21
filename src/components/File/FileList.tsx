@@ -2,10 +2,14 @@ import { FileInfo } from "electron/main/Files/Types";
 import React, { useEffect, useState } from "react";
 
 interface FileListProps {
+  selectedFile: string | null;
   onFileSelect: (path: string) => void;
 }
 
-export const FileList: React.FC<FileListProps> = ({ onFileSelect }) => {
+export const FileList: React.FC<FileListProps> = ({
+  selectedFile,
+  onFileSelect,
+}) => {
   const [files, setFiles] = useState<FileInfo[]>([]);
 
   const directoryPath = window.electronStore.getUserDirectory();
@@ -37,6 +41,7 @@ export const FileList: React.FC<FileListProps> = ({ onFileSelect }) => {
       </button> */}
       <FileExplorer
         files={files}
+        selectedFile={selectedFile}
         onFileSelect={onFileSelect}
         handleDragStart={handleDragStartImpl}
         directoryPath={directoryPath}
@@ -72,6 +77,7 @@ const moveFile = async (sourcePath: string, destinationPath: string) => {
 
 interface FileExplorerProps {
   files: FileInfo[];
+  selectedFile: string | null;
   onFileSelect: (path: string) => void;
   handleDragStart: (e: React.DragEvent, file: FileInfo) => void;
   directoryPath: string;
@@ -79,6 +85,7 @@ interface FileExplorerProps {
 
 const FileExplorer: React.FC<FileExplorerProps> = ({
   files,
+  selectedFile,
   onFileSelect,
   handleDragStart,
   directoryPath,
@@ -112,6 +119,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
         >
           <FileItem
             file={file}
+            selectedFile={selectedFile}
             onFileSelect={onFileSelect}
             handleDragStart={handleDragStart}
           />
@@ -122,12 +130,14 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
 };
 interface FileInfoProps {
   file: FileInfo;
+  selectedFile: string | null;
   onFileSelect: (path: string) => void;
   handleDragStart: (e: React.DragEvent, file: FileInfo) => void;
 }
 
 const FileItem: React.FC<FileInfoProps> = ({
   file,
+  selectedFile,
   onFileSelect,
   handleDragStart,
 }) => {
@@ -143,19 +153,34 @@ const FileItem: React.FC<FileInfoProps> = ({
   };
 
   const localHandleDragStart = (e: React.DragEvent) => {
-    e.stopPropagation(); // Prevent event bubbling up
+    e.stopPropagation();
     handleDragStart(e, file);
   };
 
   return (
     <div draggable onDragStart={localHandleDragStart}>
-      <div onClick={toggle} className="cursor-pointer">
-        {file.name}
+      <div
+        onClick={toggle}
+        className="flex items-center cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-100"
+      >
+        {isDirectory && (
+          <span
+            className={`mr-2 text-sm ${
+              isExpanded ? "transform rotate-90" : ""
+            }`}
+          >
+            {">"}
+          </span>
+        )}
+        <span className={`flex-1 ${isDirectory ? "font-semibold" : ""}`}>
+          {file.name}
+        </span>
       </div>
       {isDirectory && isExpanded && file.children && (
-        <div style={{ paddingLeft: "20px" }}>
+        <div className="pl-5">
           <FileExplorer
             files={file.children}
+            selectedFile={selectedFile}
             onFileSelect={onFileSelect}
             handleDragStart={handleDragStart}
             directoryPath={file.path}

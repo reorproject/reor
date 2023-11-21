@@ -34,7 +34,10 @@ function App() {
         <div className="flex" style={{ height: "calc(100vh - 30px)" }}>
           <div className="w-[300px]">
             {" "}
-            <FileList onFileSelect={(path) => setSelectedFilePath(path)} />
+            <FileList
+              selectedFile={selectedFilePath}
+              onFileSelect={(path) => setSelectedFilePath(path)}
+            />
           </div>
           {selectedFilePath && (
             <div className="flex" style={{ width: "calc(100vw - 300px)" }}>
