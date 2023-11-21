@@ -117,7 +117,7 @@ export const maybeRePopulateTable = async (
   const filesInfo = GetFilesInfo(directoryPath);
   if (count !== filesInfo.length) {
     await deleteAllRowsInTable(table);
-    await populateDBWithFilesInDir(table, directoryPath);
+    await populateDBWithFiles(table, filesInfo);
   }
 };
 const deleteAllRowsInTable = async (db: RagnoteTable) => {
@@ -139,11 +139,7 @@ const convertFileTypeToDBType = (file: FileInfo): RagnoteDBEntry => {
   };
 };
 
-const populateDBWithFilesInDir = async (
-  db: RagnoteTable,
-  directoryPath: string
-) => {
-  const filesInfo = GetFilesInfo(directoryPath); // TODO: deprecate
+const populateDBWithFiles = async (db: RagnoteTable, filesInfo: FileInfo[]) => {
   const entries: RagnoteDBEntry[] = await Promise.all(
     filesInfo.map(convertFileTypeToDBType)
   );
