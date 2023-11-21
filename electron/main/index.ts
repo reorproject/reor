@@ -35,6 +35,7 @@ import { FSWatcher } from "fs";
 import chokidar from "chokidar";
 import {
   GetFilesInfo,
+  moveFileOrDirectory,
   startWatchingDirectory,
   updateFileListForRenderer,
   writeFileSyncRecursive,
@@ -365,6 +366,18 @@ ipcMain.handle(
     } else {
       // If the file exists, log a message and do nothing
       console.log("File already exists:", filePath);
+    }
+  }
+);
+
+ipcMain.handle(
+  "move-file-or-dir",
+  async (event, sourcePath: string, destinationPath: string) => {
+    try {
+      moveFileOrDirectory(sourcePath, destinationPath);
+    } catch (error) {
+      console.error("Error moving file or directory:", error);
+      return { success: false, error: error };
     }
   }
 );

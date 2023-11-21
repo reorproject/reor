@@ -92,3 +92,36 @@ export function updateFileListForRenderer(
     win.webContents.send("files-list", files);
   }
 }
+
+export const moveFileOrDirectory = async (
+  sourcePath: string,
+  destinationPath: string
+) => {
+  try {
+    // Check if the source exists
+    if (!fs.existsSync(sourcePath)) {
+      throw new Error("Source path does not exist.");
+    }
+
+    // Check if the destination is a file and adjust it to be its parent directory
+    if (
+      fs.existsSync(destinationPath) &&
+      fs.lstatSync(destinationPath).isFile()
+    ) {
+      destinationPath = path.dirname(destinationPath);
+    }
+
+    // Ensure the destination directory exists
+    fs.mkdirSync(destinationPath, { recursive: true });
+
+    // Determine the new path
+    const newPath = path.join(destinationPath, path.basename(sourcePath));
+
+    // Move the file or directory
+    fs.renameSync(sourcePath, newPath);
+
+    console.log(`Moved ${sourcePath} to ${newPath}`);
+  } catch (error) {
+    console.error("Error moving file or directory:", error);
+  }
+};

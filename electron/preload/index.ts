@@ -32,6 +32,10 @@ declare global {
       readFile: (filePath: string) => Promise<any>;
       createFile: (filePath: string, content: string) => Promise<any>;
       joinPath: (...pathSegments: string[]) => Promise<string>;
+      moveFileOrDir: (
+        sourcePath: string,
+        destinationPath: string
+      ) => Promise<any>;
     };
     llm: {
       createSession: (sessionId: any) => Promise<any>;
@@ -102,6 +106,10 @@ contextBridge.exposeInMainWorld("files", {
   },
   joinPath: (...pathSegments: string[]) =>
     ipcRenderer.invoke("join-path", ...pathSegments),
+
+  moveFileOrDir: async (sourcePath: string, destinationPath: string) => {
+    return ipcRenderer.invoke("move-file-or-dir", sourcePath, destinationPath);
+  },
 });
 
 contextBridge.exposeInMainWorld("llm", {

@@ -8,6 +8,8 @@ interface FileListProps {
 export const FileList: React.FC<FileListProps> = ({ onFileSelect }) => {
   const [files, setFiles] = useState<FileInfo[]>([]);
 
+  const directoryPath = window.electronStore.getUserDirectory();
+
   useEffect(() => {
     const handleFileUpdate = (updatedFiles: FileInfo[], _: FileInfo[]) => {
       updatedFiles.sort(
@@ -37,6 +39,7 @@ export const FileList: React.FC<FileListProps> = ({ onFileSelect }) => {
         files={files}
         onFileSelect={onFileSelect}
         handleDragStart={handleDragStartImpl}
+        directoryPath={directoryPath}
       />
       {/* {files.map((file, index) => (
         <button
@@ -62,21 +65,23 @@ const handleDragStartImpl = (e: React.DragEvent, file: FileInfo) => {
   //   e.dataTransfer.getData("text/plain")
   // );
 };
+
+const moveFile = async (sourcePath: string, destinationPath: string) => {
+  const result = await window.files.moveFileOrDir(sourcePath, destinationPath);
+};
+
 interface FileExplorerProps {
   files: FileInfo[];
   onFileSelect: (path: string) => void;
   handleDragStart: (e: React.DragEvent, file: FileInfo) => void;
+  directoryPath: string;
 }
-
-const moveFileDummy = (path: string, destinationPath: string) => {
-  console.log("MOVED FROM PATH: ", path);
-  console.log("DESTINATION PATH: ", destinationPath);
-};
 
 const FileExplorer: React.FC<FileExplorerProps> = ({
   files,
   onFileSelect,
   handleDragStart,
+  directoryPath,
 }) => {
   const handleDrop = (
     e: React.DragEvent<HTMLDivElement>,
@@ -86,7 +91,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     e.stopPropagation();
     const sourcePath = e.dataTransfer.getData("text/plain"); // This is correct
 
-    moveFileDummy(sourcePath, destinationPath);
+    moveFile(sourcePath, destinationPath);
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -95,8 +100,8 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
 
   return (
     <div
-      className="h-full bg-slate-400"
-      onDrop={(e) => handleDrop(e, "dropped onto fileexplorer parent div")}
+      className="h-full"
+      onDrop={(e) => handleDrop(e, directoryPath)}
       onDragOver={handleDragOver}
     >
       {files.map((file) => (
@@ -153,6 +158,7 @@ const FileItem: React.FC<FileInfoProps> = ({
             files={file.children}
             onFileSelect={onFileSelect}
             handleDragStart={handleDragStart}
+            directoryPath={file.path}
           />
         </div>
       )}
