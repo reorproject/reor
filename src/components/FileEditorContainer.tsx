@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { FileList } from "./File/FileList";
 import { FileEditor } from "./File/FileEditor";
 import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
@@ -9,10 +9,11 @@ interface FileEditorContainerProps {}
 const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
   const [editorContent, setEditorContent] = useState<string>("");
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
+  const lastSavedContentRef = useRef<string>("");
 
   const onFileSelect = async (path: string) => {
-    // so here we can save the actual content too
-    if (selectedFilePath) {
+    // so here we can save the actual content too\\
+    if (selectedFilePath && editorContent !== lastSavedContentRef.current) {
       await window.files.writeFile(selectedFilePath, editorContent);
     }
     setSelectedFilePath(path);
@@ -37,6 +38,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
                 filePath={selectedFilePath}
                 // content={editorContent}
                 setContentInParent={setEditorContent}
+                lastSavedContentRef={lastSavedContentRef}
               />
             </div>
             <div className="w-1/3">

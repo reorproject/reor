@@ -33,16 +33,18 @@ interface FileEditorProps {
   filePath: string;
   // content: string;
   setContentInParent: (content: string) => void;
+  lastSavedContentRef: React.MutableRefObject<string>;
 }
 
 export const FileEditor: React.FC<FileEditorProps> = ({
   filePath,
   // content,
   setContentInParent,
+  lastSavedContentRef,
 }) => {
   const [content, setContent] = useState<string>("");
   const ref = useRef<MDXEditorMethods>(null);
-  const lastSavedContentRef = useRef<string>("");
+  // const lastSavedContentRef = useRef<string>("");
 
   useEffect(() => {
     const fetchContent = async () => {
