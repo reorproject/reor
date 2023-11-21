@@ -55,16 +55,40 @@ interface FileExplorerProps {
   onFileSelect: (path: string) => void;
 }
 
+const moveFileDummy = (path: string, destinationPath: string) => {
+  console.log("MOVED TO PATH: ", path);
+  console.log("DESTINATION PATH: ", destinationPath);
+};
+
 const FileExplorer: React.FC<FileExplorerProps> = ({ files, onFileSelect }) => {
+  const handleDrop = (
+    e: React.DragEvent<HTMLDivElement>,
+    destinationPath: string
+  ) => {
+    e.preventDefault();
+    const sourcePath = e.dataTransfer.getData("text/plain"); // This is correct
+
+    moveFileDummy(sourcePath, destinationPath);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+  };
+
   return (
     <div>
       {files.map((file) => (
-        <FileItem key={file.path} file={file} onFileSelect={onFileSelect} />
+        <div
+          onDrop={(e) => handleDrop(e, file.path)}
+          onDragOver={handleDragOver}
+          key={file.path}
+        >
+          <FileItem file={file} onFileSelect={onFileSelect} />
+        </div>
       ))}
     </div>
   );
 };
-
 interface FileInfoProps {
   file: FileInfo;
   onFileSelect: (path: string) => void;
@@ -73,6 +97,11 @@ interface FileInfoProps {
 const FileItem: React.FC<FileInfoProps> = ({ file, onFileSelect }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const isDirectory = file.type === "directory";
+
+  const handleDragStart = (e: React.DragEvent) => {
+    e.dataTransfer.setData("text/plain", file.path); // Use "text/plain" here
+    e.dataTransfer.effectAllowed = "move";
+  };
 
   const toggle = () => {
     if (isDirectory) {
@@ -83,7 +112,7 @@ const FileItem: React.FC<FileInfoProps> = ({ file, onFileSelect }) => {
   };
 
   return (
-    <div>
+    <div draggable onDragStart={handleDragStart}>
       <div
         onClick={toggle}
         // style={{ cursor: isDirectory ? "pointer" : "default" }}
