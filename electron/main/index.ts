@@ -33,7 +33,12 @@ import {
 import { FileInfo } from "./Files/Types";
 import { FSWatcher } from "fs";
 import chokidar from "chokidar";
-import { GetFilesInfo, writeFileSyncRecursive } from "./Files/Filesystem";
+import {
+  GetFilesInfo,
+  startWatchingDirectory,
+  updateFileListForRenderer,
+  writeFileSyncRecursive,
+} from "./Files/Filesystem";
 
 const store = new Store<StoreSchema>();
 // const user = store.get("user");
@@ -139,7 +144,9 @@ app.whenReady().then(async () => {
 
   if (userDirectory) {
     await maybeRePopulateTable(dbTable, userDirectory, [".md"]);
-    startWatchingDirectory(store.get(StoreKeys.UserDirectory));
+    if (win) {
+      startWatchingDirectory(win, store.get(StoreKeys.UserDirectory));
+    }
   }
 
   // const currentTimestamp: Date = new Date();
@@ -296,46 +303,28 @@ ipcMain.handle("open-directory-dialog", async (event) => {
 // });
 
 ipcMain.on("set-user-directory", (event, userDirectory: string) => {
+  console.log("setting user directory", userDirectory);
   store.set("UserDirectory", userDirectory);
-
+  // Test whether user directory has been set:
+  let userDirectoryFromStore = store.get("UserDirectory");
+  console.log("userDirectoryFromStore", userDirectoryFromStore);
   if (fileWatcher) {
     fileWatcher.close();
   }
 
-  startWatchingDirectory(userDirectory);
-  updateFileListForRenderer(userDirectory);
+  if (win) {
+    startWatchingDirectory(win, userDirectory);
+    updateFileListForRenderer(win, userDirectory);
+  }
   maybeRePopulateTable(dbTable, userDirectory, [".md"]);
   event.returnValue = "success";
+  userDirectoryFromStore = store.get("UserDirectory");
+  console.log("userDirectoryFromStore", userDirectoryFromStore);
 });
-
-function startWatchingDirectory(directory: string): void {
-  try {
-    const watcher = chokidar.watch(directory, {
-      ignoreInitial: true, // Skip initial add events for existing files
-    });
-
-    watcher.on("add", (path) => {
-      console.log(`File added: ${path}`);
-      updateFileListForRenderer(directory);
-    });
-
-    // Handle other events like 'change', 'unlink' if needed
-
-    // No 'ready' event handler is needed here, as we're ignoring initial scan
-  } catch (error) {
-    console.error("Error setting up file watcher:", error);
-  }
-}
-
-function updateFileListForRenderer(directory: string): void {
-  const files = GetFilesInfo(directory);
-  if (win) {
-    win.webContents.send("files-list", files);
-  }
-}
 
 ipcMain.on("get-user-directory", (event) => {
   const path = store.get(StoreKeys.UserDirectory);
+  console.log("path", path);
   event.returnValue = path;
 });
 

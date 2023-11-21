@@ -1,6 +1,8 @@
 import path from "path";
 import fs from "fs";
 import { FileInfo } from "./Types";
+import chokidar from "chokidar";
+import { BrowserWindow } from "electron";
 
 export function GetFilesInfo(
   directory: string,
@@ -51,4 +53,37 @@ export function writeFileSyncRecursive(
   }
 
   fs.writeFileSync(filePath, content, charset);
+}
+
+export function startWatchingDirectory(
+  win: BrowserWindow,
+  directory: string
+): void {
+  try {
+    const watcher = chokidar.watch(directory, {
+      ignoreInitial: true, // Skip initial add events for existing files
+    });
+
+    // TODO: oh mabe we'll need to monitor far more events on this. like delete, rename, etc.
+    watcher.on("add", (path) => {
+      console.log(`File added: ${path}`);
+      updateFileListForRenderer(win, directory);
+    });
+
+    // Handle other events like 'change', 'unlink' if needed
+
+    // No 'ready' event handler is needed here, as we're ignoring initial scan
+  } catch (error) {
+    console.error("Error setting up file watcher:", error);
+  }
+}
+
+export function updateFileListForRenderer(
+  win: BrowserWindow,
+  directory: string
+): void {
+  const files = GetFilesInfo(directory);
+  if (win) {
+    win.webContents.send("files-list", files);
+  }
 }
