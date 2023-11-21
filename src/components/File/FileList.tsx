@@ -57,10 +57,10 @@ export const FileList: React.FC<FileListProps> = ({ onFileSelect }) => {
 const handleDragStartImpl = (e: React.DragEvent, file: FileInfo) => {
   e.dataTransfer.setData("text/plain", file.path);
   e.dataTransfer.effectAllowed = "move";
-  console.log(
-    "handle drag start event: ",
-    e.dataTransfer.getData("text/plain")
-  );
+  // console.log(
+  //   "handle drag start event: ",
+  //   e.dataTransfer.getData("text/plain")
+  // );
 };
 interface FileExplorerProps {
   files: FileInfo[];
@@ -94,7 +94,11 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   };
 
   return (
-    <div>
+    <div
+      className="h-full bg-slate-400"
+      onDrop={(e) => handleDrop(e, "dropped onto fileexplorer parent div")}
+      onDragOver={handleDragOver}
+    >
       {files.map((file) => (
         <div
           onDrop={(e) => handleDrop(e, file.path)}
