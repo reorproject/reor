@@ -6,6 +6,7 @@ import { BrowserWindow } from "electron";
 
 export function GetFilesInfo(
   directory: string,
+  extensions?: string[],
   parentRelativePath: string = ""
 ): FileInfo[] {
   let fileList: FileInfo[] = [];
@@ -23,7 +24,7 @@ export function GetFilesInfo(
     const stats = fs.statSync(itemPath);
 
     if (stats.isDirectory()) {
-      const children = GetFilesInfo(itemPath, relativePath);
+      const children = GetFilesInfo(itemPath, extensions, relativePath);
       fileList.push({
         name: item,
         path: itemPath,
@@ -33,13 +34,18 @@ export function GetFilesInfo(
         children: children,
       });
     } else {
-      fileList.push({
-        name: item,
-        path: itemPath,
-        relativePath: relativePath,
-        dateModified: stats.mtime,
-        type: "file",
-      });
+      if (
+        !extensions ||
+        extensions.some((ext) => item.toLowerCase().endsWith(ext.toLowerCase()))
+      ) {
+        fileList.push({
+          name: item,
+          path: itemPath,
+          relativePath: relativePath,
+          dateModified: stats.mtime,
+          type: "file",
+        });
+      }
     }
   });
 
@@ -85,9 +91,10 @@ export function startWatchingDirectory(
 
 export function updateFileListForRenderer(
   win: BrowserWindow,
-  directory: string
+  directory: string,
+  fileExtensions?: string[]
 ): void {
-  const files = GetFilesInfo(directory);
+  const files = GetFilesInfo(directory, fileExtensions);
   if (win) {
     win.webContents.send("files-list", files);
   }

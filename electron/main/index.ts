@@ -70,6 +70,8 @@ if (!app.requestSingleInstanceLock()) {
   process.exit(0);
 }
 
+const markdownExtensions = [".md", ".markdown", ".mdown", ".mkdn", ".mkd"];
+
 // Remove electron security warnings
 // This warning only shows in development mode
 // Read more on https://www.electronjs.org/docs/latest/tutorial/security
@@ -121,7 +123,7 @@ async function createWindow() {
   win.webContents.on("did-finish-load", () => {
     win?.webContents.send("main-process-message", new Date().toLocaleString());
     const userDirectory = store.get(StoreKeys.UserDirectory) as string;
-    const files = GetFilesInfo(userDirectory);
+    const files = GetFilesInfo(userDirectory, markdownExtensions);
     win?.webContents.send("files-list", files);
   });
 
@@ -145,7 +147,7 @@ app.whenReady().then(async () => {
   createWindow();
 
   if (userDirectory) {
-    await maybeRePopulateTable(dbTable, userDirectory);
+    await maybeRePopulateTable(dbTable, userDirectory, markdownExtensions);
     if (win) {
       startWatchingDirectory(win, userDirectory);
     }
@@ -313,9 +315,9 @@ ipcMain.on("set-user-directory", (event, userDirectory: string) => {
 
   if (win) {
     startWatchingDirectory(win, userDirectory);
-    updateFileListForRenderer(win, userDirectory);
+    updateFileListForRenderer(win, userDirectory, markdownExtensions);
   }
-  maybeRePopulateTable(dbTable, userDirectory);
+  maybeRePopulateTable(dbTable, userDirectory, markdownExtensions);
   event.returnValue = "success";
 });
 

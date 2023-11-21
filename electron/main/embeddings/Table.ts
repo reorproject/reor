@@ -111,10 +111,11 @@ export class RagnoteTable {
 
 export const maybeRePopulateTable = async (
   table: RagnoteTable,
-  directoryPath: string
+  directoryPath: string,
+  fileExtensions: string[]
 ) => {
   const count = await table.countRows();
-  const filesInfo = GetFilesInfo(directoryPath);
+  const filesInfo = GetFilesInfo(directoryPath, fileExtensions);
   if (count !== filesInfo.length) {
     await deleteAllRowsInTable(table);
     await populateDBWithFiles(table, filesInfo);
