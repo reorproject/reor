@@ -10,6 +10,11 @@ export function GetFilesInfo(
 ): FileInfo[] {
   let fileList: FileInfo[] = [];
 
+  if (!fs.existsSync(directory)) {
+    console.error("Directory path does not exist:", directory);
+    return fileList;
+  }
+
   const items = fs.readdirSync(directory);
 
   items.forEach((item) => {

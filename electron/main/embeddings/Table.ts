@@ -111,14 +111,13 @@ export class RagnoteTable {
 
 export const maybeRePopulateTable = async (
   table: RagnoteTable,
-  directoryPath: string,
-  fileExtensions?: string[]
+  directoryPath: string
 ) => {
   const count = await table.countRows();
   const filesInfo = GetFilesInfo(directoryPath);
   if (count !== filesInfo.length) {
     await deleteAllRowsInTable(table);
-    await populateDBWithFilesInDir(table, directoryPath, fileExtensions);
+    await populateDBWithFilesInDir(table, directoryPath);
   }
 };
 const deleteAllRowsInTable = async (db: RagnoteTable) => {
@@ -142,8 +141,7 @@ const convertFileTypeToDBType = (file: FileInfo): RagnoteDBEntry => {
 
 const populateDBWithFilesInDir = async (
   db: RagnoteTable,
-  directoryPath: string,
-  fileExtensions?: string[]
+  directoryPath: string
 ) => {
   const filesInfo = GetFilesInfo(directoryPath); // TODO: deprecate
   const entries: RagnoteDBEntry[] = await Promise.all(
@@ -162,21 +160,6 @@ function readFile(filePath: string): string {
     return "";
   }
 }
-
-// function getFileNamesInDirectory( // TODO: modify this to the tree structure/use the other get files function
-//   directoryPath: string,
-//   extensions?: string[]
-// ): string[] {
-//   const files = fs.readdirSync(directoryPath);
-//   if (!extensions) {
-//     return files;
-//   }
-
-//   return files.filter((file) => {
-//     const fileExtension = path.extname(file);
-//     return extensions.includes(fileExtension);
-//   });
-// }
 
 function convertToRecord(entry: RagnoteDBEntry): Record<string, unknown> {
   const recordEntry: Record<string, unknown> = entry as unknown as Record<

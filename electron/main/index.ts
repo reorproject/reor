@@ -119,7 +119,8 @@ async function createWindow() {
   // Test actively push message to the Electron-Renderer
   win.webContents.on("did-finish-load", () => {
     win?.webContents.send("main-process-message", new Date().toLocaleString());
-    const files = GetFilesInfo(store.get(StoreKeys.UserDirectory));
+    const userDirectory = store.get(StoreKeys.UserDirectory) as string;
+    const files = GetFilesInfo(userDirectory);
     win?.webContents.send("files-list", files);
   });
 
@@ -143,9 +144,9 @@ app.whenReady().then(async () => {
   createWindow();
 
   if (userDirectory) {
-    await maybeRePopulateTable(dbTable, userDirectory, [".md"]);
+    await maybeRePopulateTable(dbTable, userDirectory);
     if (win) {
-      startWatchingDirectory(win, store.get(StoreKeys.UserDirectory));
+      startWatchingDirectory(win, userDirectory);
     }
   }
 
@@ -304,10 +305,7 @@ ipcMain.handle("open-directory-dialog", async (event) => {
 
 ipcMain.on("set-user-directory", (event, userDirectory: string) => {
   console.log("setting user directory", userDirectory);
-  store.set("UserDirectory", userDirectory);
-  // Test whether user directory has been set:
-  let userDirectoryFromStore = store.get("UserDirectory");
-  console.log("userDirectoryFromStore", userDirectoryFromStore);
+  store.set(StoreKeys.UserDirectory, userDirectory);
   if (fileWatcher) {
     fileWatcher.close();
   }
@@ -316,15 +314,12 @@ ipcMain.on("set-user-directory", (event, userDirectory: string) => {
     startWatchingDirectory(win, userDirectory);
     updateFileListForRenderer(win, userDirectory);
   }
-  maybeRePopulateTable(dbTable, userDirectory, [".md"]);
+  maybeRePopulateTable(dbTable, userDirectory);
   event.returnValue = "success";
-  userDirectoryFromStore = store.get("UserDirectory");
-  console.log("userDirectoryFromStore", userDirectoryFromStore);
 });
 
 ipcMain.on("get-user-directory", (event) => {
   const path = store.get(StoreKeys.UserDirectory);
-  console.log("path", path);
   event.returnValue = path;
 });
 
