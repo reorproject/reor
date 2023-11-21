@@ -33,7 +33,11 @@ export const FileList: React.FC<FileListProps> = ({ onFileSelect }) => {
       >
         Create New File
       </button> */}
-      <FileExplorer files={files} onFileSelect={onFileSelect} />
+      <FileExplorer
+        files={files}
+        onFileSelect={onFileSelect}
+        handleDragStart={handleDragStartImpl}
+      />
       {/* {files.map((file, index) => (
         <button
           key={index}
@@ -50,17 +54,30 @@ export const FileList: React.FC<FileListProps> = ({ onFileSelect }) => {
   );
 };
 
+const handleDragStartImpl = (e: React.DragEvent, file: FileInfo) => {
+  e.dataTransfer.setData("text/plain", file.path);
+  e.dataTransfer.effectAllowed = "move";
+  console.log(
+    "handle drag start event: ",
+    e.dataTransfer.getData("text/plain")
+  );
+};
 interface FileExplorerProps {
   files: FileInfo[];
   onFileSelect: (path: string) => void;
+  handleDragStart: (e: React.DragEvent, file: FileInfo) => void;
 }
 
 const moveFileDummy = (path: string, destinationPath: string) => {
-  console.log("MOVED TO PATH: ", path);
+  console.log("MOVED FROM PATH: ", path);
   console.log("DESTINATION PATH: ", destinationPath);
 };
 
-const FileExplorer: React.FC<FileExplorerProps> = ({ files, onFileSelect }) => {
+const FileExplorer: React.FC<FileExplorerProps> = ({
+  files,
+  onFileSelect,
+  handleDragStart,
+}) => {
   const handleDrop = (
     e: React.DragEvent<HTMLDivElement>,
     destinationPath: string
@@ -83,7 +100,11 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ files, onFileSelect }) => {
           onDragOver={handleDragOver}
           key={file.path}
         >
-          <FileItem file={file} onFileSelect={onFileSelect} />
+          <FileItem
+            file={file}
+            onFileSelect={onFileSelect}
+            handleDragStart={handleDragStart}
+          />
         </div>
       ))}
     </div>
@@ -92,16 +113,16 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ files, onFileSelect }) => {
 interface FileInfoProps {
   file: FileInfo;
   onFileSelect: (path: string) => void;
+  handleDragStart: (e: React.DragEvent, file: FileInfo) => void;
 }
 
-const FileItem: React.FC<FileInfoProps> = ({ file, onFileSelect }) => {
+const FileItem: React.FC<FileInfoProps> = ({
+  file,
+  onFileSelect,
+  handleDragStart,
+}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const isDirectory = file.type === "directory";
-
-  const handleDragStart = (e: React.DragEvent) => {
-    e.dataTransfer.setData("text/plain", file.path); // Use "text/plain" here
-    e.dataTransfer.effectAllowed = "move";
-  };
 
   const toggle = () => {
     if (isDirectory) {
@@ -111,18 +132,23 @@ const FileItem: React.FC<FileInfoProps> = ({ file, onFileSelect }) => {
     }
   };
 
+  const localHandleDragStart = (e: React.DragEvent) => {
+    e.stopPropagation(); // Prevent event bubbling up
+    handleDragStart(e, file);
+  };
+
   return (
-    <div draggable onDragStart={handleDragStart}>
-      <div
-        onClick={toggle}
-        // style={{ cursor: isDirectory ? "pointer" : "default" }}
-        className="cursor-pointer"
-      >
+    <div draggable onDragStart={localHandleDragStart}>
+      <div onClick={toggle} className="cursor-pointer">
         {file.name}
       </div>
       {isDirectory && isExpanded && file.children && (
         <div style={{ paddingLeft: "20px" }}>
-          <FileExplorer files={file.children} onFileSelect={onFileSelect} />
+          <FileExplorer
+            files={file.children}
+            onFileSelect={onFileSelect}
+            handleDragStart={handleDragStart}
+          />
         </div>
       )}
     </div>
