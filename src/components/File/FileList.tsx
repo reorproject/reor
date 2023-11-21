@@ -143,6 +143,7 @@ const FileItem: React.FC<FileInfoProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const isDirectory = file.type === "directory";
+  const isSelected = file.path === selectedFile; // Check if the file is selected
 
   const toggle = () => {
     if (isDirectory) {
@@ -157,12 +158,13 @@ const FileItem: React.FC<FileInfoProps> = ({
     handleDragStart(e, file);
   };
 
+  const itemClasses = `flex items-center cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-100 ${
+    isSelected ? "bg-blue-100 font-bold" : "" // Tailwind classes for selected item
+  }`;
+
   return (
     <div draggable onDragStart={localHandleDragStart}>
-      <div
-        onClick={toggle}
-        className="flex items-center cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-100"
-      >
+      <div onClick={toggle} className={itemClasses}>
         {isDirectory && (
           <span
             className={`mr-2 text-sm ${
