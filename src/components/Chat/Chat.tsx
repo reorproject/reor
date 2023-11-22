@@ -67,10 +67,16 @@ const ChatWithLLM: React.FC = () => {
       console.error("Failed to initialize streaming response:", error);
     }
   };
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // Prevents default action (new line) when pressing Enter
+      handleSubmit();
+    }
+  };
 
   return (
     <div className="flex flex-col h-screen max-w-md mx-auto border shadow-lg overflow-hidden">
-      <div className={`flex-1 overflow-auto p-4 bg-white`}>
+      <div className="flex-1 overflow-auto p-4 bg-white">
         {loading && <p className="text-center text-gray-500">Loading...</p>}
         <div className="space-y-2">
           {messages.map((message, index) => (
@@ -98,6 +104,7 @@ const ChatWithLLM: React.FC = () => {
             type="text"
             value={userInput}
             onChange={handleUserInput}
+            onKeyDown={handleKeyDown}
             className="flex-1 p-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Type your message..."
             disabled={!sessionId || loading}
