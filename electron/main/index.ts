@@ -6,7 +6,7 @@ import Store from "electron-store";
 import * as path from "path";
 import * as fs from "fs";
 import { StoreKeys, StoreSchema } from "./storeConfig";
-import { ModelLoader, SessionService } from "./llm/nodellamacpp";
+import { ModelLoader, SessionService } from "./llm/LlamaCpp";
 import * as lancedb from "vectordb";
 import {
   Field,
@@ -409,19 +409,31 @@ ipcMain.handle(
   }
 );
 
-// const modelLoader = new ModelLoader(); // Singleton
-// const sessions: { [sessionId: string]: SessionService } = {};
+const modelLoader = new ModelLoader(); // Singleton
+const sessions: { [sessionId: string]: SessionService } = {};
 
-// ipcMain.handle("createSession", async (event, sessionId: string) => {
-//   if (sessions[sessionId]) {
-//     throw new Error(`Session ${sessionId} already exists.`);
-//   }
-//   // sessionService.webContents = event.sender; // Attach the webContents of the sender to your session service
-//   const webContents = event.sender;
-//   const sessionService = new SessionService(modelLoader, webContents);
-//   sessions[sessionId] = sessionService;
-//   return sessionId;
-// });
+ipcMain.handle("createSession", async (event, sessionId: string) => {
+  if (sessions[sessionId]) {
+    throw new Error(`Session ${sessionId} already exists.`);
+  }
+  // sessionService.webContents = event.sender; // Attach the webContents of the sender to your session service
+  const webContents = event.sender;
+  const sessionService = new SessionService(modelLoader, webContents);
+  sessions[sessionId] = sessionService;
+  return sessionId;
+});
+
+ipcMain.handle(
+  "initializeStreamingResponse",
+  async (event, sessionId: string, prompt: string) => {
+    const sessionService = sessions[sessionId];
+    if (!sessionService) {
+      throw new Error(`Session ${sessionId} does not exist.`);
+    }
+
+    return sessionService.streamingPrompt(prompt);
+  }
+);
 
 // ipcMain.handle("getHello", async (event, sessionId: string) => {
 //   const sessionService = sessions[sessionId];
@@ -434,18 +446,6 @@ ipcMain.handle(
 //   console.log("getHelloResponse", getHelloResponse);
 //   return getHelloResponse;
 // });
-
-// ipcMain.handle(
-//   "initializeStreamingResponse",
-//   async (event, sessionId: string, prompt: string) => {
-//     const sessionService = sessions[sessionId];
-//     if (!sessionService) {
-//       throw new Error(`Session ${sessionId} does not exist.`);
-//     }
-
-//     return sessionService.streamingPrompt(prompt);
-//   }
-// );
 
 export async function convertToTable<T>(
   data: Array<Record<string, unknown>>,
