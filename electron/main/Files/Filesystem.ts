@@ -3,6 +3,11 @@ import fs from "fs";
 import { FileInfo, FileInfoNode, FileInfoTree } from "./Types";
 import chokidar from "chokidar";
 import { BrowserWindow } from "electron";
+import {
+  RagnoteTable,
+  addTreeToTable,
+  removeTreeFromTable,
+} from "../embeddings/Table";
 
 export function GetFilesInfoList(
   directory: string,
@@ -14,60 +19,80 @@ export function GetFilesInfoList(
 }
 
 export function GetFilesInfoTree(
-  directory: string,
+  pathInput: string,
   extensions?: string[],
   parentRelativePath: string = ""
 ): FileInfoTree {
   let fileInfoTree: FileInfoTree = [];
 
-  if (!fs.existsSync(directory)) {
-    console.error("Directory path does not exist:", directory);
+  if (!fs.existsSync(pathInput)) {
+    console.error("Path does not exist:", pathInput);
     return fileInfoTree;
   }
 
-  const items = fs.readdirSync(directory);
+  try {
+    const stats = fs.statSync(pathInput);
 
-  items.forEach((item) => {
-    const itemPath = path.join(directory, item);
-    const relativePath = path.join(parentRelativePath, item);
-
-    try {
-      const stats = fs.statSync(itemPath);
-
-      if (stats.isDirectory()) {
-        const children = GetFilesInfoTree(itemPath, extensions, relativePath);
+    if (stats.isFile()) {
+      const fileExtension = path.extname(pathInput).toLowerCase();
+      if ((extensions && extensions.includes(fileExtension)) || !extensions) {
         fileInfoTree.push({
-          name: item,
-          path: itemPath,
-          relativePath: relativePath,
+          name: path.basename(pathInput),
+          path: pathInput,
+          relativePath: parentRelativePath,
           dateModified: stats.mtime,
-          type: "directory",
-          children: children,
+          type: "file",
         });
-      } else {
-        const fileExtension = path.extname(item).toLowerCase();
+      }
+      return fileInfoTree;
+    }
 
-        if (
-          (extensions && extensions.includes(fileExtension)) ||
-          (!extensions && fileExtension)
-        ) {
+    const items = fs.readdirSync(pathInput);
+
+    items.forEach((item) => {
+      const itemPath = path.join(pathInput, item);
+      const relativePath = path.join(parentRelativePath, item);
+
+      try {
+        const itemStats = fs.statSync(itemPath);
+
+        if (itemStats.isDirectory()) {
+          const children = GetFilesInfoTree(itemPath, extensions, relativePath);
           fileInfoTree.push({
             name: item,
             path: itemPath,
             relativePath: relativePath,
-            dateModified: stats.mtime,
-            type: "file",
+            dateModified: itemStats.mtime,
+            type: "directory",
+            children: children,
           });
+        } else {
+          const fileExtension = path.extname(item).toLowerCase();
+
+          if (
+            (extensions && extensions.includes(fileExtension)) ||
+            (!extensions && fileExtension)
+          ) {
+            fileInfoTree.push({
+              name: item,
+              path: itemPath,
+              relativePath: relativePath,
+              dateModified: itemStats.mtime,
+              type: "file",
+            });
+          }
         }
+      } catch (error) {
+        console.error(`Error accessing ${itemPath}:`, error);
       }
-    } catch (error) {
-      // If there's an error (e.g., permission error), skip this file/directory
-      console.error(`Error accessing ${itemPath}:`, error);
-    }
-  });
+    });
+  } catch (error) {
+    console.error(`Error accessing ${pathInput}:`, error);
+  }
 
   return fileInfoTree;
 }
+
 export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
   let flatList: FileInfo[] = [];
 
@@ -143,17 +168,31 @@ export function updateFileListForRenderer(
   }
 }
 
-export const moveFileOrDirectory = async (
+export const orchestrateEntryMove = async (
+  table: RagnoteTable,
+  sourcePath: string,
+  destinationPath: string,
+  extensions?: string[]
+) => {
+  const fileSystemTree = GetFilesInfoTree(sourcePath, extensions);
+  await removeTreeFromTable(table, fileSystemTree);
+  const newDestinationPath = moveFileOrDirectoryInFileSystem(
+    sourcePath,
+    destinationPath
+  );
+  const newFileSystemTree = GetFilesInfoTree(newDestinationPath, extensions);
+  await addTreeToTable(table, newFileSystemTree);
+};
+
+export const moveFileOrDirectoryInFileSystem = (
   sourcePath: string,
   destinationPath: string
-) => {
+): string => {
   try {
-    // Check if the source exists
     if (!fs.existsSync(sourcePath)) {
       throw new Error("Source path does not exist.");
     }
 
-    // Check if the destination is a file and adjust it to be its parent directory
     if (
       fs.existsSync(destinationPath) &&
       fs.lstatSync(destinationPath).isFile()
@@ -161,17 +200,16 @@ export const moveFileOrDirectory = async (
       destinationPath = path.dirname(destinationPath);
     }
 
-    // Ensure the destination directory exists
     fs.mkdirSync(destinationPath, { recursive: true });
 
-    // Determine the new path
     const newPath = path.join(destinationPath, path.basename(sourcePath));
 
-    // Move the file or directory
     fs.renameSync(sourcePath, newPath);
 
     console.log(`Moved ${sourcePath} to ${newPath}`);
+    return newPath;
   } catch (error) {
     console.error("Error moving file or directory:", error);
+    return "";
   }
 };

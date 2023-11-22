@@ -7,8 +7,8 @@ import {
   EnhancedEmbeddingFunction,
   createEmbeddingFunction,
 } from "./Transformers";
-import { GetFilesInfoList } from "../Files/Filesystem";
-import { FileInfo } from "../Files/Types";
+import { GetFilesInfoList, flattenFileInfoTree } from "../Files/Filesystem";
+import { FileInfo, FileInfoTree } from "../Files/Types";
 
 export interface RagnoteDBEntry {
   notepath: string;
@@ -130,6 +130,12 @@ const deleteAllRowsInTable = async (db: RagnoteTable) => {
   }
 };
 
+const convertTreeToDBEntries = (tree: FileInfoTree): RagnoteDBEntry[] => {
+  const flattened = flattenFileInfoTree(tree);
+  const entries = flattened.map(convertFileTypeToDBType); // TODO: maybe this can be run async
+  return entries;
+};
+
 // so we want a function to convert files to dbEntry types (which will involve chunking later on)
 const convertFileTypeToDBType = (file: FileInfo): RagnoteDBEntry => {
   return {
@@ -138,6 +144,25 @@ const convertFileTypeToDBType = (file: FileInfo): RagnoteDBEntry => {
     subnoteindex: 0,
     timeadded: new Date(),
   };
+};
+
+export const addTreeToTable = async (
+  dbTable: RagnoteTable,
+  fileTree: FileInfoTree
+): Promise<void> => {
+  const dbEntries = convertTreeToDBEntries(fileTree);
+  await dbTable.add(dbEntries);
+};
+
+export const removeTreeFromTable = async (
+  dbTable: RagnoteTable,
+  fileTree: FileInfoTree
+): Promise<void> => {
+  const flattened = flattenFileInfoTree(fileTree);
+  const filePaths = flattened.map((x) => x.path);
+  for (const filePath of filePaths) {
+    await dbTable.delete(`${DatabaseFields.NOTE_PATH} = "${filePath}"`);
+  }
 };
 
 export const updateNoteInTable = async (

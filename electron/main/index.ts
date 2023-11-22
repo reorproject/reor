@@ -35,7 +35,8 @@ import { FSWatcher } from "fs";
 import chokidar from "chokidar";
 import {
   GetFilesInfoTree,
-  moveFileOrDirectory,
+  moveFileOrDirectoryInFileSystem,
+  orchestrateEntryMove,
   startWatchingDirectory,
   updateFileListForRenderer,
   writeFileSyncRecursive,
@@ -377,7 +378,12 @@ ipcMain.handle(
   "move-file-or-dir",
   async (event, sourcePath: string, destinationPath: string) => {
     try {
-      moveFileOrDirectory(sourcePath, destinationPath);
+      orchestrateEntryMove(
+        dbTable,
+        sourcePath,
+        destinationPath,
+        markdownExtensions
+      );
     } catch (error) {
       console.error("Error moving file or directory:", error);
       return { success: false, error: error };
