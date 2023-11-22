@@ -140,6 +140,26 @@ const convertFileTypeToDBType = (file: FileInfo): RagnoteDBEntry => {
   };
 };
 
+export const updateNoteInTable = async (
+  dbTable: RagnoteTable,
+  filePath: string,
+  content: string
+): Promise<void> => {
+  // TODO: maybe convert this to have try catch blocks.
+  console.log("deleting from table:");
+  await dbTable.delete(`${DatabaseFields.NOTE_PATH} = "${filePath}"`);
+  const currentTimestamp: Date = new Date();
+  console.log("adding back to table:");
+  await dbTable.add([
+    {
+      notepath: filePath,
+      content: content,
+      subnoteindex: 0,
+      timeadded: currentTimestamp,
+    },
+  ]);
+};
+
 const populateDBWithFiles = async (db: RagnoteTable, filesInfo: FileInfo[]) => {
   const entries: RagnoteDBEntry[] = await Promise.all(
     filesInfo.map(convertFileTypeToDBType)

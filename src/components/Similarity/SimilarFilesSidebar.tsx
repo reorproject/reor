@@ -12,19 +12,11 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   const [similarEntries, setSimilarEntries] = useState<RagnoteDBEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleFileRead = async (path: string) => {
+  const handleNewFileOpen = async (path: string) => {
     setLoading(true);
     try {
-      const fileContent: string = await window.files.readFile(path);
-      const searchResults: RagnoteDBEntry[] = await window.database.search(
-        fileContent,
-        10
-      );
-      // filter out the current file:
-      const filteredSearchResults = searchResults.filter(
-        (result) => result.notepath !== path
-      );
-      setSimilarEntries(filteredSearchResults);
+      const searchResults = await performSearch(path);
+      setSimilarEntries(searchResults);
     } catch (error) {
       console.error("Error:", error);
     } finally {
@@ -32,11 +24,38 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     }
   };
 
+  const performSearch = async (path: string): Promise<RagnoteDBEntry[]> => {
+    const fileContent: string = await window.files.readFile(path);
+    const searchResults: RagnoteDBEntry[] = await window.database.search(
+      fileContent,
+      10
+    );
+    // filter out the current file:
+    const filteredSearchResults = searchResults.filter(
+      (result) => result.notepath !== path
+    );
+    return filteredSearchResults;
+  };
+
   useEffect(() => {
     if (filePath) {
-      handleFileRead(filePath);
+      handleNewFileOpen(filePath);
     }
   }, [filePath]);
+
+  useEffect(() => {
+    const listener = () => {
+      console.log("received vector-database-update event");
+      performSearch(filePath)
+        .then((results) => setSimilarEntries(results))
+        .catch((error) => console.error("Error:", error));
+    };
+
+    window.ipcRenderer.receive("vector-database-update", listener);
+    return () => {
+      window.ipcRenderer.removeListener("vector-database-update", listener);
+    };
+  }, []);
 
   return (
     <div className="h-full overflow-y-auto">

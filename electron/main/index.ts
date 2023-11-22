@@ -29,6 +29,7 @@ import {
   RagnoteDBEntry,
   RagnoteTable,
   maybeRePopulateTable,
+  updateNoteInTable,
 } from "./embeddings/Table";
 import { FileInfo } from "./Files/Types";
 import { FSWatcher } from "fs";
@@ -350,10 +351,11 @@ ipcMain.handle(
   async (event, filePath: string, content: string): Promise<void> => {
     console.log("writing file", filePath);
     // so here we can use the table we've created to add and remove things from the database. And all of the methods can be async to not hold up any threads
-    await updateNoteInDB(dbTable, filePath, content);
+    await updateNoteInTable(dbTable, filePath, content);
     console.log("content to write", content);
     await fs.writeFileSync(filePath, content, "utf-8");
     console.log("finished writing file...");
+    win?.webContents.send("vector-database-update");
   }
 );
 
@@ -401,26 +403,6 @@ ipcMain.handle(
     }
   }
 );
-
-const updateNoteInDB = async (
-  dbTable: RagnoteTable,
-  filePath: string,
-  content: string
-): Promise<void> => {
-  // TODO: maybe convert this to have try catch blocks.
-  console.log("deleting from table:");
-  await dbTable.delete(`${DatabaseFields.NOTE_PATH} = "${filePath}"`);
-  const currentTimestamp: Date = new Date();
-  console.log("adding back to table:");
-  await dbTable.add([
-    {
-      notepath: filePath,
-      content: content,
-      subnoteindex: 0,
-      timeadded: currentTimestamp,
-    },
-  ]);
-};
 
 // const modelLoader = new ModelLoader(); // Singleton
 // const sessions: { [sessionId: string]: SessionService } = {};
