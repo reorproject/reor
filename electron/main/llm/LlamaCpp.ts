@@ -1,32 +1,22 @@
 import path from "path";
 import os from "os";
-// import * as nodeLLamaCpp from "node-llama-cpp";
+import { IModel, ISessionService } from "./Types";
 
-export class ModelLoader {
+export class ModelLoader implements IModel {
   private model: any;
 
-  constructor() {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    import("node-llama-cpp")
-      .then((nodeLLamaCpp: any) => {
-        try {
-          this.model = new nodeLLamaCpp.LlamaModel({
-            modelPath: path.join(
-              os.homedir(),
-              "Downloads",
-              "tinyllama-2-1b-miniguanaco.Q2_K.gguf"
-            ),
-            gpuLayers: 0,
-          });
-        } catch (error) {
-          console.error("Error initializing LlamaModel:", error);
-          // Handle or throw the error further if needed
-        }
-      })
-      .catch((error) => {
-        console.error("Error importing node-llama-cpp:", error);
-        // Handle or throw the error further if needed
+  async loadModel(): Promise<void> {
+    // Load model logic
+    this.model = await import("node-llama-cpp").then((nodeLLamaCpp: any) => {
+      return new nodeLLamaCpp.LlamaModel({
+        modelPath: path.join(
+          os.homedir(),
+          "Downloads",
+          "tinyllama-2-1b-miniguanaco.Q2_K.gguf"
+        ),
+        gpuLayers: 0,
       });
+    });
   }
 
   public async getModel(): Promise<any> {
@@ -35,9 +25,18 @@ export class ModelLoader {
     }
     return this.model;
   }
+
+  async unloadModel(): Promise<void> {
+    // Unload model logic
+    this.model = null;
+  }
+
+  isModelLoaded(): boolean {
+    return !!this.model;
+  }
 }
 
-export class SessionService {
+export class SessionService implements ISessionService {
   private session: any;
   public context: any;
   private modelLoader: ModelLoader;
@@ -48,7 +47,7 @@ export class SessionService {
     this.webContents = webContents;
     this.init();
   }
-  private async init() {
+  async init() {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     import("node-llama-cpp").then(async (nodeLLamaCpp: any) => {
       const model = await this.modelLoader.getModel();

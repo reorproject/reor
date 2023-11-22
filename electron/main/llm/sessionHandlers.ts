@@ -2,6 +2,7 @@ import { ipcMain, IpcMainInvokeEvent } from "electron";
 import { ModelLoader, SessionService } from "./LlamaCpp"; // Assuming SessionService is in the same directory
 
 const modelLoader = new ModelLoader(); // Singleton
+modelLoader.loadModel(); // Load model on startup
 const sessions: { [sessionId: string]: SessionService } = {};
 
 export const registerSessionHandlers = () => {
