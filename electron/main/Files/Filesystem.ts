@@ -30,42 +30,44 @@ export function GetFilesInfoTree(
   items.forEach((item) => {
     const itemPath = path.join(directory, item);
     const relativePath = path.join(parentRelativePath, item);
-    const stats = fs.statSync(itemPath);
 
-    if (stats.isDirectory()) {
-      const children = GetFilesInfoTree(itemPath, extensions, relativePath);
-      fileInfoTree.push({
-        name: item,
-        path: itemPath,
-        relativePath: relativePath,
-        dateModified: stats.mtime,
-        type: "directory",
-        children: children,
-      });
-    } else {
-      const fileExtension = path.extname(item).toLowerCase();
+    try {
+      const stats = fs.statSync(itemPath);
 
-      if (
-        (extensions && extensions.includes(fileExtension)) ||
-        (!extensions && fileExtension)
-      ) {
-        if (item === ".DS_Store") {
-          console.log("DS STORE IN ERE");
-          console.log("extension is: ", fileExtension);
-        }
+      if (stats.isDirectory()) {
+        const children = GetFilesInfoTree(itemPath, extensions, relativePath);
         fileInfoTree.push({
           name: item,
           path: itemPath,
           relativePath: relativePath,
           dateModified: stats.mtime,
-          type: "file",
+          type: "directory",
+          children: children,
         });
+      } else {
+        const fileExtension = path.extname(item).toLowerCase();
+
+        if (
+          (extensions && extensions.includes(fileExtension)) ||
+          (!extensions && fileExtension)
+        ) {
+          fileInfoTree.push({
+            name: item,
+            path: itemPath,
+            relativePath: relativePath,
+            dateModified: stats.mtime,
+            type: "file",
+          });
+        }
       }
+    } catch (error) {
+      // If there's an error (e.g., permission error), skip this file/directory
+      console.error(`Error accessing ${itemPath}:`, error);
     }
   });
+
   return fileInfoTree;
 }
-
 export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
   let flatList: FileInfo[] = [];
 
