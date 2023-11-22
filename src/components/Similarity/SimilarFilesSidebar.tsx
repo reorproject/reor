@@ -35,6 +35,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     const filteredSearchResults = searchResults.filter(
       (result) => result.notepath !== path
     );
+    console.log("filtered results: ", filteredSearchResults);
     return filteredSearchResults;
   };
 
@@ -45,18 +46,17 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   }, [filePath]);
 
   useEffect(() => {
-    const listener = () => {
+    const listener = async () => {
       console.log("received vector-database-update event");
-      performSearch(filePath)
-        .then((results) => setSimilarEntries(results))
-        .catch((error) => console.error("Error:", error));
+      const searchResults = await performSearch(filePath);
+      setSimilarEntries(searchResults);
     };
 
     window.ipcRenderer.receive("vector-database-update", listener);
     return () => {
       window.ipcRenderer.removeListener("vector-database-update", listener);
     };
-  }, []);
+  }, [filePath]);
 
   return (
     <div className="h-full overflow-y-auto">
