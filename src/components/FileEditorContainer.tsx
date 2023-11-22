@@ -3,6 +3,7 @@ import { FileList } from "./File/FileList";
 import { FileEditor } from "./File/FileEditor";
 import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
+import LLM from "./LLM/LLM";
 
 interface FileEditorContainerProps {}
 
@@ -31,6 +32,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
             onFileSelect={onFileSelect}
           />
         </div>
+        <LLM />
         {selectedFilePath && (
           <div className="flex" style={{ width: "calc(100vw - 300px)" }}>
             <div className="w-2/3 overflow-auto">

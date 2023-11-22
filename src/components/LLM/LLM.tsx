@@ -3,11 +3,11 @@ import React, { useState, useEffect } from "react";
 
 const LLM: React.FC = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [helloString, setHelloString] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [stream, setStream] = useState<string>("");
 
   useEffect(() => {
+    initializeSession();
     const updateStream = (event: string) => {
       setStream((prevStream) => `${prevStream}${event}`);
     };
@@ -33,20 +33,6 @@ const LLM: React.FC = () => {
     }
   };
 
-  const fetchHelloString = async () => {
-    if (!sessionId) return;
-
-    setLoading(true);
-    try {
-      const result = await window.llm.getHello(sessionId);
-      setHelloString(result);
-    } catch (error) {
-      console.error("Failed to fetch hello string:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const initializeStreamingResponse = (prompt: string) => {
     if (!sessionId) return;
     try {
@@ -60,21 +46,6 @@ const LLM: React.FC = () => {
     <div>
       {loading && <p>Loading...</p>}
       {sessionId && <p>Session ID: {sessionId}</p>}
-      {helloString && <p>Hello String: {helloString}</p>}
-      <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        onClick={initializeSession}
-        disabled={loading}
-      >
-        Initialize Session
-      </button>
-      <button
-        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-4"
-        onClick={fetchHelloString}
-        disabled={!sessionId || loading}
-      >
-        Fetch Hello String
-      </button>
       <button
         className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-4"
         onClick={() => initializeStreamingResponse("hello")}
