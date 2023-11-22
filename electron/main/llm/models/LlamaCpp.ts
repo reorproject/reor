@@ -1,6 +1,6 @@
 import path from "path";
 import os from "os";
-import { IModel, ISessionService } from "./Types";
+import { IModel, ISessionService } from "../Types";
 
 export class ModelLoader implements IModel {
   private model: any;
