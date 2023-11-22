@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-// import 'your-tailwind-styles.css'; // Replace with your actual Tailwind CSS import
 
-const LLM: React.FC = () => {
+const ChatWithLLM: React.FC = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [stream, setStream] = useState<string>("");
@@ -58,4 +57,4 @@ const LLM: React.FC = () => {
   );
 };
 
-export default LLM;
+export default ChatWithLLM;

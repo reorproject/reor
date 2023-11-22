@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
 import DirectoryPicker from "./components/File/DirectoryPicker";
-import { FileList } from "./components/File/FileList";
-import { FileEditor } from "./components/File/FileEditor";
-import LLM from "./components/Chat/LLM";
-import SimilarEntriesComponent from "./components/Similarity/SimilarFilesSidebar";
-import TitleBar from "./components/TitleBar";
 import FileEditorContainer from "./components/FileEditorContainer";
 
 interface AppProps {}
