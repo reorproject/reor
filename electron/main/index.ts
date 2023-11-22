@@ -41,6 +41,7 @@ import {
   updateFileListForRenderer,
   writeFileSyncRecursive,
 } from "./Files/Filesystem";
+import { registerSessionHandlers } from "./llm/sessionHandlers";
 
 const store = new Store<StoreSchema>();
 // const user = store.get("user");
@@ -136,6 +137,7 @@ async function createWindow() {
 
   // Apply electron-updater
   update(win);
+  registerSessionHandlers();
 }
 
 app.whenReady().then(async () => {
@@ -408,44 +410,6 @@ ipcMain.handle(
     }
   }
 );
-
-const modelLoader = new ModelLoader(); // Singleton
-const sessions: { [sessionId: string]: SessionService } = {};
-
-ipcMain.handle("createSession", async (event, sessionId: string) => {
-  if (sessions[sessionId]) {
-    throw new Error(`Session ${sessionId} already exists.`);
-  }
-  // sessionService.webContents = event.sender; // Attach the webContents of the sender to your session service
-  const webContents = event.sender;
-  const sessionService = new SessionService(modelLoader, webContents);
-  sessions[sessionId] = sessionService;
-  return sessionId;
-});
-
-ipcMain.handle(
-  "initializeStreamingResponse",
-  async (event, sessionId: string, prompt: string) => {
-    const sessionService = sessions[sessionId];
-    if (!sessionService) {
-      throw new Error(`Session ${sessionId} does not exist.`);
-    }
-
-    return sessionService.streamingPrompt(prompt);
-  }
-);
-
-// ipcMain.handle("getHello", async (event, sessionId: string) => {
-//   const sessionService = sessions[sessionId];
-//   if (!sessionService) {
-//     throw new Error(`Session ${sessionId} does not exist.`);
-//   }
-
-//   console.log("getting hello");
-//   const getHelloResponse = await sessionService.getHello();
-//   console.log("getHelloResponse", getHelloResponse);
-//   return getHelloResponse;
-// });
 
 export async function convertToTable<T>(
   data: Array<Record<string, unknown>>,

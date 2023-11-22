@@ -58,15 +58,6 @@ export class SessionService {
     });
   }
 
-  public async getHello(): Promise<string> {
-    if (!this.session) {
-      throw new Error("Session not initialized");
-    }
-    return await this.session.prompt(
-      "Tell me in detail about the roman empire. Provide at least a paragraph."
-    );
-  }
-
   public async streamingPrompt(prompt: string): Promise<string> {
     if (!this.session && !this.context) {
       throw new Error("Session not initialized");
