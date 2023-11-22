@@ -3,7 +3,7 @@ import { FileList } from "./File/FileList";
 import { FileEditor } from "./File/FileEditor";
 import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
-import LLM from "./LLM/LLM";
+import LLM from "./Chat/LLM";
 
 interface FileEditorContainerProps {}
 
