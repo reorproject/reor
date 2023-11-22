@@ -68,9 +68,7 @@ export class SessionService {
       topK: 40,
       topP: 0.02,
       onToken: (chunk: any[]) => {
-        console.log("undecoded chunk: ", chunk);
         const decodedChunk = this.context.decode(chunk);
-        console.log("decodedChunk", decodedChunk);
         this.webContents.send("tokenStream", decodedChunk);
       },
     });

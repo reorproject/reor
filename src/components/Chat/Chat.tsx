@@ -3,12 +3,16 @@ import React, { useState, useEffect } from "react";
 const ChatWithLLM: React.FC = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [stream, setStream] = useState<string>("");
+  const [userInput, setUserInput] = useState<string>("");
+  const [messages, setMessages] = useState<{ sender: string; text: string }[]>(
+    []
+  );
+  const [currentBotMessage, setCurrentBotMessage] = useState<string>("");
 
   useEffect(() => {
     initializeSession();
     const updateStream = (event: string) => {
-      setStream((prevStream) => `${prevStream}${event}`);
+      setCurrentBotMessage((prev) => prev + event);
     };
 
     window.ipcRenderer.receive("tokenStream", updateStream);
@@ -16,7 +20,17 @@ const ChatWithLLM: React.FC = () => {
     return () => {
       window.ipcRenderer.removeListener("tokenStream", updateStream);
     };
-  }, []); // Empty array as no dependencies are expected to change
+  }, []);
+
+  // useEffect(() => {
+  //   if (currentBotMessage) {
+  //     // Only update the messages array when a new user message is sent
+  //     setMessages((prevMessages) => [
+  //       ...prevMessages,
+  //       { sender: "bot", text: currentBotMessage },
+  //     ]);
+  //   }
+  // }, [userInput]); // Depend on userInput, not on currentBotMessage
 
   const initializeSession = async () => {
     setLoading(true);
@@ -32,8 +46,31 @@ const ChatWithLLM: React.FC = () => {
     }
   };
 
+  const handleUserInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserInput(e.target.value);
+  };
+
+  const handleSubmit = () => {
+    const localCurrentBotMessage = currentBotMessage;
+    setCurrentBotMessage("");
+    if (localCurrentBotMessage) {
+      // Only update the messages array when a new user message is sent
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { sender: "bot", text: localCurrentBotMessage },
+      ]);
+    }
+    if (!sessionId || !userInput.trim()) return;
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { sender: "user", text: userInput },
+    ]);
+    initializeStreamingResponse(userInput);
+    // setCurrentBotMessage(""); // Reset the current bot message here
+    setUserInput("");
+  };
+
   const initializeStreamingResponse = (prompt: string) => {
-    if (!sessionId) return;
     try {
       window.llm.initializeStreamingResponse(sessionId, prompt);
     } catch (error) {
@@ -42,17 +79,35 @@ const ChatWithLLM: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="chat-container">
       {loading && <p>Loading...</p>}
-      {sessionId && <p>Session ID: {sessionId}</p>}
-      <button
-        className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded ml-4"
-        onClick={() => initializeStreamingResponse("hello")}
-        disabled={!sessionId || loading}
-      >
-        Get stream baby
-      </button>
-      <pre>{stream}</pre>
+      <div className="messages">
+        {messages.map((message, index) => (
+          <div key={index} className={`message ${message.sender}`}>
+            {message.text}
+          </div>
+        ))}
+        {currentBotMessage && (
+          <div className="message bot">{currentBotMessage}</div>
+        )}
+      </div>
+      <div className="input-area">
+        <input
+          type="text"
+          value={userInput}
+          onChange={handleUserInput}
+          className="input"
+          placeholder="Type your message..."
+          disabled={!sessionId || loading}
+        />
+        <button
+          className="submit-button"
+          onClick={handleSubmit}
+          disabled={!sessionId || loading}
+        >
+          Send
+        </button>
+      </div>
     </div>
   );
 };
