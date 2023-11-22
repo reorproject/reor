@@ -28,6 +28,7 @@
     "electron-store": "^8.1.0",
     "electron-updater": "^6.1.1",
     "node-llama-cpp": "^2.8.0",
+    "openai": "^4.20.0",
     "react-icons": "^4.12.0",
     "vectordb": "^0.3.6"
   },

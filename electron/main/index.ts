@@ -6,7 +6,10 @@ import Store from "electron-store";
 import * as path from "path";
 import * as fs from "fs";
 import { StoreKeys, StoreSchema } from "./storeConfig";
-import { ModelLoader, SessionService } from "./llm/models/LlamaCpp";
+import {
+  LlamaCPPModelLoader,
+  LlamaCPPSessionService,
+} from "./llm/models/LlamaCpp";
 import * as lancedb from "vectordb";
 import {
   Field,

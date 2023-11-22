@@ -2,7 +2,7 @@ import path from "path";
 import os from "os";
 import { IModel, ISessionService } from "../Types";
 
-export class ModelLoader implements IModel {
+export class LlamaCPPModelLoader implements IModel {
   private model: any;
 
   async loadModel(): Promise<void> {
@@ -36,13 +36,16 @@ export class ModelLoader implements IModel {
   }
 }
 
-export class SessionService implements ISessionService {
+export class LlamaCPPSessionService implements ISessionService {
   private session: any;
   public context: any;
-  private modelLoader: ModelLoader;
+  private modelLoader: LlamaCPPModelLoader;
   public webContents: Electron.WebContents;
 
-  constructor(modelLoader: ModelLoader, webContents: Electron.WebContents) {
+  constructor(
+    modelLoader: LlamaCPPModelLoader,
+    webContents: Electron.WebContents
+  ) {
     this.modelLoader = modelLoader;
     this.webContents = webContents;
     this.init();
