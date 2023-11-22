@@ -7,7 +7,7 @@ import {
   EnhancedEmbeddingFunction,
   createEmbeddingFunction,
 } from "./Transformers";
-import { GetFilesInfo } from "../Files/Filesystem";
+import { GetFilesInfoList } from "../Files/Filesystem";
 import { FileInfo } from "../Files/Types";
 
 export interface RagnoteDBEntry {
@@ -115,10 +115,10 @@ export const maybeRePopulateTable = async (
   fileExtensions: string[]
 ) => {
   const count = await table.countRows();
-  const filesInfo = GetFilesInfo(directoryPath, fileExtensions);
-  if (count !== filesInfo.length) {
+  const filesInfoList = GetFilesInfoList(directoryPath, fileExtensions);
+  if (count !== filesInfoList.length) {
     await deleteAllRowsInTable(table);
-    await populateDBWithFiles(table, filesInfo);
+    await populateDBWithFiles(table, filesInfoList);
   }
 };
 const deleteAllRowsInTable = async (db: RagnoteTable) => {
@@ -149,7 +149,11 @@ export const updateNoteInTable = async (
   console.log("deleting from table:");
   await dbTable.delete(`${DatabaseFields.NOTE_PATH} = "${filePath}"`);
   const currentTimestamp: Date = new Date();
-  console.log("adding back to table:");
+  console.log(
+    "adding back to table with content and path: ",
+    filePath,
+    content
+  );
   await dbTable.add([
     {
       notepath: filePath,
@@ -161,6 +165,7 @@ export const updateNoteInTable = async (
 };
 
 const populateDBWithFiles = async (db: RagnoteTable, filesInfo: FileInfo[]) => {
+  console.log("filesInfo to populate db with: ", filesInfo);
   const entries: RagnoteDBEntry[] = await Promise.all(
     filesInfo.map(convertFileTypeToDBType)
   );

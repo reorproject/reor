@@ -1,19 +1,28 @@
 import path from "path";
 import fs from "fs";
-import { FileInfo } from "./Types";
+import { FileInfo, FileInfoNode, FileInfoTree } from "./Types";
 import chokidar from "chokidar";
 import { BrowserWindow } from "electron";
 
-export function GetFilesInfo(
+export function GetFilesInfoList(
+  directory: string,
+  extensions?: string[]
+): FileInfo[] {
+  const fileInfoTree = GetFilesInfoTree(directory, extensions);
+  const fileInfoList = flattenFileInfoTree(fileInfoTree);
+  return fileInfoList;
+}
+
+export function GetFilesInfoTree(
   directory: string,
   extensions?: string[],
   parentRelativePath: string = ""
-): FileInfo[] {
-  let fileList: FileInfo[] = [];
+): FileInfoTree {
+  let fileInfoTree: FileInfoTree = [];
 
   if (!fs.existsSync(directory)) {
     console.error("Directory path does not exist:", directory);
-    return fileList;
+    return fileInfoTree;
   }
 
   const items = fs.readdirSync(directory);
@@ -24,8 +33,8 @@ export function GetFilesInfo(
     const stats = fs.statSync(itemPath);
 
     if (stats.isDirectory()) {
-      const children = GetFilesInfo(itemPath, extensions, relativePath);
-      fileList.push({
+      const children = GetFilesInfoTree(itemPath, extensions, relativePath);
+      fileInfoTree.push({
         name: item,
         path: itemPath,
         relativePath: relativePath,
@@ -44,7 +53,7 @@ export function GetFilesInfo(
           console.log("DS STORE IN ERE");
           console.log("extension is: ", fileExtension);
         }
-        fileList.push({
+        fileInfoTree.push({
           name: item,
           path: itemPath,
           relativePath: relativePath,
@@ -54,8 +63,28 @@ export function GetFilesInfo(
       }
     }
   });
-  console.log("returning this filelist: ", fileList);
-  return fileList;
+  return fileInfoTree;
+}
+
+export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
+  let flatList: FileInfo[] = [];
+
+  for (const node of tree) {
+    if (node.type === "file") {
+      flatList.push({
+        name: node.name,
+        path: node.path,
+        relativePath: node.relativePath,
+        dateModified: node.dateModified,
+      });
+    }
+
+    if (node.type === "directory" && node.children) {
+      flatList = flatList.concat(flattenFileInfoTree(node.children));
+    }
+  }
+
+  return flatList;
 }
 
 export function writeFileSyncRecursive(
@@ -106,7 +135,7 @@ export function updateFileListForRenderer(
   directory: string,
   fileExtensions?: string[]
 ): void {
-  const files = GetFilesInfo(directory, fileExtensions);
+  const files = GetFilesInfoTree(directory, fileExtensions);
   if (win) {
     win.webContents.send("files-list", files);
   }

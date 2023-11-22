@@ -30,6 +30,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
       fileContent,
       10
     );
+    console.log("search results: ", searchResults);
     // filter out the current file:
     const filteredSearchResults = searchResults.filter(
       (result) => result.notepath !== path

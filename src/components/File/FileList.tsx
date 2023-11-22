@@ -1,4 +1,4 @@
-import { FileInfo } from "electron/main/Files/Types";
+import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
 import React, { useEffect, useState } from "react";
 
 interface FileListProps {
@@ -10,12 +10,12 @@ export const FileList: React.FC<FileListProps> = ({
   selectedFile,
   onFileSelect,
 }) => {
-  const [files, setFiles] = useState<FileInfo[]>([]);
+  const [files, setFiles] = useState<FileInfoTree>([]);
 
   const directoryPath = window.electronStore.getUserDirectory();
 
   useEffect(() => {
-    const handleFileUpdate = (updatedFiles: FileInfo[], _: FileInfo[]) => {
+    const handleFileUpdate = (updatedFiles: FileInfoTree, _: FileInfoTree) => {
       updatedFiles.sort(
         (a, b) => b.dateModified.getTime() - a.dateModified.getTime()
       );
@@ -62,7 +62,7 @@ export const FileList: React.FC<FileListProps> = ({
   );
 };
 
-const handleDragStartImpl = (e: React.DragEvent, file: FileInfo) => {
+const handleDragStartImpl = (e: React.DragEvent, file: FileInfoNode) => {
   e.dataTransfer.setData("text/plain", file.path);
   e.dataTransfer.effectAllowed = "move";
   // console.log(
@@ -76,10 +76,10 @@ const moveFile = async (sourcePath: string, destinationPath: string) => {
 };
 
 interface FileExplorerProps {
-  files: FileInfo[];
+  files: FileInfoTree;
   selectedFile: string | null;
   onFileSelect: (path: string) => void;
-  handleDragStart: (e: React.DragEvent, file: FileInfo) => void;
+  handleDragStart: (e: React.DragEvent, file: FileInfoNode) => void;
   directoryPath: string;
 }
 
@@ -129,10 +129,10 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   );
 };
 interface FileInfoProps {
-  file: FileInfo;
+  file: FileInfoNode;
   selectedFile: string | null;
   onFileSelect: (path: string) => void;
-  handleDragStart: (e: React.DragEvent, file: FileInfo) => void;
+  handleDragStart: (e: React.DragEvent, file: FileInfoNode) => void;
 }
 
 const FileItem: React.FC<FileInfoProps> = ({

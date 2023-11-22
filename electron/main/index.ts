@@ -31,11 +31,10 @@ import {
   maybeRePopulateTable,
   updateNoteInTable,
 } from "./embeddings/Table";
-import { FileInfo } from "./Files/Types";
 import { FSWatcher } from "fs";
 import chokidar from "chokidar";
 import {
-  GetFilesInfo,
+  GetFilesInfoTree,
   moveFileOrDirectory,
   startWatchingDirectory,
   updateFileListForRenderer,
@@ -124,7 +123,7 @@ async function createWindow() {
   win.webContents.on("did-finish-load", () => {
     win?.webContents.send("main-process-message", new Date().toLocaleString());
     const userDirectory = store.get(StoreKeys.UserDirectory) as string;
-    const files = GetFilesInfo(userDirectory, markdownExtensions);
+    const files = GetFilesInfoTree(userDirectory, markdownExtensions);
     win?.webContents.send("files-list", files);
   });
 
