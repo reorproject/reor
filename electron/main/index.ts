@@ -176,14 +176,14 @@ function createTray() {
   ]);
 
   // Set the context menu on the tray
-  tray.setContextMenu(contextMenu);
 
   // Handle the tray icon click event
   tray.on("click", () => {
+    tray?.setContextMenu(null);
     win?.isVisible() ? win.hide() : win?.show();
-    // tray?.
   });
   tray.on("right-click", () => {
+    tray?.setContextMenu(contextMenu);
     tray?.popUpContextMenu();
   });
 }
@@ -205,22 +205,6 @@ app.whenReady().then(async () => {
       startWatchingDirectory(win, userDirectory);
     }
   }
-
-  // const currentTimestamp: Date = new Date();
-  // // console.log("currentTimestamp", currentTimestamp);
-  // await dbTable.add([
-  //   {
-  //     notepath: "test-path",
-  //     content: "test-content",
-  //     subnoteindex: 0,
-  //     timeadded: currentTimestamp,
-  //   },
-  // ]);
-  // const result = await dbTable.search("h", 2);
-  // // console.log("result", result);
-  // const filterResult = await dbTable.filter(
-  //   `${DatabaseFields.NOTE_PATH} == "test-path"`
-  // );
 });
 
 // app.whenReady().then(async () => {
