@@ -26,14 +26,15 @@ export class GPT4Model implements IModel {
     return this.openai;
   }
 }
-
 export class GPT4SessionService implements ISessionService {
   private model: GPT4Model;
   public webContents: Electron.WebContents;
+  private messageHistory: any[];
 
   constructor(model: GPT4Model, webContents: Electron.WebContents) {
     this.model = model;
     this.webContents = webContents;
+    this.messageHistory = [];
   }
 
   async init(): Promise<void> {
@@ -45,10 +46,13 @@ export class GPT4SessionService implements ISessionService {
       throw new Error("Model not initialized");
     }
 
+    // Add the user's prompt to the message history
+    this.messageHistory.push({ role: "user", content: prompt });
+
     try {
       const stream = await this.model.client.chat.completions.create({
         model: "gpt-4",
-        messages: [{ role: "user", content: prompt }],
+        messages: this.messageHistory,
         stream: true,
       });
 
@@ -56,6 +60,10 @@ export class GPT4SessionService implements ISessionService {
       for await (const chunk of stream) {
         const content = chunk.choices[0]?.delta?.content || "";
         result += content;
+
+        // Update the message history with the response
+        this.messageHistory.push({ role: "assistant", content });
+
         this.webContents.send("tokenStream", content);
       }
 
