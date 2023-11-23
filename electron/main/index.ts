@@ -180,23 +180,7 @@ function createTray() {
   // Handle the tray icon click event
   tray.on("click", () => {
     tray?.setContextMenu(null);
-    const windowBounds = win?.getBounds();
-    // Get the tray icon's bounds
-    const trayBounds = tray?.getBounds();
-    if (!windowBounds || !trayBounds) return;
-    // Calculate the x and y position to make the window appear just below the tray icon
-    const x = Math.round(
-      trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2
-    );
-    const y = Math.round(trayBounds.y + trayBounds.height);
-
-    // Set the window position
-    win?.setPosition(x, y, false);
-
-    // Show the window
     win?.isVisible() ? win.hide() : win?.show();
-    // Focus the window when shown
-    win?.isVisible() ? win.focus() : null;
   });
   tray.on("right-click", () => {
     tray?.setContextMenu(contextMenu);
