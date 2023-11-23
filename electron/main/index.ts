@@ -1,12 +1,4 @@
-import {
-  app,
-  BrowserWindow,
-  shell,
-  ipcMain,
-  dialog,
-  Tray,
-  Menu,
-} from "electron";
+import { app, BrowserWindow, shell, ipcMain, dialog } from "electron";
 import { release } from "node:os";
 import { join } from "node:path";
 import { update } from "./update";
@@ -122,7 +114,6 @@ async function createWindow() {
     width: 1200,
     height: 800,
   });
-  win.hide();
 
   if (url) {
     // electron-vite-vue#298
@@ -151,42 +142,6 @@ async function createWindow() {
   update(win);
   registerSessionHandlers();
 }
-let tray: Tray | null = null;
-
-function createTray() {
-  // Create a tray instance
-  const iconPath = join(process.env.VITE_PUBLIC, "icon.png"); // Replace 'tray-icon.png' with your actual tray icon path
-  tray = new Tray(iconPath);
-
-  // Create a context menu for the tray
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: "Open",
-      click: () => {
-        win?.show();
-      },
-    },
-    {
-      label: "Quit",
-      click: () => {
-        win?.destroy();
-        app.quit();
-      },
-    },
-  ]);
-
-  // Set the context menu on the tray
-  tray.setContextMenu(contextMenu);
-
-  // Handle the tray icon click event
-  tray.on("click", () => {
-    win?.isVisible() ? win.hide() : win?.show();
-    // tray?.
-  });
-  tray.on("right-click", () => {
-    tray?.popUpContextMenu();
-  });
-}
 
 app.whenReady().then(async () => {
   const dbPath = path.join(app.getPath("userData"), "vectordb");
@@ -195,8 +150,6 @@ app.whenReady().then(async () => {
 
   await dbTable.initialize(dbConnection);
   const userDirectory = store.get(StoreKeys.UserDirectory) as string;
-  createTray();
-
   createWindow();
 
   if (userDirectory) {
@@ -297,14 +250,9 @@ app.whenReady().then(async () => {
 // console.log("created table: ", table);
 // });
 
-// app.on("window-all-closed", () => {
-//   win = null;
-//   if (process.platform !== "darwin") app.quit();
-// });
-app.on("window-all-closed", (e: any) => {
-  // Override the default behavior on macOS which closes the app when the last window is closed
-  e.preventDefault();
-  e.returnValue = false;
+app.on("window-all-closed", () => {
+  win = null;
+  if (process.platform !== "darwin") app.quit();
 });
 
 app.on("second-instance", () => {
