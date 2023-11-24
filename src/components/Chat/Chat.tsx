@@ -10,7 +10,6 @@ const ChatWithLLM: React.FC = () => {
   const [currentBotMessage, setCurrentBotMessage] = useState<string>("");
 
   useEffect(() => {
-    console.log("NAHH");
     if (!sessionId) {
       initializeSession();
       const updateStream = (event: string) => {
@@ -39,16 +38,17 @@ const ChatWithLLM: React.FC = () => {
     }
   };
 
-  const handleSubmit = () => {
-    const localCurrentBotMessage = currentBotMessage;
-    setCurrentBotMessage("");
-    if (localCurrentBotMessage) {
+  const handleSubmitNewMessage = () => {
+    // const localCurrentBotMessage = currentBotMessage;
+    console.log("yo");
+    if (currentBotMessage) {
       // Only update the messages array when a new user message is sent
       setMessages((prevMessages) => [
         ...prevMessages,
-        { sender: "bot", text: localCurrentBotMessage },
+        { sender: "bot", text: currentBotMessage },
       ]);
     }
+    setCurrentBotMessage("");
     if (!sessionId || !userInput.trim()) return;
     setMessages((prevMessages) => [
       ...prevMessages,
@@ -69,7 +69,7 @@ const ChatWithLLM: React.FC = () => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault(); // Prevents default action (new line) when pressing Enter
-      handleSubmit();
+      handleSubmitNewMessage();
     }
   };
 
@@ -110,7 +110,7 @@ const ChatWithLLM: React.FC = () => {
           />
           <button
             className="px-4 py-2 text-white bg-blue-500 rounded shadow hover:bg-blue-600 disabled:bg-blue-300"
-            onClick={handleSubmit}
+            onClick={handleSubmitNewMessage}
             disabled={!sessionId || loading}
           >
             Send
