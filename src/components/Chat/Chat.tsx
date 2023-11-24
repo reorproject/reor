@@ -25,6 +25,7 @@ const ChatWithLLM: React.FC = () => {
   const initializeSession = async () => {
     setLoading(true);
     try {
+      // we don't always need to create a session. Maybe we can reuse sessions?
       const newSessionId = await window.llm.createSession(
         "some_unique_session_id"
       );
@@ -75,7 +76,7 @@ const ChatWithLLM: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen max-w-md mx-auto border shadow-lg overflow-hidden">
+    <div className="flex flex-col max-w-md mx-auto border shadow-lg overflow-hidden">
       <div className="flex-1 overflow-auto p-4 bg-white">
         {loading && <p className="text-center text-gray-500">Loading...</p>}
         <div className="space-y-2">
