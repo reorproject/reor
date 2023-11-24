@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { IModel, ISessionService } from "../Types";
+import { IModel, ISendFunctionImplementer, ISessionService } from "../Types";
 
 export class GPT4Model implements IModel {
   private openai: OpenAI;
@@ -28,12 +28,10 @@ export class GPT4Model implements IModel {
 }
 export class GPT4SessionService implements ISessionService {
   private model: GPT4Model;
-  public webContents: Electron.WebContents;
   private messageHistory: any[];
 
-  constructor(model: GPT4Model, webContents: Electron.WebContents) {
+  constructor(model: GPT4Model) {
     this.model = model;
-    this.webContents = webContents;
     this.messageHistory = [];
   }
 
@@ -41,7 +39,10 @@ export class GPT4SessionService implements ISessionService {
     await this.model.loadModel();
   }
 
-  async streamingPrompt(prompt: string): Promise<string> {
+  async streamingPrompt(
+    prompt: string,
+    sendFunctionImplementer: ISendFunctionImplementer
+  ): Promise<string> {
     if (!this.model.isModelLoaded()) {
       throw new Error("Model not initialized");
     }
@@ -63,8 +64,7 @@ export class GPT4SessionService implements ISessionService {
 
         // Update the message history with the response
         this.messageHistory.push({ role: "assistant", content });
-
-        this.webContents.send("tokenStream", content);
+        sendFunctionImplementer.send("tokenStream", content);
       }
 
       return result;

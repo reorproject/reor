@@ -1,6 +1,6 @@
 import path from "path";
 import os from "os";
-import { IModel, ISessionService } from "../Types";
+import { IModel, ISendFunctionImplementer, ISessionService } from "../Types";
 
 export class LlamaCPPModelLoader implements IModel {
   private model: any;
@@ -40,27 +40,26 @@ export class LlamaCPPSessionService implements ISessionService {
   private session: any;
   public context: any;
   private modelLoader: LlamaCPPModelLoader;
-  public webContents: Electron.WebContents;
 
-  constructor(
-    modelLoader: LlamaCPPModelLoader,
-    webContents: Electron.WebContents
-  ) {
+  constructor(modelLoader: LlamaCPPModelLoader) {
     this.modelLoader = modelLoader;
-    this.webContents = webContents;
     this.init();
   }
   async init() {
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     import("node-llama-cpp").then(async (nodeLLamaCpp: any) => {
       const model = await this.modelLoader.getModel();
-      const context = new nodeLLamaCpp.LlamaContext({ model });
-      this.context = context;
-      this.session = new nodeLLamaCpp.LlamaChatSession({ context });
+      this.context = new nodeLLamaCpp.LlamaContext({ model });
+      this.session = new nodeLLamaCpp.LlamaChatSession({
+        context: this.context,
+      });
     });
   }
 
-  public async streamingPrompt(prompt: string): Promise<string> {
+  public async streamingPrompt(
+    prompt: string,
+    sendFunctionImplementer: ISendFunctionImplementer
+  ): Promise<string> {
     if (!this.session && !this.context) {
       throw new Error("Session not initialized");
     }
@@ -71,7 +70,7 @@ export class LlamaCPPSessionService implements ISessionService {
       topP: 0.02,
       onToken: (chunk: any[]) => {
         const decodedChunk = this.context.decode(chunk);
-        this.webContents.send("tokenStream", decodedChunk);
+        sendFunctionImplementer.send("tokenStream", decodedChunk);
       },
     });
   }

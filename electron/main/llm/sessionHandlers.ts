@@ -8,6 +8,9 @@ import { GPT4Model, GPT4SessionService } from "./models/GPT4";
 const gpt4Model = new GPT4Model(
   "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"
 );
+gpt4Model.loadModel();
+const llamaCPPModelLoader = new LlamaCPPModelLoader();
+llamaCPPModelLoader.loadModel();
 // const gpt4SessionService = new GPT4SessionService(gpt4Model, webContents);
 // await gpt4SessionService.init();
 
@@ -20,8 +23,8 @@ export const registerSessionHandlers = () => {
       if (sessions[sessionId]) {
         throw new Error(`Session ${sessionId} already exists in App backend.`);
       }
-      const webContents = event.sender;
-      const sessionService = new GPT4SessionService(gpt4Model, webContents);
+      const sessionService = new LlamaCPPSessionService(llamaCPPModelLoader);
+      const gpt4SessionService = new GPT4SessionService(gpt4Model);
       sessions[sessionId] = sessionService;
       return sessionId;
     }
@@ -34,7 +37,12 @@ export const registerSessionHandlers = () => {
       if (!sessionService) {
         throw new Error(`Session ${sessionId} does not exist.`);
       }
-      return sessionService.streamingPrompt(prompt);
+      // const gpt4SessionService = new GPT4SessionService(gpt4Model);
+      // const gpt4Res = await gpt4SessionService.streamingPrompt(
+      //   prompt,
+      //   event.sender
+      // );
+      return sessionService.streamingPrompt(prompt, event.sender);
     }
   );
 };
