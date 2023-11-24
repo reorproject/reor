@@ -7,7 +7,7 @@ import {
   RagnoteTable,
   addTreeToTable,
   removeTreeFromTable,
-} from "../embeddings/Table";
+} from "../database/Table";
 
 export function GetFilesInfoList(
   directory: string,

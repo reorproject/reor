@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { RagnoteDBEntry } from "electron/main/embeddings/Table";
+import { RagnoteDBEntry } from "electron/main/database/Table";
 interface SimilarEntriesComponentProps {
   filePath: string;
   onFileSelect: (path: string) => void;

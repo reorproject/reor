@@ -27,13 +27,13 @@ import {
   RecordBatchStreamWriter,
   Float64,
 } from "apache-arrow";
-import { DatabaseFields } from "./embeddings/Schema";
+import { DatabaseFields } from "./database/Schema";
 import {
   RagnoteDBEntry,
   RagnoteTable,
   maybeRePopulateTable,
   updateNoteInTable,
-} from "./embeddings/Table";
+} from "./database/Table";
 import { FSWatcher } from "fs";
 import chokidar from "chokidar";
 import {
