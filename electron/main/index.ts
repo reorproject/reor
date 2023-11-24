@@ -45,6 +45,7 @@ import {
   writeFileSyncRecursive,
 } from "./Files/Filesystem";
 import { registerSessionHandlers } from "./llm/sessionHandlers";
+import { FileInfoTree } from "./Files/Types";
 
 const store = new Store<StoreSchema>();
 // const user = store.get("user");
@@ -336,13 +337,13 @@ ipcMain.handle("join-path", (event, ...args) => {
   return path.join(...args);
 });
 
-// ipcMain.handle("get-files", async (): Promise<FileInfo[]> => {
-//   const directoryPath: string = store.get(StoreKeys.UserDirectory);
-//   if (!directoryPath) return [];
+ipcMain.handle("get-files", async (): Promise<FileInfoTree> => {
+  const directoryPath: string = store.get(StoreKeys.UserDirectory);
+  if (!directoryPath) return [];
 
-//   const files: FileInfo[] = getFileList(directoryPath);
-//   return files;
-// });
+  const files: FileInfoTree = GetFilesInfoTree(directoryPath);
+  return files;
+});
 
 ipcMain.handle(
   "read-file",

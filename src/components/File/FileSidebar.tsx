@@ -15,7 +15,7 @@ export const FileSidebar: React.FC<FileListProps> = ({
   const directoryPath = window.electronStore.getUserDirectory();
 
   useEffect(() => {
-    const handleFileUpdate = (updatedFiles: FileInfoTree, _: FileInfoTree) => {
+    const handleFileUpdate = (updatedFiles: FileInfoTree) => {
       updatedFiles.sort(
         (a, b) => b.dateModified.getTime() - a.dateModified.getTime()
       );
@@ -27,6 +27,13 @@ export const FileSidebar: React.FC<FileListProps> = ({
     return () => {
       window.ipcRenderer.removeListener("files-list", handleFileUpdate);
     };
+  }, []);
+
+  useEffect(() => {
+    window.files.getFiles().then((files) => {
+      files.sort((a, b) => b.dateModified.getTime() - a.dateModified.getTime());
+      setFiles(files);
+    });
   }, []);
 
   // so we also will need to now somehow get access to the user directory and display. Or maybe we shove in relative path as the name instead of name...and see what happens
