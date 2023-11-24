@@ -10,6 +10,7 @@ const ChatWithLLM: React.FC = () => {
   const [currentBotMessage, setCurrentBotMessage] = useState<string>("");
 
   useEffect(() => {
+    console.log("NAHH");
     if (!sessionId) {
       initializeSession();
       const updateStream = (event: string) => {
@@ -27,8 +28,7 @@ const ChatWithLLM: React.FC = () => {
   const initializeSession = async () => {
     setLoading(true);
     try {
-      // we don't always need to create a session. Maybe we can reuse sessions?
-      const newSessionId = await window.llm.createSession(
+      const newSessionId = await window.llm.getOrCreateSession(
         "some_unique_session_id"
       );
       setSessionId(newSessionId);
@@ -37,10 +37,6 @@ const ChatWithLLM: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleUserInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserInput(e.target.value);
   };
 
   const handleSubmit = () => {
@@ -106,7 +102,7 @@ const ChatWithLLM: React.FC = () => {
           <input
             type="text"
             value={userInput}
-            onChange={handleUserInput}
+            onChange={(e) => setUserInput(e.target.value)}
             onKeyDown={handleKeyDown}
             className="flex-1 p-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             placeholder="Type your message..."
