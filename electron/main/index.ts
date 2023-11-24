@@ -5,7 +5,7 @@ import { update } from "./update";
 import Store from "electron-store";
 import * as path from "path";
 import * as fs from "fs";
-import { StoreKeys, StoreSchema } from "./storeConfig";
+import { StoreKeys, StoreSchema } from "./Config/storeConfig";
 import {
   LlamaCPPModelLoader,
   LlamaCPPSessionService,
@@ -44,7 +44,7 @@ import {
   updateFileListForRenderer,
   writeFileSyncRecursive,
 } from "./Files/Filesystem";
-import { registerLLMSessionHandlers } from "./llm/sessionHandlers";
+import { registerLLMSessionHandlers } from "./llm/llmSessionHandlers";
 import { FileInfoTree } from "./Files/Types";
 import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
 

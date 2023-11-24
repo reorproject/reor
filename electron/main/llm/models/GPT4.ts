@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import { IModel, ISendFunctionImplementer, ISessionService } from "../Types";
 
-export class GPT4Model implements IModel {
+export class OpenAIModel implements IModel {
   private openai: OpenAI;
 
   constructor(apiKey: string) {
@@ -26,11 +26,11 @@ export class GPT4Model implements IModel {
     return this.openai;
   }
 }
-export class GPT4SessionService implements ISessionService {
-  private model: GPT4Model;
+export class OpenAIModelSessionService implements ISessionService {
+  private model: OpenAIModel;
   private messageHistory: any[];
 
-  constructor(model: GPT4Model) {
+  constructor(model: OpenAIModel) {
     this.model = model;
     this.messageHistory = [];
   }
@@ -52,7 +52,7 @@ export class GPT4SessionService implements ISessionService {
 
     try {
       const stream = await this.model.client.chat.completions.create({
-        model: "gpt-4",
+        model: "gpt-3.5-turbo",
         messages: this.messageHistory,
         stream: true,
       });
@@ -69,7 +69,7 @@ export class GPT4SessionService implements ISessionService {
 
       return result;
     } catch (error) {
-      console.error("Error during GPT-4 streaming session:", error);
+      console.error("Error during OpenAI streaming session:", error);
       throw error;
     }
   }

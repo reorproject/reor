@@ -1,14 +1,14 @@
 import { ipcMain, IpcMainInvokeEvent } from "electron";
 import { LlamaCPPModelLoader, LlamaCPPSessionService } from "./models/LlamaCpp"; // Assuming SessionService is in the same directory
 import { ISessionService } from "./Types";
-import { GPT4Model, GPT4SessionService } from "./models/GPT4";
+import { OpenAIModel, OpenAIModelSessionService } from "./models/GPT4";
 
 // const modelLoader = new ModelLoader(); // Singleton
 // modelLoader.loadModel(); // Load model on startup
-const gpt4Model = new GPT4Model(
+const openAIModel = new OpenAIModel(
   "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"
 );
-gpt4Model.loadModel();
+openAIModel.loadModel();
 const llamaCPPModelLoader = new LlamaCPPModelLoader();
 llamaCPPModelLoader.loadModel();
 // const gpt4SessionService = new GPT4SessionService(gpt4Model, webContents);
@@ -23,7 +23,7 @@ export const registerLLMSessionHandlers = () => {
       if (sessions[sessionId]) {
         throw new Error(`Session ${sessionId} already exists in App backend.`);
       }
-      const sessionService = new LlamaCPPSessionService(llamaCPPModelLoader);
+      const sessionService = new OpenAIModelSessionService(openAIModel);
       sessions[sessionId] = sessionService;
       return sessionId;
     }
@@ -36,7 +36,7 @@ export const registerLLMSessionHandlers = () => {
         return sessionId;
       }
 
-      const sessionService = new LlamaCPPSessionService(llamaCPPModelLoader);
+      const sessionService = new OpenAIModelSessionService(openAIModel);
       sessions[sessionId] = sessionService;
       return sessionId;
     }
