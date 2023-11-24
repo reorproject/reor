@@ -6,7 +6,7 @@ interface FileListProps {
   onFileSelect: (path: string) => void;
 }
 
-export const FileList: React.FC<FileListProps> = ({
+export const FileSidebar: React.FC<FileListProps> = ({
   selectedFile,
   onFileSelect,
 }) => {

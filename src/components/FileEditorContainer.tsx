@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { FileList } from "./File/FileList";
+import { FileSidebar } from "./File/FileSidebar";
 import { FileEditor } from "./File/FileEditor";
 import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
@@ -27,7 +27,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
 
       <div className="flex" style={{ height: "calc(100vh - 30px)" }}>
         <div className="w-[300px]">
-          <FileList
+          <FileSidebar
             selectedFile={selectedFilePath}
             onFileSelect={onFileSelect}
           />
