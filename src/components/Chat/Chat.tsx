@@ -10,17 +10,19 @@ const ChatWithLLM: React.FC = () => {
   const [currentBotMessage, setCurrentBotMessage] = useState<string>("");
 
   useEffect(() => {
-    initializeSession();
-    const updateStream = (event: string) => {
-      setCurrentBotMessage((prev) => prev + event);
-    };
+    if (!sessionId) {
+      initializeSession();
+      const updateStream = (event: string) => {
+        setCurrentBotMessage((prev) => prev + event);
+      };
 
-    window.ipcRenderer.receive("tokenStream", updateStream);
+      window.ipcRenderer.receive("tokenStream", updateStream);
 
-    return () => {
-      window.ipcRenderer.removeListener("tokenStream", updateStream);
-    };
-  }, []);
+      return () => {
+        window.ipcRenderer.removeListener("tokenStream", updateStream);
+      };
+    }
+  }, [sessionId]);
 
   const initializeSession = async () => {
     setLoading(true);

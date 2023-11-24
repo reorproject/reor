@@ -24,7 +24,19 @@ export const registerSessionHandlers = () => {
         throw new Error(`Session ${sessionId} already exists in App backend.`);
       }
       const sessionService = new LlamaCPPSessionService(llamaCPPModelLoader);
-      const gpt4SessionService = new GPT4SessionService(gpt4Model);
+      sessions[sessionId] = sessionService;
+      return sessionId;
+    }
+  );
+
+  ipcMain.handle(
+    "getOrCreateSession",
+    async (event: IpcMainInvokeEvent, sessionId: string) => {
+      if (sessions[sessionId]) {
+        return sessionId;
+      }
+
+      const sessionService = new LlamaCPPSessionService(llamaCPPModelLoader);
       sessions[sessionId] = sessionService;
       return sessionId;
     }

@@ -40,7 +40,7 @@ declare global {
     };
     llm: {
       createSession: (sessionId: any) => Promise<any>;
-      getHello: (sessionId: any) => Promise<any>;
+      getOrCreateSession: (sessionId: any) => Promise<any>;
       initializeStreamingResponse: (
         sessionId: any,
         prompt: string
@@ -116,6 +116,9 @@ contextBridge.exposeInMainWorld("files", {
 contextBridge.exposeInMainWorld("llm", {
   createSession: async (sessionId: any) => {
     return await ipcRenderer.invoke("createSession", sessionId);
+  },
+  getOrCreateSession: async (sessionId: any) => {
+    return await ipcRenderer.invoke("getOrCreateSession", sessionId);
   },
   getHello: async (sessionId: any) => {
     return await ipcRenderer.invoke("getHello", sessionId);

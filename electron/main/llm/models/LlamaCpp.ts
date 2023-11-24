@@ -12,7 +12,8 @@ export class LlamaCPPModelLoader implements IModel {
         modelPath: path.join(
           os.homedir(),
           "Downloads",
-          "tinyllama-2-1b-miniguanaco.Q2_K.gguf"
+          // "tinyllama-2-1b-miniguanaco.Q2_K.gguf"
+          "mistral-7b-v0.1.Q4_K_M.gguf"
         ),
         gpuLayers: 0,
       });
