@@ -38,28 +38,33 @@ const ChatWithLLM: React.FC = () => {
     }
   };
 
-  const handleSubmitNewMessage = () => {
-    // const localCurrentBotMessage = currentBotMessage;
-    console.log("yo");
+  const handleSubmitNewMessage = async () => {
     if (currentBotMessage) {
-      // Only update the messages array when a new user message is sent
       setMessages((prevMessages) => [
         ...prevMessages,
         { sender: "bot", text: currentBotMessage },
       ]);
+      setCurrentBotMessage("");
     }
-    setCurrentBotMessage("");
     if (!sessionId || !userInput.trim()) return;
+
+    if (messages.length <= 1) {
+      const augmentedPrompt = await window.database.augmentPromptWithRAG(
+        userInput,
+        2
+      );
+      startStreamingResponse(augmentedPrompt);
+    } else {
+      startStreamingResponse(userInput);
+    }
     setMessages((prevMessages) => [
       ...prevMessages,
       { sender: "user", text: userInput },
     ]);
-    initializeStreamingResponse(userInput);
-    // setCurrentBotMessage(""); // Reset the current bot message here
     setUserInput("");
   };
 
-  const initializeStreamingResponse = (prompt: string) => {
+  const startStreamingResponse = (prompt: string) => {
     try {
       window.llm.initializeStreamingResponse(sessionId, prompt);
     } catch (error) {

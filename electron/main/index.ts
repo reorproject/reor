@@ -44,8 +44,9 @@ import {
   updateFileListForRenderer,
   writeFileSyncRecursive,
 } from "./Files/Filesystem";
-import { registerSessionHandlers } from "./llm/sessionHandlers";
+import { registerLLMSessionHandlers } from "./llm/sessionHandlers";
 import { FileInfoTree } from "./Files/Types";
+import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
 
 const store = new Store<StoreSchema>();
 // const user = store.get("user");
@@ -141,7 +142,8 @@ async function createWindow() {
 
   // Apply electron-updater
   update(win);
-  registerSessionHandlers();
+  registerLLMSessionHandlers();
+  registerDBSessionHandlers(dbTable);
 }
 
 app.whenReady().then(async () => {
@@ -393,24 +395,6 @@ ipcMain.handle(
     } catch (error) {
       console.error("Error moving file or directory:", error);
       return { success: false, error: error };
-    }
-  }
-);
-
-ipcMain.handle(
-  "search",
-  async (
-    event,
-    query: string,
-    limit: number,
-    filter?: string
-  ): Promise<RagnoteDBEntry[]> => {
-    try {
-      // Assuming 'myDatabase' is your database instance with the 'search' method
-      return await dbTable.search(query, limit, filter);
-    } catch (error) {
-      console.error("Error searching database:", error);
-      throw error;
     }
   }
 );

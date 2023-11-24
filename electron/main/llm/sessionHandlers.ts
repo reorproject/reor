@@ -16,7 +16,7 @@ llamaCPPModelLoader.loadModel();
 
 const sessions: { [sessionId: string]: ISessionService } = {};
 
-export const registerSessionHandlers = () => {
+export const registerLLMSessionHandlers = () => {
   ipcMain.handle(
     "createSession",
     async (event: IpcMainInvokeEvent, sessionId: string) => {

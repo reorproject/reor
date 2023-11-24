@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { FileInfoTree } from "electron/main/Files/Types";
 // import { FileInfo } from "electron/main/Files/Types";
-import { RagnoteDBEntry } from "electron/main/embeddings/Table";
+import { RagnoteDBEntry } from "electron/main/database/Table";
 type ReceiveCallback = (...args: any[]) => void;
 
 declare global {
@@ -25,6 +25,11 @@ declare global {
         limit: number,
         filter?: string
       ) => Promise<RagnoteDBEntry[]>;
+      augmentPromptWithRAG: (
+        prompt: string,
+        limit: number,
+        filter?: string
+      ) => Promise<string>;
     };
     files: {
       openDirectoryDialog: () => Promise<any>;
@@ -60,6 +65,13 @@ contextBridge.exposeInMainWorld("database", {
     filter?: string
   ): Promise<RagnoteDBEntry[]> => {
     return ipcRenderer.invoke("search", query, limit, filter);
+  },
+  augmentPromptWithRAG: async (
+    prompt: string,
+    limit: number,
+    filter?: string
+  ): Promise<RagnoteDBEntry[]> => {
+    return ipcRenderer.invoke("augment-prompt-with-rag", prompt, limit, filter);
   },
 });
 
