@@ -5,6 +5,7 @@ import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 import ChatWithLLM from "./Chat/Chat";
 import SettingsModal from "./Settings/SettingsModal";
+import LeftSidebar from "./LeftSidebar/LeftSidebar";
 
 interface FileEditorContainerProps {}
 
@@ -12,7 +13,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
   const [editorContent, setEditorContent] = useState<string>("");
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
   const lastSavedContentRef = useRef<string>("");
-  const [isModalOpen, setModalOpen] = useState(false);
 
   const onFileSelect = async (path: string) => {
     // so here we can save the actual content too\\
@@ -28,20 +28,13 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
       <TitleBar onFileSelect={onFileSelect} />
 
       <div className="flex" style={{ height: "calc(100vh - 30px)" }}>
-        <div className="h-full w-[300px]">
+        <div className="w-[40px]">
+          <LeftSidebar />
+        </div>
+        <div className="h-full w-[200px]">
           <FileSidebar
             selectedFile={selectedFilePath}
             onFileSelect={onFileSelect}
-          />
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onClick={() => setModalOpen(true)}
-          >
-            Open Settings
-          </button>
-          <SettingsModal
-            isOpen={isModalOpen}
-            onClose={() => setModalOpen(false)}
           />
         </div>
         {selectedFilePath && (

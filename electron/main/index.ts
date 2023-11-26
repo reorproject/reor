@@ -142,7 +142,7 @@ async function createWindow() {
 
   // Apply electron-updater
   update(win);
-  registerLLMSessionHandlers();
+  registerLLMSessionHandlers(store);
   registerDBSessionHandlers(dbTable);
 }
 
@@ -328,6 +328,43 @@ ipcMain.on("set-user-directory", (event, userDirectory: string) => {
   }
   maybeRePopulateTable(dbTable, userDirectory, markdownExtensions);
   event.returnValue = "success";
+});
+
+ipcMain.on("set-openai-api-key", (event, apiKey: string) => {
+  console.log("setting openai api key", apiKey);
+  try {
+    if (!apiKey) {
+      throw new Error("API Key cannot be empty");
+    }
+    store.set(StoreKeys.UserOpenAIAPIKey, apiKey);
+    registerLLMSessionHandlers(store);
+  } catch (error) {
+    console.error("Error setting openai api key", error);
+  }
+  // if (fileWatcher) {
+  //   fileWatcher.close();
+  // }
+
+  // if (win) {
+  //   startWatchingDirectory(win, userDirectory);
+  //   updateFileListForRenderer(win, userDirectory, markdownExtensions);
+  // }
+  // maybeRePopulateTable(dbTable, userDirectory, markdownExtensions);
+  event.returnValue = "success";
+});
+
+ipcMain.on("get-openai-api-key", (event) => {
+  const apiKey = store.get(StoreKeys.UserOpenAIAPIKey);
+  // if (fileWatcher) {
+  //   fileWatcher.close();
+  // }
+
+  // if (win) {
+  //   startWatchingDirectory(win, userDirectory);
+  //   updateFileListForRenderer(win, userDirectory, markdownExtensions);
+  // }
+  // maybeRePopulateTable(dbTable, userDirectory, markdownExtensions);
+  event.returnValue = apiKey;
 });
 
 ipcMain.on("get-user-directory", (event) => {

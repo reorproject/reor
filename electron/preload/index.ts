@@ -53,7 +53,9 @@ declare global {
     };
     electronStore: {
       setUserDirectory: (path: string) => any;
-      getUserDirectory: () => any;
+      getUserDirectory: () => string;
+      setOpenAIAPIKey: (apiKey: string) => any;
+      getOpenAIAPIKey: () => string;
     };
   }
 }
@@ -78,6 +80,12 @@ contextBridge.exposeInMainWorld("database", {
 contextBridge.exposeInMainWorld("electronStore", {
   setUserDirectory: (path: string) => {
     return ipcRenderer.sendSync("set-user-directory", path);
+  },
+  setOpenAIAPIKey: (apiKey: string) => {
+    return ipcRenderer.sendSync("set-openai-api-key", apiKey);
+  },
+  getOpenAIAPIKey: () => {
+    return ipcRenderer.sendSync("get-openai-api-key");
   },
   getUserDirectory: () => {
     return ipcRenderer.sendSync("get-user-directory");

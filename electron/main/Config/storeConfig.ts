@@ -4,6 +4,7 @@ export interface StoreSchema {
     preferences?: {
       // ... other preferences
     };
+    openAIAPIKey?: string;
   };
   // ... other top-level keys
 }
@@ -12,7 +13,7 @@ export interface StoreSchema {
 export enum StoreKeys {
   UserDirectory = "user.directory",
   UserPreferences = "user.preferences",
-  // ... other keys
+  UserOpenAIAPIKey = "user.openAIAPIKey",
 }
 
 // Create a strongly-typed store instance
