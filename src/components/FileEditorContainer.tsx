@@ -38,24 +38,25 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
           />
         </div>
         {selectedFilePath && (
-          <div className="flex" style={{ width: "calc(100vw - 300px)" }}>
+          <div className="flex flex-grow relative">
             <div className="w-2/3 overflow-auto">
               <FileEditor
                 filePath={selectedFilePath}
-                // content={editorContent}
                 setContentInParent={setEditorContent}
                 lastSavedContentRef={lastSavedContentRef}
               />
             </div>
-            <div className="w-1/3">
+            <div className="w-1/3" style={{ marginRight: "300px" }}>
               <SimilarEntriesComponent
                 filePath={selectedFilePath}
                 onFileSelect={onFileSelect}
               />
             </div>
+            <div className="absolute right-0 top-0 h-full w-[300px]">
+              <ChatWithLLM />
+            </div>
           </div>
         )}
-        <ChatWithLLM />
       </div>
     </div>
   );

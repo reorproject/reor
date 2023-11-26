@@ -79,7 +79,7 @@ const ChatWithLLM: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col max-w-md mx-auto border shadow-lg overflow-hidden">
+    <div className="flex flex-col w-full h-full mx-auto border shadow-lg overflow-hidden">
       <div className="flex-1 overflow-auto p-4 bg-white">
         {loading && <p className="text-center text-gray-500">Loading...</p>}
         <div className="space-y-2">
