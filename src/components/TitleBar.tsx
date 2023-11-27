@@ -1,4 +1,4 @@
-import { MdSearch } from "react-icons/md"; // Material Design search icon
+import { MdChatBubbleOutline, MdSearch } from "react-icons/md"; // Material Design search icon
 import { HiOutlinePlusCircle } from "react-icons/hi"; // Heroicons plus circle
 import { HiSearch } from "react-icons/hi"; // Outlined search icon
 import { HiOutlineSearch } from "react-icons/hi"; // Solid search icon
@@ -8,10 +8,15 @@ import { MdChatBubble } from "react-icons/md";
 
 interface TitleBarProps {
   onFileSelect: (path: string) => void;
+  chatbotOpen: boolean;
   toggleChatbot: () => void;
 }
 
-const TitleBar: React.FC<TitleBarProps> = ({ onFileSelect, toggleChatbot }) => {
+const TitleBar: React.FC<TitleBarProps> = ({
+  onFileSelect,
+  chatbotOpen,
+  toggleChatbot,
+}) => {
   return (
     <div
       id="customTitleBar"
@@ -32,7 +37,11 @@ const TitleBar: React.FC<TitleBarProps> = ({ onFileSelect, toggleChatbot }) => {
           className="bg-transparent border-none cursor-pointer"
           onClick={toggleChatbot}
         >
-          <MdChatBubble className="text-gray-600" size={24} />
+          {chatbotOpen ? (
+            <MdChatBubble className="text-gray-600" size={24} />
+          ) : (
+            <MdChatBubbleOutline className="text-gray-600" size={24} />
+          )}
         </button>
       </div>
     </div>

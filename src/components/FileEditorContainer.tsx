@@ -29,7 +29,11 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
 
   return (
     <div>
-      <TitleBar onFileSelect={onFileSelect} toggleChatbot={toggleChatbot} />
+      <TitleBar
+        onFileSelect={onFileSelect}
+        chatbotOpen={showChatbot}
+        toggleChatbot={toggleChatbot}
+      />
 
       <div className="flex" style={{ height: "calc(100vh - 30px)" }}>
         <div className="w-[40px]">
