@@ -7,9 +7,10 @@ import NewNoteComponent from "./File/NewNote";
 
 interface TitleBarProps {
   onFileSelect: (path: string) => void;
+  toggleChatbot: () => void;
 }
 
-const TitleBar: React.FC<TitleBarProps> = ({ onFileSelect }) => {
+const TitleBar: React.FC<TitleBarProps> = ({ onFileSelect, toggleChatbot }) => {
   return (
     <div
       id="customTitleBar"
@@ -24,6 +25,12 @@ const TitleBar: React.FC<TitleBarProps> = ({ onFileSelect }) => {
           <HiOutlinePlusCircle className="text-gray-600" size={24} />
         </button>
         <NewNoteComponent onFileSelect={onFileSelect} />
+        <button
+          className="bg-transparent border-none cursor-pointer"
+          onClick={toggleChatbot}
+        >
+          Open chat
+        </button>
       </div>
     </div>
   );

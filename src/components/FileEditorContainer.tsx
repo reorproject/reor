@@ -13,6 +13,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
   const [editorContent, setEditorContent] = useState<string>("");
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
   const lastSavedContentRef = useRef<string>("");
+  const [showChatbot, setShowChatbot] = useState<boolean>(false);
 
   const onFileSelect = async (path: string) => {
     // so here we can save the actual content too\\
@@ -22,10 +23,13 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
     setSelectedFilePath(path);
     // window.ipcRenderer.send("open-file", path);
   };
+  const toggleChatbot = () => {
+    setShowChatbot(!showChatbot);
+  };
 
   return (
     <div>
-      <TitleBar onFileSelect={onFileSelect} />
+      <TitleBar onFileSelect={onFileSelect} toggleChatbot={toggleChatbot} />
 
       <div className="flex" style={{ height: "calc(100vh - 30px)" }}>
         <div className="w-[40px]">
@@ -46,15 +50,20 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
                 lastSavedContentRef={lastSavedContentRef}
               />
             </div>
-            <div className="w-1/3" style={{ marginRight: "300px" }}>
+            <div
+              className="w-1/3"
+              style={{ marginRight: showChatbot ? "300px" : "0" }}
+            >
               <SimilarEntriesComponent
                 filePath={selectedFilePath}
                 onFileSelect={onFileSelect}
               />
             </div>
-            <div className="absolute right-0 top-0 h-full w-[300px]">
-              <ChatWithLLM />
-            </div>
+            {showChatbot && (
+              <div className="absolute right-0 top-0 h-full w-[300px]">
+                <ChatWithLLM />
+              </div>
+            )}
           </div>
         )}
       </div>
