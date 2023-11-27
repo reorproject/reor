@@ -1,5 +1,5 @@
 {
-  "name": "Ragnote",
+  "name": "reor-project",
   "version": "2.2.0",
   "main": "dist-electron/main/index.js",
   "description": "Electron Vite React boilerplate.",
