@@ -230,7 +230,7 @@ export const ALL_PLUGINS = [
   quotePlugin(),
   headingsPlugin({ allowedHeadingLevels: [1, 2, 3] }),
   linkPlugin(),
-  linkDialogPlugin(),
+  // linkDialogPlugin(),
   imagePlugin({
     imageAutocompleteSuggestions: [
       "https://via.placeholder.com/150",
