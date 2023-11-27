@@ -14,12 +14,17 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
   };
 
   return (
-    <button
-      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-      onClick={handleDirectorySelection}
-    >
-      Select Directory
-    </button>
+    <div>
+      <button
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        onClick={handleDirectorySelection}
+      >
+        Select Directory
+      </button>
+      After you select a directory, files currently in the directory will be
+      indexed. This may take a while and we currently haven't implemented a
+      progress bar :)
+    </div>
   );
 };
 
