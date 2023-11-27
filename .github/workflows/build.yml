@@ -1,9 +1,9 @@
-name: Build and Package Electron App
+name: Release script
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - "v*"
 
 jobs:
   build_and_package:
@@ -12,6 +12,7 @@ jobs:
     strategy:
       matrix:
         os: [windows-latest, ubuntu-latest, macOS-latest]
+      fail-fast: false
 
     steps:
       - name: Checkout code
@@ -44,7 +45,6 @@ jobs:
       - name: Build app
         run: npm run build
 
-      # Specific step for Linux builds
       - name: Run Linux Specific Command
         if: matrix.os == 'ubuntu-latest'
         run: npx --no node-llama-cpp download
@@ -60,3 +60,21 @@ jobs:
             ./release/${{ env.APP_VERSION }}/**/*.exe
             ./release/${{ env.APP_VERSION }}/**/*.AppImage
             ./release/${{ env.APP_VERSION }}/**/*.dmg
+
+  create_release:
+    needs: build_and_package
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag' && github.event_name == 'push'
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            **/*.exe
+            **/*.AppImage
+            **/*.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
