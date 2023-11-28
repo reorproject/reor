@@ -5,7 +5,7 @@
   "description": "Electron Vite React boilerplate.",
   "author": "草鞋没号 <308487730@qq.com>",
   "license": "GPL-2.0",
-  "private": true,
+  "private": false,
   "debug": {
     "env": {
       "VITE_DEV_SERVER_URL": "http://127.0.0.1:7777/"
