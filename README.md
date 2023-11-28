@@ -34,9 +34,8 @@
 Uses [LanceDB](https://github.com/lancedb/lancedb) embedded vector database for low memory usage. Built with Electron for a seamless cross-platform experience.
 
 ### Getting Started
-1. Download from the [Releases](https://github.com/reor-project/releases) tab.
-2. Follow the installation guide.
-3. Check out the [documentation](link_to_documentation) for usage tips.
+1. Download from the [Releases](https://github.com/reorproject/reor/releases) tab available for all major operating systems
+2. Install like a normal App.
 
 ### Contribute
 Contributions are welcome. Help with bugs, features, or documentation. See [Contributing Guide](link_to_contributing_guide).
