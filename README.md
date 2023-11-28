@@ -28,6 +28,7 @@
 - See similar notes in a sidebar within the Markdown editor.
 - WYSIWYG Markdown editor.
 - Local storage for notes and VectorDB.
+- Filesystem mapping - you own your own files.
 - Tsne (coming soon)
 
 ### Powered by LanceDB & Electron
