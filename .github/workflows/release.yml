@@ -66,12 +66,18 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Download Artifacts
-        uses: actions/download-artifact@v3
-        with:
-          path: ./artifacts
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Create GitHub Release
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build and Publish Electron App
         run: npm exec electron-builder -- --publish always --win --mac --linux
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
