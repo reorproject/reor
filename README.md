@@ -40,8 +40,8 @@ Uses [LanceDB](https://github.com/lancedb/lancedb) embedded vector database for 
 ### Contribute
 Contributions are welcome. Help with bugs, features, or documentation. See [Contributing Guide](link_to_contributing_guide).
 
-### Beta Phase
-The Reor Project is in beta. Feedback and support are welcome on our [Issues](https://github.com/reor-project/issues) page.
+### Alpha Phase
+The Reor Project is in alpha. Feedback and support are welcome on our [Issues](https://github.com/reor-project/issues) page.
 
 ## License
 GPL-2.0 license. See `LICENSE` for details.
