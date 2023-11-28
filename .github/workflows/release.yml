@@ -64,7 +64,8 @@ jobs:
   create_release:
     needs: build_and_package
     runs-on: ubuntu-latest
-    if: github.ref_type == 'tag' && github.event_name == 'push'
+    permissions:
+      contents: write
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v3
