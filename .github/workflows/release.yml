@@ -60,22 +60,18 @@ jobs:
             ./release/${{ env.APP_VERSION }}/**/*.exe
             ./release/${{ env.APP_VERSION }}/**/*.AppImage
             ./release/${{ env.APP_VERSION }}/**/*.dmg
-
   create_release:
     needs: build_and_package
     runs-on: ubuntu-latest
     permissions:
       contents: write
     steps:
-      - name: Download all artifacts
+      - name: Download Artifacts
         uses: actions/download-artifact@v3
+        with:
+          path: ./artifacts
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            **/*.exe
-            **/*.AppImage
-            **/*.dmg
+        run: npm exec electron-builder -- --publish always --win --mac --linux
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
