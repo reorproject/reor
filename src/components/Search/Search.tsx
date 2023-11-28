@@ -49,7 +49,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onFileSelect }) => {
   }, []);
 
   return (
-    <div ref={containerRef} className="relative p-0.5">
+    <div ref={containerRef} className="relative p-0.5 w-full">
       <input
         type="text"
         className="border border-gray-300 rounded-md p-2 w-full h-[7px]"
@@ -57,11 +57,11 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onFileSelect }) => {
         onChange={(e) => setSearchQuery(e.target.value)}
         placeholder="Search"
       />
-      <div className="absolute top-14 left-0 z-10 w-full bg-white border border-gray-300 shadow-lg max-h-60 overflow-y-auto">
+      <div className="absolute z-10 translate-x-[-40px] w-[210px] bg-white border border-gray-300 shadow-lg max-h-screen overflow-y-auto">
         {searchResults.map((result, index) => (
           <div
             key={index}
-            className="border-b border-gray-300 p-2 cursor-pointer"
+            className="border-b border-gray-300 p-2 cursor-pointer w-full hover:bg-gray-100"
             onClick={() => onFileSelect(result.notepath)}
           >
             <p>{result.content}</p>

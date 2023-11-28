@@ -22,11 +22,13 @@ const TitleBar: React.FC<TitleBarProps> = ({
       id="customTitleBar"
       className="h-[30px] bg-white flex justify-between space-x-2 pr-2"
     >
-      <div className="ml-[90px] flex space-x-2">
+      <div className="ml-[65px] flex space-x-2">
         {/* <button className="bg-transparent border-none cursor-pointer">
         <MdSearch className="text-gray-600" size={24} />
       </button> */}
-        <SearchComponent onFileSelect={onFileSelect} />
+        <div className="w-[120px] mr-2">
+          <SearchComponent onFileSelect={onFileSelect} />
+        </div>
         <button className="bg-transparent border-none cursor-pointer">
           <HiOutlinePlusCircle className="text-gray-600" size={24} />
         </button>
