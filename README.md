@@ -31,8 +31,8 @@
 - Filesystem mapping - you own your own files.
 - Tsne (coming soon)
 
-### Powered by LanceDB & Electron
-Uses [LanceDB](https://github.com/lancedb/lancedb) embedded vector database for low memory usage. Built with Electron for a seamless cross-platform experience.
+### Powered by LanceDB & Transformers.js
+Uses [LanceDB](https://github.com/lancedb/lancedb) embedded vector database for low memory usage and Transformers.js to run [bge-base-en-v1.5](https://huggingface.co/BAAI/bge-base-en-v1.5) embedding model.
 
 ### Getting Started
 1. Download from the [Releases](https://github.com/reorproject/reor/releases) tab available for all major operating systems
