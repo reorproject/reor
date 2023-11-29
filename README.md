@@ -29,7 +29,8 @@
 - Semantic search
 - WYSIWYG Markdown editor.
 - Local storage for notes and VectorDB.
-- Filesystem mapping - you own your own files.
+- Filesystem mapping. You own your own files.
+- Cross-platform. Mac Intel & Arm, Windows and Linux.
 - Tsne (coming soon)
 
 ### Powered by LanceDB & Transformers.js
