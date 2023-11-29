@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Button } from "@material-tailwind/react";
 
 const ChatWithLLM: React.FC = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -110,16 +111,22 @@ const ChatWithLLM: React.FC = () => {
             onChange={(e) => setUserInput(e.target.value)}
             onKeyDown={handleKeyDown}
             className="flex-1 p-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Type your message..."
+            placeholder="Ask your notes..."
             disabled={!sessionId || loading}
           />
-          <button
+          {/* <button
             className="px-4 py-2 text-white bg-blue-500 rounded shadow hover:bg-blue-600 disabled:bg-blue-300"
             onClick={handleSubmitNewMessage}
             disabled={!sessionId || loading}
           >
             Send
-          </button>
+          </button> */}
+          <Button
+            className="bg-slate-700  border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
+            onClick={handleSubmitNewMessage}
+          >
+            Ask
+          </Button>
         </div>
       </div>
     </div>
