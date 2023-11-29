@@ -1,12 +1,5 @@
+import { RagnoteDBEntry } from "electron/main/database/Table";
 import React, { useState, useEffect, useRef } from "react";
-
-export interface RagnoteDBEntry {
-  notepath: string;
-  vector?: Float32Array;
-  content: string;
-  subnoteindex: number;
-  timeadded: Date;
-}
 
 interface SearchComponentProps {
   onFileSelect: (path: string) => void;
