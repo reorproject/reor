@@ -31,11 +31,11 @@ const TitleBar: React.FC<TitleBarProps> = ({
         {/* <button className="bg-transparent border-none cursor-pointer">
         <MdSearch className="text-gray-600" size={24} />
       </button> */}
-        <div className="w-[120px] mr-2">
+        <div className="ml-2">
           <SearchComponent onFileSelect={onFileSelect} />
         </div>
         <button
-          className="bg-transparent border-none cursor-pointer ml-3"
+          className="bg-transparent border-none cursor-pointer ml-1"
           onClick={toggleModal}
         >
           <FaRegPenToSquare className="" size={20} />
