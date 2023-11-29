@@ -35,7 +35,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="ml-2 mr-6 mt-0 h-full min-w-[400px]">
-        <h2 className="text-xl font-semibold mb-4 text-white">
+        <h2 className="text-xl font-semibold mb-3 text-white">
           Create New Note
         </h2>
         <input
@@ -47,7 +47,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
           placeholder="Note Name"
         />
         <Button
-          className="bg-slate-700 mt-2 border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
+          className="bg-slate-700 mt-3 border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
           onClick={sendNewNoteMsg}
         >
           Create
