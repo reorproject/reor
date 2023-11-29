@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 interface NewNoteComponentProps {
   onFileSelect: (path: string) => void;
@@ -12,6 +12,20 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
   onClose,
 }) => {
   const [fileName, setFileName] = useState<string>("");
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  const handleOffClick = (event: MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+      onClose();
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleOffClick);
+    return () => {
+      document.removeEventListener("mousedown", handleOffClick);
+    };
+  }, [onClose]);
 
   const sendNewNoteMsg = async () => {
     const notePath = await window.files.joinPath(
@@ -24,7 +38,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
     onClose(); // Close modal after file creation
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       sendNewNoteMsg();
     }
@@ -35,8 +49,11 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
   }
 
   return (
-    <div className="absolute inset-0 w-screen z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div
+        ref={modalRef}
+        className="bg-white rounded-lg shadow-xl w-full max-w-lg p-6"
+      >
         <div className="flex justify-between items-center">
           <h2 className="text-2xl font-semibold">Create New Note</h2>
           <button
