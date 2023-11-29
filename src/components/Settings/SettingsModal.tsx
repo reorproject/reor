@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from "react";
+import Modal from "../Generic/Modal";
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  // onSaveKey: (key: string) => void;
 }
 
-const SettingsModal: React.FC<ModalProps> = ({
-  isOpen,
-  onClose,
-  // onSaveKey,
-}) => {
+const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   const [openAIKey, setOpenAIKey] = useState("");
 
   useEffect(() => {
@@ -18,23 +14,16 @@ const SettingsModal: React.FC<ModalProps> = ({
     setOpenAIKey(key);
   }, []);
 
-  if (!isOpen) return null;
-
   const handleSave = () => {
-    // onSaveKey(openAIKey);
     window.electronStore.setOpenAIAPIKey(openAIKey);
     onClose();
   };
 
+  if (!isOpen) return null;
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
-      <div className="bg-gray-800 text-white rounded-lg shadow-xl p-5">
-        <button
-          className="float-right text-gray-400 hover:text-gray-200"
-          onClick={handleSave}
-        >
-          &#10005; {/* This is a simple 'X' close icon */}
-        </button>
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <div className=" text-white rounded-lg p-5">
         <h2 className="text-xl mb-4">OpenAI Key Settings</h2>
         <input
           type="password" // Changed to password type
@@ -50,7 +39,7 @@ const SettingsModal: React.FC<ModalProps> = ({
           Save Key
         </button>
       </div>
-    </div>
+    </Modal>
   );
 };
 
