@@ -6,6 +6,8 @@ import SearchComponent from "./Search/Search";
 import NewNoteComponent from "./File/NewNote";
 import { MdChatBubble } from "react-icons/md";
 import { useState } from "react";
+import { FaPenSquare } from "react-icons/fa";
+import { FaRegPenToSquare } from "react-icons/fa6";
 
 interface TitleBarProps {
   onFileSelect: (path: string) => void;
@@ -33,10 +35,10 @@ const TitleBar: React.FC<TitleBarProps> = ({
           <SearchComponent onFileSelect={onFileSelect} />
         </div>
         <button
-          className="bg-transparent border-none cursor-pointer"
+          className="bg-transparent border-none cursor-pointer ml-3"
           onClick={toggleModal}
         >
-          <HiOutlinePlusCircle className="text-gray-600" size={24} />
+          <FaRegPenToSquare className="" size={20} />
         </button>
 
         <NewNoteComponent
