@@ -49,7 +49,11 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onFileSelect }) => {
   }, []);
 
   return (
-    <div ref={containerRef} className="relative p-0.5 w-full">
+    <div
+      ref={containerRef}
+      className="p-0.5 w-full"
+      style={{ height: "calc(100vh - 30px)" }}
+    >
       <input
         type="text"
         className="border border-gray-300 rounded-md p-2 w-full h-[7px]"
@@ -57,17 +61,19 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onFileSelect }) => {
         onChange={(e) => setSearchQuery(e.target.value)}
         placeholder="Search"
       />
-      <div className="absolute z-10 translate-x-[-40px] w-[210px] bg-white border border-gray-300 shadow-lg max-h-screen overflow-y-auto">
-        {searchResults.map((result, index) => (
-          <div
-            key={index}
-            className="border-b border-gray-300 p-2 cursor-pointer w-full hover:bg-gray-100"
-            onClick={() => onFileSelect(result.notepath)}
-          >
-            <p>{result.content}</p>
-          </div>
-        ))}
-      </div>
+      {searchResults.length > 0 && (
+        <div className=" z-10 h-full translate-x-[-40px] w-[210px] bg-white border border-gray-300 shadow-lg overflow-y-auto">
+          {searchResults.map((result, index) => (
+            <div
+              key={index}
+              className="border-b border-gray-300 p-2 cursor-pointer w-full hover:bg-gray-100"
+              onClick={() => onFileSelect(result.notepath)}
+            >
+              <p>{result.content}</p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
