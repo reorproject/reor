@@ -35,9 +35,9 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
         <div className="flex justify-end">
           <button
             onClick={onClose}
-            className="text-gray-600 hover:text-gray-800 cursor-pointer"
+            className="w-5 h-5 flex items-center justify-center text-gray-600 cursor-pointer bg-transparent border-none hover:bg-slate-700 hover:bg-opacity-40"
           >
-            <span className="text-3xl">&times;</span>
+            <span className="text-3xl leading-none">&times;</span>
           </button>
         </div>
         {children}
