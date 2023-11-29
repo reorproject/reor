@@ -46,28 +46,33 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
           />
         </div>
         {selectedFilePath && (
-          <div className="flex flex-grow relative">
-            <div className="w-2/3 overflow-auto">
-              <FileEditor
-                filePath={selectedFilePath}
-                setContentInParent={setEditorContent}
-                lastSavedContentRef={lastSavedContentRef}
-              />
-            </div>
-            <div
-              className="w-1/3"
-              style={{ marginRight: showChatbot ? "300px" : "0" }}
-            >
-              <SimilarEntriesComponent
-                filePath={selectedFilePath}
-                onFileSelect={onFileSelect}
-              />
-            </div>
-            {showChatbot && (
-              <div className="absolute right-0 top-0 h-full w-[300px]">
-                <ChatWithLLM />
+          <div
+            className="w-full h-full flex overflow-x-hidden"
+            style={{ marginRight: showChatbot ? "300px" : "0" }}
+          >
+            <div className="w-full flex ">
+              <div className="w-[75%]">
+                <FileEditor
+                  filePath={selectedFilePath}
+                  setContentInParent={setEditorContent}
+                  lastSavedContentRef={lastSavedContentRef}
+                />
               </div>
-            )}
+              <div className="w-[25%]">
+                <SimilarEntriesComponent
+                  filePath={selectedFilePath}
+                  onFileSelect={onFileSelect}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+        {showChatbot && (
+          <div
+            className="absolute right-0  w-[250px]"
+            style={{ height: "calc(100vh - 30px)" }}
+          >
+            <ChatWithLLM />
           </div>
         )}
       </div>

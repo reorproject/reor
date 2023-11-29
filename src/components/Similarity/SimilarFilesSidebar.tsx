@@ -59,25 +59,38 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   }, [filePath]);
 
   return (
-    <div className="h-full overflow-y-auto">
-      {loading ? (
-        <p className="text-center text-gray-600">Loading...</p>
-      ) : (
-        <div className="space-y-4">
-          {similarEntries.map((entry, index) => (
-            <div
-              key={index}
-              className="p-10 bg-white shadow-md rounded-lg cursor-pointer hover:scale-104 hover:shadow-lg transition-transform duration-300"
-              onClick={() => onFileSelect(entry.notepath)}
-            >
-              <p className="text-gray-700">
-                <span className="text-gray-500">{entry.content}</span>
-              </p>
-            </div>
-          ))}
+    <div className="w-full h-full overflow-y-auto overflow-x-hidden space-y-4">
+      {similarEntries.map((entry, index) => (
+        <div
+          key={index}
+          className="p-10 bg-white shadow-md rounded-lg cursor-pointer hover:scale-104 hover:shadow-lg transition-transform duration-300"
+          onClick={() => onFileSelect(entry.notepath)}
+        >
+          <p className="text-gray-700">
+            <span className="text-gray-500">{entry.content}</span>
+          </p>
         </div>
-      )}
+      ))}
     </div>
+    // <div className="w-full h-full overflow-y-auto bg-blue-200">
+    //   {loading ? (
+    //     <p className=" text-gray-600">Loading...</p>
+    //   ) : (
+    //     <div className="w-full space-y-4 bg-yellow-200">
+    //       {similarEntries.map((entry, index) => (
+    //         <div
+    //           key={index}
+    //           className="p-10 bg-white shadow-md rounded-lg cursor-pointer hover:scale-104 hover:shadow-lg transition-transform duration-300"
+    //           onClick={() => onFileSelect(entry.notepath)}
+    //         >
+    //           <p className="text-gray-700">
+    //             <span className="text-gray-500">{entry.content}</span>
+    //           </p>
+    //         </div>
+    //       ))}
+    //     </div>
+    //   )}
+    // </div>
   );
 };
 

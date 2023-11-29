@@ -378,9 +378,7 @@ ipcMain.handle(
     console.log("writing file", filePath);
     // so here we can use the table we've created to add and remove things from the database. And all of the methods can be async to not hold up any threads
     await updateNoteInTable(dbTable, filePath, content);
-    console.log("content to write", content);
     await fs.writeFileSync(filePath, content, "utf-8");
-    console.log("finished writing file...");
     win?.webContents.send("vector-database-update");
   }
 );
