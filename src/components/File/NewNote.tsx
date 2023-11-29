@@ -52,7 +52,6 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
         >
           Create
         </Button>
-        {/* </button> */}
       </div>
     </Modal>
   );
