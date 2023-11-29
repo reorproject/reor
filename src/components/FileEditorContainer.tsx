@@ -4,7 +4,6 @@ import { MarkdownEditor } from "./File/MakdownEditor";
 import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 import ChatWithLLM from "./Chat/Chat";
-import SettingsModal from "./Settings/SettingsModal";
 import LeftSidebar from "./LeftSidebar/LeftSidebar";
 
 interface FileEditorContainerProps {}
