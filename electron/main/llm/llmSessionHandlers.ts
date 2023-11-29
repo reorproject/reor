@@ -1,7 +1,7 @@
 import { ipcMain, IpcMainInvokeEvent } from "electron";
 import { LlamaCPPModelLoader, LlamaCPPSessionService } from "./models/LlamaCpp"; // Assuming SessionService is in the same directory
 import { ISessionService } from "./Types";
-import { OpenAIModel, OpenAIModelSessionService } from "./models/GPT4";
+import { OpenAIModel, OpenAIModelSessionService } from "./models/OpenAI";
 import { StoreKeys, StoreSchema } from "../Config/storeConfig";
 import Store from "electron-store";
 
