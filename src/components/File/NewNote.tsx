@@ -47,7 +47,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
           placeholder="Note Name"
         />
         <Button
-          className="mt-2 border-none h-10 hover:bg-slate-800 cursor-pointer"
+          className="bg-slate-700 mt-2 border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
           onClick={sendNewNoteMsg}
         >
           Create
