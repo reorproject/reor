@@ -24,11 +24,8 @@ const TitleBar: React.FC<TitleBarProps> = ({
     setIsModalOpen(!isModalOpen);
   };
   return (
-    <div
-      id="customTitleBar"
-      className="h-[30px] bg-white flex justify-between space-x-2 pr-2"
-    >
-      <div className="ml-[65px] flex space-x-2">
+    <div id="customTitleBar" className="h-[30px] bg-white flex justify-between">
+      <div className="ml-[65px] flex">
         {/* <button className="bg-transparent border-none cursor-pointer">
         <MdSearch className="text-gray-600" size={24} />
       </button> */}

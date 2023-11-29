@@ -35,22 +35,28 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 overflow-auto bg-smoke-light flex">
-      <div className="relative p-8 bg-white w-full max-w-md m-auto flex-col flex rounded-lg">
-        <span className="absolute top-0 right-0 p-4" onClick={onClose}>
-          [Close]
-        </span>
+    <div className="absolute inset-0 w-screen z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-lg p-6">
+        <div className="flex justify-between items-center">
+          <h2 className="text-2xl font-semibold">Create New Note</h2>
+          <button
+            onClick={onClose}
+            className="text-gray-600 hover:text-gray-800 cursor-pointer"
+          >
+            <span className="text-3xl">&times;</span>
+          </button>
+        </div>
         <input
           type="text"
-          className="border border-gray-300 rounded-md p-2 w-full"
+          className="form-input mt-4 block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
           value={fileName}
           onChange={(e) => setFileName(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="Name"
+          placeholder="Note Name"
         />
         <button
           onClick={sendNewNoteMsg}
-          className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
         >
           Create
         </button>
