@@ -36,7 +36,7 @@ interface FileEditorProps {
   lastSavedContentRef: React.MutableRefObject<string>;
 }
 
-export const FileEditor: React.FC<FileEditorProps> = ({
+export const MarkdownEditor: React.FC<FileEditorProps> = ({
   filePath,
   // content,
   setContentInParent,
@@ -81,7 +81,7 @@ export const FileEditor: React.FC<FileEditorProps> = ({
   }, [content]);
 
   return (
-    <div className="">
+    <div className="h-full overflow-y-auto">
       {/* <button onClick={() => ref.current?.setMarkdown("new markdown")}>
         Set new markdown
       </button>

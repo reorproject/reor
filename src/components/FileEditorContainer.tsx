@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import { FileSidebar } from "./File/FileSidebar";
-import { FileEditor } from "./File/FileEditor";
+import { MarkdownEditor } from "./File/MakdownEditor";
 import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 import ChatWithLLM from "./Chat/Chat";
@@ -50,9 +50,9 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
             className="w-full h-full flex overflow-x-hidden"
             style={{ marginRight: showChatbot ? "250px" : "0" }}
           >
-            <div className="w-full flex ">
-              <div className="w-[75%]">
-                <FileEditor
+            <div className="w-full flex h-full">
+              <div className="w-[75%] h-full">
+                <MarkdownEditor
                   filePath={selectedFilePath}
                   setContentInParent={setEditorContent}
                   lastSavedContentRef={lastSavedContentRef}
