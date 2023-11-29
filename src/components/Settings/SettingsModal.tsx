@@ -21,18 +21,26 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSave();
+    }
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className=" text-white rounded-lg p-5">
-        <h2 className="text-xl mb-4">OpenAI Key Settings</h2>
+      <div className="ml-2 mr-6 mt-0 h-full min-w-[400px]">
+        <h2 className="text-xl font-semibold mb-4 text-white">
+          Open AI Key Settings
+        </h2>
         <input
-          type="password" // Changed to password type
-          className="w-full p-2 text-black"
-          placeholder="Enter your OpenAI Key"
+          type="text"
+          className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
           value={openAIKey}
           onChange={(e) => setOpenAIKey(e.target.value)}
+          onKeyDown={handleKeyPress}
+          placeholder="Note Name"
         />
-
         <Button
           className="mt-2 border-none h-10 hover:bg-slate-800 cursor-pointer"
           onClick={handleSave}

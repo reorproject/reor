@@ -30,8 +30,9 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div
         ref={modalRef}
-        className="bg-gray-800 rounded-lg shadow-xl w-full max-w-lg p-2"
+        className="flex bg-gray-800 rounded-lg shadow-xl max-w-lg p-2"
       >
+        {children}
         <div className="flex justify-end">
           <button
             onClick={onClose}
@@ -40,7 +41,6 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
             <span className="text-3xl leading-none">&times;</span>
           </button>
         </div>
-        {children}
       </div>
     </div>
   );
