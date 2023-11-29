@@ -21,7 +21,7 @@ const App: React.FC<AppProps> = () => {
   };
 
   return (
-    <div className="max-h-screen">
+    <div className="max-h-screen font-sans">
       {/* <TitleBar onFileSelect={onFileSelect} /> */}
       {directory ? (
         <FileEditorContainer />
