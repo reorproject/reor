@@ -5,6 +5,7 @@ import { HiOutlineSearch } from "react-icons/hi"; // Solid search icon
 import SearchComponent from "./Search/Search";
 import NewNoteComponent from "./File/NewNote";
 import { MdChatBubble } from "react-icons/md";
+import { useState } from "react";
 
 interface TitleBarProps {
   onFileSelect: (path: string) => void;
@@ -17,6 +18,11 @@ const TitleBar: React.FC<TitleBarProps> = ({
   chatbotOpen,
   toggleChatbot,
 }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const toggleModal = () => {
+    setIsModalOpen(!isModalOpen);
+  };
   return (
     <div
       id="customTitleBar"
@@ -29,10 +35,18 @@ const TitleBar: React.FC<TitleBarProps> = ({
         <div className="w-[120px] mr-2">
           <SearchComponent onFileSelect={onFileSelect} />
         </div>
-        <button className="bg-transparent border-none cursor-pointer">
+        <button
+          className="bg-transparent border-none cursor-pointer"
+          onClick={toggleModal}
+        >
           <HiOutlinePlusCircle className="text-gray-600" size={24} />
         </button>
-        <NewNoteComponent onFileSelect={onFileSelect} />
+
+        <NewNoteComponent
+          isOpen={isModalOpen}
+          onClose={toggleModal}
+          onFileSelect={onFileSelect}
+        />
       </div>
       <div className="ml-auto">
         <button
