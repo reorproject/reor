@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Modal from "../Generic/Modal";
-
+import { Button } from "@material-tailwind/react";
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -32,12 +32,13 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
           value={openAIKey}
           onChange={(e) => setOpenAIKey(e.target.value)}
         />
-        <button
-          className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+
+        <Button
+          className="mt-2 border-none h-10 hover:bg-slate-800 cursor-pointer"
           onClick={handleSave}
         >
           Save Key
-        </button>
+        </Button>
       </div>
     </Modal>
   );

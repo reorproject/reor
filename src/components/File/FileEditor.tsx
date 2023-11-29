@@ -77,7 +77,6 @@ export const FileEditor: React.FC<FileEditorProps> = ({
   }, [content]); // Dependency on content ensures saveFile has the latest content
 
   useEffect(() => {
-    console.log("setting content in child: ", content);
     setContentInParent(content);
   }, [content]);
 

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Modal from "../Generic/Modal";
 // import Modal from './Modal'; // Adjust the import path as necessary
+import { Button } from "@material-tailwind/react";
 
 interface NewNoteComponentProps {
   isOpen: boolean;
@@ -45,12 +46,13 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
           onKeyDown={handleKeyPress}
           placeholder="Note Name"
         />
-        <button
+        <Button
+          className="mt-2 border-none h-10 hover:bg-slate-800 cursor-pointer"
           onClick={sendNewNoteMsg}
-          className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
         >
           Create
-        </button>
+        </Button>
+        {/* </button> */}
       </div>
     </Modal>
   );
