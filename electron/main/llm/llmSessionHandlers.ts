@@ -46,17 +46,13 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
   ipcMain.handle(
     "initializeStreamingResponse",
     async (event: IpcMainInvokeEvent, sessionId: string, prompt: string) => {
-      console.log("INITIALIZING STREAMING RESPONSE");
       const sessionService = sessions[sessionId];
       if (!sessionService) {
         throw new Error(`Session ${sessionId} does not exist.`);
       }
-      // const gpt4SessionService = new GPT4SessionService(gpt4Model);
-      // const gpt4Res = await gpt4SessionService.streamingPrompt(
-      //   prompt,
-      //   event.sender
-      // );
-      return sessionService.streamingPrompt(prompt, event.sender);
+
+      const apiKey: string = store.get(StoreKeys.UserOpenAIAPIKey);
+      return sessionService.streamingPrompt(prompt, event.sender, apiKey);
     }
   );
 };

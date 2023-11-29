@@ -41,7 +41,8 @@ export class OpenAIModelSessionService implements ISessionService {
 
   async streamingPrompt(
     prompt: string,
-    sendFunctionImplementer: ISendFunctionImplementer
+    sendFunctionImplementer: ISendFunctionImplementer,
+    apiKey?: string
   ): Promise<string> {
     if (!this.model.isModelLoaded()) {
       throw new Error("Model not initialized");
@@ -51,6 +52,9 @@ export class OpenAIModelSessionService implements ISessionService {
     this.messageHistory.push({ role: "user", content: prompt });
 
     try {
+      if (apiKey) {
+        this.model.client.apiKey = apiKey;
+      }
       const stream = await this.model.client.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: this.messageHistory,
@@ -64,13 +68,22 @@ export class OpenAIModelSessionService implements ISessionService {
 
         // Update the message history with the response
         this.messageHistory.push({ role: "assistant", content });
-        sendFunctionImplementer.send("tokenStream", content);
+
+        sendFunctionImplementer.send("tokenStream", {
+          messageType: "success",
+          message: content,
+        });
       }
 
       return result;
     } catch (error) {
       console.error("Error during OpenAI streaming session:", error);
-      throw error;
+      // return error as string;
+      sendFunctionImplementer.send("tokenStream", {
+        messageType: "error",
+        message: "Error during OpenAI streaming session: " + error + "\n",
+      });
+      return "error cunt";
     }
   }
 }

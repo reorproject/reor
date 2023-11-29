@@ -19,7 +19,8 @@ export interface ISessionService {
    */
   streamingPrompt(
     prompt: string,
-    sendFunctionImplementer: ISendFunctionImplementer
+    sendFunctionImplementer: ISendFunctionImplementer,
+    apiKey?: string
   ): Promise<string>;
 }
 
@@ -34,3 +35,11 @@ export interface ISendFunctionImplementer {
    */
   send(channel: string, ...args: any[]): void;
 }
+
+export type ChatbotMessage = {
+  sender: string;
+  messageType: ChatbotMessageType;
+  message: string;
+};
+
+export type ChatbotMessageType = "success" | "error";

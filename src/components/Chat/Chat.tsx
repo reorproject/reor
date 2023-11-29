@@ -1,21 +1,32 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@material-tailwind/react";
+import { ChatbotMessage } from "electron/main/llm/Types";
 
 const ChatWithLLM: React.FC = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [userInput, setUserInput] = useState<string>("");
-  const [messages, setMessages] = useState<{ sender: string; text: string }[]>(
-    []
-  );
-  const [currentBotMessage, setCurrentBotMessage] = useState<string>("");
+  const [messages, setMessages] = useState<ChatbotMessage[]>([]);
+
+  const [currentBotMessage, setCurrentBotMessage] =
+    useState<ChatbotMessage | null>(null);
 
   useEffect(() => {
     if (!sessionId) {
       initializeSession();
-      const updateStream = (event: string) => {
-        setCurrentBotMessage((prev) => prev + event);
+      const updateStream = (newMessage: ChatbotMessage) => {
+        setCurrentBotMessage((prev) => {
+          return {
+            sender: "bot",
+            messageType: newMessage.messageType,
+            message: prev?.message
+              ? prev.message + newMessage.message
+              : newMessage.message,
+          };
+        });
       };
+
+      // Update the updateStream function to handle the new message structure
 
       window.ipcRenderer.receive("tokenStream", updateStream);
 
@@ -43,9 +54,13 @@ const ChatWithLLM: React.FC = () => {
     if (currentBotMessage) {
       setMessages((prevMessages) => [
         ...prevMessages,
-        { sender: "bot", text: currentBotMessage },
+        {
+          sender: "bot",
+          messageType: currentBotMessage.messageType,
+          message: currentBotMessage.message,
+        },
       ]);
-      setCurrentBotMessage("");
+      setCurrentBotMessage({ messageType: "success", message: "", sender: "" });
     }
     if (!sessionId || !userInput.trim()) return;
 
@@ -60,7 +75,7 @@ const ChatWithLLM: React.FC = () => {
     }
     setMessages((prevMessages) => [
       ...prevMessages,
-      { sender: "user", text: userInput },
+      { sender: "user", messageType: "success", message: userInput },
     ]);
     setUserInput("");
   };
@@ -93,12 +108,17 @@ const ChatWithLLM: React.FC = () => {
                   : "bg-green-100 text-green-800"
               }`}
             >
-              {message.text}
+              {message.message}
             </div>
           ))}
-          {currentBotMessage && (
-            <div className="p-2 rounded-lg bg-blue-100 text-blue-800">
-              {currentBotMessage}
+          {currentBotMessage?.messageType == "success" && (
+            <div className="p-2 rounded-lg bg-blue-100 text-blue-800 break-words">
+              {currentBotMessage.message}
+            </div>
+          )}
+          {currentBotMessage?.messageType == "error" && (
+            <div className="p-2 rounded-lg bg-red-100 text-red-800 break-words">
+              {currentBotMessage.message}
             </div>
           )}
         </div>
@@ -114,13 +134,6 @@ const ChatWithLLM: React.FC = () => {
             placeholder="Ask your notes..."
             disabled={!sessionId || loading}
           />
-          {/* <button
-            className="px-4 py-2 text-white bg-blue-500 rounded shadow hover:bg-blue-600 disabled:bg-blue-300"
-            onClick={handleSubmitNewMessage}
-            disabled={!sessionId || loading}
-          >
-            Send
-          </button> */}
           <Button
             className="bg-slate-700  border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
             onClick={handleSubmitNewMessage}
