@@ -48,7 +48,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
         {selectedFilePath && (
           <div
             className="w-full h-full flex overflow-x-hidden"
-            style={{ marginRight: showChatbot ? "300px" : "0" }}
+            style={{ marginRight: showChatbot ? "250px" : "0" }}
           >
             <div className="w-full flex ">
               <div className="w-[75%]">
