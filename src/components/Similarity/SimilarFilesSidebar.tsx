@@ -63,7 +63,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
       {similarEntries.map((entry, index) => (
         <div
           key={index}
-          className="p-10 bg-white shadow-md rounded-lg cursor-pointer hover:scale-104 hover:shadow-lg transition-transform duration-300"
+          className="pr-2 pb-1 bg-white shadow-md rounded-lg cursor-pointer hover:scale-104 hover:shadow-lg transition-transform duration-300"
           onClick={() => onFileSelect(entry.notepath)}
         >
           <p className="text-gray-700">
@@ -72,25 +72,6 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
         </div>
       ))}
     </div>
-    // <div className="w-full h-full overflow-y-auto bg-blue-200">
-    //   {loading ? (
-    //     <p className=" text-gray-600">Loading...</p>
-    //   ) : (
-    //     <div className="w-full space-y-4 bg-yellow-200">
-    //       {similarEntries.map((entry, index) => (
-    //         <div
-    //           key={index}
-    //           className="p-10 bg-white shadow-md rounded-lg cursor-pointer hover:scale-104 hover:shadow-lg transition-transform duration-300"
-    //           onClick={() => onFileSelect(entry.notepath)}
-    //         >
-    //           <p className="text-gray-700">
-    //             <span className="text-gray-500">{entry.content}</span>
-    //           </p>
-    //         </div>
-    //       ))}
-    //     </div>
-    //   )}
-    // </div>
   );
 };
 
