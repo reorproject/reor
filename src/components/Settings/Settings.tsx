@@ -64,7 +64,7 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
           Save
         </Button>
         <p className="text-xs text-white">
-          *Models are currently hardcoded. Custom models are coming very soon :)
+          *Models are currently pre-set. Custom models are coming very soon :)
         </p>
       </div>
     </Modal>
