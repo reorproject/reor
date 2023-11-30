@@ -12,7 +12,7 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
   const [isModalOpen, setIsModalOpen] = useState(true);
   const [openAIKey, setOpenAIKey] = useState("");
   const [userDirectory, setUserDirectory] = useState("");
-
+  const [errorMsg, setErrorMsg] = useState("");
   useEffect(() => {
     const key = window.electronStore.getOpenAIAPIKey() || ""; // Fallback to empty string if undefined
     setOpenAIKey(key);
@@ -23,6 +23,8 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
     if (userDirectory) {
       window.electronStore.setUserDirectory(userDirectory);
       onDirectorySelected(userDirectory);
+    } else {
+      setErrorMsg("Please select a directory.");
     }
   };
 
@@ -74,7 +76,7 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
             className="block w-[470px] px-3 py-2 mr-2 border border-gray-300 rounded-md bg-gray-200 cursor-not-allowed"
             value={"BAAI/bge-base-en-v1.5"}
             disabled
-            placeholder="Note Name"
+            placeholder="Embedding Model Name"
           />
           <h4 className="font-semibold mb-2 text-white">LLM</h4>
           <input
@@ -82,7 +84,7 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
             className="block w-[470px] px-3 py-2 border border-gray-300 rounded-md bg-gray-200 cursor-not-allowed"
             value={"GPT-3.5-turbo"}
             disabled
-            placeholder="Note Name"
+            placeholder="LLM Model Name"
           />
           <p className="mt-2 text-xs text-gray-100">
             *Models are currently hardcoded (custom models are coming soon).
@@ -94,19 +96,16 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
             value={openAIKey}
             onChange={(e) => setOpenAIKey(e.target.value)}
             onKeyDown={handleKeyPress}
-            placeholder="Note Name"
+            placeholder="Open AI API Key"
           />
 
           <Button
-            className="bg-slate-700 mt-6 mb-2 border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
+            className="bg-slate-700 mt-6  border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
             onClick={handleNext}
           >
             Next
           </Button>
-          {/* <p className="text-xs text-white">
-            *Models are currently hardcoded. Custom models are coming very soon
-            :)
-          </p> */}
+          {errorMsg && <p className="text-xs text-red-500">{errorMsg}</p>}
         </div>
       </div>
     </Modal>

@@ -37,7 +37,7 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
           className="block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-200 cursor-not-allowed"
           value={"BAAI/bge-base-en-v1.5"}
           disabled
-          placeholder="Note Name"
+          placeholder="Embedding Model"
         />
         <h4 className="font-semibold mb-2 text-white">LLM</h4>
         <input
@@ -45,7 +45,7 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
           className="block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-200 cursor-not-allowed"
           value={"GPT-3.5-turbo"}
           disabled
-          placeholder="Note Name"
+          placeholder="LLM Model"
         />
         <h4 className="font-semibold mb-2 text-white">Open AI Key</h4>
         <input
@@ -54,7 +54,7 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
           value={openAIKey}
           onChange={(e) => setOpenAIKey(e.target.value)}
           onKeyDown={handleKeyPress}
-          placeholder="Note Name"
+          placeholder="Open AI API Key"
         />
 
         <Button
