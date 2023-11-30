@@ -161,97 +161,7 @@ app.whenReady().then(async () => {
       startWatchingDirectory(win, userDirectory);
     }
   }
-
-  // const currentTimestamp: Date = new Date();
-  // // console.log("currentTimestamp", currentTimestamp);
-  // await dbTable.add([
-  //   {
-  //     notepath: "test-path",
-  //     content: "test-content",
-  //     subnoteindex: 0,
-  //     timeadded: currentTimestamp,
-  //   },
-  // ]);
-  // const result = await dbTable.search("h", 2);
-  // // console.log("result", result);
-  // const filterResult = await dbTable.filter(
-  //   `${DatabaseFields.NOTE_PATH} == "test-path"`
-  // );
 });
-
-// app.whenReady().then(async () => {
-// createWindow();
-
-// const pipe = await setupPipeline("Xenova/all-MiniLM-L6-v2");
-// console.log(pipe);
-// const uri = "data/sample-lancedb";
-// const db = await lancedb.connect(uri);
-// db.dropTable("test-table");
-// const table = await GetOrCreateTable(db, "test-table");
-// // // console.log("table schema",)
-// // console.log("CALLING ADD:");
-// const currentTimestamp: Date = new Date();
-// const currentTimestampInMilliseconds: number = currentTimestamp.getTime();
-
-// console.log("currentTimestamp", currentTimestamp);
-// console.log("currentTimestampInMilliseconds", currentTimestampInMilliseconds);
-// table.add([
-//   {
-//     path: "test-path",
-//     content: "test-content",
-//     subNoteIndex: 0,
-//     timeAdded: currentTimestamp,
-//   },
-// ]);
-// const result = await table.search("h").limit(2).execute();
-// console.log("result", result);
-// const data = [
-//   {
-//     path: "test-path",
-//     content: "test-content",
-//     subNoteIndex: 0,
-//     timeAdded: currentTimestamp, // Convert current time to nanoseconds since Unix epoch
-//     // vector: [1.0], //await pipe("test-content", { pooling: "mean", normalize: true }),
-//   },
-//   // { id: 1, text: "Cherry", type: "fruit" },
-//   // { id: 2, text: "Carrot", type: "vegetable" },
-//   // { id: 3, text: "Potato", type: "vegetable" },
-//   // { id: 4, text: "Apple", type: "fruit" },
-//   // { id: 5, text: "Banana", type: "fruit" },
-// ];
-// const schema = new Schema([
-//   new Field("id", new Float64(), false),
-//   new Field(
-//     "vector",
-//     new FixedSizeList(384, new Field("item", new Float32())),
-//     false
-//   ),
-//   new Field("text", new Utf8(), false),
-//   new Field("type", new Utf8(), false),
-// ]);
-
-// // Create the table with the embedding function
-// const embedFunc = await createEmbeddingFunction(
-//   "all-MiniLM-L6-v2",
-//   "content"
-// );
-// const newTable = await db.createTable({
-//   name: "food_table",
-//   data,
-//   embeddingFunction: embedFunc,
-// });
-// console.log("NEW TABLE", newTable);
-// // table.add(data);
-// const arrowTable: ArrowTable = await convertToTable(data, embedFunc);
-// console.log("arrowTable", arrowTable);
-// console.log("arrowTable", arrowTable.schema);
-// console.log("arrowTable", arrowTable.schema);
-// for (const field of arrowTable.schema.fields) {
-//   console.log(`Field Name: ${field.name}, Type: ${field.type}`);
-// }
-// const table = await db.createTable("food_table", data, embedFunc);
-// console.log("created table: ", table);
-// });
 
 app.on("window-all-closed", () => {
   win = null;
@@ -303,17 +213,6 @@ ipcMain.handle("open-directory-dialog", async (event) => {
     return null;
   }
 });
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
-
-// IPC listener
-// ipcMain.on("electron-store-get", async (event, val) => {
-//   event.returnValue = store.get(val);
-// });
-// ipcMain.on("electron-store-set", async (event, key, val) => {
-//   store.set(key, val);
-// });
 
 ipcMain.on("set-user-directory", (event, userDirectory: string) => {
   console.log("setting user directory", userDirectory);
