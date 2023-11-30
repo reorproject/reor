@@ -115,13 +115,22 @@ export const maybeRePopulateTable = async (
 ) => {
   const filesInfoList = GetFilesInfoList(directoryPath, extensionsToFilterFor);
 
-  for (const fileInfo of filesInfoList) {
+  const checkAndConvertPromises = filesInfoList.map(async (fileInfo) => {
     const isFileInDBResult = await isFileInDB(table, fileInfo.path);
     if (!isFileInDBResult) {
-      const dbEntry = convertFileTypeToDBType(fileInfo);
-      await table.add([dbEntry]);
+      return convertFileTypeToDBType(fileInfo);
     }
-  }
+    return null;
+  });
+
+  const results = await Promise.all(checkAndConvertPromises);
+
+  // Use a type guard to filter out null values
+  const entriesToAdd: RagnoteDBEntry[] = results.filter(
+    (entry): entry is RagnoteDBEntry => entry !== null
+  );
+
+  await table.add(entriesToAdd);
 };
 
 const isFileInDB = async (
