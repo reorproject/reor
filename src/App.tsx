@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import DirectoryPicker from "./components/File/DirectoryPicker";
+import DirectoryPicker from "./components/Settings/InitialSettingsPage";
 import FileEditorContainer from "./components/FileEditorContainer";
 
 interface AppProps {}
