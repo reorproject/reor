@@ -6,39 +6,17 @@ import Store from "electron-store";
 import * as path from "path";
 import * as fs from "fs";
 import { StoreKeys, StoreSchema } from "./Config/storeConfig";
-import {
-  LlamaCPPModelLoader,
-  LlamaCPPSessionService,
-} from "./llm/models/LlamaCpp";
+
 import * as lancedb from "vectordb";
+
 import {
-  Field,
-  type FixedSizeListBuilder,
-  Float32,
-  makeBuilder,
-  RecordBatchFileWriter,
-  Utf8,
-  Int32,
-  type Vector,
-  FixedSizeList,
-  vectorFromArray,
-  Schema,
-  Table as ArrowTable,
-  RecordBatchStreamWriter,
-  Float64,
-} from "apache-arrow";
-import { DatabaseFields } from "./database/Schema";
-import {
-  RagnoteDBEntry,
   RagnoteTable,
   maybeRePopulateTable,
   updateNoteInTable,
 } from "./database/Table";
 import { FSWatcher } from "fs";
-import chokidar from "chokidar";
 import {
   GetFilesInfoTree,
-  moveFileOrDirectoryInFileSystem,
   orchestrateEntryMove,
   startWatchingDirectory,
   updateFileListForRenderer,

@@ -4,9 +4,15 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
+  hideCloseButton?: boolean;
 }
 
-const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
+const Modal: React.FC<ModalProps> = ({
+  isOpen,
+  onClose,
+  children,
+  hideCloseButton,
+}) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   const handleOffClick = (event: MouseEvent) => {
@@ -33,14 +39,16 @@ const Modal: React.FC<ModalProps> = ({ isOpen, onClose, children }) => {
         className="flex bg-gray-800 rounded-lg shadow-xl max-w-lg p-2"
       >
         {children}
-        <div className="flex justify-end">
-          <button
-            onClick={onClose}
-            className="w-5 h-5 flex items-center justify-center text-gray-600 cursor-pointer bg-transparent border-none hover:bg-slate-700 hover:bg-opacity-40"
-          >
-            <span className="text-3xl leading-none">&times;</span>
-          </button>
-        </div>
+        {!hideCloseButton && (
+          <div className="flex justify-end">
+            <button
+              onClick={onClose}
+              className="w-5 h-5 flex items-center justify-center text-gray-600 cursor-pointer bg-transparent border-none hover:bg-slate-700 hover:bg-opacity-40"
+            >
+              <span className="text-3xl leading-none">&times;</span>
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
