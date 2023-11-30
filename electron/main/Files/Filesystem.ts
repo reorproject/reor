@@ -11,16 +11,16 @@ import {
 
 export function GetFilesInfoList(
   directory: string,
-  extensions?: string[]
+  extensionsToFilterFor?: string[]
 ): FileInfo[] {
-  const fileInfoTree = GetFilesInfoTree(directory, extensions);
+  const fileInfoTree = GetFilesInfoTree(directory, extensionsToFilterFor);
   const fileInfoList = flattenFileInfoTree(fileInfoTree);
   return fileInfoList;
 }
 
 export function GetFilesInfoTree(
   pathInput: string,
-  extensions?: string[],
+  extensionsToFilterFor?: string[],
   parentRelativePath: string = ""
 ): FileInfoTree {
   let fileInfoTree: FileInfoTree = [];
@@ -35,7 +35,11 @@ export function GetFilesInfoTree(
 
     if (stats.isFile()) {
       const fileExtension = path.extname(pathInput).toLowerCase();
-      if ((extensions && extensions.includes(fileExtension)) || !extensions) {
+      if (
+        (extensionsToFilterFor &&
+          extensionsToFilterFor.includes(fileExtension)) ||
+        !extensionsToFilterFor
+      ) {
         fileInfoTree.push({
           name: path.basename(pathInput),
           path: pathInput,
@@ -57,7 +61,11 @@ export function GetFilesInfoTree(
         const itemStats = fs.statSync(itemPath);
 
         if (itemStats.isDirectory()) {
-          const children = GetFilesInfoTree(itemPath, extensions, relativePath);
+          const children = GetFilesInfoTree(
+            itemPath,
+            extensionsToFilterFor,
+            relativePath
+          );
           fileInfoTree.push({
             name: item,
             path: itemPath,
@@ -70,8 +78,9 @@ export function GetFilesInfoTree(
           const fileExtension = path.extname(item).toLowerCase();
 
           if (
-            (extensions && extensions.includes(fileExtension)) ||
-            (!extensions && fileExtension)
+            (extensionsToFilterFor &&
+              extensionsToFilterFor.includes(fileExtension)) ||
+            (!extensionsToFilterFor && fileExtension)
           ) {
             fileInfoTree.push({
               name: item,
@@ -131,7 +140,7 @@ export function writeFileSyncRecursive(
 export function startWatchingDirectory(
   win: BrowserWindow,
   directory: string,
-  extensions?: string[]
+  extensionsToFilterFor?: string[]
 ): void {
   try {
     const watcher = chokidar.watch(directory, {
@@ -141,8 +150,10 @@ export function startWatchingDirectory(
     watcher.on("add", (path) => {
       // Check if the file extension is in the provided list (if any)
       if (
-        !extensions ||
-        extensions.some((ext) => path.toLowerCase().endsWith(ext.toLowerCase()))
+        !extensionsToFilterFor ||
+        extensionsToFilterFor.some((ext) =>
+          path.toLowerCase().endsWith(ext.toLowerCase())
+        )
       ) {
         console.log(`File added: ${path}`);
         updateFileListForRenderer(win, directory);

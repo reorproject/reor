@@ -20,16 +20,24 @@ export interface RagnoteDBEntry {
 
 export class RagnoteTable {
   // implements Table
-  public table!: LanceDBTable<string>;
-  public embedFun!: EnhancedEmbeddingFunction<string>;
+  public table!: LanceDBTable<any>;
+  public embedFun!: EnhancedEmbeddingFunction<string | number[]>;
+  public userDirectory!: string;
+  public dbConnection!: Connection;
   // private embeddingModelHFRepo = "Xenova/all-MiniLM-L6-v2";
 
-  async initialize(dbConnection: Connection) {
+  async initialize(dbConnection: Connection, userDirectory: string) {
     this.embedFun = await createEmbeddingFunction(
       "Xenova/bge-base-en-v1.5",
       "content"
     );
-    this.table = await GetOrCreateLanceTable(dbConnection, this.embedFun);
+    this.userDirectory = userDirectory;
+    this.dbConnection = dbConnection;
+    this.table = await GetOrCreateLanceTable(
+      dbConnection,
+      this.embedFun,
+      userDirectory
+    );
   }
 
   async add(data: RagnoteDBEntry[]): Promise<void> {
@@ -43,8 +51,6 @@ export class RagnoteTable {
       chunks.push(recordEntry.slice(i, i + chunkSize));
     }
     let index = 0;
-    console.log("50th", chunks[1391]);
-    // this.
     for (const chunk of chunks) {
       try {
         console.log("index is: ", index);
@@ -85,22 +91,15 @@ export class RagnoteTable {
   }
 
   async filter(filterString: string) {
-    // const query = new Query("asdf");
     const rawResults = await this.table
-      .search("")
+      .search(Array(768).fill(1))
       .filter(filterString)
+      .limit(1000)
       .execute();
-    // query.filter(filterString);
-    // const rawResults = await query.execute();
+
     const mapped = rawResults.map(convertRawDBResultToRagnoteDBEntry);
     // const filtered = mapped.filter((x) => x !== null);
     return mapped as RagnoteDBEntry[];
-
-    // const lanceQuery = await this.table.filter(filterString);
-    // const rawResults = await lanceQuery.execute();
-    // const mapped = rawResults.map(convertToRagnoteDBEntry);
-    // // const filtered = mapped.filter((x) => x !== null);
-    // return mapped as RagnoteDBEntry[];
   }
 
   async countRows(): Promise<number> {
@@ -112,15 +111,30 @@ export class RagnoteTable {
 export const maybeRePopulateTable = async (
   table: RagnoteTable,
   directoryPath: string,
-  fileExtensions: string[]
+  extensionsToFilterFor: string[]
 ) => {
-  const count = await table.countRows();
-  const filesInfoList = GetFilesInfoList(directoryPath, fileExtensions);
-  if (count !== filesInfoList.length) {
-    await deleteAllRowsInTable(table);
-    await populateDBWithFiles(table, filesInfoList);
+  const filesInfoList = GetFilesInfoList(directoryPath, extensionsToFilterFor);
+
+  for (const fileInfo of filesInfoList) {
+    const isFileInDBResult = await isFileInDB(table, fileInfo.path);
+    if (!isFileInDBResult) {
+      const dbEntry = convertFileTypeToDBType(fileInfo);
+      await table.add([dbEntry]);
+    }
   }
 };
+
+const isFileInDB = async (
+  db: RagnoteTable,
+  filePath: string
+): Promise<boolean> => {
+  const results = await db.filter(
+    `${DatabaseFields.NOTE_PATH} = '${filePath}'`
+  );
+
+  return results.length > 0;
+};
+
 const deleteAllRowsInTable = async (db: RagnoteTable) => {
   try {
     await db.delete(`${DatabaseFields.CONTENT} != ''`);

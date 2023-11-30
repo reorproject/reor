@@ -47,18 +47,11 @@ export async function createEmbeddingFunction(
   repoName: string, // all-MiniLM-L6-v2
   sourceColumn: string
   // embeddingModelsPath: string
-): Promise<EnhancedEmbeddingFunction<string>> {
+): Promise<EnhancedEmbeddingFunction<string | number[]>> {
   let pipe: Pipeline;
   let tokenizer: PreTrainedTokenizer;
   let contextLength: number;
   try {
-    console.log("SETTING UP EMBEDDING FUNCTION WITH THE FOLLOWING ARGS: ", {
-      repoName,
-      sourceColumn,
-      // embeddingModelsPath,
-    });
-    // const modelPath = path.join(embeddingModelsPath, repoName);
-    // await DownloadModelFilesFromHFRepo(repoName, embeddingModelsPath);
     const { pipeline, env, AutoTokenizer } = await import(
       "@xenova/transformers"
     );
@@ -87,7 +80,13 @@ export async function createEmbeddingFunction(
     name: repoName,
     contextLength: contextLength,
     sourceColumn,
-    embed: async (batch: string[]): Promise<number[][]> => {
+    embed: async (batch: (string | number[])[]): Promise<number[][]> => {
+      if (batch.length === 0 || batch[0].length === 0) {
+        return [];
+      }
+      if (typeof batch[0][0] === "number") {
+        return batch as number[][];
+      }
       if (pipe === null) {
         throw new Error("Pipeline not initialized");
       }
@@ -107,7 +106,7 @@ export async function createEmbeddingFunction(
         return [];
       }
     },
-    tokenize: (data: string[]): any[] => {
+    tokenize: (data: (string | number[])[]): any[] => {
       if (tokenizer === null) {
         throw new Error("Tokenizer not initialized");
       }

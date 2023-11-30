@@ -151,11 +151,11 @@ app.whenReady().then(async () => {
   console.log("PATH IS: ", dbPath);
   dbConnection = await lancedb.connect(dbPath);
 
-  await dbTable.initialize(dbConnection);
   const userDirectory = store.get(StoreKeys.UserDirectory) as string;
   createWindow();
 
   if (userDirectory) {
+    await dbTable.initialize(dbConnection, userDirectory);
     await maybeRePopulateTable(dbTable, userDirectory, markdownExtensions);
     if (win) {
       startWatchingDirectory(win, userDirectory);
@@ -214,7 +214,7 @@ ipcMain.handle("open-directory-dialog", async (event) => {
   }
 });
 
-ipcMain.on("set-user-directory", (event, userDirectory: string) => {
+ipcMain.on("set-user-directory", async (event, userDirectory: string) => {
   console.log("setting user directory", userDirectory);
   store.set(StoreKeys.UserDirectory, userDirectory);
   if (fileWatcher) {
@@ -225,6 +225,7 @@ ipcMain.on("set-user-directory", (event, userDirectory: string) => {
     startWatchingDirectory(win, userDirectory);
     updateFileListForRenderer(win, userDirectory, markdownExtensions);
   }
+  await dbTable.initialize(dbConnection, userDirectory);
   maybeRePopulateTable(dbTable, userDirectory, markdownExtensions);
   event.returnValue = "success";
 });

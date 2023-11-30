@@ -28,7 +28,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     const fileContent: string = await window.files.readFile(path);
     const searchResults: RagnoteDBEntry[] = await window.database.search(
       fileContent,
-      10
+      20
     );
     console.log("search results: ", searchResults);
     // filter out the current file:
