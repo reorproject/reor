@@ -128,17 +128,11 @@ export const maybeRePopulateTable = async (
   const filesInfoList = GetFilesInfoList(directoryPath, extensionsToFilterFor);
   const tableArray = await getTableAsArray(table);
 
-  const filesToAdd = [];
-  for (const fileInfo of filesInfoList) {
-    const isFileInDBResult = tableArray.some(
-      (x) => x.notepath === fileInfo.path
-    );
-    if (!isFileInDBResult) {
-      const convertedFile = convertFileTypeToDBType(fileInfo);
-      filesToAdd.push(convertedFile);
-      // await table.add([convertedFile]);
-    }
-  }
+  const tableArrayPaths = new Set(tableArray.map((x) => x.notepath));
+
+  const filesToAdd = filesInfoList
+    .filter((fileInfo) => !tableArrayPaths.has(fileInfo.path))
+    .map(convertFileTypeToDBType);
   console.log("FILES THAT NEED TO ARE NOT IN DB: ", filesToAdd.length);
   await table.add(filesToAdd, onProgress);
   if (onProgress) {
