@@ -126,47 +126,42 @@ export const maybeRePopulateTable = async (
   onProgress?: (progress: number) => void
 ) => {
   const filesInfoList = GetFilesInfoList(directoryPath, extensionsToFilterFor);
-  const tableCount = await table.countRows();
-  console.log("checking files to index: ", filesInfoList.length);
-  const results = [];
-  // const results = await table.filter(`${DatabaseFields.CONTENT} != ''`, 100);
-  // console.log("ALL ITEMS IN DB ARE: ", results);
+  const tableArray = await getTableAsArray(table);
 
-  const isFirstFileInDB = await isFileInDB(
-    table,
-    filesInfoList[0].path,
-    tableCount
-  );
-  console.log("isFirstFileInDB: ", isFirstFileInDB);
-  const isSecondFileInDB = await isFileInDB(
-    table,
-    filesInfoList[1].path,
-    tableCount
-  );
-  console.log("isSecondFileInDB: ", isSecondFileInDB);
-
-  for (let index = 0; index < filesInfoList.length; index++) {
-    const fileInfo = filesInfoList[index];
-    console.log("checking file to index: ", index, fileInfo.path);
-
-    const isFileInDBResult = await isFileInDB(table, fileInfo.path, tableCount);
+  const filesToAdd = [];
+  for (const fileInfo of filesInfoList) {
+    const isFileInDBResult = tableArray.some(
+      (x) => x.notepath === fileInfo.path
+    );
     if (!isFileInDBResult) {
-      console.log("file not in db, converting to db type");
       const convertedFile = convertFileTypeToDBType(fileInfo);
-      results.push(convertedFile);
+      filesToAdd.push(convertedFile);
+      // await table.add([convertedFile]);
     }
   }
-  // Use a type guard to filter out null values. NOT REALLY NEEDED
-  // const entriesToAdd: RagnoteDBEntry[] = results.filter(
-  //   (entry): entry is RagnoteDBEntry => entry !== null
-  // );
-  console.log("FILES THAT NEED TO ARE NOT IN DB: ", results.length);
-
-  await table.add(results, onProgress);
+  console.log("FILES THAT NEED TO ARE NOT IN DB: ", filesToAdd.length);
+  await table.add(filesToAdd, onProgress);
   if (onProgress) {
     onProgress(1);
   }
   console.log("db count now is: ", await table.countRows());
+};
+
+const getTableAsArray = async (table: RagnoteTable) => {
+  const totalRows = await table.countRows();
+  if (totalRows == 0) {
+    return [];
+  }
+  const nonEmptyResults = await table.filter(
+    `${DatabaseFields.CONTENT} != ''`,
+    totalRows
+  );
+  const emptyResults = await table.filter(
+    `${DatabaseFields.CONTENT} = ''`,
+    totalRows
+  );
+  const results = nonEmptyResults.concat(emptyResults);
+  return results;
 };
 
 const isFileInDB = async (
