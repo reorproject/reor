@@ -48,11 +48,14 @@ export class RagnoteTable {
       string,
       unknown
     >[];
-    const chunkSize = 100;
+    const chunkSize = 50;
     const chunks = [];
     for (let i = 0; i < recordEntry.length; i += chunkSize) {
       chunks.push(recordEntry.slice(i, i + chunkSize));
     }
+    console.log("length of data: ", data.length);
+    console.log("length of chunks: ", chunks.length);
+
     let index = 0;
     const totalChunks = chunks.length;
     for (const chunk of chunks) {
@@ -98,13 +101,13 @@ export class RagnoteTable {
     // return rawResults;
   }
 
-  async filter(filterString: string) {
+  async filter(filterString: string, limit: number = 10) {
     const rawResults = await this.table
-      .search(Array(768).fill(1))
+      .search(Array(768).fill(1)) // TODO: remove hardcoding
       .filter(filterString)
-      .limit(1000)
+      .limit(limit)
       .execute();
-
+    console.log("raw results: ", rawResults);
     const mapped = rawResults.map(convertRawDBResultToRagnoteDBEntry);
     // const filtered = mapped.filter((x) => x !== null);
     return mapped as RagnoteDBEntry[];
@@ -123,36 +126,64 @@ export const maybeRePopulateTable = async (
   onProgress?: (progress: number) => void
 ) => {
   const filesInfoList = GetFilesInfoList(directoryPath, extensionsToFilterFor);
+  const tableCount = await table.countRows();
+  console.log("checking files to index: ", filesInfoList.length);
+  const results = [];
+  // const results = await table.filter(`${DatabaseFields.CONTENT} != ''`, 100);
+  // console.log("ALL ITEMS IN DB ARE: ", results);
 
-  const checkAndConvertPromises = filesInfoList.map(async (fileInfo) => {
-    const isFileInDBResult = await isFileInDB(table, fileInfo.path);
-    if (!isFileInDBResult) {
-      return convertFileTypeToDBType(fileInfo);
-    }
-    return null;
-  });
-
-  const results = await Promise.all(checkAndConvertPromises);
-
-  // Use a type guard to filter out null values
-  const entriesToAdd: RagnoteDBEntry[] = results.filter(
-    (entry): entry is RagnoteDBEntry => entry !== null
+  const isFirstFileInDB = await isFileInDB(
+    table,
+    filesInfoList[0].path,
+    tableCount
   );
+  console.log("isFirstFileInDB: ", isFirstFileInDB);
+  const isSecondFileInDB = await isFileInDB(
+    table,
+    filesInfoList[1].path,
+    tableCount
+  );
+  console.log("isSecondFileInDB: ", isSecondFileInDB);
 
-  await table.add(entriesToAdd, onProgress);
+  for (let index = 0; index < filesInfoList.length; index++) {
+    const fileInfo = filesInfoList[index];
+    console.log("checking file to index: ", index, fileInfo.path);
+
+    const isFileInDBResult = await isFileInDB(table, fileInfo.path, tableCount);
+    if (!isFileInDBResult) {
+      console.log("file not in db, converting to db type");
+      const convertedFile = convertFileTypeToDBType(fileInfo);
+      results.push(convertedFile);
+    }
+  }
+  // Use a type guard to filter out null values. NOT REALLY NEEDED
+  // const entriesToAdd: RagnoteDBEntry[] = results.filter(
+  //   (entry): entry is RagnoteDBEntry => entry !== null
+  // );
+  console.log("FILES THAT NEED TO ARE NOT IN DB: ", results.length);
+
+  await table.add(results, onProgress);
   if (onProgress) {
     onProgress(1);
   }
+  console.log("db count now is: ", await table.countRows());
 };
 
 const isFileInDB = async (
-  db: RagnoteTable,
-  filePath: string
+  table: RagnoteTable,
+  filePath: string,
+  tableCount: number // this Lancedb shit is fucked and requires filtering across the full length of the table if not we don't get results we want.
 ): Promise<boolean> => {
-  const results = await db.filter(
-    `${DatabaseFields.NOTE_PATH} = '${filePath}'`
+  console.log("checking file in db: ", filePath);
+  console.log("table count is: ", tableCount);
+  if (tableCount == 0) {
+    return false;
+  }
+  const results = await table.filter(
+    `${DatabaseFields.NOTE_PATH} = '${filePath}'`,
+    tableCount
   );
-
+  console.log("FILES TO INDEX: ", results.length);
   return results.length > 0;
 };
 
