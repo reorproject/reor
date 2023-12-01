@@ -140,6 +140,9 @@ export const maybeRePopulateTable = async (
   );
 
   await table.add(entriesToAdd, onProgress);
+  if (onProgress) {
+    onProgress(1);
+  }
 };
 
 const isFileInDB = async (
