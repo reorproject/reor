@@ -125,20 +125,16 @@ async function createWindow() {
 }
 
 app.whenReady().then(async () => {
-  const dbPath = path.join(app.getPath("userData"), "vectordb");
-  console.log("PATH IS: ", dbPath);
-  dbConnection = await lancedb.connect(dbPath);
-
-  const userDirectory = store.get(StoreKeys.UserDirectory) as string;
+  // const userDirectory = store.get(StoreKeys.UserDirectory) as string;
   createWindow();
 
-  if (userDirectory) {
-    await dbTable.initialize(dbConnection, userDirectory);
-    await maybeRePopulateTable(dbTable, userDirectory, markdownExtensions);
-    if (win) {
-      startWatchingDirectory(win, userDirectory);
-    }
-  }
+  // if (userDirectory) {
+  //   await dbTable.initialize(dbConnection, userDirectory);
+  //   await maybeRePopulateTable(dbTable, userDirectory, markdownExtensions);
+  //   if (win) {
+  //     startWatchingDirectory(win, userDirectory);
+  //   }
+  // }
 });
 
 app.on("window-all-closed", () => {
@@ -199,13 +195,42 @@ ipcMain.on("set-user-directory", async (event, userDirectory: string) => {
     fileWatcher.close();
   }
 
+  // if (win) {
+  //   startWatchingDirectory(win, userDirectory);
+  //   updateFileListForRenderer(win, userDirectory, markdownExtensions);
+  // }
+  // await dbTable.initialize(dbConnection, userDirectory);
+  // maybeRePopulateTable(
+  //   dbTable,
+  //   userDirectory,
+  //   markdownExtensions,
+  //   (progress) => {
+  //     event.sender.send("indexing-progress", progress);
+  //   }
+  // );
+  event.returnValue = "success";
+});
+
+ipcMain.on("index-files-in-directory", async (event, userDirectory: string) => {
+  // this should be called by default and
+  const dbPath = path.join(app.getPath("userData"), "vectordb");
+  console.log("PATH IS: ", dbPath);
+  dbConnection = await lancedb.connect(dbPath);
+  console.log("indexing files in directory", userDirectory);
+  await dbTable.initialize(dbConnection, userDirectory);
+  await maybeRePopulateTable(
+    dbTable,
+    userDirectory,
+    markdownExtensions,
+    (progress) => {
+      event.sender.send("indexing-progress", progress);
+    }
+  );
   if (win) {
     startWatchingDirectory(win, userDirectory);
     updateFileListForRenderer(win, userDirectory, markdownExtensions);
   }
-  await dbTable.initialize(dbConnection, userDirectory);
-  maybeRePopulateTable(dbTable, userDirectory, markdownExtensions);
-  event.returnValue = "success";
+  event.sender.send("indexing-complete", "success");
 });
 
 ipcMain.on("set-openai-api-key", (event, apiKey: string) => {

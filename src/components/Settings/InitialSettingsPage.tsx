@@ -42,6 +42,22 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
     }
   };
 
+  // useEffect(() => {
+  //   const listener = async (progress: string) => {
+  //     console.log(
+  //       "received vector-database-update event: PROGRESS: ",
+  //       progress
+  //     );
+  //     // const searchResults = await performSearch(filePath);
+  //     // setSimilarEntries(searchResults);
+  //   };
+
+  //   window.ipcRenderer.receive("indexing-progress", listener);
+  //   return () => {
+  //     window.ipcRenderer.removeListener("indexing-progress", listener);
+  //   };
+  // }, []);
+
   return (
     <Modal
       isOpen={isModalOpen}

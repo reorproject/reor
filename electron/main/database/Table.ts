@@ -40,7 +40,10 @@ export class RagnoteTable {
     );
   }
 
-  async add(data: RagnoteDBEntry[]): Promise<void> {
+  async add(
+    data: RagnoteDBEntry[],
+    onProgress?: (progress: number) => void
+  ): Promise<void> {
     const recordEntry: Record<string, unknown>[] = data as unknown as Record<
       string,
       unknown
@@ -51,6 +54,7 @@ export class RagnoteTable {
       chunks.push(recordEntry.slice(i, i + chunkSize));
     }
     let index = 0;
+    const totalChunks = chunks.length;
     for (const chunk of chunks) {
       try {
         console.log("index is: ", index);
@@ -61,6 +65,10 @@ export class RagnoteTable {
         // Example: break; // to exit the loop
       }
       index++;
+      const progress = index / totalChunks;
+      if (onProgress) {
+        onProgress(progress);
+      }
       // break;
     }
   }
@@ -111,7 +119,8 @@ export class RagnoteTable {
 export const maybeRePopulateTable = async (
   table: RagnoteTable,
   directoryPath: string,
-  extensionsToFilterFor: string[]
+  extensionsToFilterFor: string[],
+  onProgress?: (progress: number) => void
 ) => {
   const filesInfoList = GetFilesInfoList(directoryPath, extensionsToFilterFor);
 
@@ -130,7 +139,7 @@ export const maybeRePopulateTable = async (
     (entry): entry is RagnoteDBEntry => entry !== null
   );
 
-  await table.add(entriesToAdd);
+  await table.add(entriesToAdd, onProgress);
 };
 
 const isFileInDB = async (

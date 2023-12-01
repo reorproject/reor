@@ -9,7 +9,7 @@ declare global {
     ipcRenderer: {
       // send: (channel: string, ...args: any[]) => void;
       // sendSync: (channel: string, ...args: any[]) => any;
-      // on: (channel: string, listener: (...args: any[]) => void) => void;
+      on: (channel: string, listener: (...args: any[]) => void) => void;
       // once: (channel: string, listener: (...args: any[]) => void) => void;
       // invoke: (channel: string, ...args: any[]) => Promise<any>;
       removeListener: (
@@ -25,6 +25,7 @@ declare global {
         limit: number,
         filter?: string
       ) => Promise<RagnoteDBEntry[]>;
+      indexFilesInDirectory: (directoryPath: string) => any;
       augmentPromptWithRAG: (
         prompt: string,
         limit: number,
@@ -68,6 +69,9 @@ contextBridge.exposeInMainWorld("database", {
   ): Promise<RagnoteDBEntry[]> => {
     return ipcRenderer.invoke("search", query, limit, filter);
   },
+  indexFilesInDirectory: async (directoryPath: string) => {
+    return ipcRenderer.send("index-files-in-directory", directoryPath);
+  },
   augmentPromptWithRAG: async (
     prompt: string,
     limit: number,
@@ -95,7 +99,7 @@ contextBridge.exposeInMainWorld("electronStore", {
 contextBridge.exposeInMainWorld("ipcRenderer", {
   // send: ipcRenderer.send,
   // sendSync: ipcRenderer.sendSync,
-  // on: ipcRenderer.on,
+  on: ipcRenderer.on,
   // once: ipcRenderer.once,
   // invoke: ipcRenderer.invoke,
   removeListener: ipcRenderer.removeListener,
