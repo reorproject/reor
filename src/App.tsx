@@ -14,6 +14,7 @@ const App: React.FC<AppProps> = () => {
     const initialDirectory = window.electronStore.getUserDirectory();
     if (initialDirectory) {
       setDirectory(initialDirectory);
+      window.database.indexFilesInDirectory(initialDirectory);
       // If directory exists, you may want to check if indexing is needed
     }
   }, []);
