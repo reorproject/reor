@@ -44,6 +44,7 @@ export class RagnoteTable {
     data: RagnoteDBEntry[],
     onProgress?: (progress: number) => void
   ): Promise<void> {
+    data = data.filter((x) => x.content !== "");
     const recordEntry: Record<string, unknown>[] = data as unknown as Record<
       string,
       unknown
@@ -227,7 +228,7 @@ export const updateNoteInTable = async (
 ): Promise<void> => {
   // TODO: maybe convert this to have try catch blocks.
   console.log("deleting from table:");
-  await dbTable.delete(`${DatabaseFields.NOTE_PATH} = "${filePath}"`);
+  await dbTable.delete(`${DatabaseFields.NOTE_PATH} = '${filePath}'`);
   const currentTimestamp: Date = new Date();
   console.log(
     "adding back to table with content and path: ",

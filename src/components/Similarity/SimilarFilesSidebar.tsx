@@ -26,16 +26,18 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
 
   const performSearch = async (path: string): Promise<RagnoteDBEntry[]> => {
     const fileContent: string = await window.files.readFile(path);
+    if (!fileContent) {
+      console.error("File content is empty");
+      return [];
+    }
     const searchResults: RagnoteDBEntry[] = await window.database.search(
       fileContent,
       20
     );
-    console.log("search results: ", searchResults);
     // filter out the current file:
     const filteredSearchResults = searchResults.filter(
       (result) => result.notepath !== path
     );
-    console.log("filtered results: ", filteredSearchResults);
     return filteredSearchResults;
   };
 
