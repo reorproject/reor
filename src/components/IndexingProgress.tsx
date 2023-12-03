@@ -55,9 +55,9 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({
         <h6 className="mt-2 mb-2 text-2xl font-semibold text-white">
           Indexing your files...
         </h6>
-        <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden mb-2">
+        <div className="w-full h-4 bg-gray-800 rounded-full overflow-hidden mb-2 border-2 border-gray-400">
           <div
-            className="bg-black h-full transition-all duration-300 ease-out"
+            className="bg-blue-400 h-full transition-all duration-300 ease-out"
             style={{ width: `${progress * 100}%` }}
           ></div>
         </div>
