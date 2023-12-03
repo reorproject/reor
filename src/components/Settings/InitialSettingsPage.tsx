@@ -9,7 +9,6 @@ interface Props {
 }
 
 const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
-  const [isModalOpen, setIsModalOpen] = useState(true);
   const [openAIKey, setOpenAIKey] = useState("");
   const [userDirectory, setUserDirectory] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -60,7 +59,7 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
 
   return (
     <Modal
-      isOpen={isModalOpen}
+      isOpen={true}
       onClose={() => console.log("Not allowing a close for now")}
       hideCloseButton={true}
     >
