@@ -2,7 +2,7 @@ import { ipcMain, IpcMainInvokeEvent } from "electron";
 import { LlamaCPPModelLoader, LlamaCPPSessionService } from "./models/LlamaCpp"; // Assuming SessionService is in the same directory
 import { ISessionService } from "./Types";
 import { OpenAIModel, OpenAIModelSessionService } from "./models/OpenAI";
-import { StoreKeys, StoreSchema } from "../Config/storeConfig";
+import { AIModelConfig, StoreKeys, StoreSchema } from "../Config/storeConfig";
 import Store from "electron-store";
 
 // const modelLoader = new ModelLoader(); // Singleton
@@ -36,10 +36,21 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       if (sessions[sessionId]) {
         return sessionId;
       }
-
-      const sessionService = new OpenAIModelSessionService(openAIModel);
-      sessions[sessionId] = sessionService;
-      return sessionId;
+      const defaultModelName = store.get(StoreKeys.DefaultAIModel);
+      const defaultModelConfig: AIModelConfig = store.get(
+        `${StoreKeys.AIModels}.${defaultModelName}`
+      );
+      console.log("model name: ", defaultModelName);
+      console.log("DEFAULT MODEL CONFIG IS: ", defaultModelConfig);
+      if (defaultModelConfig.engine === "openai") {
+        const sessionService = new OpenAIModelSessionService(openAIModel);
+        sessions[sessionId] = sessionService;
+        return sessionId;
+      } else {
+        const sessionService = new LlamaCPPSessionService(llamaCPPModelLoader);
+        sessions[sessionId] = sessionService;
+        return sessionId;
+      }
     }
   );
 
