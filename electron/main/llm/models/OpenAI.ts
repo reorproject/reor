@@ -3,9 +3,11 @@ import { IModel, ISendFunctionImplementer, ISessionService } from "../Types";
 
 export class OpenAIModel implements IModel {
   private openai: OpenAI;
+  public modelName: string;
 
-  constructor(apiKey: string) {
+  constructor(apiKey: string, modelName: string) {
     this.openai = new OpenAI({ apiKey });
+    this.modelName = modelName;
   }
 
   async loadModel(): Promise<void> {
@@ -56,7 +58,7 @@ export class OpenAIModelSessionService implements ISessionService {
         this.model.client.apiKey = apiKey;
       }
       const stream = await this.model.client.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: this.model.modelName,
         messages: this.messageHistory,
         stream: true,
       });

@@ -11,24 +11,12 @@ import Store from "electron-store";
 const sessions: { [sessionId: string]: ISessionService } = {};
 
 export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
-  const apiKey: string = store.get(StoreKeys.UserOpenAIAPIKey);
-  const openAIModel = new OpenAIModel(apiKey);
-  openAIModel.loadModel();
+  const openAIAPIKey: string = store.get(StoreKeys.UserOpenAIAPIKey);
+
   const llamaCPPModelLoader = new LlamaCPPModelLoader();
   llamaCPPModelLoader.loadModel();
   // const gpt4SessionService = new GPT4SessionService(gpt4Model, webContents);
   // await gpt4SessionService.init();
-  ipcMain.handle(
-    "createSession",
-    async (event: IpcMainInvokeEvent, sessionId: string) => {
-      if (sessions[sessionId]) {
-        throw new Error(`Session ${sessionId} already exists in App backend.`);
-      }
-      const sessionService = new OpenAIModelSessionService(openAIModel);
-      sessions[sessionId] = sessionService;
-      return sessionId;
-    }
-  );
 
   ipcMain.handle(
     "getOrCreateSession",
@@ -42,7 +30,9 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       );
       console.log("model name: ", defaultModelName);
       console.log("DEFAULT MODEL CONFIG IS: ", defaultModelConfig);
+
       if (defaultModelConfig.engine === "openai") {
+        const openAIModel = new OpenAIModel(openAIAPIKey, defaultModelName);
         const sessionService = new OpenAIModelSessionService(openAIModel);
         sessions[sessionId] = sessionService;
         return sessionId;
