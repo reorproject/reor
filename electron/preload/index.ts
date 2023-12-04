@@ -1,4 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
+import { AIModelConfig } from "electron/main/Config/storeConfig";
 import { FileInfoTree } from "electron/main/Files/Types";
 // import { FileInfo } from "electron/main/Files/Types";
 import { RagnoteDBEntry } from "electron/main/database/Table";
@@ -57,6 +58,13 @@ declare global {
       getUserDirectory: () => string;
       setOpenAIAPIKey: (apiKey: string) => any;
       getOpenAIAPIKey: () => string;
+      getAIModelConfigs: () => Promise<Record<string, AIModelConfig>>;
+      setupAIModel: (
+        modelName: string,
+        modelConfig: AIModelConfig
+      ) => Promise<any>;
+      setDefaultAIModel: (modelName: string) => any;
+      getDefaultAIModel: () => Promise<string>;
     };
   }
 }
@@ -93,6 +101,19 @@ contextBridge.exposeInMainWorld("electronStore", {
   },
   getUserDirectory: () => {
     return ipcRenderer.sendSync("get-user-directory");
+  },
+  getAIModelConfigs: async (): Promise<AIModelConfig[]> => {
+    return ipcRenderer.invoke("get-ai-model-configs");
+  },
+  setupAIModel: async (modelName: string, modelConfig: AIModelConfig) => {
+    return ipcRenderer.invoke("setup-new-model", modelName, modelConfig);
+  },
+  setDefaultAIModel: (modelName: string) => {
+    ipcRenderer.send("set-default-ai-model", modelName);
+  },
+
+  getDefaultAIModel: async () => {
+    return ipcRenderer.invoke("get-default-ai-model");
   },
 });
 

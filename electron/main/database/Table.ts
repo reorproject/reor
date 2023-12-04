@@ -54,14 +54,11 @@ export class RagnoteTable {
     for (let i = 0; i < recordEntry.length; i += chunkSize) {
       chunks.push(recordEntry.slice(i, i + chunkSize));
     }
-    console.log("length of data: ", data.length);
-    console.log("length of chunks: ", chunks.length);
 
     let index = 0;
     const totalChunks = chunks.length;
     for (const chunk of chunks) {
       try {
-        console.log("index is: ", index);
         await this.table.add(chunk);
       } catch (error) {
         console.error("Error adding chunk to DB:", error);
@@ -108,7 +105,6 @@ export class RagnoteTable {
       .filter(filterString)
       .limit(limit)
       .execute();
-    console.log("raw results: ", rawResults);
     const mapped = rawResults.map(convertRawDBResultToRagnoteDBEntry);
     // const filtered = mapped.filter((x) => x !== null);
     return mapped as RagnoteDBEntry[];
@@ -134,12 +130,10 @@ export const maybeRePopulateTable = async (
   const filesToAdd = filesInfoList
     .filter((fileInfo) => !tableArrayPaths.has(fileInfo.path))
     .map(convertFileTypeToDBType);
-  console.log("FILES THAT NEED TO ARE NOT IN DB: ", filesToAdd.length);
   await table.add(filesToAdd, onProgress);
   if (onProgress) {
     onProgress(1);
   }
-  console.log("db count now is: ", await table.countRows());
 };
 
 const getTableAsArray = async (table: RagnoteTable) => {
@@ -164,8 +158,6 @@ const isFileInDB = async (
   filePath: string,
   tableCount: number // this Lancedb shit is fucked and requires filtering across the full length of the table if not we don't get results we want.
 ): Promise<boolean> => {
-  console.log("checking file in db: ", filePath);
-  console.log("table count is: ", tableCount);
   if (tableCount == 0) {
     return false;
   }
@@ -173,7 +165,6 @@ const isFileInDB = async (
     `${DatabaseFields.NOTE_PATH} = '${filePath}'`,
     tableCount
   );
-  console.log("FILES TO INDEX: ", results.length);
   return results.length > 0;
 };
 
@@ -227,14 +218,8 @@ export const updateNoteInTable = async (
   content: string
 ): Promise<void> => {
   // TODO: maybe convert this to have try catch blocks.
-  console.log("deleting from table:");
   await dbTable.delete(`${DatabaseFields.NOTE_PATH} = '${filePath}'`);
   const currentTimestamp: Date = new Date();
-  console.log(
-    "adding back to table with content and path: ",
-    filePath,
-    content
-  );
   await dbTable.add([
     {
       notepath: filePath,
@@ -246,7 +231,6 @@ export const updateNoteInTable = async (
 };
 
 const populateDBWithFiles = async (db: RagnoteTable, filesInfo: FileInfo[]) => {
-  console.log("filesInfo to populate db with: ", filesInfo);
   const entries: RagnoteDBEntry[] = await Promise.all(
     filesInfo.map(convertFileTypeToDBType)
   );

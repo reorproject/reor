@@ -58,19 +58,17 @@ export async function createEmbeddingFunction(
     // env.localModelPath = embeddingModelsPath;
     // env.allowRemoteModels = false;
     // env.allowLocalModels = true;
-    console.log(
-      "CACHE DIR IS: ",
-      path.join(app.getPath("userData"), "transformers-cache")
-    );
-    env.cacheDir = path.join(app.getPath("userData"), "transformers-cache");
+    const cacheDir = path.join(app.getPath("userData"), "models", "embeddings");
+    console.log("CACHE DIR IS: ", cacheDir);
+    env.cacheDir = cacheDir;
     pipe = await pipeline("feature-extraction", repoName, {
-      cache_dir: path.join(app.getPath("userData"), "transformers-cache"),
+      cache_dir: cacheDir,
     });
     console.log("MODEL CONFIG IS: ", pipe.model.config.hidden_size);
     contextLength = pipe.model.config.hidden_size;
 
     tokenizer = await AutoTokenizer.from_pretrained(repoName, {
-      cache_dir: path.join(app.getPath("userData"), "transformers-cache"),
+      cache_dir: cacheDir,
     });
   } catch (error) {
     console.error("Failed to initialize pipeline", error);

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
+import ConfigureLLMComponent from "./DownloadLLM";
+import AIModelDropdown from "./AIModelDropdown";
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -56,6 +58,8 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
           onKeyDown={handleKeyPress}
           placeholder="Open AI API Key"
         />
+        <AIModelDropdown />
+        <ConfigureLLMComponent />
 
         <Button
           className="bg-slate-700 mt-4 border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"

@@ -5,7 +5,7 @@ import { update } from "./update";
 import Store from "electron-store";
 import * as path from "path";
 import * as fs from "fs";
-import { StoreKeys, StoreSchema } from "./Config/storeConfig";
+import { AIModelConfig, StoreKeys, StoreSchema } from "./Config/storeConfig";
 
 import * as lancedb from "vectordb";
 
@@ -56,6 +56,37 @@ if (!app.requestSingleInstanceLock()) {
 }
 
 const markdownExtensions = [".md", ".markdown", ".mdown", ".mkdn", ".mkd"];
+
+const defaultAIModels = {
+  "gpt-3.5-turbo-1106": {
+    localpath: "",
+    contextlength: 16385,
+    engine: "openai",
+  },
+  "gpt-4-1106-preview": {
+    localpath: "",
+    contextlength: 128000,
+    engine: "openai",
+  },
+  "gpt-4-0613": {
+    localpath: "",
+    contextlength: 8192,
+    engine: "openai",
+  },
+  "gpt-4-32k-0613": {
+    localpath: "",
+    contextlength: 32768,
+    engine: "openai",
+  },
+};
+
+const currentAIModels = store.get(StoreKeys.AIModels);
+const hasModelsChanged =
+  JSON.stringify(currentAIModels) !== JSON.stringify(defaultAIModels);
+
+if (!currentAIModels || hasModelsChanged) {
+  store.set(StoreKeys.AIModels, defaultAIModels);
+}
 
 // Remove electron security warnings
 // This warning only shows in development mode
@@ -195,20 +226,17 @@ ipcMain.on("set-user-directory", async (event, userDirectory: string) => {
     fileWatcher.close();
   }
 
-  // if (win) {
-  //   startWatchingDirectory(win, userDirectory);
-  //   updateFileListForRenderer(win, userDirectory, markdownExtensions);
-  // }
-  // await dbTable.initialize(dbConnection, userDirectory);
-  // maybeRePopulateTable(
-  //   dbTable,
-  //   userDirectory,
-  //   markdownExtensions,
-  //   (progress) => {
-  //     event.sender.send("indexing-progress", progress);
-  //   }
-  // );
   event.returnValue = "success";
+});
+
+ipcMain.on("set-default-ai-model", (event, modelName: string) => {
+  console.log("setting default ai model", modelName);
+  store.set(StoreKeys.DefaultAIModel, modelName);
+});
+
+// Handler to get the default AI model
+ipcMain.handle("get-default-ai-model", () => {
+  return store.get(StoreKeys.DefaultAIModel);
 });
 
 ipcMain.on("index-files-in-directory", async (event, userDirectory: string) => {
@@ -232,6 +260,34 @@ ipcMain.on("index-files-in-directory", async (event, userDirectory: string) => {
   }
   event.sender.send("indexing-complete", "success");
 });
+
+ipcMain.handle("get-ai-model-configs", () => {
+  // Assuming store.get() returns the value for the given key
+  const aiModelConfigs = store.get(StoreKeys.AIModels);
+  return aiModelConfigs || {};
+});
+
+ipcMain.on(
+  "setup-new-model",
+  (event, modelName: string, modelConfig: AIModelConfig) => {
+    const existingModels =
+      (store.get(StoreKeys.AIModels) as Record<string, AIModelConfig>) || {};
+
+    if (existingModels[modelName]) {
+      event.reply("setup-new-model-response", "Model already exists");
+      return;
+    }
+
+    const updatedModels = {
+      ...existingModels,
+      [modelName]: modelConfig,
+    };
+
+    store.set(StoreKeys.AIModels, updatedModels);
+
+    event.reply("setup-new-model-response", "Model set up successfully");
+  }
+);
 
 ipcMain.on("set-openai-api-key", (event, apiKey: string) => {
   console.log("setting openai api key", apiKey);
