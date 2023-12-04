@@ -1,7 +1,7 @@
 import * as lancedb from "vectordb";
 // import { Schema } from 'apache-arrow';
 import CreateDatabaseSchema from "./Schema";
-import { EnhancedEmbeddingFunction } from "./Transformers";
+import { EnhancedEmbeddingFunction } from "./Embeddings";
 
 const GetOrCreateLanceTable = async (
   db: lancedb.Connection,

@@ -29,14 +29,14 @@ import {
 } from "@mdxeditor/editor";
 import { LeafDirective } from "mdast-util-directive";
 
-interface FileEditorProps {
+interface MarkdownEditorProps {
   filePath: string;
   // content: string;
   setContentInParent: (content: string) => void;
   lastSavedContentRef: React.MutableRefObject<string>;
 }
 
-export const MarkdownEditor: React.FC<FileEditorProps> = ({
+export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   filePath,
   // content,
   setContentInParent,
@@ -48,10 +48,16 @@ export const MarkdownEditor: React.FC<FileEditorProps> = ({
 
   useEffect(() => {
     const fetchContent = async () => {
-      const fileContent = await window.files.readFile(filePath);
-      setContent(fileContent);
-      ref.current?.setMarkdown(fileContent);
-      lastSavedContentRef.current = fileContent; // Initialize with fetched content
+      try {
+        const fileContent = await window.files.readFile(filePath);
+        setContent(fileContent);
+        ref.current?.setMarkdown(fileContent);
+        lastSavedContentRef.current = fileContent; // Initialize with fetched content
+      } catch (error) {
+        // Handle the error here
+        console.error("Error reading file:", error);
+        // Optionally, you can set some state to show an error message in the UI
+      }
     };
 
     if (filePath) {

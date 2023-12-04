@@ -6,7 +6,7 @@ import path from "path";
 import {
   EnhancedEmbeddingFunction,
   createEmbeddingFunction,
-} from "./Transformers";
+} from "./Embeddings";
 import { GetFilesInfoList, flattenFileInfoTree } from "../Files/Filesystem";
 import { FileInfo, FileInfoTree } from "../Files/Types";
 
