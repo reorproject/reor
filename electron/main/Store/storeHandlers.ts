@@ -34,32 +34,11 @@ export const registerStoreHandlers = (
     return aiModelConfigs || {};
   });
 
+  // Refactored ipcMain.handle to use the new function
   ipcMain.handle(
     "setup-new-model",
     async (event, modelName: string, modelConfig: AIModelConfig) => {
-      console.log("setting up new model", modelName, modelConfig);
-      const existingModels =
-        (store.get(StoreKeys.AIModels) as Record<string, AIModelConfig>) || {};
-
-      if (existingModels[modelName]) {
-        return "Model already exists";
-      }
-      console.log("validating model config");
-      const isNotValid = validateAIModelConfig(modelName, modelConfig);
-      if (isNotValid) {
-        console.log("invalid model config");
-        return isNotValid;
-      }
-      console.log("model config is valid");
-
-      const updatedModels = {
-        ...existingModels,
-        [modelName]: modelConfig,
-      };
-
-      store.set(StoreKeys.AIModels, updatedModels);
-      store.set(StoreKeys.DefaultAIModel, modelName);
-      return "Model set up successfully";
+      return addNewModelSchemaToStore(store, modelName, modelConfig);
     }
   );
 
@@ -86,3 +65,33 @@ export const registerStoreHandlers = (
     event.returnValue = path;
   });
 };
+
+export async function addNewModelSchemaToStore(
+  store: Store<StoreSchema>,
+  modelName: string,
+  modelConfig: AIModelConfig
+): Promise<string> {
+  console.log("setting up new model", modelName, modelConfig);
+  const existingModels =
+    (store.get(StoreKeys.AIModels) as Record<string, AIModelConfig>) || {};
+
+  if (existingModels[modelName]) {
+    return "Model already exists";
+  }
+  console.log("validating model config");
+  const isNotValid = validateAIModelConfig(modelName, modelConfig);
+  if (isNotValid) {
+    console.log("invalid model config");
+    return isNotValid;
+  }
+  console.log("model config is valid");
+
+  const updatedModels = {
+    ...existingModels,
+    [modelName]: modelConfig,
+  };
+
+  store.set(StoreKeys.AIModels, updatedModels);
+  store.set(StoreKeys.DefaultAIModel, modelName);
+  return "Model set up successfully";
+}
