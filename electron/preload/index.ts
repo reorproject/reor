@@ -163,7 +163,7 @@ contextBridge.exposeInMainWorld("llm", {
   //   return await ipcRenderer.invoke("createSession", sessionId);
   // },
   getOrCreateSession: async (sessionId: any) => {
-    return await ipcRenderer.invoke("getOrCreateSession", sessionId);
+    return await ipcRenderer.invoke("get-or-create-session", sessionId);
   },
   getHello: async (sessionId: any) => {
     return await ipcRenderer.invoke("getHello", sessionId);

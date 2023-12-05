@@ -89,14 +89,3 @@ export class OpenAIModelSessionService implements ISessionService {
     }
   }
 }
-
-// const fetchOpenAIModels = async (apiKey: string) => {
-//   try {
-//     const openai = new OpenAI({ apiKey });
-//     const modelsResponse = await openai.models.list();
-//     return modelsResponse.data;
-//   } catch (error) {
-//     console.error("Error fetching models from OpenAI:", error);
-//     return [];
-//   }
-// };

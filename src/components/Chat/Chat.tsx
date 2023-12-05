@@ -11,6 +11,21 @@ const ChatWithLLM: React.FC = () => {
   const [currentBotMessage, setCurrentBotMessage] =
     useState<ChatbotMessage | null>(null);
 
+  const initializeSession = async () => {
+    setLoading(true);
+    try {
+      console.log("Creating a new session...");
+      const newSessionId = await window.llm.getOrCreateSession(
+        "some_unique_session_id"
+      );
+      console.log("Created a new session with id:", newSessionId);
+      setSessionId(newSessionId);
+    } catch (error) {
+      console.error("Failed to create a new session:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
     if (!sessionId) {
       initializeSession();
@@ -35,20 +50,6 @@ const ChatWithLLM: React.FC = () => {
       };
     }
   }, [sessionId]);
-
-  const initializeSession = async () => {
-    setLoading(true);
-    try {
-      const newSessionId = await window.llm.getOrCreateSession(
-        "some_unique_session_id"
-      );
-      setSessionId(newSessionId);
-    } catch (error) {
-      console.error("Failed to create a new session:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleSubmitNewMessage = async () => {
     if (currentBotMessage) {

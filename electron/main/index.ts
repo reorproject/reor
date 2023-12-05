@@ -26,6 +26,7 @@ import { registerLLMSessionHandlers } from "./llm/llmSessionHandlers";
 import { FileInfoTree } from "./Files/Types";
 import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
 import { validateAIModelConfig } from "./llm/llmConfig";
+import AIModelManager from "@/components/Settings/LLMSettings";
 
 const store = new Store<StoreSchema>();
 // const user = store.get("user");
@@ -58,35 +59,43 @@ if (!app.requestSingleInstanceLock()) {
 
 const markdownExtensions = [".md", ".markdown", ".mdown", ".mkdn", ".mkd"];
 
-const defaultAIModels = {
+const defaultAIModels: { [modelName: string]: AIModelConfig } = {
   "gpt-3.5-turbo-1106": {
-    localpath: "",
-    contextlength: 16385,
+    localPath: "",
+    contextLength: 16385,
     engine: "openai",
   },
   "gpt-4-1106-preview": {
-    localpath: "",
-    contextlength: 128000,
+    localPath: "",
+    contextLength: 128000,
     engine: "openai",
   },
   "gpt-4-0613": {
-    localpath: "",
-    contextlength: 8192,
+    localPath: "",
+    contextLength: 8192,
     engine: "openai",
   },
   "gpt-4-32k-0613": {
-    localpath: "",
-    contextlength: 32768,
+    localPath: "",
+    contextLength: 32768,
     engine: "openai",
   },
 };
 
-const currentAIModels = store.get(StoreKeys.AIModels);
-const hasModelsChanged =
-  JSON.stringify(currentAIModels) !== JSON.stringify(defaultAIModels);
+const currentAIModels =
+  (store.get(StoreKeys.AIModels) as Record<string, AIModelConfig>) || {};
 
-if (!currentAIModels || hasModelsChanged) {
-  store.set(StoreKeys.AIModels, defaultAIModels);
+// Merge default models with existing ones
+const updatedModels = { ...currentAIModels };
+for (const [modelName, modelConfig] of Object.entries(defaultAIModels)) {
+  if (!updatedModels[modelName]) {
+    updatedModels[modelName] = modelConfig;
+  }
+}
+
+// Save the updated models if they are different from the current models
+if (JSON.stringify(currentAIModels) !== JSON.stringify(updatedModels)) {
+  store.set(StoreKeys.AIModels, updatedModels);
 }
 
 // Remove electron security warnings

@@ -1,5 +1,5 @@
 import { ipcMain, IpcMainInvokeEvent } from "electron";
-import { LlamaCPPModelLoader, LlamaCPPSessionService } from "./models/LlamaCpp"; // Assuming SessionService is in the same directory
+import { LlamaCPPSessionService } from "./models/LlamaCpp"; // Assuming SessionService is in the same directory
 import { ISessionService } from "./Types";
 import { OpenAIModel, OpenAIModelSessionService } from "./models/OpenAI";
 import { AIModelConfig, StoreKeys, StoreSchema } from "../Config/storeConfig";
@@ -13,13 +13,13 @@ const sessions: { [sessionId: string]: ISessionService } = {};
 export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
   const openAIAPIKey: string = store.get(StoreKeys.UserOpenAIAPIKey);
 
-  const llamaCPPModelLoader = new LlamaCPPModelLoader();
-  llamaCPPModelLoader.loadModel();
+  // const llamaCPPModelLoader = new LlamaCPPModelLoader();
+  // llamaCPPModelLoader.loadModel();
   // const gpt4SessionService = new GPT4SessionService(gpt4Model, webContents);
   // await gpt4SessionService.init();
 
   ipcMain.handle(
-    "getOrCreateSession",
+    "get-or-create-session",
     async (event: IpcMainInvokeEvent, sessionId: string) => {
       if (sessions[sessionId]) {
         return sessionId;
@@ -37,7 +37,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
         sessions[sessionId] = sessionService;
         return sessionId;
       } else {
-        const sessionService = new LlamaCPPSessionService(llamaCPPModelLoader);
+        const sessionService = new LlamaCPPSessionService();
         sessions[sessionId] = sessionService;
         return sessionId;
       }

@@ -2,55 +2,58 @@ import path from "path";
 import os from "os";
 import { IModel, ISendFunctionImplementer, ISessionService } from "../Types";
 
-export class LlamaCPPModelLoader implements IModel {
-  private model: any;
+export class LlamaCPPSessionService implements ISessionService {
+  private session: any;
+  public context: any;
+  private model: any; // Model instance
 
-  async loadModel(): Promise<void> {
-    // Load model logic
-    this.model = await import("node-llama-cpp").then((nodeLLamaCpp: any) => {
-      return new nodeLLamaCpp.LlamaModel({
-        modelPath: path.join(
-          os.homedir(),
-          "Downloads",
-          "tinyllama-2-1b-miniguanaco.Q2_K.gguf"
-          // "mistral-7b-v0.1.Q4_K_M.gguf"
-        ),
-        gpuLayers: 0,
-      });
+  constructor() {
+    this.init();
+  }
+
+  private async loadModel(): Promise<void> {
+    // Load model logic - similar to what was in LlamaCPPModelLoader
+    const nodeLLamaCpp = await import("node-llama-cpp");
+    this.model = new nodeLLamaCpp.LlamaModel({
+      modelPath: path.join(
+        os.homedir(),
+        "Downloads",
+        "tinyllama-2-1b-miniguanaco.Q2_K.gguf"
+        // "mistral-7b-v0.1.Q4_K_M.gguf"
+      ),
+      gpuLayers: 0,
     });
+
+    // this.model = await import("node-llama-cpp").then((nodeLLamaCpp: any) => {
+    //   return new nodeLLamaCpp.LlamaModel({
+    //     modelPath: path.join(
+    //       os.homedir(),
+    //       "Downloads",
+    //       "tinyllama-2-1b-miniguanaco.Q2_K.gguf"
+    //       // "mistral-7b-v0.1.Q4_K_M.gguf"
+    //     ),
+    //     gpuLayers: 0,
+    //   });
+    // });
   }
 
-  public async getModel(): Promise<any> {
-    if (!this.model) {
-      throw new Error("Model not initialized");
-    }
-    return this.model;
-  }
-
-  async unloadModel(): Promise<void> {
+  private async unloadModel(): Promise<void> {
     // Unload model logic
     this.model = null;
   }
 
-  isModelLoaded(): boolean {
+  private isModelLoaded(): boolean {
     return !!this.model;
   }
-}
 
-export class LlamaCPPSessionService implements ISessionService {
-  private session: any;
-  public context: any;
-  private modelLoader: LlamaCPPModelLoader;
-
-  constructor(modelLoader: LlamaCPPModelLoader) {
-    this.modelLoader = modelLoader;
-    this.init();
-  }
   async init() {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    await this.loadModel();
+    if (!this.isModelLoaded()) {
+      throw new Error("Model not loaded");
+    }
+
     import("node-llama-cpp").then(async (nodeLLamaCpp: any) => {
-      const model = await this.modelLoader.getModel();
-      this.context = new nodeLLamaCpp.LlamaContext({ model });
+      this.context = new nodeLLamaCpp.LlamaContext({ model: this.model });
       this.session = new nodeLLamaCpp.LlamaChatSession({
         context: this.context,
       });
@@ -71,7 +74,12 @@ export class LlamaCPPSessionService implements ISessionService {
       topP: 0.02,
       onToken: (chunk: any[]) => {
         const decodedChunk = this.context.decode(chunk);
-        sendFunctionImplementer.send("tokenStream", decodedChunk);
+        console.log("decoded chunk: ", decodedChunk);
+        sendFunctionImplementer.send("tokenStream", {
+          messageType: "success",
+          message: decodedChunk,
+        });
+        // sendFunctionImplementer.send("tokenStream", decodedChunk);
       },
     });
   }
