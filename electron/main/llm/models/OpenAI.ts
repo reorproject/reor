@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { IModel, ISendFunctionImplementer, ISessionService } from "../Types";
+import { ISendFunctionImplementer, ISessionService } from "../Types";
 
 export class OpenAIModelSessionService implements ISessionService {
   private openai: OpenAI;

@@ -1,15 +1,9 @@
-export interface IModel {
-  loadModel(): Promise<void>;
-  unloadModel(): Promise<void>;
-  isModelLoaded(): boolean;
-}
-
 export interface ISessionService {
   /**
    * Initializes the session.
    * @returns A promise that resolves when the initialization is complete.
    */
-  init(): Promise<void>;
+  // init(): Promise<void>;
 
   /**
    * Handles the streaming of prompts.

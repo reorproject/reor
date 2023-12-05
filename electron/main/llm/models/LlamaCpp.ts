@@ -1,26 +1,35 @@
 import path from "path";
 import os from "os";
-import { IModel, ISendFunctionImplementer, ISessionService } from "../Types";
+import { ISendFunctionImplementer, ISessionService } from "../Types";
 
 export class LlamaCPPSessionService implements ISessionService {
   private session: any;
   public context: any;
   private model: any; // Model instance
 
-  constructor() {
-    this.init();
+  constructor(localModelPath: string) {
+    this.init(localModelPath);
   }
 
-  private async loadModel(): Promise<void> {
+  async init(localModelPath: string): Promise<void> {
+    await this.loadModel(localModelPath);
+    if (!this.isModelLoaded()) {
+      throw new Error("Model not loaded");
+    }
+
+    import("node-llama-cpp").then(async (nodeLLamaCpp: any) => {
+      this.context = new nodeLLamaCpp.LlamaContext({ model: this.model });
+      this.session = new nodeLLamaCpp.LlamaChatSession({
+        context: this.context,
+      });
+    });
+  }
+
+  private async loadModel(localModelPath: string): Promise<void> {
     // Load model logic - similar to what was in LlamaCPPModelLoader
     const nodeLLamaCpp = await import("node-llama-cpp");
     this.model = new nodeLLamaCpp.LlamaModel({
-      modelPath: path.join(
-        os.homedir(),
-        "Downloads",
-        "tinyllama-2-1b-miniguanaco.Q2_K.gguf"
-        // "mistral-7b-v0.1.Q4_K_M.gguf"
-      ),
+      modelPath: localModelPath,
       gpuLayers: 0,
     });
 
@@ -44,20 +53,6 @@ export class LlamaCPPSessionService implements ISessionService {
 
   private isModelLoaded(): boolean {
     return !!this.model;
-  }
-
-  async init() {
-    await this.loadModel();
-    if (!this.isModelLoaded()) {
-      throw new Error("Model not loaded");
-    }
-
-    import("node-llama-cpp").then(async (nodeLLamaCpp: any) => {
-      this.context = new nodeLLamaCpp.LlamaContext({ model: this.model });
-      this.session = new nodeLLamaCpp.LlamaChatSession({
-        context: this.context,
-      });
-    });
   }
 
   public async streamingPrompt(
