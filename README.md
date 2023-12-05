@@ -41,8 +41,8 @@ Uses [LanceDB](https://github.com/lancedb/lancedb) embedded vector database for 
 2. Install like a normal App.
 
 ### Importing from other apps
-Reor works with a single directory of markdowns in a filesystem. Everything that is done in Reor is written to that directory. You choose the directory on first boot of the app.
-As such, to import notes/files from another app, you'll need to populate that directory manually with markdown files. Integrations are hopefully coming soon!
+Reor works within a single directory in the filesystem. You choose the directory on first boot.
+To import notes/files from another app, you'll need to populate that directory manually with markdown files. Integrations with other apps are hopefully coming soon!
 
 ### Contribute
 Contributions are welcome. Help with bugs, features, or documentation. See [Contributing Guide](link_to_contributing_guide).
