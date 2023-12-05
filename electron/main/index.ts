@@ -30,7 +30,7 @@ import { registerStoreHandlers } from "./Store/storeHandlers";
 
 const store = new Store<StoreSchema>();
 // const user = store.get("user");
-store.clear();
+// store.clear();
 
 // // Check if 'user' and 'directory' exist before attempting to delete
 // if (user && typeof user === "object" && "directory" in user) {
@@ -59,56 +59,6 @@ if (!app.requestSingleInstanceLock()) {
 }
 
 const markdownExtensions = [".md", ".markdown", ".mdown", ".mkdn", ".mkd"];
-
-const defaultAIModels: { [modelName: string]: AIModelConfig } = {
-  "gpt-3.5-turbo-1106": {
-    localPath: "",
-    contextLength: 16385,
-    engine: "openai",
-  },
-  "gpt-4-1106-preview": {
-    localPath: "",
-    contextLength: 128000,
-    engine: "openai",
-  },
-  "gpt-4-0613": {
-    localPath: "",
-    contextLength: 8192,
-    engine: "openai",
-  },
-  "gpt-4-32k-0613": {
-    localPath: "",
-    contextLength: 32768,
-    engine: "openai",
-  },
-};
-
-const existingModels =
-  (store.get(StoreKeys.AIModels) as Record<string, AIModelConfig>) || {};
-
-const updatedModels = { ...existingModels };
-
-for (const [modelName, modelConfig] of Object.entries(defaultAIModels)) {
-  if (!existingModels[modelName]) {
-    console.log("Validating model config for:", modelName);
-
-    // const isNotValid = validateAIModelConfig(modelName, modelConfig);
-    // if (isNotValid) {
-    //   console.log("Invalid model config for model:", modelName, isNotValid);
-    //   // Optionally handle the invalid model config case
-    //   // For now, we'll skip adding this model
-    //   continue;
-    // }
-
-    console.log("Model config is valid for model:", modelName);
-    updatedModels[modelName] = modelConfig;
-  }
-}
-
-// Save the updated models if they are different from the current models
-if (JSON.stringify(existingModels) !== JSON.stringify(updatedModels)) {
-  store.set(StoreKeys.AIModels, updatedModels);
-}
 
 // Remove electron security warnings
 // This warning only shows in development mode

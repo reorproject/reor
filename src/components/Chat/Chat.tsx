@@ -14,8 +14,13 @@ const ChatWithLLM: React.FC = () => {
   const initializeSession = async () => {
     setLoading(true);
     try {
+      const sessionID = "some_unique_session_id";
+      const sessionExists = await window.llm.doesSessionExist(sessionID);
+      if (sessionExists) {
+        await window.llm.deleteSession(sessionID);
+      }
       console.log("Creating a new session...");
-      const newSessionId = await window.llm.getOrCreateSession(
+      const newSessionId = await window.llm.createSession(
         "some_unique_session_id"
       );
       console.log("Created a new session with id:", newSessionId);

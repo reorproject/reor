@@ -46,7 +46,9 @@ declare global {
       ) => Promise<any>;
     };
     llm: {
-      // createSession: (sessionId: any) => Promise<any>;
+      createSession: (sessionId: any) => Promise<any>;
+      doesSessionExist: (sessionId: any) => Promise<any>;
+      deleteSession: (sessionId: any) => Promise<any>;
       getOrCreateSession: (sessionId: any) => Promise<any>;
       initializeStreamingResponse: (
         sessionId: any,
@@ -159,18 +161,21 @@ contextBridge.exposeInMainWorld("files", {
 });
 
 contextBridge.exposeInMainWorld("llm", {
-  // createSession: async (sessionId: any) => {
-  //   return await ipcRenderer.invoke("createSession", sessionId);
-  // },
+  createSession: async (sessionId: any) => {
+    return await ipcRenderer.invoke("create-session", sessionId);
+  },
+  doesSessionExist: async (sessionId: any) => {
+    return await ipcRenderer.invoke("does-session-exist", sessionId);
+  },
+  deleteSession: async (sessionId: any) => {
+    return await ipcRenderer.invoke("delete-session", sessionId);
+  },
   getOrCreateSession: async (sessionId: any) => {
     return await ipcRenderer.invoke("get-or-create-session", sessionId);
   },
-  getHello: async (sessionId: any) => {
-    return await ipcRenderer.invoke("getHello", sessionId);
-  },
   initializeStreamingResponse: async (sessionId: any, prompt: string) => {
     return await ipcRenderer.invoke(
-      "initializeStreamingResponse",
+      "initialize-streaming-response",
       sessionId,
       prompt
     );

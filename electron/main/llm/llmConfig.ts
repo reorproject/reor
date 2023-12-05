@@ -1,4 +1,4 @@
-import { AIModelConfig } from "../Config/storeConfig";
+import { AIModelConfig } from "../Store/storeConfig";
 
 export function validateAIModelConfig(
   modelName: string,
@@ -7,9 +7,6 @@ export function validateAIModelConfig(
   // Validate localPath: ensure it's not empty
   if (!modelName.trim()) {
     return "Model name is required.";
-  }
-  if (!config.localPath.trim()) {
-    return "Local path is required.";
   }
 
   // Validate contextLength: ensure it's a positive number
@@ -20,6 +17,9 @@ export function validateAIModelConfig(
   // Validate engine: ensure it's either "openai" or "llamacpp"
   if (config.engine !== "openai" && config.engine !== "llamacpp") {
     return "Engine must be either 'openai' or 'llamacpp'.";
+  }
+  if (config.engine == "llamacpp" && !config.localPath.trim()) {
+    return "Local path is required.";
   }
 
   // Optional field validation for errorMsg: ensure it's not empty if provided

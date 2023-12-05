@@ -8,6 +8,7 @@ export const registerStoreHandlers = (
   store: Store<StoreSchema>,
   fileWatcher: FSWatcher | null
 ) => {
+  setupDefaultModels(store);
   ipcMain.on("set-user-directory", async (event, userDirectory: string) => {
     console.log("setting user directory", userDirectory);
     store.set(StoreKeys.UserDirectory, userDirectory);
@@ -94,4 +95,33 @@ export async function addNewModelSchemaToStore(
   store.set(StoreKeys.AIModels, updatedModels);
   store.set(StoreKeys.DefaultAIModel, modelName);
   return "Model set up successfully";
+}
+
+const defaultAIModels: { [modelName: string]: AIModelConfig } = {
+  "gpt-3.5-turbo-1106": {
+    localPath: "",
+    contextLength: 16385,
+    engine: "openai",
+  },
+  "gpt-4-1106-preview": {
+    localPath: "",
+    contextLength: 128000,
+    engine: "openai",
+  },
+  "gpt-4-0613": {
+    localPath: "",
+    contextLength: 8192,
+    engine: "openai",
+  },
+};
+
+async function setupDefaultModels(store: Store<StoreSchema>) {
+  for (const [modelName, modelConfig] of Object.entries(defaultAIModels)) {
+    const result = await addNewModelSchemaToStore(
+      store,
+      modelName,
+      modelConfig
+    );
+    console.log(`Setup for ${modelName}: ${result}`);
+  }
 }

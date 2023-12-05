@@ -1,8 +1,8 @@
 import { ipcMain, IpcMainInvokeEvent } from "electron";
 import { LlamaCPPSessionService } from "./models/LlamaCpp"; // Assuming SessionService is in the same directory
 import { ISessionService } from "./Types";
-import { OpenAIModel, OpenAIModelSessionService } from "./models/OpenAI";
-import { AIModelConfig, StoreKeys, StoreSchema } from "../Config/storeConfig";
+import { OpenAIModelSessionService } from "./models/OpenAI";
+import { AIModelConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 
 // const modelLoader = new ModelLoader(); // Singleton
@@ -11,41 +11,47 @@ import Store from "electron-store";
 const sessions: { [sessionId: string]: ISessionService } = {};
 
 export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
-  const openAIAPIKey: string = store.get(StoreKeys.UserOpenAIAPIKey);
-
   // const llamaCPPModelLoader = new LlamaCPPModelLoader();
   // llamaCPPModelLoader.loadModel();
   // const gpt4SessionService = new GPT4SessionService(gpt4Model, webContents);
   // await gpt4SessionService.init();
 
   ipcMain.handle(
+    "does-session-exist",
+    async (event: IpcMainInvokeEvent, sessionId: string) => {
+      return !!sessions[sessionId];
+    }
+  );
+
+  ipcMain.handle(
+    "delete-session",
+    async (event: IpcMainInvokeEvent, sessionId: string) => {
+      if (sessions[sessionId]) {
+        delete sessions[sessionId];
+      }
+      return "success";
+    }
+  );
+  ipcMain.handle(
+    "create-session",
+    async (event: IpcMainInvokeEvent, sessionId: string) => {
+      return createSession(store, sessionId);
+    }
+  );
+
+  // Refactored get-or-create-session handler
+  ipcMain.handle(
     "get-or-create-session",
     async (event: IpcMainInvokeEvent, sessionId: string) => {
       if (sessions[sessionId]) {
         return sessionId;
       }
-      const defaultModelName = store.get(StoreKeys.DefaultAIModel);
-      const defaultModelConfig: AIModelConfig = store.get(
-        `${StoreKeys.AIModels}.${defaultModelName}`
-      );
-      console.log("model name: ", defaultModelName);
-      console.log("DEFAULT MODEL CONFIG IS: ", defaultModelConfig);
-
-      if (defaultModelConfig.engine === "openai") {
-        const openAIModel = new OpenAIModel(openAIAPIKey, defaultModelName);
-        const sessionService = new OpenAIModelSessionService(openAIModel);
-        sessions[sessionId] = sessionService;
-        return sessionId;
-      } else {
-        const sessionService = new LlamaCPPSessionService();
-        sessions[sessionId] = sessionService;
-        return sessionId;
-      }
+      return createSession(store, sessionId);
     }
   );
 
   ipcMain.handle(
-    "initializeStreamingResponse",
+    "initialize-streaming-response",
     async (event: IpcMainInvokeEvent, sessionId: string, prompt: string) => {
       const sessionService = sessions[sessionId];
       if (!sessionService) {
@@ -57,3 +63,26 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
     }
   );
 };
+
+async function createSession(
+  store: Store<StoreSchema>,
+  sessionId: string
+): Promise<string> {
+  const defaultModelName = store.get(StoreKeys.DefaultAIModel);
+
+  const allConfigs = store.get(StoreKeys.AIModels);
+  const currentConfig = allConfigs[defaultModelName];
+
+  if (currentConfig.engine === "openai") {
+    const openAIAPIKey: string = store.get(StoreKeys.UserOpenAIAPIKey);
+    const sessionService = new OpenAIModelSessionService(
+      openAIAPIKey,
+      defaultModelName
+    );
+    sessions[sessionId] = sessionService;
+  } else {
+    const sessionService = new LlamaCPPSessionService();
+    sessions[sessionId] = sessionService;
+  }
+  return sessionId;
+}
