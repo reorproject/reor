@@ -17,7 +17,6 @@ jobs:
           - os: macos-latest # Intel-based macOS (default architecture)
           - os: macos-11 # macOS with M1 chip (ARM architecture)
             arch: arm64
-      fail-fast: false
 
     steps:
       - name: Checkout code
@@ -60,11 +59,12 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.os }}-app
+          name: ${{ matrix.os }}-${{ matrix.arch || 'x64' }}-app
           path: |
-            ./release/${{ env.APP_VERSION }}/**/*.exe
-            ./release/${{ env.APP_VERSION }}/**/*.AppImage
-            ./release/${{ env.APP_VERSION }}/**/*.dmg
+            ./release/${{ env.APP_VERSION }}/**/*-${{ matrix.arch || 'x64' }}.exe
+            ./release/${{ env.APP_VERSION }}/**/*-${{ matrix.arch || 'x64' }}.AppImage
+            ./release/${{ env.APP_VERSION }}/**/*-${{ matrix.arch || 'x64' }}.dmg
+
   create_release:
     needs: build_and_package
     runs-on: ubuntu-latest
@@ -78,8 +78,11 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            **/*.exe
-            **/*.AppImage
-            **/*.dmg
+            **/*-x64.exe
+            **/*-arm64.exe
+            **/*-x64.AppImage
+            **/*-arm64.AppImage
+            **/*-x64.dmg
+            **/*-arm64.dmg
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

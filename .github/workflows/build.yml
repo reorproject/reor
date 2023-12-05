@@ -61,8 +61,8 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.os }}-app
+          name: ${{ matrix.os }}-${{ matrix.arch || 'x64' }}-app
           path: |
-            ./release/${{ env.APP_VERSION }}/**/*.exe
-            ./release/${{ env.APP_VERSION }}/**/*.AppImage
-            ./release/${{ env.APP_VERSION }}/**/*.dmg
+            ./release/${{ env.APP_VERSION }}/**/*-${{ matrix.arch || 'x64' }}.exe
+            ./release/${{ env.APP_VERSION }}/**/*-${{ matrix.arch || 'x64' }}.AppImage
+            ./release/${{ env.APP_VERSION }}/**/*-${{ matrix.arch || 'x64' }}.dmg
