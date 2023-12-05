@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
-import ConfigureLLMComponent from "./ConfigureLLM";
-import AIModelDropdown from "./AIModelDropdown";
 import AIModelManager from "./LLMSettings";
 interface ModalProps {
   isOpen: boolean;
