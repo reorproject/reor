@@ -5,7 +5,7 @@ import { update } from "./update";
 import Store from "electron-store";
 import * as path from "path";
 import * as fs from "fs";
-import { AIModelConfig, StoreKeys, StoreSchema } from "./Config/storeConfig";
+import { AIModelConfig, StoreKeys, StoreSchema } from "./Store/storeConfig";
 
 import * as lancedb from "vectordb";
 
@@ -26,10 +26,11 @@ import { registerLLMSessionHandlers } from "./llm/llmSessionHandlers";
 import { FileInfoTree } from "./Files/Types";
 import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
 import { validateAIModelConfig } from "./llm/llmConfig";
-import AIModelManager from "@/components/Settings/LLMSettings";
+import { registerStoreHandlers } from "./Store/storeHandlers";
 
 const store = new Store<StoreSchema>();
 // const user = store.get("user");
+store.clear();
 
 // // Check if 'user' and 'directory' exist before attempting to delete
 // if (user && typeof user === "object" && "directory" in user) {
@@ -82,19 +83,30 @@ const defaultAIModels: { [modelName: string]: AIModelConfig } = {
   },
 };
 
-const currentAIModels =
+const existingModels =
   (store.get(StoreKeys.AIModels) as Record<string, AIModelConfig>) || {};
 
-// Merge default models with existing ones
-const updatedModels = { ...currentAIModels };
+const updatedModels = { ...existingModels };
+
 for (const [modelName, modelConfig] of Object.entries(defaultAIModels)) {
-  if (!updatedModels[modelName]) {
+  if (!existingModels[modelName]) {
+    console.log("Validating model config for:", modelName);
+
+    // const isNotValid = validateAIModelConfig(modelName, modelConfig);
+    // if (isNotValid) {
+    //   console.log("Invalid model config for model:", modelName, isNotValid);
+    //   // Optionally handle the invalid model config case
+    //   // For now, we'll skip adding this model
+    //   continue;
+    // }
+
+    console.log("Model config is valid for model:", modelName);
     updatedModels[modelName] = modelConfig;
   }
 }
 
 // Save the updated models if they are different from the current models
-if (JSON.stringify(currentAIModels) !== JSON.stringify(updatedModels)) {
+if (JSON.stringify(existingModels) !== JSON.stringify(updatedModels)) {
   store.set(StoreKeys.AIModels, updatedModels);
 }
 
@@ -163,6 +175,7 @@ async function createWindow() {
   update(win);
   registerLLMSessionHandlers(store);
   registerDBSessionHandlers(dbTable);
+  registerStoreHandlers(store, fileWatcher);
 }
 
 app.whenReady().then(async () => {
@@ -229,26 +242,6 @@ ipcMain.handle("open-directory-dialog", async (event) => {
   }
 });
 
-ipcMain.on("set-user-directory", async (event, userDirectory: string) => {
-  console.log("setting user directory", userDirectory);
-  store.set(StoreKeys.UserDirectory, userDirectory);
-  if (fileWatcher) {
-    fileWatcher.close();
-  }
-
-  event.returnValue = "success";
-});
-
-ipcMain.on("set-default-ai-model", (event, modelName: string) => {
-  console.log("setting default ai model", modelName);
-  store.set(StoreKeys.DefaultAIModel, modelName);
-});
-
-// Handler to get the default AI model
-ipcMain.handle("get-default-ai-model", () => {
-  return store.get(StoreKeys.DefaultAIModel);
-});
-
 ipcMain.on("index-files-in-directory", async (event, userDirectory: string) => {
   // this should be called by default and
   const dbPath = path.join(app.getPath("userData"), "vectordb");
@@ -269,64 +262,6 @@ ipcMain.on("index-files-in-directory", async (event, userDirectory: string) => {
     updateFileListForRenderer(win, userDirectory, markdownExtensions);
   }
   event.sender.send("indexing-complete", "success");
-});
-
-ipcMain.handle("get-ai-model-configs", () => {
-  // Assuming store.get() returns the value for the given key
-  const aiModelConfigs = store.get(StoreKeys.AIModels);
-  return aiModelConfigs || {};
-});
-
-ipcMain.handle(
-  "setup-new-model",
-  async (event, modelName: string, modelConfig: AIModelConfig) => {
-    console.log("setting up new model", modelName, modelConfig);
-    const existingModels =
-      (store.get(StoreKeys.AIModels) as Record<string, AIModelConfig>) || {};
-
-    if (existingModels[modelName]) {
-      return "Model already exists";
-    }
-    console.log("validating model config");
-    const isNotValid = validateAIModelConfig(modelName, modelConfig);
-    if (isNotValid) {
-      console.log("invalid model config");
-      return isNotValid;
-    }
-    console.log("model config is valid");
-
-    const updatedModels = {
-      ...existingModels,
-      [modelName]: modelConfig,
-    };
-
-    store.set(StoreKeys.AIModels, updatedModels);
-    store.set(StoreKeys.DefaultAIModel, modelName);
-    return "Model set up successfully";
-  }
-);
-
-ipcMain.on("set-openai-api-key", (event, apiKey: string) => {
-  console.log("setting openai api key", apiKey);
-  try {
-    if (!apiKey) {
-      throw new Error("API Key cannot be empty");
-    }
-    store.set(StoreKeys.UserOpenAIAPIKey, apiKey);
-  } catch (error) {
-    console.error("Error setting openai api key", error);
-  }
-  event.returnValue = "success";
-});
-
-ipcMain.on("get-openai-api-key", (event) => {
-  const apiKey = store.get(StoreKeys.UserOpenAIAPIKey);
-  event.returnValue = apiKey;
-});
-
-ipcMain.on("get-user-directory", (event) => {
-  const path = store.get(StoreKeys.UserDirectory);
-  event.returnValue = path;
 });
 
 ipcMain.handle("join-path", (event, ...args) => {

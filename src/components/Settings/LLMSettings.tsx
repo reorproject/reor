@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ChangeEvent } from "react";
-import { AIModelConfig } from "electron/main/Config/storeConfig";
+import { AIModelConfig } from "electron/main/Store/storeConfig";
 
 const AIModelManager: React.FC = () => {
   const [modelConfigs, setModelConfigs] = useState<

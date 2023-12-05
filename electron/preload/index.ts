@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { AIModelConfig } from "electron/main/Config/storeConfig";
+import { AIModelConfig } from "electron/main/Store/storeConfig";
 import { FileInfoTree } from "electron/main/Files/Types";
 // import { FileInfo } from "electron/main/Files/Types";
 import { RagnoteDBEntry } from "electron/main/database/Table";
