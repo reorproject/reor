@@ -59,7 +59,7 @@ declare global {
       setOpenAIAPIKey: (apiKey: string) => any;
       getOpenAIAPIKey: () => string;
       getAIModelConfigs: () => Promise<Record<string, AIModelConfig>>;
-      setupAIModel: (
+      setupNewLocalLLM: (
         modelName: string,
         modelConfig: AIModelConfig
       ) => Promise<any>;
@@ -105,7 +105,7 @@ contextBridge.exposeInMainWorld("electronStore", {
   getAIModelConfigs: async (): Promise<AIModelConfig[]> => {
     return ipcRenderer.invoke("get-ai-model-configs");
   },
-  setupAIModel: async (modelName: string, modelConfig: AIModelConfig) => {
+  setupNewLocalLLM: async (modelName: string, modelConfig: AIModelConfig) => {
     return ipcRenderer.invoke("setup-new-model", modelName, modelConfig);
   },
   setDefaultAIModel: (modelName: string) => {

@@ -25,6 +25,7 @@ import {
 import { registerLLMSessionHandlers } from "./llm/llmSessionHandlers";
 import { FileInfoTree } from "./Files/Types";
 import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
+import { validateAIModelConfig } from "./llm/llmConfig";
 
 const store = new Store<StoreSchema>();
 // const user = store.get("user");
@@ -267,16 +268,23 @@ ipcMain.handle("get-ai-model-configs", () => {
   return aiModelConfigs || {};
 });
 
-ipcMain.on(
+ipcMain.handle(
   "setup-new-model",
-  (event, modelName: string, modelConfig: AIModelConfig) => {
+  async (event, modelName: string, modelConfig: AIModelConfig) => {
+    console.log("setting up new model", modelName, modelConfig);
     const existingModels =
       (store.get(StoreKeys.AIModels) as Record<string, AIModelConfig>) || {};
 
     if (existingModels[modelName]) {
-      event.reply("setup-new-model-response", "Model already exists");
-      return;
+      return "Model already exists";
     }
+    console.log("validating model config");
+    const isNotValid = validateAIModelConfig(modelName, modelConfig);
+    if (isNotValid) {
+      console.log("invalid model config");
+      return isNotValid;
+    }
+    console.log("model config is valid");
 
     const updatedModels = {
       ...existingModels,
@@ -284,8 +292,8 @@ ipcMain.on(
     };
 
     store.set(StoreKeys.AIModels, updatedModels);
-
-    event.reply("setup-new-model-response", "Model set up successfully");
+    store.set(StoreKeys.DefaultAIModel, modelName);
+    return "Model set up successfully";
   }
 );
 
