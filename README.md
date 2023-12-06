@@ -4,11 +4,11 @@
 </p> -->
 
 <h4 align="center">
-   Local AI Personal Knowledge Management App
+   Local AI Personal Knowledge Management App (Beta)
 </h4>
 
 <p align="center">
-    <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-GPLv2-blue.svg"></a>
+    <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-GPLv3-blue.svg"></a>
     <a href="https://github.com/reorproject/reor/releases"><img alt="Releases" src="https://img.shields.io/github/release-date/public/public"></a>
     <a href="https://github.com/reorproject/reor/issues"><img alt="Issues" src="https://img.shields.io/github/issues/public/public"></a>
 </p>
@@ -51,4 +51,4 @@ Contributions are welcome. Help with bugs, features, or documentation. See [Cont
 The Reor Project is in alpha. Feedback and support are welcome on our [Issues](https://github.com/reor-project/issues) page.
 
 ## License
-GPL-2.0 license. See `LICENSE` for details.
+GPL-3.0 license. See `LICENSE` for details.
