@@ -28,13 +28,56 @@ import { cursor } from "@milkdown/plugin-cursor";
 import { clipboard } from "@milkdown/plugin-clipboard";
 import { insert, replaceAll, getMarkdown } from "@milkdown/utils";
 
-const Milkdown2: React.FC = () => {
+export interface MarkdownEditorProps {
+  filePath: string;
+  // content: string;
+  setContentInParent: (content: string) => void;
+  lastSavedContentRef: React.MutableRefObject<string>;
+}
+
+export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
+  filePath,
+  setContentInParent,
+  lastSavedContentRef,
+}) => {
   const [content, setContent] = useState<string>(
     "# hello \nSelect me to annotate me!"
   );
+  useEffect(() => {
+    console.log("content in parent=", content);
+    setContentInParent(content);
+  }, [content]);
+  return (
+    <div className="bg-red-100">
+      <Milkdown2 content={content} setContent={setContent} />
+      <hr />
+    </div>
+  );
+};
+
+export interface MilkdownEditorProps {
+  //   filePath: string;
+  // content: string;
+  //   setContentInParent: (content: string) => void;
+  //   lastSavedContentRef: React.MutableRefObject<string>;
+  content: string;
+  setContent: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const Milkdown2: React.FC<MilkdownEditorProps> = ({
+  //   filePath,
+  //   setContentInParent,
+  //   lastSavedContentRef,
+  content,
+  setContent,
+}) => {
+  //   const [content, setContent] = useState<string>(
+  //     "# hello \nSelect me to annotate me!"
+  //   );
 
   useEffect(() => {
     console.log("content=", content);
+    // setContentInParent(content);
   }, [content]);
 
   const { editor, getInstance } = useEditor(
@@ -114,10 +157,7 @@ const Milkdown2: React.FC = () => {
 
   return (
     <div className="bg-red-100">
-      <h1 onClick={setValue}>Hello Editors</h1>
       <ReactEditor editor={editor} />
-      <hr />
-      <pre>{content}</pre>
     </div>
   );
 };
