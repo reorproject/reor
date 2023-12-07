@@ -6,6 +6,7 @@ import TitleBar from "./TitleBar";
 import ChatWithLLM from "./Chat/Chat";
 import LeftSidebar from "./LeftSidebar/LeftSidebar";
 import { MilkdownEditor, MilkdownEditorWrapper } from "./File/MilkdownEditor";
+import Milkdown2 from "./File/MilkdownSecondTry";
 
 interface FileEditorContainerProps {}
 
@@ -52,10 +53,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
           >
             <div className="w-full flex h-full">
               <div className="w-[75%] h-full">
-                <MilkdownEditorWrapper
-                  filePath={selectedFilePath}
-                  setContentInParent={setEditorContent}
-                  lastSavedContentRef={lastSavedContentRef}
+                <Milkdown2
+                // filePath={selectedFilePath}
+                // setContentInParent={setEditorContent}
+                // lastSavedContentRef={lastSavedContentRef}
                 />
               </div>
               <div className="w-[25%]">

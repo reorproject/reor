@@ -1,6 +1,8 @@
 // FileEditor.tsx
 import "@mdxeditor/editor/style.css";
 import React, { useEffect, useRef, useState } from "react";
+import "./dark-editor.css";
+
 import {
   AdmonitionDirectiveDescriptor,
   DiffSourceToggleWrapper,
@@ -97,8 +99,11 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
       {/* <MDXEditor ref={ref} markdown="hello world" onChange={console.log} />{" "} */}
       <MDXEditor
         ref={ref}
+        className="dark-theme dark-editor"
         onChange={setContent}
         markdown={content}
+        suppressHtmlProcessing={true}
+        onError={(error) => console.log("error", error)}
         plugins={ALL_PLUGINS}
       />
       {/* <MDXEditor

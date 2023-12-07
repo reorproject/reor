@@ -9,7 +9,7 @@ import "@milkdown/theme-nord/style.css";
 import { MarkdownEditorProps } from "./MarkdownEditor";
 
 export const MilkdownEditor: React.FC = () => {
-  const { get } = useEditor((root) =>
+  const { loading, get } = useEditor((root) =>
     Editor.make()
       .config(nord)
       .config((ctx) => {
@@ -17,6 +17,23 @@ export const MilkdownEditor: React.FC = () => {
       })
       .use(commonmark)
   );
+  //   useEffect(() => {
+  //     console.log("editor", get());
+  //   }, [get]);
+  //   const editor = get();
+  //   console.log("editor", editor);
+  //   editor?.ctx.set(defaultValueCtx, "Hello, Milkdown!");
+
+  useEffect(() => {
+    if (!loading) {
+      const editor = get();
+      console.log("editor", editor);
+      editor?.ctx.set(defaultValueCtx, "Hello, Milkdown!");
+    }
+    // const editor = get();
+    // console.log("editor", editor);
+    // editor?.ctx.set(defaultValueCtx, "Hello, Milkdown!");
+  }, [loading, get]);
 
   return <Milkdown />;
 };
