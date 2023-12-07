@@ -1,10 +1,11 @@
 import React, { useRef, useState } from "react";
 import { FileSidebar } from "./File/FileSidebar";
-import { MarkdownEditor } from "./File/MakdownEditor";
+import { MarkdownEditor } from "./File/MarkdownEditor";
 import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 import ChatWithLLM from "./Chat/Chat";
 import LeftSidebar from "./LeftSidebar/LeftSidebar";
+import { MilkdownEditor, MilkdownEditorWrapper } from "./File/MilkdownEditor";
 
 interface FileEditorContainerProps {}
 
@@ -51,7 +52,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
           >
             <div className="w-full flex h-full">
               <div className="w-[75%] h-full">
-                <MarkdownEditor
+                <MilkdownEditorWrapper
                   filePath={selectedFilePath}
                   setContentInParent={setEditorContent}
                   lastSavedContentRef={lastSavedContentRef}

@@ -29,7 +29,7 @@ import {
 } from "@mdxeditor/editor";
 import { LeafDirective } from "mdast-util-directive";
 
-interface MarkdownEditorProps {
+export interface MarkdownEditorProps {
   filePath: string;
   // content: string;
   setContentInParent: (content: string) => void;
