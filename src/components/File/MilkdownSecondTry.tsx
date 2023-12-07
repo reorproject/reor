@@ -101,7 +101,7 @@ const Milkdown2: React.FC = () => {
         .use(history)
         .use(listener)
         .use(prism)
-        .use(menu)
+        // .use(menu)
         .use(block)
         .use(cursor)
         .use(clipboard)
@@ -112,20 +112,9 @@ const Milkdown2: React.FC = () => {
     console.log(getInstance()?.action(replaceAll("# Fetched \nMarkup")));
   };
 
-  const getValue = () => {
-    const instance = getInstance();
-    console.log("LHUII");
-    // const context = instance.ctx;
-    // console.log("context is: ", context);
-    // const markdown = getMarkdown(context);
-    // console.log("markdown is: ", markdown);
-    // console.log(instance.action(getMarkdown));
-  };
-
   return (
-    <div className="App">
+    <div className="bg-red-100">
       <h1 onClick={setValue}>Hello Editors</h1>
-      <button onClick={getValue}>get value</button>
       <ReactEditor editor={editor} />
       <hr />
       <pre>{content}</pre>
