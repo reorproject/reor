@@ -208,7 +208,7 @@ ipcMain.on("index-files-in-directory", async (event, userDirectory: string) => {
     }
   );
   if (win) {
-    startWatchingDirectory(win, userDirectory);
+    startWatchingDirectory(win, userDirectory, markdownExtensions);
     updateFileListForRenderer(win, userDirectory, markdownExtensions);
   }
   event.sender.send("indexing-complete", "success");
