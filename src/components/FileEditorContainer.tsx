@@ -1,12 +1,11 @@
 import React, { useRef, useState } from "react";
 import { FileSidebar } from "./File/FileSidebar";
-import { MarkdownEditor } from "./File/MilkdownSecondTry";
 import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 import ChatWithLLM from "./Chat/Chat";
 import LeftSidebar from "./LeftSidebar/LeftSidebar";
 import { MilkdownEditor, MilkdownEditorWrapper } from "./File/MilkdownEditor";
-import Milkdown2 from "./File/MilkdownSecondTry";
+import MarkdownEditor from "./File/MilkdownSecondTry";
 
 interface FileEditorContainerProps {}
 

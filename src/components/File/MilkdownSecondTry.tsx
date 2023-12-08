@@ -35,49 +35,38 @@ export interface MarkdownEditorProps {
   lastSavedContentRef: React.MutableRefObject<string>;
 }
 
-export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
+const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   filePath,
   setContentInParent,
   lastSavedContentRef,
+  // content,
+  // setContent,
 }) => {
-  const [content, setContent] = useState<string>(
-    "# hello \nSelect me to annotate me!"
-  );
+  const [content, setContent] = useState<string>("");
+
+  // const ref = useRef<MDXEditorMethods>(null);
+  // const lastSavedContentRef = useRef<string>("");
+
+  const saveFile = async () => {
+    if (content !== lastSavedContentRef.current) {
+      // Check for changes since last save
+      console.log("calling save file:");
+      await window.files.writeFile(filePath, content);
+      lastSavedContentRef.current = content; // Update the ref to the latest saved content
+    }
+  };
+
   useEffect(() => {
-    console.log("content in parent=", content);
+    const saveInterval = setInterval(() => {
+      saveFile();
+    }, 5000); // Every 10 seconds
+
+    return () => clearInterval(saveInterval); // Clear the interval when component unmounts
+  }, [content]); // Dependency on content ensures saveFile has the latest content
+
+  useEffect(() => {
+    // console.log("content set to: ")
     setContentInParent(content);
-  }, [content]);
-  return (
-    <div className="bg-red-100">
-      <Milkdown2 content={content} setContent={setContent} />
-      <hr />
-    </div>
-  );
-};
-
-export interface MilkdownEditorProps {
-  //   filePath: string;
-  // content: string;
-  //   setContentInParent: (content: string) => void;
-  //   lastSavedContentRef: React.MutableRefObject<string>;
-  content: string;
-  setContent: React.Dispatch<React.SetStateAction<string>>;
-}
-
-const Milkdown2: React.FC<MilkdownEditorProps> = ({
-  //   filePath,
-  //   setContentInParent,
-  //   lastSavedContentRef,
-  content,
-  setContent,
-}) => {
-  //   const [content, setContent] = useState<string>(
-  //     "# hello \nSelect me to annotate me!"
-  //   );
-
-  useEffect(() => {
-    console.log("content=", content);
-    // setContentInParent(content);
   }, [content]);
 
   const { editor, getInstance } = useEditor(
@@ -150,7 +139,25 @@ const Milkdown2: React.FC<MilkdownEditorProps> = ({
         .use(clipboard)
     // .use(slash) // Uncomment if slash is used
   );
+  useEffect(() => {
+    const fetchContent = async () => {
+      try {
+        const fileContent = await window.files.readFile(filePath);
+        // setContent(fileContent);
+        getInstance()?.action(replaceAll(fileContent));
+        // ref.current?.setMarkdown(fileContent);
+        lastSavedContentRef.current = fileContent; // Initialize with fetched content
+      } catch (error) {
+        // Handle the error here
+        console.error("Error reading file:", error);
+        // Optionally, you can set some state to show an error message in the UI
+      }
+    };
 
+    if (filePath) {
+      fetchContent();
+    }
+  }, [filePath]);
   const setValue = () => {
     console.log(getInstance()?.action(replaceAll("# Fetched \nMarkup")));
   };
@@ -162,4 +169,4 @@ const Milkdown2: React.FC<MilkdownEditorProps> = ({
   );
 };
 
-export default Milkdown2;
+export default MarkdownEditor;
