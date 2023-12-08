@@ -155,6 +155,7 @@ export function startWatchingDirectory(
           path.toLowerCase().endsWith(ext.toLowerCase())
         )
       ) {
+        console.log("extensions: ", extensionsToFilterFor);
         console.log(`File added: ${path}`);
         updateFileListForRenderer(win, directory);
       }

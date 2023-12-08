@@ -130,13 +130,13 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         .use(nord)
         .use(commonmark)
         .use(gfm)
-        .use(history)
+        // .use(history)
         .use(listener)
-        .use(prism)
-        // .use(menu)
-        .use(block)
-        .use(cursor)
-        .use(clipboard)
+    // .use(prism)
+    // .use(menu)
+    // .use(block)
+    // .use(cursor)
+    // .use(clipboard)
     // .use(slash) // Uncomment if slash is used
   );
   useEffect(() => {
