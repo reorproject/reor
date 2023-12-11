@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 type CustomSelectProps = {
   options: string[];
@@ -12,6 +12,26 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   onChange,
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const wrapperRef = useRef<HTMLDivElement>(null); // Ref for the wrapper element
+
+  useEffect(() => {
+    // Function to check if the clicked element is outside of the component
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    // Bind the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [wrapperRef]);
 
   const toggleDropdown = () => setIsOpen(!isOpen);
   const handleOptionClick = (value: string) => {
@@ -20,7 +40,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   };
 
   return (
-    <div className="relative">
+    <div className="relative" ref={wrapperRef}>
       <div
         className="block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-200 cursor-pointer"
         onClick={toggleDropdown}
