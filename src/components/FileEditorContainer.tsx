@@ -57,6 +57,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
                   setContentInParent={setEditorContent}
                   lastSavedContentRef={lastSavedContentRef}
                 />
+                {/* <MilkdownEditor /> */}
               </div>
               <div className="w-[25%]">
                 <SimilarEntriesComponent

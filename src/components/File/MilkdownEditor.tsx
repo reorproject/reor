@@ -1,21 +1,25 @@
 import { defaultValueCtx, Editor, rootCtx } from "@milkdown/core";
 import { FC, useEffect, useState } from "react";
 
-import { Milkdown, useEditor, MilkdownProvider } from "@milkdown/react";
+import { ReactEditor, useEditor } from "@milkdown/react";
 import { commonmark } from "@milkdown/preset-commonmark";
 import { nord } from "@milkdown/theme-nord";
+import { gfm } from "@milkdown/preset-gfm";
 
-import "@milkdown/theme-nord/style.css";
-import { MarkdownEditorProps } from "./MarkdownEditor";
+// import "@milkdown/theme-nord/style.css";
+// import { MarkdownEditorProps } from "./MarkdownEditor";
 
 export const MilkdownEditor: React.FC = () => {
-  const { loading, get } = useEditor((root) =>
-    Editor.make()
-      .config(nord)
-      .config((ctx) => {
-        ctx.set(rootCtx, root);
-      })
-      .use(commonmark)
+  const { editor, loading, getInstance } = useEditor(
+    (root) =>
+      Editor.make()
+        .use(nord)
+        .use(commonmark)
+        // .use(gfm)
+        .config((ctx) => {
+          ctx.set(rootCtx, root);
+        })
+    // .use(commonmark)
   );
   //   useEffect(() => {
   //     console.log("editor", get());
@@ -24,24 +28,24 @@ export const MilkdownEditor: React.FC = () => {
   //   console.log("editor", editor);
   //   editor?.ctx.set(defaultValueCtx, "Hello, Milkdown!");
 
-  useEffect(() => {
-    if (!loading) {
-      const editor = get();
-      console.log("editor", editor);
-      editor?.ctx.set(defaultValueCtx, "Hello, Milkdown!");
-    }
-    // const editor = get();
-    // console.log("editor", editor);
-    // editor?.ctx.set(defaultValueCtx, "Hello, Milkdown!");
-  }, [loading, get]);
+  // useEffect(() => {
+  //   if (!loading) {
+  //     const editor = get();
+  //     console.log("editor", editor);
+  //     editor?.ctx.set(defaultValueCtx, "Hello, Milkdown!");
+  //   }
+  //   // const editor = get();
+  //   // console.log("editor", editor);
+  //   // editor?.ctx.set(defaultValueCtx, "Hello, Milkdown!");
+  // }, [loading, get]);
 
-  return <Milkdown />;
+  return <ReactEditor editor={editor} />;
 };
 
-export const MilkdownEditorWrapper: React.FC<MarkdownEditorProps> = () => {
+export const MilkdownEditorWrapper: React.FC = () => {
   return (
-    <MilkdownProvider>
-      <MilkdownEditor />
-    </MilkdownProvider>
+    // <MilkdownProvider>
+    <MilkdownEditor />
+    // </MilkdownProvider>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-// import "./styles.css";
+import "./styles.css";
 import {
   Editor,
   rootCtx,
@@ -70,43 +70,41 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   }, [content]);
 
   const { editor, getInstance } = useEditor(
-    (root: HTMLElement) =>
+    (root) =>
       Editor.make()
-        .config((ctx: Ctx) => {
+        .config((ctx) => {
           ctx.set(rootCtx, root);
           ctx.set(defaultValueCtx, content);
           ctx
             .get(listenerCtx)
-            .beforeMount((ctx: Ctx) => {
+            .beforeMount((ctx) => {
               console.log("beforeMount");
             })
-            .mounted((ctx: Ctx) => {
+            .mounted((ctx) => {
               console.log("mounted");
               insert("# Default Title");
             })
-            .updated((ctx: Ctx, doc: any, prevDoc: any) => {
+            .updated((ctx, doc, prevDoc) => {
               console.log("updated", doc, prevDoc);
               console.log("updated JSON", doc.toJSON());
             })
-            .markdownUpdated(
-              (ctx: Ctx, markdown: string, prevMarkdown: string | null) => {
-                console.log(
-                  "markdownUpdated to=",
-                  markdown,
-                  "\nprev=",
-                  prevMarkdown
-                );
-                setContent(markdown);
-              }
-            )
-            .blur((ctx: Ctx) => {
+            .markdownUpdated((ctx, markdown, prevMarkdown) => {
+              console.log(
+                "markdownUpdated to=",
+                markdown,
+                "\nprev=",
+                prevMarkdown
+              );
+              setContent(markdown);
+            })
+            .blur((ctx) => {
               console.log("when editor loses focus");
             })
-            .focus((ctx: Ctx) => {
+            .focus((ctx) => {
               const view = ctx.get(editorViewCtx);
               console.log("focus", view);
             })
-            .destroy((ctx: Ctx) => {
+            .destroy((ctx) => {
               console.log("destroy");
             });
         })
@@ -117,28 +115,24 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
               const marks = ctx.get(schemaCtx).marks;
               const nodes = ctx.get(schemaCtx).nodes;
               return [
-                createToggleIcon(
-                  "bold",
-                  "ok", //   (ctx: Ctx) => () => console.log("OK"),
-                  marks.strong,
-                  marks.code_inline
-                ),
+                createToggleIcon("bold", "OK", marks.strong, marks.code_inline),
               ];
             },
           })
         )
         .use(nord)
         .use(commonmark)
-        .use(gfm)
-        // .use(history)
+        // .use(gfm)
+        .use(history)
         .use(listener)
-    // .use(prism)
-    // .use(menu)
-    // .use(block)
-    // .use(cursor)
-    // .use(clipboard)
-    // .use(slash) // Uncomment if slash is used
+        .use(prism)
+        // .use(menu)
+        .use(block)
+        .use(cursor)
+        .use(clipboard)
+    // .use(slash)
   );
+
   useEffect(() => {
     const fetchContent = async () => {
       try {
@@ -163,7 +157,8 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   };
 
   return (
-    <div className="bg-red-100">
+    <div className="App">
+      {" "}
       <ReactEditor editor={editor} />
     </div>
   );
