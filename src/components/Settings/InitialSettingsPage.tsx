@@ -102,9 +102,6 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
             disabled
             placeholder="LLM Model Name"
           />
-          <p className="mt-2 text-xs text-gray-100">
-            *Models are currently pre-set (custom models are coming soon).
-          </p>
           <h4 className="font-semibold mb-2 text-white">Open AI Key</h4>
           <input
             type="text"

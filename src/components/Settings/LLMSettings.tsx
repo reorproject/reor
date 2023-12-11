@@ -1,5 +1,6 @@
 import React, { useState, useEffect, ChangeEvent } from "react";
 import { AIModelConfig } from "electron/main/Store/storeConfig";
+import CustomSelect from "../Generic/Select";
 
 const AIModelManager: React.FC = () => {
   const [modelConfigs, setModelConfigs] = useState<
@@ -51,16 +52,48 @@ const AIModelManager: React.FC = () => {
     });
   };
 
-  const handleDefaultModelChange = (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    const selectedModel = e.target.value;
+  const handleDefaultModelChange = (selectedModel: string) => {
+    // const selectedModel = e.target.value;
     setDefaultModel(selectedModel);
     window.electronStore.setDefaultAIModel(selectedModel);
   };
+  const modelNames = Object.keys(modelConfigs);
 
   return (
     <div>
+      <h4 className="font-semibold mb-2 text-white">LLM</h4>
+      {/* <input
+        type="text"
+        className="block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-200 cursor-not-allowed"
+        value={"GPT-3.5-turbo"}
+        disabled
+        placeholder="LLM Model"
+      /> */}
+
+      <CustomSelect
+        options={modelNames}
+        value={defaultModel}
+        onChange={handleDefaultModelChange}
+      />
+      {/* <select
+        value={defaultModel}
+        onChange={handleDefaultModelChange}
+        className="block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-200 cursor-not-allowed"
+      >
+        {Object.entries(modelConfigs).map(([modelName, config]) => (
+          <option key={modelName} value={modelName}>
+            {modelName}
+          </option>
+        ))}
+      </select> */}
+
+      {/* <select value={defaultModel} onChange={handleDefaultModelChange}>
+        {Object.entries(modelConfigs).map(([modelName, config]) => (
+          <option key={modelName} value={modelName}>
+            {modelName}
+          </option>
+        ))}
+      </select> */}
       {/* <h2>Configure LLM</h2> */}
       <input
         type="text"
@@ -88,13 +121,6 @@ const AIModelManager: React.FC = () => {
 
       {/* Default Model Dropdown */}
       {/* <h3>Default AI Model</h3> */}
-      <select value={defaultModel} onChange={handleDefaultModelChange}>
-        {Object.entries(modelConfigs).map(([modelName, config]) => (
-          <option key={modelName} value={modelName}>
-            {modelName}
-          </option>
-        ))}
-      </select>
     </div>
   );
 };

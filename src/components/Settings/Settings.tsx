@@ -40,14 +40,17 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
           disabled
           placeholder="Embedding Model"
         />
-        <h4 className="font-semibold mb-2 text-white">LLM</h4>
+        {/* <h4 className="font-semibold mb-2 text-white">LLM</h4>
         <input
           type="text"
           className="block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-200 cursor-not-allowed"
           value={"GPT-3.5-turbo"}
           disabled
           placeholder="LLM Model"
-        />
+        /> */}
+        <div className="mt-2">
+          <AIModelManager />
+        </div>
         <h4 className="font-semibold mb-2 text-white">Open AI Key</h4>
         <input
           type="text"
@@ -57,9 +60,7 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
           onKeyDown={handleKeyPress}
           placeholder="Open AI API Key"
         />
-        <div className="mt-2">
-          <AIModelManager />
-        </div>
+
         <Button
           className="bg-slate-700 mt-4 border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
           onClick={handleSave}
@@ -67,9 +68,6 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         >
           Save
         </Button>
-        <p className="text-xs text-white">
-          *Models are currently pre-set. Custom models are coming very soon :)
-        </p>
       </div>
     </Modal>
   );
