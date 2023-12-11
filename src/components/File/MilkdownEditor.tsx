@@ -5,6 +5,7 @@ import { ReactEditor, useEditor } from "@milkdown/react";
 import { commonmark } from "@milkdown/preset-commonmark";
 import { nord } from "@milkdown/theme-nord";
 import { gfm } from "@milkdown/preset-gfm";
+import { menu } from "@milkdown/plugin-menu";
 
 // import "@milkdown/theme-nord/style.css";
 // import { MarkdownEditorProps } from "./MarkdownEditor";
@@ -16,6 +17,7 @@ export const MilkdownEditor: React.FC = () => {
         .use(nord)
         .use(commonmark)
         // .use(gfm)
+        .use(menu)
         .config((ctx) => {
           ctx.set(rootCtx, root);
         })

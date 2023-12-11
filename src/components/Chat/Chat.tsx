@@ -143,6 +143,7 @@ const ChatWithLLM: React.FC = () => {
           <Button
             className="bg-slate-700  border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
             onClick={handleSubmitNewMessage}
+            placeholder=""
           >
             Ask
           </Button>

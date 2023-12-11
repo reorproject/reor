@@ -63,6 +63,7 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         <Button
           className="bg-slate-700 mt-4 border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
           onClick={handleSave}
+          placeholder=""
         >
           Save
         </Button>

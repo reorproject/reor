@@ -76,6 +76,7 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
           <Button
             className="bg-slate-700 mt-2 border-none h-10 hover:bg-slate-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
             onClick={handleDirectorySelection}
+            placeholder=""
           >
             Select Directory
           </Button>
@@ -117,6 +118,7 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
           <Button
             className="bg-slate-700 mt-6  border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
             onClick={handleNext}
+            placeholder=""
           >
             Next
           </Button>
