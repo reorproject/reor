@@ -12,10 +12,9 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   onChange,
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const wrapperRef = useRef<HTMLDivElement>(null); // Ref for the wrapper element
+  const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Function to check if the clicked element is outside of the component
     const handleClickOutside = (event: MouseEvent) => {
       if (
         wrapperRef.current &&
@@ -25,10 +24,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       }
     };
 
-    // Bind the event listener
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      // Unbind the event listener on clean up
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [wrapperRef]);
@@ -40,15 +37,21 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   };
 
   return (
-    <div className="relative" ref={wrapperRef}>
+    <div className="relative w-full bg-red-200" ref={wrapperRef}>
       <div
-        className="block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-200 cursor-pointer"
+        className="flex justify-between items-center  w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-200 cursor-pointer"
         onClick={toggleDropdown}
       >
-        {value}
+        <span>{value}</span>
+        <span
+          className="transform transition-transform"
+          style={{ transform: isOpen ? "rotate(180deg)" : "none" }}
+        >
+          &#9660;{" "}
+        </span>
       </div>
       {isOpen && (
-        <div className="absolute w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg z-10">
+        <div className="absolute w-full border px-3 py-2 border-gray-300 rounded-md shadow-lg z-10 bg-white">
           {options.map((option, index) => (
             <div
               key={index}
