@@ -30,16 +30,18 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="ml-2 mr-6 mt-0 h-full min-w-[400px]">
+      <div className="ml-2  mt-0 h-full w-[500px]">
         <h2 className="text-2xl font-semibold mb-4 text-white">Settings</h2>
         <h4 className="font-semibold mb-2 text-white">Embedding Model</h4>
-        <input
-          type="text"
-          className="block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-200 cursor-not-allowed"
-          value={"BAAI/bge-base-en-v1.5"}
-          disabled
-          placeholder="Embedding Model"
-        />
+        <div className="w-full">
+          <input
+            type="text"
+            className=" w-full py-2 pl-2 box-border border border-gray-300 rounded-md  bg-gray-200 cursor-not-allowed"
+            value={"BAAI/bge-base-en-v1.5"}
+            disabled
+            placeholder="Embedding Model"
+          />
+        </div>
         {/* <h4 className="font-semibold mb-2 text-white">LLM</h4>
         <input
           type="text"
@@ -48,13 +50,13 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
           disabled
           placeholder="LLM Model"
         /> */}
-        <div className="mt-2">
+        <div className="mt-2 w-full ">
           <AIModelManager />
         </div>
         <h4 className="font-semibold mb-2 text-white">Open AI Key</h4>
         <input
           type="text"
-          className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
+          className="block w-full px-3 py-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
           value={openAIKey}
           onChange={(e) => setOpenAIKey(e.target.value)}
           onKeyDown={handleKeyPress}

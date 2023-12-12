@@ -60,21 +60,16 @@ const AIModelManager: React.FC = () => {
   const modelNames = Object.keys(modelConfigs);
 
   return (
-    <div>
+    <div className="w-full ">
       <h4 className="font-semibold mb-2 text-white">LLM</h4>
-      {/* <input
-        type="text"
-        className="block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-200 cursor-not-allowed"
-        value={"GPT-3.5-turbo"}
-        disabled
-        placeholder="LLM Model"
-      /> */}
 
-      <CustomSelect
-        options={modelNames}
-        value={defaultModel}
-        onChange={handleDefaultModelChange}
-      />
+      <div className="w-full">
+        <CustomSelect
+          options={modelNames}
+          value={defaultModel}
+          onChange={handleDefaultModelChange}
+        />
+      </div>
       {/* <select
         value={defaultModel}
         onChange={handleDefaultModelChange}

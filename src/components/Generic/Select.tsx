@@ -37,25 +37,25 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   };
 
   return (
-    <div className="relative w-full bg-red-200" ref={wrapperRef}>
+    <div className="relative w-full " ref={wrapperRef}>
       <div
-        className="flex justify-between items-center  w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-200 cursor-pointer"
+        className="flex justify-between items-center  w-full py-2 border border-gray-300 rounded-md bg-gray-200 cursor-pointer"
         onClick={toggleDropdown}
       >
-        <span>{value}</span>
+        <span className="ml-2 text-[13px] text-gray-600">{value}</span>
         <span
-          className="transform transition-transform"
+          className="transform transition-transform mr-2"
           style={{ transform: isOpen ? "rotate(180deg)" : "none" }}
         >
           &#9660;{" "}
         </span>
       </div>
       {isOpen && (
-        <div className="absolute w-full border px-3 py-2 border-gray-300 rounded-md shadow-lg z-10 bg-white">
+        <div className="absolute w-full border border-gray-300 rounded-md shadow-lg z-10 bg-white">
           {options.map((option, index) => (
             <div
               key={index}
-              className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+              className=" py-2 hover:bg-gray-100 cursor-pointer"
               onClick={() => handleOptionClick(option)}
             >
               {option}
