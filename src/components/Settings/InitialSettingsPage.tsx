@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
+import AIModelManager from "./LLMSettings";
 
 interface Props {
   onDirectorySelected: (path: string) => void;
@@ -63,8 +64,8 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
       onClose={() => console.log("Not allowing a close for now")}
       hideCloseButton={true}
     >
-      <div className="">
-        <div className="ml-2 mr-6 mt-0 h-full  ">
+      <div className="w-full mr-3">
+        <div className="ml-2 mt-0 h-full  ">
           <h2 className="text-2xl font-semibold mb-0 text-white">
             Welcome to the Reor Project.
           </h2>
@@ -89,23 +90,24 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
           <h4 className="font-semibold mb-2 text-white">Embedding Model</h4>
           <input
             type="text"
-            className="block w-[470px] px-3 py-2 mr-2 border border-gray-300 rounded-md bg-gray-200 cursor-not-allowed"
+            className="block w-full box-border px-3 py-2 mr-2 border border-gray-300 rounded-md bg-gray-200 cursor-not-allowed"
             value={"BAAI/bge-base-en-v1.5"}
             disabled
             placeholder="Embedding Model Name"
           />
-          <h4 className="font-semibold mb-2 text-white">LLM</h4>
+          <AIModelManager />
+          {/* <h4 className="font-semibold mb-2 text-white">LLM</h4>
           <input
             type="text"
-            className="block w-[470px] px-3 py-2 border border-gray-300 rounded-md bg-gray-200 cursor-not-allowed"
+            className="block w-full px-3 py-2 box-border border border-gray-300 rounded-md bg-gray-200 cursor-not-allowed"
             value={"GPT-3.5-turbo"}
             disabled
             placeholder="LLM Model Name"
-          />
+          /> */}
           <h4 className="font-semibold mb-2 text-white">Open AI Key</h4>
           <input
             type="text"
-            className="block w-[470px] px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
+            className="block w-full px-3 py-2 box-border border border-gray-300 rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
             value={openAIKey}
             onChange={(e) => setOpenAIKey(e.target.value)}
             onKeyDown={handleKeyPress}
@@ -113,7 +115,7 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
           />
 
           <Button
-            className="bg-slate-700 mt-6  border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
+            className="bg-slate-700 mt-6 mb-3  border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
             onClick={handleNext}
             placeholder=""
           >
