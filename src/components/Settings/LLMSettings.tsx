@@ -67,7 +67,7 @@ const AIModelManager: React.FC = () => {
     <div className="w-full  bg-gray-800 rounded">
       <h4 className="font-semibold mb-4 text-white">LLM</h4>
 
-      <div className="w-full mb-4">
+      <div className="w-full mb-1">
         <CustomSelect
           options={modelNames}
           value={defaultModel}
@@ -76,7 +76,7 @@ const AIModelManager: React.FC = () => {
       </div>
 
       <Button
-        className="bg-slate-700 border-none h-5 hover:bg-slate-900 cursor-pointer  text-center pt-0 pb-0 pr-2 pl-2"
+        className="bg-slate-700 border-none h-5 mt-1 hover:bg-slate-900 cursor-pointer  text-center pt-0 pb-0 pr-2 pl-2"
         onClick={toggleAddingNewModel}
         placeholder=""
       >
@@ -94,7 +94,7 @@ const AIModelManager: React.FC = () => {
       </Button>
 
       {addingNewModel && (
-        <div className="mt-4">
+        <div className="mt-2">
           <input
             className="w-full p-2 mb-2 text-black box-border"
             type="text"
