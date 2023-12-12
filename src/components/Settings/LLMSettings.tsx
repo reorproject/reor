@@ -1,6 +1,7 @@
 import React, { useState, useEffect, ChangeEvent } from "react";
 import { AIModelConfig } from "electron/main/Store/storeConfig";
 import CustomSelect from "../Generic/Select";
+import { Button } from "@material-tailwind/react";
 
 const AIModelManager: React.FC = () => {
   const [modelConfigs, setModelConfigs] = useState<
@@ -13,6 +14,7 @@ const AIModelManager: React.FC = () => {
     engine: "llamacpp",
   });
   const [defaultModel, setDefaultModel] = useState<string>("");
+  const [addingNewModel, setAddingNewModel] = useState<boolean>(false);
 
   // Function to fetch existing model configurations
   const fetchModelConfigs = async () => {
@@ -53,69 +55,79 @@ const AIModelManager: React.FC = () => {
   };
 
   const handleDefaultModelChange = (selectedModel: string) => {
-    // const selectedModel = e.target.value;
     setDefaultModel(selectedModel);
     window.electronStore.setDefaultAIModel(selectedModel);
   };
+
+  const toggleAddingNewModel = () => setAddingNewModel(!addingNewModel);
+
   const modelNames = Object.keys(modelConfigs);
 
   return (
-    <div className="w-full ">
-      <h4 className="font-semibold mb-2 text-white">LLM</h4>
+    <div className="w-full  bg-gray-800 rounded">
+      <h4 className="font-semibold mb-4 text-white">LLM</h4>
 
-      <div className="w-full">
+      <div className="w-full mb-4">
         <CustomSelect
           options={modelNames}
           value={defaultModel}
           onChange={handleDefaultModelChange}
         />
       </div>
-      {/* <select
-        value={defaultModel}
-        onChange={handleDefaultModelChange}
-        className="block w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-200 cursor-not-allowed"
+
+      <Button
+        className="bg-slate-700 border-none h-5 hover:bg-slate-900 cursor-pointer  text-center pt-0 pb-0 pr-2 pl-2"
+        onClick={toggleAddingNewModel}
+        placeholder=""
       >
-        {Object.entries(modelConfigs).map(([modelName, config]) => (
-          <option key={modelName} value={modelName}>
-            {modelName}
-          </option>
-        ))}
-      </select> */}
+        {addingNewModel ? (
+          <>
+            <span>Cancel</span>
+            <span className="ml-2">▲</span>
+          </>
+        ) : (
+          <>
+            <span>New Local Model</span>
+            <span className="ml-2">▼</span>
+          </>
+        )}
+      </Button>
 
-      {/* <select value={defaultModel} onChange={handleDefaultModelChange}>
-        {Object.entries(modelConfigs).map(([modelName, config]) => (
-          <option key={modelName} value={modelName}>
-            {modelName}
-          </option>
-        ))}
-      </select> */}
-      {/* <h2>Configure LLM</h2> */}
-      <input
-        type="text"
-        placeholder="Model Name"
-        name="modelName"
-        value={currentModelName}
-        onChange={(e) => setCurrentModelName(e.target.value)}
-      />
-      {/* Model Configuration Form */}
-      <input
-        type="text"
-        placeholder="Local Path"
-        name="localPath"
-        value={currentConfig.localPath}
-        onChange={handleInputChange}
-      />
-      <input
-        type="number"
-        placeholder="Context Length"
-        name="contextLength"
-        value={currentConfig.contextLength}
-        onChange={handleInputChange}
-      />
-      <button onClick={saveModelConfig}>Save Configuration</button>
-
-      {/* Default Model Dropdown */}
-      {/* <h3>Default AI Model</h3> */}
+      {addingNewModel && (
+        <div className="mt-4">
+          <input
+            className="w-full p-2 mb-2 text-black box-border"
+            type="text"
+            placeholder="Model Name"
+            name="modelName"
+            value={currentModelName}
+            onChange={(e) => setCurrentModelName(e.target.value)}
+          />
+          <input
+            className="w-full p-2 mb-2 text-black box-border"
+            type="text"
+            placeholder="Local Path"
+            name="localPath"
+            value={currentConfig.localPath}
+            onChange={handleInputChange}
+          />
+          <input
+            className="w-full p-2 mb-2 text-black box-border"
+            type="number"
+            placeholder="Context Length (in tokens)"
+            name="contextLength"
+            value={currentConfig.contextLength || ""}
+            onChange={handleInputChange}
+          />
+          <Button
+            className="bg-slate-700  border-none h-5 hover:bg-slate-900 cursor-pointer  text-center pt-0 pb-0 pr-2 pl-2"
+            onClick={saveModelConfig}
+            placeholder=""
+          >
+            Save Configuration
+          </Button>
+        </div>
+      )}
     </div>
   );
 };
