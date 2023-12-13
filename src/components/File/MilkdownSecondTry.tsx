@@ -121,11 +121,11 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         )
         .use(nord)
         .use(commonmark)
-        .use(gfm)
+        // .use(gfm)
         .use(history)
         .use(listener)
         .use(prism)
-        .use(menu)
+        // .use(menu)
         .use(block)
         .use(cursor)
         .use(clipboard)
@@ -151,12 +151,9 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
       fetchContent();
     }
   }, [filePath]);
-  const setValue = () => {
-    console.log(getInstance()?.action(replaceAll("# Fetched \nMarkup")));
-  };
 
   return (
-    <div className="App">
+    <div className="h-full">
       {" "}
       <ReactEditor editor={editor} />
     </div>
