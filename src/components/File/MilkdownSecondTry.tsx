@@ -127,7 +127,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         .use(listener)
         .use(prism)
         // .use(menu)
-        .use(block)
+        // .use(block)
         .use(cursor)
         .use(clipboard)
     // .use(slash)
