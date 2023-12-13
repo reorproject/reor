@@ -18,6 +18,7 @@ import {
   createToggleIcon,
   defaultButtons,
 } from "@milkdown/plugin-tooltip";
+import "./milkdown.css";
 import { listener, listenerCtx } from "@milkdown/plugin-listener";
 import { prism } from "@milkdown/plugin-prism";
 import { menu } from "@milkdown/plugin-menu";
@@ -153,8 +154,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   }, [filePath]);
 
   return (
-    <div className="h-full">
-      {" "}
+    <div className="h-fulloverflow-auto">
       <ReactEditor editor={editor} />
     </div>
   );

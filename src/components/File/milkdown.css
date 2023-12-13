@@ -1,0 +1,9 @@
+.milkdown .editor {
+    height: 100vh;
+    /* set the background color: */
+    background-color: #2e3440;
+    color: white;
+    /* font-size: 50px; */
+    /* border: 2px solid black; */
+    overflow: auto;
+}

@@ -50,8 +50,8 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
             className="w-full h-full flex overflow-x-hidden"
             style={{ marginRight: showChatbot ? "250px" : "0" }}
           >
-            <div className="w-full flex h-full">
-              <div className="w-[75%] h-full">
+            <div className="w-full flex h-full ">
+              <div className="w-[75%] h-full overflow-auto">
                 <MarkdownEditor
                   filePath={selectedFilePath}
                   setContentInParent={setEditorContent}
