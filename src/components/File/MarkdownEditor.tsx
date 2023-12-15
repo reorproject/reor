@@ -83,7 +83,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
             });
         })
 
-        // .use(nord)
+        .use(nord)
         .use(commonmark)
         // .use(gfm)
         .use(history)

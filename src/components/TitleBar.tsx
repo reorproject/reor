@@ -8,17 +8,20 @@ import { MdChatBubble } from "react-icons/md";
 import { useState } from "react";
 import { FaPenSquare } from "react-icons/fa";
 import { FaRegPenToSquare } from "react-icons/fa6";
+import { TbEqualDouble } from "react-icons/tb";
 
 interface TitleBarProps {
   onFileSelect: (path: string) => void;
   chatbotOpen: boolean;
   toggleChatbot: () => void;
+  toggleSimilarFiles: () => void;
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
   onFileSelect,
   chatbotOpen,
   toggleChatbot,
+  toggleSimilarFiles,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -47,7 +50,18 @@ const TitleBar: React.FC<TitleBarProps> = ({
           onFileSelect={onFileSelect}
         />
       </div>
-      <div className="ml-auto">
+      <div className="ml-auto flex">
+        <button
+          className="bg-transparent border-none cursor-pointer"
+          onClick={toggleSimilarFiles}
+        >
+          <TbEqualDouble className="text-gray-600" size={24} />
+          {/* {chatbotOpen ? (
+            <MdChatBubble className="text-gray-600" size={24} />
+          ) : (
+            <MdChatBubbleOutline className="text-gray-600" size={24} />
+          )} */}
+        </button>
         <button
           className="bg-transparent border-none cursor-pointer"
           onClick={toggleChatbot}

@@ -13,6 +13,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
   const lastSavedContentRef = useRef<string>("");
   const [showChatbot, setShowChatbot] = useState<boolean>(false);
+  const [showSimilarFiles, setShowSimilarFiles] = useState<boolean>(false);
 
   const onFileSelect = async (path: string) => {
     // so here we can save the actual content too\\
@@ -25,6 +26,9 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
   const toggleChatbot = () => {
     setShowChatbot(!showChatbot);
   };
+  const toggleSimilarFiles = () => {
+    setShowSimilarFiles(!showSimilarFiles);
+  };
 
   return (
     <div>
@@ -32,6 +36,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
         onFileSelect={onFileSelect}
         chatbotOpen={showChatbot}
         toggleChatbot={toggleChatbot}
+        toggleSimilarFiles={toggleSimilarFiles}
       />
 
       <div className="flex" style={{ height: "calc(100vh - 30px)" }}>
@@ -50,7 +55,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
             style={{ marginRight: showChatbot ? "250px" : "0" }}
           >
             <div className="w-full flex h-full ">
-              <div className="w-[75%] h-full overflow-auto">
+              <div
+                className="h-full overflow-auto"
+                style={{ width: showSimilarFiles ? "75%" : "100%" }}
+              >
                 <MarkdownEditor
                   filePath={selectedFilePath}
                   setContentInParent={setEditorContent}
@@ -58,12 +66,14 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
                 />
                 {/* <MilkdownEditor /> */}
               </div>
-              <div className="w-[25%]">
-                <SimilarEntriesComponent
-                  filePath={selectedFilePath}
-                  onFileSelect={onFileSelect}
-                />
-              </div>
+              {showSimilarFiles && (
+                <div className="w-[25%]">
+                  <SimilarEntriesComponent
+                    filePath={selectedFilePath}
+                    onFileSelect={onFileSelect}
+                  />
+                </div>
+              )}
             </div>
           </div>
         )}
