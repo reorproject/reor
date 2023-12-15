@@ -4,8 +4,7 @@ import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 import ChatWithLLM from "./Chat/Chat";
 import LeftSidebar from "./LeftSidebar/LeftSidebar";
-import { MilkdownEditor, MilkdownEditorWrapper } from "./File/MilkdownEditor";
-import MarkdownEditor from "./File/MilkdownSecondTry";
+import MarkdownEditor from "./File/MarkdownEditor";
 
 interface FileEditorContainerProps {}
 
