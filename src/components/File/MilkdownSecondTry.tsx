@@ -77,50 +77,13 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
           ctx.set(defaultValueCtx, content);
           ctx
             .get(listenerCtx)
-            .beforeMount((ctx) => {
-              console.log("beforeMount");
-            })
-            .mounted((ctx) => {
-              console.log("mounted");
-              insert("# Default Title");
-            })
-            .updated((ctx, doc, prevDoc) => {
-              console.log("updated", doc, prevDoc);
-              console.log("updated JSON", doc.toJSON());
-            })
+
             .markdownUpdated((ctx, markdown, prevMarkdown) => {
-              console.log(
-                "markdownUpdated to=",
-                markdown,
-                "\nprev=",
-                prevMarkdown
-              );
               setContent(markdown);
-            })
-            .blur((ctx) => {
-              console.log("when editor loses focus");
-            })
-            .focus((ctx) => {
-              const view = ctx.get(editorViewCtx);
-              console.log("focus", view);
-            })
-            .destroy((ctx) => {
-              console.log("destroy");
             });
         })
-        .use(
-          tooltip.configure(tooltipPlugin, {
-            bottom: true,
-            items: (ctx: Ctx) => {
-              const marks = ctx.get(schemaCtx).marks;
-              const nodes = ctx.get(schemaCtx).nodes;
-              return [
-                createToggleIcon("bold", "OK", marks.strong, marks.code_inline),
-              ];
-            },
-          })
-        )
-        .use(nord)
+
+        // .use(nord)
         .use(commonmark)
         // .use(gfm)
         .use(history)
