@@ -106,7 +106,7 @@ const AIModelManager: React.FC = () => {
           <input
             className="w-full p-2 mb-2 text-black box-border"
             type="text"
-            placeholder="Local Path"
+            placeholder="Local Path (.gguf file)"
             name="localPath"
             value={currentConfig.localPath}
             onChange={handleInputChange}
