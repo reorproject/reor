@@ -9,7 +9,7 @@
 
 <p align="center">
     <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-GPLv3-blue.svg"></a>
-    <a href="https://github.com/reorproject/reor/releases"><img alt="Releases" src="https://img.shields.io/github/release-date/public/public"></a>
+<img alt="GitHub Release Date - Published_At" src="https://img.shields.io/github/release-date/reorproject/reor">
     <a href="https://github.com/reorproject/reor/issues"><img alt="Issues" src="https://img.shields.io/github/issues/public/public"></a>
 </p>
 
