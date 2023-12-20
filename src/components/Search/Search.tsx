@@ -71,11 +71,12 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onFileSelect }) => {
       )}
       <div className="absolute" style={{ height: "calc(100vh - 30px)" }}>
         {searchResults.length > 0 && (
-          <div className=" z-10 h-full translate-x-[-40px] w-[210px] bg-white border border-gray-300 shadow-lg overflow-y-auto">
+          <div className=" z-10 h-full border-pink-500 translate-x-[-40px]  bg-pink-500 border  shadow-lg overflow-x-none overflow-y-auto">
             {searchResults.map((result, index) => (
               <div
                 key={index}
-                className="border-b border-gray-300 p-2 cursor-pointer w-full hover:bg-gray-100"
+                className="pr-2 pb-1 mt-0 w-[240px] text-white pt-1 border-l-1 border-r-1 border-solid border-white pl-2 shadow-md cursor-pointer hover:scale-104 hover:shadow-lg transition-transform duration-300 overflow-x-auto word-break[break-all]"
+                style={{ backgroundColor: "#1F2937" }}
                 onClick={() => onFileSelect(result.notepath)}
               >
                 <ReactMarkdown>{result.content}</ReactMarkdown>
