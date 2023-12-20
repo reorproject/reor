@@ -9,6 +9,14 @@ import {
   removeTreeFromTable,
 } from "../database/Table";
 
+export const markdownExtensions = [
+  ".md",
+  ".markdown",
+  ".mdown",
+  ".mkdn",
+  ".mkd",
+];
+
 export function GetFilesInfoList(
   directory: string,
   extensionsToFilterFor?: string[]
