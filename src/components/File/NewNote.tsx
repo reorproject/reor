@@ -15,14 +15,35 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
   onFileSelect,
 }) => {
   const [fileName, setFileName] = useState<string>("");
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
+  const [isValidName, setIsValidName] = useState<boolean>(true);
+
+  const validNamePattern = /^[a-zA-Z0-9_-]+$/;
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newName = e.target.value;
+    if (newName === "") {
+      setFileName(newName);
+      setErrorMessage(""); // Clear error message when input is empty
+    } else if (validNamePattern.test(newName)) {
+      setFileName(newName);
+      setErrorMessage(""); // Clear error message for valid input
+    } else {
+      // Set an error message for invalid input
+      setErrorMessage(
+        "Note name can only contain letters, numbers, underscores, and hyphens."
+      );
+    }
+  };
 
   const sendNewNoteMsg = async () => {
-    if (!fileName) {
+    if (!fileName || errorMessage) {
       return;
     }
     const notePath = await window.files.joinPath(
       window.electronStore.getUserDirectory(),
-      fileName
+      fileName + ".md"
     );
     console.log("NEW NOTE PATH: ", notePath);
     window.files.createFile(notePath, "");
@@ -45,17 +66,20 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
           type="text"
           className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
           value={fileName}
-          onChange={(e) => setFileName(e.target.value)}
+          // onChange={(e) => setFileName(e.target.value)}
+          onChange={handleNameChange}
           onKeyDown={handleKeyPress}
           placeholder="Note Name"
         />
+
         <Button
-          className="bg-slate-700 mt-3 mb-2 border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
+          className="bg-slate-700 mt-2 border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
           onClick={sendNewNoteMsg}
           placeholder=""
         >
           Create
         </Button>
+        {errorMessage && <p className="text-red-500 text-xs">{errorMessage}</p>}
       </div>
     </Modal>
   );

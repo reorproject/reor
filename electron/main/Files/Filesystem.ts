@@ -177,6 +177,22 @@ export function startWatchingDirectory(
   }
 }
 
+export function appendExtensionIfMissing(
+  filename: string,
+  extensions: string[]
+): string {
+  // Check if the filename ends with any of the provided extensions
+  const hasExtension = extensions.some((ext) => filename.endsWith(ext));
+
+  // If the filename already has one of the extensions, return it as is
+  if (hasExtension) {
+    return filename;
+  }
+
+  // If not, append the first extension from the list to the filename
+  return filename + extensions[0];
+}
+
 export function updateFileListForRenderer(
   win: BrowserWindow,
   directory: string,
