@@ -1,6 +1,7 @@
 import { RagnoteDBEntry } from "electron/main/database/Table";
 import React, { useState, useEffect, useRef } from "react";
 import { FaSearch } from "react-icons/fa"; // Import the search icon
+import ReactMarkdown from "react-markdown";
 
 interface SearchComponentProps {
   onFileSelect: (path: string) => void;
@@ -58,7 +59,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onFileSelect }) => {
           className="border border-gray-300 rounded-md p-2 w-[120px] h-[7px]"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search"
+          placeholder="Semantic search"
           onBlur={() => setShowSearch(false)}
         />
       ) : (
@@ -77,7 +78,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onFileSelect }) => {
                 className="border-b border-gray-300 p-2 cursor-pointer w-full hover:bg-gray-100"
                 onClick={() => onFileSelect(result.notepath)}
               >
-                <p>{result.content}</p>
+                <ReactMarkdown>{result.content}</ReactMarkdown>
               </div>
             ))}
           </div>
