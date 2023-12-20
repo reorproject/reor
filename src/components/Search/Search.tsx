@@ -69,9 +69,9 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onFileSelect }) => {
           onClick={() => setShowSearch(true)}
         />
       )}
-      <div className="absolute" style={{ height: "calc(100vh - 30px)" }}>
+      <div className="absolute z-20" style={{ height: "calc(100vh - 30px)" }}>
         {searchResults.length > 0 && (
-          <div className=" z-10 h-full border-pink-500 translate-x-[-40px]  bg-pink-500 border  shadow-lg overflow-x-none overflow-y-auto">
+          <div className=" z-10 h-full translate-x-[-40px] border  shadow-lg overflow-x-none overflow-y-auto">
             {searchResults.map((result, index) => (
               <div
                 key={index}
