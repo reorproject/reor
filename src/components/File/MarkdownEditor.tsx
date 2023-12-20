@@ -59,7 +59,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   useEffect(() => {
     const saveInterval = setInterval(() => {
       saveFile();
-    }, 5000); // Every 10 seconds
+    }, 1000); // Every 1 second
 
     return () => clearInterval(saveInterval); // Clear the interval when component unmounts
   }, [content]); // Dependency on content ensures saveFile has the latest content
