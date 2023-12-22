@@ -12,8 +12,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: windows-latest
-          - os: ubuntu-latest
+          # - os: windows-latest
+          # - os: ubuntu-latest
           - os: macos-latest # Intel-based macOS (default architecture)
           - os: macos-11 # macOS with M1 chip (ARM architecture)
             arch: arm64
