@@ -116,11 +116,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     }
   }, [filePath]);
 
-  return (
-    <div className="h-fulloverflow-auto">
-      <ReactEditor editor={editor} />
-    </div>
-  );
+  return <ReactEditor editor={editor} />;
 };
 
 export default MarkdownEditor;
