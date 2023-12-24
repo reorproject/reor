@@ -4,7 +4,7 @@
 </p> -->
 
 <h4 align="center">
-   Local AI Personal Knowledge Management App (Beta)
+   A local-first private AI Personal Knowledge Management Tool
 </h4>
 
 <p align="center">
