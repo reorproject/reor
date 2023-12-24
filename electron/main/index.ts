@@ -1,11 +1,19 @@
-import { app, BrowserWindow, shell, ipcMain, dialog } from "electron";
+import {
+  app,
+  BrowserWindow,
+  shell,
+  ipcMain,
+  dialog,
+  Menu,
+  MenuItem,
+} from "electron";
 import { release } from "node:os";
 import { join } from "node:path";
 import { update } from "./update";
 import Store from "electron-store";
 import * as path from "path";
 import { AIModelConfig, StoreKeys, StoreSchema } from "./Store/storeConfig";
-
+// import contextMenus from "./contextMenus";
 import * as lancedb from "vectordb";
 
 import {
@@ -28,6 +36,7 @@ import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
 import { validateAIModelConfig } from "./llm/llmConfig";
 import { registerStoreHandlers } from "./Store/storeHandlers";
 import { registerFileHandlers } from "./Files/registerFilesHandler";
+// import {  } from "electron/main";
 
 const store = new Store<StoreSchema>();
 // const user = store.get("user");
@@ -212,4 +221,24 @@ ipcMain.on("index-files-in-directory", async (event, userDirectory: string) => {
     updateFileListForRenderer(win, userDirectory, markdownExtensions);
   }
   event.sender.send("indexing-complete", "success");
+});
+
+ipcMain.on("show-context-menu-file-item", (event, menuKey) => {
+  const menu = new Menu();
+  menu.append(
+    new MenuItem({
+      label: "Delete",
+      click: () => {
+        console.log("CLICKED MENU ITEM: delete");
+        // event.sender.send("context-menu-command", "delete");
+      },
+    })
+  );
+
+  console.log("menu key: ", menuKey);
+
+  const browserWindow = BrowserWindow.fromWebContents(event.sender);
+  if (browserWindow) {
+    menu.popup({ window: browserWindow });
+  }
 });

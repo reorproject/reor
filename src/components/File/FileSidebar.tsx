@@ -141,7 +141,6 @@ interface FileInfoProps {
   onFileSelect: (path: string) => void;
   handleDragStart: (e: React.DragEvent, file: FileInfoNode) => void;
 }
-
 const FileItem: React.FC<FileInfoProps> = ({
   file,
   selectedFile,
@@ -150,7 +149,7 @@ const FileItem: React.FC<FileInfoProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const isDirectory = file.type === "directory";
-  const isSelected = file.path === selectedFile; // Check if the file is selected
+  const isSelected = file.path === selectedFile;
 
   const toggle = () => {
     if (isDirectory) {
@@ -165,12 +164,36 @@ const FileItem: React.FC<FileInfoProps> = ({
     handleDragStart(e, file);
   };
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.contextMenu.showFileItemContextMenu(file.path);
+  };
+  // useEffect(() => {
+  //   const removeMenuActionListener = window.contextMenu.onMenuActionCUNT(
+  //     (action) => {
+  //       if (action === "delete") {
+  //         console.log("Delete action for", file.path);
+  //         // Implement your delete action here
+  //       }
+  //       // Handle other actions as needed
+  //     }
+  //   );
+  //   // Cleanup function to remove the listener when the component unmounts
+  //   return () => {
+  //     removeMenuActionListener();
+  //   };
+  // }, [file]);
+
   const itemClasses = `flex items-center cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-100 ${
-    isSelected ? "bg-blue-100 font-bold" : "" // Tailwind classes for selected item
+    isSelected ? "bg-blue-100 font-bold" : ""
   }`;
 
   return (
-    <div draggable onDragStart={localHandleDragStart}>
+    <div
+      draggable
+      onDragStart={localHandleDragStart}
+      onContextMenu={handleContextMenu}
+    >
       <div onClick={toggle} className={itemClasses}>
         {isDirectory && (
           <span
