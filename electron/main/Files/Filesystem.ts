@@ -155,7 +155,7 @@ export function startWatchingDirectory(
       ignoreInitial: true,
     });
 
-    watcher.on("add", (path) => {
+    const handleFileEvent = (eventType: string, path: string) => {
       // Check if the file extension is in the provided list (if any)
       if (
         !extensionsToFilterFor ||
@@ -163,13 +163,18 @@ export function startWatchingDirectory(
           path.toLowerCase().endsWith(ext.toLowerCase())
         )
       ) {
-        console.log("extensions: ", extensionsToFilterFor);
-        console.log(`File added: ${path}`);
+        console.log(`extensions: `, extensionsToFilterFor);
+        console.log(`File ${eventType}: ${path}`);
         updateFileListForRenderer(win, directory);
       }
-    });
+    };
 
-    // Handle other events like 'change', 'unlink' if needed
+    watcher
+      .on("add", (path) => handleFileEvent("added", path))
+      .on("change", (path) => handleFileEvent("changed", path))
+      .on("unlink", (path) => handleFileEvent("removed", path))
+      .on("addDir", (path) => handleFileEvent("directory added", path))
+      .on("unlinkDir", (path) => handleFileEvent("directory removed", path));
 
     // No 'ready' event handler is needed here, as we're ignoring initial scan
   } catch (error) {

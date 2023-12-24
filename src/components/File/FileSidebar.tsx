@@ -166,7 +166,7 @@ const FileItem: React.FC<FileInfoProps> = ({
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
-    window.contextMenu.showFileItemContextMenu(file.path);
+    window.contextMenu.showFileItemContextMenu(file);
   };
   // useEffect(() => {
   //   const removeMenuActionListener = window.contextMenu.onMenuActionCUNT(

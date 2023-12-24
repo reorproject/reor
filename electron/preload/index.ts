@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { AIModelConfig } from "electron/main/Store/storeConfig";
-import { FileInfoTree } from "electron/main/Files/Types";
+import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
 // import { FileInfo } from "electron/main/Files/Types";
 import { RagnoteDBEntry } from "electron/main/database/Table";
 type ReceiveCallback = (...args: any[]) => void;
@@ -21,8 +21,7 @@ declare global {
       receive: (channel: string, callback: ReceiveCallback) => void;
     };
     contextMenu: {
-      showFileItemContextMenu: (filePath: string) => void;
-      onMenuActionCUNT: (callback: (action: string) => void) => () => void;
+      showFileItemContextMenu: (filePath: FileInfoNode) => void;
     };
     database: {
       search: (
@@ -143,19 +142,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
 contextBridge.exposeInMainWorld("contextMenu", {
   // Function to trigger the context menu
-  showFileItemContextMenu: (filePath: string) => {
-    ipcRenderer.send("show-context-menu-file-item", filePath);
+  showFileItemContextMenu: (file: FileInfoNode) => {
+    ipcRenderer.send("show-context-menu-file-item", file);
   },
 
   // Function to set up a listener for menu actions
-  onMenuActionCUNT: (callback: (action: string) => void) => {
-    const handler = (_: any, action: any) => callback(action);
-    ipcRenderer.on("context-menu-command", handler);
-    // Return a function to remove the listener
-    return () => {
-      ipcRenderer.removeListener("context-menu-command", handler);
-    };
-  },
 });
 
 contextBridge.exposeInMainWorld("files", {

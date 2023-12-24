@@ -15,7 +15,7 @@ import * as path from "path";
 import { AIModelConfig, StoreKeys, StoreSchema } from "./Store/storeConfig";
 // import contextMenus from "./contextMenus";
 import * as lancedb from "vectordb";
-
+import * as fs from "fs";
 import {
   RagnoteTable,
   maybeRePopulateTable,
@@ -31,7 +31,7 @@ import {
   writeFileSyncRecursive,
 } from "./Files/Filesystem";
 import { registerLLMSessionHandlers } from "./llm/llmSessionHandlers";
-import { FileInfoTree } from "./Files/Types";
+import { FileInfoNode, FileInfoTree } from "./Files/Types";
 import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
 import { validateAIModelConfig } from "./llm/llmConfig";
 import { registerStoreHandlers } from "./Store/storeHandlers";
@@ -223,19 +223,25 @@ ipcMain.on("index-files-in-directory", async (event, userDirectory: string) => {
   event.sender.send("indexing-complete", "success");
 });
 
-ipcMain.on("show-context-menu-file-item", (event, menuKey) => {
+ipcMain.on("show-context-menu-file-item", (event, file: FileInfoNode) => {
   const menu = new Menu();
   menu.append(
     new MenuItem({
       label: "Delete",
       click: () => {
-        console.log("CLICKED MENU ITEM: delete");
-        // event.sender.send("context-menu-command", "delete");
+        console.log(file.path);
+        fs.unlink(file.path, (err) => {
+          if (err) {
+            console.error("An error occurred:", err);
+            return;
+          }
+          console.log(`File at ${file.path} was deleted successfully.`);
+        }); // event.sender.send("context-menu-command", "delete");
       },
     })
   );
 
-  console.log("menu key: ", menuKey);
+  console.log("menu key: ", file);
 
   const browserWindow = BrowserWindow.fromWebContents(event.sender);
   if (browserWindow) {
