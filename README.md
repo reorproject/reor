@@ -10,18 +10,16 @@
 <p align="center">
     <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-GPLv3-blue.svg"></a>
 <img alt="GitHub Release Date - Published_At" src="https://img.shields.io/github/release-date/reorproject/reor">
-    <a href="https://github.com/reorproject/reor/issues"><img alt="Issues" src="https://img.shields.io/github/issues/public/public"></a>
 </p>
 
 ## About
 **The Reor Project** is a local-first AI application for managing personal knowledge and notes. It's designed to be AI-first: knowledge is organised and augmented by AI. 
 
 ### Hypotheses
-- AI should be used to both generate content but also organise unstructured corpuses of content.
-- Notes should be embedded in a feature space and cosine similarity should be used.
-- When crafting new thoughts or ideas, seeing similar thoughts or ideas can enhance that process.
-- Running AI models locally is a must. OpenAI should not have access to _private_ thoughts.
-- Open-source models are likely to outperform proprietary ones in specific tasks like query development and [knowledge graph creation](https://arxiv.org/abs/2310.04562).
+1. AI should be used to both generate and organise unstructured corpuses of content.
+2. Thoughts and ideas are private. AI models should run _locally_.
+3. Notes should be embedded in a feature space and cosine similarity should be used.
+4. When crafting new thoughts or ideas, seeing similar thoughts or ideas can enhance that process.
 
 ### Features
 - Chat with your notes.
@@ -47,8 +45,8 @@ To import notes/files from another app, you'll need to populate that directory m
 ### Contribute
 Contributions are welcome. Help with bugs, features, or documentation. See [Contributing Guide](link_to_contributing_guide).
 
-### Alpha Phase
-The Reor Project is in alpha. Feedback and support are welcome on our [Issues](https://github.com/reor-project/issues) page.
+### Beta Phase
+The Reor Project is in beta. Feedback and support are welcome on our [Issues](https://github.com/reor-project/issues) page.
 
 ## License
 GPL-3.0 license. See `LICENSE` for details.
