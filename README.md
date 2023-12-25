@@ -28,8 +28,6 @@
 - WYSIWYG Markdown editor.
 - Local storage for notes and VectorDB.
 - Filesystem mapping. You own your own files.
-- Cross-platform. Mac Intel & Arm, Windows and Linux.
-- Tsne (coming soon)
 
 ### Powered by LanceDB & Transformers.js
 Uses [LanceDB](https://github.com/lancedb/lancedb) embedded vector database for low memory usage and Transformers.js to run [bge-base-en-v1.5](https://huggingface.co/BAAI/bge-base-en-v1.5) embedding model.
