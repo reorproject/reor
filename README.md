@@ -24,7 +24,7 @@
 ### Features
 - Chat with your notes.
 - See similar notes in a sidebar within the Markdown editor.
-- Semantic search
+- Semantic search.
 - WYSIWYG Markdown editor.
 - Local storage for notes and VectorDB.
 - Filesystem mapping. You own your own files.
