@@ -16,9 +16,9 @@
 **The Reor Project** is a local-first AI application for managing personal knowledge and notes. It's designed to be AI-first: knowledge is organised and augmented by AI. 
 
 ### Hypotheses
-1. AI should be used to both generate and organise unstructured corpuses of content.
-2. Thoughts and ideas are private. AI models should run _locally_.
-3. Notes should be embedded in a feature space and cosine similarity should be used.
+1. AI should be used to both generate and organise unstructured thoughts and ideas.
+2. Those same thoughts and ideas are private. AI models should run _locally_.
+3. Documents should be embedded in a feature space and cosine similarity should be used.
 4. When crafting new thoughts or ideas, seeing similar thoughts or ideas can enhance that process.
 
 ### Features
