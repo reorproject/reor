@@ -1,9 +1,9 @@
 {
   "name": "reor-project",
-  "version": "2.2.0",
+  "version": "0.1.17",
   "main": "dist-electron/main/index.js",
-  "description": "Electron Vite React boilerplate.",
-  "author": "草鞋没号 <308487730@qq.com>",
+  "description": "An AI powered PKM app.",
+  "author": "",
   "license": "GPL-3.0",
   "private": false,
   "debug": {
