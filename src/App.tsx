@@ -20,7 +20,6 @@ const App: React.FC<AppProps> = () => {
   }, []);
 
   const handleDirectorySelected = (directoryPath: string) => {
-    console.log("HANDLING DIRECTORY SELECTED");
     setIsIndexing(true); // Start indexing
     setDirectory(directoryPath);
     // Trigger indexing in your main process here

@@ -8,7 +8,7 @@ export function createRAGPrompt(
   const contents = entries.map((entry) => entry.content).join(" ");
 
   // Combine the contents with the query to form the final prompt
-  const prompt = `Given the following user-generated notes in a notetaking app:
+  const prompt = `Given the following notes:
   ### Notes start ###
   ${contents}
   ### Notes end ###
