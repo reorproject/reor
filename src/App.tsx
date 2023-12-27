@@ -34,7 +34,7 @@ const App: React.FC<AppProps> = () => {
   // useEffect(() => {
 
   return (
-    <div className="max-h-screen font-sans">
+    <div className="max-h-screen font-sans bg-gray-800">
       {directory ? (
         isIndexing ? (
           <IndexingProgress onIndexingComplete={handleIndexingComplete} />
