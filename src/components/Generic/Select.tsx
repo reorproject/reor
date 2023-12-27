@@ -51,11 +51,11 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         </span>
       </div>
       {isOpen && (
-        <div className="absolute w-full border border-gray-300 rounded-md shadow-lg z-10 bg-white">
+        <div className="absolute w-full text-[13px] border text-gray-600  border-gray-300 rounded-md shadow-lg z-10 bg-white">
           {options.map((option, index) => (
             <div
               key={index}
-              className=" py-2 hover:bg-gray-100 cursor-pointer"
+              className=" py-2 pl-2 hover:bg-gray-100 cursor-pointer rounded-md "
               onClick={() => handleOptionClick(option)}
             >
               {option}
