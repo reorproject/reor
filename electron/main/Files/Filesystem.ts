@@ -209,6 +209,16 @@ export function updateFileListForRenderer(
   }
 }
 
+export function readFile(filePath: string): string {
+  try {
+    const data = fs.readFileSync(filePath, "utf8");
+    return data;
+  } catch (err) {
+    console.error("An error occurred:", err);
+    return "";
+  }
+}
+
 export const orchestrateEntryMove = async (
   table: RagnoteTable,
   sourcePath: string,

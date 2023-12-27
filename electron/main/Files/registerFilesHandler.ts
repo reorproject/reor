@@ -12,7 +12,7 @@ import {
   writeFileSyncRecursive,
 } from "./Filesystem";
 import * as fs from "fs";
-import { RagnoteTable, updateNoteInTable } from "../database/Table";
+import { RagnoteTable, updateFileInTable } from "../database/Table";
 
 export const registerFileHandlers = (
   store: Store<StoreSchema>,
@@ -43,7 +43,7 @@ export const registerFileHandlers = (
     async (event, filePath: string, content: string): Promise<void> => {
       console.log("writing file", filePath);
       // so here we can use the table we've created to add and remove things from the database. And all of the methods can be async to not hold up any threads
-      await updateNoteInTable(dbTable, filePath, content);
+      await updateFileInTable(dbTable, filePath, content);
       await fs.writeFileSync(filePath, content, "utf-8");
       win?.webContents.send("vector-database-update");
     }

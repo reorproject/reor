@@ -7,8 +7,13 @@ import {
   EnhancedEmbeddingFunction,
   createEmbeddingFunction,
 } from "./Embeddings";
-import { GetFilesInfoList, flattenFileInfoTree } from "../Files/Filesystem";
+import {
+  GetFilesInfoList,
+  flattenFileInfoTree,
+  readFile,
+} from "../Files/Filesystem";
 import { FileInfo, FileInfoTree } from "../Files/Types";
+import { chunkMarkdownByHeadings } from "../RAG/Chunking";
 
 export interface RagnoteDBEntry {
   notepath: string;
@@ -125,12 +130,22 @@ export const maybeRePopulateTable = async (
   const filesInfoList = GetFilesInfoList(directoryPath, extensionsToFilterFor);
   const tableArray = await getTableAsArray(table);
 
-  const tableArrayPaths = new Set(tableArray.map((x) => x.notepath));
+  const dbItemsToAddByFilePathChunked = filesInfoList.map(
+    convertFileTypeToDBType
+  );
 
-  const filesToAdd = filesInfoList
-    .filter((fileInfo) => !tableArrayPaths.has(fileInfo.path))
-    .map(convertFileTypeToDBType);
-  await table.add(filesToAdd, onProgress);
+  const dbItemsToAdd = dbItemsToAddByFilePathChunked
+    .filter((chunkedItems) => {
+      const notepath = chunkedItems[0].notepath;
+      const tableCount = tableArray.filter(
+        (x) => x.notepath == notepath
+      ).length;
+      return chunkedItems.length != tableCount;
+    })
+    .flat();
+
+  await table.add(dbItemsToAdd, onProgress);
+
   if (onProgress) {
     onProgress(1);
   }
@@ -153,21 +168,6 @@ const getTableAsArray = async (table: RagnoteTable) => {
   return results;
 };
 
-const isFileInDB = async (
-  table: RagnoteTable,
-  filePath: string,
-  tableCount: number // this Lancedb shit is fucked and requires filtering across the full length of the table if not we don't get results we want.
-): Promise<boolean> => {
-  if (tableCount == 0) {
-    return false;
-  }
-  const results = await table.filter(
-    `${DatabaseFields.NOTE_PATH} = '${filePath}'`,
-    tableCount
-  );
-  return results.length > 0;
-};
-
 const deleteAllRowsInTable = async (db: RagnoteTable) => {
   try {
     await db.delete(`${DatabaseFields.CONTENT} != ''`);
@@ -179,18 +179,23 @@ const deleteAllRowsInTable = async (db: RagnoteTable) => {
 
 const convertTreeToDBEntries = (tree: FileInfoTree): RagnoteDBEntry[] => {
   const flattened = flattenFileInfoTree(tree);
-  const entries = flattened.map(convertFileTypeToDBType); // TODO: maybe this can be run async
+  const entries = flattened.flatMap(convertFileTypeToDBType);
   return entries;
 };
 
 // so we want a function to convert files to dbEntry types (which will involve chunking later on)
-const convertFileTypeToDBType = (file: FileInfo): RagnoteDBEntry => {
-  return {
-    notepath: file.path,
-    content: readFile(file.path),
-    subnoteindex: 0,
-    timeadded: new Date(),
-  };
+const convertFileTypeToDBType = (file: FileInfo): RagnoteDBEntry[] => {
+  const fileContent = readFile(file.path);
+  const chunks = chunkMarkdownByHeadings(fileContent);
+  const entries = chunks.map((content, index) => {
+    return {
+      notepath: file.path,
+      content: content,
+      subnoteindex: index,
+      timeadded: new Date(),
+    };
+  });
+  return entries;
 };
 
 export const addTreeToTable = async (
@@ -212,7 +217,7 @@ export const removeTreeFromTable = async (
   }
 };
 
-export const updateNoteInTable = async (
+export const updateFileInTable = async (
   dbTable: RagnoteTable,
   filePath: string,
   content: string
@@ -220,41 +225,17 @@ export const updateNoteInTable = async (
   // TODO: maybe convert this to have try catch blocks.
   await dbTable.delete(`${DatabaseFields.NOTE_PATH} = '${filePath}'`);
   const currentTimestamp: Date = new Date();
-  await dbTable.add([
-    {
+  const chunkedContentList = chunkMarkdownByHeadings(content);
+  const dbEntries = chunkedContentList.map((content, index) => {
+    return {
       notepath: filePath,
       content: content,
-      subnoteindex: 0,
+      subnoteindex: index,
       timeadded: currentTimestamp,
-    },
-  ]);
+    };
+  });
+  await dbTable.add(dbEntries);
 };
-
-const populateDBWithFiles = async (db: RagnoteTable, filesInfo: FileInfo[]) => {
-  const entries: RagnoteDBEntry[] = await Promise.all(
-    filesInfo.map(convertFileTypeToDBType)
-  );
-
-  await db.add(entries);
-};
-
-function readFile(filePath: string): string {
-  try {
-    const data = fs.readFileSync(filePath, "utf8");
-    return data;
-  } catch (err) {
-    console.error("An error occurred:", err);
-    return "";
-  }
-}
-
-function convertToRecord(entry: RagnoteDBEntry): Record<string, unknown> {
-  const recordEntry: Record<string, unknown> = entry as unknown as Record<
-    string,
-    unknown
-  >;
-  return recordEntry;
-}
 
 function convertRawDBResultToRagnoteDBEntry(
   record: Record<string, unknown>
