@@ -16,7 +16,10 @@ import { AIModelConfig, StoreKeys, StoreSchema } from "./Store/storeConfig";
 // import contextMenus from "./contextMenus";
 import * as lancedb from "vectordb";
 import * as fs from "fs";
-import { RagnoteTable, maybeRePopulateTable } from "./database/Table";
+import {
+  RagnoteTable,
+  repopulateTableWithMissingItems,
+} from "./database/Table";
 import { FSWatcher } from "fs";
 import {
   GetFilesInfoTree,
@@ -200,12 +203,11 @@ ipcMain.handle("open-directory-dialog", async (event) => {
 ipcMain.on("index-files-in-directory", async (event, userDirectory: string) => {
   // this should be called by default and
   const dbPath = path.join(app.getPath("userData"), "vectordb");
-  console.log("PATH IS: ", dbPath);
   dbConnection = await lancedb.connect(dbPath);
 
   await dbTable.initialize(dbConnection, userDirectory);
 
-  await maybeRePopulateTable(
+  await repopulateTableWithMissingItems(
     dbTable,
     userDirectory,
     markdownExtensions,

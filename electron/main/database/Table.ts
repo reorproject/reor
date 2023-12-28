@@ -121,7 +121,7 @@ export class RagnoteTable {
   }
 }
 
-export const maybeRePopulateTable = async (
+export const repopulateTableWithMissingItems = async (
   table: RagnoteTable,
   directoryPath: string,
   extensionsToFilterFor: string[],
@@ -129,26 +129,22 @@ export const maybeRePopulateTable = async (
 ) => {
   const filesInfoList = GetFilesInfoList(directoryPath, extensionsToFilterFor);
   const tableArray = await getTableAsArray(table);
-
-  const dbItemsToAddByFilePathChunked = filesInfoList.map(
-    convertFileTypeToDBType
-  );
-
-  const dbItemsToAdd = dbItemsToAddByFilePathChunked
-    .filter((chunkedItems) => {
-      const notepath = chunkedItems[0].notepath;
-      const tableCount = tableArray.filter(
-        (x) => x.notepath == notepath
-      ).length;
-      return chunkedItems.length != tableCount;
-    })
-    .flat();
-
-  await table.add(dbItemsToAdd, onProgress);
-
-  if (onProgress) {
-    onProgress(1);
+  const dbItemsToAdd = computeDbItemsToAdd(filesInfoList, tableArray, table);
+  if (dbItemsToAdd.length == 0) {
+    console.log("no items to add");
+    return;
   }
+  const filePathsToDelete = dbItemsToAdd.map((x) => x[0].notepath);
+  const quotedFilePaths = filePathsToDelete
+    .map((filePath) => `'${filePath}'`)
+    .join(", ");
+
+  // Now use the quoted file paths in your query string
+  const filterString = `${DatabaseFields.NOTE_PATH} IN (${quotedFilePaths})`;
+  await table.delete(filterString);
+  const flattenedItemsToAdd = dbItemsToAdd.flat();
+  await table.add(flattenedItemsToAdd, onProgress);
+  onProgress && onProgress(1);
 };
 
 const getTableAsArray = async (table: RagnoteTable) => {
@@ -166,6 +162,36 @@ const getTableAsArray = async (table: RagnoteTable) => {
   );
   const results = nonEmptyResults.concat(emptyResults);
   return results;
+};
+
+const computeDbItemsToAdd = (
+  filesInfoList: FileInfo[],
+  tableArray: RagnoteDBEntry[],
+  table: RagnoteTable
+): RagnoteDBEntry[][] => {
+  return filesInfoList
+    .map(convertFileTypeToDBType)
+    .filter((listOfChunks) =>
+      filterChunksNotInTable(listOfChunks, tableArray, table)
+    );
+};
+
+const filterChunksNotInTable = (
+  listOfChunks: RagnoteDBEntry[],
+  tableArray: RagnoteDBEntry[],
+  table: RagnoteTable
+): boolean => {
+  if (listOfChunks.length == 0) {
+    return false;
+  }
+  if (listOfChunks[0].content == "") {
+    return false;
+  }
+  const notepath = listOfChunks[0].notepath;
+  const itemsAlreadyInTable = tableArray.filter(
+    (item) => item.notepath == notepath
+  );
+  return listOfChunks.length != itemsAlreadyInTable.length;
 };
 
 const deleteAllRowsInTable = async (db: RagnoteTable) => {
