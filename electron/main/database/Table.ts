@@ -132,6 +132,7 @@ export const repopulateTableWithMissingItems = async (
   const dbItemsToAdd = computeDbItemsToAdd(filesInfoList, tableArray, table);
   if (dbItemsToAdd.length == 0) {
     console.log("no items to add");
+    onProgress && onProgress(1);
     return;
   }
   const filePathsToDelete = dbItemsToAdd.map((x) => x[0].notepath);
