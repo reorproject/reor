@@ -41,10 +41,10 @@ Reor works within a single directory in the filesystem. You choose the directory
 To import notes/files from another app, you'll need to populate that directory manually with markdown files. Integrations with other apps are hopefully coming soon!
 
 ### Contribute
-Contributions are welcome. Help with bugs, features, or documentation. See [Contributing Guide](link_to_contributing_guide).
+Contributions are welcome. Help with bugs, features, or documentation.
 
 ### Beta Phase
-The Reor Project is in beta. Feedback and support are welcome on our [Issues](https://github.com/reor-project/issues) page.
+The Reor Project is in beta. It is very much stable and usable right now. Of course, it won't be as bug-free as something like Obsidian. But I am working as hard as I can to make this as good of an experience as can be! Feedback and support are welcome on our [Issues](https://github.com/reor-project/issues) page.
 
 ## License
 GPL-3.0 license. See `LICENSE` for details.
