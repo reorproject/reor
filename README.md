@@ -4,7 +4,7 @@
 </p> -->
 
 <h4 align="center">
-   A local-first private AI Personal Knowledge Management Tool
+   An AI self-organizing note-taking tool powered by local models
 </h4>
 
 <p align="center">
@@ -22,7 +22,7 @@
 4. When crafting new thoughts or ideas, seeing similar thoughts or ideas can enhance that process.
 
 ### Features
-- Chat with your notes.
+- Q&A across corpus of notes.
 - See similar notes in a sidebar within the Markdown editor.
 - Semantic search.
 - WYSIWYG Markdown editor.
