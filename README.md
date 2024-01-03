@@ -4,7 +4,7 @@
 </p> -->
 
 <h4 align="center">
-   An AI self-organizing note-taking tool powered by local models
+   A self-organizing note-taking tool powered by local AI models
 </h4>
 
 <p align="center">
@@ -13,35 +13,34 @@
 </p>
 
 ## About
-**The Reor Project** is a local-first AI application for managing personal knowledge and notes. It's designed to be AI-first: knowledge is organised and augmented by AI. 
+**The Reor Project** is a local-first AI application for managing personal knowledge and notes. It uses AI to organize, help write, and answer questions about notes. The key difference between something like mem.ai or Reflect Notes is that the AI can run locally and privately.
 
 ### Hypotheses
 1. AI should be used to both generate and organise unstructured thoughts and ideas.
 2. Those same thoughts and ideas are private. AI models should run _locally_.
-3. Documents should be embedded in a feature space and cosine similarity should be used.
-4. When crafting new thoughts or ideas, seeing similar thoughts or ideas can enhance that process.
+3. Notes should be embedded into a feature space so that similar notes can be compared
 
 ### Features
-- Q&A across corpus of notes.
-- See similar notes in a sidebar within the Markdown editor.
+- Q&A with your notes.
+- Embedding sidebar to automatically connect similar notes.
 - Semantic search.
 - WYSIWYG Markdown editor.
-- Local storage for notes and VectorDB.
-- Filesystem mapping. You own your own files.
+- Markdown files stored locally.
 
-### Powered by LanceDB & Transformers.js
-Uses [LanceDB](https://github.com/lancedb/lancedb) embedded vector database for low memory usage and Transformers.js to run [bge-base-en-v1.5](https://huggingface.co/BAAI/bge-base-en-v1.5) embedding model.
 
 ### Getting Started
-1. Download from the [Releases](https://github.com/reorproject/reor/releases) tab available currently for MacOS (Intel & Arm). Windows and Linux support coming by the end of the year.
+1. Download from the [Releases](https://github.com/reorproject/reor/releases) tab available currently for MacOS (Intel & Arm). Windows and Linux support coming soon :)
 2. Install like a normal App.
+   
+### Technologies
+- [LanceDB](https://github.com/lancedb/lancedb) vector database for ultra low latency, low-memory and local vector store.
+- [Transformers.js](https://github.com/xenova/transformers.js) to run embedding models locally.
+- [Llama.cpp](https://github.com/ggerganov/llama.cpp) to run local LLMs uber efficiently.
 
 ### Importing from other apps
 Reor works within a single directory in the filesystem. You choose the directory on first boot.
 To import notes/files from another app, you'll need to populate that directory manually with markdown files. Integrations with other apps are hopefully coming soon!
 
-### Contribute
-Contributions are welcome. Help with bugs, features, or documentation.
 
 ### Beta Phase
 The Reor Project is in beta. It is very much stable and usable right now. Of course, it won't be as bug-free as something like Obsidian. But I am working as hard as I can to make this as good of an experience as can be! Feedback and support are welcome on our [Issues](https://github.com/reor-project/issues) page.
