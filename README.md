@@ -13,7 +13,7 @@
 </p>
 
 ## About
-**The Reor Project** is a local-first AI application for managing personal knowledge and notes. It uses AI to organize, help write, and answer questions about notes. The key difference between something like mem.ai or Reflect Notes is that the AI can run locally and privately.
+**The Reor Project** is a local-first AI application for managing personal knowledge and notes. It uses AI to organize, help write, and answer questions about notes. The key difference between something like mem.ai or Reflect Notes is that the AI models can run fully locally and privately.
 
 ### Hypotheses
 1. AI should be used to both generate and organise unstructured thoughts and ideas.
