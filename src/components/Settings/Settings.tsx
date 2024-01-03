@@ -53,9 +53,7 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         <div className="mt-2 w-full ">
           <AIModelManager />
         </div>
-        <h4 className="font-semibold mb-2 text-white">
-          Open AI Key (Optional)
-        </h4>
+        <h4 className="font-semibold mb-2 text-white">Open AI Key</h4>
         <input
           type="text"
           className="block w-full px-3 py-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
