@@ -43,11 +43,11 @@ const store = new Store<StoreSchema>();
 
 // Check if 'user' and 'directory' exist before attempting to delete
 // if (user && typeof user === "object" && "directory" in user) {
-// Delete the 'directory' property
-// delete user.directory;
+//   // Delete the 'directory' property
+//   delete user.directory;
 
-// Save the updated 'user' object back to the store
-// store.set("user", user);
+//   // Save the updated 'user' object back to the store
+//   store.set("user", user);
 // }
 
 process.env.DIST_ELECTRON = join(__dirname, "../");
@@ -190,7 +190,7 @@ ipcMain.handle("open-win", (_, arg) => {
 
 ipcMain.handle("open-directory-dialog", async (event) => {
   const result = await dialog.showOpenDialog({
-    properties: ["openDirectory"],
+    properties: ["openDirectory", "createDirectory"],
   });
 
   if (!result.canceled && result.filePaths.length > 0) {

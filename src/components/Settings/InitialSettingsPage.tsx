@@ -70,12 +70,14 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
             Welcome to the Reor Project.
           </h2>
           <p className="mt-2 text-gray-100">
-            At its heart, this is a markdown editor with embedded AI. Everything
-            is written to a directory on your filesystem. Please choose that
-            directory here:
+            Reor is a self-organising note-taking app. Each note will be saved
+            as a markdown file to a "vault" directory on your machine.
+          </p>
+          <p className="mt-2 text-gray-100">
+            Please choose your vault directory here:
           </p>
           <Button
-            className="bg-slate-700 mt-2 border-none h-10 hover:bg-slate-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
+            className="bg-slate-700  border-none h-10 hover:bg-slate-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
             onClick={handleDirectorySelection}
             placeholder=""
           >
