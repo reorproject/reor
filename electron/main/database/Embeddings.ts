@@ -61,9 +61,9 @@ export async function createEmbeddingFunction(
     const cacheDir = path.join(app.getPath("userData"), "models", "embeddings");
     console.log("CACHE DIR IS: ", cacheDir);
     env.cacheDir = cacheDir;
-    pipe = await pipeline("feature-extraction", repoName, {
+    pipe = (await pipeline("feature-extraction", repoName, {
       cache_dir: cacheDir,
-    });
+    })) as Pipeline;
     console.log("MODEL CONFIG IS: ", pipe.model.config.hidden_size);
     contextLength = pipe.model.config.hidden_size;
 
