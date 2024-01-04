@@ -163,8 +163,6 @@ export function startWatchingDirectory(
           path.toLowerCase().endsWith(ext.toLowerCase())
         )
       ) {
-        console.log(`extensions: `, extensionsToFilterFor);
-        console.log(`File ${eventType}: ${path}`);
         updateFileListForRenderer(win, directory);
       }
     };

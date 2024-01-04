@@ -12,8 +12,8 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
   const [editorContent, setEditorContent] = useState<string>("");
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
   const lastSavedContentRef = useRef<string>("");
-  const [showChatbot, setShowChatbot] = useState<boolean>(false);
-  const [showSimilarFiles, setShowSimilarFiles] = useState<boolean>(false);
+  const [showChatbot, setShowChatbot] = useState<boolean>(true);
+  const [showSimilarFiles, setShowSimilarFiles] = useState<boolean>(true);
 
   const onFileSelect = async (path: string) => {
     // so here we can save the actual content too\\
