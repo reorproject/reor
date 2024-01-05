@@ -29,7 +29,7 @@
 
 
 ### Getting Started
-1. Download from the [Releases](https://github.com/reorproject/reor/releases) tab available currently for MacOS (Intel & Arm). Windows and Linux support coming soon :)
+1. Download from the [Releases](https://github.com/reorproject/reor/releases) tab available currently for MacOS (Intel & Arm). Windows and Linux support coming soon.
 2. Install like a normal App.
    
 ### Technologies
