@@ -1,6 +1,6 @@
 {
   "name": "reor-project",
-  "version": "0.1.19",
+  "version": "0.1.20",
   "main": "dist-electron/main/index.js",
   "description": "An AI powered PKM app.",
   "author": "",
