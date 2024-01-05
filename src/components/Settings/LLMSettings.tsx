@@ -2,11 +2,14 @@ import React, { useState, useEffect, ChangeEvent } from "react";
 import { AIModelConfig } from "electron/main/Store/storeConfig";
 import CustomSelect from "../Generic/Select";
 import { Button } from "@material-tailwind/react";
+import Modal from "../Generic/Modal";
 
 const AIModelManager: React.FC = () => {
   const [modelConfigs, setModelConfigs] = useState<
     Record<string, AIModelConfig>
   >({});
+  const [isNewLocalModelModalOpen, setIsNewLocalModelModalOpen] =
+    useState<boolean>(false);
   const [currentModelName, setCurrentModelName] = useState<string>("");
   const [currentConfig, setCurrentConfig] = useState<AIModelConfig>({
     localPath: "",
@@ -74,7 +77,58 @@ const AIModelManager: React.FC = () => {
           onChange={handleDefaultModelChange}
         />
       </div>
-
+      {/* <Button
+        className="bg-slate-700 border-none h-5 mt-1 hover:bg-slate-900 cursor-pointer  text-center pt-0 pb-0 pr-2 pl-2"
+        onClick={() => setIsNewLocalModelModalOpen(true)}
+        placeholder=""
+      >
+        Show Modal{" "}
+      </Button> */}
+      <Modal
+        isOpen={isNewLocalModelModalOpen}
+        onClose={() => setIsNewLocalModelModalOpen(false)}
+      >
+        <div className="w-[300px] ml-2 mr-2 mb-2">
+          <p className="text-white text-lg font-semibold mb-0">
+            Add New Local Model
+          </p>
+          <p className="text-white text-sm mb-2 mt-0">
+            Choose a .gguf model file on your computer to use as a local model.
+            You can download the best models from TheBloke on Huggingface.
+          </p>
+          <input
+            className="w-full p-2 mb-2 mt-3 text-black box-border"
+            type="text"
+            placeholder="Model Name"
+            name="modelName"
+            value={currentModelName}
+            onChange={(e) => setCurrentModelName(e.target.value)}
+          />
+          <input
+            className="w-full p-2 mb-2 text-black box-border"
+            type="text"
+            placeholder="Local Path (.gguf file)"
+            name="localPath"
+            value={currentConfig.localPath}
+            onChange={handleInputChange}
+          />
+          <input
+            className="w-full p-2 mb-2 text-black box-border"
+            type="number"
+            placeholder="Context Length (in tokens)"
+            name="contextLength"
+            value={currentConfig.contextLength || ""}
+            onChange={handleInputChange}
+          />
+          <Button
+            className="bg-slate-700  border-none h-5 hover:bg-slate-900 cursor-pointer  text-center pt-0 pb-0 pr-2 pl-2"
+            onClick={saveModelConfig}
+            placeholder=""
+          >
+            Save Configuration
+          </Button>
+        </div>
+      </Modal>
       <Button
         className="bg-slate-700 border-none h-5 mt-1 hover:bg-slate-900 cursor-pointer  text-center pt-0 pb-0 pr-2 pl-2"
         onClick={toggleAddingNewModel}
