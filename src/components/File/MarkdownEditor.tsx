@@ -85,12 +85,12 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
         .use(nord)
         .use(commonmark)
-        // .use(gfm)
+        .use(gfm)
         .use(history)
         .use(listener)
         .use(prism)
         // .use(menu)
-        // .use(block)
+        .use(block)
         .use(cursor)
         .use(clipboard)
     // .use(slash)
@@ -116,7 +116,18 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
     }
   }, [filePath]);
 
-  return <ReactEditor editor={editor} />;
+  return (
+    <div
+      // className="font-material-icons"
+      style={
+        {
+          // fontFamily: "Material Icons",
+        }
+      }
+    >
+      <ReactEditor editor={editor} />
+    </div>
+  );
 };
 
 export default MarkdownEditor;
