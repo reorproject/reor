@@ -204,7 +204,7 @@ const deleteAllRowsInTable = async (db: RagnoteTable) => {
   }
 };
 
-const convertTreeToDBEntries = (tree: FileInfoTree): RagnoteDBEntry[] => {
+const convertFileTreeToDBEntries = (tree: FileInfoTree): RagnoteDBEntry[] => {
   const flattened = flattenFileInfoTree(tree);
   const entries = flattened.flatMap(convertFileTypeToDBType);
   return entries;
@@ -229,7 +229,7 @@ export const addTreeToTable = async (
   dbTable: RagnoteTable,
   fileTree: FileInfoTree
 ): Promise<void> => {
-  const dbEntries = convertTreeToDBEntries(fileTree);
+  const dbEntries = convertFileTreeToDBEntries(fileTree);
   await dbTable.add(dbEntries);
 };
 

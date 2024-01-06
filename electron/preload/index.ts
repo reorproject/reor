@@ -32,7 +32,7 @@ declare global {
       indexFilesInDirectory: (directoryPath: string) => any;
       augmentPromptWithRAG: (
         prompt: string,
-        limit: number,
+        numberOfContextItems: number,
         filter?: string
       ) => Promise<string>;
     };
@@ -87,10 +87,15 @@ contextBridge.exposeInMainWorld("database", {
   },
   augmentPromptWithRAG: async (
     prompt: string,
-    limit: number,
+    numberOfContextItems: number,
     filter?: string
   ): Promise<RagnoteDBEntry[]> => {
-    return ipcRenderer.invoke("augment-prompt-with-rag", prompt, limit, filter);
+    return ipcRenderer.invoke(
+      "augment-prompt-with-rag",
+      prompt,
+      numberOfContextItems,
+      filter
+    );
   },
 });
 

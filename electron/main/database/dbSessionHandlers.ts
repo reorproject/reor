@@ -26,12 +26,16 @@ export const registerDBSessionHandlers = (dbTable: RagnoteTable) => {
     async (
       event,
       query: string,
-      limit: number,
+      numberOfContextItems: number,
       filter?: string
     ): Promise<string> => {
       try {
         // Assuming 'myDatabase' is your database instance with the 'search' method
-        const searchResults = await dbTable.search(query, limit, filter);
+        const searchResults = await dbTable.search(
+          query,
+          numberOfContextItems,
+          filter
+        );
         const prompt = createRAGPrompt(searchResults, query);
         console.log("rag augmented prompt:", prompt);
         return prompt;
