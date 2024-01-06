@@ -4,7 +4,7 @@
 </p> -->
 
 <h4 align="center">
-   A self-organizing note-taking tool powered by local AI models
+   A self-organizing note-taking app powered by local AI models.
 </h4>
 
 <p align="center">
