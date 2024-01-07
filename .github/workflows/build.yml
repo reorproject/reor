@@ -64,12 +64,12 @@ jobs:
       - name: Rename artifacts for ARM architecture
         if: matrix.os == 'macos-11'
         run: |
-          mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/${{ github.event.repository.name }}_${{ env.APP_VERSION }}-arm.dmg
+          mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/reor-project_${{ env.APP_VERSION }}-arm64.dmg
 
       - name: Rename artifacts for Intel architecture
         if: matrix.os == 'macos-latest'
         run: |
-          mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/${{ github.event.repository.name }}_${{ env.APP_VERSION }}-intel.dmg
+          mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/reor-project_${{ env.APP_VERSION }}-intel.dmg
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
@@ -78,5 +78,5 @@ jobs:
           path: |
             ./release/*/*.exe
             ./release/${{ env.APP_VERSION }}/**/*.AppImage
-            ./release/${{ env.APP_VERSION }}/*-arm.dmg
+            ./release/${{ env.APP_VERSION }}/*-arm64.dmg
             ./release/${{ env.APP_VERSION }}/*-intel.dmg
