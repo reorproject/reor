@@ -73,7 +73,7 @@ jobs:
         with:
           name: ${{ matrix.os }}-app
           path: |
-            ./release/${{ env.APP_VERSION }}/**/*.exe
+            ./release/${{ env.APP_VERSION }}/*.exe
             ./release/${{ env.APP_VERSION }}/**/*.AppImage
             ./release/${{ env.APP_VERSION }}/*-arm.dmg
             ./release/${{ env.APP_VERSION }}/*-intel.dmg
