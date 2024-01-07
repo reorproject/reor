@@ -247,3 +247,7 @@ ipcMain.on("show-context-menu-file-item", (event, file: FileInfoNode) => {
     menu.popup({ window: browserWindow });
   }
 });
+
+ipcMain.on("open-external", (event, url) => {
+  shell.openExternal(url);
+});

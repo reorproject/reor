@@ -3,6 +3,7 @@ import { AIModelConfig } from "electron/main/Store/storeConfig";
 import CustomSelect from "../Generic/Select";
 import { Button } from "@material-tailwind/react";
 import Modal from "../Generic/Modal";
+import ExternalLink from "../Generic/ExternalLink";
 
 const AIModelManager: React.FC = () => {
   const [modelConfigs, setModelConfigs] = useState<
@@ -95,10 +96,12 @@ const AIModelManager: React.FC = () => {
           <p className="text-white text-sm mb-2 mt-0">
             Choose a .gguf model file on your computer to use as a local model.
             You can download the best models from{" "}
-            <a href="https://huggingface.co/TheBloke?sort_models=downloads#models">
-              TheBloke on Huggingface
-            </a>
-            .
+            {/* <div className="text-blue-300"> */}
+            <ExternalLink
+              url="https://huggingface.co/TheBloke?sort_models=downloads#models"
+              label="TheBloke on Huggingface"
+            />
+            {/* </div> */}.
           </p>
           <input
             className="w-full p-2 mb-2 mt-3 text-black box-border"

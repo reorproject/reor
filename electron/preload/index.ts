@@ -20,6 +20,9 @@ declare global {
       // removeAllListeners: (channel: string) => void;
       receive: (channel: string, callback: ReceiveCallback) => void;
     };
+    electron: {
+      openExternal: (url: string) => void;
+    };
     contextMenu: {
       showFileItemContextMenu: (filePath: FileInfoNode) => void;
     };
@@ -97,6 +100,10 @@ contextBridge.exposeInMainWorld("database", {
       filter
     );
   },
+});
+
+contextBridge.exposeInMainWorld("electron", {
+  openExternal: (url: string) => ipcRenderer.send("open-external", url),
 });
 
 contextBridge.exposeInMainWorld("electronStore", {
