@@ -30,13 +30,14 @@ export const generateTableName = (
   embeddingFuncName: string,
   userDirectory: string
 ): string => {
-  const directoryPathAlias = userDirectory.replace(/[/\\]/g, "-");
+  const sanitizeForFileSystem = (str: string) => {
+    return str.replace(/[<>:"/\\|?*]/g, "_");
+  };
 
-  // so now we should check whether there is a limit on table name size...We should try to induce that error
-  return `ragnote_table_${embeddingFuncName.replace(
-    "/",
-    "_"
-  )}_${directoryPathAlias}`;
+  const directoryPathAlias = sanitizeForFileSystem(userDirectory);
+  const sanitizedEmbeddingFuncName = sanitizeForFileSystem(embeddingFuncName);
+
+  return `ragnote_table_${sanitizedEmbeddingFuncName}_${directoryPathAlias}`;
 };
 
 export default GetOrCreateLanceTable;
