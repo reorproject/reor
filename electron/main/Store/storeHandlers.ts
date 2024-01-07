@@ -3,6 +3,7 @@ import { AIModelConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 import { validateAIModelConfig } from "../llm/llmConfig";
 import { FSWatcher } from "fs";
+import * as path from "path";
 
 export const registerStoreHandlers = (
   store: Store<StoreSchema>,
@@ -37,9 +38,15 @@ export const registerStoreHandlers = (
 
   // Refactored ipcMain.handle to use the new function
   ipcMain.handle(
-    "setup-new-model",
-    async (event, modelName: string, modelConfig: AIModelConfig) => {
-      return addNewModelSchemaToStore(store, modelName, modelConfig);
+    "setup-new-local-model",
+    async (event, modelConfig: AIModelConfig) => {
+      // ok well maybe here we could leverage the path module and use that to pass the name through.
+      console.log("setting up new local model", modelConfig);
+      return addNewModelSchemaToStore(
+        store,
+        path.basename(modelConfig.localPath),
+        modelConfig
+      );
     }
   );
 

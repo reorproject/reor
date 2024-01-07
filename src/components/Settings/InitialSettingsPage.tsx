@@ -29,13 +29,18 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
   };
 
   const handleDirectorySelection = async () => {
-    const path = await window.files.openDirectoryDialog();
+    const paths = await window.files.openDirectoryDialog();
+    if (!paths) {
+      return;
+    }
+    const path = paths[0];
     if (path) {
       setUserDirectory(path);
       // window.electronStore.setUserDirectory(path);
       // onDirectorySelected(path);
     }
   };
+
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleNext();

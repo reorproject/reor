@@ -11,16 +11,12 @@ const AIModelManager: React.FC = () => {
   >({});
   const [isNewLocalModelModalOpen, setIsNewLocalModelModalOpen] =
     useState<boolean>(false);
-  const [currentModelName, setCurrentModelName] = useState<string>("");
-  const [currentConfig, setCurrentConfig] = useState<AIModelConfig>({
-    localPath: "",
-    contextLength: 0,
-    engine: "llamacpp",
-  });
+  const [newModelPath, setNewModelPath] = useState<string>("");
+  const [newModelContextLength, setNewModelContextLength] = useState<
+    number | null
+  >(null);
   const [defaultModel, setDefaultModel] = useState<string>("");
-  const [addingNewModel, setAddingNewModel] = useState<boolean>(false);
 
-  // Function to fetch existing model configurations
   const fetchModelConfigs = async () => {
     try {
       const configs = await window.electronStore.getAIModelConfigs();
@@ -36,26 +32,21 @@ const AIModelManager: React.FC = () => {
     fetchModelConfigs();
   }, []);
 
-  const saveModelConfig = async () => {
-    console.log(
-      "saving the following config: ",
-      currentModelName,
-      currentConfig
-    );
-    const res = await window.electronStore.setupNewLocalLLM(
-      currentModelName,
-      currentConfig
-    );
+  const saveModelConfigToElectronStore = async () => {
+    if (!newModelPath || !newModelContextLength) {
+      return;
+    }
+    const newConfig: AIModelConfig = {
+      localPath: newModelPath,
+      contextLength: newModelContextLength,
+      engine: "llamacpp",
+    };
+
+    const res = await window.electronStore.setupNewLocalLLM(newConfig);
     console.log("setupNewLocalLLM response: ", res);
     // Refresh model configs after saving
     fetchModelConfigs();
-  };
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setCurrentConfig({
-      ...currentConfig,
-      [e.target.name]: e.target.value,
-    });
+    setIsNewLocalModelModalOpen(false);
   };
 
   const handleDefaultModelChange = (selectedModel: string) => {
@@ -63,9 +54,18 @@ const AIModelManager: React.FC = () => {
     window.electronStore.setDefaultAIModel(selectedModel);
   };
 
-  const toggleAddingNewModel = () => setAddingNewModel(!addingNewModel);
-
   const modelNames = Object.keys(modelConfigs);
+
+  const handleModelFileSelection = async () => {
+    const paths = await window.files.openFileDialog([".gguf"]);
+    if (!paths) {
+      return;
+    }
+    const path = paths[0];
+    if (path) {
+      setNewModelPath(path);
+    }
+  };
 
   return (
     <div className="w-full  bg-gray-800 rounded">
@@ -76,15 +76,13 @@ const AIModelManager: React.FC = () => {
           options={modelNames}
           value={defaultModel}
           onChange={handleDefaultModelChange}
+          addButton={{
+            label: "Add a New Local Model",
+            onClick: () => setIsNewLocalModelModalOpen(true),
+          }}
         />
       </div>
-      <Button
-        className="bg-slate-700 border-none h-5 mt-1 hover:bg-slate-900 cursor-pointer  text-center pt-0 pb-0 pr-2 pl-2"
-        onClick={() => setIsNewLocalModelModalOpen(true)}
-        placeholder=""
-      >
-        New Local Model
-      </Button>
+
       <Modal
         isOpen={isNewLocalModelModalOpen}
         onClose={() => setIsNewLocalModelModalOpen(false)}
@@ -101,94 +99,38 @@ const AIModelManager: React.FC = () => {
               url="https://huggingface.co/TheBloke?sort_models=downloads#models"
               label="TheBloke on Huggingface"
             />
-            {/* </div> */}.
           </p>
+
+          <Button
+            className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
+            onClick={handleModelFileSelection}
+            placeholder=""
+          >
+            Select Model .GGUF File
+          </Button>
+          {newModelPath && (
+            <p className="mt-2 text-xs text-gray-100">
+              Selected: <strong>{newModelPath}</strong>
+            </p>
+          )}
           <input
-            className="w-full p-2 mb-2 mt-3 text-black box-border"
-            type="text"
-            placeholder="Model Name"
-            name="modelName"
-            value={currentModelName}
-            onChange={(e) => setCurrentModelName(e.target.value)}
-          />
-          <input
-            className="w-full p-2 mb-2 text-black box-border"
-            type="text"
-            placeholder="Local Path (.gguf file)"
-            name="localPath"
-            value={currentConfig.localPath}
-            onChange={handleInputChange}
-          />
-          <input
-            className="w-full p-2 mb-2 text-black box-border"
+            className="w-full p-2 mb-1 mt-3 text-black box-border"
             type="number"
             placeholder="Context Length (in tokens)"
             name="contextLength"
-            value={currentConfig.contextLength || ""}
-            onChange={handleInputChange}
+            value={newModelContextLength || ""}
+            onChange={(e) => setNewModelContextLength(parseInt(e.target.value))}
           />
+
           <Button
-            className="bg-slate-700  border-none h-5 hover:bg-slate-900 cursor-pointer  text-center pt-0 pb-0 pr-2 pl-2"
-            onClick={saveModelConfig}
+            className="bg-slate-700  border-none h-5 hover:bg-slate-900 cursor-pointer mt-2 text-center pt-0 pb-0 pr-2 pl-2"
+            onClick={saveModelConfigToElectronStore}
             placeholder=""
           >
-            Save Configuration
+            Save New Model
           </Button>
         </div>
       </Modal>
-      {/* <Button
-        className="bg-slate-700 border-none h-5 mt-1 hover:bg-slate-900 cursor-pointer  text-center pt-0 pb-0 pr-2 pl-2"
-        onClick={toggleAddingNewModel}
-        placeholder=""
-      >
-        {addingNewModel ? (
-          <>
-            <span>Cancel</span>
-            <span className="ml-2">▲</span>
-          </>
-        ) : (
-          <>
-            <span>New Local Model</span>
-            <span className="ml-2">▼</span>
-          </>
-        )}
-      </Button> */}
-
-      {addingNewModel && (
-        <div className="mt-2">
-          <input
-            className="w-full p-2 mb-2 text-black box-border"
-            type="text"
-            placeholder="Model Name"
-            name="modelName"
-            value={currentModelName}
-            onChange={(e) => setCurrentModelName(e.target.value)}
-          />
-          <input
-            className="w-full p-2 mb-2 text-black box-border"
-            type="text"
-            placeholder="Local Path (.gguf file)"
-            name="localPath"
-            value={currentConfig.localPath}
-            onChange={handleInputChange}
-          />
-          <input
-            className="w-full p-2 mb-2 text-black box-border"
-            type="number"
-            placeholder="Context Length (in tokens)"
-            name="contextLength"
-            value={currentConfig.contextLength || ""}
-            onChange={handleInputChange}
-          />
-          <Button
-            className="bg-slate-700  border-none h-5 hover:bg-slate-900 cursor-pointer  text-center pt-0 pb-0 pr-2 pl-2"
-            onClick={saveModelConfig}
-            placeholder=""
-          >
-            Save Configuration
-          </Button>
-        </div>
-      )}
     </div>
   );
 };

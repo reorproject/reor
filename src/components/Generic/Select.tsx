@@ -4,12 +4,17 @@ type CustomSelectProps = {
   options: string[];
   value: string;
   onChange: (value: string) => void;
+  addButton?: {
+    label: string;
+    onClick: () => void;
+  };
 };
 
 const CustomSelect: React.FC<CustomSelectProps> = ({
   options,
   value,
   onChange,
+  addButton,
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -51,16 +56,25 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         </span>
       </div>
       {isOpen && (
-        <div className="absolute w-full text-[13px] border text-gray-600  border-gray-300 rounded-md shadow-lg z-10 bg-white">
+        <div className="absolute w-full text-[13px] border text-gray-600 border-gray-300 rounded-md shadow-lg z-10 bg-white">
           {options.map((option, index) => (
             <div
               key={index}
-              className=" py-2 pl-2 hover:bg-gray-100 cursor-pointer rounded-md "
+              className="py-2 pl-2 hover:bg-gray-100 cursor-pointer rounded-md"
               onClick={() => handleOptionClick(option)}
             >
               {option}
             </div>
           ))}
+
+          {addButton && (
+            <div
+              className="py-2 pl-2 pr-2 mt-1 bg-gray-200 text-gray-700 text-center cursor-pointer rounded-md hover:bg-gray-300 shadow-sm transition-colors"
+              onClick={addButton.onClick}
+            >
+              {addButton.label}
+            </div>
+          )}
         </div>
       )}
     </div>

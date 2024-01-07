@@ -40,7 +40,8 @@ declare global {
       ) => Promise<string>;
     };
     files: {
-      openDirectoryDialog: () => Promise<any>;
+      openDirectoryDialog: () => Promise<string[]>;
+      openFileDialog: (fileExtensions?: string[]) => Promise<string[]>;
       getFiles: () => Promise<FileInfoTree>;
       writeFile: (filePath: string, content: string) => Promise<any>;
       readFile: (filePath: string) => Promise<any>;
@@ -67,10 +68,7 @@ declare global {
       setOpenAIAPIKey: (apiKey: string) => any;
       getOpenAIAPIKey: () => string;
       getAIModelConfigs: () => Promise<Record<string, AIModelConfig>>;
-      setupNewLocalLLM: (
-        modelName: string,
-        modelConfig: AIModelConfig
-      ) => Promise<any>;
+      setupNewLocalLLM: (modelConfig: AIModelConfig) => Promise<any>;
       setDefaultAIModel: (modelName: string) => any;
       getDefaultAIModel: () => Promise<string>;
     };
@@ -122,8 +120,8 @@ contextBridge.exposeInMainWorld("electronStore", {
   getAIModelConfigs: async (): Promise<AIModelConfig[]> => {
     return ipcRenderer.invoke("get-ai-model-configs");
   },
-  setupNewLocalLLM: async (modelName: string, modelConfig: AIModelConfig) => {
-    return ipcRenderer.invoke("setup-new-model", modelName, modelConfig);
+  setupNewLocalLLM: async (modelConfig: AIModelConfig) => {
+    return ipcRenderer.invoke("setup-new-local-model", modelConfig);
   },
   setDefaultAIModel: (modelName: string) => {
     ipcRenderer.send("set-default-ai-model", modelName);
@@ -163,8 +161,9 @@ contextBridge.exposeInMainWorld("contextMenu", {
 
 contextBridge.exposeInMainWorld("files", {
   openDirectoryDialog: () => ipcRenderer.invoke("open-directory-dialog"),
+  openFileDialog: (fileExtensions?: string[]) =>
+    ipcRenderer.invoke("open-file-dialog", fileExtensions),
   getFiles: async (): Promise<FileInfoTree> => {
-    // No need to pass a channel name as a string literal every time, which can be error-prone
     return ipcRenderer.invoke("get-files");
   },
 

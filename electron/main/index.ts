@@ -44,10 +44,10 @@ const store = new Store<StoreSchema>();
 // Check if 'user' and 'directory' exist before attempting to delete
 // if (user && typeof user === "object" && "directory" in user) {
 //   // Delete the 'directory' property
-//   delete user.directory;
+// delete user.directory;
 
 //   // Save the updated 'user' object back to the store
-//   store.set("user", user);
+// store.set("user", user);
 // }
 
 process.env.DIST_ELECTRON = join(__dirname, "../");
@@ -192,11 +192,26 @@ ipcMain.handle("open-directory-dialog", async (event) => {
   const result = await dialog.showOpenDialog({
     properties: ["openDirectory", "createDirectory"],
   });
-
-  if (!result.canceled && result.filePaths.length > 0) {
-    return result.filePaths[0];
+  if (!result.canceled) {
+    return result.filePaths;
   } else {
     return null;
+  }
+});
+
+ipcMain.handle("open-file-dialog", async (event, extensions) => {
+  const filters =
+    extensions && extensions.length > 0 ? [{ name: "Files", extensions }] : [];
+
+  const result = await dialog.showOpenDialog({
+    properties: ["openFile", "multiSelections"],
+    filters: filters,
+  });
+
+  if (!result.canceled) {
+    return result.filePaths;
+  } else {
+    return [];
   }
 });
 
