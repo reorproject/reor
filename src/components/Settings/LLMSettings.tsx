@@ -77,13 +77,13 @@ const AIModelManager: React.FC = () => {
           onChange={handleDefaultModelChange}
         />
       </div>
-      {/* <Button
+      <Button
         className="bg-slate-700 border-none h-5 mt-1 hover:bg-slate-900 cursor-pointer  text-center pt-0 pb-0 pr-2 pl-2"
         onClick={() => setIsNewLocalModelModalOpen(true)}
         placeholder=""
       >
-        Show Modal{" "}
-      </Button> */}
+        New Local Model
+      </Button>
       <Modal
         isOpen={isNewLocalModelModalOpen}
         onClose={() => setIsNewLocalModelModalOpen(false)}
@@ -94,7 +94,11 @@ const AIModelManager: React.FC = () => {
           </p>
           <p className="text-white text-sm mb-2 mt-0">
             Choose a .gguf model file on your computer to use as a local model.
-            You can download the best models from TheBloke on Huggingface.
+            You can download the best models from{" "}
+            <a href="https://huggingface.co/TheBloke?sort_models=downloads#models">
+              TheBloke on Huggingface
+            </a>
+            .
           </p>
           <input
             className="w-full p-2 mb-2 mt-3 text-black box-border"
@@ -129,7 +133,7 @@ const AIModelManager: React.FC = () => {
           </Button>
         </div>
       </Modal>
-      <Button
+      {/* <Button
         className="bg-slate-700 border-none h-5 mt-1 hover:bg-slate-900 cursor-pointer  text-center pt-0 pb-0 pr-2 pl-2"
         onClick={toggleAddingNewModel}
         placeholder=""
@@ -145,7 +149,7 @@ const AIModelManager: React.FC = () => {
             <span className="ml-2">▼</span>
           </>
         )}
-      </Button>
+      </Button> */}
 
       {addingNewModel && (
         <div className="mt-2">
