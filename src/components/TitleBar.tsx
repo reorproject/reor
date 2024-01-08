@@ -9,6 +9,14 @@ import { useState } from "react";
 import { FaPenSquare } from "react-icons/fa";
 import { FaRegPenToSquare } from "react-icons/fa6";
 import { TbEqualDouble } from "react-icons/tb";
+import { PiSidebar } from "react-icons/pi";
+import { BsFillChatRightDotsFill } from "react-icons/bs";
+
+import {
+  BsChatRightDots,
+  BsChatLeftDots,
+  BsFillChatLeftDotsFill,
+} from "react-icons/bs";
 
 interface TitleBarProps {
   onFileSelect: (path: string) => void;
@@ -50,28 +58,41 @@ const TitleBar: React.FC<TitleBarProps> = ({
           onFileSelect={onFileSelect}
         />
       </div>
-      <div className="ml-auto flex">
-        <button
-          className="bg-transparent border-none cursor-pointer"
+
+      <div className="flex justify-content-right align-items-right">
+        {/* <button
+          className="bg-transparent border-none cursor-pointer mr-0 bg-blue-300"
+          onClick={() => {
+            toggleSimilarFiles();
+            toggleChatbot();
+          }}
+        > */}
+        <PiSidebar
+          className="text-gray-600 cursor-pointer"
+          size={28}
           onClick={toggleSimilarFiles}
-        >
-          <TbEqualDouble className="text-gray-600" size={24} />
-          {/* {chatbotOpen ? (
-            <MdChatBubble className="text-gray-600" size={24} />
-          ) : (
-            <MdChatBubbleOutline className="text-gray-600" size={24} />
-          )} */}
-        </button>
-        <button
-          className="bg-transparent border-none cursor-pointer"
+        />
+        {/* </button> */}
+        {/* <button
+          className="bg-transparent border-none cursor-pointer mt-[2.3px]  bg-yellow-300 padding-0"
           onClick={toggleChatbot}
-        >
+        > */}
+        <div className="mt-[0.32rem] mr-[0.5rem] ml-[0.3rem]">
           {chatbotOpen ? (
-            <MdChatBubble className="text-gray-600" size={24} />
+            <BsFillChatLeftDotsFill
+              size={22}
+              className="text-gray-600 cursor-pointer"
+              onClick={toggleChatbot}
+            />
           ) : (
-            <MdChatBubbleOutline className="text-gray-600" size={24} />
+            <BsChatLeftDots
+              className="text-gray-600 cursor-pointer "
+              size={22}
+              onClick={toggleChatbot}
+            />
           )}
-        </button>
+        </div>
+        {/* </button> */}
       </div>
     </div>
   );
