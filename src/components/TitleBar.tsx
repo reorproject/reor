@@ -68,7 +68,10 @@ const TitleBar: React.FC<TitleBarProps> = ({
         />
       </div>
 
-      <div className="flex justify-content-right align-items-right">
+      <div
+        className="flex justify-content-right align-items-right"
+        style={platform === "win32" ? { marginRight: "8.5rem" } : {}}
+      >
         {/* <button
           className="bg-transparent border-none cursor-pointer mr-0 bg-blue-300"
           onClick={() => {
@@ -77,15 +80,12 @@ const TitleBar: React.FC<TitleBarProps> = ({
           }}
         > */}
         <PiSidebar
-          className="text-gray-600 cursor-pointer"
+          className="text-gray-600 cursor-pointer mt-[0.1rem]"
           size={28}
           onClick={toggleSimilarFiles}
         />
 
-        <div
-          className="mt-[0.32rem] mr-[0.5rem] ml-[0.3rem]"
-          style={platform === "win32" ? { marginRight: "10rem" } : {}}
-        >
+        <div className="mt-[0.33rem] mr-[0.5rem] ml-[0.3rem]">
           {chatbotOpen ? (
             <BsFillChatLeftDotsFill
               size={22}
