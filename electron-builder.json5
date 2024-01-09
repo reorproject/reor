@@ -1,5 +1,5 @@
 {
-  appId: "YourAppID",
+  appId: "com.reorproject.reor",
   asar: true,
   directories: {
     output: "release/${version}",
@@ -7,6 +7,7 @@
   files: ["dist-electron/**/*", "dist/**/*"],
   mac: {
     artifactName: "${productName}_${version}.${ext}",
+    // arch: ["arm64"],
     target: ["dmg", "zip"],
   },
   win: {
@@ -27,35 +28,21 @@
   linux: {
     artifactName: "${productName}_${version}.${ext}",
     target: [
-      // {
-      //   target: "deb",
-      //   arch: ["x64", "arm64"], // Specify architectures as needed
-      //   // Additional specific properties can go here
-      // },
-      // {
-      //   target: "rpm",
-      //   arch: ["x64", "arm64"], // Specify architectures as needed
-      //   // Additional specific properties can go here
-      // },
       {
         target: "AppImage",
         arch: ["x64", "arm64"], // Specify architectures as needed
-        // Additional specific properties can go here
       },
     ],
-    category: "Utility", // Change as appropriate for your app
-    synopsis: "Short description of your app",
-    description: "Full description of your app",
-    // mimeType: ["x-scheme-handler/your-custom-protocol"], // If you have custom URL handlers
-    desktop: {
-      // Desktop file properties
-    },
-    // depends: ["fuse", "libfuse2", "libvips"], // List your dependencies here
+    category: "Productivity", // Change as appropriate for your app
+    synopsis: "Self-organizing note-taking app",
+    description: "A self-organizing note-taking app that is fully private and powered by local AI models.",
+    desktop: {},
     artifactName: "${productName}_${version}.${ext}",
   },
   publish: {
-    provider: "generic",
-    channel: "latest",
-    url: "https://github.com/electron-vite/electron-vite-react/releases/download/v0.9.9/",
+    provider: "github",
+    repo: "reor",
+    owner: "reorproject",
+    releaseType: "draft",
   },
 }
