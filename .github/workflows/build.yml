@@ -62,7 +62,7 @@ jobs:
         run: echo "APP_VERSION=${{ env.APP_VERSION }}"
 
       - name: Rename artifacts for ARM architecture
-        if: matrix.os == 'macos-11'
+        if: matrix.os == 'macos-latest-xlarge'
         run: |
           mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/reor-project_${{ env.APP_VERSION }}-arm64.dmg
 
