@@ -15,8 +15,8 @@ jobs:
           - os: windows-latest
           # - os: ubuntu-latest
           - os: macos-latest # Intel-based macOS (default architecture)
-          - os: macos-11 # macOS with M1 chip (ARM architecture)
-            arch: arm64
+          - os: macos-latest-xlarge # macOS with M1 chip (ARM architecture)
+            # arch: arm64
       fail-fast: false
 
     steps:
@@ -58,7 +58,7 @@ jobs:
         run: echo "APP_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
       - name: Rename artifacts for ARM architecture
-        if: matrix.os == 'macos-11'
+        if: matrix.os == 'macos-latest-xlarge'
         run: |
           mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/reor-project_${{ env.APP_VERSION }}-arm64.dmg
 
