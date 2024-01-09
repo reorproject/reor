@@ -266,3 +266,7 @@ ipcMain.on("show-context-menu-file-item", (event, file: FileInfoNode) => {
 ipcMain.on("open-external", (event, url) => {
   shell.openExternal(url);
 });
+
+ipcMain.handle("get-platform", async (event) => {
+  return process.platform;
+});

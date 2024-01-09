@@ -5,7 +5,7 @@ import { HiOutlineSearch } from "react-icons/hi"; // Solid search icon
 import SearchComponent from "./Search/Search";
 import NewNoteComponent from "./File/NewNote";
 import { MdChatBubble } from "react-icons/md";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaPenSquare } from "react-icons/fa";
 import { FaRegPenToSquare } from "react-icons/fa6";
 import { TbEqualDouble } from "react-icons/tb";
@@ -32,7 +32,16 @@ const TitleBar: React.FC<TitleBarProps> = ({
   toggleSimilarFiles,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [platform, setPlatform] = useState("");
 
+  useEffect(() => {
+    const fetchPlatform = async () => {
+      const response = await window.electron.getPlatform();
+      setPlatform(response);
+    };
+
+    fetchPlatform();
+  }, []);
   const toggleModal = () => {
     setIsModalOpen(!isModalOpen);
   };
@@ -72,12 +81,11 @@ const TitleBar: React.FC<TitleBarProps> = ({
           size={28}
           onClick={toggleSimilarFiles}
         />
-        {/* </button> */}
-        {/* <button
-          className="bg-transparent border-none cursor-pointer mt-[2.3px]  bg-yellow-300 padding-0"
-          onClick={toggleChatbot}
-        > */}
-        <div className="mt-[0.32rem] mr-[0.5rem] ml-[0.3rem]">
+
+        <div
+          className="mt-[0.32rem] mr-[0.5rem] ml-[0.3rem]"
+          style={platform === "win32" ? { marginRight: "10rem" } : {}}
+        >
           {chatbotOpen ? (
             <BsFillChatLeftDotsFill
               size={22}
@@ -92,7 +100,6 @@ const TitleBar: React.FC<TitleBarProps> = ({
             />
           )}
         </div>
-        {/* </button> */}
       </div>
     </div>
   );
