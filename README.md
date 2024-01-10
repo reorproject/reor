@@ -10,6 +10,8 @@
 <p align="center">
     <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-GPLv3-blue.svg"></a>
 <img alt="GitHub Release Date - Published_At" src="https://img.shields.io/github/release-date/reorproject/reor">
+    <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/reorproject/reor">
+
 </p>
 <!-- <img width="1342" alt="Screenshot 2024-01-10 at 18 43 31" src="https://github.com/reorproject/reor/assets/17236551/336ff84d-cecc-44de-bd92-57ff61579dea"> -->
 <!-- <img width="1203" alt="Screenshot 2024-01-10 at 18 24 55" src="https://github.com/reorproject/reor/assets/17236551/cde5ab19-b394-459e-8657-bfc4f204014f"> -->
