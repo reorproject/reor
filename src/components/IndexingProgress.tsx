@@ -53,7 +53,10 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({
     >
       <div className="w-[500px] h-[100px]">
         <h6 className="mt-2 mb-2 text-2xl font-semibold text-white">
-          Indexing your files...
+          {progress === 0
+            ? "Initializing vector database..."
+            : "Indexing your files..."}
+          {/* Indexing your files... */}
         </h6>
         <div className="w-full h-4 bg-gray-800 rounded-full overflow-hidden mb-2 border-2 border-gray-400">
           <div
@@ -62,7 +65,7 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({
           ></div>
         </div>
         <span className="text-sm text-white font-semibold">
-          {Math.round(progress * 100)}% - {eta}
+          {progress > 0 && <>{Math.round(progress * 100)}% -</>} {eta}
         </span>
       </div>
     </Modal>
