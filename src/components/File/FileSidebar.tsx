@@ -1,5 +1,7 @@
 import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
 import React, { useEffect, useState } from "react";
+import { FaChevronRight } from "react-icons/fa";
+import { FaChevronDown } from "react-icons/fa";
 
 interface FileListProps {
   selectedFile: string | null;
@@ -189,12 +191,10 @@ const FileItem: React.FC<FileInfoProps> = ({
     >
       <div onClick={toggle} className={itemClasses}>
         {isDirectory && (
-          <span
-            className={`mr-2 text-sm ${
-              isExpanded ? "transform rotate-90" : ""
-            }`}
-          >
-            {">"}
+          <span className={`mr-2 text-sm `}>
+            {/* {">"} */}
+            {/* <FaChevronRight /> */}
+            {isExpanded ? <FaChevronDown /> : <FaChevronRight />}
           </span>
         )}
         <span
