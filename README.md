@@ -31,7 +31,13 @@
 ### Getting Started
 1. Download from the [Releases](https://github.com/reorproject/reor/releases) tab. Mac & Windows are currently supported with Linux support coming soon.
 2. Install like a normal App.
-   
+
+### App is damaged error on Apple Silicon
+Apple is sometimes rather pesky with build requirements. Because Reor is built to run models locally, Apple sometimes tells you the app is damaged when you try to open it. Just run this to avoid that:
+```
+sudo xattr -rds com.apple.quarantine /Applications/Reor.app
+```
+
 ### Technologies
 - [LanceDB](https://github.com/lancedb/lancedb) vector database for ultra low latency, low-memory and local vector store.
 - [Transformers.js](https://github.com/xenova/transformers.js) to run embedding models locally.
