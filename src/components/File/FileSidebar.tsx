@@ -192,7 +192,7 @@ const FileItem: React.FC<FileInfoProps> = ({
   //   };
   // }, [file]);
 
-  const itemClasses = `flex items-center cursor-pointer p-2 text-sm border-b border-gray-200 hover:bg-gray-100 ${
+  const itemClasses = `flex items-center cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-100 ${
     isSelected ? "bg-blue-100 font-bold" : ""
   }`;
 

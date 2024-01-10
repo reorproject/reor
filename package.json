@@ -1,10 +1,9 @@
 {
   "name": "reor-project",
-  "version": "0.1.25",
-  "productName": "Reor",
+  "version": "0.1.24",
   "main": "dist-electron/main/index.js",
   "description": "An AI powered PKM app.",
-  "author": "Sam L'Huillier",
+  "author": "",
   "license": "GPL-3.0",
   "private": false,
   "debug": {
@@ -73,19 +72,5 @@
   },
   "engines": {
     "node": "^14.18.0 || >=16.0.0"
-  },
-  "build": {
-    "appId": "com.reorproject.reor",
-    "mac": {
-      "target": [
-        {
-          "target": "dmg",
-          "arch": [
-            "x64",
-            "arm64"
-          ]
-        }
-      ]
-    }
   }
 }

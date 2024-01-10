@@ -43,8 +43,6 @@ jobs:
           key: ${{ runner.os }}-tsc-${{ hashFiles('**/tsconfig.json') }}
           restore-keys: |
             ${{ runner.os }}-tsc-
-      - name: Set up GH_TOKEN
-        run: echo "GH_TOKEN=${{ secrets.GH_TOKEN }}" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: npm install
@@ -68,14 +66,17 @@ jobs:
         run: |
           mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/reor-project_${{ env.APP_VERSION }}-arm64.dmg
 
-      # - name: Rename artifacts for Intel architecture
-      #   if: matrix.os == 'macos-latest'
-      #   run: |
-      #     mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/reor-project_${{ env.APP_VERSION }}-intel.dmg
+      - name: Rename artifacts for Intel architecture
+        if: matrix.os == 'macos-latest'
+        run: |
+          mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/reor-project_${{ env.APP_VERSION }}-intel.dmg
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.os }}-app
           path: |
-            ./dist/*.dmg
+            ./release/*/*.exe
+            ./release/${{ env.APP_VERSION }}/**/*.AppImage
+            ./release/${{ env.APP_VERSION }}/*-arm64.dmg
+            ./release/${{ env.APP_VERSION }}/*-intel.dmg
