@@ -56,7 +56,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
           >
             <div className="w-full flex h-full ">
               <div
-                className="h-full overflow-auto"
+                className="h-full "
                 style={{ width: showSimilarFiles ? "75%" : "100%" }}
               >
                 <MarkdownEditor

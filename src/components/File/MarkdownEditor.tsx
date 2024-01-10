@@ -118,6 +118,7 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
   return (
     <div
+      className="h-full overflow-auto"
       // className="font-material-icons"
       style={
         {
