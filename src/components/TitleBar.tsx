@@ -54,7 +54,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
         {/* <button className="bg-transparent border-none cursor-pointer">
         <MdSearch className="text-gray-600" size={24} />
       </button> */}
-        <div className="ml-2 mt-[1.5px]">
+        <div className="ml-2 mt-[2.2px]">
           <SearchComponent onFileSelect={onFileSelect} />
         </div>
         <button

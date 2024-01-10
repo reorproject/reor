@@ -39,7 +39,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
         toggleSimilarFiles={toggleSimilarFiles}
       />
 
-      <div className="flex" style={{ height: "calc(100vh - 30px)" }}>
+      <div className="flex" style={{ height: "calc(100vh - 33px)" }}>
         <div className="w-[40px]">
           <LeftSidebar />
         </div>
@@ -80,7 +80,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
         {showChatbot && (
           <div
             className="absolute right-0  w-[250px]"
-            style={{ height: "calc(100vh - 30px)" }}
+            style={{ height: "calc(100vh - 33px)" }}
           >
             <ChatWithLLM />
           </div>

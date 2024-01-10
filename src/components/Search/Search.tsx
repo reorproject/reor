@@ -56,7 +56,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onFileSelect }) => {
         <input
           ref={searchInputRef} // Attach the ref to the input
           type="text"
-          className="border border-gray-300 rounded-md p-2 w-[120px] h-[7px]"
+          className="border-none rounded-md p-2 w-[120px] h-[7px]"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Semantic search"
@@ -69,7 +69,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onFileSelect }) => {
           onClick={() => setShowSearch(true)}
         />
       )}
-      <div className="absolute z-20" style={{ height: "calc(100vh - 30px)" }}>
+      <div className="absolute z-20" style={{ height: "calc(100vh - 33px)" }}>
         {searchResults.length > 0 && (
           <div className=" z-10 h-full translate-x-[-80px] border  shadow-lg overflow-x-none overflow-y-auto">
             {searchResults.map((result, index) => (
