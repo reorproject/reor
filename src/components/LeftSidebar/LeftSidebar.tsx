@@ -6,7 +6,7 @@ const LeftSidebar: React.FC = () => {
   const [isModalOpen, setModalOpen] = useState(false);
 
   return (
-    <div className="w-full h-full bg-gray-800 flex flex-col justify-between">
+    <div className="w-full h-full  flex flex-col justify-between">
       <div className="flex-grow"></div> {/* Spacer div */}
       <SettingsModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
       <button

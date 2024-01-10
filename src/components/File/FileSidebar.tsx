@@ -176,24 +176,9 @@ const FileItem: React.FC<FileInfoProps> = ({
     e.preventDefault();
     window.contextMenu.showFileItemContextMenu(file);
   };
-  // useEffect(() => {
-  //   const removeMenuActionListener = window.contextMenu.onMenuActionCUNT(
-  //     (action) => {
-  //       if (action === "delete") {
-  //         console.log("Delete action for", file.path);
-  //         // Implement your delete action here
-  //       }
-  //       // Handle other actions as needed
-  //     }
-  //   );
-  //   // Cleanup function to remove the listener when the component unmounts
-  //   return () => {
-  //     removeMenuActionListener();
-  //   };
-  // }, [file]);
 
-  const itemClasses = `flex items-center cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-100 ${
-    isSelected ? "bg-blue-100 font-bold" : ""
+  const itemClasses = `flex items-center cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-800 ${
+    isSelected ? "bg-gray-800 text-white font-semibold" : "text-gray-200"
   }`;
 
   return (
@@ -212,7 +197,9 @@ const FileItem: React.FC<FileInfoProps> = ({
             {">"}
           </span>
         )}
-        <span className={`flex-1 ${isDirectory ? "font-semibold" : ""}`}>
+        <span
+          className={`text-sm flex-1 ${isDirectory ? "font-semibold" : ""}`}
+        >
           {file.name}
         </span>
       </div>
