@@ -57,7 +57,7 @@ const AIModelManager: React.FC = () => {
   const modelNames = Object.keys(modelConfigs);
 
   const handleModelFileSelection = async () => {
-    const paths = await window.files.openFileDialog([".gguf"]);
+    const paths = await window.files.openFileDialog(["gguf"]);
     if (!paths) {
       return;
     }
