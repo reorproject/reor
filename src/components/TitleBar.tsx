@@ -46,19 +46,22 @@ const TitleBar: React.FC<TitleBarProps> = ({
     setIsModalOpen(!isModalOpen);
   };
   return (
-    <div id="customTitleBar" className="h-[30px] bg-white flex justify-between">
+    <div
+      id="customTitleBar"
+      className="h-[33px] bg-gray-800 flex justify-between"
+    >
       <div className="ml-[65px] flex">
         {/* <button className="bg-transparent border-none cursor-pointer">
         <MdSearch className="text-gray-600" size={24} />
       </button> */}
-        <div className="ml-2">
+        <div className="ml-2 mt-[1.5px]">
           <SearchComponent onFileSelect={onFileSelect} />
         </div>
         <button
           className="bg-transparent border-none cursor-pointer ml-1"
           onClick={toggleModal}
         >
-          <FaRegPenToSquare className="" size={20} />
+          <FaRegPenToSquare className="text-gray-100" size={20} />
         </button>
 
         <NewNoteComponent
@@ -80,7 +83,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
           }}
         > */}
         <PiSidebar
-          className="text-gray-600 cursor-pointer mt-[0.1rem]"
+          className="text-gray-100 cursor-pointer mt-[0.1rem]"
           size={28}
           onClick={toggleSimilarFiles}
         />
@@ -89,12 +92,12 @@ const TitleBar: React.FC<TitleBarProps> = ({
           {chatbotOpen ? (
             <BsFillChatLeftDotsFill
               size={22}
-              className="text-gray-600 cursor-pointer"
+              className="text-gray-100 cursor-pointer"
               onClick={toggleChatbot}
             />
           ) : (
             <BsChatLeftDots
-              className="text-gray-600 cursor-pointer "
+              className="text-gray-100 cursor-pointer "
               size={22}
               onClick={toggleChatbot}
             />

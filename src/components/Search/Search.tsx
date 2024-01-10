@@ -65,7 +65,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onFileSelect }) => {
       ) : (
         <FaSearch
           size={20}
-          className="mt-0.5 cursor-pointer"
+          className="mt-0.5 cursor-pointer text-gray-100"
           onClick={() => setShowSearch(true)}
         />
       )}
