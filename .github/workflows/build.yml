@@ -47,19 +47,16 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Set up environment for macOS build
+      - name: Build app
+        run: |
+          npm run build
         if: matrix.os == 'macos-latest'
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_ID_PASS }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # If you use GitHub token for auto-update
-        run: |
-          npm run build
-
-      # - name: Build app
-      #   run: npm run build
 
       # Specific step for Linux builds
       - name: Run Linux Specific Command
