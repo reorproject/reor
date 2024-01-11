@@ -12,7 +12,7 @@ jobs:
         include:
           - os: macos-latest
             # arch: x64
-          # - os: macos-latest-xlarge
+          - os: macos-latest-xlarge
           # arch: arm64
           - os: windows-latest
           - os: ubuntu-latest
@@ -48,10 +48,10 @@ jobs:
         run: npm install
 
       - name: Set up environment for macOS build
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-latest' || matrix.os == 'macos-latest-xlarge'
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_ID_PASS }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # If you use GitHub token for auto-update
@@ -59,7 +59,7 @@ jobs:
           npm run build
 
       - name: Build for non-macos
-        if: matrix.os != 'macos-latest'
+        if: matrix.os != 'macos-latest' && matrix.os != 'macos-latest-xlarge'
         run: |
           npm run build
 
