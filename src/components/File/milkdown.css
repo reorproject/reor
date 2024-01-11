@@ -1,5 +1,6 @@
 .milkdown .editor {
     /* height: 100vh; */
+    height: calc(100vh - 33px);
     /* set the background color: */
     background-color: #2e3440;
     color: white;

@@ -19,7 +19,6 @@ import {
   createToggleIcon,
   defaultButtons,
 } from "@milkdown/plugin-tooltip";
-// import "./milkdown.css";
 import { listener, listenerCtx } from "@milkdown/plugin-listener";
 import { prism } from "@milkdown/plugin-prism";
 import { menu } from "@milkdown/plugin-menu";
