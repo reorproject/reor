@@ -1,9 +1,10 @@
 {
   "name": "reor-project",
   "version": "0.1.25",
+  "productName": "Reor",
   "main": "dist-electron/main/index.js",
-  "description": "An AI powered PKM app.",
-  "author": "",
+  "description": "A private & self-organizing note-taking app.",
+  "author": "Sam L'Huillier",
   "license": "GPL-3.0",
   "private": false,
   "debug": {
