@@ -20,8 +20,8 @@ export enum DatabaseFields {
   TIME_ADDED = "timeadded",
 }
 
-const CreateDatabaseSchema = (vectorDim: number) => {
-  const schema = new Schema([
+const CreateDatabaseSchema = (vectorDim: number): Schema<any> => {
+  const schemaFields = [
     new Field(DatabaseFields.NOTE_PATH, new Utf8(), false),
     new Field(
       DatabaseFields.VECTOR,
@@ -35,7 +35,8 @@ const CreateDatabaseSchema = (vectorDim: number) => {
       new ArrowDate(DateUnit.MILLISECOND),
       false
     ),
-  ]);
+  ];
+  const schema = new Schema(schemaFields);
   return schema;
 };
 
