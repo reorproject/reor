@@ -87,18 +87,20 @@ export const MdxEditor: React.FC<MdxEditor> = ({
     setContentInParent(content);
   }, [content]);
 
+  const handleDivClick = () => {
+    if (ref.current) {
+      ref.current.focus(); // Programmatically trigger a click on the MDXEditor
+    }
+  };
+
   return (
-    <div className="h-full overflow-y-auto bg-yellow-200">
-      {/* <button onClick={() => ref.current?.setMarkdown("new markdown")}>
-        Set new markdown
-      </button>
-      <button onClick={() => console.log(ref.current?.getMarkdown())}>
-        Get markdown
-      </button> */}
-      {/* <MDXEditor ref={ref} markdown="hello world" onChange={console.log} />{" "} */}
+    <div
+      className="h-full overflow-y-auto  cursor-text"
+      onClick={handleDivClick}
+    >
       <MDXEditor
         ref={ref}
-        className="dark-theme dark-editor bg-blue-200"
+        className="dark-theme dark-editor"
         // style={{ height: "calc(100vh - 33px)" }}
         onChange={setContent}
         markdown={content}
@@ -106,31 +108,6 @@ export const MdxEditor: React.FC<MdxEditor> = ({
         onError={(error) => console.log("error", error)}
         plugins={ALL_PLUGINS}
       />
-      {/* <MDXEditor
-        onChange={console.log}
-        markdown={markdown}
-        contentEditableClassName="prose"
-        plugins={[
-          // the viewMode parameter lets you switch the editor to diff or source mode.
-          // you can get the diffMarkdown from your backend and pass it here.
-          diffSourcePlugin({
-            diffMarkdown: "An older version",
-            viewMode: "rich-text",
-          }),
-          headingsPlugin(),
-          listsPlugin(),
-          toolbarPlugin({
-            toolbarContents: () => (
-              <DiffSourceToggleWrapper>
-                <UndoRedo />
-              </DiffSourceToggleWrapper>
-            ),
-          }),
-        ]}
-      /> */}
-      {/* <button onClick={saveFile} className="mt-4 bg-blue-500 text-white p-2">
-        Save
-      </button> */}
     </div>
   );
 };
