@@ -1,6 +1,6 @@
 {
   "name": "reor-project",
-  "version": "0.1.27",
+  "version": "0.1.28",
   "productName": "Reor",
   "main": "dist-electron/main/index.js",
   "description": "A private & self-organizing note-taking app.",

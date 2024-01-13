@@ -78,12 +78,12 @@ jobs:
       - name: Rename artifacts for ARM architecture
         if: matrix.os == 'macos-latest-xlarge'
         run: |
-          mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/reor-project_${{ env.APP_VERSION }}-arm64.dmg
+          mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/Reor_${{ env.APP_VERSION }}-arm64.dmg
 
       - name: Rename artifacts for Intel architecture
         if: matrix.os == 'macos-latest'
         run: |
-          mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/reor-project_${{ env.APP_VERSION }}-intel.dmg
+          mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/Reor_${{ env.APP_VERSION }}-intel.dmg
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
