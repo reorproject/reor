@@ -40,6 +40,13 @@
 1. Download from the [Releases](https://github.com/reorproject/reor/releases) tab. Mac & Windows are currently supported with Linux support coming soon.
 2. Install like a normal App.
 
+### Extra Linux packages:
+Strangely, Linux induces some package issues with regards to Transformers.js (the library we use for embeddings). So you may need to install the following packages: "fuse", "libfuse2", "libvips". On Ubuntu:
+```
+sudo apt update
+sudo apt install fuse libfuse2 libvips
+```
+
 ### Technologies
 - [LanceDB](https://github.com/lancedb/lancedb) vector database for ultra low latency, low-memory and local vector store.
 - [Transformers.js](https://github.com/xenova/transformers.js) to run embedding models locally.
