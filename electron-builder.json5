@@ -39,7 +39,7 @@
       // },
       {
         target: "AppImage",
-        arch: ["x64", "arm64"], // Specify architectures as needed
+        // arch: ["x64", "arm64"], // Specify architectures as needed
         // Additional specific properties can go here
       },
     ],

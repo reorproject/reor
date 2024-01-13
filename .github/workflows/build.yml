@@ -16,6 +16,7 @@ jobs:
           # arch: arm64
           - os: windows-latest
           - os: ubuntu-latest
+            arch: x64
 
     runs-on: ${{ matrix.os }}
 
