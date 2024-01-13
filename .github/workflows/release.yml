@@ -14,7 +14,7 @@ jobs:
         include:
           - os: windows-latest
           - os: ubuntu-latest
-           arch: x64
+              arch: x64
           - os: macos-latest # Intel-based macOS (default architecture)
           - os: macos-latest-xlarge # macOS with M1 chip (ARM architecture)
             # arch: arm64
