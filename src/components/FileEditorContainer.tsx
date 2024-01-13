@@ -5,6 +5,7 @@ import TitleBar from "./TitleBar";
 import ChatWithLLM from "./Chat/Chat";
 import LeftSidebar from "./LeftSidebar/LeftSidebar";
 import MarkdownEditor from "./File/MarkdownEditor";
+import { MdxEditor } from "./File/MdxEditor";
 
 interface FileEditorContainerProps {}
 
@@ -59,7 +60,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
                 className="h-full "
                 style={{ width: showSimilarFiles ? "75%" : "100%" }}
               >
-                <MarkdownEditor
+                <MdxEditor
                   filePath={selectedFilePath}
                   setContentInParent={setEditorContent}
                   lastSavedContentRef={lastSavedContentRef}

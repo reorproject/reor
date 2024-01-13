@@ -1,8 +1,9 @@
-@import url('@radix-ui/colors/tomatoDark.css');
-@import url('@radix-ui/colors/mauveDark.css');
+/* @import url('@radix-ui/colors/tomatoDark.css');
+@import url('@radix-ui/colors/mauveDark.css'); */
 
 .dark-editor {
-  --accentBase: var(--tomato1);
+  /* height: calc(100vh - 33px); */
+  /* --accentBase: var(--tomato1);
   --accentBgSubtle: var(--tomato2);
   --accentBg: var(--tomato3);
   --accentBgHover: var(--tomato4);
@@ -47,5 +48,5 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 
   color: var(--baseText);
-  background: var(--baseBg);
+  background: var(--baseBg); */
 }
