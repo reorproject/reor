@@ -17,7 +17,8 @@
 <!-- <img width="1203" alt="Screenshot 2024-01-10 at 18 24 55" src="https://github.com/reorproject/reor/assets/17236551/cde5ab19-b394-459e-8657-bfc4f204014f"> -->
 <!-- <img width="1202" alt="Screenshot 2024-01-10 at 18 50 03" src="https://github.com/reorproject/reor/assets/17236551/c85fdc6b-057f-4693-829a-d0e45da6113e"> -->
 <!-- <img width="1200" alt="Screenshot 2024-01-10 at 18 54 02" src="https://github.com/reorproject/reor/assets/17236551/e6d3b7af-d3f4-4ffe-a2a6-f4682beaff06"> -->
-<img width="1200" alt="gray-screenshot" src="https://github.com/reorproject/reor/assets/17236551/157ef4a9-6d73-4a30-91d3-1c36b8296197">
+
+![reor](https://github.com/reorproject/reor/assets/17236551/cf743f16-fe5d-4099-bc08-74b8c76709c4)
 
 ## About
 **The Reor Project** is a local-first AI application for managing personal knowledge and notes. It uses AI to organize, help write, and answer questions about notes. The key difference between something like mem.ai or Reflect Notes is that the AI models can run fully locally and privately.
