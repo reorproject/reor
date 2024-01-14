@@ -6,6 +6,8 @@ import ChatWithLLM from "./Chat/Chat";
 import LeftSidebar from "./LeftSidebar/LeftSidebar";
 import MarkdownEditor from "./File/MarkdownEditor";
 import { MdxEditor } from "./File/MdxEditor";
+import { Rnd } from "react-rnd";
+import { RndResizeCallback } from "react-rnd";
 
 interface FileEditorContainerProps {}
 
@@ -15,6 +17,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
   const lastSavedContentRef = useRef<string>("");
   const [showChatbot, setShowChatbot] = useState<boolean>(true);
   const [showSimilarFiles, setShowSimilarFiles] = useState<boolean>(true);
+  const [fileSidebarWidth, setFileSidebarWidth] = useState(200);
 
   const onFileSelect = async (path: string) => {
     // so here we can save the actual content too\\
@@ -30,7 +33,15 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
   const toggleSimilarFiles = () => {
     setShowSimilarFiles(!showSimilarFiles);
   };
-
+  const handleResize: RndResizeCallback = (
+    e,
+    direction,
+    ref,
+    delta,
+    position
+  ) => {
+    setFileSidebarWidth(ref.offsetWidth);
+  };
   return (
     <div>
       <TitleBar
@@ -41,42 +52,58 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
       />
 
       <div className="flex" style={{ height: "calc(100vh - 33px)" }}>
-        <div className="w-[40px]">
+        <div
+          className="flex-none"
+          style={{ width: "40px", flexGrow: 0, flexShrink: 0 }}
+        >
           <LeftSidebar />
         </div>
-        <div className="h-full w-[200px]">
-          <FileSidebar
-            selectedFile={selectedFilePath}
-            onFileSelect={onFileSelect}
-          />
-        </div>
+        <Rnd
+          // className="flex-grow"
+          default={{
+            x: 40, // Starts right after the LeftSidebar
+            y: 0,
+            width: fileSidebarWidth,
+            height: "100%",
+          }}
+          minWidth={100}
+          maxWidth={"50%"}
+          bounds="parent"
+          onResize={handleResize}
+        >
+          <div className="h-full">
+            <FileSidebar
+              selectedFile={selectedFilePath}
+              onFileSelect={onFileSelect}
+            />
+          </div>
+        </Rnd>
+        {/* </Rnd> */}
         {selectedFilePath && (
           <div
-            className="w-full h-full flex overflow-x-hidden"
+            className="flex-grow h-full flex overflow-x-hidden"
             style={{ marginRight: showChatbot ? "250px" : "0" }}
           >
-            <div className="w-full flex h-full ">
-              <div
-                className="h-full "
-                style={{ width: showSimilarFiles ? "75%" : "100%" }}
-              >
-                <MdxEditor
-                  filePath={selectedFilePath}
-                  setContentInParent={setEditorContent}
-                  lastSavedContentRef={lastSavedContentRef}
-                />
-                {/* <MilkdownEditor /> */}
-              </div>
-              {showSimilarFiles && (
-                <div className="w-[25%]">
-                  <SimilarEntriesComponent
-                    filePath={selectedFilePath}
-                    onFileSelect={onFileSelect}
-                  />
-                </div>
-              )}
+            <div
+              className="flex h-full"
+              style={{ marginLeft: fileSidebarWidth }}
+            >
+              <MdxEditor
+                filePath={selectedFilePath}
+                setContentInParent={setEditorContent}
+                lastSavedContentRef={lastSavedContentRef}
+              />
             </div>
+            {showSimilarFiles && (
+              <div className="w-[25%]">
+                <SimilarEntriesComponent
+                  filePath={selectedFilePath}
+                  onFileSelect={onFileSelect}
+                />
+              </div>
+            )}
           </div>
+          // </div>
         )}
         {showChatbot && (
           <div
