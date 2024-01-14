@@ -85,7 +85,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
             style={{ marginRight: showChatbot ? "250px" : "0" }}
           >
             <div
-              className="flex h-full"
+              className="flex h-full w-full"
               style={{ marginLeft: fileSidebarWidth }}
             >
               <MdxEditor
