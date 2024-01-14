@@ -55,12 +55,14 @@
     "react-loader-spinner": "^6.1.6",
     "react-markdown": "^9.0.1",
     "react-rnd": "^10.4.1",
+    "react-window": "^1.8.10",
     "vectordb": "0.4.1"
   },
   "devDependencies": {
     "@playwright/test": "^1.37.1",
     "@types/react": "^18.2.20",
     "@types/react-dom": "^18.2.7",
+    "@types/react-window": "^1.8.8",
     "@vitejs/plugin-react": "^4.0.4",
     "autoprefixer": "^10.4.16",
     "electron": "^28.0.0-beta.4",

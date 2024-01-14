@@ -42,6 +42,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
   ) => {
     setFileSidebarWidth(ref.offsetWidth);
   };
+
   return (
     <div>
       <TitleBar
@@ -51,23 +52,33 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
         toggleSimilarFiles={toggleSimilarFiles}
       />
 
-      <div className="flex" style={{ height: "calc(100vh - 33px)" }}>
+      <div
+        className="flex"
+        style={{
+          height: "calc(100vh - 33px)",
+          display: "flex",
+          flexDirection: "row",
+        }}
+      >
+        {/* Left Sidebar with fixed width and no flex-grow or flex-shrink */}
         <div
-          className="flex-none"
-          style={{ width: "40px", flexGrow: 0, flexShrink: 0 }}
+          style={{
+            width: "40px",
+            height: "calc(100vh - 33px)",
+            flex: "0 0 40px", // Flex shorthand for flex-grow, flex-shrink, and flex-basis
+          }}
         >
           <LeftSidebar />
         </div>
+
+        {/* Rnd component - resizable file viewer */}
         <Rnd
-          className="bg-blue-400"
-          default={{
-            x: 40, // Starts right after the LeftSidebar
-            y: 0,
-            width: fileSidebarWidth,
+          style={{
             height: "calc(100vh - 33px)",
+            flex: 1, // Grow to fill the remaining space
           }}
           minWidth={100}
-          maxWidth={"50%"}
+          maxWidth={"calc(100vw - 40px)"}
           bounds="parent"
           onResize={handleResize}
           enableResizing={{
@@ -81,13 +92,14 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
             topLeft: false,
           }}
         >
-          <div className="h-full bg-yellow-200">
+          <div className="h-full">
             <FileSidebar
               selectedFile={selectedFilePath}
               onFileSelect={onFileSelect}
             />
           </div>
         </Rnd>
+
         {/* </Rnd> */}
         {selectedFilePath && (
           <div

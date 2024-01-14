@@ -41,13 +41,13 @@ const store = new Store<StoreSchema>();
 const user = store.get("user");
 // store.clear();
 
-// // Check if 'user' and 'directory' exist before attempting to delete
+// Check if 'user' and 'directory' exist before attempting to delete
 // if (user && typeof user === "object" && "directory" in user) {
-//   // Delete the 'directory' property
-//   delete user.directory;
+// Delete the 'directory' property
+// delete user.directory;
 
-//   // Save the updated 'user' object back to the store
-//   store.set("user", user);
+// Save the updated 'user' object back to the store
+// store.set("user", user);
 // }
 
 process.env.DIST_ELECTRON = join(__dirname, "../");
