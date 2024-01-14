@@ -59,19 +59,29 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
           <LeftSidebar />
         </div>
         <Rnd
-          // className="flex-grow"
+          className="bg-blue-400"
           default={{
             x: 40, // Starts right after the LeftSidebar
             y: 0,
             width: fileSidebarWidth,
-            height: "100%",
+            height: "calc(100vh - 33px)",
           }}
           minWidth={100}
           maxWidth={"50%"}
           bounds="parent"
           onResize={handleResize}
+          enableResizing={{
+            top: false,
+            right: true,
+            bottom: false,
+            left: false,
+            topRight: false,
+            bottomRight: false,
+            bottomLeft: false,
+            topLeft: false,
+          }}
         >
-          <div className="h-full">
+          <div className="h-full bg-yellow-200">
             <FileSidebar
               selectedFile={selectedFilePath}
               onFileSelect={onFileSelect}
