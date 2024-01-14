@@ -48,7 +48,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
   return (
     <div
       id="customTitleBar"
-      className="h-[33px] bg-gray-800 flex justify-between"
+      className="h-[33px] bg-gray-900 flex justify-between"
     >
       <div className="ml-[65px] flex">
         {/* <button className="bg-transparent border-none cursor-pointer">

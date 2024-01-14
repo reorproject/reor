@@ -218,6 +218,7 @@ ipcMain.handle("open-file-dialog", async (event, extensions) => {
 ipcMain.on("index-files-in-directory", async (event, userDirectory: string) => {
   // this should be called by default and
   const dbPath = path.join(app.getPath("userData"), "vectordb");
+  console.log("dbPath: ", dbPath);
   dbConnection = await lancedb.connect(dbPath);
 
   await dbTable.initialize(dbConnection, userDirectory);

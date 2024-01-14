@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Modal from "./Generic/Modal";
+import { Audio } from "react-loader-spinner";
+import CircularProgress from "@mui/material/CircularProgress";
+
 // import { ipcRenderer, IpcRendererEvent } from "electron";
 
 interface IndexingProgressProps {
@@ -55,8 +58,7 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({
         <h6 className="mt-2 mb-2 text-2xl font-semibold text-white">
           {progress === 0
             ? "Initializing vector database..."
-            : "Indexing your files..."}
-          {/* Indexing your files... */}
+            : "Indexing files..."}
         </h6>
         <div className="w-full h-4 bg-gray-800 rounded-full overflow-hidden mb-2 border-2 border-gray-400">
           <div
@@ -64,9 +66,20 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({
             style={{ width: `${progress * 100}%` }}
           ></div>
         </div>
-        <span className="text-sm text-white font-semibold">
-          {progress > 0 && <>{Math.round(progress * 100)}% -</>} {eta}
-        </span>
+        <div className="flex">
+          {progress == 0 && (
+            <CircularProgress
+              size={20}
+              thickness={7}
+              style={{ color: "white" }}
+              className="mr-2"
+            />
+          )}
+
+          <span className="text-sm text-white font-semibold">
+            {progress > 0 && <>{Math.round(progress * 100)}% -</>} {eta}
+          </span>
+        </div>
       </div>
     </Modal>
   );

@@ -179,8 +179,8 @@ const FileItem: React.FC<FileInfoProps> = ({
     window.contextMenu.showFileItemContextMenu(file);
   };
 
-  const itemClasses = `flex items-center cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-800 ${
-    isSelected ? "bg-gray-800 text-white font-semibold" : "text-gray-200"
+  const itemClasses = `flex items-center cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 ${
+    isSelected ? "bg-gray-700 text-white font-semibold" : "text-gray-200"
   }`;
 
   return (
