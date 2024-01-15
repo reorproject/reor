@@ -7,6 +7,7 @@ body {
   margin: 0;
   min-height: 100%;
   min-width: 100%;
+  font-family:'Times New Roman', Times, serif;
   /* -webkit-app-region: drag; */
 }
 
@@ -21,3 +22,24 @@ body {
 button {
   -webkit-app-region: no-drag;
 }
+
+/* ::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #3e3e3e; 
+}
+
+::-webkit-scrollbar-thumb {
+  background: #555; 
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #777; 
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #444; 
+} */
