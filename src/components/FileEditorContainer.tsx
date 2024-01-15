@@ -6,6 +6,7 @@ import ChatWithLLM from "./Chat/Chat";
 import LeftSidebar from "./LeftSidebar/LeftSidebar";
 import MarkdownEditor from "./File/MarkdownEditor";
 import { MdxEditor } from "./File/MdxEditor";
+import ResizableComponent from "./Generic/ResizableComponent";
 
 interface FileEditorContainerProps {}
 
@@ -44,12 +45,14 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
         <div className="w-[40px] border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-gray-600 border-solid">
           <LeftSidebar />
         </div>
-        <div className="h-full w-[200px]">
-          <FileSidebar
-            selectedFile={selectedFilePath}
-            onFileSelect={onFileSelect}
-          />
-        </div>
+        <ResizableComponent>
+          <div className="h-full ">
+            <FileSidebar
+              selectedFile={selectedFilePath}
+              onFileSelect={onFileSelect}
+            />
+          </div>
+        </ResizableComponent>
         {selectedFilePath && (
           <div
             className="w-full h-full flex overflow-x-hidden"
