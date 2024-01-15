@@ -45,14 +45,16 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
         <div className="w-[40px] border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-gray-600 border-solid">
           <LeftSidebar />
         </div>
+
         <ResizableComponent resizeSide="right">
-          <div className="h-full ">
+          <div className="h-full border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-gray-600 border-solid">
             <FileSidebar
               selectedFile={selectedFilePath}
               onFileSelect={onFileSelect}
             />
           </div>
         </ResizableComponent>
+
         {selectedFilePath && (
           <div
             className="w-full h-full flex overflow-x-hidden"
