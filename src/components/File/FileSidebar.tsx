@@ -180,13 +180,13 @@ const FileItem: React.FC<FileInfoProps> = ({
       <div onClick={toggle} className={itemClasses}>
         {isDirectory && (
           <span className={`mr-2 text-sm `}>
-            {/* {">"} */}
-            {/* <FaChevronRight /> */}
             {isExpanded ? <FaChevronDown /> : <FaChevronRight />}
           </span>
         )}
         <span
-          className={`text-sm flex-1 ${isDirectory ? "font-semibold" : ""}`}
+          className={`text-sm flex-1 truncate ${
+            isDirectory ? "font-semibold" : ""
+          }`}
         >
           {file.name}
         </span>
