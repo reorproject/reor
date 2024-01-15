@@ -47,7 +47,7 @@ const ResizableComponent: React.FC<ResizableComponentProps> = ({
 
   const getResizeHandleStyle = (): CSSProperties => {
     return {
-      width: "10px",
+      width: "5px",
       cursor: "ew-resize",
       position: "absolute",
       top: 0,

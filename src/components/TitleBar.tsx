@@ -50,7 +50,12 @@ const TitleBar: React.FC<TitleBarProps> = ({
       id="customTitleBar"
       className="h-[33px] bg-gray-900 flex justify-between"
     >
-      <div className="ml-[65px] flex">
+      <div
+        className=" flex"
+        style={
+          platform === "darwin" ? { marginLeft: "65px" } : { marginLeft: "5px" }
+        }
+      >
         {/* <button className="bg-transparent border-none cursor-pointer">
         <MdSearch className="text-gray-600" size={24} />
       </button> */}
