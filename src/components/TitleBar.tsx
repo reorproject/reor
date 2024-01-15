@@ -6,23 +6,27 @@ import SearchComponent from "./Search/Search";
 import NewNoteComponent from "./File/NewNote";
 import { MdChatBubble } from "react-icons/md";
 import { useEffect, useState } from "react";
-import { FaPenSquare } from "react-icons/fa";
+import { FaPenSquare, FaSearch } from "react-icons/fa";
 import { FaRegPenToSquare } from "react-icons/fa6";
 import { TbEqualDouble } from "react-icons/tb";
 import { PiSidebar } from "react-icons/pi";
 import { BsFillChatRightDotsFill } from "react-icons/bs";
+import { FaFolderClosed } from "react-icons/fa6";
+import { IoFolderOutline } from "react-icons/io5";
 
 import {
   BsChatRightDots,
   BsChatLeftDots,
   BsFillChatLeftDotsFill,
 } from "react-icons/bs";
+import { SidebarAbleToShow } from "./FileEditorContainer";
 
 interface TitleBarProps {
   onFileSelect: (path: string) => void;
   chatbotOpen: boolean;
   toggleChatbot: () => void;
   toggleSimilarFiles: () => void;
+  makeSidebarShow: (show: SidebarAbleToShow) => void;
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
@@ -30,6 +34,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
   chatbotOpen,
   toggleChatbot,
   toggleSimilarFiles,
+  makeSidebarShow,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [platform, setPlatform] = useState("");
@@ -53,20 +58,30 @@ const TitleBar: React.FC<TitleBarProps> = ({
       <div
         className=" flex"
         style={
-          platform === "darwin" ? { marginLeft: "65px" } : { marginLeft: "1px" }
+          platform === "darwin" ? { marginLeft: "70px" } : { marginLeft: "1px" }
         }
       >
         {/* <button className="bg-transparent border-none cursor-pointer">
         <MdSearch className="text-gray-600" size={24} />
       </button> */}
-        <div className="ml-2 mt-[2.2px]">
-          <SearchComponent onFileSelect={onFileSelect} />
+        <div className="mt-[0.3rem]" onClick={() => makeSidebarShow("files")}>
+          <IoFolderOutline className="text-gray-200 cursor-pointer" size={22} />
+        </div>
+        <div
+          className="ml-2 mt-[2.2px]"
+          onClick={() => makeSidebarShow("search")}
+        >
+          <FaSearch
+            size={20}
+            className="mt-[3px] cursor-pointer text-gray-200"
+            // onClick={() => setShowSearch(true)}
+          />
         </div>
         <button
           className="bg-transparent border-none cursor-pointer ml-1"
           onClick={toggleModal}
         >
-          <FaRegPenToSquare className="text-gray-100" size={20} />
+          <FaRegPenToSquare className="text-gray-200" size={20} />
         </button>
 
         <NewNoteComponent

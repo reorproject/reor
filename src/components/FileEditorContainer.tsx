@@ -9,6 +9,7 @@ import { MdxEditor } from "./File/MdxEditor";
 import ResizableComponent from "./Generic/ResizableComponent";
 
 interface FileEditorContainerProps {}
+export type SidebarAbleToShow = "files" | "search";
 
 const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
   const [editorContent, setEditorContent] = useState<string>("");
@@ -16,6 +17,8 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
   const lastSavedContentRef = useRef<string>("");
   const [showChatbot, setShowChatbot] = useState<boolean>(false);
   const [showSimilarFiles, setShowSimilarFiles] = useState<boolean>(true);
+  const [sidebarShowing, setSidebarShowing] =
+    useState<SidebarAbleToShow>("files");
 
   const onFileSelect = async (path: string) => {
     // so here we can save the actual content too\\
@@ -39,6 +42,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
         chatbotOpen={showChatbot}
         toggleChatbot={toggleChatbot}
         toggleSimilarFiles={toggleSimilarFiles}
+        makeSidebarShow={setSidebarShowing}
       />
 
       <div className="flex" style={{ height: "calc(100vh - 33px)" }}>
@@ -48,10 +52,14 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
 
         <ResizableComponent resizeSide="right">
           <div className="h-full border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-gray-600 border-solid">
-            <FileSidebar
-              selectedFile={selectedFilePath}
-              onFileSelect={onFileSelect}
-            />
+            {sidebarShowing === "files" ? (
+              <FileSidebar
+                selectedFile={selectedFilePath}
+                onFileSelect={onFileSelect}
+              />
+            ) : (
+              <div>search</div>
+            )}
           </div>
         </ResizableComponent>
 
