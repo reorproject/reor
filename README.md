@@ -47,11 +47,6 @@ sudo apt update
 sudo apt install fuse libfuse2 libvips
 ```
 
-### Technologies
-- [LanceDB](https://github.com/lancedb/lancedb) vector database for ultra low latency, low-memory and local vector store.
-- [Transformers.js](https://github.com/xenova/transformers.js) to run embedding models locally.
-- [Llama.cpp](https://github.com/ggerganov/llama.cpp) to run local LLMs uber efficiently.
-
 ### Importing from other apps
 Reor works within a single directory in the filesystem. You choose the directory on first boot.
 To import notes/files from another app, you'll need to populate that directory manually with markdown files. Integrations with other apps are hopefully coming soon!
