@@ -7,7 +7,7 @@ const LeftSidebar: React.FC = () => {
 
   return (
     <div className="w-full h-full bg-gray-800 flex flex-col justify-between">
-      <div className="flex-grow"></div> {/* Spacer div */}
+      <div className="flex-grow border-1 border-yellow-300"></div>
       <SettingsModal isOpen={isModalOpen} onClose={() => setModalOpen(false)} />
       <button
         className="bg-transparent border-none pb-2 cursor-pointer"

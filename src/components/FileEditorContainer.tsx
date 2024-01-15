@@ -41,10 +41,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
       />
 
       <div className="flex" style={{ height: "calc(100vh - 33px)" }}>
-        <div className="w-[40px]">
+        <div className="w-[40px] border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-gray-600 border-solid">
           <LeftSidebar />
         </div>
-        <div className="h-full w-[250px]">
+        <div className="h-full w-[200px]">
           <FileSidebar
             selectedFile={selectedFilePath}
             onFileSelect={onFileSelect}
@@ -57,10 +57,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
           >
             <div className="w-full flex h-full ">
               <div
-                className="h-full "
+                className="h-full bg-gray-900"
                 style={{ width: showSimilarFiles ? "75%" : "100%" }}
               >
-                <MdxEditor
+                <MarkdownEditor
                   filePath={selectedFilePath}
                   setContentInParent={setEditorContent}
                   lastSavedContentRef={lastSavedContentRef}

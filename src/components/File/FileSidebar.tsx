@@ -20,14 +20,12 @@ export const FileSidebar: React.FC<FileListProps> = ({
   useEffect(() => {
     const handleFileUpdate = (updatedFiles: FileInfoTree) => {
       updatedFiles.sort((a, b) => {
-        // Prioritize directories over files
-        if (a.type === "directory" && b.type !== "directory") {
-          return -1;
-        }
-        if (a.type !== "directory" && b.type === "directory") {
-          return 1;
-        }
-        // If both are of the same type, sort by dateModified
+        // if (a.type === "directory" && b.type !== "directory") {
+        //   return -1;
+        // }
+        // if (a.type !== "directory" && b.type === "directory") {
+        //   return 1;
+        // }
         return b.dateModified.getTime() - a.dateModified.getTime();
       });
       setFiles(updatedFiles);
