@@ -1,13 +1,17 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, CSSProperties } from "react";
 
 interface ResizableComponentProps {
   children: React.ReactNode;
+  initialWidth?: number;
+  resizeSide: "left" | "right" | "both";
 }
 
 const ResizableComponent: React.FC<ResizableComponentProps> = ({
   children,
+  initialWidth = 200, // Default value if not provided
+  resizeSide,
 }) => {
-  const [width, setWidth] = useState<number>(200);
+  const [width, setWidth] = useState<number>(initialWidth);
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
   const startDragging = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
@@ -18,10 +22,12 @@ const ResizableComponent: React.FC<ResizableComponentProps> = ({
   const onDrag = useCallback(
     (e: MouseEvent) => {
       if (isDragging) {
-        setWidth((prevWidth) => prevWidth + e.movementX);
+        // Adjust width based on the drag side
+        const deltaWidth = resizeSide === "left" ? -e.movementX : e.movementX;
+        setWidth((prevWidth) => prevWidth + deltaWidth);
       }
     },
-    [isDragging]
+    [isDragging, resizeSide]
   );
 
   const stopDragging = useCallback(() => {
@@ -39,27 +45,36 @@ const ResizableComponent: React.FC<ResizableComponentProps> = ({
     }
   }, [isDragging, onDrag, stopDragging]);
 
+  const getResizeHandleStyle = (): CSSProperties => {
+    return {
+      width: "10px",
+      cursor: "ew-resize",
+      position: "absolute",
+      top: 0,
+      bottom: 0,
+      ...(resizeSide === "left" && { left: 0 }),
+      ...(resizeSide === "right" && { right: 0 }),
+      ...(resizeSide === "both" && { left: 0, right: 0 }),
+    };
+  };
+
+  const resizeHandleStyle = getResizeHandleStyle();
+
   return (
     <div
       style={{
         width: `${width}px`,
-        resize: "horizontal",
+        resize: "none",
         overflow: "auto",
         position: "relative",
+        height: "100%",
       }}
-      onMouseDown={startDragging}
+      onMouseDown={resizeSide === "both" ? startDragging : undefined}
     >
       <div style={{ width: "100%", height: "100%" }}>{children}</div>
-      <div
-        style={{
-          width: "10px",
-          cursor: "ew-resize",
-          position: "absolute",
-          right: 0,
-          top: 0,
-          bottom: 0,
-        }}
-      />
+      {resizeSide !== "both" && (
+        <div style={resizeHandleStyle} onMouseDown={startDragging} />
+      )}
     </div>
   );
 };

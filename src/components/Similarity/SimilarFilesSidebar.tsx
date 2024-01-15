@@ -90,7 +90,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   }, [filePath]);
 
   return (
-    <div className="w-full h-full overflow-y-auto overflow-x-hidden mt-0">
+    <div className="h-full overflow-y-auto overflow-x-hidden mt-0 ">
       {similarEntries.map((entry, index) => (
         <div
           key={index}
@@ -98,10 +98,6 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
           style={{ backgroundColor: "#1F2937" }}
           onClick={() => onFileSelect(entry.notepath)}
         >
-          {/* <p className="text-gray-700">
-            <span className="text-gray-500">{entry.content}</span>
-          </p> */}
-          {/* <SimilarEntryItem content={entry.content} /> */}
           <ReactMarkdown>{entry.content}</ReactMarkdown>
         </div>
       ))}
