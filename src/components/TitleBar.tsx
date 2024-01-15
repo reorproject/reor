@@ -53,7 +53,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
       <div
         className=" flex"
         style={
-          platform === "darwin" ? { marginLeft: "65px" } : { marginLeft: "5px" }
+          platform === "darwin" ? { marginLeft: "65px" } : { marginLeft: "1px" }
         }
       >
         {/* <button className="bg-transparent border-none cursor-pointer">
