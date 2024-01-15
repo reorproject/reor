@@ -37,7 +37,7 @@
 
 
 ### Getting Started
-1. Download from the [Releases](https://github.com/reorproject/reor/releases) tab. Mac & Windows are currently supported with Linux support coming soon.
+1. Download from [reorproject.org](https://reorproject.org). Mac, Linux & Windows are all supported.
 2. Install like a normal App.
 
 ### Extra Linux packages:
