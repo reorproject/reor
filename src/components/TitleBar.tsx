@@ -1,17 +1,8 @@
-import { MdChatBubbleOutline, MdSearch } from "react-icons/md"; // Material Design search icon
-import { HiOutlinePlusCircle } from "react-icons/hi"; // Heroicons plus circle
-import { HiSearch } from "react-icons/hi"; // Outlined search icon
-import { HiOutlineSearch } from "react-icons/hi"; // Solid search icon
-import SearchComponent from "./Search/Search";
 import NewNoteComponent from "./File/NewNote";
-import { MdChatBubble } from "react-icons/md";
 import { useEffect, useState } from "react";
-import { FaPenSquare, FaSearch } from "react-icons/fa";
+import { FaSearch } from "react-icons/fa";
 import { FaRegPenToSquare } from "react-icons/fa6";
-import { TbEqualDouble } from "react-icons/tb";
 import { PiSidebar } from "react-icons/pi";
-import { BsFillChatRightDotsFill } from "react-icons/bs";
-import { FaFolderClosed } from "react-icons/fa6";
 import { IoFolderOutline } from "react-icons/io5";
 
 import {
