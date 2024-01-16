@@ -7,6 +7,7 @@ import LeftSidebar from "./LeftSidebar/LeftSidebar";
 import MarkdownEditor from "./File/MarkdownEditor";
 import { MdxEditor } from "./File/MdxEditor";
 import ResizableComponent from "./Generic/ResizableComponent";
+import SearchComponent from "./Search/FileSidebarSearch";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search";
@@ -58,7 +59,8 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
                 onFileSelect={onFileSelect}
               />
             ) : (
-              <div>search</div>
+              // <div>search</div>
+              <SearchComponent onFileSelect={onFileSelect} />
             )}
           </div>
         </ResizableComponent>
