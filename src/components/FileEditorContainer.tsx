@@ -53,7 +53,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
         </div>
 
         <ResizableComponent resizeSide="right">
-          <div className="h-full border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-gray-600 border-solid">
+          <div className="h-full border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-gray-600 border-solid w-full">
             <SidebarManager
               selectedFilePath={selectedFilePath}
               onFileSelect={onFileSelect}

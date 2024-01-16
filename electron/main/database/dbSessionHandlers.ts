@@ -1,6 +1,7 @@
 import { ipcMain } from "electron";
 import { DBEntry, LanceDBTableWrapper } from "./LanceTableWrapper";
 import { createRAGPrompt } from "../Prompts/Prompts";
+import { DatabaseFields } from "./Schema";
 
 export const registerDBSessionHandlers = (dbTable: LanceDBTableWrapper) => {
   ipcMain.handle(
@@ -45,4 +46,8 @@ export const registerDBSessionHandlers = (dbTable: LanceDBTableWrapper) => {
       }
     }
   );
+  ipcMain.handle("get-database-fields", (event) => {
+    // event.reply("database-fields-response", DatabaseFields);
+    return DatabaseFields;
+  });
 };

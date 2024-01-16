@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { DBEntry, DBResult } from "electron/main/database/LanceTableWrapper";
 import ReactMarkdown from "react-markdown";
 import DBResultPreview from "../File/DBResultPreview";
+// import { DatabaseFields } from "electron/main/database/Schema";
+// import { DatabaseFields } from "electron/main/database/Schema";
 
 interface SimilarEntriesComponentProps {
   filePath: string;
@@ -27,21 +29,26 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     }
   };
 
-  const performSearch = async (path: string): Promise<DBResult[]> => {
-    const fileContent: string = await window.files.readFile(path);
+  const performSearch = async (filePath: string): Promise<DBResult[]> => {
+    const fileContent: string = await window.files.readFile(filePath);
     if (!fileContent) {
       console.error("File content is empty");
       return [];
     }
+    const databaseFields = await window.database.getDatabaseFields();
+    console.log("database fields: ", databaseFields);
     const searchResults: DBResult[] = await window.database.search(
       fileContent,
-      20
+      20,
+      `${databaseFields.NOTE_PATH} != ${filePath}`
     );
     // filter out the current file:
-    const filteredSearchResults = searchResults.filter(
-      (result) => result.notepath !== path
-    );
-    return filteredSearchResults;
+    console.log("NUMBER OF RESULTS: ", searchResults.length);
+    // const filteredSearchResults = searchResults.filter(
+    //   (result) => result.notepath !== path
+    // );
+    // console.log("NUMBER OF FILTERED RESULTS: ", filteredSearchResults.length);
+    return searchResults;
   };
 
   useEffect(() => {

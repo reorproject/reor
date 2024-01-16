@@ -39,6 +39,7 @@ declare global {
         numberOfContextItems: number,
         filter?: string
       ) => Promise<string>;
+      getDatabaseFields: () => Promise<Record<string, string>>;
     };
     files: {
       openDirectoryDialog: () => Promise<string[]>;
@@ -98,6 +99,9 @@ contextBridge.exposeInMainWorld("database", {
       numberOfContextItems,
       filter
     );
+  },
+  getDatabaseFields: async (): Promise<Record<string, string>> => {
+    return ipcRenderer.invoke("get-database-fields");
   },
 });
 

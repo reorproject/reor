@@ -18,7 +18,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
   const [searchResults, setSearchResults] = useState<DBResult[]>([]);
 
   return (
-    <>
+    <div className="w-full">
       {sidebarShowing === "files" && (
         <FileSidebar
           selectedFile={selectedFilePath}
@@ -34,7 +34,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
           setSearchResults={setSearchResults}
         />
       )}
-    </>
+    </div>
   );
 };
 

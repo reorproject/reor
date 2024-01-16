@@ -38,22 +38,24 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
 
   return (
     <div
-      ref={containerRef}
+      // ref={containerRef}
       // style={{ height: "calc(100vh - 33px)" }}
-      className="p-0.5"
+      className="p-0.5  w-full"
     >
-      <input
-        ref={searchInputRef} // Attach the ref to the input
-        type="text"
-        className="border-none rounded-md p-2 w-full h-[7px]"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        placeholder="Semantic search"
-        // onBlur={() => setShowSearch(false)}
-      />
-      <div>
+      <div className="pr-1 pl-1">
+        <input
+          ref={searchInputRef}
+          type="text"
+          className="mt-1 w-full mr-5 h-7 bg-gray-800 text-white p-1 rounded-md  border-[2px] border-white focus:outline-none focus:border-white focus:ring-1 focus:ring-white"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Semantic search..."
+        />
+      </div>
+
+      <div className="mt-2 w-full">
         {searchResults.length > 0 && (
-          <div className="h-full overflow-x-none overflow-y-auto">
+          <div className="">
             {searchResults.map((result, index) => (
               <DBResultPreview
                 key={index}
