@@ -1,7 +1,7 @@
 import { DBResult } from "electron/main/database/LanceTableWrapper";
 import React, { useState } from "react";
 import { FileSidebar } from "../File/FileSidebar";
-import SearchComponent from "../Search/FileSidebarSearch";
+import SearchComponent from "./FileSidebarSearch";
 
 interface SidebarManagerProps {
   selectedFilePath: string | null;

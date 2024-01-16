@@ -7,7 +7,7 @@ import LeftSidebar from "./Sidebars/IconsSidebar";
 import MarkdownEditor from "./File/MarkdownEditor";
 import { MdxEditor } from "./File/MdxEditor";
 import ResizableComponent from "./Generic/ResizableComponent";
-import SearchComponent from "./Search/FileSidebarSearch";
+import SearchComponent from "./Sidebars/FileSidebarSearch";
 import SidebarManager from "./Sidebars/MainSidebar";
 
 interface FileEditorContainerProps {}
