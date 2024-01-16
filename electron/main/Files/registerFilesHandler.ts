@@ -12,7 +12,8 @@ import {
   writeFileSyncRecursive,
 } from "./Filesystem";
 import * as fs from "fs";
-import { LanceDBTableWrapper, updateFileInTable } from "../database/Table";
+import { LanceDBTableWrapper } from "../database/LanceTableWrapper";
+import { updateFileInTable } from "../database/TableHelperFunctions";
 
 export const registerFileHandlers = (
   store: Store<StoreSchema>,

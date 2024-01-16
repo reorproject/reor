@@ -1,8 +1,8 @@
-import { DBEntry } from "electron/main/database/Table";
+import { DBEntry } from "electron/main/database/LanceTableWrapper";
 import React, { useState, useEffect, useRef } from "react";
 import { FaSearch } from "react-icons/fa"; // Import the search icon
 import ReactMarkdown from "react-markdown";
-import FilePreview from "../File/FilePreview";
+import FilePreview from "../File/DBResultPreview";
 
 interface SearchComponentProps {
   onFileSelect: (path: string) => void;

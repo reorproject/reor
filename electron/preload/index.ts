@@ -2,7 +2,7 @@ import { contextBridge, ipcRenderer } from "electron";
 import { AIModelConfig } from "electron/main/Store/storeConfig";
 import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
 // import { FileInfo } from "electron/main/Files/Types";
-import { DBEntry } from "electron/main/database/Table";
+import { DBEntry } from "electron/main/database/LanceTableWrapper";
 type ReceiveCallback = (...args: any[]) => void;
 
 declare global {

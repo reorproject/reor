@@ -1,4 +1,4 @@
-import { DBEntry } from "electron/main/database/Table";
+import { DBEntry } from "electron/main/database/LanceTableWrapper";
 import ReactMarkdown from "react-markdown";
 
 interface FilePreviewProps {

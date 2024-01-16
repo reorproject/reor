@@ -4,10 +4,10 @@ import { FileInfo, FileInfoNode, FileInfoTree } from "./Types";
 import chokidar from "chokidar";
 import { BrowserWindow } from "electron";
 import {
-  LanceDBTableWrapper,
   addTreeToTable,
   removeTreeFromTable,
-} from "../database/Table";
+} from "../database/TableHelperFunctions";
+import { LanceDBTableWrapper } from "../database/LanceTableWrapper";
 
 export const markdownExtensions = [
   ".md",

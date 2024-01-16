@@ -1,5 +1,5 @@
 import { ipcMain } from "electron";
-import { DBEntry, LanceDBTableWrapper } from "./Table";
+import { DBEntry, LanceDBTableWrapper } from "./LanceTableWrapper";
 import { createRAGPrompt } from "../Prompts/Prompts";
 
 export const registerDBSessionHandlers = (dbTable: LanceDBTableWrapper) => {

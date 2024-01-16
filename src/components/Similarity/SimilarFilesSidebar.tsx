@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { DBEntry } from "electron/main/database/Table";
+import { DBEntry } from "electron/main/database/LanceTableWrapper";
 import ReactMarkdown from "react-markdown";
-import FilePreview from "../File/FilePreview";
+import FilePreview from "../File/DBResultPreview";
 
 interface SimilarEntriesComponentProps {
   filePath: string;

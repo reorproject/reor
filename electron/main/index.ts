@@ -16,10 +16,7 @@ import { AIModelConfig, StoreKeys, StoreSchema } from "./Store/storeConfig";
 // import contextMenus from "./contextMenus";
 import * as lancedb from "vectordb";
 import * as fs from "fs";
-import {
-  LanceDBTableWrapper,
-  repopulateTableWithMissingItems,
-} from "./database/Table";
+import { LanceDBTableWrapper } from "./database/LanceTableWrapper";
 import { FSWatcher } from "fs";
 import {
   GetFilesInfoTree,
@@ -35,6 +32,7 @@ import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
 import { validateAIModelConfig } from "./llm/llmConfig";
 import { registerStoreHandlers } from "./Store/storeHandlers";
 import { registerFileHandlers } from "./Files/registerFilesHandler";
+import { repopulateTableWithMissingItems } from "./database/TableHelperFunctions";
 // import {  } from "electron/main";
 
 const store = new Store<StoreSchema>();
