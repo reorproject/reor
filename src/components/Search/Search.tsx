@@ -1,4 +1,4 @@
-import { RagnoteDBEntry } from "electron/main/database/Table";
+import { DBEntry } from "electron/main/database/Table";
 import React, { useState, useEffect, useRef } from "react";
 import { FaSearch } from "react-icons/fa"; // Import the search icon
 import ReactMarkdown from "react-markdown";
@@ -9,13 +9,13 @@ interface SearchComponentProps {
 
 const SearchComponent: React.FC<SearchComponentProps> = ({ onFileSelect }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [searchResults, setSearchResults] = useState<RagnoteDBEntry[]>([]);
+  const [searchResults, setSearchResults] = useState<DBEntry[]>([]);
   const [showSearch, setShowSearch] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null); // Reference for the input field
 
   const handleSearch = async (query: string) => {
-    const results: RagnoteDBEntry[] = await window.database.search(query, 20);
+    const results: DBEntry[] = await window.database.search(query, 20);
     setSearchResults(results);
   };
   useEffect(() => {

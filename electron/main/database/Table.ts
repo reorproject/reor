@@ -15,7 +15,7 @@ import {
 import { FileInfo, FileInfoTree } from "../Files/Types";
 import { chunkMarkdownByHeadings } from "../RAG/Chunking";
 
-export interface RagnoteDBEntry {
+export interface DBEntry {
   notepath: string;
   vector?: Float32Array;
   content: string;
@@ -46,7 +46,7 @@ export class RagnoteTable {
   }
 
   async add(
-    data: RagnoteDBEntry[],
+    data: DBEntry[],
     onProgress?: (progress: number) => void
   ): Promise<void> {
     data = data.filter((x) => x.content !== "");
@@ -89,7 +89,7 @@ export class RagnoteTable {
     //   metricType: string,
     limit: number,
     filter?: string
-  ): Promise<RagnoteDBEntry[]> {
+  ): Promise<DBEntry[]> {
     const lanceQuery = await this.table
       .search(query)
       // .metricType(metricType)
@@ -100,7 +100,7 @@ export class RagnoteTable {
     const rawResults = await lanceQuery.execute();
     const mapped = rawResults.map(convertRawDBResultToRagnoteDBEntry);
     // const filtered = mapped.filter((x) => x !== null);
-    return mapped as RagnoteDBEntry[];
+    return mapped as DBEntry[];
     // return rawResults;
   }
 
@@ -112,7 +112,7 @@ export class RagnoteTable {
       .execute();
     const mapped = rawResults.map(convertRawDBResultToRagnoteDBEntry);
     // const filtered = mapped.filter((x) => x !== null);
-    return mapped as RagnoteDBEntry[];
+    return mapped as DBEntry[];
   }
 
   async countRows(): Promise<number> {
@@ -167,9 +167,9 @@ const getTableAsArray = async (table: RagnoteTable) => {
 
 const computeDbItemsToAdd = (
   filesInfoList: FileInfo[],
-  tableArray: RagnoteDBEntry[],
+  tableArray: DBEntry[],
   table: RagnoteTable
-): RagnoteDBEntry[][] => {
+): DBEntry[][] => {
   return filesInfoList
     .map(convertFileTypeToDBType)
     .filter((listOfChunks) =>
@@ -178,8 +178,8 @@ const computeDbItemsToAdd = (
 };
 
 const filterChunksNotInTable = (
-  listOfChunks: RagnoteDBEntry[],
-  tableArray: RagnoteDBEntry[],
+  listOfChunks: DBEntry[],
+  tableArray: DBEntry[],
   table: RagnoteTable
 ): boolean => {
   if (listOfChunks.length == 0) {
@@ -204,14 +204,14 @@ const deleteAllRowsInTable = async (db: RagnoteTable) => {
   }
 };
 
-const convertFileTreeToDBEntries = (tree: FileInfoTree): RagnoteDBEntry[] => {
+const convertFileTreeToDBEntries = (tree: FileInfoTree): DBEntry[] => {
   const flattened = flattenFileInfoTree(tree);
   const entries = flattened.flatMap(convertFileTypeToDBType);
   return entries;
 };
 
 // so we want a function to convert files to dbEntry types (which will involve chunking later on)
-const convertFileTypeToDBType = (file: FileInfo): RagnoteDBEntry[] => {
+const convertFileTypeToDBType = (file: FileInfo): DBEntry[] => {
   const fileContent = readFile(file.path);
   const chunks = chunkMarkdownByHeadings(fileContent);
   const entries = chunks.map((content, index) => {
@@ -266,7 +266,7 @@ export const updateFileInTable = async (
 
 function convertRawDBResultToRagnoteDBEntry(
   record: Record<string, unknown>
-): RagnoteDBEntry | null {
+): DBEntry | null {
   if (
     DatabaseFields.NOTE_PATH in record &&
     DatabaseFields.VECTOR in record &&
@@ -274,7 +274,7 @@ function convertRawDBResultToRagnoteDBEntry(
     DatabaseFields.SUB_NOTE_INDEX in record &&
     DatabaseFields.TIME_ADDED in record
   ) {
-    return record as unknown as RagnoteDBEntry;
+    return record as unknown as DBEntry;
   }
   return null;
 }

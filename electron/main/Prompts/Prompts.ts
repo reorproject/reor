@@ -1,9 +1,6 @@
-import { RagnoteDBEntry } from "../database/Table";
+import { DBEntry } from "../database/Table";
 
-export function createRAGPrompt(
-  entries: RagnoteDBEntry[],
-  query: string
-): string {
+export function createRAGPrompt(entries: DBEntry[], query: string): string {
   // Concatenate the content of each entry
   const contents = entries.map((entry) => entry.content).join(" ");
 

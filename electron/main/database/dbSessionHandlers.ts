@@ -1,5 +1,5 @@
 import { ipcMain } from "electron";
-import { RagnoteDBEntry, RagnoteTable } from "./Table";
+import { DBEntry, RagnoteTable } from "./Table";
 import { createRAGPrompt } from "../Prompts/Prompts";
 
 export const registerDBSessionHandlers = (dbTable: RagnoteTable) => {
@@ -10,7 +10,7 @@ export const registerDBSessionHandlers = (dbTable: RagnoteTable) => {
       query: string,
       limit: number,
       filter?: string
-    ): Promise<RagnoteDBEntry[]> => {
+    ): Promise<DBEntry[]> => {
       try {
         // Assuming 'myDatabase' is your database instance with the 'search' method
         return await dbTable.search(query, limit, filter);

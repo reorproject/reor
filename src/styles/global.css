@@ -11,6 +11,11 @@ body {
   /* -webkit-app-region: drag; */
 }
 
+* {
+  box-sizing: border-box;
+}
+
+
 #customTitleBar {
   -webkit-app-region: drag;
 }
