@@ -2,7 +2,7 @@
 @import url('@radix-ui/colors/mauveDark.css'); */
 
 .dark-editor {
-  background-color: blue;
+  /* background-color: blue; */
   /* height: calc(100vh - 33px); */
   /* --accentBase: var(--tomato1);
   --accentBgSubtle: var(--tomato2);
@@ -50,4 +50,12 @@
 
   color: var(--baseText);
   background: var(--baseBg); */
+}
+
+h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 2.5rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
 }

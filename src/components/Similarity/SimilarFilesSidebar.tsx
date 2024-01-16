@@ -36,18 +36,13 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
       return [];
     }
     const databaseFields = await window.database.getDatabaseFields();
-    console.log("database fields: ", databaseFields);
+    const filterString = `${databaseFields.NOTE_PATH} != '${filePath}'`;
     const searchResults: DBResult[] = await window.database.search(
       fileContent,
-      20,
-      `${databaseFields.NOTE_PATH} != ${filePath}`
+      30,
+      filterString
     );
-    // filter out the current file:
-    console.log("NUMBER OF RESULTS: ", searchResults.length);
-    // const filteredSearchResults = searchResults.filter(
-    //   (result) => result.notepath !== path
-    // );
-    // console.log("NUMBER OF FILTERED RESULTS: ", filteredSearchResults.length);
+    console.log("NUMBER OF FILTERED RESULTS: ", searchResults.length);
     return searchResults;
   };
 
@@ -71,7 +66,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   }, [filePath]);
 
   return (
-    <div className="h-full overflow-y-auto overflow-x-hidden mt-0">
+    <div className="h-full overflow-y-auto overflow-x-hidden mt-0 border-l-[0.1px] border-t-0 border-b-0 border-r-0 border-gray-600 border-solid">
       {similarEntries.map((dbResult, index) => (
         <DBResultPreview
           key={index}

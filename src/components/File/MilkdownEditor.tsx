@@ -35,7 +35,7 @@ export interface MarkdownEditorProps {
   lastSavedContentRef: React.MutableRefObject<string>;
 }
 
-const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
+const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
   filePath,
   setContentInParent,
   lastSavedContentRef,
@@ -131,4 +131,4 @@ const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   );
 };
 
-export default MarkdownEditor;
+export default MilkdownEditor;

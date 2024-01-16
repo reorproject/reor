@@ -4,7 +4,7 @@ import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 import ChatWithLLM from "./Chat/Chat";
 import LeftSidebar from "./Sidebars/IconsSidebar";
-import MarkdownEditor from "./File/MarkdownEditor";
+import MilkdownEditor from "./File/MilkdownEditor";
 import { MdxEditor } from "./File/MdxEditor";
 import ResizableComponent from "./Generic/ResizableComponent";
 import SearchComponent from "./Sidebars/FileSidebarSearch";
@@ -69,14 +69,15 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
           >
             <div className="w-full flex h-full">
               <div
-                className="h-full bg-gray-900 w-full"
+                className="h-full bg-slate-300 w-full"
                 // style={{ width: showSimilarFiles ? "75%" : "100%" }}
               >
-                <MarkdownEditor
+                <MilkdownEditor
                   filePath={selectedFilePath}
                   setContentInParent={setEditorContent}
                   lastSavedContentRef={lastSavedContentRef}
                 />
+                {/* hello */}
                 {/* <MilkdownEditor /> */}
               </div>
               {showSimilarFiles && (

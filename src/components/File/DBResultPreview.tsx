@@ -18,7 +18,7 @@ const DBResultPreview: React.FC<DBResultPreview> = ({
       className="pr-2 pb-1 mt-0 text-white pt-1 border-l-0 border-r-0 border-solid border-gray-300 border-[0.1px] pl-2 shadow-md cursor-pointer hover:scale-104 hover:shadow-lg hover:bg-[#262f3b] transition-transform duration-300"
       onClick={() => onSelect(entry.notepath)}
     >
-      {/* <ReactMarkdown>{entry.content}</ReactMarkdown> */}
+      <ReactMarkdown>{entry.content}</ReactMarkdown>
       <div className="text-xs text-gray-200">
         Vector distance: {entry._distance.toFixed(2)}
       </div>

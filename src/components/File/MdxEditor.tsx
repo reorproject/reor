@@ -95,7 +95,7 @@ export const MdxEditor: React.FC<MdxEditor> = ({
 
   return (
     <div
-      className="h-full overflow-y-auto w-full cursor-text"
+      className="h-full overflow-y-auto w-full cursor-text bg-slate-800 "
       onClick={handleDivClick}
     >
       <MDXEditor
