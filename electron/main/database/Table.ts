@@ -1,8 +1,6 @@
 import { Connection, Table as LanceDBTable, Query } from "vectordb";
 import GetOrCreateLanceTable from "./Lance";
 import { DatabaseFields } from "./Schema";
-import fs from "fs";
-import path from "path";
 import {
   EnhancedEmbeddingFunction,
   createEmbeddingFunction,
@@ -23,13 +21,15 @@ export interface DBEntry {
   timeadded: Date;
 }
 
-export class RagnoteTable {
-  // implements Table
+export interface DBResult extends DBEntry {
+  distance: number;
+}
+
+export class LanceDBTableWrapper {
   public table!: LanceDBTable<any>;
   public embedFun!: EnhancedEmbeddingFunction<string | number[]>;
   public userDirectory!: string;
   public dbConnection!: Connection;
-  // private embeddingModelHFRepo = "Xenova/all-MiniLM-L6-v2";
 
   async initialize(dbConnection: Connection, userDirectory: string) {
     this.embedFun = await createEmbeddingFunction(
@@ -98,10 +98,8 @@ export class RagnoteTable {
       lanceQuery.filter(filter);
     }
     const rawResults = await lanceQuery.execute();
-    const mapped = rawResults.map(convertRawDBResultToRagnoteDBEntry);
-    // const filtered = mapped.filter((x) => x !== null);
+    const mapped = rawResults.map(convertLanceResultToDBResult);
     return mapped as DBEntry[];
-    // return rawResults;
   }
 
   async filter(filterString: string, limit: number = 10) {
@@ -110,7 +108,7 @@ export class RagnoteTable {
       .filter(filterString)
       .limit(limit)
       .execute();
-    const mapped = rawResults.map(convertRawDBResultToRagnoteDBEntry);
+    const mapped = rawResults.map(convertLanceResultToDBResult);
     // const filtered = mapped.filter((x) => x !== null);
     return mapped as DBEntry[];
   }
@@ -122,7 +120,7 @@ export class RagnoteTable {
 }
 
 export const repopulateTableWithMissingItems = async (
-  table: RagnoteTable,
+  table: LanceDBTableWrapper,
   directoryPath: string,
   extensionsToFilterFor: string[],
   onProgress?: (progress: number) => void
@@ -148,7 +146,7 @@ export const repopulateTableWithMissingItems = async (
   onProgress && onProgress(1);
 };
 
-const getTableAsArray = async (table: RagnoteTable) => {
+const getTableAsArray = async (table: LanceDBTableWrapper) => {
   const totalRows = await table.countRows();
   if (totalRows == 0) {
     return [];
@@ -168,7 +166,7 @@ const getTableAsArray = async (table: RagnoteTable) => {
 const computeDbItemsToAdd = (
   filesInfoList: FileInfo[],
   tableArray: DBEntry[],
-  table: RagnoteTable
+  table: LanceDBTableWrapper
 ): DBEntry[][] => {
   return filesInfoList
     .map(convertFileTypeToDBType)
@@ -180,7 +178,7 @@ const computeDbItemsToAdd = (
 const filterChunksNotInTable = (
   listOfChunks: DBEntry[],
   tableArray: DBEntry[],
-  table: RagnoteTable
+  table: LanceDBTableWrapper
 ): boolean => {
   if (listOfChunks.length == 0) {
     return false;
@@ -195,7 +193,7 @@ const filterChunksNotInTable = (
   return listOfChunks.length != itemsAlreadyInTable.length;
 };
 
-const deleteAllRowsInTable = async (db: RagnoteTable) => {
+const deleteAllRowsInTable = async (db: LanceDBTableWrapper) => {
   try {
     await db.delete(`${DatabaseFields.CONTENT} != ''`);
     await db.delete(`${DatabaseFields.CONTENT} = ''`);
@@ -210,7 +208,6 @@ const convertFileTreeToDBEntries = (tree: FileInfoTree): DBEntry[] => {
   return entries;
 };
 
-// so we want a function to convert files to dbEntry types (which will involve chunking later on)
 const convertFileTypeToDBType = (file: FileInfo): DBEntry[] => {
   const fileContent = readFile(file.path);
   const chunks = chunkMarkdownByHeadings(fileContent);
@@ -226,7 +223,7 @@ const convertFileTypeToDBType = (file: FileInfo): DBEntry[] => {
 };
 
 export const addTreeToTable = async (
-  dbTable: RagnoteTable,
+  dbTable: LanceDBTableWrapper,
   fileTree: FileInfoTree
 ): Promise<void> => {
   const dbEntries = convertFileTreeToDBEntries(fileTree);
@@ -234,7 +231,7 @@ export const addTreeToTable = async (
 };
 
 export const removeTreeFromTable = async (
-  dbTable: RagnoteTable,
+  dbTable: LanceDBTableWrapper,
   fileTree: FileInfoTree
 ): Promise<void> => {
   const flattened = flattenFileInfoTree(fileTree);
@@ -245,7 +242,7 @@ export const removeTreeFromTable = async (
 };
 
 export const updateFileInTable = async (
-  dbTable: RagnoteTable,
+  dbTable: LanceDBTableWrapper,
   filePath: string,
   content: string
 ): Promise<void> => {
@@ -259,22 +256,24 @@ export const updateFileInTable = async (
       content: content,
       subnoteindex: index,
       timeadded: currentTimestamp,
+      // distance:
     };
   });
   await dbTable.add(dbEntries);
 };
 
-function convertRawDBResultToRagnoteDBEntry(
+function convertLanceResultToDBResult(
   record: Record<string, unknown>
-): DBEntry | null {
+): DBResult | null {
   if (
     DatabaseFields.NOTE_PATH in record &&
     DatabaseFields.VECTOR in record &&
     DatabaseFields.CONTENT in record &&
     DatabaseFields.SUB_NOTE_INDEX in record &&
-    DatabaseFields.TIME_ADDED in record
+    DatabaseFields.TIME_ADDED in record &&
+    DatabaseFields.DISTANCE in record
   ) {
-    return record as unknown as DBEntry;
+    return record as unknown as DBResult;
   }
   return null;
 }

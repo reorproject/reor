@@ -17,7 +17,7 @@ import { AIModelConfig, StoreKeys, StoreSchema } from "./Store/storeConfig";
 import * as lancedb from "vectordb";
 import * as fs from "fs";
 import {
-  RagnoteTable,
+  LanceDBTableWrapper,
   repopulateTableWithMissingItems,
 } from "./database/Table";
 import { FSWatcher } from "fs";
@@ -79,7 +79,7 @@ const url = process.env.VITE_DEV_SERVER_URL;
 const indexHtml = join(process.env.DIST, "index.html");
 
 let dbConnection: lancedb.Connection;
-let dbTable = new RagnoteTable();
+let dbTable = new LanceDBTableWrapper();
 let fileWatcher: FSWatcher | null = null;
 
 async function createWindow() {

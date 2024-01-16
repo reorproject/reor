@@ -18,6 +18,7 @@ export enum DatabaseFields {
   CONTENT = "content",
   SUB_NOTE_INDEX = "subnoteindex",
   TIME_ADDED = "timeadded",
+  DISTANCE = "_distance",
 }
 
 const CreateDatabaseSchema = (vectorDim: number): Schema<any> => {

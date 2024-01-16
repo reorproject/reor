@@ -1,8 +1,8 @@
 import { ipcMain } from "electron";
-import { DBEntry, RagnoteTable } from "./Table";
+import { DBEntry, LanceDBTableWrapper } from "./Table";
 import { createRAGPrompt } from "../Prompts/Prompts";
 
-export const registerDBSessionHandlers = (dbTable: RagnoteTable) => {
+export const registerDBSessionHandlers = (dbTable: LanceDBTableWrapper) => {
   ipcMain.handle(
     "search",
     async (

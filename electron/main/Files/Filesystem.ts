@@ -4,7 +4,7 @@ import { FileInfo, FileInfoNode, FileInfoTree } from "./Types";
 import chokidar from "chokidar";
 import { BrowserWindow } from "electron";
 import {
-  RagnoteTable,
+  LanceDBTableWrapper,
   addTreeToTable,
   removeTreeFromTable,
 } from "../database/Table";
@@ -218,7 +218,7 @@ export function readFile(filePath: string): string {
 }
 
 export const orchestrateEntryMove = async (
-  table: RagnoteTable,
+  table: LanceDBTableWrapper,
   sourcePath: string,
   destinationPath: string,
   extensions?: string[]

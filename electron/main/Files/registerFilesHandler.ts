@@ -12,11 +12,11 @@ import {
   writeFileSyncRecursive,
 } from "./Filesystem";
 import * as fs from "fs";
-import { RagnoteTable, updateFileInTable } from "../database/Table";
+import { LanceDBTableWrapper, updateFileInTable } from "../database/Table";
 
 export const registerFileHandlers = (
   store: Store<StoreSchema>,
-  dbTable: RagnoteTable,
+  dbTable: LanceDBTableWrapper,
   win: BrowserWindow
 ) => {
   ipcMain.handle("join-path", (event, ...args) => {
