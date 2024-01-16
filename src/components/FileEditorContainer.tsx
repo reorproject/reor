@@ -3,11 +3,12 @@ import { FileSidebar } from "./File/FileSidebar";
 import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 import ChatWithLLM from "./Chat/Chat";
-import LeftSidebar from "./LeftSidebar/LeftSidebar";
+import LeftSidebar from "./Sidebars/IconsSidebar";
 import MarkdownEditor from "./File/MarkdownEditor";
 import { MdxEditor } from "./File/MdxEditor";
 import ResizableComponent from "./Generic/ResizableComponent";
 import SearchComponent from "./Search/FileSidebarSearch";
+import SidebarManager from "./Sidebars/MainSidebar";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search";
@@ -53,15 +54,11 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
 
         <ResizableComponent resizeSide="right">
           <div className="h-full border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-gray-600 border-solid">
-            {sidebarShowing === "files" ? (
-              <FileSidebar
-                selectedFile={selectedFilePath}
-                onFileSelect={onFileSelect}
-              />
-            ) : (
-              // <div>search</div>
-              <SearchComponent onFileSelect={onFileSelect} />
-            )}
+            <SidebarManager
+              selectedFilePath={selectedFilePath}
+              onFileSelect={onFileSelect}
+              sidebarShowing={sidebarShowing}
+            />
           </div>
         </ResizableComponent>
 

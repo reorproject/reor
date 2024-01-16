@@ -12,8 +12,8 @@ export const registerDBSessionHandlers = (dbTable: LanceDBTableWrapper) => {
       filter?: string
     ): Promise<DBEntry[]> => {
       try {
-        // Assuming 'myDatabase' is your database instance with the 'search' method
-        return await dbTable.search(query, limit, filter);
+        const searchResults = await dbTable.search(query, limit, filter);
+        return searchResults;
       } catch (error) {
         console.error("Error searching database:", error);
         throw error;

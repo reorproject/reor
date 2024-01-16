@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { DBEntry } from "electron/main/database/LanceTableWrapper";
+import { DBEntry, DBResult } from "electron/main/database/LanceTableWrapper";
 import ReactMarkdown from "react-markdown";
-import FilePreview from "../File/DBResultPreview";
+import DBResultPreview from "../File/DBResultPreview";
 
 interface SimilarEntriesComponentProps {
   filePath: string;
@@ -12,7 +12,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   filePath,
   onFileSelect,
 }) => {
-  const [similarEntries, setSimilarEntries] = useState<DBEntry[]>([]);
+  const [similarEntries, setSimilarEntries] = useState<DBResult[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleNewFileOpen = async (path: string) => {
@@ -27,13 +27,13 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     }
   };
 
-  const performSearch = async (path: string): Promise<DBEntry[]> => {
+  const performSearch = async (path: string): Promise<DBResult[]> => {
     const fileContent: string = await window.files.readFile(path);
     if (!fileContent) {
       console.error("File content is empty");
       return [];
     }
-    const searchResults: DBEntry[] = await window.database.search(
+    const searchResults: DBResult[] = await window.database.search(
       fileContent,
       20
     );
@@ -65,8 +65,12 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
 
   return (
     <div className="h-full overflow-y-auto overflow-x-hidden mt-0">
-      {similarEntries.map((entry, index) => (
-        <FilePreview key={index} entry={entry} onSelect={onFileSelect} />
+      {similarEntries.map((dbResult, index) => (
+        <DBResultPreview
+          key={index}
+          dbResult={dbResult}
+          onSelect={onFileSelect}
+        />
       ))}
     </div>
   );

@@ -15,7 +15,7 @@ export interface DBEntry {
 }
 
 export interface DBResult extends DBEntry {
-  distance: number;
+  _distance: number;
 }
 
 export class LanceDBTableWrapper {
@@ -78,7 +78,7 @@ export class LanceDBTableWrapper {
     //   metricType: string,
     limit: number,
     filter?: string
-  ): Promise<DBEntry[]> {
+  ): Promise<DBResult[]> {
     const lanceQuery = await this.table
       .search(query)
       // .metricType(metricType)
@@ -88,7 +88,7 @@ export class LanceDBTableWrapper {
     }
     const rawResults = await lanceQuery.execute();
     const mapped = rawResults.map(convertLanceResultToDBResult);
-    return mapped as DBEntry[];
+    return mapped as DBResult[];
   }
 
   async filter(filterString: string, limit: number = 10) {

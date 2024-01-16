@@ -41,17 +41,4 @@ const CreateDatabaseSchema = (vectorDim: number): Schema<any> => {
   return schema;
 };
 
-// return new Schema([
-//   new Field("path", new Utf8()),
-//   new Field("content", new Utf8()),
-//   new Field("subNoteIndex", new Int16()),
-//   // TODO: maybe here we'll have like cluster details or something like that.
-//   // + also last modified and last saved date.
-//   // + we need to think about what other pieces of data could aid the RAG pipeline
-//   new Field(
-//     "vector",
-//     new FixedSizeList(384, new Field("item", new Float32())),
-//     false
-//   ),
-// ]);
 export default CreateDatabaseSchema;

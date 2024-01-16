@@ -2,7 +2,7 @@ import { contextBridge, ipcRenderer } from "electron";
 import { AIModelConfig } from "electron/main/Store/storeConfig";
 import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
 // import { FileInfo } from "electron/main/Files/Types";
-import { DBEntry } from "electron/main/database/LanceTableWrapper";
+import { DBEntry, DBResult } from "electron/main/database/LanceTableWrapper";
 type ReceiveCallback = (...args: any[]) => void;
 
 declare global {
@@ -32,7 +32,7 @@ declare global {
         query: string,
         limit: number,
         filter?: string
-      ) => Promise<DBEntry[]>;
+      ) => Promise<DBResult[]>;
       indexFilesInDirectory: (directoryPath: string) => any;
       augmentPromptWithRAG: (
         prompt: string,

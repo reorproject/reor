@@ -1,55 +1,40 @@
-import { DBEntry } from "electron/main/database/LanceTableWrapper";
+import { DBResult } from "electron/main/database/LanceTableWrapper";
 import React, { useState, useEffect, useRef } from "react";
-import { FaSearch } from "react-icons/fa"; // Import the search icon
-import ReactMarkdown from "react-markdown";
-import FilePreview from "../File/DBResultPreview";
+import DBResultPreview from "../File/DBResultPreview";
 
 interface SearchComponentProps {
   onFileSelect: (path: string) => void;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  searchResults: DBResult[];
+  setSearchResults: (results: DBResult[]) => void;
 }
 
-const SearchComponent: React.FC<SearchComponentProps> = ({ onFileSelect }) => {
-  const [searchQuery, setSearchQuery] = useState<string>("");
-  const [searchResults, setSearchResults] = useState<DBEntry[]>([]);
-  const [showSearch, setShowSearch] = useState(false);
+const SearchComponent: React.FC<SearchComponentProps> = ({
+  onFileSelect,
+  searchQuery,
+  setSearchQuery,
+  searchResults,
+  setSearchResults,
+}) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null); // Reference for the input field
 
   const handleSearch = async (query: string) => {
-    const results: DBEntry[] = await window.database.search(query, 20);
+    const results: DBResult[] = await window.database.search(query, 20);
     setSearchResults(results);
   };
-  useEffect(() => {
-    if (showSearch && searchInputRef.current) {
-      searchInputRef.current.focus(); // Automatically focus the input field when it appears
-    }
-  }, [showSearch]);
 
+  useEffect(() => {
+    searchInputRef.current?.focus();
+  }, []);
   const debouncedSearch = debounce((query: string) => handleSearch(query), 300);
 
   useEffect(() => {
     if (searchQuery) {
       debouncedSearch(searchQuery);
-    } else {
-      setSearchResults([]);
     }
   }, [searchQuery]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(event.target as Node)
-      ) {
-        setSearchResults([]);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
 
   return (
     <div
@@ -64,21 +49,17 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onFileSelect }) => {
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         placeholder="Semantic search"
-        onBlur={() => setShowSearch(false)}
+        // onBlur={() => setShowSearch(false)}
       />
       <div>
         {searchResults.length > 0 && (
           <div className="h-full overflow-x-none overflow-y-auto">
             {searchResults.map((result, index) => (
-              <FilePreview entry={result} onSelect={onFileSelect} />
-              // <div
-              //   key={index}
-              //   className="pr-2 pb-1 mt-0 w-[240px] text-white pt-1 border-l-1 border-r-1 border-solid border-white pl-2 shadow-md cursor-pointer hover:scale-104 hover:shadow-lg transition-transform duration-300 overflow-x-auto word-break[break-all]"
-              //   style={{ backgroundColor: "#1F2937" }}
-              //   onClick={() => onFileSelect(result.notepath)}
-              // >
-              //   <ReactMarkdown>{result.content}</ReactMarkdown>
-              // </div>
+              <DBResultPreview
+                key={index}
+                dbResult={result}
+                onSelect={onFileSelect}
+              />
             ))}
           </div>
         )}
