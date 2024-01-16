@@ -67,12 +67,17 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
 
   return (
     <div className="h-full overflow-y-auto overflow-x-hidden mt-0 border-l-[0.1px] border-t-0 border-b-0 border-r-0 border-gray-600 border-solid">
+      {/* <div className="flex justify-center items-center h-3 mt-2 mb-0 ">
+        <p className="text-gray-200 font-semibold">Similar notes</p>
+      </div> */}
       {similarEntries.map((dbResult, index) => (
-        <DBResultPreview
-          key={index}
-          dbResult={dbResult}
-          onSelect={onFileSelect}
-        />
+        <div className="p-2">
+          <DBResultPreview
+            key={index}
+            dbResult={dbResult}
+            onSelect={onFileSelect}
+          />
+        </div>
       ))}
     </div>
   );
