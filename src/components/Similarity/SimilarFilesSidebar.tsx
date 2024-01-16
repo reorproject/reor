@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { DBEntry, DBResult } from "electron/main/database/LanceTableWrapper";
 import ReactMarkdown from "react-markdown";
-import DBResultPreview from "../File/DBResultPreview";
+import { DBResultPreview } from "../File/DBResultPreview";
+// import DBResultPreview from "../File/DBResultPreview";
 // import { DatabaseFields } from "electron/main/database/Schema";
 // import { DatabaseFields } from "electron/main/database/Schema";
 

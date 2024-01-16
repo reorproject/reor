@@ -1,6 +1,6 @@
 import { DBResult } from "electron/main/database/LanceTableWrapper";
 import React, { useState, useEffect, useRef } from "react";
-import DBResultPreview from "../File/DBResultPreview";
+import { DBSearchPreview } from "../File/DBResultPreview";
 
 interface SearchComponentProps {
   onFileSelect: (path: string) => void;
@@ -46,7 +46,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
         <input
           ref={searchInputRef}
           type="text"
-          className="mt-1 w-full mr-5 h-7 bg-gray-800 text-white p-1 rounded-md  border-[2px] border-white focus:outline-none focus:border-white focus:ring-1 focus:ring-white"
+          className="mt-1 w-full mr-5 h-8 bg-gray-800 text-white p-1 rounded-md  border-[2px] border-white focus:outline-none focus:border-white focus:ring-1 focus:ring-white"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Semantic search..."
@@ -55,9 +55,9 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
 
       <div className="mt-2 w-full">
         {searchResults.length > 0 && (
-          <div className="">
+          <div className="w-full">
             {searchResults.map((result, index) => (
-              <DBResultPreview
+              <DBSearchPreview
                 key={index}
                 dbResult={result}
                 onSelect={onFileSelect}
