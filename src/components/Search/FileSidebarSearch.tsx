@@ -2,6 +2,7 @@ import { DBEntry } from "electron/main/database/Table";
 import React, { useState, useEffect, useRef } from "react";
 import { FaSearch } from "react-icons/fa"; // Import the search icon
 import ReactMarkdown from "react-markdown";
+import FilePreview from "../File/FilePreview";
 
 interface SearchComponentProps {
   onFileSelect: (path: string) => void;
@@ -51,7 +52,11 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onFileSelect }) => {
   }, []);
 
   return (
-    <div ref={containerRef} className="p-0.5">
+    <div
+      ref={containerRef}
+      // style={{ height: "calc(100vh - 33px)" }}
+      className="p-0.5"
+    >
       <input
         ref={searchInputRef} // Attach the ref to the input
         type="text"
@@ -61,18 +66,19 @@ const SearchComponent: React.FC<SearchComponentProps> = ({ onFileSelect }) => {
         placeholder="Semantic search"
         onBlur={() => setShowSearch(false)}
       />
-      <div style={{ height: "calc(100vh - 33px)" }}>
+      <div>
         {searchResults.length > 0 && (
-          <div className="h-full border  shadow-lg overflow-x-none overflow-y-auto">
+          <div className="h-full overflow-x-none overflow-y-auto">
             {searchResults.map((result, index) => (
-              <div
-                key={index}
-                className="pr-2 pb-1 mt-0 w-[240px] text-white pt-1 border-l-1 border-r-1 border-solid border-white pl-2 shadow-md cursor-pointer hover:scale-104 hover:shadow-lg transition-transform duration-300 overflow-x-auto word-break[break-all]"
-                style={{ backgroundColor: "#1F2937" }}
-                onClick={() => onFileSelect(result.notepath)}
-              >
-                <ReactMarkdown>{result.content}</ReactMarkdown>
-              </div>
+              <FilePreview entry={result} onSelect={onFileSelect} />
+              // <div
+              //   key={index}
+              //   className="pr-2 pb-1 mt-0 w-[240px] text-white pt-1 border-l-1 border-r-1 border-solid border-white pl-2 shadow-md cursor-pointer hover:scale-104 hover:shadow-lg transition-transform duration-300 overflow-x-auto word-break[break-all]"
+              //   style={{ backgroundColor: "#1F2937" }}
+              //   onClick={() => onFileSelect(result.notepath)}
+              // >
+              //   <ReactMarkdown>{result.content}</ReactMarkdown>
+              // </div>
             ))}
           </div>
         )}
