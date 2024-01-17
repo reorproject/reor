@@ -1,5 +1,5 @@
 import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaChevronRight } from "react-icons/fa";
 import { FaChevronDown } from "react-icons/fa";
 import { FixedSizeList as List, ListChildComponentProps } from "react-window";
@@ -69,8 +69,8 @@ const handleDragStartImpl = (e: React.DragEvent, file: FileInfoNode) => {
   // );
 };
 
-const moveFile = async (sourcePath: string, destinationPath: string) => {
-  const result = await window.files.moveFileOrDir(sourcePath, destinationPath);
+export const moveFile = async (sourcePath: string, destinationPath: string) => {
+  await window.files.moveFileOrDir(sourcePath, destinationPath);
 };
 
 interface FileExplorerProps {
@@ -86,7 +86,6 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   selectedFile,
   onFileSelect,
   handleDragStart,
-  directoryPath,
 }) => {
   const [listHeight, setListHeight] = useState(window.innerHeight);
 
@@ -101,10 +100,6 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
       window.removeEventListener("resize", updateHeight);
     };
   }, []);
-
-  useEffect(() => {
-    console.log("list height: ", listHeight);
-  }, [listHeight]);
 
   const Row: React.FC<ListChildComponentProps> = ({ index, style }) => {
     const file = files[index];

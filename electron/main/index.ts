@@ -12,7 +12,7 @@ import { join } from "node:path";
 import { update } from "./update";
 import Store from "electron-store";
 import * as path from "path";
-import { AIModelConfig, StoreKeys, StoreSchema } from "./Store/storeConfig";
+import { StoreKeys, StoreSchema } from "./Store/storeConfig";
 // import contextMenus from "./contextMenus";
 import * as lancedb from "vectordb";
 import * as fs from "fs";
@@ -21,22 +21,18 @@ import { FSWatcher } from "fs";
 import {
   GetFilesInfoTree,
   markdownExtensions,
-  orchestrateEntryMove,
   startWatchingDirectory,
   updateFileListForRenderer,
-  writeFileSyncRecursive,
 } from "./Files/Filesystem";
 import { registerLLMSessionHandlers } from "./llm/llmSessionHandlers";
-import { FileInfoNode, FileInfoTree } from "./Files/Types";
+import { FileInfoNode } from "./Files/Types";
 import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
-import { validateAIModelConfig } from "./llm/llmConfig";
 import { registerStoreHandlers } from "./Store/storeHandlers";
 import { registerFileHandlers } from "./Files/registerFilesHandler";
 import { repopulateTableWithMissingItems } from "./database/TableHelperFunctions";
-// import {  } from "electron/main";
 
 const store = new Store<StoreSchema>();
-const user = store.get("user");
+// const user = store.get("user");
 // store.clear();
 
 // Check if 'user' and 'directory' exist before attempting to delete
@@ -77,8 +73,8 @@ const url = process.env.VITE_DEV_SERVER_URL;
 const indexHtml = join(process.env.DIST, "index.html");
 
 let dbConnection: lancedb.Connection;
-let dbTable = new LanceDBTableWrapper();
-let fileWatcher: FSWatcher | null = null;
+const dbTable = new LanceDBTableWrapper();
+const fileWatcher: FSWatcher | null = null;
 
 async function createWindow() {
   win = new BrowserWindow({
@@ -181,7 +177,7 @@ ipcMain.handle("open-win", (_, arg) => {
   }
 });
 
-ipcMain.handle("open-directory-dialog", async (event) => {
+ipcMain.handle("open-directory-dialog", async () => {
   const result = await dialog.showOpenDialog({
     properties: ["openDirectory", "createDirectory"],
   });
@@ -261,6 +257,6 @@ ipcMain.on("open-external", (event, url) => {
   shell.openExternal(url);
 });
 
-ipcMain.handle("get-platform", async (event) => {
+ipcMain.handle("get-platform", async () => {
   return process.platform;
 });

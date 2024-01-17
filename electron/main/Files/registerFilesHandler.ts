@@ -1,8 +1,6 @@
-import { BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
-import { AIModelConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
+import { BrowserWindow, ipcMain } from "electron";
+import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
-import { validateAIModelConfig } from "../llm/llmConfig";
-import { FSWatcher } from "fs";
 import * as path from "path";
 import { FileInfoTree } from "./Types";
 import {
@@ -76,7 +74,6 @@ export const registerFileHandlers = (
         );
       } catch (error) {
         console.error("Error moving file or directory:", error);
-        return { success: false, error: error };
       }
     }
   );

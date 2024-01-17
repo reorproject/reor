@@ -1,5 +1,5 @@
 import { DBResult } from "electron/main/database/LanceTableWrapper";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { DBSearchPreview } from "../File/DBResultPreview";
 
 interface SearchComponentProps {
@@ -17,7 +17,6 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   searchResults,
   setSearchResults,
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null); // Reference for the input field
 
   const handleSearch = async (query: string) => {
@@ -70,7 +69,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   );
 };
 
-const debounce = <F extends (...args: any[]) => void>(
+const debounce = <F extends (...args: string[]) => Promise<void>>(
   func: F,
   delay: number
 ): ((...args: Parameters<F>) => void) => {

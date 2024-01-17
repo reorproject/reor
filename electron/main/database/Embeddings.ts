@@ -2,7 +2,6 @@ import * as lancedb from "vectordb";
 import { Pipeline, PreTrainedTokenizer } from "@xenova/transformers";
 // Import path library:
 import path from "path";
-import { DownloadModelFilesFromHFRepo } from "../download/download";
 import { app } from "electron";
 
 export interface EnhancedEmbeddingFunction<T>
@@ -70,7 +69,7 @@ export async function createEmbeddingFunction(
         return [];
       }
     },
-    tokenize: (data: (string | number[])[]): any[] => {
+    tokenize: (data: (string | number[])[]): string[] => {
       if (tokenizer === null) {
         throw new Error("Tokenizer not initialized");
       }

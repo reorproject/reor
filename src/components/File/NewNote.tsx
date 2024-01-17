@@ -17,7 +17,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
   const [fileName, setFileName] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
 
-  const [isValidName, setIsValidName] = useState<boolean>(true);
+  // const [isValidName, setIsValidName] = useState<boolean>(true);
 
   const validNamePattern = /^[a-zA-Z0-9_-]+$/;
 

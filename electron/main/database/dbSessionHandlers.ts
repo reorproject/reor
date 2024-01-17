@@ -46,7 +46,7 @@ export const registerDBSessionHandlers = (dbTable: LanceDBTableWrapper) => {
       }
     }
   );
-  ipcMain.handle("get-database-fields", (event) => {
+  ipcMain.handle("get-database-fields", () => {
     // event.reply("database-fields-response", DatabaseFields);
     return DatabaseFields;
   });

@@ -5,11 +5,7 @@ import { FaRegPenToSquare } from "react-icons/fa6";
 import { PiSidebar } from "react-icons/pi";
 import { IoFolderOutline } from "react-icons/io5";
 
-import {
-  BsChatRightDots,
-  BsChatLeftDots,
-  BsFillChatLeftDotsFill,
-} from "react-icons/bs";
+import { BsChatLeftDots, BsFillChatLeftDotsFill } from "react-icons/bs";
 import { SidebarAbleToShow } from "./FileEditorContainer";
 
 interface TitleBarProps {
@@ -126,42 +122,42 @@ export default TitleBar;
 
 import React from "react";
 
-type ChatButtonProps = {
-  onClick: () => void; // You can define the type of your onClick function more precisely if needed
-};
+// type ChatButtonProps = {
+//   onClick: () => void; // You can define the type of your onClick function more precisely if needed
+// };
 
-const ChatButton: React.FC<ChatButtonProps> = ({ onClick }) => {
-  return (
-    <button
-      onClick={onClick}
-      className=" bg-gray-200 h-full rounded-lg hover:bg-gray-300 text-gray-800 font-semibold py-2 px-3 border border-gray-400  shadow inline-flex items-center"
-    >
-      <BsFillChatLeftDotsFill
-        size={19}
-        className=" cursor-pointer mr-2 mt-[1px]"
-        // onClick={toggleChatbot}
-      />
-      <span>Chat</span>
-    </button>
-  );
-};
+// const ChatButton: React.FC<ChatButtonProps> = ({ onClick }) => {
+//   return (
+//     <button
+//       onClick={onClick}
+//       className=" bg-gray-200 h-full rounded-lg hover:bg-gray-300 text-gray-800 font-semibold py-2 px-3 border border-gray-400  shadow inline-flex items-center"
+//     >
+//       <BsFillChatLeftDotsFill
+//         size={19}
+//         className=" cursor-pointer mr-2 mt-[1px]"
+//         // onClick={toggleChatbot}
+//       />
+//       <span>Chat</span>
+//     </button>
+//   );
+// };
 
-type SimilarFilesButtonProps = {
-  onClick: () => void; // You can define the type of your onClick function more precisely if needed
-};
+// type SimilarFilesButtonProps = {
+//   onClick: () => void; // You can define the type of your onClick function more precisely if needed
+// };
 
-const SimilarFilesButton: React.FC<SimilarFilesButtonProps> = ({ onClick }) => {
-  return (
-    <button
-      onClick={onClick}
-      className=" bg-gray-200 h-full rounded-lg hover:bg-gray-300 text-gray-800 font-semibold py-2 px-3 border border-gray-400 rounded shadow inline-flex items-center"
-    >
-      <PiSidebar
-        size={19}
-        className=" cursor-pointer mr-2 mt-[1px]"
-        // onClick={toggleChatbot}
-      />
-      <span>Related</span>
-    </button>
-  );
-};
+// const SimilarFilesButton: React.FC<SimilarFilesButtonProps> = ({ onClick }) => {
+//   return (
+//     <button
+//       onClick={onClick}
+//       className=" bg-gray-200 h-full rounded-lg hover:bg-gray-300 text-gray-800 font-semibold py-2 px-3 border border-gray-400 rounded shadow inline-flex items-center"
+//     >
+//       <PiSidebar
+//         size={19}
+//         className=" cursor-pointer mr-2 mt-[1px]"
+//         // onClick={toggleChatbot}
+//       />
+//       <span>Related</span>
+//     </button>
+//   );
+// };

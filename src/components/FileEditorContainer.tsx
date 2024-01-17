@@ -1,19 +1,16 @@
 import React, { useRef, useState } from "react";
-import { FileSidebar } from "./File/FileSidebar";
 import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 import ChatWithLLM from "./Chat/Chat";
 import LeftSidebar from "./Sidebars/IconsSidebar";
 import MilkdownEditor from "./File/MilkdownEditor";
-import { MdxEditor } from "./File/MdxEditor";
 import ResizableComponent from "./Generic/ResizableComponent";
-import SearchComponent from "./Sidebars/FileSidebarSearch";
 import SidebarManager from "./Sidebars/MainSidebar";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search";
 
-const FileEditorContainer: React.FC<FileEditorContainerProps> = ({}) => {
+const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const [editorContent, setEditorContent] = useState<string>("");
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
   const lastSavedContentRef = useRef<string>("");

@@ -1,4 +1,5 @@
-import { DBEntry, DBResult } from "electron/main/database/LanceTableWrapper";
+import React from "react";
+import { DBResult } from "electron/main/database/LanceTableWrapper";
 import ReactMarkdown from "react-markdown";
 
 interface DBResultPreview {
@@ -53,9 +54,7 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({
 
 // export default DBResultPreview;
 
-function getFileName(filePath: string): string {
-  // Use a regular expression to split the path by either forward slash or backslash
+export function getFileName(filePath: string): string {
   const parts = filePath.split(/[/\\]/);
-  // The last element of the array will be the file name
   return parts.pop() || ""; // Fallback to an empty string if the array is empty
 }

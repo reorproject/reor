@@ -1,6 +1,4 @@
-// import React from "react";
-
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
 import AIModelManager from "./LLMSettings";
@@ -76,7 +74,7 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
           </h2>
           <p className="mt-2 text-gray-100">
             Reor is a self-organising note-taking app. Each note will be saved
-            as a markdown file to a "vault" directory on your machine.
+            as a markdown file to a &quot;vault&quot; directory on your machine.
           </p>
           <p className="mt-2 text-gray-100">
             Please choose your vault directory here:

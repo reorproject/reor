@@ -37,7 +37,7 @@ const ChatWithLLM: React.FC = () => {
       const updateStream = (newMessage: ChatbotMessage) => {
         setCurrentBotMessage((prev) => {
           return {
-            sender: "bot",
+            sender: "assistant",
             messageType: newMessage.messageType,
             message: prev?.message
               ? prev.message + newMessage.message
@@ -61,12 +61,16 @@ const ChatWithLLM: React.FC = () => {
       setMessages((prevMessages) => [
         ...prevMessages,
         {
-          sender: "bot",
+          sender: "assistant",
           messageType: currentBotMessage.messageType,
           message: currentBotMessage.message,
         },
       ]);
-      setCurrentBotMessage({ messageType: "success", message: "", sender: "" });
+      setCurrentBotMessage({
+        messageType: "success",
+        message: "",
+        sender: "assistant",
+      });
     }
     if (!sessionId || !userInput.trim()) return;
 
@@ -109,7 +113,7 @@ const ChatWithLLM: React.FC = () => {
             <div
               key={index}
               className={`p-2 rounded-lg ${
-                message.sender === "bot"
+                message.sender === "assistant"
                   ? "bg-blue-100 text-blue-800"
                   : "bg-green-100 text-green-800"
               }`}

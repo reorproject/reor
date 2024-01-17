@@ -4,13 +4,10 @@ import "./dark-editor.css";
 
 import {
   AdmonitionDirectiveDescriptor,
-  DiffSourceToggleWrapper,
   DirectiveDescriptor,
-  KitchenSinkToolbar,
   MDXEditor,
   MDXEditorMethods,
   SandpackConfig,
-  UndoRedo,
   codeBlockPlugin,
   codeMirrorPlugin,
   diffSourcePlugin,
@@ -18,7 +15,6 @@ import {
   frontmatterPlugin,
   headingsPlugin,
   imagePlugin,
-  linkDialogPlugin,
   linkPlugin,
   listsPlugin,
   markdownShortcutPlugin,
@@ -26,7 +22,6 @@ import {
   sandpackPlugin,
   tablePlugin,
   thematicBreakPlugin,
-  toolbarPlugin,
 } from "@mdxeditor/editor";
 import { LeafDirective } from "mdast-util-directive";
 

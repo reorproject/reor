@@ -1,4 +1,4 @@
-import { ipcMain, IpcMainInvokeEvent } from "electron";
+import { ipcMain } from "electron";
 import { AIModelConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 import { validateAIModelConfig } from "../llm/llmConfig";
@@ -10,15 +10,18 @@ export const registerStoreHandlers = (
   fileWatcher: FSWatcher | null
 ) => {
   setupDefaultModels(store);
-  ipcMain.on("set-user-directory", async (event, userDirectory: string) => {
-    console.log("setting user directory", userDirectory);
-    store.set(StoreKeys.UserDirectory, userDirectory);
-    if (fileWatcher) {
-      fileWatcher.close();
-    }
+  ipcMain.on(
+    "set-user-directory",
+    async (event, userDirectory: string): Promise<void> => {
+      console.log("setting user directory", userDirectory);
+      store.set(StoreKeys.UserDirectory, userDirectory);
+      if (fileWatcher) {
+        fileWatcher.close();
+      }
 
-    event.returnValue = "success";
-  });
+      event.returnValue = "success";
+    }
+  );
 
   ipcMain.on("set-default-ai-model", (event, modelName: string) => {
     console.log("setting default ai model", modelName);

@@ -3,11 +3,8 @@ import {
   Field,
   Utf8,
   FixedSizeList,
-  Int16,
   Float32,
   Float64,
-  Timestamp,
-  TimeUnit,
   DateUnit,
   Date_ as ArrowDate,
 } from "apache-arrow";
@@ -21,7 +18,7 @@ export enum DatabaseFields {
   DISTANCE = "_distance",
 }
 
-const CreateDatabaseSchema = (vectorDim: number): Schema<any> => {
+const CreateDatabaseSchema = (vectorDim: number): Schema => {
   const schemaFields = [
     new Field(DatabaseFields.NOTE_PATH, new Utf8(), false),
     new Field(

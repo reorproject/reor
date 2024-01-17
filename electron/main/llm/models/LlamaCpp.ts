@@ -1,5 +1,4 @@
-import path from "path";
-import os from "os";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ISendFunctionImplementer, ISessionService } from "../Types";
 
 export class LlamaCPPSessionService implements ISessionService {

@@ -27,11 +27,11 @@ export interface ISendFunctionImplementer {
    * @param channel The channel to send the message to.
    * @param args Additional arguments for the message.
    */
-  send(channel: string, ...args: any[]): void;
+  send(channel: string, ...args: unknown[]): void;
 }
 
 export type ChatbotMessage = {
-  sender: string;
+  sender: "user" | "assistant";
   messageType: ChatbotMessageType;
   message: string;
 };

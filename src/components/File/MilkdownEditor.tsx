@@ -1,32 +1,18 @@
 import React, { useEffect, useState } from "react";
-import {
-  Editor,
-  rootCtx,
-  defaultValueCtx,
-  editorViewCtx,
-  Ctx,
-  schemaCtx,
-} from "@milkdown/core";
+import { Editor, rootCtx, defaultValueCtx } from "@milkdown/core";
 import { nord } from "@milkdown/theme-nord";
 import { commonmark } from "@milkdown/preset-commonmark";
 import { history } from "@milkdown/plugin-history";
 import { gfm } from "@milkdown/preset-gfm";
 import { ReactEditor, useEditor } from "@milkdown/react";
-import {
-  tooltip,
-  tooltipPlugin,
-  createToggleIcon,
-  defaultButtons,
-} from "@milkdown/plugin-tooltip";
 import "./milkdown.css";
 import { listener, listenerCtx } from "@milkdown/plugin-listener";
 import { prism } from "@milkdown/plugin-prism";
-import { menu } from "@milkdown/plugin-menu";
 import { block } from "@milkdown/plugin-block";
 // import slash from "./slash"; // Uncomment if slash is used
 import { cursor } from "@milkdown/plugin-cursor";
 import { clipboard } from "@milkdown/plugin-clipboard";
-import { insert, replaceAll, getMarkdown } from "@milkdown/utils";
+import { replaceAll } from "@milkdown/utils";
 
 export interface MarkdownEditorProps {
   filePath: string;
@@ -78,7 +64,7 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
           ctx
             .get(listenerCtx)
 
-            .markdownUpdated((ctx, markdown, prevMarkdown) => {
+            .markdownUpdated((ctx, markdown) => {
               setContent(markdown);
             });
         })

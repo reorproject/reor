@@ -1,10 +1,4 @@
-import { Connection, Table as LanceDBTable, Query } from "vectordb";
-import GetOrCreateLanceTable from "./Lance";
 import { DatabaseFields } from "./Schema";
-import {
-  EnhancedEmbeddingFunction,
-  createEmbeddingFunction,
-} from "./Embeddings";
 import {
   GetFilesInfoList,
   flattenFileInfoTree,
@@ -22,7 +16,7 @@ export const repopulateTableWithMissingItems = async (
 ) => {
   const filesInfoList = GetFilesInfoList(directoryPath, extensionsToFilterFor);
   const tableArray = await getTableAsArray(table);
-  const dbItemsToAdd = computeDbItemsToAdd(filesInfoList, tableArray, table);
+  const dbItemsToAdd = computeDbItemsToAdd(filesInfoList, tableArray);
   if (dbItemsToAdd.length == 0) {
     console.log("no items to add");
     onProgress && onProgress(1);
@@ -60,20 +54,16 @@ const getTableAsArray = async (table: LanceDBTableWrapper) => {
 
 const computeDbItemsToAdd = (
   filesInfoList: FileInfo[],
-  tableArray: DBEntry[],
-  table: LanceDBTableWrapper
+  tableArray: DBEntry[]
 ): DBEntry[][] => {
   return filesInfoList
     .map(convertFileTypeToDBType)
-    .filter((listOfChunks) =>
-      filterChunksNotInTable(listOfChunks, tableArray, table)
-    );
+    .filter((listOfChunks) => filterChunksNotInTable(listOfChunks, tableArray));
 };
 
 const filterChunksNotInTable = (
   listOfChunks: DBEntry[],
-  tableArray: DBEntry[],
-  table: LanceDBTableWrapper
+  tableArray: DBEntry[]
 ): boolean => {
   if (listOfChunks.length == 0) {
     return false;

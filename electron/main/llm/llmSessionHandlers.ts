@@ -2,7 +2,7 @@ import { ipcMain, IpcMainInvokeEvent } from "electron";
 import { LlamaCPPSessionService } from "./models/LlamaCpp"; // Assuming SessionService is in the same directory
 import { ISessionService } from "./Types";
 import { OpenAIModelSessionService } from "./models/OpenAI";
-import { AIModelConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
+import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 
 // const modelLoader = new ModelLoader(); // Singleton
@@ -18,14 +18,14 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
 
   ipcMain.handle(
     "does-session-exist",
-    async (event: IpcMainInvokeEvent, sessionId: string) => {
+    async (event: IpcMainInvokeEvent, sessionId: string): Promise<boolean> => {
       return !!sessions[sessionId];
     }
   );
 
   ipcMain.handle(
     "delete-session",
-    async (event: IpcMainInvokeEvent, sessionId: string) => {
+    async (event: IpcMainInvokeEvent, sessionId: string): Promise<string> => {
       if (sessions[sessionId]) {
         delete sessions[sessionId];
       }
@@ -34,7 +34,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
   );
   ipcMain.handle(
     "create-session",
-    async (event: IpcMainInvokeEvent, sessionId: string) => {
+    async (event: IpcMainInvokeEvent, sessionId: string): Promise<string> => {
       return createSession(store, sessionId);
     }
   );
@@ -42,7 +42,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
   // Refactored get-or-create-session handler
   ipcMain.handle(
     "get-or-create-session",
-    async (event: IpcMainInvokeEvent, sessionId: string) => {
+    async (event: IpcMainInvokeEvent, sessionId: string): Promise<string> => {
       if (sessions[sessionId]) {
         return sessionId;
       }
@@ -52,7 +52,11 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
 
   ipcMain.handle(
     "initialize-streaming-response",
-    async (event: IpcMainInvokeEvent, sessionId: string, prompt: string) => {
+    async (
+      event: IpcMainInvokeEvent,
+      sessionId: string,
+      prompt: string
+    ): Promise<string> => {
       const sessionService = sessions[sessionId];
       if (!sessionService) {
         throw new Error(`Session ${sessionId} does not exist.`);

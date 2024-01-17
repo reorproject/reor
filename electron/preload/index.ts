@@ -3,20 +3,18 @@ import { AIModelConfig } from "electron/main/Store/storeConfig";
 import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
 // import { FileInfo } from "electron/main/Files/Types";
 import { DBEntry, DBResult } from "electron/main/database/LanceTableWrapper";
-type ReceiveCallback = (...args: any[]) => void;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type ReceiveCallback = (...args: any[]) => void;
 
 declare global {
   interface Window {
     ipcRenderer: {
       // send: (channel: string, ...args: any[]) => void;
       // sendSync: (channel: string, ...args: any[]) => any;
-      on: (channel: string, listener: (...args: any[]) => void) => void;
+      on: (channel: string, listener: (...args: unknown[]) => void) => void;
       // once: (channel: string, listener: (...args: any[]) => void) => void;
       // invoke: (channel: string, ...args: any[]) => Promise<any>;
-      removeListener: (
-        channel: string,
-        listener: (...args: any[]) => void
-      ) => void;
+      removeListener: (channel: string, listener: ReceiveCallback) => void;
       // removeAllListeners: (channel: string) => void;
       receive: (channel: string, callback: ReceiveCallback) => void;
     };
@@ -33,7 +31,7 @@ declare global {
         limit: number,
         filter?: string
       ) => Promise<DBResult[]>;
-      indexFilesInDirectory: (directoryPath: string) => any;
+      indexFilesInDirectory: (directoryPath: string) => void;
       augmentPromptWithRAG: (
         prompt: string,
         numberOfContextItems: number,
@@ -45,33 +43,33 @@ declare global {
       openDirectoryDialog: () => Promise<string[]>;
       openFileDialog: (fileExtensions?: string[]) => Promise<string[]>;
       getFiles: () => Promise<FileInfoTree>;
-      writeFile: (filePath: string, content: string) => Promise<any>;
-      readFile: (filePath: string) => Promise<any>;
-      createFile: (filePath: string, content: string) => Promise<any>;
+      writeFile: (filePath: string, content: string) => Promise<void>;
+      readFile: (filePath: string) => Promise<string>;
+      createFile: (filePath: string, content: string) => Promise<void>;
       joinPath: (...pathSegments: string[]) => Promise<string>;
       moveFileOrDir: (
         sourcePath: string,
         destinationPath: string
-      ) => Promise<any>;
+      ) => Promise<void>;
     };
     llm: {
-      createSession: (sessionId: any) => Promise<any>;
-      doesSessionExist: (sessionId: any) => Promise<any>;
-      deleteSession: (sessionId: any) => Promise<any>;
-      getOrCreateSession: (sessionId: any) => Promise<any>;
+      createSession: (sessionId: string) => Promise<string>;
+      doesSessionExist: (sessionId: string) => Promise<boolean>;
+      deleteSession: (sessionId: string) => Promise<string>;
+      getOrCreateSession: (sessionId: string) => Promise<string>;
       initializeStreamingResponse: (
-        sessionId: any,
+        sessionId: string,
         prompt: string
-      ) => Promise<any>;
+      ) => Promise<string>;
     };
     electronStore: {
-      setUserDirectory: (path: string) => any;
+      setUserDirectory: (path: string) => Promise<void>;
       getUserDirectory: () => string;
-      setOpenAIAPIKey: (apiKey: string) => any;
+      setOpenAIAPIKey: (apiKey: string) => Promise<void>;
       getOpenAIAPIKey: () => string;
       getAIModelConfigs: () => Promise<Record<string, AIModelConfig>>;
-      setupNewLocalLLM: (modelConfig: AIModelConfig) => Promise<any>;
-      setDefaultAIModel: (modelName: string) => any;
+      setupNewLocalLLM: (modelConfig: AIModelConfig) => Promise<void>;
+      setDefaultAIModel: (modelName: string) => void;
       getDefaultAIModel: () => Promise<string>;
     };
   }
@@ -146,14 +144,9 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
   // invoke: ipcRenderer.invoke,
   removeListener: ipcRenderer.removeListener,
   // removeAllListeners: ipcRenderer.removeAllListeners,
-  receive: (channel: string, callback: (...args: any[]) => void) => {
+  receive: (channel: string, callback: (...args: unknown[]) => void) => {
     ipcRenderer.on(channel, (event, ...args) => callback(...args));
   },
-});
-
-contextBridge.exposeInMainWorld("electronAPI", {
-  openContextMenu: (menuTemplate: any) =>
-    ipcRenderer.invoke("open-context-menu", menuTemplate),
 });
 
 contextBridge.exposeInMainWorld("contextMenu", {
@@ -195,19 +188,19 @@ contextBridge.exposeInMainWorld("files", {
 });
 
 contextBridge.exposeInMainWorld("llm", {
-  createSession: async (sessionId: any) => {
+  createSession: async (sessionId: string) => {
     return await ipcRenderer.invoke("create-session", sessionId);
   },
-  doesSessionExist: async (sessionId: any) => {
+  doesSessionExist: async (sessionId: string) => {
     return await ipcRenderer.invoke("does-session-exist", sessionId);
   },
-  deleteSession: async (sessionId: any) => {
+  deleteSession: async (sessionId: string) => {
     return await ipcRenderer.invoke("delete-session", sessionId);
   },
-  getOrCreateSession: async (sessionId: any) => {
+  getOrCreateSession: async (sessionId: string) => {
     return await ipcRenderer.invoke("get-or-create-session", sessionId);
   },
-  initializeStreamingResponse: async (sessionId: any, prompt: string) => {
+  initializeStreamingResponse: async (sessionId: string, prompt: string) => {
     return await ipcRenderer.invoke(
       "initialize-streaming-response",
       sessionId,

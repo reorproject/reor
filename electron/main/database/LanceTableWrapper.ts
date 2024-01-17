@@ -1,4 +1,4 @@
-import { Connection, Table as LanceDBTable, Query } from "vectordb";
+import { Connection, Table as LanceDBTable } from "vectordb";
 import GetOrCreateLanceTable from "./Lance";
 import {
   EnhancedEmbeddingFunction,
@@ -19,6 +19,7 @@ export interface DBResult extends DBEntry {
 }
 
 export class LanceDBTableWrapper {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public table!: LanceDBTable<any>;
   public embedFun!: EnhancedEmbeddingFunction<string | number[]>;
   public userDirectory!: string;

@@ -8,7 +8,6 @@ export interface AIModelConfig {
 export interface StoreSchema {
   user: {
     directory?: string;
-    preferences?: {};
     openAIAPIKey?: string;
   };
   aiModels: {
@@ -20,7 +19,6 @@ export interface StoreSchema {
 // Enum for store keys
 export enum StoreKeys {
   UserDirectory = "user.directory",
-  UserPreferences = "user.preferences",
   UserOpenAIAPIKey = "user.openAIAPIKey",
   AIModels = "aiModels",
   DefaultAIModel = "defaultAIModel",

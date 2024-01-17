@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
-import { DBEntry, DBResult } from "electron/main/database/LanceTableWrapper";
-import ReactMarkdown from "react-markdown";
+import React, { useEffect, useState } from "react";
+import { DBResult } from "electron/main/database/LanceTableWrapper";
 import { DBResultPreview } from "../File/DBResultPreview";
 // import DBResultPreview from "../File/DBResultPreview";
 // import { DatabaseFields } from "electron/main/database/Schema";
@@ -16,6 +15,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   onFileSelect,
 }) => {
   const [similarEntries, setSimilarEntries] = useState<DBResult[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleNewFileOpen = async (path: string) => {
@@ -72,7 +72,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
         <p className="text-gray-200 font-semibold">Similar notes</p>
       </div> */}
       {similarEntries.map((dbResult, index) => (
-        <div className="p-2">
+        <div className="p-2" key={index}>
           <DBResultPreview
             key={index}
             dbResult={dbResult}

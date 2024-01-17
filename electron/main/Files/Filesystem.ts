@@ -1,6 +1,6 @@
 import path from "path";
 import fs from "fs";
-import { FileInfo, FileInfoNode, FileInfoTree } from "./Types";
+import { FileInfo, FileInfoTree } from "./Types";
 import chokidar from "chokidar";
 import { BrowserWindow } from "electron";
 import {
@@ -31,7 +31,7 @@ export function GetFilesInfoTree(
   extensionsToFilterFor?: string[],
   parentRelativePath: string = ""
 ): FileInfoTree {
-  let fileInfoTree: FileInfoTree = [];
+  const fileInfoTree: FileInfoTree = [];
 
   if (!fs.existsSync(pathInput)) {
     console.error("Path does not exist:", pathInput);

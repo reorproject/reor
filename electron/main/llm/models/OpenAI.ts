@@ -1,10 +1,14 @@
 import OpenAI from "openai";
-import { ISendFunctionImplementer, ISessionService } from "../Types";
+import {
+  ChatbotMessage,
+  ISendFunctionImplementer,
+  ISessionService,
+} from "../Types";
 
 export class OpenAIModelSessionService implements ISessionService {
   private openai: OpenAI;
   public modelName: string;
-  private messageHistory: any[];
+  private messageHistory: ChatbotMessage[];
 
   constructor(apiKey: string, modelName: string) {
     this.openai = new OpenAI({ apiKey });

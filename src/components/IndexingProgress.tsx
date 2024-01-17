@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Modal from "./Generic/Modal";
-import { Audio } from "react-loader-spinner";
 import CircularProgress from "@mui/material/CircularProgress";
 
 // import { ipcRenderer, IpcRendererEvent } from "electron";
@@ -87,9 +86,9 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({
 
 // export default IndexingProgress;
 
-interface ProgressBarProps {
-  progress: number;
-}
+// interface ProgressBarProps {
+//   progress: number;
+// }
 
 // const ProgressBar: React.FC<ProgressBarProps> = ({ progress }) => {
 //   const getProgressState = () => {
