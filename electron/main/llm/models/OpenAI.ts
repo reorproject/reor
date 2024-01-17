@@ -35,7 +35,11 @@ export class OpenAIModelSessionService implements ISessionService {
     }
 
     // Add the user's prompt to the message history
-    this.messageHistory.push({ role: "user", content: prompt });
+    this.messageHistory.push({
+      role: "user",
+      content: prompt,
+      messageType: "success",
+    });
 
     try {
       if (apiKey) {
@@ -53,7 +57,11 @@ export class OpenAIModelSessionService implements ISessionService {
         result += content;
 
         // Update the message history with the response
-        this.messageHistory.push({ role: "assistant", content });
+        this.messageHistory.push({
+          role: "assistant",
+          content,
+          messageType: "success",
+        });
 
         sendFunctionImplementer.send("tokenStream", {
           messageType: "success",

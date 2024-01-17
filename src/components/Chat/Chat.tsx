@@ -37,11 +37,11 @@ const ChatWithLLM: React.FC = () => {
       const updateStream = (newMessage: ChatbotMessage) => {
         setCurrentBotMessage((prev) => {
           return {
-            sender: "assistant",
+            role: "assistant",
             messageType: newMessage.messageType,
-            message: prev?.message
-              ? prev.message + newMessage.message
-              : newMessage.message,
+            content: prev?.content
+              ? prev.content + newMessage.content
+              : newMessage.content,
           };
         });
       };
@@ -61,15 +61,15 @@ const ChatWithLLM: React.FC = () => {
       setMessages((prevMessages) => [
         ...prevMessages,
         {
-          sender: "assistant",
+          role: "assistant",
           messageType: currentBotMessage.messageType,
-          message: currentBotMessage.message,
+          content: currentBotMessage.content,
         },
       ]);
       setCurrentBotMessage({
         messageType: "success",
-        message: "",
-        sender: "assistant",
+        content: "",
+        role: "assistant",
       });
     }
     if (!sessionId || !userInput.trim()) return;
@@ -79,24 +79,25 @@ const ChatWithLLM: React.FC = () => {
         userInput,
         5
       );
-      startStreamingResponse(augmentedPrompt);
+      startStreamingResponse(sessionId, augmentedPrompt);
     } else {
-      startStreamingResponse(userInput);
+      startStreamingResponse(sessionId, userInput);
     }
     setMessages((prevMessages) => [
       ...prevMessages,
-      { sender: "user", messageType: "success", message: userInput },
+      { role: "user", messageType: "success", content: userInput },
     ]);
     setUserInput("");
   };
 
-  const startStreamingResponse = (prompt: string) => {
+  const startStreamingResponse = (sessionId: string, prompt: string) => {
     try {
       window.llm.initializeStreamingResponse(sessionId, prompt);
     } catch (error) {
       console.error("Failed to initialize streaming response:", error);
     }
   };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault(); // Prevents default action (new line) when pressing Enter
@@ -113,22 +114,22 @@ const ChatWithLLM: React.FC = () => {
             <div
               key={index}
               className={`p-2 rounded-lg ${
-                message.sender === "assistant"
+                message.role === "assistant"
                   ? "bg-blue-100 text-blue-800"
                   : "bg-green-100 text-green-800"
               }`}
             >
-              {message.message}
+              {message.content}
             </div>
           ))}
           {currentBotMessage?.messageType == "success" && (
             <div className="p-2 rounded-lg bg-blue-100 text-blue-800 break-words">
-              {currentBotMessage.message}
+              {currentBotMessage.content}
             </div>
           )}
           {currentBotMessage?.messageType == "error" && (
             <div className="p-2 rounded-lg bg-red-100 text-red-800 break-words">
-              {currentBotMessage.message}
+              {currentBotMessage.content}
             </div>
           )}
         </div>

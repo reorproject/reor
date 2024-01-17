@@ -31,9 +31,9 @@ export interface ISendFunctionImplementer {
 }
 
 export type ChatbotMessage = {
-  sender: "user" | "assistant";
-  messageType: ChatbotMessageType;
-  message: string;
+  role: "user" | "assistant";
+  messageType: "success" | "error";
+  content: string;
 };
 
-export type ChatbotMessageType = "success" | "error";
+// export type ChatbotMessageType = ;
