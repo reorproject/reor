@@ -17,7 +17,11 @@ export class LlamaCPPSessionService implements ISessionService {
     }
 
     import("node-llama-cpp").then(async (nodeLLamaCpp: any) => {
-      this.context = new nodeLLamaCpp.LlamaContext({ model: this.model });
+      this.context = new nodeLLamaCpp.LlamaContext({
+        model: this.model,
+        // contextSize: 1024,
+        // batchSize: 1,
+      });
       this.session = new nodeLLamaCpp.LlamaChatSession({
         context: this.context,
       });
@@ -71,9 +75,8 @@ export class LlamaCPPSessionService implements ISessionService {
         console.log("decoded chunk: ", decodedChunk);
         sendFunctionImplementer.send("tokenStream", {
           messageType: "success",
-          message: decodedChunk,
+          content: decodedChunk,
         });
-        // sendFunctionImplementer.send("tokenStream", decodedChunk);
       },
     });
   }

@@ -43,7 +43,6 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
       30,
       filterString
     );
-    console.log("NUMBER OF FILTERED RESULTS: ", searchResults.length);
     return searchResults;
   };
 

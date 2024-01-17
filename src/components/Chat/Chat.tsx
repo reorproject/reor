@@ -35,10 +35,11 @@ const ChatWithLLM: React.FC = () => {
     if (!sessionId) {
       initializeSession();
       const updateStream = (newMessage: ChatbotMessage) => {
+        console.log("Received new message:", newMessage);
         setCurrentBotMessage((prev) => {
           return {
             role: "assistant",
-            messageType: newMessage.messageType,
+            messageType: "success",
             content: prev?.content
               ? prev.content + newMessage.content
               : newMessage.content,
@@ -55,6 +56,10 @@ const ChatWithLLM: React.FC = () => {
       };
     }
   }, [sessionId]);
+
+  useEffect(() => {
+    console.log("CURRENT BOT MESSAGE:", currentBotMessage);
+  }, [currentBotMessage]);
 
   const handleSubmitNewMessage = async () => {
     if (currentBotMessage) {
@@ -77,7 +82,7 @@ const ChatWithLLM: React.FC = () => {
     if (messages.length <= 1) {
       const augmentedPrompt = await window.database.augmentPromptWithRAG(
         userInput,
-        5
+        20
       );
       startStreamingResponse(sessionId, augmentedPrompt);
     } else {

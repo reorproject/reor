@@ -3,6 +3,7 @@ import {
   ChatbotMessage,
   ISendFunctionImplementer,
   ISessionService,
+  OpenAIMessage,
 } from "../Types";
 
 export class OpenAIModelSessionService implements ISessionService {
@@ -45,9 +46,16 @@ export class OpenAIModelSessionService implements ISessionService {
       if (apiKey) {
         this.openai.apiKey = apiKey;
       }
+      const openAIMessages = this.messageHistory.map((msg) => ({
+        role: msg.role,
+        content: msg.content,
+      })) as OpenAIMessage[];
+
+      console.log("openAIMessages", openAIMessages);
+
       const stream = await this.openai.chat.completions.create({
         model: this.modelName,
-        messages: this.messageHistory,
+        messages: openAIMessages,
         stream: true,
       });
 
@@ -65,7 +73,7 @@ export class OpenAIModelSessionService implements ISessionService {
 
         sendFunctionImplementer.send("tokenStream", {
           messageType: "success",
-          message: content,
+          content,
         });
       }
 
@@ -74,7 +82,7 @@ export class OpenAIModelSessionService implements ISessionService {
       console.error("Error during OpenAI streaming session:", error);
       sendFunctionImplementer.send("tokenStream", {
         messageType: "error",
-        message: "Error during OpenAI streaming session: " + error + "\n",
+        content: "Error during OpenAI streaming session: " + error + "\n",
       });
       return "error";
     }
