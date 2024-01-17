@@ -34,20 +34,19 @@ const ChatWithLLM: React.FC = () => {
   useEffect(() => {
     if (!sessionId) {
       initializeSession();
+
       const updateStream = (newMessage: ChatbotMessage) => {
         console.log("Received new message:", newMessage);
         setCurrentBotMessage((prev) => {
           return {
             role: "assistant",
-            messageType: "success",
+            messageType: newMessage.messageType,
             content: prev?.content
               ? prev.content + newMessage.content
               : newMessage.content,
           };
         });
       };
-
-      // Update the updateStream function to handle the new message structure
 
       window.ipcRenderer.receive("tokenStream", updateStream);
 
