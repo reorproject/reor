@@ -19,11 +19,10 @@ export class LlamaCPPSessionService implements ISessionService {
     import("node-llama-cpp").then(async (nodeLLamaCpp: any) => {
       this.context = new nodeLLamaCpp.LlamaContext({
         model: this.model,
-        // contextSize: 1024,
-        // batchSize: 1,
+        contextSize: this.model.trainContextSize(),
       });
       this.session = new nodeLLamaCpp.LlamaChatSession({
-        context: this.context,
+        contextSequence: this.context.getSequence(),
       });
     });
   }
@@ -35,18 +34,6 @@ export class LlamaCPPSessionService implements ISessionService {
       modelPath: localModelPath,
       gpuLayers: 0,
     });
-
-    // this.model = await import("node-llama-cpp").then((nodeLLamaCpp: any) => {
-    //   return new nodeLLamaCpp.LlamaModel({
-    //     modelPath: path.join(
-    //       os.homedir(),
-    //       "Downloads",
-    //       "tinyllama-2-1b-miniguanaco.Q2_K.gguf"
-    //       // "mistral-7b-v0.1.Q4_K_M.gguf"
-    //     ),
-    //     gpuLayers: 0,
-    //   });
-    // });
   }
 
   private async unloadModel(): Promise<void> {
@@ -63,21 +50,43 @@ export class LlamaCPPSessionService implements ISessionService {
     sendFunctionImplementer: ISendFunctionImplementer
   ): Promise<string> {
     if (!this.session && !this.context) {
-      throw new Error("Session not initialized");
+      sendFunctionImplementer.send("tokenStream", {
+        messageType: "error",
+        content: "Session not initialized",
+      });
+      return "Session not initialized";
     }
     console.log("starting streaming prompt");
-    return await this.session.prompt(prompt, {
-      temperature: 0.8,
-      topK: 40,
-      topP: 0.02,
-      onToken: (chunk: any[]) => {
-        const decodedChunk = this.context.decode(chunk);
-        console.log("decoded chunk: ", decodedChunk);
-        sendFunctionImplementer.send("tokenStream", {
-          messageType: "success",
-          content: decodedChunk,
-        });
-      },
-    });
+
+    try {
+      return await this.session.prompt(prompt, {
+        temperature: 0.8,
+        topK: 40,
+        topP: 0.02,
+        onToken: (chunk: any[]) => {
+          const decodedChunk = this.model.detokenize(chunk);
+          sendFunctionImplementer.send("tokenStream", {
+            messageType: "success",
+            content: decodedChunk,
+          });
+        },
+      });
+    } catch (err) {
+      sendFunctionImplementer.send("tokenStream", {
+        messageType: "error",
+        content: errorToString(err),
+      });
+      return "";
+    }
+  }
+}
+
+function errorToString(error: unknown): string {
+  if (error instanceof Error) {
+    // Use toString() method for Error objects
+    return error.toString();
+  } else {
+    // Convert other types of errors to string
+    return String(error);
   }
 }
