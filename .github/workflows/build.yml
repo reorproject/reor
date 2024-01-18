@@ -3,7 +3,7 @@ name: Build and Package Electron App
 on:
   push:
     branches:
-      - main
+      - "*"
 
 jobs:
   build_and_package:
@@ -47,6 +47,9 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      - name: Run Linter
+        run: npm run lint
 
       - name: Set up environment for macOS build
         if: matrix.os == 'macos-latest' || matrix.os == 'macos-latest-xlarge'
