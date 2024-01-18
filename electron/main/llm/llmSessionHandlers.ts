@@ -35,7 +35,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
   ipcMain.handle(
     "create-session",
     async (event: IpcMainInvokeEvent, sessionId: string): Promise<string> => {
-      return createSession(store, sessionId);
+      return await createSession(store, sessionId);
     }
   );
 
@@ -85,7 +85,8 @@ async function createSession(
     );
     sessions[sessionId] = sessionService;
   } else {
-    const sessionService = new LlamaCPPSessionService(currentConfig.localPath);
+    const sessionService = new LlamaCPPSessionService();
+    await sessionService.init(currentConfig.localPath);
     sessions[sessionId] = sessionService;
   }
   return sessionId;

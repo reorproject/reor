@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@material-tailwind/react";
 import { ChatbotMessage } from "electron/main/llm/Types";
+import { errorToString } from "@/functions/error";
 
 const ChatWithLLM: React.FC = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -27,6 +28,11 @@ const ChatWithLLM: React.FC = () => {
       setSessionId(newSessionId);
     } catch (error) {
       console.error("Failed to create a new session:", error);
+      setCurrentBotMessage({
+        messageType: "error",
+        content: errorToString(error),
+        role: "assistant",
+      });
     } finally {
       setLoading(false);
     }
