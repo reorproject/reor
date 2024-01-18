@@ -56,9 +56,6 @@ export const registerStoreHandlers = (
   ipcMain.on("set-openai-api-key", (event, apiKey: string) => {
     console.log("setting openai api key", apiKey);
     try {
-      if (!apiKey) {
-        throw new Error("API Key cannot be empty");
-      }
       store.set(StoreKeys.UserOpenAIAPIKey, apiKey);
     } catch (error) {
       console.error("Error setting openai api key", error);

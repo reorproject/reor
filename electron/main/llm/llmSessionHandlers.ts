@@ -35,7 +35,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
   ipcMain.handle(
     "create-session",
     async (event: IpcMainInvokeEvent, sessionId: string): Promise<string> => {
-      return createSession(store, sessionId);
+      return await createSession(store, sessionId);
     }
   );
 
@@ -46,7 +46,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       if (sessions[sessionId]) {
         return sessionId;
       }
-      return createSession(store, sessionId);
+      return await createSession(store, sessionId);
     }
   );
 
@@ -79,13 +79,19 @@ async function createSession(
 
   if (currentConfig.engine === "openai") {
     const openAIAPIKey: string = store.get(StoreKeys.UserOpenAIAPIKey);
+    if (!openAIAPIKey) {
+      throw new Error(
+        "OpenAI API key not set. Please set it in settings and re-open the chat window."
+      );
+    }
     const sessionService = new OpenAIModelSessionService(
       openAIAPIKey,
       defaultModelName
     );
     sessions[sessionId] = sessionService;
   } else {
-    const sessionService = new LlamaCPPSessionService(currentConfig.localPath);
+    const sessionService = new LlamaCPPSessionService();
+    await sessionService.init(currentConfig.localPath);
     sessions[sessionId] = sessionService;
   }
   return sessionId;
