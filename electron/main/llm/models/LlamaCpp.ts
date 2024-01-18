@@ -6,9 +6,6 @@ export class LlamaCPPSessionService implements ISessionService {
   public context: any;
   private model: any; // Model instance
 
-  constructor() {
-    // this.init(localModelPath);
-  }
   async init(localModelPath: string): Promise<void> {
     // try {
     await this.loadModel(localModelPath);
