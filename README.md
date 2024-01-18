@@ -4,8 +4,7 @@
 </p> -->
 
 <h4 align="center">
-   A self-organizing note-taking app powered by local AI models.
-</h4>
+AI second brain & personal knowledge management app. </h4>
 
 <p align="center">
     <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-GPLv3-blue.svg"></a>
@@ -21,19 +20,7 @@
 ![reor](https://github.com/reorproject/reor/assets/17236551/cf743f16-fe5d-4099-bc08-74b8c76709c4)
 
 ## About
-**The Reor Project** is a local-first AI application for managing personal knowledge and notes. It uses AI to organize, help write, and answer questions about notes. The key difference between something like mem.ai or Reflect Notes is that the AI models can run fully locally and privately. No data needs to be shared with OpenAI!
-
-### Hypotheses
-1. AI should be used to both generate and organise unstructured thoughts and ideas.
-2. Those same thoughts and ideas are private. AI models should run _locally_.
-3. Notes should be embedded into a feature space so that similar notes can be compared
-
-### Features
-- Q&A with your notes.
-- Embedding sidebar to automatically connect similar notes.
-- Semantic search.
-- WYSIWYG Markdown editor.
-- Markdown files stored locally.
+**The Reor Project** is a standalone desktop app for managing personal knowledge with AI. It uses AI to organize, help write and answer questions about your personal knowledge base. Think Obsidian meets second brain AI, but fully private: You can search semantically, chat with an LLM that has full knowledge of you and use the WYSIWYG markdown editor to write directly into your knowledge base. And no data needs to be shared with OpenAI!
 
 
 ### Getting Started
@@ -41,7 +28,7 @@
 2. Install like a normal App.
 
 ### Extra Linux packages:
-Strangely, Linux induces some package issues with regards to Transformers.js (the library we use for embeddings). So you may need to install the following packages: "fuse", "libfuse2", "libvips". On Ubuntu:
+Strangely, Linux causes some package issues with regards to Transformers.js (the library we use for embeddings). So you may need to install the following packages: "fuse", "libfuse2", "libvips". On Ubuntu:
 ```
 sudo apt update
 sudo apt install fuse libfuse2 libvips
@@ -53,7 +40,9 @@ To import notes/files from another app, you'll need to populate that directory m
 
 
 ### Beta Phase
-The Reor Project is in beta. It is very much stable and usable right now. Of course, it won't be as bug-free as something like Obsidian. But I am working as hard as I can to make this as good of an experience as can be! Feedback and support are welcome on our [Issues](https://github.com/reor-project/issues) page.
+The Reor Project is in currently in beta. And almost ready for stable release! Of course, it won't be as bug-free right now as something like Obsidian. But I am working as hard as I can to make this as good of an experience as can be! Feedback and support are welcome on our [Issues](https://github.com/reor-project/issues) page.
 
 ## License
 GPL-3.0 license. See `LICENSE` for details.
+
+*Reor means "to think" in Latin :)
