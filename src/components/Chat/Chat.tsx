@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@material-tailwind/react";
 import { ChatbotMessage } from "electron/main/llm/Types";
 import { errorToString } from "@/functions/error";
+import Textarea from "@mui/joy/Textarea";
 
 const ChatWithLLM: React.FC = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -62,10 +63,6 @@ const ChatWithLLM: React.FC = () => {
     }
   }, [sessionId]);
 
-  useEffect(() => {
-    console.log("CURRENT BOT MESSAGE:", currentBotMessage);
-  }, [currentBotMessage]);
-
   const handleSubmitNewMessage = async () => {
     if (currentBotMessage) {
       setMessages((prevMessages) => [
@@ -108,11 +105,20 @@ const ChatWithLLM: React.FC = () => {
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+  const handleKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement> = (
+    e
+  ) => {
+    if (!e.shiftKey && e.key == "Enter") {
       e.preventDefault(); // Prevents default action (new line) when pressing Enter
       handleSubmitNewMessage();
+      setUserInput("");
     }
+  };
+
+  const handleInputChange: React.ChangeEventHandler<HTMLTextAreaElement> = (
+    e
+  ) => {
+    setUserInput(e.target.value);
   };
 
   return (
@@ -146,15 +152,16 @@ const ChatWithLLM: React.FC = () => {
       </div>
       <div className="p-4 bg-gray-100">
         <div className="flex space-x-2">
-          <input
-            type="text"
-            value={userInput}
-            onChange={(e) => setUserInput(e.target.value)}
+          <Textarea
             onKeyDown={handleKeyDown}
-            className="flex-1 p-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Ask your notes..."
-            disabled={!sessionId || loading}
+            onChange={handleInputChange}
+            value={userInput}
+            className="w-full"
+            name="Solid"
+            placeholder="Ask your knowledge..."
+            variant="solid"
           />
+
           <Button
             className="bg-slate-700  border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
             onClick={handleSubmitNewMessage}
