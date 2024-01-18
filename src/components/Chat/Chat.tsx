@@ -157,9 +157,9 @@ const ChatWithLLM: React.FC = () => {
             onChange={handleInputChange}
             value={userInput}
             className="w-full"
-            name="Solid"
+            name="Outlined"
             placeholder="Ask your knowledge..."
-            variant="solid"
+            variant="outlined"
           />
 
           <Button
