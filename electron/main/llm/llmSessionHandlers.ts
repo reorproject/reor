@@ -79,6 +79,11 @@ async function createSession(
 
   if (currentConfig.engine === "openai") {
     const openAIAPIKey: string = store.get(StoreKeys.UserOpenAIAPIKey);
+    if (!openAIAPIKey) {
+      throw new Error(
+        "OpenAI API key not set. Please set it in settings and re-open the chat window."
+      );
+    }
     const sessionService = new OpenAIModelSessionService(
       openAIAPIKey,
       defaultModelName
