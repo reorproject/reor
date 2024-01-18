@@ -46,7 +46,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       if (sessions[sessionId]) {
         return sessionId;
       }
-      return createSession(store, sessionId);
+      return await createSession(store, sessionId);
     }
   );
 
