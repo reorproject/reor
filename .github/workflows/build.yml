@@ -3,7 +3,10 @@ name: Build and Package Electron App
 on:
   push:
     branches:
-      - main
+      - "*"
+  pull_request:
+    branches:
+      - "*"
 
 jobs:
   build_and_package:
