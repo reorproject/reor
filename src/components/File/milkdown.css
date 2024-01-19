@@ -10,11 +10,32 @@
     padding: 2px;
     padding-left: 5px;
 }
-
 .milkdown .editor:focus {
     outline: none;
 }
 
+/* .milkdown .editor p {
+    margin: 0;
+    line-height: normal; 
+} */
+
+/* .milkdown .editor h1,
+.milkdown .editor h2,
+.milkdown .editor h3,
+.milkdown .editor h4,
+.milkdown .editor h5,
+.milkdown .editor h6 {
+    margin-top: 5rem; 
+        margin-bottom: 5rem; } */
+
+.milkdown .editor .paragraph {
+    margin: 0rem 0;
+    line-height: 1.5;
+}
+
+.milkdown .editor .heading {
+    margin: 1rem 0 !important;
+}
 
 /* .milkdown {
     font-size: 1em;
