@@ -48,4 +48,4 @@ The Reor Project is in currently in beta. And almost ready for stable release! O
 ## License
 GPL-3.0 license. See `LICENSE` for details.
 
-**Reor means "to think" in Latin.*
+*Reor means "to think" in Latin.*
