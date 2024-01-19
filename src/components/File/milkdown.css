@@ -35,7 +35,33 @@
 
 .milkdown .editor .heading {
     margin: 1rem 0 !important;
+    /* font-size: 1.4rem; */
 }
+
+.milkdown .editor h1 {
+    font-size: 1.8em !important; /* Adjust the size as needed */
+}
+
+.milkdown .editor h2 {
+    font-size: 1.6em !important;
+}
+
+.milkdown .editor h3 {
+    font-size: 1.4em !important;
+}
+
+.milkdown .editor h4 {
+    font-size: 1.2em !important;
+}
+
+.milkdown .editor h5 {
+    font-size: 1.1em !important;
+}
+
+.milkdown .editor h6 {
+    font-size: 1.0em !important;
+}
+
 
 /* .milkdown {
     font-size: 1em;
