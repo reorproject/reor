@@ -17,10 +17,13 @@ AI second brain & personal knowledge management app. </h4>
 <!-- <img width="1202" alt="Screenshot 2024-01-10 at 18 50 03" src="https://github.com/reorproject/reor/assets/17236551/c85fdc6b-057f-4693-829a-d0e45da6113e"> -->
 <!-- <img width="1200" alt="Screenshot 2024-01-10 at 18 54 02" src="https://github.com/reorproject/reor/assets/17236551/e6d3b7af-d3f4-4ffe-a2a6-f4682beaff06"> -->
 
-![reor](https://github.com/reorproject/reor/assets/17236551/cf743f16-fe5d-4099-bc08-74b8c76709c4)
 
 ## About
-**The Reor Project** is a standalone app for managing and editing personal knowledge with AI. It connects related ideas automatically, organizes documents and answers questions with full RAG context of the knowledge base. You can search semantically in natural language and edit with the WYSIWYG Markdown editor. Think Obsidian meets AI second brain, but private & offline.
+**The Reor Project** is a personal knowledge management tool that automatically manages your knowledge with AI: It connects together related ideas, provides semantic search and answers questions with the full context of the knowledge base. You can edit your knowledge base with an Obsidian-like WYSIWYG markdown editor. 
+
+Reor was built right from the very start to be able to **run models locally**. We believe running models locally *(and privately)* is essential: no one entity should be able to control the world's new forms of intelligence, no matter how "open" they are. 
+
+![reor](https://github.com/reorproject/reor/assets/17236551/cf743f16-fe5d-4099-bc08-74b8c76709c4)
 
 
 ### Getting Started
@@ -45,4 +48,4 @@ The Reor Project is in currently in beta. And almost ready for stable release! O
 ## License
 GPL-3.0 license. See `LICENSE` for details.
 
-*Reor means "to think" in Latin :)
+**Reor means "to think" in Latin :)*
