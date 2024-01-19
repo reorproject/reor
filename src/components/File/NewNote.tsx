@@ -60,9 +60,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="ml-2 mr-6 mt-0 h-full min-w-[400px]">
-        <h2 className="text-xl font-semibold mb-3 text-white">
-          Create New Note
-        </h2>
+        <h2 className="text-xl font-semibold mb-3 text-white">New Note</h2>
         <input
           type="text"
           className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"

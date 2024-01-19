@@ -1,3 +1,4 @@
+import { removeFileExtension } from "@/functions/strings";
 import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
 import React, { useEffect, useState } from "react";
 import { FaChevronRight } from "react-icons/fa";
@@ -181,7 +182,7 @@ const FileItem: React.FC<FileInfoProps> = ({
             isDirectory ? "font-semibold" : ""
           }`}
         >
-          {file.name}
+          {removeFileExtension(file.name)}
         </span>
       </div>
       {isDirectory && isExpanded && file.children && (
