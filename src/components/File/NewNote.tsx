@@ -19,7 +19,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
 
   // const [isValidName, setIsValidName] = useState<boolean>(true);
 
-  const validNamePattern = /^[a-zA-Z0-9_-]+$/;
+  const validNamePattern = /^[a-zA-Z0-9_-\s]+$/;
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
@@ -31,6 +31,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
       setErrorMessage(""); // Clear error message for valid input
     } else {
       // Set an error message for invalid input
+      setFileName(newName);
       setErrorMessage(
         "Note name can only contain letters, numbers, underscores, and hyphens."
       );

@@ -20,12 +20,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     useState<SidebarAbleToShow>("files");
 
   const onFileSelect = async (path: string) => {
-    // so here we can save the actual content too\\
     if (selectedFilePath && editorContent !== lastSavedContentRef.current) {
-      await window.files.writeFile(selectedFilePath, editorContent);
+      await window.files.writeFile(selectedFilePath, editorContent); // save the current content.
     }
     setSelectedFilePath(path);
-    // window.ipcRenderer.send("open-file", path);
   };
   const toggleChatbot = () => {
     setShowChatbot(!showChatbot);
