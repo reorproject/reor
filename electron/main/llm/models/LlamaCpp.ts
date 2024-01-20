@@ -18,8 +18,11 @@ export class LlamaCPPSessionService implements ISessionService {
       model: this.model,
       contextSize: this.model.trainContextSize,
     });
+    // this.session = new nodeLLamaCpp.LlamaChatSession({
+    //   contextSequence: this.context.getSequence(),
+    // });
     this.session = new nodeLLamaCpp.LlamaChatSession({
-      contextSequence: this.context.getSequence(),
+      context: this.context,
     });
     // } catch (error) {
     //   console.error("Error thrown in initi:", error);
@@ -61,11 +64,9 @@ export class LlamaCPPSessionService implements ISessionService {
 
     try {
       return await this.session.prompt(prompt, {
-        temperature: 0.8,
-        topK: 40,
-        topP: 0.02,
         onToken: (chunk: any[]) => {
-          const decodedChunk = this.model.detokenize(chunk);
+          const decodedChunk = this.context.decode(chunk);
+          console.log("decoded chunk: ", decodedChunk);
           sendFunctionImplementer.send("tokenStream", {
             messageType: "success",
             content: decodedChunk,
