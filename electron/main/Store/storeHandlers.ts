@@ -124,11 +124,6 @@ const defaultAIModels: { [modelName: string]: AIModelConfig } = {
 
 async function setupDefaultModels(store: Store<StoreSchema>) {
   for (const [modelName, modelConfig] of Object.entries(defaultAIModels)) {
-    const result = await addNewModelSchemaToStore(
-      store,
-      modelName,
-      modelConfig
-    );
-    console.log(`Setup for ${modelName}: ${result}`);
+    await addNewModelSchemaToStore(store, modelName, modelConfig);
   }
 }
