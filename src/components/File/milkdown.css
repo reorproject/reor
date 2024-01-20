@@ -33,6 +33,20 @@
     line-height: 1.5;
 }
 
+/* do the s */
+.milkdown .editor ol, .milkdown .editor ul {
+    margin: 0em 0 !important;
+}
+
+.milkdown .editor blockquote {
+    margin: 0.5em 0 !important;
+    padding-left: 1em;
+    border-left: 3px solid #ccc; /* Example style */
+    /* Other styling as needed */
+}
+
+
+
 .milkdown .editor .heading {
     margin: 1rem 0 !important;
     /* font-size: 1.4rem; */
