@@ -45,7 +45,9 @@ const TitleBar: React.FC<TitleBarProps> = ({
       <div
         className=" flex"
         style={
-          platform === "darwin" ? { marginLeft: "70px" } : { marginLeft: "1px" }
+          platform === "darwin"
+            ? { marginLeft: "70px" }
+            : { marginLeft: "10px" }
         }
       >
         {/* <button className="bg-transparent border-none cursor-pointer">
@@ -55,17 +57,17 @@ const TitleBar: React.FC<TitleBarProps> = ({
           <IoFolderOutline className="text-gray-200 cursor-pointer" size={22} />
         </div>
         <div
-          className="ml-2 mt-[2.2px]"
+          className="ml-[15px] mt-[2.2px]"
           onClick={() => makeSidebarShow("search")}
         >
           <FaSearch
-            size={20}
-            className="mt-[3px] cursor-pointer text-gray-200"
+            size={18}
+            className="mt-[4.2px] cursor-pointer text-gray-200"
             // onClick={() => setShowSearch(true)}
           />
         </div>
         <button
-          className="bg-transparent border-none cursor-pointer ml-1"
+          className="bg-transparent border-none cursor-pointer ml-[8px]"
           onClick={toggleModal}
         >
           <FaRegPenToSquare className="text-gray-200" size={20} />
