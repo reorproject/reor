@@ -25,11 +25,12 @@ export class LanceDBTableWrapper {
   public userDirectory!: string;
   public dbConnection!: Connection;
 
-  async initialize(dbConnection: Connection, userDirectory: string) {
-    this.embedFun = await createEmbeddingFunction(
-      "Xenova/bge-base-en-v1.5",
-      "content"
-    );
+  async initialize(
+    dbConnection: Connection,
+    userDirectory: string,
+    embedFuncRepoName: string
+  ) {
+    this.embedFun = await createEmbeddingFunction(embedFuncRepoName, "content");
     this.userDirectory = userDirectory;
     this.dbConnection = dbConnection;
     this.table = await GetOrCreateLanceTable(

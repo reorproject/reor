@@ -203,28 +203,39 @@ ipcMain.handle("open-file-dialog", async (event, extensions) => {
     return [];
   }
 });
-
-ipcMain.on("index-files-in-directory", async (event, userDirectory: string) => {
-  // this should be called by default and
-  const dbPath = path.join(app.getPath("userData"), "vectordb");
-  console.log("dbPath: ", dbPath);
-  dbConnection = await lancedb.connect(dbPath);
-
-  await dbTable.initialize(dbConnection, userDirectory);
-
-  await repopulateTableWithMissingItems(
-    dbTable,
-    userDirectory,
-    markdownExtensions,
-    (progress) => {
-      event.sender.send("indexing-progress", progress);
+ipcMain.on("index-files-in-directory", async (event) => {
+  try {
+    const userDirectory = store.get(StoreKeys.UserDirectory) as string;
+    const embedFuncRepoName = store.get(
+      StoreKeys.DefaultEmbedFuncRepo
+    ) as string;
+    if (!embedFuncRepoName || !userDirectory) {
+      throw new Error("No default embed func repo or db path set");
     }
-  );
-  if (win) {
-    startWatchingDirectory(win, userDirectory, markdownExtensions);
-    updateFileListForRenderer(win, userDirectory, markdownExtensions);
+    const dbPath = path.join(app.getPath("userData"), "vectordb");
+    console.log("dbPath: ", dbPath);
+    dbConnection = await lancedb.connect(dbPath);
+
+    await dbTable.initialize(dbConnection, userDirectory, embedFuncRepoName);
+
+    await repopulateTableWithMissingItems(
+      dbTable,
+      userDirectory,
+      markdownExtensions,
+      (progress) => {
+        event.sender.send("indexing-progress", progress);
+      }
+    );
+    if (win) {
+      startWatchingDirectory(win, userDirectory, markdownExtensions);
+      updateFileListForRenderer(win, userDirectory, markdownExtensions);
+    }
+    event.sender.send("indexing-progress", 1);
+    // event.sender.send("indexing-complete", "success");
+  } catch (error) {
+    console.error("Error during file indexing:", error);
+    event.sender.send("indexing-progress", 1);
   }
-  event.sender.send("indexing-complete", "success");
 });
 
 ipcMain.on("show-context-menu-file-item", (event, file: FileInfoNode) => {

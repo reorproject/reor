@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { DBResult } from "electron/main/database/LanceTableWrapper";
 import { DBResultPreview } from "../File/DBResultPreview";
-// import DBResultPreview from "../File/DBResultPreview";
-// import { DatabaseFields } from "electron/main/database/Schema";
-// import { DatabaseFields } from "electron/main/database/Schema";
 
 interface SimilarEntriesComponentProps {
   filePath: string;
@@ -53,23 +50,34 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   }, [filePath]);
 
   useEffect(() => {
-    const listener = async () => {
-      console.log("received vector-database-update event");
+    const vectorDBUpdateListener = async () => {
       const searchResults = await performSearch(filePath);
       setSimilarEntries(searchResults);
     };
 
-    window.ipcRenderer.receive("vector-database-update", listener);
+    window.ipcRenderer.receive(
+      "vector-database-update",
+      vectorDBUpdateListener
+    );
     return () => {
-      window.ipcRenderer.removeListener("vector-database-update", listener);
+      window.ipcRenderer.removeListener(
+        "vector-database-update",
+        vectorDBUpdateListener
+      );
     };
   }, [filePath]);
 
   return (
     <div className="h-full overflow-y-auto overflow-x-hidden mt-0 border-l-[0.1px] border-t-0 border-b-0 border-r-0 border-gray-600 border-solid">
-      {/* <div className="flex justify-center items-center h-3 mt-2 mb-0 ">
-        <p className="text-gray-200 font-semibold">Similar notes</p>
-      </div> */}
+      {similarEntries.length === 0 && (
+        <div className="flex flex-col items-center justify-center h-full">
+          <div className="flex">
+            <p className="text-gray-500 text-lg">
+              Waiting for related notes...
+            </p>
+          </div>
+        </div>
+      )}
       {similarEntries.map((dbResult, index) => (
         <div className="p-2" key={index}>
           <DBResultPreview

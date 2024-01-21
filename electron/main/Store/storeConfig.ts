@@ -14,6 +14,7 @@ export interface StoreSchema {
     [modelName: string]: AIModelConfig;
   };
   defaultAIModel: string; // Key of the default model
+  defaultEmbedFuncRepo: string;
 }
 
 // Enum for store keys
@@ -22,4 +23,5 @@ export enum StoreKeys {
   UserOpenAIAPIKey = "user.openAIAPIKey",
   AIModels = "aiModels",
   DefaultAIModel = "defaultAIModel",
+  DefaultEmbedFuncRepo = "defaultEmbedFuncRepo",
 }
