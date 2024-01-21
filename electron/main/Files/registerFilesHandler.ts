@@ -40,10 +40,8 @@ export const registerFileHandlers = (
   ipcMain.handle(
     "write-file",
     async (event, filePath: string, content: string): Promise<void> => {
-      console.log("writing file", filePath);
-      // so here we can use the table we've created to add and remove things from the database. And all of the methods can be async to not hold up any threads
-      await updateFileInTable(dbTable, filePath, content);
       await fs.writeFileSync(filePath, content, "utf-8");
+      await updateFileInTable(dbTable, filePath, content);
       win?.webContents.send("vector-database-update");
     }
   );

@@ -31,7 +31,7 @@ declare global {
         limit: number,
         filter?: string
       ) => Promise<DBResult[]>;
-      indexFilesInDirectory: (directoryPath: string) => void;
+      indexFilesInDirectory: () => void;
       augmentPromptWithRAG: (
         prompt: string,
         numberOfContextItems: number,
@@ -69,8 +69,11 @@ declare global {
       getOpenAIAPIKey: () => string;
       getAIModelConfigs: () => Promise<Record<string, AIModelConfig>>;
       setupNewLocalLLM: (modelConfig: AIModelConfig) => Promise<void>;
+
       setDefaultAIModel: (modelName: string) => void;
-      getDefaultAIModel: () => Promise<string>;
+      getDefaultAIModel: () => string;
+      getDefaultEmbedFuncRepo: () => string;
+      setDefaultEmbedFuncRepo: (repoName: string) => void;
     };
   }
 }
@@ -83,8 +86,8 @@ contextBridge.exposeInMainWorld("database", {
   ): Promise<DBEntry[]> => {
     return ipcRenderer.invoke("search", query, limit, filter);
   },
-  indexFilesInDirectory: async (directoryPath: string) => {
-    return ipcRenderer.send("index-files-in-directory", directoryPath);
+  indexFilesInDirectory: async () => {
+    return ipcRenderer.send("index-files-in-directory");
   },
   augmentPromptWithRAG: async (
     prompt: string,
@@ -131,8 +134,15 @@ contextBridge.exposeInMainWorld("electronStore", {
     ipcRenderer.send("set-default-ai-model", modelName);
   },
 
-  getDefaultAIModel: async () => {
-    return ipcRenderer.invoke("get-default-ai-model");
+  getDefaultAIModel: () => {
+    return ipcRenderer.sendSync("get-default-ai-model");
+  },
+
+  getDefaultEmbedFuncRepo: () => {
+    return ipcRenderer.sendSync("get-default-embed-func-repo");
+  },
+  setDefaultEmbedFuncRepo: (repoName: string) => {
+    ipcRenderer.send("set-default-embed-func-repo", repoName);
   },
 });
 

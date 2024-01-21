@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
-import AIModelManager from "./LLMSettings";
+import LLMSettings from "./LLMSettings";
+import EmbeddingModelManager from "./EmbeddingSettings";
 
 interface Props {
-  onDirectorySelected: (path: string) => void;
+  readyForIndexing: () => void;
 }
 
-const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
+const InitialSetupSettings: React.FC<Props> = ({ readyForIndexing }) => {
   const [openAIKey, setOpenAIKey] = useState("");
   const [userDirectory, setUserDirectory] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+
   useEffect(() => {
     const key = window.electronStore.getOpenAIAPIKey() || ""; // Fallback to empty string if undefined
     setOpenAIKey(key);
@@ -20,11 +22,18 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
     window.electronStore.setOpenAIAPIKey(openAIKey);
     if (userDirectory) {
       window.electronStore.setUserDirectory(userDirectory);
-      onDirectorySelected(userDirectory);
+      readyForIndexing();
     } else {
       setErrorMsg("Please select a directory.");
     }
   };
+
+  useEffect(() => {
+    const directory = window.electronStore.getUserDirectory();
+    if (directory) {
+      setUserDirectory(directory);
+    }
+  }, []);
 
   const handleDirectorySelection = async () => {
     const paths = await window.files.openDirectoryDialog();
@@ -44,22 +53,6 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
       handleNext();
     }
   };
-
-  // useEffect(() => {
-  //   const listener = async (progress: string) => {
-  //     console.log(
-  //       "received vector-database-update event: PROGRESS: ",
-  //       progress
-  //     );
-  //     // const searchResults = await performSearch(filePath);
-  //     // setSimilarEntries(searchResults);
-  //   };
-
-  //   window.ipcRenderer.receive("indexing-progress", listener);
-  //   return () => {
-  //     window.ipcRenderer.removeListener("indexing-progress", listener);
-  //   };
-  // }, []);
 
   return (
     <Modal
@@ -93,22 +86,8 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
           )}
 
           <h4 className="font-semibold mb-2 text-white">Embedding Model</h4>
-          <input
-            type="text"
-            className="block w-full box-border px-3 py-2 mr-2 border border-gray-300 rounded-md bg-gray-200 cursor-not-allowed"
-            value={"BAAI/bge-base-en-v1.5"}
-            disabled
-            placeholder="Embedding Model Name"
-          />
-          <AIModelManager />
-          {/* <h4 className="font-semibold mb-2 text-white">LLM</h4>
-          <input
-            type="text"
-            className="block w-full px-3 py-2 box-border border border-gray-300 rounded-md bg-gray-200 cursor-not-allowed"
-            value={"GPT-3.5-turbo"}
-            disabled
-            placeholder="LLM Model Name"
-          /> */}
+          <EmbeddingModelManager />
+          <LLMSettings />
           <h4 className="font-semibold mb-2 text-white">
             Open AI Key (Optional)
           </h4>
@@ -135,4 +114,4 @@ const DirectoryPicker: React.FC<Props> = ({ onDirectorySelected }) => {
   );
 };
 
-export default DirectoryPicker;
+export default InitialSetupSettings;

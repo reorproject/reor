@@ -1,48 +1,53 @@
 // App.tsx
 import React, { useEffect, useState } from "react";
-import DirectoryPicker from "./components/Settings/InitialSettingsPage";
+import InitialSetupSettings from "./components/Settings/InitialSettingsPage";
 import FileEditorContainer from "./components/FileEditorContainer";
 import IndexingProgress from "./components/IndexingProgress";
 
 interface AppProps {}
 
 const App: React.FC<AppProps> = () => {
-  const [directory, setDirectory] = useState<string | null>(null);
-  const [isIndexing, setIsIndexing] = useState(false); // New state to track indexing
+  const [
+    userHasConfiguredSettingsForIndexing,
+    setUserHasConfiguredSettingsForIndexing,
+  ] = useState<boolean>(false);
+
+  const [indexingProgress, setIndexingProgress] = useState<number>(0);
+
+  useEffect(() => {
+    const handleProgressUpdate = (newProgress: number) => {
+      setIndexingProgress(newProgress);
+    };
+    // Listener stays active for any new indexing that happens from backend
+    window.ipcRenderer.receive("indexing-progress", handleProgressUpdate);
+  }, []);
 
   useEffect(() => {
     const initialDirectory = window.electronStore.getUserDirectory();
-    if (initialDirectory) {
-      setDirectory(initialDirectory);
-      setIsIndexing(true); // Start indexing
-      window.database.indexFilesInDirectory(initialDirectory);
-      // If directory exists, you may want to check if indexing is needed
+    const defaultEmbedFunc = window.electronStore.getDefaultEmbedFuncRepo();
+    if (initialDirectory && defaultEmbedFunc) {
+      setUserHasConfiguredSettingsForIndexing(true);
+      window.database.indexFilesInDirectory();
     }
   }, []);
 
-  const handleDirectorySelected = (directoryPath: string) => {
-    setIsIndexing(true); // Start indexing
-    setDirectory(directoryPath);
-    // Trigger indexing in your main process here
-    // Use IPC to send the directory path to the main process
-    window.database.indexFilesInDirectory(directoryPath);
+  const handleAllInitialSettingsAreReady = () => {
+    setUserHasConfiguredSettingsForIndexing(true);
+    window.database.indexFilesInDirectory();
   };
-
-  const handleIndexingComplete = () => {
-    setIsIndexing(false); // Indexing completed
-  };
-  // useEffect(() => {
 
   return (
     <div className="max-h-screen font-sans bg-gray-800">
-      {directory ? (
-        isIndexing ? (
-          <IndexingProgress onIndexingComplete={handleIndexingComplete} />
+      {userHasConfiguredSettingsForIndexing ? (
+        indexingProgress < 1 ? (
+          <IndexingProgress indexingProgress={indexingProgress} />
         ) : (
           <FileEditorContainer />
         )
       ) : (
-        <DirectoryPicker onDirectorySelected={handleDirectorySelected} />
+        <InitialSetupSettings
+          readyForIndexing={handleAllInitialSettingsAreReady}
+        />
       )}
     </div>
   );

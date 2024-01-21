@@ -23,14 +23,18 @@ export const registerStoreHandlers = (
     }
   );
 
+  ipcMain.on("set-default-embed-func-repo", (event, repoName: string) => {
+    store.set(StoreKeys.DefaultEmbedFuncRepo, repoName);
+  });
+
   ipcMain.on("set-default-ai-model", (event, modelName: string) => {
     console.log("setting default ai model", modelName);
     store.set(StoreKeys.DefaultAIModel, modelName);
   });
 
   // Handler to get the default AI model
-  ipcMain.handle("get-default-ai-model", () => {
-    return store.get(StoreKeys.DefaultAIModel);
+  ipcMain.on("get-default-ai-model", (event) => {
+    event.returnValue = store.get(StoreKeys.DefaultAIModel);
   });
 
   ipcMain.handle("get-ai-model-configs", () => {
@@ -72,6 +76,10 @@ export const registerStoreHandlers = (
     const path = store.get(StoreKeys.UserDirectory);
     event.returnValue = path;
   });
+
+  ipcMain.on("get-default-embed-func-repo", (event) => {
+    event.returnValue = store.get(StoreKeys.DefaultEmbedFuncRepo);
+  });
 };
 
 export async function addNewModelSchemaToStore(
@@ -79,7 +87,6 @@ export async function addNewModelSchemaToStore(
   modelName: string,
   modelConfig: AIModelConfig
 ): Promise<string> {
-  console.log("setting up new model", modelName, modelConfig);
   const existingModels =
     (store.get(StoreKeys.AIModels) as Record<string, AIModelConfig>) || {};
 

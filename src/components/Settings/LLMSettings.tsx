@@ -5,7 +5,7 @@ import { Button } from "@material-tailwind/react";
 import Modal from "../Generic/Modal";
 import ExternalLink from "../Generic/ExternalLink";
 
-const AIModelManager: React.FC = () => {
+const LLMSettings: React.FC = () => {
   const [modelConfigs, setModelConfigs] = useState<
     Record<string, AIModelConfig>
   >({});
@@ -135,4 +135,4 @@ const AIModelManager: React.FC = () => {
   );
 };
 
-export default AIModelManager;
+export default LLMSettings;
