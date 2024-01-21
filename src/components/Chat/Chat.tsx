@@ -43,7 +43,6 @@ const ChatWithLLM: React.FC = () => {
       initializeSession();
 
       const updateStream = (newMessage: ChatbotMessage) => {
-        console.log("Received new message:", newMessage);
         setCurrentBotMessage((prev) => {
           return {
             role: "assistant",
@@ -64,15 +63,18 @@ const ChatWithLLM: React.FC = () => {
   }, [sessionId]);
 
   const handleSubmitNewMessage = async () => {
+    let newMessages = messages;
     if (currentBotMessage) {
-      setMessages((prevMessages) => [
-        ...prevMessages,
+      newMessages = [
+        ...newMessages,
         {
           role: "assistant",
           messageType: currentBotMessage.messageType,
           content: currentBotMessage.content,
         },
-      ]);
+      ];
+      setMessages(newMessages);
+
       setCurrentBotMessage({
         messageType: "success",
         content: "",
@@ -81,17 +83,20 @@ const ChatWithLLM: React.FC = () => {
     }
     if (!sessionId || !userInput.trim()) return;
 
-    if (messages.length <= 1) {
+    if (newMessages.length <= 1) {
+      console.log("Augmenting prompt with RAG...");
       const augmentedPrompt = await window.database.augmentPromptWithRAG(
         userInput,
-        5
+        2
       );
       startStreamingResponse(sessionId, augmentedPrompt);
     } else {
       startStreamingResponse(sessionId, userInput);
     }
-    setMessages((prevMessages) => [
-      ...prevMessages,
+
+    // Add the user's message to the messages
+    setMessages([
+      ...newMessages,
       { role: "user", messageType: "success", content: userInput },
     ]);
     setUserInput("");
