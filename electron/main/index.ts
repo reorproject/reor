@@ -33,7 +33,7 @@ import { repopulateTableWithMissingItems } from "./database/TableHelperFunctions
 
 const store = new Store<StoreSchema>();
 // const user = store.get("user");
-// store.clear();
+store.clear();
 
 // Check if 'user' and 'directory' exist before attempting to delete
 // if (user && typeof user === "object" && "directory" in user) {
@@ -206,11 +206,14 @@ ipcMain.handle("open-file-dialog", async (event, extensions) => {
 ipcMain.on("index-files-in-directory", async (event) => {
   try {
     const userDirectory = store.get(StoreKeys.UserDirectory) as string;
+    if (!userDirectory) {
+      throw new Error("No user directory set");
+    }
     const embedFuncRepoName = store.get(
       StoreKeys.DefaultEmbedFuncRepo
     ) as string;
-    if (!embedFuncRepoName || !userDirectory) {
-      throw new Error("No default embed func repo or db path set");
+    if (!embedFuncRepoName) {
+      throw new Error("No default embed func repo set");
     }
     const dbPath = path.join(app.getPath("userData"), "vectordb");
     console.log("dbPath: ", dbPath);

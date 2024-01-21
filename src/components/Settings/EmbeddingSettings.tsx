@@ -22,6 +22,7 @@ const EmbeddingModelManager: React.FC<EmbeddingModelManagerProps> = ({
       setSelectedModel(defaultModel);
     } else {
       setSelectedModel(modelRepos[0]);
+      window.electronStore.setDefaultEmbedFuncRepo(modelRepos[0]);
       if (handleUserHasChangedModel) {
         handleUserHasChangedModel(true);
       }

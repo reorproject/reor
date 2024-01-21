@@ -32,6 +32,7 @@ export const repopulateTableWithMissingItems = async (
   await table.delete(filterString);
   const flattenedItemsToAdd = dbItemsToAdd.flat();
   await table.add(flattenedItemsToAdd, onProgress);
+  console.log("done adding");
   onProgress && onProgress(1);
 };
 
