@@ -25,7 +25,9 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
       try {
         await window.files.writeFile(selectedFilePath, editorContent); // save the current content.
       } catch (e) {
-        toast.error("Error saving current file! Please try again.");
+        toast.error("Error saving current file! Please try again.", {
+          className: "mt-5",
+        });
         return;
       }
     }

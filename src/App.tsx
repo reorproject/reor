@@ -26,6 +26,7 @@ const App: React.FC<AppProps> = () => {
     const handleIndexingError = (error: string) => {
       console.log("Indexing error:", error);
       toast.error(error, {
+        className: "mt-5",
         autoClose: false,
         closeOnClick: false,
         draggable: false,
