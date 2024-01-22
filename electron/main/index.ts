@@ -79,7 +79,7 @@ const fileWatcher: FSWatcher | null = null;
 async function createWindow() {
   win = new BrowserWindow({
     title: "Main window",
-    icon: join(process.env.VITE_PUBLIC, "favicon.ico"),
+    // icon: join(process.env.VITE_PUBLIC, "favicon.ico"), // oh we could also try just setting this to .ico
     webPreferences: {
       preload,
     },
