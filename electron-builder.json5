@@ -26,6 +26,7 @@
   },
   linux: {
     artifactName: "${productName}_${version}.${ext}",
+    asarUnpack: ["**/node_modules/sharp/**"],
     target: [
       // {
       //   target: "deb",
