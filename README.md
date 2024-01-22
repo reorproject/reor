@@ -30,13 +30,6 @@ Reor was built right from the very start to **run models locally**. We believe r
 1. Download from [reorproject.org](https://reorproject.org). Mac, Linux & Windows are all supported.
 2. Install like a normal App.
 
-### Extra Linux packages:
-Strangely, Linux causes some package issues with regards to Transformers.js (the library we use for embeddings). So you may need to install the following packages: "fuse", "libfuse2", "libvips". On Ubuntu:
-```
-sudo apt update
-sudo apt install fuse libfuse2 libvips
-```
-
 ### Importing from other apps
 Reor works within a single directory in the filesystem. You choose the directory on first boot.
 To import notes/files from another app, you'll need to populate that directory manually with markdown files. Integrations with other apps are hopefully coming soon!
