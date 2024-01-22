@@ -6,6 +6,7 @@ import LeftSidebar from "./Sidebars/IconsSidebar";
 import MilkdownEditor from "./File/MilkdownEditor";
 import ResizableComponent from "./Generic/ResizableComponent";
 import SidebarManager from "./Sidebars/MainSidebar";
+import { toast } from "react-toastify";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search";
@@ -21,7 +22,12 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
 
   const onFileSelect = async (path: string) => {
     if (selectedFilePath && editorContent !== lastSavedContentRef.current) {
-      await window.files.writeFile(selectedFilePath, editorContent); // save the current content.
+      try {
+        await window.files.writeFile(selectedFilePath, editorContent); // save the current content.
+      } catch (e) {
+        toast.error("Error saving current file! Please try again.");
+        return;
+      }
     }
     setSelectedFilePath(path);
   };

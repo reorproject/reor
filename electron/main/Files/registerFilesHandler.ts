@@ -41,8 +41,12 @@ export const registerFileHandlers = (
     "write-file",
     async (event, filePath: string, content: string): Promise<void> => {
       await fs.writeFileSync(filePath, content, "utf-8");
-      await updateFileInTable(dbTable, filePath, content);
-      win?.webContents.send("vector-database-update");
+      try {
+        await updateFileInTable(dbTable, filePath, content);
+        win?.webContents.send("vector-database-update");
+      } catch (error) {
+        console.error("Error updating file in table:", error);
+      }
     }
   );
 
