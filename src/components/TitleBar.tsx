@@ -57,7 +57,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
           <IoFolderOutline className="text-gray-200 cursor-pointer" size={22} />
         </div>
         <div
-          className="ml-[15px] mt-[2.2px]"
+          className="ml-[12px] mt-[2.2px]"
           onClick={() => makeSidebarShow("search")}
         >
           <FaSearch
@@ -67,7 +67,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
           />
         </div>
         <button
-          className="bg-transparent border-none cursor-pointer ml-[8px]"
+          className="bg-transparent border-none cursor-pointer ml-[6px]"
           onClick={toggleModal}
         >
           <FaRegPenToSquare className="text-gray-200" size={20} />
