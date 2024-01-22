@@ -25,14 +25,11 @@ const App: React.FC<AppProps> = () => {
   useEffect(() => {
     const handleIndexingError = (error: string) => {
       console.log("Indexing error:", error);
-      toast.error(
-        `Indexing error you won't be able to use chat nor related notes: ${error}. Please try restarting or send me an email with your error: samlhuillier1@gmail.com`,
-        {
-          autoClose: false,
-          closeOnClick: false,
-          draggable: false,
-        }
-      );
+      toast.error(error, {
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
+      });
       setIndexingProgress(1);
     };
     window.ipcRenderer.receive("indexing-error", handleIndexingError);

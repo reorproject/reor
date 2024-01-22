@@ -236,6 +236,14 @@ ipcMain.on("index-files-in-directory", async (event) => {
     event.sender.send("indexing-progress", 1);
     // event.sender.send("indexing-complete", "success");
   } catch (error) {
+    const platform = process.platform;
+    if (platform === "linux") {
+      const linuxError = `Indexing error: ${error}. Given that you are on Linux, please install libvips and try again.`;
+      event.sender.send("indexing-error", linuxError);
+    } else {
+      const nonLinuxError = `Indexing error: ${error}. Please try restarting or send me an email with your error: samlhuillier1@gmail.com`;
+      event.sender.send("indexing-error", nonLinuxError);
+    }
     console.error("Error during file indexing:", error);
     event.sender.send("indexing-error", error);
   }
