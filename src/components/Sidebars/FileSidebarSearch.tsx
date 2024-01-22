@@ -20,7 +20,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   const searchInputRef = useRef<HTMLInputElement>(null); // Reference for the input field
 
   const handleSearch = async (query: string) => {
-    const results: DBResult[] = await window.database.search(query, 20);
+    const results: DBResult[] = await window.database.search(query, 50);
     setSearchResults(results);
   };
 

@@ -237,7 +237,7 @@ ipcMain.on("index-files-in-directory", async (event) => {
     // event.sender.send("indexing-complete", "success");
   } catch (error) {
     console.error("Error during file indexing:", error);
-    event.sender.send("indexing-progress", 1);
+    event.sender.send("indexing-error", error);
   }
 });
 

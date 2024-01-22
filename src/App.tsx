@@ -1,5 +1,6 @@
-// App.tsx
 import React, { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import InitialSetupSettings from "./components/Settings/InitialSettingsPage";
 import FileEditorContainer from "./components/FileEditorContainer";
 import IndexingProgress from "./components/IndexingProgress";
@@ -18,8 +19,23 @@ const App: React.FC<AppProps> = () => {
     const handleProgressUpdate = (newProgress: number) => {
       setIndexingProgress(newProgress);
     };
-    // Listener stays active for any new indexing that happens from backend
     window.ipcRenderer.receive("indexing-progress", handleProgressUpdate);
+  }, []);
+
+  useEffect(() => {
+    const handleIndexingError = (error: string) => {
+      console.log("Indexing error:", error);
+      toast.error(
+        `Indexing error you won't be able to use chat nor related notes: ${error}. Please try restarting or send me an email with your error: samlhuillier1@gmail.com`,
+        {
+          autoClose: false,
+          closeOnClick: false,
+          draggable: false,
+        }
+      );
+      setIndexingProgress(1);
+    };
+    window.ipcRenderer.receive("indexing-error", handleIndexingError);
   }, []);
 
   useEffect(() => {
@@ -38,6 +54,7 @@ const App: React.FC<AppProps> = () => {
 
   return (
     <div className="max-h-screen font-sans bg-gray-800">
+      <ToastContainer />
       {userHasConfiguredSettingsForIndexing ? (
         indexingProgress < 1 ? (
           <IndexingProgress indexingProgress={indexingProgress} />
