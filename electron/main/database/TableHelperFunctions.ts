@@ -5,7 +5,7 @@ import {
   readFile,
 } from "../Files/Filesystem";
 import { FileInfo, FileInfoTree } from "../Files/Types";
-import { chunkMarkdownByHeadings } from "../RAG/Chunking";
+import { chunkMarkdownByHeadingsAndByCharsIfBig } from "../RAG/Chunking";
 import { DBEntry, DBResult, LanceDBTableWrapper } from "./LanceTableWrapper";
 
 export const repopulateTableWithMissingItems = async (
@@ -14,11 +14,12 @@ export const repopulateTableWithMissingItems = async (
   extensionsToFilterFor: string[],
   onProgress?: (progress: number) => void
 ) => {
-  const filesInfoList = GetFilesInfoList(directoryPath, extensionsToFilterFor);
+  const filesInfoTree = GetFilesInfoList(directoryPath, extensionsToFilterFor);
   const tableArray = await getTableAsArray(table);
-  const dbItemsToAdd = computeDbItemsToAdd(filesInfoList, tableArray);
+  const dbItemsToAdd = await computeDbItemsToAdd(filesInfoTree, tableArray);
   if (dbItemsToAdd.length == 0) {
     console.log("no items to add");
+    console.log("TABLE COUNT IS: ", await table.countRows());
     onProgress && onProgress(1);
     return;
   }
@@ -53,13 +54,17 @@ const getTableAsArray = async (table: LanceDBTableWrapper) => {
   return results;
 };
 
-const computeDbItemsToAdd = (
+const computeDbItemsToAdd = async (
   filesInfoList: FileInfo[],
   tableArray: DBEntry[]
-): DBEntry[][] => {
-  return filesInfoList
-    .map(convertFileTypeToDBType)
-    .filter((listOfChunks) => filterChunksNotInTable(listOfChunks, tableArray));
+): Promise<DBEntry[][]> => {
+  const promises = filesInfoList.map(convertFileTypeToDBType);
+
+  const convertedItems = await Promise.all(promises);
+
+  return convertedItems.filter((listOfChunks) =>
+    filterChunksNotInTable(listOfChunks, tableArray)
+  );
 };
 
 const filterChunksNotInTable = (
@@ -79,15 +84,23 @@ const filterChunksNotInTable = (
   return listOfChunks.length != itemsAlreadyInTable.length;
 };
 
-const convertFileTreeToDBEntries = (tree: FileInfoTree): DBEntry[] => {
+const convertFileTreeToDBEntries = async (
+  tree: FileInfoTree
+): Promise<DBEntry[]> => {
   const flattened = flattenFileInfoTree(tree);
-  const entries = flattened.flatMap(convertFileTypeToDBType);
-  return entries;
+
+  // Map each file info to a promise using the async function
+  const promises = flattened.map(convertFileTypeToDBType);
+
+  // Wait for all promises to resolve
+  const entries = await Promise.all(promises);
+
+  return entries.flat();
 };
 
-const convertFileTypeToDBType = (file: FileInfo): DBEntry[] => {
+const convertFileTypeToDBType = async (file: FileInfo): Promise<DBEntry[]> => {
   const fileContent = readFile(file.path);
-  const chunks = chunkMarkdownByHeadings(fileContent);
+  const chunks = await chunkMarkdownByHeadingsAndByCharsIfBig(fileContent);
   const entries = chunks.map((content, index) => {
     return {
       notepath: file.path,
@@ -103,7 +116,7 @@ export const addTreeToTable = async (
   dbTable: LanceDBTableWrapper,
   fileTree: FileInfoTree
 ): Promise<void> => {
-  const dbEntries = convertFileTreeToDBEntries(fileTree);
+  const dbEntries = await convertFileTreeToDBEntries(fileTree);
   await dbTable.add(dbEntries);
 };
 
@@ -126,7 +139,9 @@ export const updateFileInTable = async (
   // TODO: maybe convert this to have try catch blocks.
   await dbTable.delete(`${DatabaseFields.NOTE_PATH} = '${filePath}'`);
   const currentTimestamp: Date = new Date();
-  const chunkedContentList = chunkMarkdownByHeadings(content);
+  const chunkedContentList = await chunkMarkdownByHeadingsAndByCharsIfBig(
+    content
+  );
   const dbEntries = chunkedContentList.map((content, index) => {
     return {
       notepath: filePath,
