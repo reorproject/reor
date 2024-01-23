@@ -3,11 +3,10 @@ import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 export const chunkMarkdownByHeadingsAndByCharsIfBig = async (
   markdownContent: string
 ): Promise<string[]> => {
-  const chunkSize = 400;
+  const chunkSize = 600;
   const chunkOverlap = 20;
   const chunksByHeading = chunkMarkdownByHeadings(markdownContent);
 
-  // it doesn't matter the order of the chunks so we should just split by those which are above our chunk size and those below our chunk size:
   const chunksWithBigChunksSplit: string[] = [];
   const chunksWithSmallChunksSplit: string[] = [];
   chunksByHeading.forEach((chunk) => {
@@ -17,15 +16,13 @@ export const chunkMarkdownByHeadingsAndByCharsIfBig = async (
       chunksWithSmallChunksSplit.push(chunk);
     }
   });
-  // console.log("chunksWithBigChunksSplit: ", chunksWithBigChunksSplit);
-  // then we can split the big chunks by characters:
+
   const chunkedRecursively = await chunkStringsRecursively(
     chunksWithBigChunksSplit,
     chunkSize,
     chunkOverlap
   );
 
-  // then we can return the two arrays concatenated:
   return chunksWithSmallChunksSplit.concat(chunkedRecursively);
 };
 

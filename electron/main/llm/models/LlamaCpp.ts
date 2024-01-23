@@ -1,22 +1,30 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { AIModelConfig } from "electron/main/Store/storeConfig";
 import { ISendFunctionImplementer, ISessionService } from "../Types";
 
 export class LlamaCPPSessionService implements ISessionService {
   private session: any;
-  public context: any;
+  private context: any;
   private model: any; // Model instance
+  public activeContextSize?: number;
 
-  async init(localModelPath: string): Promise<void> {
+  async init(storeModelConfig: AIModelConfig): Promise<void> {
     // try {
-    await this.loadModel(localModelPath);
+
+    await this.loadModel(storeModelConfig.localPath);
     if (!this.isModelLoaded()) {
       throw new Error("Model not loaded");
     }
 
+    this.activeContextSize = chooseRightContextSize(
+      this.model.trainContextSize,
+      storeModelConfig.contextLength
+    );
+
     const nodeLLamaCpp = await import("node-llama-cpp");
     this.context = new nodeLLamaCpp.LlamaContext({
       model: this.model,
-      contextSize: this.model.trainContextSize,
+      contextSize: this.activeContextSize, // so for now, this doesn't do much to prevent context crashes
     });
     // this.session = new nodeLLamaCpp.LlamaChatSession({
     //   contextSequence: this.context.getSequence(),
@@ -35,7 +43,7 @@ export class LlamaCPPSessionService implements ISessionService {
     const nodeLLamaCpp = await import("node-llama-cpp");
     this.model = new nodeLLamaCpp.LlamaModel({
       modelPath: localModelPath,
-      gpuLayers: 0,
+      gpuLayers: getGPULayersToUse(),
     });
     // } catch (error) {
     //   console.log("Error:", JSON.stringify(error, null, 2));
@@ -66,6 +74,8 @@ export class LlamaCPPSessionService implements ISessionService {
       return await this.session.prompt(prompt, {
         onToken: (chunk: any[]) => {
           const decodedChunk = this.context.decode(chunk);
+          // const encodedDecode = this.context.encode(decodedChunk);
+          // console.log("ENCODED :", encodedDecode);
           console.log("decoded chunk: ", decodedChunk);
           sendFunctionImplementer.send("tokenStream", {
             messageType: "success",
@@ -82,8 +92,7 @@ export class LlamaCPPSessionService implements ISessionService {
     }
   }
 }
-
-function errorToString(error: unknown): string {
+export function errorToString(error: unknown): string {
   if (error instanceof Error) {
     // Use toString() method for Error objects
     return error.toString();
@@ -92,3 +101,24 @@ function errorToString(error: unknown): string {
     return String(error);
   }
 }
+
+const getGPULayersToUse = (): number => {
+  if (process.platform === "darwin" && process.arch === "arm64") {
+    return 100; // NOTE: Will use fewer GPU layers if the model has fewer layers.
+  }
+  return 0;
+};
+
+const chooseRightContextSize = (
+  modelContextSize: number,
+  storeContextSize?: number
+): number => {
+  if (
+    storeContextSize &&
+    storeContextSize > 0 &&
+    storeContextSize < modelContextSize
+  ) {
+    return storeContextSize;
+  }
+  return modelContextSize;
+};

@@ -1,6 +1,6 @@
 export interface AIModelConfig {
   localPath: string;
-  contextLength: number;
+  contextLength?: number;
   errorMsg?: string;
   engine: "openai" | "llamacpp";
 }

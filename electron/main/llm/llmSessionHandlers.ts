@@ -91,7 +91,7 @@ async function createSession(
     sessions[sessionId] = sessionService;
   } else {
     const sessionService = new LlamaCPPSessionService();
-    await sessionService.init(currentConfig.localPath);
+    await sessionService.init(currentConfig);
     sessions[sessionId] = sessionService;
   }
   return sessionId;
