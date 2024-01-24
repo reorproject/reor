@@ -5,12 +5,9 @@ export function createRAGPrompt(entries: DBEntry[], query: string): string {
   const contents = entries.map((entry) => entry.content).join(" ");
 
   // Combine the contents with the query to form the final prompt
-  const prompt = `Given the following notes:
-  ### Notes start ###
-  ${contents}
-  ### Notes end ###
-  Answer the following user query responding directly to the user:
-   ${query}`;
+  const prompt = `Answer the question below based on the following notes:
+${contents}
+Question: ${query}`;
 
   return prompt;
 }
