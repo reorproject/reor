@@ -59,7 +59,9 @@ const InitialSetupSettings: React.FC<Props> = ({ initialSettingsAreReady }) => {
           {currentStep === 3 && (
             <>
               {/* LLM Settings Component */}
-              <LLMSettings />
+              <LLMSettings
+                userHasCompleted={(completed) => setNextPageAllowed(completed)}
+              />
               {/* Open AI Key Input */}
             </>
           )}

@@ -5,7 +5,11 @@ import { Button } from "@material-tailwind/react";
 import Modal from "../Generic/Modal";
 import ExternalLink from "../Generic/ExternalLink";
 
-const LLMSettings: React.FC = () => {
+interface LLMSettingsProps {
+  userHasCompleted?: (completed: boolean) => void;
+}
+
+const LLMSettings: React.FC = ({ userHasCompleted }) => {
   const [modelConfigs, setModelConfigs] = useState<
     Record<string, AIModelConfig>
   >({});
@@ -48,6 +52,13 @@ const LLMSettings: React.FC = () => {
     fetchModelConfigs();
     setIsNewLocalModelModalOpen(false);
   };
+
+  useEffect(() => {
+    // this condition may in fact be less necessary: no need for the user to use chatbot...
+    if (userHasCompleted && defaultModel) {
+      userHasCompleted(true);
+    }
+  }, [defaultModel]);
 
   const handleDefaultModelChange = (selectedModel: string) => {
     setDefaultModel(selectedModel);
