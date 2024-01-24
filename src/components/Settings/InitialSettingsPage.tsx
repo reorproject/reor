@@ -1,56 +1,36 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
 import LLMSettings from "./LLMSettings";
 import EmbeddingModelManager from "./EmbeddingSettings";
+import DirectoryPicker from "./DirectoryPicker";
 
 interface Props {
-  readyForIndexing: () => void;
+  initialSettingsAreReady: () => void;
 }
 
-const InitialSetupSettings: React.FC<Props> = ({ readyForIndexing }) => {
-  const [openAIKey, setOpenAIKey] = useState("");
-  const [userDirectory, setUserDirectory] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
-
-  useEffect(() => {
-    const key = window.electronStore.getOpenAIAPIKey() || ""; // Fallback to empty string if undefined
-    setOpenAIKey(key);
-  }, []);
+const InitialSetupSettings: React.FC<Props> = ({ initialSettingsAreReady }) => {
+  const [currentStep, setCurrentStep] = useState(1);
+  // const [openAIKey, setOpenAIKey] = useState("");
+  // const [userDirectory, setUserDirectory] = useState("");
+  // const [errorMsg, setErrorMsg] = useState("");
+  const [nextPageAllowed, setNextPageAllowed] = useState(false);
 
   const handleNext = () => {
-    window.electronStore.setOpenAIAPIKey(openAIKey);
-    if (userDirectory) {
-      window.electronStore.setUserDirectory(userDirectory);
-      readyForIndexing();
+    if (currentStep < 3 && nextPageAllowed) {
+      setCurrentStep(currentStep + 1);
+      setNextPageAllowed(false);
     } else {
-      setErrorMsg("Please select a directory.");
+      if (nextPageAllowed) {
+        initialSettingsAreReady();
+      }
     }
   };
 
-  useEffect(() => {
-    const directory = window.electronStore.getUserDirectory();
-    if (directory) {
-      setUserDirectory(directory);
-    }
-  }, []);
-
-  const handleDirectorySelection = async () => {
-    const paths = await window.files.openDirectoryDialog();
-    if (!paths) {
-      return;
-    }
-    const path = paths[0];
-    if (path) {
-      setUserDirectory(path);
-      // window.electronStore.setUserDirectory(path);
-      // onDirectorySelected(path);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleNext();
+  const handleBack = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+      setNextPageAllowed(false);
     }
   };
 
@@ -61,53 +41,49 @@ const InitialSetupSettings: React.FC<Props> = ({ readyForIndexing }) => {
       hideCloseButton={true}
     >
       <div className="w-full mr-3">
-        <div className="ml-2 mt-0 h-full  ">
-          <h2 className="text-2xl font-semibold mb-0 text-white">
-            Welcome to the Reor Project.
-          </h2>
-          <p className="mt-2 text-gray-100">
-            Reor is a self-organising note-taking app. Each note will be saved
-            as a markdown file to a &quot;vault&quot; directory on your machine.
-          </p>
-          <p className="mt-2 text-gray-100">
-            Please choose your vault directory here:
-          </p>
-          <Button
-            className="bg-slate-700  border-none h-10 hover:bg-slate-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
-            onClick={handleDirectorySelection}
-            placeholder=""
-          >
-            Select Directory
-          </Button>
-          {userDirectory && (
-            <p className="mt-2 text-xs text-gray-100">
-              Selected: <strong>{userDirectory}</strong>
-            </p>
+        <div className="ml-2 mt-0 h-full">
+          {/* Conditional rendering based on currentStep */}
+          {currentStep === 1 && (
+            <DirectoryPicker
+              userHasCompleted={(allowed) => setNextPageAllowed(allowed)}
+            />
+          )}
+          {currentStep === 2 && (
+            <>
+              {/* Embedding Model Setup Component */}
+              <EmbeddingModelManager
+                userHasCompleted={(completed) => setNextPageAllowed(completed)}
+              />
+            </>
+          )}
+          {currentStep === 3 && (
+            <>
+              {/* LLM Settings Component */}
+              <LLMSettings />
+              {/* Open AI Key Input */}
+            </>
           )}
 
-          <h4 className="font-semibold mb-2 text-white">Embedding Model</h4>
-          <EmbeddingModelManager />
-          <LLMSettings />
-          <h4 className="font-semibold mb-2 text-white">
-            Open AI Key (Optional)
-          </h4>
-          <input
-            type="text"
-            className="block w-full px-3 py-2 box-border border border-gray-300 rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
-            value={openAIKey}
-            onChange={(e) => setOpenAIKey(e.target.value)}
-            onKeyDown={handleKeyPress}
-            placeholder="Open AI API Key"
-          />
-
-          <Button
-            className="bg-slate-700 mt-6 mb-3  border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
-            onClick={handleNext}
-            placeholder=""
-          >
-            Next
-          </Button>
-          {errorMsg && <p className="text-xs text-red-500">{errorMsg}</p>}
+          <div className="flex justify-between mt-5">
+            {currentStep > 1 ? (
+              <Button
+                className="bg-slate-700 mb-3 border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center"
+                onClick={handleBack}
+                placeholder=""
+              >
+                Back
+              </Button>
+            ) : (
+              <div className="flex-grow"></div>
+            )}
+            <Button
+              className="bg-slate-700 mb-3 border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center"
+              onClick={handleNext}
+              placeholder=""
+            >
+              {currentStep < 3 ? "Next" : "Submit"}
+            </Button>
+          </div>
         </div>
       </div>
     </Modal>

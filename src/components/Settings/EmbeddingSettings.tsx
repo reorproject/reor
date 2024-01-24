@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import CustomSelect from "../Generic/Select";
 
 interface EmbeddingModelManagerProps {
+  userHasCompleted?: (completed: boolean) => void;
   handleUserHasChangedModel?: (bool: boolean) => void;
 }
 const EmbeddingModelManager: React.FC<EmbeddingModelManagerProps> = ({
+  userHasCompleted,
   handleUserHasChangedModel,
 }) => {
   const modelRepos = [
@@ -14,8 +16,8 @@ const EmbeddingModelManager: React.FC<EmbeddingModelManagerProps> = ({
     "Xenova/all-MiniLM-L6-v2",
   ];
 
-  // State to keep track of the selected model
   const [selectedModel, setSelectedModel] = useState<string>("");
+
   useEffect(() => {
     const defaultModel = window.electronStore.getDefaultEmbedFuncRepo();
     if (defaultModel) {
@@ -28,6 +30,12 @@ const EmbeddingModelManager: React.FC<EmbeddingModelManagerProps> = ({
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (userHasCompleted && selectedModel) {
+      userHasCompleted(true);
+    }
+  }, [selectedModel]);
 
   const handleChangeOnModelSelect = (newSelectedModel: string) => {
     setSelectedModel(newSelectedModel);

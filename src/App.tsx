@@ -61,7 +61,7 @@ const App: React.FC<AppProps> = () => {
         )
       ) : (
         <InitialSetupSettings
-          readyForIndexing={handleAllInitialSettingsAreReady}
+          initialSettingsAreReady={handleAllInitialSettingsAreReady}
         />
       )}
     </div>
