@@ -10,7 +10,7 @@ export function validateAIModelConfig(
   }
 
   // Validate contextLength: ensure it's a positive number
-  if (config.contextLength <= 0) {
+  if (config.contextLength && config.contextLength <= 0) {
     return "Context length must be a positive number.";
   }
 

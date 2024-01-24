@@ -38,7 +38,7 @@ export const registerDBSessionHandlers = (dbTable: LanceDBTableWrapper) => {
             numberOfContextItems,
             filter
           );
-        } // so perhaps here we can pass in both the tokenizer and the context limit into the createRAGPrompt function
+        }
         const prompt = createRAGPrompt(searchResults, query);
         console.log("rag augmented prompt:", prompt);
         return prompt;
