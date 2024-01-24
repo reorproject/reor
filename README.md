@@ -19,7 +19,7 @@ AI second brain & personal knowledge management app. </h4>
 
 
 ## About
-**The Reor Project** is a personal knowledge management tool that automatically manages your knowledge with AI: It connects together related ideas, provides semantic search and answers questions with the full context of the knowledge base. You can edit your knowledge base with an Obsidian-like WYSIWYG markdown editor. 
+**The Reor Project** is a personal knowledge management tool that automatically organizes knowledge with AI: It connects together related ideas, provides semantic search and answers questions with the full context of everything in the knowledge base. You can also edit notes with an Obsidian-like WYSIWYG markdown editor. 
 
 Reor was built right from the very start to **run models locally**. We believe running models locally *(and privately)* is essential: no one entity should be able to control the world's first artificially intelligent systems, nor your personal thoughts, no matter how "open" they are. 
 
