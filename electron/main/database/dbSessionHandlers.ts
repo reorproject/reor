@@ -31,12 +31,14 @@ export const registerDBSessionHandlers = (dbTable: LanceDBTableWrapper) => {
       filter?: string
     ): Promise<string> => {
       try {
-        // Assuming 'myDatabase' is your database instance with the 'search' method
-        const searchResults = await dbTable.search(
-          query,
-          numberOfContextItems,
-          filter
-        );
+        let searchResults: DBEntry[] = [];
+        if (numberOfContextItems > 0) {
+          searchResults = await dbTable.search(
+            query,
+            numberOfContextItems,
+            filter
+          );
+        } // so perhaps here we can pass in both the tokenizer and the context limit into the createRAGPrompt function
         const prompt = createRAGPrompt(searchResults, query);
         console.log("rag augmented prompt:", prompt);
         return prompt;

@@ -193,7 +193,7 @@ ipcMain.handle("open-file-dialog", async (event, extensions) => {
     extensions && extensions.length > 0 ? [{ name: "Files", extensions }] : [];
 
   const result = await dialog.showOpenDialog({
-    properties: ["openFile", "multiSelections"],
+    properties: ["openFile", "multiSelections", "showHiddenFiles"], // Add 'showHiddenFiles' here
     filters: filters,
   });
 
@@ -203,6 +203,7 @@ ipcMain.handle("open-file-dialog", async (event, extensions) => {
     return [];
   }
 });
+
 ipcMain.on("index-files-in-directory", async (event) => {
   try {
     const userDirectory = store.get(StoreKeys.UserDirectory) as string;

@@ -20,18 +20,22 @@ export class LlamaCPPSessionService implements ISessionService {
       this.model.trainContextSize,
       storeModelConfig.contextLength
     );
-
+    // console.log("ACTIVE CONTEXT SIZE:", this.activeContextSize);
+    console.log(
+      "MODEL: this.model.trainContextSize",
+      this.model.trainContextSize
+    );
     const nodeLLamaCpp = await import("node-llama-cpp");
     this.context = new nodeLLamaCpp.LlamaContext({
       model: this.model,
-      contextSize: this.activeContextSize, // so for now, this doesn't do much to prevent context crashes
+      contextSize: 2048, // so for now, this doesn't do much to prevent context crashes
+    });
+    this.session = new nodeLLamaCpp.LlamaChatSession({
+      contextSequence: this.context.getSequence(),
     });
     // this.session = new nodeLLamaCpp.LlamaChatSession({
-    //   contextSequence: this.context.getSequence(),
+    //   context: this.context,
     // });
-    this.session = new nodeLLamaCpp.LlamaChatSession({
-      context: this.context,
-    });
     // } catch (error) {
     //   console.error("Error thrown in initi:", error);
     //   throw error; // Re-throw the error to propagate it up
@@ -57,6 +61,11 @@ export class LlamaCPPSessionService implements ISessionService {
     return !!this.model;
   }
 
+  public tokenize(text: string): number[] {
+    return this.session.model.tokenize(text);
+    // return this.context.encode(text);
+  }
+
   public async streamingPrompt(
     prompt: string,
     sendFunctionImplementer: ISendFunctionImplementer
@@ -71,12 +80,16 @@ export class LlamaCPPSessionService implements ISessionService {
     console.log("starting streaming prompt");
 
     try {
+      const tokensInput = this.tokenize(prompt);
+      console.log("tokensInput:", tokensInput.length);
       return await this.session.prompt(prompt, {
         onToken: (chunk: any[]) => {
-          const decodedChunk = this.context.decode(chunk);
+          // const decodedChunk = this.context.decode(chunk);
+          const decodedChunk = this.session.model.detokenize(chunk);
           // const encodedDecode = this.context.encode(decodedChunk);
           // console.log("ENCODED :", encodedDecode);
-          console.log("decoded chunk: ", decodedChunk);
+          console.log("chunk out: ", chunk);
+          console.log("decodedChunk:", decodedChunk);
           sendFunctionImplementer.send("tokenStream", {
             messageType: "success",
             content: decodedChunk,
@@ -112,7 +125,10 @@ const getGPULayersToUse = (): number => {
 const chooseRightContextSize = (
   modelContextSize: number,
   storeContextSize?: number
-): number => {
+): number | undefined => {
+  if (!modelContextSize) {
+    return storeContextSize;
+  }
   if (
     storeContextSize &&
     storeContextSize > 0 &&

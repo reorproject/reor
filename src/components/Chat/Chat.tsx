@@ -134,20 +134,22 @@ const ChatWithLLM: React.FC = () => {
             <div
               key={index}
               className={`p-2 rounded-lg ${
-                message.role === "assistant"
+                message.messageType === "error"
+                  ? "bg-red-100 text-red-800"
+                  : message.role === "assistant"
                   ? "bg-blue-100 text-blue-800"
                   : "bg-green-100 text-green-800"
-              }`}
+              } break-words`}
             >
               {message.content}
             </div>
           ))}
-          {currentBotMessage?.messageType == "success" && (
+          {currentBotMessage?.messageType === "success" && (
             <div className="p-2 rounded-lg bg-blue-100 text-blue-800 break-words">
               {currentBotMessage.content}
             </div>
           )}
-          {currentBotMessage?.messageType == "error" && (
+          {currentBotMessage?.messageType === "error" && (
             <div className="p-2 rounded-lg bg-red-100 text-red-800 break-words">
               {currentBotMessage.content}
             </div>
