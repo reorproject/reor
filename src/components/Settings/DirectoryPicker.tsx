@@ -3,21 +3,30 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@material-tailwind/react";
 
 interface DirectoryPickerProps {
-  //   onDirectorySelect: (directory: string) => void;
-  userHasCompleted: (completed: boolean) => void;
+  userHasCompleted?: (completed: boolean) => void;
+  userTriedToSubmit?: boolean;
 }
 
 const DirectoryPicker: React.FC<DirectoryPickerProps> = ({
   userHasCompleted,
+  userTriedToSubmit,
 }) => {
   const [userDirectory, setUserDirectory] = useState<string>("");
+  const [errorMsg, setErrorMsg] = useState<string>("");
 
   useEffect(() => {
     const userDirectory = window.electronStore.getUserDirectory();
-    console.log("GOTTEN USER DIRECTORY: ", userDirectory);
     if (userDirectory) {
       setUserDirectory(userDirectory);
-      userHasCompleted(true);
+      if (userHasCompleted) {
+        userHasCompleted(true);
+      }
+      setErrorMsg("");
+    } else {
+      if (userHasCompleted) {
+        userHasCompleted(false);
+      }
+      setErrorMsg("No directory selected");
     }
   }, []);
 
@@ -27,7 +36,10 @@ const DirectoryPicker: React.FC<DirectoryPickerProps> = ({
       const path = paths[0];
       console.log("calling set directory IN DIRECTORY PICKER: ", path);
       window.electronStore.setUserDirectory(path);
-      userHasCompleted(true);
+      if (userHasCompleted) {
+        userHasCompleted(true);
+      }
+      setErrorMsg("");
       setUserDirectory(path);
     }
   };
@@ -59,7 +71,9 @@ const DirectoryPicker: React.FC<DirectoryPickerProps> = ({
           Selected: <strong>{userDirectory}</strong>
         </p>
       )}
-      {/* {errorMsg && <p className="text-xs text-red-500">{errorMsg}</p>} */}
+      {errorMsg && userTriedToSubmit && (
+        <p className="text-xs text-red-500">{errorMsg}</p>
+      )}
     </>
   );
 };

@@ -4,11 +4,14 @@ import CustomSelect from "../Generic/Select";
 interface EmbeddingModelManagerProps {
   userHasCompleted?: (completed: boolean) => void;
   handleUserHasChangedModel?: (bool: boolean) => void;
+  userTriedToSubmit?: boolean;
 }
 const EmbeddingModelManager: React.FC<EmbeddingModelManagerProps> = ({
   userHasCompleted,
   handleUserHasChangedModel,
+  userTriedToSubmit,
 }) => {
+  const [currentError, setCurrentError] = useState<string>("");
   const modelRepos = [
     "Xenova/bge-large-en-v1.5",
     "Xenova/bge-base-en-v1.5",
@@ -32,8 +35,20 @@ const EmbeddingModelManager: React.FC<EmbeddingModelManagerProps> = ({
   }, []);
 
   useEffect(() => {
-    if (userHasCompleted && selectedModel) {
-      userHasCompleted(true);
+    if (selectedModel) {
+      if (setCurrentError) {
+        setCurrentError("");
+      }
+      if (userHasCompleted) {
+        userHasCompleted(true);
+      }
+    } else {
+      if (setCurrentError) {
+        setCurrentError("No model selected");
+      }
+      if (userHasCompleted) {
+        userHasCompleted(false);
+      }
     }
   }, [selectedModel]);
 
@@ -52,6 +67,9 @@ const EmbeddingModelManager: React.FC<EmbeddingModelManagerProps> = ({
         value={selectedModel}
         onChange={handleChangeOnModelSelect}
       />
+      {userTriedToSubmit && !selectedModel && (
+        <p className="text-red-500 text-sm mt-1">{currentError}</p>
+      )}
     </div>
   );
 };

@@ -7,9 +7,15 @@ import ExternalLink from "../Generic/ExternalLink";
 
 interface LLMSettingsProps {
   userHasCompleted?: (completed: boolean) => void;
+  // setCurrentError?: (error: string) => void;
+  userTriedToSubmit?: boolean;
 }
 
-const LLMSettings: React.FC = ({ userHasCompleted }) => {
+const LLMSettings: React.FC<LLMSettingsProps> = ({
+  userHasCompleted,
+  // setCurrentError,
+  userTriedToSubmit,
+}) => {
   const [modelConfigs, setModelConfigs] = useState<
     Record<string, AIModelConfig>
   >({});
@@ -20,6 +26,7 @@ const LLMSettings: React.FC = ({ userHasCompleted }) => {
     number | null
   >(null);
   const [defaultModel, setDefaultModel] = useState<string>("");
+  const [currentError, setCurrentError] = useState<string>("");
 
   const fetchModelConfigs = async () => {
     try {
@@ -55,8 +62,20 @@ const LLMSettings: React.FC = ({ userHasCompleted }) => {
 
   useEffect(() => {
     // this condition may in fact be less necessary: no need for the user to use chatbot...
-    if (userHasCompleted && defaultModel) {
-      userHasCompleted(true);
+    if (defaultModel) {
+      if (setCurrentError) {
+        setCurrentError("");
+      }
+      if (userHasCompleted) {
+        userHasCompleted(true);
+      }
+    } else {
+      if (setCurrentError) {
+        setCurrentError("No model selected");
+      }
+      if (userHasCompleted) {
+        userHasCompleted(false);
+      }
     }
   }, [defaultModel]);
 
@@ -93,6 +112,9 @@ const LLMSettings: React.FC = ({ userHasCompleted }) => {
           }}
         />
       </div>
+      {userTriedToSubmit && !defaultModel && (
+        <p className="text-red-500 text-sm mt-1">{currentError}</p>
+      )}
 
       <Modal
         isOpen={isNewLocalModelModalOpen}
