@@ -1,7 +1,7 @@
-import { DBResult } from "electron/main/database/LanceTableWrapper";
 import React, { useState } from "react";
 import { FileSidebar } from "../File/FileSidebar";
 import SearchComponent from "./FileSidebarSearch";
+import { DBQueryResult } from "electron/main/database/Schema";
 
 interface SidebarManagerProps {
   selectedFilePath: string | null;
@@ -15,7 +15,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
   sidebarShowing,
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [searchResults, setSearchResults] = useState<DBResult[]>([]);
+  const [searchResults, setSearchResults] = useState<DBQueryResult[]>([]);
 
   return (
     <div className="w-full">

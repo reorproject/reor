@@ -1,8 +1,8 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { AIModelConfig } from "electron/main/Store/storeConfig";
 import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
+import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 // import { FileInfo } from "electron/main/Files/Types";
-import { DBEntry, DBResult } from "electron/main/database/LanceTableWrapper";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
 
@@ -30,7 +30,7 @@ declare global {
         query: string,
         limit: number,
         filter?: string
-      ) => Promise<DBResult[]>;
+      ) => Promise<DBQueryResult[]>;
       indexFilesInDirectory: () => void;
       augmentPromptWithRAG: (
         prompt: string,

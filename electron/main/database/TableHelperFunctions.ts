@@ -1,4 +1,4 @@
-import { DatabaseFields } from "./Schema";
+import { DBEntry, DBQueryResult, DatabaseFields } from "./Schema";
 import {
   GetFilesInfoList,
   flattenFileInfoTree,
@@ -6,7 +6,7 @@ import {
 } from "../Files/Filesystem";
 import { FileInfo, FileInfoTree } from "../Files/Types";
 import { chunkMarkdownByHeadingsAndByCharsIfBig } from "../RAG/Chunking";
-import { DBEntry, DBResult, LanceDBTableWrapper } from "./LanceTableWrapper";
+import { LanceDBTableWrapper } from "./LanceTableWrapper";
 
 export const repopulateTableWithMissingItems = async (
   table: LanceDBTableWrapper,
@@ -19,18 +19,11 @@ export const repopulateTableWithMissingItems = async (
   const dbItemsToAdd = await computeDbItemsToAdd(filesInfoTree, tableArray);
   if (dbItemsToAdd.length == 0) {
     console.log("no items to add");
-    console.log("TABLE COUNT IS: ", await table.countRows());
     onProgress && onProgress(1);
     return;
   }
   const filePathsToDelete = dbItemsToAdd.map((x) => x[0].notepath);
-  const quotedFilePaths = filePathsToDelete
-    .map((filePath) => `'${filePath}'`)
-    .join(", ");
-
-  // Now use the quoted file paths in your query string
-  const filterString = `${DatabaseFields.NOTE_PATH} IN (${quotedFilePaths})`;
-  await table.delete(filterString);
+  await table.deleteDBItemsByFilePaths(filePathsToDelete);
   const flattenedItemsToAdd = dbItemsToAdd.flat();
   await table.add(flattenedItemsToAdd, onProgress);
   console.log("done adding");
@@ -112,6 +105,14 @@ const convertFileTypeToDBType = async (file: FileInfo): Promise<DBEntry[]> => {
   return entries;
 };
 
+export function sanitizePathForDatabase(filePath: string): string {
+  return filePath.replace(/'/g, "''");
+}
+
+export function unsanitizePathForFileSystem(dbPath: string): string {
+  return dbPath.replace(/''/g, "'");
+}
+
 export const addTreeToTable = async (
   dbTable: LanceDBTableWrapper,
   fileTree: FileInfoTree
@@ -126,9 +127,7 @@ export const removeTreeFromTable = async (
 ): Promise<void> => {
   const flattened = flattenFileInfoTree(fileTree);
   const filePaths = flattened.map((x) => x.path);
-  for (const filePath of filePaths) {
-    await dbTable.delete(`${DatabaseFields.NOTE_PATH} = "${filePath}"`);
-  }
+  await dbTable.deleteDBItemsByFilePaths(filePaths);
 };
 
 export const updateFileInTable = async (
@@ -136,8 +135,7 @@ export const updateFileInTable = async (
   filePath: string,
   content: string
 ): Promise<void> => {
-  // TODO: maybe convert this to have try catch blocks.
-  await dbTable.delete(`${DatabaseFields.NOTE_PATH} = '${filePath}'`);
+  await dbTable.deleteDBItemsByFilePaths([filePath]);
   const currentTimestamp: Date = new Date();
   const chunkedContentList = await chunkMarkdownByHeadingsAndByCharsIfBig(
     content
@@ -148,7 +146,6 @@ export const updateFileInTable = async (
       content: content,
       subnoteindex: index,
       timeadded: currentTimestamp,
-      // distance:
     };
   });
   await dbTable.add(dbEntries);
@@ -156,7 +153,7 @@ export const updateFileInTable = async (
 
 export function convertLanceResultToDBResult(
   record: Record<string, unknown>
-): DBResult | null {
+): DBQueryResult | null {
   if (
     DatabaseFields.NOTE_PATH in record &&
     DatabaseFields.VECTOR in record &&
@@ -165,7 +162,11 @@ export function convertLanceResultToDBResult(
     DatabaseFields.TIME_ADDED in record &&
     DatabaseFields.DISTANCE in record
   ) {
-    return record as unknown as DBResult;
+    const recordAsDBQueryType = record as unknown as DBQueryResult;
+    recordAsDBQueryType.notepath = unsanitizePathForFileSystem(
+      recordAsDBQueryType.notepath
+    );
+    return recordAsDBQueryType;
   }
   return null;
 }

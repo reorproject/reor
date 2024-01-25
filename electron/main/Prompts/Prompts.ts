@@ -1,4 +1,4 @@
-import { DBEntry } from "../database/LanceTableWrapper";
+import { DBEntry } from "../database/Schema";
 
 export function createRAGPrompt(entries: DBEntry[], query: string): string {
   // Concatenate the content of each entry

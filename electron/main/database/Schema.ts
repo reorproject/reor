@@ -9,6 +9,17 @@ import {
   Date_ as ArrowDate,
 } from "apache-arrow";
 
+export interface DBEntry {
+  notepath: string;
+  vector?: Float32Array;
+  content: string;
+  subnoteindex: number;
+  timeadded: Date;
+}
+export interface DBQueryResult extends DBEntry {
+  _distance: number;
+}
+
 export enum DatabaseFields {
   NOTE_PATH = "notepath",
   VECTOR = "vector",

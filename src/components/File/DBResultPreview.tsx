@@ -1,9 +1,9 @@
+import { DBQueryResult } from "electron/main/database/Schema";
 import React from "react";
-import { DBResult } from "electron/main/database/LanceTableWrapper";
 import ReactMarkdown from "react-markdown";
 
 interface DBResultPreview {
-  dbResult: DBResult;
+  dbResult: DBQueryResult;
   onSelect: (path: string) => void;
 }
 
@@ -28,7 +28,7 @@ export const DBResultPreview: React.FC<DBResultPreview> = ({
 };
 
 interface DBSearchPreviewProps {
-  dbResult: DBResult;
+  dbResult: DBQueryResult;
   onSelect: (path: string) => void;
 }
 
