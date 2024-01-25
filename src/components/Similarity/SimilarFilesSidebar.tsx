@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { DBResult } from "electron/main/database/LanceTableWrapper";
 import { DBResultPreview } from "../File/DBResultPreview";
+import { DBQueryResult } from "electron/main/database/Schema";
 
 interface SimilarEntriesComponentProps {
   filePath: string;
@@ -11,7 +11,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   filePath,
   onFileSelect,
 }) => {
-  const [similarEntries, setSimilarEntries] = useState<DBResult[]>([]);
+  const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -27,7 +27,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     }
   };
 
-  const performSearch = async (filePath: string): Promise<DBResult[]> => {
+  const performSearch = async (filePath: string): Promise<DBQueryResult[]> => {
     const fileContent: string = await window.files.readFile(filePath);
     if (!fileContent) {
       console.error("File content is empty");
@@ -35,7 +35,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     }
     const databaseFields = await window.database.getDatabaseFields();
     const filterString = `${databaseFields.NOTE_PATH} != '${filePath}'`;
-    const searchResults: DBResult[] = await window.database.search(
+    const searchResults: DBQueryResult[] = await window.database.search(
       fileContent,
       30,
       filterString

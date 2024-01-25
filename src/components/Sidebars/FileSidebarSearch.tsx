@@ -1,13 +1,13 @@
-import { DBResult } from "electron/main/database/LanceTableWrapper";
 import React, { useEffect, useRef } from "react";
 import { DBSearchPreview } from "../File/DBResultPreview";
+import { DBQueryResult } from "electron/main/database/Schema";
 
 interface SearchComponentProps {
   onFileSelect: (path: string) => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
-  searchResults: DBResult[];
-  setSearchResults: (results: DBResult[]) => void;
+  searchResults: DBQueryResult[];
+  setSearchResults: (results: DBQueryResult[]) => void;
 }
 
 const SearchComponent: React.FC<SearchComponentProps> = ({
@@ -20,7 +20,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   const searchInputRef = useRef<HTMLInputElement>(null); // Reference for the input field
 
   const handleSearch = async (query: string) => {
-    const results: DBResult[] = await window.database.search(query, 50);
+    const results: DBQueryResult[] = await window.database.search(query, 50);
     setSearchResults(results);
   };
 
