@@ -52,7 +52,15 @@ const InitialSetupSettings: React.FC<Props> = ({ initialSettingsAreReady }) => {
               <EmbeddingModelManager
                 userHasCompleted={(completed) => setNextPageAllowed(completed)}
                 userTriedToSubmit={userTriedToSubmit}
-              />
+              >
+                <h2 className="text-2xl font-semibold mb-0 text-white">
+                  Embedding Model
+                </h2>{" "}
+                <p className="mt-5 text-gray-100">
+                  Each note is embedded by a local embedding model into a vector
+                  database. Please choose your embedding model below:
+                </p>
+              </EmbeddingModelManager>
             </>
           )}
           {currentStep === 3 && (
@@ -64,10 +72,15 @@ const InitialSetupSettings: React.FC<Props> = ({ initialSettingsAreReady }) => {
             </>
           )}
           <div className="flex justify-between mt-5">
-            {currentStep > 1 ? (
+            {currentStep > 0 ? (
               <Button
-                className="bg-slate-700 mb-3 border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center"
+                className={`bg-slate-700 mb-3 border-none h-10 w-[80px] text-center ${
+                  currentStep === 1
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:bg-slate-900 cursor-pointer"
+                }`}
                 onClick={handleBack}
+                disabled={currentStep === 1}
                 placeholder=""
               >
                 Back

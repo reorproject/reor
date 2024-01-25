@@ -56,7 +56,7 @@ const DirectoryPicker: React.FC<DirectoryPickerProps> = ({
       </p>
       <p className="mt-2 text-gray-100"></p>
       <p className="mt-7 text-gray-100 mb-5">
-        Please choose your vault directory below.
+        Please choose your vault directory below:
       </p>
       <Button
         className="bg-slate-700 border-none h-10 hover:bg-slate-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2 mb-2"

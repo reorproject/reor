@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, ReactNode } from "react";
 import CustomSelect from "../Generic/Select";
 
 interface EmbeddingModelManagerProps {
   userHasCompleted?: (completed: boolean) => void;
   handleUserHasChangedModel?: (bool: boolean) => void;
   userTriedToSubmit?: boolean;
+  children?: ReactNode; // Define children prop
 }
 const EmbeddingModelManager: React.FC<EmbeddingModelManagerProps> = ({
   userHasCompleted,
   handleUserHasChangedModel,
   userTriedToSubmit,
+  children,
 }) => {
   const [currentError, setCurrentError] = useState<string>("");
   const modelRepos = [
@@ -62,6 +64,7 @@ const EmbeddingModelManager: React.FC<EmbeddingModelManagerProps> = ({
 
   return (
     <div className="w-full bg-gray-800 rounded">
+      {children}
       <CustomSelect
         options={modelRepos}
         value={selectedModel}
