@@ -1,4 +1,4 @@
-import { DatabaseFields } from "./Schema";
+import { DBEntry, DBQueryResult, DatabaseFields } from "./Schema";
 import {
   GetFilesInfoList,
   flattenFileInfoTree,
@@ -6,7 +6,7 @@ import {
 } from "../Files/Filesystem";
 import { FileInfo, FileInfoTree } from "../Files/Types";
 import { chunkMarkdownByHeadingsAndByCharsIfBig } from "../RAG/Chunking";
-import { DBEntry, DBResult, LanceDBTableWrapper } from "./LanceTableWrapper";
+import { LanceDBTableWrapper } from "./LanceTableWrapper";
 
 export const repopulateTableWithMissingItems = async (
   table: LanceDBTableWrapper,
@@ -19,7 +19,6 @@ export const repopulateTableWithMissingItems = async (
   const dbItemsToAdd = await computeDbItemsToAdd(filesInfoTree, tableArray);
   if (dbItemsToAdd.length == 0) {
     console.log("no items to add");
-    console.log("TABLE COUNT IS: ", await table.countRows());
     onProgress && onProgress(1);
     return;
   }
@@ -28,7 +27,6 @@ export const repopulateTableWithMissingItems = async (
     .map((filePath) => `'${filePath}'`)
     .join(", ");
 
-  // Now use the quoted file paths in your query string
   const filterString = `${DatabaseFields.NOTE_PATH} IN (${quotedFilePaths})`;
   await table.delete(filterString);
   const flattenedItemsToAdd = dbItemsToAdd.flat();
@@ -112,6 +110,26 @@ const convertFileTypeToDBType = async (file: FileInfo): Promise<DBEntry[]> => {
   return entries;
 };
 
+export function sanitizePathForDatabase(filePath: string): string {
+  // Replace backslashes with forward slashes for Windows, escape single quotes for all
+  let sanitizedPath =
+    process.platform === "win32" ? filePath.replace(/\\/g, "/") : filePath;
+
+  sanitizedPath = sanitizedPath.replace(/'/g, "''");
+
+  return sanitizedPath;
+}
+
+export function unsanitizePathForFileSystem(dbPath: string): string {
+  // Convert forward slashes back to backslashes for Windows, revert single quote escaping
+  let originalPath =
+    process.platform === "win32" ? dbPath.replace(/\//g, "\\") : dbPath;
+
+  originalPath = originalPath.replace(/''/g, "'");
+
+  return originalPath;
+}
+
 export const addTreeToTable = async (
   dbTable: LanceDBTableWrapper,
   fileTree: FileInfoTree
@@ -156,7 +174,7 @@ export const updateFileInTable = async (
 
 export function convertLanceResultToDBResult(
   record: Record<string, unknown>
-): DBResult | null {
+): DBQueryResult | null {
   if (
     DatabaseFields.NOTE_PATH in record &&
     DatabaseFields.VECTOR in record &&
@@ -165,7 +183,7 @@ export function convertLanceResultToDBResult(
     DatabaseFields.TIME_ADDED in record &&
     DatabaseFields.DISTANCE in record
   ) {
-    return record as unknown as DBResult;
+    return record as unknown as DBQueryResult;
   }
   return null;
 }

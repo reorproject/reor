@@ -50,6 +50,9 @@ jobs:
       - name: Run Linter
         run: npm run lint
 
+      - name: Run Tests
+        run: npm run test
+
       - name: Set up environment for macOS build
         if: matrix.os == 'macos-latest' || matrix.os == 'macos-latest-xlarge'
         env:

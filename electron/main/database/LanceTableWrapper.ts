@@ -5,18 +5,7 @@ import {
   createEmbeddingFunction,
 } from "./Embeddings";
 import { convertLanceResultToDBResult } from "./TableHelperFunctions";
-
-export interface DBEntry {
-  notepath: string;
-  vector?: Float32Array;
-  content: string;
-  subnoteindex: number;
-  timeadded: Date;
-}
-
-export interface DBResult extends DBEntry {
-  _distance: number;
-}
+import { DBEntry, DBQueryResult } from "./Schema";
 
 export class LanceDBTableWrapper {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -80,7 +69,7 @@ export class LanceDBTableWrapper {
     //   metricType: string,
     limit: number,
     filter?: string
-  ): Promise<DBResult[]> {
+  ): Promise<DBQueryResult[]> {
     const lanceQuery = await this.table
       .search(query)
       // .metricType(metricType)
@@ -90,7 +79,7 @@ export class LanceDBTableWrapper {
     }
     const rawResults = await lanceQuery.execute();
     const mapped = rawResults.map(convertLanceResultToDBResult);
-    return mapped as DBResult[];
+    return mapped as DBQueryResult[];
   }
 
   async filter(filterString: string, limit: number = 10) {
