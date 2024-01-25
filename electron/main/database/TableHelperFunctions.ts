@@ -23,12 +23,7 @@ export const repopulateTableWithMissingItems = async (
     return;
   }
   const filePathsToDelete = dbItemsToAdd.map((x) => x[0].notepath);
-  const quotedFilePaths = filePathsToDelete
-    .map((filePath) => `'${filePath}'`)
-    .join(", ");
-
-  const filterString = `${DatabaseFields.NOTE_PATH} IN (${quotedFilePaths})`;
-  await table.delete(filterString);
+  await table.deleteDBItemsByFilePaths(filePathsToDelete);
   const flattenedItemsToAdd = dbItemsToAdd.flat();
   await table.add(flattenedItemsToAdd, onProgress);
   console.log("done adding");
@@ -111,23 +106,11 @@ const convertFileTypeToDBType = async (file: FileInfo): Promise<DBEntry[]> => {
 };
 
 export function sanitizePathForDatabase(filePath: string): string {
-  // Replace backslashes with forward slashes for Windows, escape single quotes for all
-  let sanitizedPath =
-    process.platform === "win32" ? filePath.replace(/\\/g, "/") : filePath;
-
-  sanitizedPath = sanitizedPath.replace(/'/g, "''");
-
-  return sanitizedPath;
+  return filePath.replace(/'/g, "''");
 }
 
 export function unsanitizePathForFileSystem(dbPath: string): string {
-  // Convert forward slashes back to backslashes for Windows, revert single quote escaping
-  let originalPath =
-    process.platform === "win32" ? dbPath.replace(/\//g, "\\") : dbPath;
-
-  originalPath = originalPath.replace(/''/g, "'");
-
-  return originalPath;
+  return dbPath.replace(/''/g, "'");
 }
 
 export const addTreeToTable = async (
@@ -144,9 +127,7 @@ export const removeTreeFromTable = async (
 ): Promise<void> => {
   const flattened = flattenFileInfoTree(fileTree);
   const filePaths = flattened.map((x) => x.path);
-  for (const filePath of filePaths) {
-    await dbTable.delete(`${DatabaseFields.NOTE_PATH} = "${filePath}"`);
-  }
+  await dbTable.deleteDBItemsByFilePaths(filePaths);
 };
 
 export const updateFileInTable = async (
@@ -154,8 +135,7 @@ export const updateFileInTable = async (
   filePath: string,
   content: string
 ): Promise<void> => {
-  // TODO: maybe convert this to have try catch blocks.
-  await dbTable.delete(`${DatabaseFields.NOTE_PATH} = '${filePath}'`);
+  await dbTable.deleteDBItemsByFilePaths([filePath]);
   const currentTimestamp: Date = new Date();
   const chunkedContentList = await chunkMarkdownByHeadingsAndByCharsIfBig(
     content
@@ -166,7 +146,6 @@ export const updateFileInTable = async (
       content: content,
       subnoteindex: index,
       timeadded: currentTimestamp,
-      // distance:
     };
   });
   await dbTable.add(dbEntries);
@@ -183,7 +162,11 @@ export function convertLanceResultToDBResult(
     DatabaseFields.TIME_ADDED in record &&
     DatabaseFields.DISTANCE in record
   ) {
-    return record as unknown as DBQueryResult;
+    const recordAsDBQueryType = record as unknown as DBQueryResult;
+    recordAsDBQueryType.notepath = unsanitizePathForFileSystem(
+      recordAsDBQueryType.notepath
+    );
+    return recordAsDBQueryType;
   }
   return null;
 }

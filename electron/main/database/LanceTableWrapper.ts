@@ -4,15 +4,16 @@ import {
   EnhancedEmbeddingFunction,
   createEmbeddingFunction,
 } from "./Embeddings";
-import { convertLanceResultToDBResult } from "./TableHelperFunctions";
-import { DBEntry, DBQueryResult } from "./Schema";
+import {
+  convertLanceResultToDBResult,
+  sanitizePathForDatabase,
+} from "./TableHelperFunctions";
+import { DBEntry, DBQueryResult, DatabaseFields } from "./Schema";
 
 export class LanceDBTableWrapper {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  public table!: LanceDBTable<any>;
-  public embedFun!: EnhancedEmbeddingFunction<string | number[]>;
-  public userDirectory!: string;
-  public dbConnection!: Connection;
+  private table!: LanceDBTable<any>;
+  private embedFun!: EnhancedEmbeddingFunction<string | number[]>;
 
   async initialize(
     dbConnection: Connection,
@@ -20,8 +21,6 @@ export class LanceDBTableWrapper {
     embedFuncRepoName: string
   ) {
     this.embedFun = await createEmbeddingFunction(embedFuncRepoName, "content");
-    this.userDirectory = userDirectory;
-    this.dbConnection = dbConnection;
     this.table = await GetOrCreateLanceTable(
       dbConnection,
       this.embedFun,
@@ -33,7 +32,12 @@ export class LanceDBTableWrapper {
     data: DBEntry[],
     onProgress?: (progress: number) => void
   ): Promise<void> {
-    data = data.filter((x) => x.content !== "");
+    data = data
+      .filter((x) => x.content !== "")
+      .map((x) => {
+        x.content = sanitizePathForDatabase(x.content);
+        return x;
+      });
     const recordEntry: Record<string, unknown>[] = data as unknown as Record<
       string,
       unknown
@@ -60,8 +64,13 @@ export class LanceDBTableWrapper {
     }
   }
 
-  async delete(filter: string): Promise<void> {
-    await this.table.delete(filter);
+  async deleteDBItemsByFilePaths(filePaths: string[]): Promise<void> {
+    const quotedFilePaths = filePaths
+      .map((filePath) => sanitizePathForDatabase(filePath))
+      .map((filePath) => `'${filePath}'`)
+      .join(", ");
+    const filterString = `${DatabaseFields.NOTE_PATH} IN (${quotedFilePaths})`;
+    await this.table.delete(filterString);
   }
 
   async search(
@@ -82,7 +91,7 @@ export class LanceDBTableWrapper {
     return mapped as DBQueryResult[];
   }
 
-  async filter(filterString: string, limit: number = 10) {
+  async filter(filterString: string, limit: number = 10): Promise<DBEntry[]> {
     const rawResults = await this.table
       .search(Array(768).fill(1)) // TODO: remove hardcoding
       .filter(filterString)
