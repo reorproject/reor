@@ -49,26 +49,29 @@ const DirectoryPicker: React.FC<DirectoryPickerProps> = ({
       <h2 className="text-2xl font-semibold mb-0 text-white">
         Welcome to the Reor Project.
       </h2>
-      <p className="mt-2 text-gray-100">
-        Reor is a self-organising note-taking app. Each note will be saved as a
-        markdown file to a &quot;vault&quot; directory on your machine.
+      <p className="mt-5 text-gray-100">
+        Reor is a self-organizing personal knowledge management app. Each note
+        you write will be saved as a markdown file to a vault directory on your
+        machine.
       </p>
-      <p className="mt-2 text-gray-100">
-        Please choose your vault directory here:
+      <p className="mt-2 text-gray-100"></p>
+      <p className="mt-7 text-gray-100 mb-5">
+        Please choose your vault directory below.
       </p>
       <Button
-        className="bg-slate-700 border-none h-10 hover:bg-slate-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
+        className="bg-slate-700 border-none h-10 hover:bg-slate-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2 mb-2"
         onClick={handleDirectorySelection}
         placeholder=""
       >
         Select Directory
       </Button>
-      <p className="mt-2 text-gray-100 text-xs">
-        (You can choose something with files in it. Those files will be indexed)
-      </p>
-      {userDirectory && (
+      {userDirectory ? (
         <p className="mt-2 text-xs text-gray-100">
           Selected: <strong>{userDirectory}</strong>
+        </p>
+      ) : (
+        <p className="mt-2 text-xs text-gray-100">
+          <i>Markdown files already in this directory will be indexed.</i>
         </p>
       )}
       {errorMsg && userTriedToSubmit && (
