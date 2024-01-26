@@ -81,8 +81,8 @@ const SettingsModal: React.FC<ModalProps> = ({
                 childrenBelowDropdown={
                   <p className=" text-gray-100 text-xs">
                     <i>
-                      And if you notice some lag it is likely because you chose
-                      too large of a model...
+                      If you notice some lag it is likely because you chose too
+                      large of a model...
                     </i>
                   </p>
                 }

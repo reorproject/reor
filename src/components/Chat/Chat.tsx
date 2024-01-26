@@ -47,6 +47,7 @@ const ChatWithLLM: React.FC = () => {
   useEffect(() => {
     return () => {
       if (sessionId) {
+        console.log("Deleting session:", sessionId);
         window.llm.deleteSession(sessionId);
       }
       console.log("Component is unmounted (hidden)");
@@ -149,7 +150,7 @@ const ChatWithLLM: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col w-full h-full mx-auto border shadow-lg overflow-hidden bg-white">
+    <div className="flex flex-col w-full h-full mx-auto border shadow-lg overflow-hidden bg-gray-700">
       <div className="flex-1 overflow-auto p-4 bg-transparent">
         {loadingSession && (
           <p className="text-center text-gray-500">Loading...</p>
@@ -181,16 +182,20 @@ const ChatWithLLM: React.FC = () => {
           )}
         </div>
       </div>
-      <div className="p-4 bg-gray-100">
+      <div className="p-4 bg-gray-500">
         <div className="flex space-x-2 h-[38px]">
           <Textarea
             onKeyDown={handleKeyDown}
             onChange={handleInputChange}
             value={userInput}
-            className="w-full h-full " // 'resize-none' to prevent manual resizing
+            className="w-full h-full bg-gray-300" // 'resize-none' to prevent manual resizing
             name="Outlined"
             placeholder="Ask your knowledge..."
             variant="outlined"
+            style={{
+              backgroundColor: "rgb(55 65 81 / var(--tw-bg-opacity))",
+              color: "rgb(209 213 219)",
+            }}
           />
           {/* <div className="w-[80px]"> */}
           <div className="flex justify-center items-center h-full ">
@@ -198,7 +203,7 @@ const ChatWithLLM: React.FC = () => {
               <CircularProgress
                 size={32}
                 thickness={20}
-                style={{ color: "rgb(51 65 85 / var(--tw-bg-opacity))" }}
+                style={{ color: "rgb(209 213 219 / var(--tw-bg-opacity))" }}
                 className="h-full w-full m-x-auto color-gray-500 "
               />
             ) : (
