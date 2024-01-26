@@ -27,6 +27,8 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
     "delete-session",
     async (event: IpcMainInvokeEvent, sessionId: string): Promise<string> => {
       if (sessions[sessionId]) {
+        const sessionService = sessions[sessionId];
+        await sessionService.abort();
         delete sessions[sessionId];
       }
       return "success";

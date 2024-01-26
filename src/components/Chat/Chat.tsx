@@ -44,6 +44,15 @@ const ChatWithLLM: React.FC = () => {
     }
   };
 
+  useEffect(() => {
+    return () => {
+      if (sessionId) {
+        window.llm.deleteSession(sessionId);
+      }
+      console.log("Component is unmounted (hidden)");
+    };
+  }, [sessionId]);
+
   const handleSubmitNewMessage = async () => {
     if (loadingResponse) return;
     let newMessages = messages;
@@ -184,17 +193,17 @@ const ChatWithLLM: React.FC = () => {
             variant="outlined"
           />
           {/* <div className="w-[80px]"> */}
-          <div className="flex justify-center items-center h-full w-[80px]">
+          <div className="flex justify-center items-center h-full ">
             {loadingResponse ? (
               <CircularProgress
                 size={32}
                 thickness={20}
                 style={{ color: "rgb(51 65 85 / var(--tw-bg-opacity))" }}
-                className="h-full w-full m-x-auto color-gray-500"
+                className="h-full w-full m-x-auto color-gray-500 "
               />
             ) : (
               <Button
-                className="bg-slate-700  border-none h-full hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2"
+                className="bg-slate-700 w-[70px] border-none h-full hover:bg-slate-900 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2"
                 onClick={handleSubmitNewMessage}
                 placeholder=""
               >

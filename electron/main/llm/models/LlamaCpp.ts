@@ -7,6 +7,7 @@ export class LlamaCPPSessionService implements ISessionService {
   private context: any;
   private model: any; // Model instance
   public activeContextSize?: number;
+  private abortController?: AbortController;
 
   async init(storeModelConfig: AIModelConfig): Promise<void> {
     // try {
@@ -66,6 +67,13 @@ export class LlamaCPPSessionService implements ISessionService {
     // return this.context.encode(text);
   }
 
+  public abort(): void {
+    if (this.abortController) {
+      this.abortController.abort();
+      this.abortController = undefined; // Reset the controller
+    }
+  }
+
   public async streamingPrompt(
     prompt: string,
     sendFunctionImplementer: ISendFunctionImplementer
@@ -78,6 +86,7 @@ export class LlamaCPPSessionService implements ISessionService {
       return "Session not initialized";
     }
     console.log("starting streaming prompt");
+    this.abortController = new AbortController();
 
     try {
       const tokensInput = this.tokenize(prompt);
@@ -95,6 +104,7 @@ export class LlamaCPPSessionService implements ISessionService {
             content: decodedChunk,
           });
         },
+        signal: this.abortController.signal,
       });
     } catch (err) {
       sendFunctionImplementer.send("tokenStream", {
@@ -105,6 +115,7 @@ export class LlamaCPPSessionService implements ISessionService {
     }
   }
 }
+
 export function errorToString(error: unknown): string {
   if (error instanceof Error) {
     // Use toString() method for Error objects

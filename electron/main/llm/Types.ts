@@ -16,6 +16,11 @@ export interface ISessionService {
     sendFunctionImplementer: ISendFunctionImplementer,
     apiKey?: string
   ): Promise<string>;
+
+  /**
+   * Aborts the response.
+   */
+  abort(): void;
 }
 
 /**
