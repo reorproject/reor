@@ -72,7 +72,7 @@ const InitialSetupSettings: React.FC<Props> = ({ initialSettingsAreReady }) => {
             </>
           )}
           <div className="flex justify-between mt-5">
-            {currentStep > 0 ? (
+            {currentStep > 1 ? (
               <Button
                 className={`bg-slate-700 mb-3 border-none h-10 w-[80px] text-center ${
                   currentStep === 1
@@ -88,15 +88,15 @@ const InitialSetupSettings: React.FC<Props> = ({ initialSettingsAreReady }) => {
             ) : (
               <div className="flex-grow"></div>
             )}
-            {/* {nextPageAllowed && ( */}
-            <Button
-              className="bg-slate-700 mb-3 border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center"
-              onClick={handleNext}
-              placeholder=""
-            >
-              {currentStep < 3 ? "Next" : "Submit"}
-            </Button>
-            {/* )} */}
+            {nextPageAllowed && (
+              <Button
+                className="bg-slate-700 mb-3 border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center"
+                onClick={handleNext}
+                placeholder=""
+              >
+                {currentStep < 3 ? "Next" : "Submit"}
+              </Button>
+            )}
           </div>
         </div>
       </div>

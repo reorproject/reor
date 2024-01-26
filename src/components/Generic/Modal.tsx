@@ -36,11 +36,11 @@ const Modal: React.FC<ModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div
         ref={modalRef}
-        className="flex bg-gray-800 rounded-lg shadow-xl max-w-lg p-2"
+        className="flex bg-gray-800 rounded-lg shadow-xl max-w-lg "
       >
         {children}
         {!hideCloseButton && (
-          <div className="flex justify-end">
+          <div className="flex justify-end m-2">
             <button
               onClick={onClose}
               className="w-5 h-5 flex items-center justify-center text-gray-600 cursor-pointer bg-transparent border-none hover:bg-slate-700 hover:bg-opacity-40"

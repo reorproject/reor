@@ -6,12 +6,14 @@ interface EmbeddingModelManagerProps {
   handleUserHasChangedModel?: (bool: boolean) => void;
   userTriedToSubmit?: boolean;
   children?: ReactNode; // Define children prop
+  childrenBelowDropdown?: ReactNode;
 }
 const EmbeddingModelManager: React.FC<EmbeddingModelManagerProps> = ({
   userHasCompleted,
   handleUserHasChangedModel,
   userTriedToSubmit,
   children,
+  childrenBelowDropdown,
 }) => {
   const [currentError, setCurrentError] = useState<string>("");
   const modelRepos = [
@@ -70,6 +72,7 @@ const EmbeddingModelManager: React.FC<EmbeddingModelManagerProps> = ({
         value={selectedModel}
         onChange={handleChangeOnModelSelect}
       />
+      {childrenBelowDropdown}
       {userTriedToSubmit && !selectedModel && (
         <p className="text-red-500 text-sm mt-1">{currentError}</p>
       )}
