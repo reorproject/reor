@@ -30,13 +30,19 @@ Reor was built right from the very start to **run models locally**. We believe r
 1. Download from [reorproject.org](https://reorproject.org). Mac, Linux & Windows are all supported.
 2. Install like a normal App.
 
-### Importing from other apps
+
+### Running local models
+Reor interacts directly with [Llama.cpp](https://github.com/ggerganov/llama.cpp) libraries so there's no need to download Ollama. Although right now, we don't download models for you so you'll need to download your model of choice manually:
+1. Download a GGUF model file. [TheBloke](https://huggingface.co/TheBloke?sort_models=downloads#models) has this nice page with the most popular models. I recommend starting with a 7B 4-bit model and see how that performs on your system.
+2. Connect it in Reor settings under "Add a new local model".
+
+And if you so please, you can also use OpenAI models via your own API key...
+
+### Importing notes from other apps
 Reor works within a single directory in the filesystem. You choose the directory on first boot.
 To import notes/files from another app, you'll need to populate that directory manually with markdown files. Integrations with other apps are hopefully coming soon!
 
 
-### Beta Phase
-The Reor Project is in currently in beta. And almost ready for stable release! Of course, it won't be as bug-free right now as something like Obsidian. But I am working as hard as I can to make this as good of an experience as can be! Feedback and support are welcome on our [Issues](https://github.com/reor-project/issues) page.
 
 ## License
 GPL-3.0 license. See `LICENSE` for details.
