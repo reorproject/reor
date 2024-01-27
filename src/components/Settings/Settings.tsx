@@ -81,8 +81,8 @@ const SettingsModal: React.FC<ModalProps> = ({
                 childrenBelowDropdown={
                   <p className=" text-gray-100 text-xs">
                     <i>
-                      If you notice some lag it is likely because you chose too
-                      large of a model...
+                      If you notice some lag in the editor it is likely because
+                      you chose too large of a model...
                     </i>
                   </p>
                 }
@@ -105,13 +105,13 @@ const SettingsModal: React.FC<ModalProps> = ({
             </div>
           )}
 
-          <Button
+          {/* <Button
             className="bg-slate-700 mt-0 mb-2 border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
             onClick={handleSave}
             placeholder=""
           >
             Save
-          </Button>
+          </Button> */}
         </div>
       </div>
     </Modal>

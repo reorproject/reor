@@ -7,21 +7,11 @@ import { AIModelConfig } from "electron/main/Store/storeConfig";
 interface LocalModelModalProps {
   isOpen: boolean;
   onClose: () => void;
-  //   newModelPath: string;
-  //   setNewModelPath: (path: string) => void;
-  //   newModelContextLength: number | null;
-  //   setNewModelContextLength: (length: number) => void;
-  //   saveModelConfig: () => Promise<void>;
 }
 
 const LocalModelModal: React.FC<LocalModelModalProps> = ({
   isOpen,
   onClose,
-  //   newModelPath,
-  //   setNewModelPath,
-  //   newModelContextLength,
-  //   setNewModelContextLength,
-  //   saveModelConfig,
 }) => {
   const [newModelContextLength, setNewModelContextLength] = useState<
     number | null

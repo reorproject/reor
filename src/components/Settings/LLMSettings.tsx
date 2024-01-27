@@ -68,7 +68,7 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
   return (
     <div className="w-full  bg-gray-800 rounded">
       <h2 className="font-semibold mb-4 text-white">LLM</h2>
-      <p className="text-gray-100 mb-1">Default LLM:</p>
+      <h4 className="text-gray-100 mb-1">Default LLM:</h4>
       <div className="w-full mb-1">
         <CustomSelect
           options={modelNames}
@@ -80,21 +80,31 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
           }}
         />
       </div>
-      <p className="text-gray-100 mb-1">Setup a new local LLM:</p>
+      <h4 className="text-gray-100 mb-1">Local LLM Settings:</h4>
+      <div className="flex">
+        <Button
+          className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1 mr-4"
+          onClick={() => setIsNewLocalModelModalOpen(true)}
+          placeholder={""}
+        >
+          Add New Local LLM
+        </Button>
+        <Button
+          className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1"
+          onClick={() => setIsNewLocalModelModalOpen(true)}
+          placeholder={""}
+        >
+          Context Length Settings
+        </Button>
+      </div>
+
+      <h4 className="text-gray-100 mb-0">Setup a new remote (OpenAI) LLM:</h4>
       <Button
-        className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
+        className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3"
         onClick={() => setIsNewLocalModelModalOpen(true)}
         placeholder=""
       >
-        Add New Local LLM
-      </Button>
-      <p className="text-gray-100 mb-1">Setup a new remote (OpenAI) LLM:</p>
-      <Button
-        className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
-        onClick={() => setIsNewLocalModelModalOpen(true)}
-        placeholder=""
-      >
-        Add New Remote LLM
+        Remote LLM Setup
       </Button>
 
       <LocalModelModal
@@ -103,11 +113,6 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
           setIsNewLocalModelModalOpen(false);
           fetchModelConfigs();
         }}
-        // newModelPath={newModelPath}
-        // setNewModelPath={setNewModelPath}
-        // newModelContextLength={newModelContextLength}
-        // setNewModelContextLength={setNewModelContextLength}
-        // saveModelConfig={saveModelConfigToElectronStore}
       />
       {userTriedToSubmit && !defaultModel && (
         <p className="text-red-500 text-sm mt-1">{currentError}</p>
