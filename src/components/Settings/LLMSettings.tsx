@@ -106,7 +106,7 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
       <div className="flex">
         <Button
           className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
-          onClick={() => setIsNewLocalModelModalOpen(true)}
+          onClick={() => setIsRemoteLLMModalOpen(true)}
           placeholder=""
         >
           Remote LLM Setup

@@ -1,8 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@material-tailwind/react";
 import Modal from "../Generic/Modal";
-import ExternalLink from "../Generic/ExternalLink";
-import { AIModelConfig } from "electron/main/Store/storeConfig";
 
 interface RemoteLLMModalProps {
   isOpen: boolean;
@@ -10,75 +8,51 @@ interface RemoteLLMModalProps {
 }
 
 const RemoteLLMModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose }) => {
-  const [newModelContextLength, setNewModelContextLength] = useState<
-    number | null
-  >(null);
-  const [newModelPath, setNewModelPath] = useState<string>("");
-  const handleModelFileSelection = async () => {
-    const paths = await window.files.openFileDialog(["gguf"]);
-    if (paths && paths.length > 0) {
-      setNewModelPath(paths[0]);
-    }
-  };
-  const saveModelConfigToElectronStore = async () => {
-    if (!newModelPath || !newModelContextLength) {
-      return;
-    }
-    const newConfig: AIModelConfig = {
-      localPath: newModelPath,
-      contextLength: newModelContextLength,
-      engine: "llamacpp",
-    };
+  const [openAIKey, setOpenAIKey] = useState("");
 
-    const res = await window.electronStore.setupNewLocalLLM(newConfig);
-    console.log("setupNewLocalLLM response: ", res);
+  useEffect(() => {
+    const key = window.electronStore.getOpenAIAPIKey() || ""; // Fallback to empty string if undefined
+    setOpenAIKey(key);
+  }, []);
+
+  const handleSave = () => {
+    window.electronStore.setOpenAIAPIKey(openAIKey);
+
     onClose();
+  };
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSave();
+    }
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="w-[300px] ml-2 mr-2 mb-2">
-        <p className="text-white text-lg font-semibold mb-0">
-          Add New Local Model
+    <Modal isOpen={isOpen} onClose={handleSave}>
+      <div className="w-[300px] ml-3 mr-2 mb-2">
+        <h2 className="font-semibold mb-0 text-white">Remote LLM Setup</h2>
+        <p className="text-gray-100 mb-2 mt-2 text-sm">
+          Enter your OpenAI API key below to enable OpenAI models in the
+          Chatbot:
         </p>
-        <p className="text-white text-sm mb-2 mt-0">
-          Choose a .gguf model file on your computer to use as a local model.
-          You can download the best models from{" "}
-          <ExternalLink
-            url="https://huggingface.co/TheBloke?sort_models=downloads#models"
-            label="TheBloke on Huggingface"
-          />
-        </p>
-
-        <Button
-          className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
-          onClick={handleModelFileSelection}
-          placeholder=""
-        >
-          Select Model .GGUF File
-        </Button>
-
-        {newModelPath && (
-          <p className="mt-2 text-xs text-gray-100">
-            Selected: <strong>{newModelPath}</strong>
-          </p>
-        )}
-
         <input
-          className="w-full p-2 mb-1 mt-3 text-black box-border"
-          type="number"
-          placeholder="Context Length (in tokens)"
-          name="contextLength"
-          value={newModelContextLength || ""}
-          onChange={(e) => setNewModelContextLength(parseInt(e.target.value))}
+          type="text"
+          className="block w-full px-3 py-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
+          value={openAIKey}
+          onChange={(e) => setOpenAIKey(e.target.value)}
+          onKeyDown={handleKeyPress}
+          placeholder="Open AI API Key"
         />
-
+        <p className="mt-2 text-gray-100 text-xs">
+          <i>
+            You can then choose an OpenAI model in the Default Models dropdown.
+          </i>
+        </p>
         <Button
-          className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-3"
-          onClick={saveModelConfigToElectronStore}
+          className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mt-1 w-[80px]"
+          onClick={handleSave}
           placeholder=""
         >
-          Save New Model
+          Save
         </Button>
       </div>
     </Modal>

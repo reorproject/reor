@@ -12,18 +12,10 @@ const SettingsModal: React.FC<ModalProps> = ({
   isOpen,
   onClose: onCloseFromParent,
 }) => {
-  const [openAIKey, setOpenAIKey] = useState("");
   const [willNeedToReIndex, setWillNeedToReIndex] = useState(false);
   const [activeTab, setActiveTab] = useState("llmSettings");
 
-  useEffect(() => {
-    const key = window.electronStore.getOpenAIAPIKey() || ""; // Fallback to empty string if undefined
-    setOpenAIKey(key);
-  }, []);
-
   const handleSave = () => {
-    window.electronStore.setOpenAIAPIKey(openAIKey);
-
     if (willNeedToReIndex) {
       window.database.indexFilesInDirectory();
     }
