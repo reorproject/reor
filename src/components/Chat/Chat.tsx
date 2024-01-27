@@ -183,12 +183,12 @@ const ChatWithLLM: React.FC = () => {
         </div>
       </div>
       <div className="p-4 bg-gray-500">
-        <div className="flex space-x-2 h-[38px]">
+        <div className="flex space-x-2 h-full">
           <Textarea
             onKeyDown={handleKeyDown}
             onChange={handleInputChange}
             value={userInput}
-            className="w-full h-full bg-gray-300" // 'resize-none' to prevent manual resizing
+            className="w-full  bg-gray-300" // 'resize-none' to prevent manual resizing
             name="Outlined"
             placeholder="Ask your knowledge..."
             variant="outlined"
