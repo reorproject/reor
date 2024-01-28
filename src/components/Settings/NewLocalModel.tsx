@@ -75,8 +75,8 @@ const LocalModelModal: React.FC<LocalModelModalProps> = ({
           {" "}
           You can download the most popular models from{" "}
           <ExternalLink
-            url="https://huggingface.co/TheBloke?sort_models=downloads#models"
-            label="TheBloke on Huggingface"
+            url="https://huggingface.co/models?sort=downloads&search=gguf"
+            label="Huggingface"
           />
           .
         </p>
@@ -87,8 +87,7 @@ const LocalModelModal: React.FC<LocalModelModalProps> = ({
         )}
         <h3 className="text-gray-100 mb-1 mt-6">Context Length</h3>
         <p className="text-gray-100 text-sm mb-2 mt-0">
-          2048 is recommended for most systems. You can change this later in
-          settings:
+          You can change this later in settings:
         </p>
         <CustomSelect
           options={contextLengthOptions}
