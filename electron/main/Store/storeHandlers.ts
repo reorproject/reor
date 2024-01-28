@@ -43,6 +43,18 @@ export const registerStoreHandlers = (
     return aiModelConfigs || {};
   });
 
+  ipcMain.handle("update-ai-model-config", (event, modelName, modelConfig) => {
+    console.log("updating ai model config", modelName, modelConfig);
+    const aiModelConfigs = store.get(StoreKeys.AIModels);
+    if (aiModelConfigs) {
+      const updatedModelConfigs = {
+        ...aiModelConfigs,
+        [modelName]: modelConfig,
+      };
+      store.set(StoreKeys.AIModels, updatedModelConfigs);
+    }
+  });
+
   // Refactored ipcMain.handle to use the new function
   ipcMain.handle(
     "setup-new-local-model",

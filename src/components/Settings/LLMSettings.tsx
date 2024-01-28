@@ -4,6 +4,7 @@ import CustomSelect from "../Generic/Select";
 import { Button } from "@material-tailwind/react";
 import LocalModelModal from "./NewLocalModel";
 import RemoteLLMModal from "./RemoteLLMSetup";
+import ContextLengthModal from "./ContextLengthSettings";
 
 interface LLMSettingsProps {
   userHasCompleted?: (completed: boolean) => void;
@@ -23,6 +24,9 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
     useState<boolean>(false);
 
   const [isRemoteLLMModalOpen, setIsRemoteLLMModalOpen] =
+    useState<boolean>(false);
+
+  const [isConextLengthModalOpen, setIsContextLengthModalOpen] =
     useState<boolean>(false);
 
   const [defaultModel, setDefaultModel] = useState<string>("");
@@ -95,14 +99,14 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
         </Button>
         <Button
           className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1"
-          onClick={() => setIsNewLocalModelModalOpen(true)}
+          onClick={() => setIsContextLengthModalOpen(true)}
           placeholder={""}
         >
           Context Length Settings
         </Button>
       </div>
 
-      <h4 className="text-gray-100 mb-0">Setup a new remote (OpenAI) LLM:</h4>
+      <h4 className="text-gray-100 mb-0">Setup remote (OpenAI) LLMs:</h4>
       <div className="flex">
         <Button
           className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
@@ -119,6 +123,11 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
           setIsNewLocalModelModalOpen(false);
           fetchModelConfigs();
         }}
+      />
+      <ContextLengthModal
+        isOpen={isConextLengthModalOpen}
+        onClose={() => setIsContextLengthModalOpen(false)}
+        modelConfigs={modelConfigs}
       />
       <RemoteLLMModal
         isOpen={isRemoteLLMModalOpen}

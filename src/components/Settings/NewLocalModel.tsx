@@ -10,7 +10,7 @@ interface LocalModelModalProps {
   onClose: () => void;
 }
 
-const contextLengthOptions = [
+export const contextLengthOptions = [
   { label: "1024", value: "1024" },
   { label: "2048 (recommended)", value: "2048" },
   { label: "4096", value: "4096" },
