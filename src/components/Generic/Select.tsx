@@ -1,7 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 
+type OptionType = {
+  label: string;
+  value: string;
+};
+
 type CustomSelectProps = {
-  options: string[];
+  options: OptionType[];
   value: string;
   onChange: (value: string) => void;
   addButton?: {
@@ -36,8 +41,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   }, [wrapperRef]);
 
   const toggleDropdown = () => setIsOpen(!isOpen);
-  const handleOptionClick = (value: string) => {
-    onChange(value);
+  const handleOptionClick = (optionValue: string) => {
+    onChange(optionValue);
     setIsOpen(false);
   };
 
@@ -61,9 +66,9 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
             <div
               key={index}
               className="py-2 pl-2 hover:bg-gray-100 cursor-pointer rounded-md"
-              onClick={() => handleOptionClick(option)}
+              onClick={() => handleOptionClick(option.value)}
             >
-              {option}
+              {option.label}
             </div>
           ))}
 

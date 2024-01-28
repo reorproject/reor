@@ -45,12 +45,13 @@ const LocalModelModal: React.FC<LocalModelModalProps> = ({
           Add New Local Model
         </p>
         <p className="text-white text-sm mb-2 mt-0">
-          Choose a .gguf model file on your computer to use as a local model.
-          You can download the best models from{" "}
+          To use a local model you need to download a GGUF file onto your
+          computer and attach it here. You can download the best models from{" "}
           <ExternalLink
             url="https://huggingface.co/TheBloke?sort_models=downloads#models"
             label="TheBloke on Huggingface"
           />
+          .
         </p>
 
         <Button
