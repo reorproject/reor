@@ -69,8 +69,8 @@ const ContextLengthModal: React.FC<ContextLengthModalProps> = ({
         {Object.entries(localModelConfigs)
           .filter(([, config]) => config.engine === "llamacpp")
           .map(([modelKey, config]) => (
-            <div key={modelKey} className=" mt-0">
-              <h4 className="text-white mt-0 mb-1">{modelKey}</h4>
+            <div key={modelKey} className=" mt-8">
+              <h4 className="text-white mt-0 mb-1">{modelKey}:</h4>
               <CustomSelect
                 options={contextLengthOptions}
                 value={config.contextLength?.toString() || ""}
@@ -86,7 +86,7 @@ const ContextLengthModal: React.FC<ContextLengthModalProps> = ({
             You haven&apos;t added any local models yet.
           </p>
         ) : (
-          <p className="text-gray-100 text-xs mb-0 mt-2">
+          <p className="text-gray-100 text-xs mb-0 mt-5">
             <i>
               If you experience a crash, try lowering the context length. If you
               get a context length error, increase it.

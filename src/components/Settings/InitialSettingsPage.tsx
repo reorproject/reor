@@ -90,7 +90,7 @@ const OldInitialSetupSettings: React.FC<OldInitialSettingsProps> = ({
             (You can customize your models later)
           </p>
           <Button
-            className="bg-slate-700 mt-6 mb-3  border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
+            className="bg-slate-700 mt-4 mb-3  border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
             onClick={handleNext}
             placeholder=""
           >
