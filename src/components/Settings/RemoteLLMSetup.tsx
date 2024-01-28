@@ -16,8 +16,11 @@ const RemoteLLMModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose }) => {
   }, []);
 
   const handleSave = () => {
-    window.electronStore.setOpenAIAPIKey(openAIKey);
-    window.electronStore.addRemoteModelsToStore();
+    if (openAIKey) {
+      window.electronStore.setOpenAIAPIKey(openAIKey);
+      window.electronStore.addRemoteModelsToStore();
+    }
+
     onClose();
   };
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -29,10 +32,9 @@ const RemoteLLMModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose }) => {
   return (
     <Modal isOpen={isOpen} onClose={handleSave}>
       <div className="w-[300px] ml-3 mr-2 mb-2">
-        <h2 className="font-semibold mb-0 text-white">Remote LLM Setup</h2>
+        <h3 className="font-semibold mb-0 text-white">OpenAI Setup</h3>
         <p className="text-gray-100 mb-2 mt-2 text-sm">
-          Enter your OpenAI API key below to enable OpenAI models in the
-          Chatbot:
+          Enter your OpenAI API key below:
         </p>
         <input
           type="text"
@@ -40,11 +42,11 @@ const RemoteLLMModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose }) => {
           value={openAIKey}
           onChange={(e) => setOpenAIKey(e.target.value)}
           onKeyDown={handleKeyPress}
-          placeholder="Open AI API Key"
+          placeholder="OpenAI API Key"
         />
         <p className="mt-2 text-gray-100 text-xs">
           <i>
-            You can then choose an OpenAI model in the Default Models dropdown.
+            You&apos;ll then be able to choose an OpenAI model in the dropdown.
           </i>
         </p>
         <Button

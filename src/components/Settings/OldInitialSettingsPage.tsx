@@ -49,17 +49,17 @@ const OldInitialSetupSettings: React.FC<OldInitialSettingsProps> = ({
       onClose={() => console.log("Not allowing a close for now")}
       hideCloseButton={true}
     >
-      <div className="w-full mr-3">
+      <div className="w-full mr-4 ml-2">
         <div className="ml-2 mt-0 h-full  ">
           <h2 className="text-2xl font-semibold mb-0 text-white">
             Welcome to the Reor Project.
           </h2>
-          <p className="mt-2 text-gray-100">
+          <p className="mt-2 text-gray-100 ">
             Reor is a self-organising note-taking app. Each note will be saved
             as a markdown file to a &quot;vault&quot; directory on your machine.
           </p>
-          <p className="mt-2 text-gray-100">
-            Please choose your vault directory here:
+          <p className="mt-2 text-gray-100 italic">
+            Choose your vault directory here:
           </p>
           <Button
             className="bg-slate-700  border-none h-10 hover:bg-slate-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
@@ -68,14 +68,23 @@ const OldInitialSetupSettings: React.FC<OldInitialSettingsProps> = ({
           >
             Select Directory
           </Button>
+          <p className="mt-2 text-xs text-gray-100 italic">
+            This directory can be empty or contain existing files...
+          </p>
           {userDirectory && (
             <p className="mt-2 text-xs text-gray-100">
               Selected: <strong>{userDirectory}</strong>
             </p>
           )}
+          <div className="mt-8">
+            <EmbeddingModelManager>
+              <h3 className="font-semibold mb-2 text-white">Embedding Model</h3>
 
-          <h4 className="font-semibold mb-2 text-white">Embedding Model</h4>
-          <EmbeddingModelManager />
+              <p className="mt-0 text-gray-100 italic">
+                Choose a local embedding model for linking notes:
+              </p>
+            </EmbeddingModelManager>
+          </div>
           <LLMSettings isInitialSetup={true} />
 
           <Button

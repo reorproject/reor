@@ -83,21 +83,25 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
     <div className="w-full  bg-gray-800 rounded">
       {isInitialSetup ? (
         <div>
-          <h4 className="font-semibold mb-4 text-white">LLM</h4>
+          <h3 className="font-semibold mb-1 text-gray-100">LLM</h3>
+          <p className="mt-0 text-gray-100 italic">
+            Choose an LLM for Q&A. Either attach a local model or an OpenAI
+            model. You can do this later too...
+          </p>
           <div className="flex">
             <Button
               className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mr-4"
               onClick={() => setIsNewLocalModelModalOpen(true)}
               placeholder={""}
             >
-              Add New Local LLM
+              Attach Local LLM
             </Button>
             <Button
               className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mb-3 mr-4"
               onClick={() => setIsRemoteLLMModalOpen(true)}
               placeholder=""
             >
-              Remote LLM Setup
+              Connect to OpenAI
             </Button>
           </div>
           {Object.keys(modelConfigs).length > 0 && (
