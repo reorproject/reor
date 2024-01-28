@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Modal from "../Generic/Modal";
-import { Button } from "@material-tailwind/react";
 import LLMSettings from "./LLMSettings";
 import EmbeddingModelManager from "./EmbeddingSettings";
 interface ModalProps {
@@ -20,12 +19,6 @@ const SettingsModal: React.FC<ModalProps> = ({
       window.database.indexFilesInDirectory();
     }
     onCloseFromParent();
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleSave();
-    }
   };
 
   if (!isOpen) return null;
@@ -96,14 +89,6 @@ const SettingsModal: React.FC<ModalProps> = ({
               <LLMSettings />
             </div>
           )}
-
-          {/* <Button
-            className="bg-slate-700 mt-0 mb-2 border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
-            onClick={handleSave}
-            placeholder=""
-          >
-            Save
-          </Button> */}
         </div>
       </div>
     </Modal>

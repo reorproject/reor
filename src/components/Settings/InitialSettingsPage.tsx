@@ -10,93 +10,122 @@ interface Props {
 }
 
 const InitialSetupSettings: React.FC<Props> = ({ initialSettingsAreReady }) => {
-  const [currentStep, setCurrentStep] = useState(1);
   const [nextPageAllowed, setNextPageAllowed] = useState(false);
   const [userTriedToSubmit, setUserTriedToSubmit] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState("directoryPicker");
 
+  const steps = ["directoryPicker", "llmSettings", "embeddingModel"];
+
+  // Get the current step index
+  const currentStepIndex = steps.indexOf(activeTab);
+
+  // Handle "Next" button click
   const handleNext = () => {
-    setUserTriedToSubmit(true);
-    if (currentStep < 3 && nextPageAllowed) {
-      setCurrentStep(currentStep + 1);
-      setNextPageAllowed(false);
-    } else {
-      if (nextPageAllowed) {
-        initialSettingsAreReady();
-      }
+    console.log("current step index: ", currentStepIndex);
+    if (currentStepIndex < steps.length - 1) {
+      console.log("setting active tab to: ", steps[currentStepIndex + 1]);
+      setActiveTab(steps[currentStepIndex + 1]);
     }
   };
 
-  const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-      setNextPageAllowed(false);
-    }
-  };
+  // Handle "Back" button click
+  // const handleBack = () => {
+  //   if (currentStepIndex > 0) {
+  //     setActiveTab(steps[currentStepIndex - 1]);
+  //   }
+  // };
 
   return (
     <Modal
       isOpen={true}
-      onClose={() => console.log("Not allowing a close for now")}
-      hideCloseButton={true}
+      onClose={() => {
+        console.log("no close for now");
+      }}
     >
-      <div className="w-full mr-3">
-        <div className="ml-2 mt-0 h-full">
-          {currentStep === 1 && (
+      <div className=" mt-0  flex w-[600px] min-h-[300px]">
+        <div className="flex flex-col ml-2 pr-1 w-[120px]  bg-gray-800 text-white border-r-[0.1px] border-gray-700 border-solid border-b-0 border-t-0 border-l-0">
+          <div
+            className={`flex items-center mt-2 rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
+              activeTab === "directoryPicker"
+                ? "bg-gray-700 text-white font-semibold"
+                : "text-gray-200"
+            }`}
+            onClick={() => setActiveTab("directoryPicker")}
+          >
+            1. Vault
+          </div>
+          <div
+            className={`flex items-center mt-2 rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
+              activeTab === "llmSettings"
+                ? "bg-gray-700 text-white font-semibold"
+                : "text-gray-200"
+            }`}
+            onClick={() => setActiveTab("llmSettings")}
+          >
+            2. LLM
+          </div>
+          <div
+            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
+              activeTab === "embeddingModel"
+                ? "bg-gray-700 text-white font-semibold"
+                : "text-gray-200"
+            }`}
+            onClick={() => setActiveTab("embeddingModel")}
+          >
+            3. Embedding Model
+          </div>
+        </div>
+
+        {/* Right Content Area */}
+        <div className="flex-1 ml-2 w-full">
+          {/* <h2 className="text-2xl font-semibold mb-4 text-white">Settings</h2> */}
+          {activeTab === "directoryPicker" && (
             <DirectoryPicker
               userHasCompleted={(allowed) => setNextPageAllowed(allowed)}
               userTriedToSubmit={userTriedToSubmit}
             />
           )}
-          {currentStep === 2 && (
-            <>
+          {activeTab === "embeddingModel" && (
+            <div className="w-full">
               <EmbeddingModelManager
-                userHasCompleted={(completed) => setNextPageAllowed(completed)}
-                userTriedToSubmit={userTriedToSubmit}
+                handleUserHasChangedModel={(completed) =>
+                  setNextPageAllowed(completed)
+                }
+                childrenBelowDropdown={
+                  <p className=" text-gray-100 text-xs">
+                    <i>
+                      If you notice some lag in the editor it is likely because
+                      you chose too large of a model...
+                    </i>
+                  </p>
+                }
               >
                 <h2 className="text-2xl font-semibold mb-0 text-white">
                   Embedding Model
                 </h2>{" "}
                 <p className="mt-5 text-gray-100">
-                  Each note is embedded by a local embedding model into a vector
-                  database. Please choose your embedding model below:
+                  If you change this, your files will be re-indexed:
                 </p>
+                {/* <EmbeddingModelManager.childrenBelowDropdown> */}
+                {/* </EmbeddingModelManager.childrenBelowDropdown> */}
               </EmbeddingModelManager>
-            </>
+            </div>
           )}
-          {currentStep === 3 && (
-            <>
-              <LLMSettings
-                userHasCompleted={(completed) => setNextPageAllowed(completed)}
-                userTriedToSubmit={userTriedToSubmit}
-              />
-            </>
+
+          {activeTab === "llmSettings" && (
+            <div className="mt-2 w-full">
+              <LLMSettings />
+            </div>
           )}
-          <div className="flex justify-between mt-5">
-            {currentStep > 1 ? (
-              <Button
-                className={`bg-slate-700 mb-3 border-none h-10 w-[80px] text-center ${
-                  currentStep === 1
-                    ? "opacity-50 cursor-not-allowed"
-                    : "hover:bg-slate-900 cursor-pointer"
-                }`}
-                onClick={handleBack}
-                disabled={currentStep === 1}
-                placeholder=""
-              >
-                Back
-              </Button>
-            ) : (
-              <div className="flex-grow"></div>
-            )}
-            {nextPageAllowed && (
-              <Button
-                className="bg-slate-700 mb-3 border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center"
-                onClick={handleNext}
-                placeholder=""
-              >
-                {currentStep < 3 ? "Next" : "Submit"}
-              </Button>
-            )}
+
+          <div className="flex justify-end mt-4">
+            <Button
+              className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2 mt-1 mr-0 mb-3"
+              onClick={handleNext}
+              placeholder=""
+            >
+              Next
+            </Button>
           </div>
         </div>
       </div>
@@ -105,3 +134,22 @@ const InitialSetupSettings: React.FC<Props> = ({ initialSettingsAreReady }) => {
 };
 
 export default InitialSetupSettings;
+
+// const handleNext = () => {
+//   setUserTriedToSubmit(true);
+//   if (currentStep < 3 && nextPageAllowed) {
+//     setCurrentStep(currentStep + 1);
+//     setNextPageAllowed(false);
+//   } else {
+//     if (nextPageAllowed) {
+//       initialSettingsAreReady();
+//     }
+//   }
+// };
+
+// const handleBack = () => {
+//   if (currentStep > 1) {
+//     setCurrentStep(currentStep - 1);
+//     setNextPageAllowed(false);
+//   }
+// };

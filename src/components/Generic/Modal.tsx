@@ -36,7 +36,7 @@ const Modal: React.FC<ModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
       <div
         ref={modalRef}
-        className="flex bg-gray-800 rounded-lg shadow-xl max-w-lg "
+        className="flex bg-gray-800 rounded-lg shadow-xl  max-w-lg"
       >
         {children}
         {!hideCloseButton && (

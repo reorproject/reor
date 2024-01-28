@@ -4,6 +4,7 @@ import "react-toastify/dist/ReactToastify.css";
 import InitialSetupSettings from "./components/Settings/InitialSettingsPage";
 import FileEditorContainer from "./components/FileEditorContainer";
 import IndexingProgress from "./components/IndexingProgress";
+import OldInitialSetupSettings from "./components/Settings/OldInitialSettingsPage";
 
 interface AppProps {}
 
@@ -60,8 +61,8 @@ const App: React.FC<AppProps> = () => {
           <FileEditorContainer />
         )
       ) : (
-        <InitialSetupSettings
-          initialSettingsAreReady={handleAllInitialSettingsAreReady}
+        <OldInitialSetupSettings
+          readyForIndexing={handleAllInitialSettingsAreReady}
         />
       )}
     </div>

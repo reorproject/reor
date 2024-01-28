@@ -33,7 +33,7 @@ import { repopulateTableWithMissingItems } from "./database/TableHelperFunctions
 
 const store = new Store<StoreSchema>();
 // const user = store.get("user");
-// // store.clear();
+store.clear();
 
 // // Check if 'user' and 'directory' exist before attempting to delete
 // if (user && typeof user === "object" && "directory" in user) {
