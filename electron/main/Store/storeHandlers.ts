@@ -90,23 +90,23 @@ export async function addNewModelSchemaToStore(
   const existingModels =
     (store.get(StoreKeys.AIModels) as Record<string, AIModelConfig>) || {};
 
-  if (existingModels[modelName]) {
-    return "Model already exists";
-  }
-  console.log("validating model config");
-  const isNotValid = validateAIModelConfig(modelName, modelConfig);
-  if (isNotValid) {
-    console.log("invalid model config");
-    return isNotValid;
-  }
-  console.log("model config is valid");
+  if (!existingModels[modelName]) {
+    console.log("validating model config");
+    const isNotValid = validateAIModelConfig(modelName, modelConfig);
+    if (isNotValid) {
+      console.log("invalid model config");
+      return isNotValid;
+    }
+    console.log("model config is valid");
 
-  const updatedModels = {
-    ...existingModels,
-    [modelName]: modelConfig,
-  };
+    const updatedModels = {
+      ...existingModels,
+      [modelName]: modelConfig,
+    };
 
-  store.set(StoreKeys.AIModels, updatedModels);
+    store.set(StoreKeys.AIModels, updatedModels);
+  }
+
   store.set(StoreKeys.DefaultAIModel, modelName);
   return "Model set up successfully";
 }
