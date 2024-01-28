@@ -46,7 +46,8 @@ const RemoteLLMModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose }) => {
         />
         <p className="mt-2 text-gray-100 text-xs">
           <i>
-            You&apos;ll then be able to choose an OpenAI model in the dropdown.
+            You&apos;ll then be able to choose an OpenAI model in the model
+            dropdown...
           </i>
         </p>
         <Button

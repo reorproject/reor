@@ -58,7 +58,7 @@ const OldInitialSetupSettings: React.FC<OldInitialSettingsProps> = ({
             Reor is a self-organising note-taking app. Each note will be saved
             as a markdown file to a &quot;vault&quot; directory on your machine.
           </p>
-          <p className="mt-2 text-gray-100 italic">
+          <p className="mt-2 text-gray-100">
             Choose your vault directory here:
           </p>
           <Button
@@ -68,8 +68,8 @@ const OldInitialSetupSettings: React.FC<OldInitialSettingsProps> = ({
           >
             Select Directory
           </Button>
-          <p className="mt-2 text-xs text-gray-100 italic">
-            This directory can be empty or contain existing files...
+          <p className="mt-2 text-xs text-gray-100 ">
+            (Your vault directory doesn&apos;t need to be empty)
           </p>
           {userDirectory && (
             <p className="mt-2 text-xs text-gray-100">
@@ -80,13 +80,15 @@ const OldInitialSetupSettings: React.FC<OldInitialSettingsProps> = ({
             <EmbeddingModelManager>
               <h3 className="font-semibold mb-2 text-white">Embedding Model</h3>
 
-              <p className="mt-0 text-gray-100 italic">
+              {/* <p className="mt-0 text-gray-100 italic">
                 Choose a local embedding model for linking notes:
-              </p>
+              </p> */}
             </EmbeddingModelManager>
           </div>
           <LLMSettings isInitialSetup={true} />
-
+          <p className="mt-0 text-gray-100 text-xs">
+            (You can customize your models later)
+          </p>
           <Button
             className="bg-slate-700 mt-6 mb-3  border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
             onClick={handleNext}

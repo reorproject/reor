@@ -60,8 +60,8 @@ const LocalModelModal: React.FC<LocalModelModalProps> = ({
       <div className="w-[400px] ml-2 mr-2 mb-2 pl-3">
         <h2 className="text-white  font-semibold mb-0">New Local Model</h2>
         <p className="text-white text-sm mb-2 mt-1">
-          To use a local model you need to download a GGUF file onto your
-          computer and attach it here:
+          To use a local model you need to download a GGUF model file and attach
+          it here:
         </p>
 
         <Button
@@ -85,10 +85,10 @@ const LocalModelModal: React.FC<LocalModelModalProps> = ({
             Selected: <strong>{newModelPath}</strong>
           </p>
         )}
-        <h3 className="text-gray-100 mb-1 mt-6">Context Length</h3>
-        <p className="text-gray-100 text-sm mb-2 mt-0">
+        <h3 className="text-gray-100 mb-2 mt-6">Context Length</h3>
+        {/* <p className="text-gray-100 text-sm mb-2 mt-0">
           You can change this later in settings:
-        </p>
+        </p> */}
         <CustomSelect
           options={contextLengthOptions}
           value={selectedContextLength}
@@ -96,10 +96,11 @@ const LocalModelModal: React.FC<LocalModelModalProps> = ({
             setSelectedContextLength(newValue);
           }}
         />
-        <p className="text-gray-100 text-xs mb-2 mt-1">
+        <p className="text-gray-100 text-xs mb-2 mt-2">
           <i>
             If you experience a crash, try lowering the context length. If you
-            get a context length error, increase it.
+            get a context length error, increase it. You can do this in
+            Settings.
           </i>
         </p>
 
