@@ -68,6 +68,7 @@ declare global {
       setOpenAIAPIKey: (apiKey: string) => Promise<void>;
       getOpenAIAPIKey: () => string;
       getAIModelConfigs: () => Promise<Record<string, AIModelConfig>>;
+      addRemoteModelsToStore: () => Promise<void>;
       updateAIModelConfig: (
         modelName: string,
         modelConfig: AIModelConfig
@@ -131,6 +132,9 @@ contextBridge.exposeInMainWorld("electronStore", {
   },
   getAIModelConfigs: async (): Promise<AIModelConfig[]> => {
     return ipcRenderer.invoke("get-ai-model-configs");
+  },
+  addRemoteModelsToStore: async () => {
+    return ipcRenderer.invoke("add-remote-models-to-store");
   },
   updateAIModelConfig: async (
     modelName: string,

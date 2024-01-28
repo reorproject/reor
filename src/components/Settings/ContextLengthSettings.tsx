@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Modal from "../Generic/Modal";
 import { AIModelConfig } from "electron/main/Store/storeConfig";
 import CustomSelect from "../Generic/Select";
+import { contextLengthOptions } from "./NewLocalModel";
 
 interface ContextLengthModalProps {
   isOpen: boolean;
@@ -14,51 +15,60 @@ const ContextLengthModal: React.FC<ContextLengthModalProps> = ({
   onClose,
   modelConfigs,
 }) => {
-  // State to manage context lengths for all models
-  const [contextLengths, setContextLengths] = useState<Record<string, string>>(
-    {}
-  );
+  const [localModelConfigs, setLocalModelConfigs] = useState<
+    Record<string, AIModelConfig>
+  >({});
 
   useEffect(() => {
-    // Initialize contextLengths state when modelConfigs is updated
-    const initialContextLengths = Object.keys(modelConfigs).reduce(
-      (acc, key) => {
-        acc[key] = modelConfigs[key].contextLength?.toString() || "";
-        return acc;
-      },
-      {} as Record<string, string>
-    );
-    setContextLengths(initialContextLengths);
+    // Initialize localModelConfigs state when modelConfigs is updated
+    setLocalModelConfigs({ ...modelConfigs });
   }, [modelConfigs]);
 
   // Options for context length dropdown
-  const contextLengthOptions = [
-    { label: "512", value: "512" },
-    { label: "1024", value: "1024" },
-    { label: "2048", value: "2048" },
-    // Add more options as needed
-  ];
 
+  const updateAIModelConfig = async (
+    modelName: string,
+    modelConfig: AIModelConfig
+  ) => {
+    try {
+      await window.electronStore.updateAIModelConfig(modelName, modelConfig);
+      console.log(`Model config updated for ${modelName}`);
+    } catch (error) {
+      console.error(`Error updating model config for ${modelName}:`, error);
+    }
+  };
   // Handle changing context length for a specific model
   const handleContextLengthChange = (modelKey: string, value: string) => {
-    setContextLengths((prev) => ({ ...prev, [modelKey]: value }));
-    // Update modelConfigs state here if needed
+    const newContextLength = parseInt(value);
+    setLocalModelConfigs((prevConfigs) => ({
+      ...prevConfigs,
+      [modelKey]: {
+        ...prevConfigs[modelKey],
+        contextLength: newContextLength,
+      },
+    }));
+
+    // Call updateAIModelConfig with the updated model config
+    updateAIModelConfig(modelKey, {
+      ...localModelConfigs[modelKey],
+      contextLength: newContextLength,
+    });
   };
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      {Object.keys(modelConfigs).map((modelKey) => (
-        <div key={modelKey}>
-          <h3>Model: {modelKey}</h3>
-          <CustomSelect
-            options={contextLengthOptions}
-            value={contextLengths[modelKey] || ""}
-            onChange={(value: string) =>
-              handleContextLengthChange(modelKey, value)
-            }
-          />
-        </div>
-      ))}
+      {Object.entries(localModelConfigs)
+        .filter(([_, config]) => config.engine === "llamacpp")
+        .map(([modelKey, config]) => (
+          <div key={modelKey}>
+            <h3>Model: {modelKey}</h3>
+            <CustomSelect
+              options={contextLengthOptions}
+              value={config.contextLength?.toString() || ""}
+              onChange={(value) => handleContextLengthChange(modelKey, value)}
+            />
+          </div>
+        ))}
     </Modal>
   );
 };

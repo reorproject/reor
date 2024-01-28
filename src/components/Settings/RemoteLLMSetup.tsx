@@ -17,7 +17,7 @@ const RemoteLLMModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose }) => {
 
   const handleSave = () => {
     window.electronStore.setOpenAIAPIKey(openAIKey);
-
+    window.electronStore.addRemoteModelsToStore();
     onClose();
   };
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {

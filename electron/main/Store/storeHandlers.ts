@@ -9,7 +9,6 @@ export const registerStoreHandlers = (
   store: Store<StoreSchema>,
   fileWatcher: FSWatcher | null
 ) => {
-  setupDefaultModels(store);
   ipcMain.on(
     "set-user-directory",
     async (event, userDirectory: string): Promise<void> => {
@@ -41,6 +40,10 @@ export const registerStoreHandlers = (
     // Assuming store.get() returns the value for the given key
     const aiModelConfigs = store.get(StoreKeys.AIModels);
     return aiModelConfigs || {};
+  });
+
+  ipcMain.handle("add-remote-models-to-store", async () => {
+    await addRemoteModelsToElectronStore(store);
   });
 
   ipcMain.handle("update-ai-model-config", (event, modelName, modelConfig) => {
@@ -117,13 +120,14 @@ export async function addNewModelSchemaToStore(
     };
 
     store.set(StoreKeys.AIModels, updatedModels);
+    store.set(StoreKeys.DefaultAIModel, modelName);
+    return "Model set up successfully";
+  } else {
+    return "Model already exists";
   }
-
-  store.set(StoreKeys.DefaultAIModel, modelName);
-  return "Model set up successfully";
 }
 
-const defaultAIModels: { [modelName: string]: AIModelConfig } = {
+const remoteAIModels: { [modelName: string]: AIModelConfig } = {
   "gpt-3.5-turbo-1106": {
     localPath: "",
     contextLength: 16385,
@@ -141,8 +145,10 @@ const defaultAIModels: { [modelName: string]: AIModelConfig } = {
   },
 };
 
-async function setupDefaultModels(store: Store<StoreSchema>) {
-  for (const [modelName, modelConfig] of Object.entries(defaultAIModels)) {
+export async function addRemoteModelsToElectronStore(
+  store: Store<StoreSchema>
+) {
+  for (const [modelName, modelConfig] of Object.entries(remoteAIModels)) {
     await addNewModelSchemaToStore(store, modelName, modelConfig);
   }
 }

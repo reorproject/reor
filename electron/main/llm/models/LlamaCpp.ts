@@ -29,7 +29,7 @@ export class LlamaCPPSessionService implements ISessionService {
     const nodeLLamaCpp = await import("node-llama-cpp");
     this.context = new nodeLLamaCpp.LlamaContext({
       model: this.model,
-      contextSize: 2048, // so for now, this doesn't do much to prevent context crashes
+      contextSize: storeModelConfig.contextLength,
     });
     this.session = new nodeLLamaCpp.LlamaChatSession({
       contextSequence: this.context.getSequence(),
