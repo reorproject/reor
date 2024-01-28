@@ -45,7 +45,7 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
 
   useEffect(() => {
     fetchModelConfigs();
-  }, []);
+  }, [isConextLengthModalOpen, isNewLocalModelModalOpen, isRemoteLLMModalOpen]);
 
   useEffect(() => {
     // this condition may in fact be less necessary: no need for the user to use chatbot...
@@ -121,17 +121,20 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
         isOpen={isNewLocalModelModalOpen}
         onClose={() => {
           setIsNewLocalModelModalOpen(false);
-          fetchModelConfigs();
         }}
       />
       <ContextLengthModal
         isOpen={isConextLengthModalOpen}
-        onClose={() => setIsContextLengthModalOpen(false)}
+        onClose={() => {
+          setIsContextLengthModalOpen(false);
+        }}
         modelConfigs={modelConfigs}
       />
       <RemoteLLMModal
         isOpen={isRemoteLLMModalOpen}
-        onClose={() => setIsRemoteLLMModalOpen(false)}
+        onClose={() => {
+          setIsRemoteLLMModalOpen(false);
+        }}
       />
       {userTriedToSubmit && !defaultModel && (
         <p className="text-red-500 text-sm mt-1">{currentError}</p>
