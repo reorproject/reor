@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import InitialSetupSettings from "./components/Settings/InitialSettingsPage";
 import FileEditorContainer from "./components/FileEditorContainer";
 import IndexingProgress from "./components/IndexingProgress";
-import OldInitialSetupSettings from "./components/Settings/OldInitialSettingsPage";
+import OldInitialSetupSettings from "./components/Settings/InitialSettingsPage";
 
 interface AppProps {}
 
