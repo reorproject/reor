@@ -27,6 +27,8 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
     "delete-session",
     async (event: IpcMainInvokeEvent, sessionId: string): Promise<string> => {
       if (sessions[sessionId]) {
+        const sessionService = sessions[sessionId];
+        await sessionService.abort();
         delete sessions[sessionId];
       }
       return "success";
@@ -73,8 +75,17 @@ async function createSession(
   sessionId: string
 ): Promise<string> {
   const defaultModelName = store.get(StoreKeys.DefaultAIModel);
-
+  if (!defaultModelName) {
+    throw new Error(
+      "No default LLM model configured. Please choose either a local or a remote LLM in Settings."
+    );
+  }
   const allConfigs = store.get(StoreKeys.AIModels);
+
+  if (!allConfigs) {
+    throw new Error("No AI models configured");
+  }
+
   const currentConfig = allConfigs[defaultModelName];
 
   if (currentConfig.engine === "openai") {

@@ -10,6 +10,7 @@ export class OpenAIModelSessionService implements ISessionService {
   private openai: OpenAI;
   public modelName: string;
   private messageHistory: ChatbotMessage[];
+  private abortStreaming: boolean = false;
 
   constructor(apiKey: string, modelName: string) {
     this.openai = new OpenAI({ apiKey });
@@ -26,6 +27,10 @@ export class OpenAIModelSessionService implements ISessionService {
     return true;
   }
 
+  public abort(): void {
+    this.abortStreaming = true;
+  }
+
   async streamingPrompt(
     prompt: string,
     sendFunctionImplementer: ISendFunctionImplementer,
@@ -34,6 +39,7 @@ export class OpenAIModelSessionService implements ISessionService {
     if (!this.isModelLoaded()) {
       throw new Error("Model not initialized");
     }
+    this.abortStreaming = false;
 
     // Add the user's prompt to the message history
     this.messageHistory.push({
@@ -61,6 +67,9 @@ export class OpenAIModelSessionService implements ISessionService {
 
       let result = "";
       for await (const chunk of stream) {
+        if (this.abortStreaming) {
+          break; // Exit the loop if the flag is set
+        }
         const content = chunk.choices[0]?.delta?.content || "";
         result += content;
 

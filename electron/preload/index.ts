@@ -68,6 +68,11 @@ declare global {
       setOpenAIAPIKey: (apiKey: string) => Promise<void>;
       getOpenAIAPIKey: () => string;
       getAIModelConfigs: () => Promise<Record<string, AIModelConfig>>;
+      addRemoteModelsToStore: () => Promise<void>;
+      updateAIModelConfig: (
+        modelName: string,
+        modelConfig: AIModelConfig
+      ) => Promise<void>;
       setupNewLocalLLM: (modelConfig: AIModelConfig) => Promise<void>;
 
       setDefaultAIModel: (modelName: string) => void;
@@ -113,6 +118,7 @@ contextBridge.exposeInMainWorld("electron", {
 
 contextBridge.exposeInMainWorld("electronStore", {
   setUserDirectory: (path: string) => {
+    console.log("setting user directory IN PRELOAD", path);
     return ipcRenderer.sendSync("set-user-directory", path);
   },
   setOpenAIAPIKey: (apiKey: string) => {
@@ -126,6 +132,15 @@ contextBridge.exposeInMainWorld("electronStore", {
   },
   getAIModelConfigs: async (): Promise<AIModelConfig[]> => {
     return ipcRenderer.invoke("get-ai-model-configs");
+  },
+  addRemoteModelsToStore: async () => {
+    return ipcRenderer.invoke("add-remote-models-to-store");
+  },
+  updateAIModelConfig: async (
+    modelName: string,
+    modelConfig: AIModelConfig
+  ) => {
+    return ipcRenderer.invoke("update-ai-model-config", modelName, modelConfig);
   },
   setupNewLocalLLM: async (modelConfig: AIModelConfig) => {
     return ipcRenderer.invoke("setup-new-local-model", modelConfig);

@@ -38,7 +38,7 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({
       onClose={() => console.log("Not allowing a close for now")}
       hideCloseButton={true}
     >
-      <div className="w-[500px] h-[100px]">
+      <div className="w-[500px] h-[100px] ml-3 mb-3 mt-2">
         <h6 className="mt-2 mb-2 text-2xl font-semibold text-white">
           {indexingProgress === 0
             ? "Initializing vector database..."

@@ -9,7 +9,6 @@ export const registerStoreHandlers = (
   store: Store<StoreSchema>,
   fileWatcher: FSWatcher | null
 ) => {
-  setupDefaultModels(store);
   ipcMain.on(
     "set-user-directory",
     async (event, userDirectory: string): Promise<void> => {
@@ -41,6 +40,22 @@ export const registerStoreHandlers = (
     // Assuming store.get() returns the value for the given key
     const aiModelConfigs = store.get(StoreKeys.AIModels);
     return aiModelConfigs || {};
+  });
+
+  ipcMain.handle("add-remote-models-to-store", async () => {
+    await addRemoteModelsToElectronStore(store);
+  });
+
+  ipcMain.handle("update-ai-model-config", (event, modelName, modelConfig) => {
+    console.log("updating ai model config", modelName, modelConfig);
+    const aiModelConfigs = store.get(StoreKeys.AIModels);
+    if (aiModelConfigs) {
+      const updatedModelConfigs = {
+        ...aiModelConfigs,
+        [modelName]: modelConfig,
+      };
+      store.set(StoreKeys.AIModels, updatedModelConfigs);
+    }
   });
 
   // Refactored ipcMain.handle to use the new function
@@ -90,31 +105,38 @@ export async function addNewModelSchemaToStore(
   const existingModels =
     (store.get(StoreKeys.AIModels) as Record<string, AIModelConfig>) || {};
 
-  if (existingModels[modelName]) {
+  if (!existingModels[modelName]) {
+    console.log("validating model config");
+    const isNotValid = validateAIModelConfig(modelName, modelConfig);
+    if (isNotValid) {
+      console.log("invalid model config");
+      return isNotValid;
+    }
+    console.log("model config is valid");
+
+    const updatedModels = {
+      ...existingModels,
+      [modelName]: modelConfig,
+    };
+
+    store.set(StoreKeys.AIModels, updatedModels);
+    store.set(StoreKeys.DefaultAIModel, modelName);
+    return "Model set up successfully";
+  } else {
     return "Model already exists";
   }
-  console.log("validating model config");
-  const isNotValid = validateAIModelConfig(modelName, modelConfig);
-  if (isNotValid) {
-    console.log("invalid model config");
-    return isNotValid;
-  }
-  console.log("model config is valid");
-
-  const updatedModels = {
-    ...existingModels,
-    [modelName]: modelConfig,
-  };
-
-  store.set(StoreKeys.AIModels, updatedModels);
-  store.set(StoreKeys.DefaultAIModel, modelName);
-  return "Model set up successfully";
 }
 
-const defaultAIModels: { [modelName: string]: AIModelConfig } = {
+const remoteAIModels: { [modelName: string]: AIModelConfig } = {
   "gpt-3.5-turbo-1106": {
     localPath: "",
     contextLength: 16385,
+    engine: "openai",
+  },
+
+  "gpt-4-0613": {
+    localPath: "",
+    contextLength: 8192,
     engine: "openai",
   },
   "gpt-4-1106-preview": {
@@ -122,15 +144,12 @@ const defaultAIModels: { [modelName: string]: AIModelConfig } = {
     contextLength: 128000,
     engine: "openai",
   },
-  "gpt-4-0613": {
-    localPath: "",
-    contextLength: 8192,
-    engine: "openai",
-  },
 };
 
-async function setupDefaultModels(store: Store<StoreSchema>) {
-  for (const [modelName, modelConfig] of Object.entries(defaultAIModels)) {
+export async function addRemoteModelsToElectronStore(
+  store: Store<StoreSchema>
+) {
+  for (const [modelName, modelConfig] of Object.entries(remoteAIModels)) {
     await addNewModelSchemaToStore(store, modelName, modelConfig);
   }
 }
