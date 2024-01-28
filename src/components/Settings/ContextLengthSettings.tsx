@@ -81,17 +81,18 @@ const ContextLengthModal: React.FC<ContextLengthModalProps> = ({
         {/* if list is empty print something: */}
         {Object.entries(localModelConfigs).filter(
           ([, config]) => config.engine === "llamacpp"
-        ).length === 0 && (
+        ).length === 0 ? (
           <p className="text-gray-100 text-sm mb-0 mt-0 italic">
             You haven&apos;t added any local models yet.
           </p>
+        ) : (
+          <p className="text-gray-100 text-xs mb-0 mt-2">
+            <i>
+              If you experience a crash, try lowering the context length. If you
+              get a context length error, increase it.
+            </i>
+          </p>
         )}
-        <p className="text-gray-100 text-xs mb-0 mt-2">
-          <i>
-            If you experience a crash, try lowering the context length. If you
-            get a context length error, increase it.
-          </i>
-        </p>
       </div>
     </Modal>
   );

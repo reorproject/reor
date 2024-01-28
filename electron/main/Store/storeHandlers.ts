@@ -133,14 +133,15 @@ const remoteAIModels: { [modelName: string]: AIModelConfig } = {
     contextLength: 16385,
     engine: "openai",
   },
-  "gpt-4-1106-preview": {
-    localPath: "",
-    contextLength: 128000,
-    engine: "openai",
-  },
+
   "gpt-4-0613": {
     localPath: "",
     contextLength: 8192,
+    engine: "openai",
+  },
+  "gpt-4-1106-preview": {
+    localPath: "",
+    contextLength: 128000,
     engine: "openai",
   },
 };

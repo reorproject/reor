@@ -11,17 +11,10 @@ interface OldInitialSettingsProps {
 const OldInitialSetupSettings: React.FC<OldInitialSettingsProps> = ({
   readyForIndexing,
 }) => {
-  const [openAIKey, setOpenAIKey] = useState("");
   const [userDirectory, setUserDirectory] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
-  useEffect(() => {
-    const key = window.electronStore.getOpenAIAPIKey() || ""; // Fallback to empty string if undefined
-    setOpenAIKey(key);
-  }, []);
-
   const handleNext = () => {
-    window.electronStore.setOpenAIAPIKey(openAIKey);
     if (userDirectory) {
       window.electronStore.setUserDirectory(userDirectory);
       readyForIndexing();
@@ -47,12 +40,6 @@ const OldInitialSetupSettings: React.FC<OldInitialSettingsProps> = ({
       setUserDirectory(path);
       // window.electronStore.setUserDirectory(path);
       // onDirectorySelected(path);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleNext();
     }
   };
 
@@ -89,18 +76,7 @@ const OldInitialSetupSettings: React.FC<OldInitialSettingsProps> = ({
 
           <h4 className="font-semibold mb-2 text-white">Embedding Model</h4>
           <EmbeddingModelManager />
-          <LLMSettings />
-          <h4 className="font-semibold mb-2 text-white">
-            Open AI Key (Optional)
-          </h4>
-          <input
-            type="text"
-            className="block w-full px-3 py-2 box-border border border-gray-300 rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
-            value={openAIKey}
-            onChange={(e) => setOpenAIKey(e.target.value)}
-            onKeyDown={handleKeyPress}
-            placeholder="Open AI API Key"
-          />
+          <LLMSettings isInitialSetup={true} />
 
           <Button
             className="bg-slate-700 mt-6 mb-3  border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"

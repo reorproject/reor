@@ -10,12 +10,14 @@ interface LLMSettingsProps {
   userHasCompleted?: (completed: boolean) => void;
   // setCurrentError?: (error: string) => void;
   userTriedToSubmit?: boolean;
+  isInitialSetup?: boolean;
 }
 
 const LLMSettings: React.FC<LLMSettingsProps> = ({
   userHasCompleted,
   // setCurrentError,
   userTriedToSubmit,
+  isInitialSetup,
 }) => {
   const [modelConfigs, setModelConfigs] = useState<
     Record<string, AIModelConfig>
@@ -79,44 +81,85 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
 
   return (
     <div className="w-full  bg-gray-800 rounded">
-      <h2 className="font-semibold mb-4 text-white">LLM</h2>
-      <h4 className="text-gray-100 mb-1">Default LLM:</h4>
-      <div className="w-full mb-1">
-        <CustomSelect
-          options={modelOptions}
-          value={defaultModel}
-          onChange={handleDefaultModelChange}
-        />
-      </div>
-      <h4 className="text-gray-100 mb-1">Local LLM Settings:</h4>
-      <div className="flex">
-        <Button
-          className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mr-4"
-          onClick={() => setIsNewLocalModelModalOpen(true)}
-          placeholder={""}
-        >
-          Add New Local LLM
-        </Button>
-        <Button
-          className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1"
-          onClick={() => setIsContextLengthModalOpen(true)}
-          placeholder={""}
-        >
-          Context Length Settings
-        </Button>
-      </div>
+      {isInitialSetup ? (
+        <div>
+          <h4 className="font-semibold mb-4 text-white">LLM</h4>
+          <div className="flex">
+            <Button
+              className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mr-4"
+              onClick={() => setIsNewLocalModelModalOpen(true)}
+              placeholder={""}
+            >
+              Add New Local LLM
+            </Button>
+            <Button
+              className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mb-3 mr-4"
+              onClick={() => setIsRemoteLLMModalOpen(true)}
+              placeholder=""
+            >
+              Remote LLM Setup
+            </Button>
+          </div>
+          {Object.keys(modelConfigs).length > 0 && (
+            <div>
+              <h4 className="text-gray-100 mb-1">Default LLM:</h4>
+              <div className="w-full mb-1">
+                <CustomSelect
+                  options={modelOptions}
+                  value={defaultModel}
+                  onChange={handleDefaultModelChange}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div>
+          <h2 className="font-semibold mb-4 text-white">LLM</h2>
+          {Object.keys(modelConfigs).length > 0 && (
+            <div>
+              <h4 className="text-gray-100 mb-1">Default LLM:</h4>
+              <div className="w-full mb-1">
+                <CustomSelect
+                  options={modelOptions}
+                  value={defaultModel}
+                  onChange={handleDefaultModelChange}
+                />
+              </div>
+            </div>
+          )}
+          <h4 className="text-gray-100 mb-1">Local LLM Settings:</h4>
+          <div className="flex">
+            <Button
+              className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mr-4"
+              onClick={() => setIsNewLocalModelModalOpen(true)}
+              placeholder={""}
+            >
+              Add New Local LLM
+            </Button>
+            <Button
+              className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1"
+              onClick={() => setIsContextLengthModalOpen(true)}
+              placeholder={""}
+            >
+              Context Length Settings
+            </Button>
+          </div>
 
-      <h4 className="text-gray-100 mb-0">Setup remote (OpenAI) LLMs:</h4>
-      <div className="flex">
-        <Button
-          className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
-          onClick={() => setIsRemoteLLMModalOpen(true)}
-          placeholder=""
-        >
-          Remote LLM Setup
-        </Button>
-        <div className="border-none h-8 w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1"></div>
-      </div>
+          <h4 className="text-gray-100 mb-0">Setup remote (OpenAI) LLMs:</h4>
+          <div className="flex">
+            <Button
+              className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
+              onClick={() => setIsRemoteLLMModalOpen(true)}
+              placeholder=""
+            >
+              Remote LLM Setup
+            </Button>
+            <div className="border-none h-8 w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1"></div>
+          </div>
+        </div>
+      )}
+
       <LocalModelModal
         isOpen={isNewLocalModelModalOpen}
         onClose={() => {
