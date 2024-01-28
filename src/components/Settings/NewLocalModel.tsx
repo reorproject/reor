@@ -3,20 +3,36 @@ import { Button } from "@material-tailwind/react";
 import Modal from "../Generic/Modal";
 import ExternalLink from "../Generic/ExternalLink";
 import { AIModelConfig } from "electron/main/Store/storeConfig";
+import CustomSelect from "../Generic/Select";
 
 interface LocalModelModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+const contextLengthOptions = [
+  { label: "1024", value: "1024" },
+  { label: "2048 (recommended for most systems)", value: "2048" },
+  { label: "4096", value: "4096" },
+  { label: "8192", value: "8192" },
+  { label: "16384", value: "16384" },
+  { label: "32768", value: "32768" }, // This is slightly above 30k but included for completeness
+];
+
 const LocalModelModal: React.FC<LocalModelModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  const [newModelContextLength, setNewModelContextLength] = useState<
-    number | null
-  >(null);
+  // const [newModelContextLength, setNewModelContextLength] = useState<number>(
+  //   parseInt(contextLengthOptions[1].value)
+  // );
+
+  const [selectedContextLength, setSelectedContextLength] = useState(
+    contextLengthOptions[0].value
+  );
+
   const [newModelPath, setNewModelPath] = useState<string>("");
+
   const handleModelFileSelection = async () => {
     const paths = await window.files.openFileDialog(["gguf"]);
     if (paths && paths.length > 0) {
@@ -24,12 +40,12 @@ const LocalModelModal: React.FC<LocalModelModalProps> = ({
     }
   };
   const saveModelConfigToElectronStore = async () => {
-    if (!newModelPath || !newModelContextLength) {
+    if (!newModelPath || !selectedContextLength) {
       return;
     }
     const newConfig: AIModelConfig = {
       localPath: newModelPath,
-      contextLength: newModelContextLength,
+      contextLength: parseInt(selectedContextLength),
       engine: "llamacpp",
     };
 
@@ -41,9 +57,7 @@ const LocalModelModal: React.FC<LocalModelModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="w-[300px] ml-2 mr-2 mb-2">
-        <p className="text-white text-lg font-semibold mb-0">
-          Add New Local Model
-        </p>
+        <h3 className="text-white  font-semibold mb-0">New Local Model</h3>
         <p className="text-white text-sm mb-2 mt-0">
           To use a local model you need to download a GGUF file onto your
           computer and attach it here. You can download the best models from{" "}
@@ -68,13 +82,12 @@ const LocalModelModal: React.FC<LocalModelModalProps> = ({
           </p>
         )}
 
-        <input
-          className="w-full p-2 mb-1 mt-3 text-black box-border"
-          type="number"
-          placeholder="Context Length (in tokens)"
-          name="contextLength"
-          value={newModelContextLength || ""}
-          onChange={(e) => setNewModelContextLength(parseInt(e.target.value))}
+        <CustomSelect
+          options={contextLengthOptions}
+          value={selectedContextLength}
+          onChange={(newValue) => {
+            setSelectedContextLength(newValue);
+          }}
         />
 
         <Button

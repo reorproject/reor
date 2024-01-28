@@ -62,12 +62,16 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
     }
   }, [defaultModel]);
 
+  // const modelNames = Object.keys(modelConfigs);
   const handleDefaultModelChange = (selectedModel: string) => {
     setDefaultModel(selectedModel);
     window.electronStore.setDefaultAIModel(selectedModel);
   };
 
-  const modelNames = Object.keys(modelConfigs);
+  const modelOptions = Object.keys(modelConfigs).map((key) => ({
+    label: key, // Assuming displayName exists in AIModelConfig
+    value: key,
+  }));
 
   return (
     <div className="w-full  bg-gray-800 rounded">
@@ -75,13 +79,9 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
       <h4 className="text-gray-100 mb-1">Default LLM:</h4>
       <div className="w-full mb-1">
         <CustomSelect
-          options={modelNames}
+          options={modelOptions}
           value={defaultModel}
           onChange={handleDefaultModelChange}
-          addButton={{
-            label: "Add a New Local Model",
-            onClick: () => setIsNewLocalModelModalOpen(true),
-          }}
         />
       </div>
       <h4 className="text-gray-100 mb-1">Local LLM Settings:</h4>
