@@ -44,6 +44,23 @@ Reor works within a single directory in the filesystem. You choose the directory
 To import notes/files from another app, you'll need to populate that directory manually with markdown files. Integrations with other apps are hopefully coming soon!
 
 
+### Building from source
+#### Clone repo:
+```
+git clone https://github.com/reorproject/reor.git
+```
+#### Install dependencies:
+```
+npm install
+```
+#### Run for dev:
+```
+npm run dev
+```
+#### Build:
+```
+npm run build
+```
 
 ## License
 GPL-3.0 license. See `LICENSE` for details.
