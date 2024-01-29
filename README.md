@@ -23,9 +23,7 @@ AI second brain & personal knowledge management app. </h4>
 
 Reor was built right from the very start to **run models locally**. We believe running models locally *(and privately)* is essential: no one entity should be able to control the world's first artificially intelligent systems nor your personal thoughts, no matter how "open" they are. 
 
-![output](https://github.com/reorproject/reor/assets/17236551/963fdc88-80b6-4eac-9555-8662091e9bb7)
-
-
+![reor](https://github.com/reorproject/reor/assets/17236551/cf743f16-fe5d-4099-bc08-74b8c76709c4)
 
 ### Getting Started
 1. Download from [reorproject.org](https://reorproject.org). Mac, Linux & Windows are all supported.
