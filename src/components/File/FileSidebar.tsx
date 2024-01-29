@@ -89,6 +89,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   handleDragStart,
 }) => {
   const [listHeight, setListHeight] = useState(window.innerHeight);
+  const [expandedDirectories, setExpandedDirectories] = useState<string[]>([]);
 
   useEffect(() => {
     const updateHeight = () => {
@@ -102,8 +103,44 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     };
   }, []);
 
+  const getVisibleItems = (
+    files: FileInfoTree,
+    expandedDirectories: string[]
+  ) => {
+    let visibleItems: FileInfoTree = [];
+    files.forEach((file) => {
+      visibleItems.push(file);
+      if (
+        file.type === "directory" &&
+        expandedDirectories.includes(file.path)
+      ) {
+        if (file.children) {
+          visibleItems = [
+            ...visibleItems,
+            ...getVisibleItems(file.children, expandedDirectories),
+          ];
+        }
+      }
+    });
+    return visibleItems;
+  };
+
+  const handleDirectoryToggle = (path: string) => {
+    setExpandedDirectories((prev) => {
+      if (prev.includes(path)) {
+        return prev.filter((p) => p !== path); // Remove the path if it's already expanded
+      } else {
+        return [...prev, path]; // Add the path if it's not yet expanded
+      }
+    });
+  };
+
+  // Calculate visible items and item count
+  const visibleItems = getVisibleItems(files, expandedDirectories);
+  const itemCount = visibleItems.length;
+
   const Row: React.FC<ListChildComponentProps> = ({ index, style }) => {
-    const file = files[index];
+    const file = visibleItems[index];
     return (
       <div style={style}>
         <FileItem
@@ -111,6 +148,8 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
           selectedFile={selectedFile}
           onFileSelect={onFileSelect}
           handleDragStart={handleDragStart}
+          onDirectoryToggle={handleDirectoryToggle}
+          isExpanded={expandedDirectories.includes(file.path)}
         />
       </div>
     );
@@ -119,7 +158,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   return (
     <List
       height={listHeight}
-      itemCount={files.length}
+      itemCount={itemCount}
       itemSize={35} // Adjust based on your item size
       width={"100%"}
     >
@@ -132,20 +171,25 @@ interface FileInfoProps {
   selectedFile: string | null;
   onFileSelect: (path: string) => void;
   handleDragStart: (e: React.DragEvent, file: FileInfoNode) => void;
+  onDirectoryToggle: (path: string) => void;
+  isExpanded?: boolean;
 }
 const FileItem: React.FC<FileInfoProps> = ({
   file,
   selectedFile,
   onFileSelect,
   handleDragStart,
+  onDirectoryToggle,
+  isExpanded,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  // const [isExpanded, setIsExpanded] = useState(false);
   const isDirectory = file.type === "directory";
   const isSelected = file.path === selectedFile;
 
   const toggle = () => {
-    if (isDirectory) {
-      setIsExpanded(!isExpanded);
+    if (file.type === "directory") {
+      // setIsExpanded(!isExpanded);
+      onDirectoryToggle(file.path);
     } else {
       onFileSelect(file.path);
     }
@@ -185,17 +229,6 @@ const FileItem: React.FC<FileInfoProps> = ({
           {removeFileExtension(file.name)}
         </span>
       </div>
-      {isDirectory && isExpanded && file.children && (
-        <div className="pl-5">
-          <FileExplorer
-            files={file.children}
-            selectedFile={selectedFile}
-            onFileSelect={onFileSelect}
-            handleDragStart={handleDragStart}
-            directoryPath={file.path}
-          />
-        </div>
-      )}
     </div>
   );
 };
