@@ -18,18 +18,23 @@ export const FileSidebar: React.FC<FileListProps> = ({
 
   const directoryPath = window.electronStore.getUserDirectory();
 
+  // Sorting function
+  const sortFiles = (fileList: FileInfoTree) => {
+    return fileList.sort((a, b) => {
+      if (a.type === "directory" && b.type !== "directory") {
+        return -1;
+      }
+      if (a.type !== "directory" && b.type === "directory") {
+        return 1;
+      }
+      return b.dateModified.getTime() - a.dateModified.getTime();
+    });
+  };
+
   useEffect(() => {
     const handleFileUpdate = (updatedFiles: FileInfoTree) => {
-      updatedFiles.sort((a, b) => {
-        // if (a.type === "directory" && b.type !== "directory") {
-        //   return -1;
-        // }
-        // if (a.type !== "directory" && b.type === "directory") {
-        //   return 1;
-        // }
-        return b.dateModified.getTime() - a.dateModified.getTime();
-      });
-      setFiles(updatedFiles);
+      const sortedFiles = sortFiles(updatedFiles);
+      setFiles(sortedFiles);
     };
 
     window.ipcRenderer.receive("files-list", handleFileUpdate);
@@ -40,11 +45,12 @@ export const FileSidebar: React.FC<FileListProps> = ({
   }, []);
 
   useEffect(() => {
-    window.files.getFiles().then((files) => {
-      files.sort((a, b) => b.dateModified.getTime() - a.dateModified.getTime());
-      setFiles(files);
+    window.files.getFiles().then((fetchedFiles) => {
+      const sortedFiles = sortFiles(fetchedFiles);
+      setFiles(sortedFiles);
     });
   }, []);
+
   return (
     <div
       className="flex flex-col text-white overflow-y-auto overflow-x-hidden"
