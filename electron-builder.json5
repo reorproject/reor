@@ -1,6 +1,7 @@
 {
   appId: "YourAppID",
   asar: true,
+  asarUnpack: ["**/*.{node,dll,metal,exp,lib}"],
   directories: {
     output: "release/${version}",
   },
