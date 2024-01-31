@@ -1,12 +1,12 @@
 {
   appId: "YourAppID",
   asar: true,
-  asarUnpack: ["**/*.{node,dll,metal,exp,lib}"],
   directories: {
     output: "release/${version}",
   },
   files: ["dist-electron/**/*", "dist/**/*"],
   mac: {
+    asarUnpack: ["**/*.{node,dll,metal,exp,lib}"],
     artifactName: "${productName}_${version}.${ext}",
     target: ["dmg", "zip"],
   },
