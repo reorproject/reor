@@ -1,4 +1,4 @@
-import { Connection, Table as LanceDBTable } from "vectordb";
+import { Connection, Table as LanceDBTable, MetricType } from "vectordb";
 import GetOrCreateLanceTable from "./Lance";
 import {
   EnhancedEmbeddingFunction,
@@ -81,6 +81,7 @@ export class LanceDBTableWrapper {
   ): Promise<DBQueryResult[]> {
     const lanceQuery = await this.table
       .search(query)
+      .metricType(MetricType.Cosine)
       // .metricType(metricType)
       .limit(limit);
     if (filter) {
@@ -94,6 +95,7 @@ export class LanceDBTableWrapper {
   async filter(filterString: string, limit: number = 10): Promise<DBEntry[]> {
     const rawResults = await this.table
       .search(Array(768).fill(1)) // TODO: remove hardcoding
+      .metricType(MetricType.Cosine)
       .filter(filterString)
       .limit(limit)
       .execute();

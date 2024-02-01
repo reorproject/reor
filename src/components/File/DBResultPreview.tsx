@@ -21,7 +21,7 @@ export const DBResultPreview: React.FC<DBResultPreview> = ({
     >
       <ReactMarkdown>{entry.content}</ReactMarkdown>
       <div className="text-xs text-gray-200">
-        Vector distance: {entry._distance.toFixed(2)}
+        Similarity: {cosineDistanceToPercentage(entry._distance)}%
       </div>
     </div>
   );
@@ -46,13 +46,16 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({
     >
       <ReactMarkdown className="">{entry.content}</ReactMarkdown>
       <div className="text-xs text-gray-200">
-        Vector distance: {entry._distance.toFixed(2)}
+        Similarity: {cosineDistanceToPercentage(entry._distance)}%
       </div>
     </div>
   );
 };
 
 // export default DBResultPreview;
+const cosineDistanceToPercentage = (similarity: number) => {
+  return ((1 - similarity) * 100).toFixed(2);
+};
 
 export function getFileName(filePath: string): string {
   const parts = filePath.split(/[/\\]/);
