@@ -34,7 +34,7 @@ const LocalModelModal: React.FC<LocalModelModalProps> = ({
   const [newModelPath, setNewModelPath] = useState<string>("");
 
   const handleModelFileSelection = async () => {
-    const paths = await window.files.openFileDialog(["gguf"]);
+    const paths = await window.files.openFileDialog();
     if (paths && paths.length > 0) {
       setNewModelPath(paths[0]);
     }
