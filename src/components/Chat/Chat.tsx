@@ -4,6 +4,7 @@ import { ChatbotMessage } from "electron/main/llm/Types";
 import { errorToString } from "@/functions/error";
 import Textarea from "@mui/joy/Textarea";
 import CircularProgress from "@mui/material/CircularProgress";
+import ReactMarkdown from "react-markdown";
 
 const ChatWithLLM: React.FC = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -58,6 +59,10 @@ const ChatWithLLM: React.FC = () => {
     if (loadingResponse) return;
     let newMessages = messages;
     if (currentBotMessage) {
+      // check whether currentBotMessage.content includes a newline character:
+      if (currentBotMessage.content.includes("\n")) {
+        console.log("currentBotMessage.content includes a newline character");
+      }
       newMessages = [
         ...newMessages,
         {
@@ -157,28 +162,29 @@ const ChatWithLLM: React.FC = () => {
         )}
         <div className="space-y-2">
           {messages.map((message, index) => (
-            <div
+            <ReactMarkdown
               key={index}
-              className={`p-2 rounded-lg ${
+              className={`p-1 pl-1 markdown-content rounded-lg ${
                 message.messageType === "error"
                   ? "bg-red-100 text-red-800"
                   : message.role === "assistant"
                   ? "bg-blue-100 text-blue-800"
                   : "bg-green-100 text-green-800"
-              } break-words`}
+              } `}
             >
               {message.content}
-            </div>
+            </ReactMarkdown>
           ))}
-          {currentBotMessage?.messageType === "success" && (
-            <div className="p-2 rounded-lg bg-blue-100 text-blue-800 break-words">
+          {currentBotMessage && (
+            <ReactMarkdown
+              className={`p-1 pl-1 markdown-content rounded-lg ${
+                currentBotMessage.messageType === "error"
+                  ? "bg-red-100 text-red-800"
+                  : "bg-blue-100 text-blue-800"
+              } `}
+            >
               {currentBotMessage.content}
-            </div>
-          )}
-          {currentBotMessage?.messageType === "error" && (
-            <div className="p-2 rounded-lg bg-red-100 text-red-800 break-words">
-              {currentBotMessage.content}
-            </div>
+            </ReactMarkdown>
           )}
         </div>
       </div>
