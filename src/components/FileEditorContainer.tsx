@@ -52,7 +52,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
 
       <div className="flex" style={{ height: "calc(100vh - 33px)" }}>
         <div className="w-[40px] border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-gray-600 border-solid">
-          <LeftSidebar />
+          <LeftSidebar
+            sidebarShowing={sidebarShowing}
+            makeSidebarShow={setSidebarShowing}
+          />
         </div>
 
         <ResizableComponent resizeSide="right">
@@ -66,31 +69,21 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         </ResizableComponent>
 
         {selectedFilePath && (
-          <div
-            className="w-full h-full flex overflow-x-hidden"
-            // style={{ marginRight: showChatbot ? "250px" : "0" }}
-          >
+          <div className="w-full h-full flex overflow-x-hidden">
             <div className="w-full flex h-full">
-              <div
-                className="h-full w-full"
-                // style={{ width: showSimilarFiles ? "75%" : "100%" }}
-              >
+              <div className="h-full w-full">
                 <MilkdownEditor
                   filePath={selectedFilePath}
                   setContentInParent={setEditorContent}
                   lastSavedContentRef={lastSavedContentRef}
                 />
-                {/* hello */}
-                {/* <MilkdownEditor /> */}
               </div>
               {showSimilarFiles && (
                 <ResizableComponent resizeSide="left" initialWidth={400}>
-                  {/* <div className="w-full"> */}
                   <SimilarEntriesComponent
                     filePath={selectedFilePath}
                     onFileSelect={onFileSelect}
                   />
-                  {/* </div> */}
                 </ResizableComponent>
               )}
             </div>

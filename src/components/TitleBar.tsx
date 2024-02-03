@@ -53,7 +53,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
         {/* <button className="bg-transparent border-none cursor-pointer">
         <MdSearch className="text-gray-600" size={24} />
       </button> */}
-        <div className="mt-[0.3rem]" onClick={() => makeSidebarShow("files")}>
+        {/* <div className="mt-[0.3rem]" onClick={() => makeSidebarShow("files")}>
           <IoFolderOutline className="text-gray-200 cursor-pointer" size={22} />
         </div>
         <div
@@ -65,13 +65,13 @@ const TitleBar: React.FC<TitleBarProps> = ({
             className="mt-[4.2px] cursor-pointer text-gray-200"
             // onClick={() => setShowSearch(true)}
           />
-        </div>
-        <button
+        </div> */}
+        {/* <button
           className="bg-transparent border-none cursor-pointer ml-[6px]"
           onClick={toggleModal}
         >
           <FaRegPenToSquare className="text-gray-200" size={20} />
-        </button>
+        </button> */}
 
         <NewNoteComponent
           isOpen={isModalOpen}
