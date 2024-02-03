@@ -3,6 +3,7 @@ import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
 import LLMSettings from "./LLMSettings";
 import EmbeddingModelManager from "./EmbeddingSettings";
+import DirectorySelector from "./DirectorySelectorNew";
 
 interface OldInitialSettingsProps {
   readyForIndexing: () => void;
@@ -61,21 +62,11 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
           <p className="mt-2 text-gray-100">
             Choose your vault directory here:
           </p>
-          <Button
-            className="bg-slate-700  border-none h-10 hover:bg-slate-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
-            onClick={handleDirectorySelection}
-            placeholder=""
-          >
-            Select Directory
-          </Button>
+          <DirectorySelector onDirectorySelected={setUserDirectory} />
           <p className="mt-2 text-xs text-gray-100 ">
             (Your vault directory doesn&apos;t need to be empty)
           </p>
-          {userDirectory && (
-            <p className="mt-2 text-xs text-gray-100">
-              Selected: <strong>{userDirectory}</strong>
-            </p>
-          )}
+
           <div className="mt-8">
             <EmbeddingModelManager>
               <h3 className="font-semibold mb-2 text-white">Embedding Model</h3>
