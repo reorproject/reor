@@ -80,7 +80,7 @@ const ChatWithLLM: React.FC = () => {
     if (newMessages.length <= 1) {
       const augmentedPrompt = await window.database.augmentPromptWithRAG(
         userInput,
-        8
+        9
       );
       startStreamingResponse(currentSessionId, augmentedPrompt);
     } else {

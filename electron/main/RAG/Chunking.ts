@@ -3,7 +3,7 @@ import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 export const chunkMarkdownByHeadingsAndByCharsIfBig = async (
   markdownContent: string
 ): Promise<string[]> => {
-  const chunkSize = 600;
+  const chunkSize = 500;
   const chunkOverlap = 20;
   const chunksByHeading = chunkMarkdownByHeadings(markdownContent);
 

@@ -30,29 +30,49 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
   return (
     <div className="w-full h-full bg-gray-800 flex flex-col items-center justify-between">
       <div
-        className="hover:bg-slate-700 flex items-center justify-center w-full h-8 cursor-pointer"
-        style={{ backgroundColor: sidebarShowing === "files" ? "#334155" : "" }}
+        className=" flex items-center justify-center w-full h-8 cursor-pointer"
         onClick={() => makeSidebarShow("files")}
       >
-        <IoFolderOutline className="mx-auto text-gray-200 " size={22} />
+        <div
+          className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-slate-700"
+          style={{
+            backgroundColor: sidebarShowing === "files" ? "#334155" : "",
+          }}
+        >
+          <IoFolderOutline className="mx-auto text-gray-200 " size={22} />
+        </div>
       </div>
       {/* )} */}
       {/* {sidebarShowing !== "search" && ( */}
       <div
-        className="flex items-center justify-center w-full h-8 hover:bg-slate-700 cursor-pointer"
-        style={{
-          backgroundColor: sidebarShowing === "search" ? "#334155" : "",
-        }}
+        className="flex items-center justify-center w-full h-8  cursor-pointer"
+        // style={{
+        //   backgroundColor: sidebarShowing === "search" ? "#334155" : "",
+        // }}
         onClick={() => makeSidebarShow("search")}
       >
-        <FaSearch size={18} className=" text-gray-200" />
+        <div
+          className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-slate-700"
+          style={{
+            backgroundColor: sidebarShowing === "search" ? "#334155" : "",
+          }}
+        >
+          <FaSearch size={18} className=" text-gray-200" />
+        </div>
       </div>
       {/* )} */}
       <div
-        className="bg-transparent border-none cursor-pointer flex items-center justify-center w-full h-8 hover:bg-slate-700"
+        className="bg-transparent border-none cursor-pointer flex items-center justify-center w-full h-8 "
         onClick={toggleModal}
       >
-        <FaRegPenToSquare className="text-gray-200" size={20} />
+        <div
+          className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-slate-700"
+          // style={{
+          //   backgroundColor: sidebarShowing === "search" ? "#334155" : "",
+          // }}
+        >
+          <FaRegPenToSquare className="text-gray-200" size={20} />
+        </div>
       </div>
       <NewNoteComponent
         isOpen={isNewNoteModalOpen}
