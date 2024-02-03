@@ -8,19 +8,24 @@ import ReactMarkdown from "react-markdown";
 
 const ChatWithLLM: React.FC = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
-  const [loadingSession, setLoadingSession] = useState<boolean>(false);
+  // const [loadingSession, setLoadingSession] = useState<boolean>(false);
   const [userInput, setUserInput] = useState<string>("");
   const [messages, setMessages] = useState<ChatbotMessage[]>([]);
-  // const [waitingForFirstToken, setWaitingForFirstToken] =
-  //   useState<boolean>(false);
+  const [defaultModel, setDefaultModel] = useState<string>("");
 
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
 
   const [currentBotMessage, setCurrentBotMessage] =
     useState<ChatbotMessage | null>(null);
 
-  const initializeSession = async () => {
-    setLoadingSession(true);
+  useEffect(() => {
+    const fetchDefaultModel = async () => {
+      const defaultModelName = await window.electronStore.getDefaultAIModel();
+      setDefaultModel(defaultModelName);
+    };
+    fetchDefaultModel();
+  }, []);
+  const initializeSession = async (): Promise<string> => {
     try {
       const sessionID = "some_unique_session_id";
       const sessionExists = await window.llm.doesSessionExist(sessionID);
@@ -33,6 +38,8 @@ const ChatWithLLM: React.FC = () => {
       );
       console.log("Created a new session with id:", newSessionId);
       setSessionId(newSessionId);
+
+      return newSessionId;
     } catch (error) {
       console.error("Failed to create a new session:", error);
       setCurrentBotMessage({
@@ -40,29 +47,18 @@ const ChatWithLLM: React.FC = () => {
         content: errorToString(error),
         role: "assistant",
       });
-    } finally {
-      setLoadingSession(false);
+      return "";
     }
   };
 
-  useEffect(() => {
-    return () => {
-      if (sessionId) {
-        console.log("Deleting session:", sessionId);
-        window.llm.deleteSession(sessionId);
-      }
-      console.log("Component is unmounted (hidden)");
-    };
-  }, [sessionId]);
-
   const handleSubmitNewMessage = async () => {
     if (loadingResponse) return;
+    let currentSessionId = sessionId;
+    if (!currentSessionId) {
+      currentSessionId = await initializeSession();
+    }
     let newMessages = messages;
     if (currentBotMessage) {
-      // check whether currentBotMessage.content includes a newline character:
-      if (currentBotMessage.content.includes("\n")) {
-        console.log("currentBotMessage.content includes a newline character");
-      }
       newMessages = [
         ...newMessages,
         {
@@ -79,16 +75,16 @@ const ChatWithLLM: React.FC = () => {
         role: "assistant",
       });
     }
-    if (!sessionId || !userInput.trim()) return;
+    if (!currentSessionId || !userInput.trim()) return;
 
     if (newMessages.length <= 1) {
       const augmentedPrompt = await window.database.augmentPromptWithRAG(
         userInput,
         8
       );
-      startStreamingResponse(sessionId, augmentedPrompt);
+      startStreamingResponse(currentSessionId, augmentedPrompt);
     } else {
-      startStreamingResponse(sessionId, userInput);
+      startStreamingResponse(currentSessionId, userInput);
     }
 
     // Add the user's message to the messages
@@ -100,9 +96,7 @@ const ChatWithLLM: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!sessionId) {
-      initializeSession();
-
+    if (sessionId) {
       const updateStream = (newMessage: ChatbotMessage) => {
         setCurrentBotMessage((prev) => {
           return {
@@ -123,6 +117,16 @@ const ChatWithLLM: React.FC = () => {
     }
   }, [sessionId]);
 
+  useEffect(() => {
+    return () => {
+      if (sessionId) {
+        console.log("Deleting session:", sessionId);
+        window.llm.deleteSession(sessionId);
+      }
+      console.log("Component is unmounted (hidden)");
+    };
+  }, [sessionId]);
+
   const startStreamingResponse = async (sessionId: string, prompt: string) => {
     try {
       console.log("Initializing streaming response...");
@@ -130,7 +134,6 @@ const ChatWithLLM: React.FC = () => {
       await window.llm.initializeStreamingResponse(sessionId, prompt);
       console.log("Initialized streaming response");
       setLoadingResponse(false);
-      // setWaitingForFirstToken(true);
     } catch (error) {
       setLoadingResponse(false);
 
@@ -156,11 +159,21 @@ const ChatWithLLM: React.FC = () => {
 
   return (
     <div className="flex flex-col w-full h-full mx-auto border shadow-lg overflow-hidden bg-gray-700">
-      <div className="flex-1 overflow-auto p-4 bg-transparent">
-        {loadingSession && (
-          <p className="text-center text-gray-500">Loading...</p>
+      <div className="flex-1 overflow-auto p-4 pt-0 bg-transparent">
+        {messages.length === 0 && !currentBotMessage && (
+          <div>
+            {defaultModel ? (
+              <p className="text-center text-gray-500">
+                Default model: {defaultModel}
+              </p>
+            ) : (
+              <p className="text-center text-gray-500">
+                No default model selected
+              </p>
+            )}
+          </div>
         )}
-        <div className="space-y-2">
+        <div className="space-y-2 mt-4">
           {messages.map((message, index) => (
             <ReactMarkdown
               key={index}

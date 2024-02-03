@@ -15,7 +15,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const [editorContent, setEditorContent] = useState<string>("");
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
   const lastSavedContentRef = useRef<string>("");
-  const [showChatbot, setShowChatbot] = useState<boolean>(false);
+  const [showChatbot, setShowChatbot] = useState<boolean>(true);
   const [showSimilarFiles, setShowSimilarFiles] = useState<boolean>(true);
   const [sidebarShowing, setSidebarShowing] =
     useState<SidebarAbleToShow>("files");
