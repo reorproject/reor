@@ -72,7 +72,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
           >
             <div className="w-full flex h-full">
               <div
-                className="h-full bg-slate-300 w-full"
+                className="h-full w-full"
                 // style={{ width: showSimilarFiles ? "75%" : "100%" }}
               >
                 <MilkdownEditor
