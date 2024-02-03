@@ -12,10 +12,6 @@ AI second brain & personal knowledge management app. </h4>
     <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/reorproject/reor">
 
 </p>
-<!-- <img width="1342" alt="Screenshot 2024-01-10 at 18 43 31" src="https://github.com/reorproject/reor/assets/17236551/336ff84d-cecc-44de-bd92-57ff61579dea"> -->
-<!-- <img width="1203" alt="Screenshot 2024-01-10 at 18 24 55" src="https://github.com/reorproject/reor/assets/17236551/cde5ab19-b394-459e-8657-bfc4f204014f"> -->
-<!-- <img width="1202" alt="Screenshot 2024-01-10 at 18 50 03" src="https://github.com/reorproject/reor/assets/17236551/c85fdc6b-057f-4693-829a-d0e45da6113e"> -->
-<!-- <img width="1200" alt="Screenshot 2024-01-10 at 18 54 02" src="https://github.com/reorproject/reor/assets/17236551/e6d3b7af-d3f4-4ffe-a2a6-f4682beaff06"> -->
 
 
 ## About
@@ -23,7 +19,11 @@ AI second brain & personal knowledge management app. </h4>
 
 Reor was built right from the very start to **run models locally**. We believe running models locally *(and privately)* is essential: no one entity should be in control of AGI and put it behind a black box, no matter how "open" they claim to be. 
 
-![cut (2)](https://github.com/reorproject/reor/assets/17236551/ade4d0c5-4b41-4c02-9f6e-c35f8968d6fd)
+
+
+https://github.com/reorproject/reor/assets/17236551/1bbc1b2d-c3d9-451c-a008-7f12c84f96db
+
+
 
 ### Getting Started
 1. Download from [reorproject.org](https://reorproject.org). Mac, Linux & Windows are all supported.
