@@ -1,13 +1,11 @@
 import NewNoteComponent from "./File/NewNote";
 import { useEffect, useState } from "react";
-import { FaSearch } from "react-icons/fa";
-import { FaRegPenToSquare } from "react-icons/fa6";
 import { PiSidebar } from "react-icons/pi";
-import { IoFolderOutline } from "react-icons/io5";
 
 import { BsChatLeftDots, BsFillChatLeftDotsFill } from "react-icons/bs";
 import { SidebarAbleToShow } from "./FileEditorContainer";
 
+export const titleBarHeight = "30px";
 interface TitleBarProps {
   onFileSelect: (path: string) => void;
   chatbotOpen: boolean;
@@ -21,7 +19,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
   chatbotOpen,
   toggleChatbot,
   toggleSimilarFiles,
-  makeSidebarShow,
+  // makeSidebarShow,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [platform, setPlatform] = useState("");
@@ -40,7 +38,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
   return (
     <div
       id="customTitleBar"
-      className="h-[33px] bg-gray-900 flex justify-between"
+      className={`h-titlebar bg-gray-900 flex justify-between`}
     >
       <div
         className=" flex"
@@ -53,7 +51,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
         {/* <button className="bg-transparent border-none cursor-pointer">
         <MdSearch className="text-gray-600" size={24} />
       </button> */}
-        <div className="mt-[0.3rem]" onClick={() => makeSidebarShow("files")}>
+        {/* <div className="mt-[0.3rem]" onClick={() => makeSidebarShow("files")}>
           <IoFolderOutline className="text-gray-200 cursor-pointer" size={22} />
         </div>
         <div
@@ -65,13 +63,13 @@ const TitleBar: React.FC<TitleBarProps> = ({
             className="mt-[4.2px] cursor-pointer text-gray-200"
             // onClick={() => setShowSearch(true)}
           />
-        </div>
-        <button
+        </div> */}
+        {/* <button
           className="bg-transparent border-none cursor-pointer ml-[6px]"
           onClick={toggleModal}
         >
           <FaRegPenToSquare className="text-gray-200" size={20} />
-        </button>
+        </button> */}
 
         <NewNoteComponent
           isOpen={isModalOpen}

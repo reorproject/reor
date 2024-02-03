@@ -36,11 +36,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   }, [searchQuery]);
 
   return (
-    <div
-      // ref={containerRef}
-      // style={{ height: "calc(100vh - 33px)" }}
-      className="p-0.5  w-full"
-    >
+    <div className="p-0.5  w-full">
       <div className="pr-1 pl-1">
         <input
           ref={searchInputRef}

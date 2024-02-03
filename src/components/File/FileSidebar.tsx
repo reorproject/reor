@@ -52,10 +52,7 @@ export const FileSidebar: React.FC<FileListProps> = ({
   }, []);
 
   return (
-    <div
-      className="flex flex-col text-white overflow-y-auto overflow-x-hidden"
-      style={{ height: "calc(100vh - 33px)" }}
-    >
+    <div className="flex flex-col h-below-titlebar text-white overflow-y-auto overflow-x-hidden">
       <FileExplorer
         files={files}
         selectedFile={selectedFile}

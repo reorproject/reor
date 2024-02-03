@@ -6,6 +6,13 @@ export default {
       fontFamily: {
         // "material-icons": ["Material Icons"],
       },
+      height: {
+        titlebar: "30px",
+        "below-titlebar": "calc(100vh - 30px)",
+      },
+      minHeight: {
+        "below-titlebar-min": "calc(100vh - 30px)",
+      },
     },
   },
   corePlugins: {

@@ -19,7 +19,9 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     setLoading(true);
     try {
       const searchResults = await performSearch(path);
-      setSimilarEntries(searchResults);
+      if (searchResults.length > 0) {
+        setSimilarEntries(searchResults);
+      }
     } catch (error) {
       console.error("Error:", error);
     } finally {
@@ -52,7 +54,9 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   useEffect(() => {
     const vectorDBUpdateListener = async () => {
       const searchResults = await performSearch(filePath);
-      setSimilarEntries(searchResults);
+      if (searchResults.length > 0) {
+        setSimilarEntries(searchResults);
+      }
     };
 
     window.ipcRenderer.receive(
@@ -69,15 +73,6 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
 
   return (
     <div className="h-full overflow-y-auto overflow-x-hidden mt-0 border-l-[0.1px] border-t-0 border-b-0 border-r-0 border-gray-600 border-solid">
-      {similarEntries.length === 0 && (
-        <div className="flex flex-col items-center justify-center h-full">
-          <div className="flex">
-            <p className="text-gray-500 text-lg">
-              Waiting for related notes...
-            </p>
-          </div>
-        </div>
-      )}
       {similarEntries.map((dbResult, index) => (
         <div className="p-2" key={index}>
           <DBResultPreview
@@ -87,6 +82,15 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
           />
         </div>
       ))}
+      {similarEntries.length === 0 && (
+        <div className="flex flex-col items-center justify-center h-full">
+          <div className="flex">
+            <p className="text-gray-500 text-lg">
+              Waiting for related notes...
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

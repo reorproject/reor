@@ -13,7 +13,7 @@ import { block } from "@milkdown/plugin-block";
 import { cursor } from "@milkdown/plugin-cursor";
 import { clipboard } from "@milkdown/plugin-clipboard";
 import { replaceAll } from "@milkdown/utils";
-import { slash } from "@milkdown/plugin-slash";
+// import { slash } from "@milkdown/plugin-slash";
 
 export interface MarkdownEditorProps {
   filePath: string;
@@ -56,30 +56,31 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
     setContentInParent(content);
   }, [content]);
 
-  const { editor, getInstance } = useEditor((root) =>
-    Editor.make()
-      .config((ctx) => {
-        ctx.set(rootCtx, root);
-        ctx.set(defaultValueCtx, content);
-        ctx
-          .get(listenerCtx)
+  const { editor, getInstance } = useEditor(
+    (root) =>
+      Editor.make()
+        .config((ctx) => {
+          ctx.set(rootCtx, root);
+          ctx.set(defaultValueCtx, content);
+          ctx
+            .get(listenerCtx)
 
-          .markdownUpdated((ctx, markdown) => {
-            setContent(markdown);
-          });
-      })
+            .markdownUpdated((ctx, markdown) => {
+              setContent(markdown);
+            });
+        })
 
-      .use(nord)
-      .use(commonmark)
-      .use(gfm)
-      .use(history)
-      .use(listener)
-      .use(prism)
-      // .use(menu)
-      .use(block)
-      .use(cursor)
-      .use(clipboard)
-      .use(slash)
+        .use(nord)
+        .use(commonmark)
+        .use(gfm)
+        .use(history)
+        .use(listener)
+        .use(prism)
+        // .use(menu)
+        .use(block)
+        .use(cursor)
+        .use(clipboard)
+    // .use(slash)
   );
 
   useEffect(() => {
