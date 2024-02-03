@@ -109,13 +109,15 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     };
   }, []);
 
-  const getVisibleItems = (
+  const getVisibleFilesAndFlatten = (
     files: FileInfoTree,
-    expandedDirectories: string[]
-  ) => {
-    let visibleItems: FileInfoTree = [];
+    expandedDirectories: string[],
+    indentMultiplyer = 0
+  ): { file: FileInfoNode; indentMultiplyer: number }[] => {
+    let visibleItems: { file: FileInfoNode; indentMultiplyer: number }[] = [];
     files.forEach((file) => {
-      visibleItems.push(file);
+      const a = { file, indentMultiplyer };
+      visibleItems.push(a);
       if (
         file.type === "directory" &&
         expandedDirectories.includes(file.path)
@@ -123,7 +125,11 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
         if (file.children) {
           visibleItems = [
             ...visibleItems,
-            ...getVisibleItems(file.children, expandedDirectories),
+            ...getVisibleFilesAndFlatten(
+              file.children,
+              expandedDirectories,
+              indentMultiplyer + 1
+            ),
           ];
         }
       }
@@ -142,20 +148,21 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   };
 
   // Calculate visible items and item count
-  const visibleItems = getVisibleItems(files, expandedDirectories);
+  const visibleItems = getVisibleFilesAndFlatten(files, expandedDirectories);
   const itemCount = visibleItems.length;
 
   const Row: React.FC<ListChildComponentProps> = ({ index, style }) => {
-    const file = visibleItems[index];
+    const fileObject = visibleItems[index];
     return (
       <div style={style}>
         <FileItem
-          file={file}
+          file={fileObject.file}
           selectedFile={selectedFile}
           onFileSelect={onFileSelect}
           handleDragStart={handleDragStart}
           onDirectoryToggle={handleDirectoryToggle}
-          isExpanded={expandedDirectories.includes(file.path)}
+          isExpanded={expandedDirectories.includes(fileObject.file.path)}
+          indentMultiplyer={fileObject.indentMultiplyer}
         />
       </div>
     );
@@ -179,6 +186,7 @@ interface FileInfoProps {
   handleDragStart: (e: React.DragEvent, file: FileInfoNode) => void;
   onDirectoryToggle: (path: string) => void;
   isExpanded?: boolean;
+  indentMultiplyer?: number;
 }
 const FileItem: React.FC<FileInfoProps> = ({
   file,
@@ -187,10 +195,12 @@ const FileItem: React.FC<FileInfoProps> = ({
   handleDragStart,
   onDirectoryToggle,
   isExpanded,
+  indentMultiplyer,
 }) => {
   // const [isExpanded, setIsExpanded] = useState(false);
   const isDirectory = file.type === "directory";
   const isSelected = file.path === selectedFile;
+  const indentation = indentMultiplyer ? 10 * indentMultiplyer : 0;
 
   const toggle = () => {
     if (file.type === "directory") {
@@ -220,6 +230,7 @@ const FileItem: React.FC<FileInfoProps> = ({
       draggable
       onDragStart={localHandleDragStart}
       onContextMenu={handleContextMenu}
+      style={{ paddingLeft: `${indentation}px` }}
     >
       <div onClick={toggle} className={itemClasses}>
         {isDirectory && (
