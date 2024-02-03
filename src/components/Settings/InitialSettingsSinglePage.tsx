@@ -8,7 +8,7 @@ interface OldInitialSettingsProps {
   readyForIndexing: () => void;
 }
 
-const OldInitialSetupSettings: React.FC<OldInitialSettingsProps> = ({
+const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
   readyForIndexing,
 }) => {
   const [userDirectory, setUserDirectory] = useState("");
@@ -79,10 +79,6 @@ const OldInitialSetupSettings: React.FC<OldInitialSettingsProps> = ({
           <div className="mt-8">
             <EmbeddingModelManager>
               <h3 className="font-semibold mb-2 text-white">Embedding Model</h3>
-
-              {/* <p className="mt-0 text-gray-100 italic">
-                Choose a local embedding model for linking notes:
-              </p> */}
             </EmbeddingModelManager>
           </div>
           <LLMSettings isInitialSetup={true} />
@@ -103,4 +99,4 @@ const OldInitialSetupSettings: React.FC<OldInitialSettingsProps> = ({
   );
 };
 
-export default OldInitialSetupSettings;
+export default InitialSetupSinglePage;

@@ -3,7 +3,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import FileEditorContainer from "./components/FileEditorContainer";
 import IndexingProgress from "./components/IndexingProgress";
-import OldInitialSetupSettings from "./components/Settings/InitialSettingsPage";
+import InitialSetupSinglePage from "./components/Settings/InitialSettingsSinglePage";
 
 interface AppProps {}
 
@@ -60,7 +60,7 @@ const App: React.FC<AppProps> = () => {
           <FileEditorContainer />
         )
       ) : (
-        <OldInitialSetupSettings
+        <InitialSetupSinglePage
           readyForIndexing={handleAllInitialSettingsAreReady}
         />
       )}
