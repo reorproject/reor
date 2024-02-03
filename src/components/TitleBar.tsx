@@ -1,9 +1,6 @@
 import NewNoteComponent from "./File/NewNote";
 import { useEffect, useState } from "react";
-import { FaSearch } from "react-icons/fa";
-import { FaRegPenToSquare } from "react-icons/fa6";
 import { PiSidebar } from "react-icons/pi";
-import { IoFolderOutline } from "react-icons/io5";
 
 import { BsChatLeftDots, BsFillChatLeftDotsFill } from "react-icons/bs";
 import { SidebarAbleToShow } from "./FileEditorContainer";
@@ -22,7 +19,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
   chatbotOpen,
   toggleChatbot,
   toggleSimilarFiles,
-  makeSidebarShow,
+  // makeSidebarShow,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [platform, setPlatform] = useState("");

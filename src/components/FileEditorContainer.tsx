@@ -56,6 +56,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
       >
         <div className="w-[40px] border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-gray-600 border-solid">
           <LeftSidebar
+            onFileSelect={onFileSelect}
             sidebarShowing={sidebarShowing}
             makeSidebarShow={setSidebarShowing}
           />
