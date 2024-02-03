@@ -25,20 +25,20 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
     <div className="w-full h-full bg-gray-800 flex flex-col justify-between">
       {/* {sidebarShowing !== "files" && ( */}
       <div
-        className="ml-[12px] mt-[0.3rem]"
+        className="hover:bg-slate-600"
         onClick={() => makeSidebarShow("files")}
       >
-        <IoFolderOutline className="text-gray-200 cursor-pointer" size={22} />
+        <IoFolderOutline
+          className="mx-auto text-gray-200 cursor-pointer"
+          size={22}
+        />
       </div>
       {/* )} */}
       {/* {sidebarShowing !== "search" && ( */}
-      <div
-        className="ml-[12px] mt-[2.2px]"
-        onClick={() => makeSidebarShow("search")}
-      >
+      <div className="" onClick={() => makeSidebarShow("search")}>
         <FaSearch
           size={18}
-          className="mt-[4.2px] cursor-pointer text-gray-200"
+          className="cursor-pointer text-gray-200"
           // onClick={() => setShowSearch(true)}
         />
       </div>

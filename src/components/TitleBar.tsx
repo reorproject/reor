@@ -8,6 +8,7 @@ import { IoFolderOutline } from "react-icons/io5";
 import { BsChatLeftDots, BsFillChatLeftDotsFill } from "react-icons/bs";
 import { SidebarAbleToShow } from "./FileEditorContainer";
 
+export const titleBarHeight = "30px";
 interface TitleBarProps {
   onFileSelect: (path: string) => void;
   chatbotOpen: boolean;
@@ -40,7 +41,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
   return (
     <div
       id="customTitleBar"
-      className="h-[33px] bg-gray-900 flex justify-between"
+      className={`h-titlebar bg-gray-900 flex justify-between`}
     >
       <div
         className=" flex"

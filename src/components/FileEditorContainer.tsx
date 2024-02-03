@@ -50,7 +50,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         makeSidebarShow={setSidebarShowing}
       />
 
-      <div className="flex" style={{ height: "calc(100vh - 33px)" }}>
+      <div
+        className="flex h-below-titlebar"
+        // style={{ height: `calc(100vh - ${titleBarHeight})` }}
+      >
         <div className="w-[40px] border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-gray-600 border-solid">
           <LeftSidebar
             sidebarShowing={sidebarShowing}
@@ -91,8 +94,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         )}
         {showChatbot && (
           <div
-            className={`${selectedFilePath ? "" : "absolute right-0"}`}
-            style={{ height: "calc(100vh - 33px)" }}
+            className={`h-below-titlebar ${
+              selectedFilePath ? "" : "absolute right-0"
+            }`}
+            // style={{ height: `calc(100vh - ${titleBarHeight})` }}
           >
             <ResizableComponent resizeSide="left" initialWidth={300}>
               <ChatWithLLM />

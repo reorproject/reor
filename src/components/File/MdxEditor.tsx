@@ -96,7 +96,6 @@ export const MdxEditor: React.FC<MdxEditor> = ({
       <MDXEditor
         ref={ref}
         className="dark-theme dark-editor"
-        // style={{ height: "calc(100vh - 33px)" }}
         onChange={setContent}
         markdown={content}
         suppressHtmlProcessing={true}

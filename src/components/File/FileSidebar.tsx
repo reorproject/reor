@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { FaChevronRight } from "react-icons/fa";
 import { FaChevronDown } from "react-icons/fa";
 import { FixedSizeList as List, ListChildComponentProps } from "react-window";
+import { titleBarHeight } from "../TitleBar";
 
 interface FileListProps {
   selectedFile: string | null;
@@ -53,8 +54,8 @@ export const FileSidebar: React.FC<FileListProps> = ({
 
   return (
     <div
-      className="flex flex-col text-white overflow-y-auto overflow-x-hidden"
-      style={{ height: "calc(100vh - 33px)" }}
+      className="flex flex-col h-below-titlebar text-white overflow-y-auto overflow-x-hidden"
+      // style={{ height: `calc(100vh - ${titleBarHeight})` }}
     >
       <FileExplorer
         files={files}
