@@ -118,7 +118,6 @@ contextBridge.exposeInMainWorld("electron", {
 
 contextBridge.exposeInMainWorld("electronStore", {
   setUserDirectory: (path: string) => {
-    console.log("setting user directory IN PRELOAD", path);
     return ipcRenderer.sendSync("set-user-directory", path);
   },
   setOpenAIAPIKey: (apiKey: string) => {

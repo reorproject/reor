@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
 import LLMSettings from "./LLMSettings";
 import EmbeddingModelManager from "./EmbeddingSettings";
-import DirectorySelector from "./DirectorySelectorNew";
+import DirectorySelector from "./DirectorySelector";
 
 interface OldInitialSettingsProps {
   readyForIndexing: () => void;
@@ -12,35 +12,15 @@ interface OldInitialSettingsProps {
 const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
   readyForIndexing,
 }) => {
-  const [userDirectory, setUserDirectory] = useState("");
+  // const [userDirectory, setUserDirectory] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [showError, setShowError] = useState(false);
 
   const handleNext = () => {
-    if (userDirectory) {
-      window.electronStore.setUserDirectory(userDirectory);
+    if (errorMsg === "") {
       readyForIndexing();
     } else {
-      setErrorMsg("Please select a directory.");
-    }
-  };
-
-  useEffect(() => {
-    const directory = window.electronStore.getUserDirectory();
-    if (directory) {
-      setUserDirectory(directory);
-    }
-  }, []);
-
-  const handleDirectorySelection = async () => {
-    const paths = await window.files.openDirectoryDialog();
-    if (!paths) {
-      return;
-    }
-    const path = paths[0];
-    if (path) {
-      setUserDirectory(path);
-      // window.electronStore.setUserDirectory(path);
-      // onDirectorySelected(path);
+      setShowError(true);
     }
   };
 
@@ -62,7 +42,7 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
           <p className="mt-2 text-gray-100">
             Choose your vault directory here:
           </p>
-          <DirectorySelector onDirectorySelected={setUserDirectory} />
+          <DirectorySelector setErrorMsg={setErrorMsg} />
           <p className="mt-2 text-xs text-gray-100 ">
             (Your vault directory doesn&apos;t need to be empty)
           </p>
@@ -83,7 +63,9 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
           >
             Next
           </Button>
-          {errorMsg && <p className="text-xs text-red-500">{errorMsg}</p>}
+          {showError && errorMsg && (
+            <p className="text-xs text-red-500">{errorMsg}</p>
+          )}
         </div>
       </div>
     </Modal>

@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@material-tailwind/react";
 
 interface DirectorySelectorProps {
-  onDirectorySelected: (directory: string) => void;
+  setErrorMsg: (error: string) => void;
 }
 
 const DirectorySelector: React.FC<DirectorySelectorProps> = ({
-  onDirectorySelected,
+  setErrorMsg,
 }) => {
   const [userDirectory, setUserDirectory] = useState<string>("");
 
@@ -14,9 +14,24 @@ const DirectorySelector: React.FC<DirectorySelectorProps> = ({
     const paths = await window.files.openDirectoryDialog();
     if (paths && paths[0]) {
       setUserDirectory(paths[0]);
-      onDirectorySelected(paths[0]);
     }
   };
+
+  useEffect(() => {
+    const directory = window.electronStore.getUserDirectory();
+    if (directory) {
+      setUserDirectory(directory);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!userDirectory) {
+      setErrorMsg("Please select a directory");
+    } else {
+      window.electronStore.setUserDirectory(userDirectory);
+      setErrorMsg("");
+    }
+  }, [userDirectory]);
 
   return (
     <div>
