@@ -164,7 +164,7 @@ const ChatWithLLM: React.FC = () => {
           <div>
             {defaultModel ? (
               <p className="text-center text-gray-500">
-                Default model: {defaultModel}
+                Using default model: {defaultModel}
               </p>
             ) : (
               <p className="text-center text-gray-500">
