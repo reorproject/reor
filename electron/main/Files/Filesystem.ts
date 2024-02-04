@@ -123,16 +123,19 @@ export function writeFileSyncRecursive(
 
 export function startWatchingDirectory(
   win: BrowserWindow,
-  directory: string
+  directoryToWatch: string
 ): void {
   try {
-    const watcher = chokidar.watch(directory, {
+    const watcher = chokidar.watch(directoryToWatch, {
       ignoreInitial: true,
     });
 
     const handleFileEvent = (eventType: string, filePath: string) => {
-      if (fileHasExtensionInList(filePath, markdownExtensions)) {
-        updateFileListForRenderer(win, directory);
+      if (
+        fileHasExtensionInList(filePath, markdownExtensions) ||
+        eventType.includes("directory")
+      ) {
+        updateFileListForRenderer(win, directoryToWatch);
       }
     };
 
