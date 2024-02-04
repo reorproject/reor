@@ -17,18 +17,14 @@ export const markdownExtensions = [
   ".mkd",
 ];
 
-export function GetFilesInfoList(
-  directory: string,
-  extensionsToFilterFor?: string[]
-): FileInfo[] {
-  const fileInfoTree = GetFilesInfoTree(directory, extensionsToFilterFor);
+export function GetFilesInfoList(directory: string): FileInfo[] {
+  const fileInfoTree = GetFilesInfoTree(directory);
   const fileInfoList = flattenFileInfoTree(fileInfoTree);
   return fileInfoList;
 }
 
 export function GetFilesInfoTree(
   pathInput: string,
-  extensionsToFilterFor?: string[],
   parentRelativePath: string = ""
 ): FileInfoTree {
   const fileInfoTree: FileInfoTree = [];
@@ -40,9 +36,11 @@ export function GetFilesInfoTree(
 
   try {
     const stats = fs.statSync(pathInput);
-
     if (stats.isFile()) {
-      if (fileHasExtensionInList(pathInput, extensionsToFilterFor)) {
+      if (
+        fileHasExtensionInList(pathInput, markdownExtensions) &&
+        !isHidden(path.basename(pathInput))
+      ) {
         fileInfoTree.push({
           name: path.basename(pathInput),
           path: pathInput,
@@ -51,28 +49,32 @@ export function GetFilesInfoTree(
         });
       }
     } else {
-      const itemsInDir = fs.readdirSync(pathInput);
+      const itemsInDir = fs
+        .readdirSync(pathInput)
+        .filter((item) => !isHidden(item));
 
       const childNodes: FileInfoTree = itemsInDir
         .map((item) => {
           const itemPath = path.join(pathInput, item);
           return GetFilesInfoTree(
             itemPath,
-            extensionsToFilterFor,
             path.join(parentRelativePath, item)
           );
         })
         .flat();
+
       if (parentRelativePath === "") {
         return childNodes;
       }
-      fileInfoTree.push({
-        name: path.basename(pathInput),
-        path: pathInput,
-        relativePath: parentRelativePath,
-        dateModified: stats.mtime,
-        children: childNodes,
-      });
+      if (!isHidden(path.basename(pathInput))) {
+        fileInfoTree.push({
+          name: path.basename(pathInput),
+          path: pathInput,
+          relativePath: parentRelativePath,
+          dateModified: stats.mtime,
+          children: childNodes,
+        });
+      }
     }
   } catch (error) {
     console.error(`Error accessing ${pathInput}:`, error);
@@ -81,6 +83,9 @@ export function GetFilesInfoTree(
   return fileInfoTree;
 }
 
+function isHidden(fileName: string): boolean {
+  return fileName.startsWith(".");
+}
 export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
   let flatList: FileInfo[] = [];
 
@@ -118,8 +123,7 @@ export function writeFileSyncRecursive(
 
 export function startWatchingDirectory(
   win: BrowserWindow,
-  directory: string,
-  extensionsToFilterFor?: string[]
+  directory: string
 ): void {
   try {
     const watcher = chokidar.watch(directory, {
@@ -127,7 +131,7 @@ export function startWatchingDirectory(
     });
 
     const handleFileEvent = (eventType: string, filePath: string) => {
-      if (fileHasExtensionInList(filePath, extensionsToFilterFor)) {
+      if (fileHasExtensionInList(filePath, markdownExtensions)) {
         updateFileListForRenderer(win, directory);
       }
     };
@@ -147,10 +151,15 @@ export function startWatchingDirectory(
 
 function fileHasExtensionInList(
   filePath: string,
-  extensions?: string[]
+  extensions: string[]
 ): boolean {
-  const fileExtension = path.extname(filePath).toLowerCase();
-  return !extensions || extensions.includes(fileExtension);
+  try {
+    const fileExtension = path.extname(filePath).toLowerCase();
+    return extensions.includes(fileExtension);
+  } catch (error) {
+    console.error("Error checking file extension for extensions:", extensions);
+    return false;
+  }
 }
 
 export function appendExtensionIfMissing(
@@ -171,10 +180,9 @@ export function appendExtensionIfMissing(
 
 export function updateFileListForRenderer(
   win: BrowserWindow,
-  directory: string,
-  fileExtensions?: string[]
+  directory: string
 ): void {
-  const files = GetFilesInfoTree(directory, fileExtensions);
+  const files = GetFilesInfoTree(directory);
   if (win) {
     win.webContents.send("files-list", files);
   }
@@ -193,16 +201,15 @@ export function readFile(filePath: string): string {
 export const orchestrateEntryMove = async (
   table: LanceDBTableWrapper,
   sourcePath: string,
-  destinationPath: string,
-  extensions?: string[]
+  destinationPath: string
 ) => {
-  const fileSystemTree = GetFilesInfoTree(sourcePath, extensions);
+  const fileSystemTree = GetFilesInfoTree(sourcePath);
   await removeTreeFromTable(table, fileSystemTree);
   const newDestinationPath = moveFileOrDirectoryInFileSystem(
     sourcePath,
     destinationPath
   );
-  const newFileSystemTree = GetFilesInfoTree(newDestinationPath, extensions);
+  const newFileSystemTree = GetFilesInfoTree(newDestinationPath);
   await addTreeToTable(table, newFileSystemTree);
 };
 

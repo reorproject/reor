@@ -20,7 +20,6 @@ import { LanceDBTableWrapper } from "./database/LanceTableWrapper";
 import { FSWatcher } from "fs";
 import {
   GetFilesInfoTree,
-  markdownExtensions,
   startWatchingDirectory,
   updateFileListForRenderer,
 } from "./Files/Filesystem";
@@ -107,7 +106,7 @@ async function createWindow() {
   win.webContents.on("did-finish-load", () => {
     win?.webContents.send("main-process-message", new Date().toLocaleString());
     const userDirectory = store.get(StoreKeys.UserDirectory) as string;
-    const files = GetFilesInfoTree(userDirectory, markdownExtensions);
+    const files = GetFilesInfoTree(userDirectory);
     win?.webContents.send("files-list", files);
   });
 
@@ -225,14 +224,13 @@ ipcMain.on("index-files-in-directory", async (event) => {
     await repopulateTableWithMissingItems(
       dbTable,
       userDirectory,
-      markdownExtensions,
       (progress) => {
         event.sender.send("indexing-progress", progress);
       }
     );
     if (win) {
-      startWatchingDirectory(win, userDirectory, markdownExtensions);
-      updateFileListForRenderer(win, userDirectory, markdownExtensions);
+      startWatchingDirectory(win, userDirectory);
+      updateFileListForRenderer(win, userDirectory);
     }
     event.sender.send("indexing-progress", 1);
     // event.sender.send("indexing-complete", "success");

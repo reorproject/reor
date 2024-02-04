@@ -5,7 +5,6 @@ import * as path from "path";
 import { FileInfoTree } from "./Types";
 import {
   GetFilesInfoTree,
-  markdownExtensions,
   orchestrateEntryMove,
   writeFileSyncRecursive,
 } from "./Filesystem";
@@ -68,12 +67,7 @@ export const registerFileHandlers = (
     "move-file-or-dir",
     async (event, sourcePath: string, destinationPath: string) => {
       try {
-        orchestrateEntryMove(
-          dbTable,
-          sourcePath,
-          destinationPath,
-          markdownExtensions
-        );
+        orchestrateEntryMove(dbTable, sourcePath, destinationPath);
       } catch (error) {
         console.error("Error moving file or directory:", error);
       }
