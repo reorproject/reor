@@ -37,7 +37,10 @@ export function GetFilesInfoTree(
   try {
     const stats = fs.statSync(pathInput);
     if (stats.isFile()) {
-      if (fileHasExtensionInList(pathInput, markdownExtensions)) {
+      if (
+        fileHasExtensionInList(pathInput, markdownExtensions) &&
+        !isHidden(path.basename(pathInput))
+      ) {
         fileInfoTree.push({
           name: path.basename(pathInput),
           path: pathInput,
@@ -46,7 +49,9 @@ export function GetFilesInfoTree(
         });
       }
     } else {
-      const itemsInDir = fs.readdirSync(pathInput);
+      const itemsInDir = fs
+        .readdirSync(pathInput)
+        .filter((item) => !isHidden(item));
 
       const childNodes: FileInfoTree = itemsInDir
         .map((item) => {
@@ -57,16 +62,19 @@ export function GetFilesInfoTree(
           );
         })
         .flat();
+
       if (parentRelativePath === "") {
         return childNodes;
       }
-      fileInfoTree.push({
-        name: path.basename(pathInput),
-        path: pathInput,
-        relativePath: parentRelativePath,
-        dateModified: stats.mtime,
-        children: childNodes,
-      });
+      if (!isHidden(path.basename(pathInput))) {
+        fileInfoTree.push({
+          name: path.basename(pathInput),
+          path: pathInput,
+          relativePath: parentRelativePath,
+          dateModified: stats.mtime,
+          children: childNodes,
+        });
+      }
     }
   } catch (error) {
     console.error(`Error accessing ${pathInput}:`, error);
@@ -75,6 +83,9 @@ export function GetFilesInfoTree(
   return fileInfoTree;
 }
 
+function isHidden(fileName: string): boolean {
+  return fileName.startsWith(".");
+}
 export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
   let flatList: FileInfo[] = [];
 
