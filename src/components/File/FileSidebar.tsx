@@ -19,16 +19,26 @@ export const FileSidebar: React.FC<FileListProps> = ({
   const directoryPath = window.electronStore.getUserDirectory();
 
   // Sorting function
-  const sortFiles = (fileList: FileInfoTree) => {
-    return fileList.sort((a, b) => {
+  const sortFiles = (fileList: FileInfoTree): FileInfoTree => {
+    fileList.sort((a, b) => {
       if (isFileNodeDirectory(a) && !isFileNodeDirectory(b)) {
         return -1;
       }
       if (!isFileNodeDirectory(a) && isFileNodeDirectory(b)) {
         return 1;
       }
+      // Then sort by dateModified
       return b.dateModified.getTime() - a.dateModified.getTime();
     });
+
+    fileList.forEach((fileInfoNode) => {
+      // If a node has children, sort them recursively
+      if (fileInfoNode.children && fileInfoNode.children.length > 0) {
+        sortFiles(fileInfoNode.children);
+      }
+    });
+
+    return fileList;
   };
 
   useEffect(() => {

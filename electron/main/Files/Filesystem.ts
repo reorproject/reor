@@ -53,58 +53,30 @@ export function GetFilesInfoTree(
           path: pathInput,
           relativePath: parentRelativePath,
           dateModified: stats.mtime,
-          // type: "file",
         });
       }
-      return fileInfoTree;
-    }
+    } else {
+      const itemsInDir = fs.readdirSync(pathInput);
 
-    const items = fs.readdirSync(pathInput);
-
-    items.forEach((item) => {
-      const itemPath = path.join(pathInput, item);
-      const relativePathWithinUserDir = path.join(parentRelativePath, item);
-
-      // Perhaps, this function should ultimately be more recursive than it is right now...
-
-      try {
-        const itemStats = fs.statSync(itemPath);
-
-        if (itemStats.isDirectory()) {
-          const children = GetFilesInfoTree(
+      const childNodes: FileInfoTree = itemsInDir
+        .map((item) => {
+          const itemPath = path.join(pathInput, item);
+          return GetFilesInfoTree(
             itemPath,
             extensionsToFilterFor,
-            relativePathWithinUserDir
+            path.join(parentRelativePath, item)
           );
-          fileInfoTree.push({
-            name: item,
-            path: itemPath,
-            relativePath: relativePathWithinUserDir,
-            dateModified: itemStats.mtime,
-            // type: "directory",
-            children: children,
-          });
-        } else {
-          const fileExtension = path.extname(item).toLowerCase();
+        })
+        .flat();
 
-          if (
-            (extensionsToFilterFor &&
-              extensionsToFilterFor.includes(fileExtension)) ||
-            (!extensionsToFilterFor && fileExtension)
-          ) {
-            fileInfoTree.push({
-              name: item,
-              path: itemPath,
-              relativePath: relativePathWithinUserDir,
-              dateModified: itemStats.mtime,
-              // type: "file",
-            });
-          }
-        }
-      } catch (error) {
-        console.error(`Error accessing ${itemPath}:`, error);
-      }
-    });
+      fileInfoTree.push({
+        name: path.basename(pathInput),
+        path: pathInput,
+        relativePath: parentRelativePath,
+        dateModified: stats.mtime,
+        children: childNodes,
+      });
+    }
   } catch (error) {
     console.error(`Error accessing ${pathInput}:`, error);
   }
