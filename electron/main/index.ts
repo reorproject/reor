@@ -25,7 +25,7 @@ import {
   updateFileListForRenderer,
 } from "./Files/Filesystem";
 import { registerLLMSessionHandlers } from "./llm/llmSessionHandlers";
-import { FileInfoNode } from "./Files/Types";
+// import { FileInfoNode } from "./Files/Types";
 import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
 import { registerStoreHandlers } from "./Store/storeHandlers";
 import { registerFileHandlers } from "./Files/registerFilesHandler";
@@ -250,20 +250,41 @@ ipcMain.on("index-files-in-directory", async (event) => {
   }
 });
 
-ipcMain.on("show-context-menu-file-item", (event, file: FileInfoNode) => {
+ipcMain.on("show-context-menu-file-item", (event, file) => {
   const menu = new Menu();
   menu.append(
     new MenuItem({
       label: "Delete",
       click: () => {
         console.log(file.path);
-        fs.unlink(file.path, (err) => {
+        fs.stat(file.path, (err, stats) => {
           if (err) {
             console.error("An error occurred:", err);
             return;
           }
-          console.log(`File at ${file.path} was deleted successfully.`);
-        }); // event.sender.send("context-menu-command", "delete");
+
+          if (stats.isDirectory()) {
+            // For directories (Node.js v14.14.0 and later)
+            fs.rm(file.path, { recursive: true }, (err) => {
+              if (err) {
+                console.error("An error occurred:", err);
+                return;
+              }
+              console.log(
+                `Directory at ${file.path} was deleted successfully.`
+              );
+            });
+          } else {
+            // For files
+            fs.unlink(file.path, (err) => {
+              if (err) {
+                console.error("An error occurred:", err);
+                return;
+              }
+              console.log(`File at ${file.path} was deleted successfully.`);
+            });
+          }
+        });
       },
     })
   );

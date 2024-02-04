@@ -220,7 +220,7 @@ const FileItem: React.FC<FileInfoProps> = ({
     window.contextMenu.showFileItemContextMenu(file);
   };
 
-  const itemClasses = `flex items-center cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 mt-0 mb-0 ${
+  const itemClasses = `flex items-center cursor-pointer p-2 border-b border-gray-200 hover:bg-slate-700 h-full mt-0 mb-0 ${
     isSelected ? "bg-gray-700 text-white font-semibold" : "text-gray-200"
   }`;
 
@@ -233,12 +233,12 @@ const FileItem: React.FC<FileInfoProps> = ({
     >
       <div onClick={toggle} className={itemClasses}>
         {isDirectory && (
-          <span className={`mr-2 text-[13px] `}>
+          <span className={`mr-2 mt-1 text-[13px] `}>
             {isExpanded ? <FaChevronDown /> : <FaChevronRight />}
           </span>
         )}
         <span
-          className={`text-[13px] flex-1 truncate ${
+          className={`text-[13px] flex-1 truncate mt-0 ${
             isDirectory ? "font-semibold" : ""
           }`}
         >
