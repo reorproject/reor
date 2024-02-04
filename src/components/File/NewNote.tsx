@@ -19,21 +19,20 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
 
   // const [isValidName, setIsValidName] = useState<boolean>(true);
 
-  const validNamePattern = /^[a-zA-Z0-9_-\s]+$/;
+  const validNamePattern = /^[a-zA-Z0-9_\-/\s]+$/;
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
     if (newName === "") {
       setFileName(newName);
-      setErrorMessage(""); // Clear error message when input is empty
-    } else if (validNamePattern.test(newName)) {
+      setErrorMessage("");
+    } else if (validNamePattern.test(newName) && !newName.includes("../")) {
       setFileName(newName);
-      setErrorMessage(""); // Clear error message for valid input
+      setErrorMessage("");
     } else {
-      // Set an error message for invalid input
       setFileName(newName);
       setErrorMessage(
-        "Note name can only contain letters, numbers, underscores, and hyphens."
+        "Note name can only contain letters, numbers, underscores, hyphens, and slashes."
       );
     }
   };
@@ -42,14 +41,19 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
     if (!fileName || errorMessage) {
       return;
     }
-    const notePath = await window.files.joinPath(
+    // Normalize the path separators to forward slashes
+    const normalizedFileName = fileName.replace(/\\/g, "/");
+    const fullPath = await window.files.joinPath(
       window.electronStore.getUserDirectory(),
-      fileName + ".md"
+      normalizedFileName + ".md"
     );
-    window.files.createFile(notePath, "");
-    onFileSelect(notePath);
-    onClose(); // Close modal after file creation
+    // Create directories if they don't exist
+    // await window.files.ensureDirectoryExists(fullPath);
+    window.files.createFile(fullPath, "");
+    onFileSelect(fullPath);
+    onClose();
   };
+
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       sendNewNoteMsg();
