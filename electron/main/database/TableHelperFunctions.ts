@@ -11,10 +11,9 @@ import { LanceDBTableWrapper } from "./LanceTableWrapper";
 export const repopulateTableWithMissingItems = async (
   table: LanceDBTableWrapper,
   directoryPath: string,
-  extensionsToFilterFor: string[],
   onProgress?: (progress: number) => void
 ) => {
-  const filesInfoTree = GetFilesInfoList(directoryPath, extensionsToFilterFor);
+  const filesInfoTree = GetFilesInfoList(directoryPath);
   const tableArray = await getTableAsArray(table);
   const dbItemsToAdd = await computeDbItemsToAdd(filesInfoTree, tableArray);
   if (dbItemsToAdd.length == 0) {
