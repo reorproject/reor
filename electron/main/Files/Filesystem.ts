@@ -1,6 +1,6 @@
 import path from "path";
 import fs from "fs";
-import { FileInfo, FileInfoTree } from "./Types";
+import { FileInfo, FileInfoTree, isFileNodeDirectory } from "./Types";
 import chokidar from "chokidar";
 import { BrowserWindow } from "electron";
 import {
@@ -53,7 +53,7 @@ export function GetFilesInfoTree(
           path: pathInput,
           relativePath: parentRelativePath,
           dateModified: stats.mtime,
-          type: "file",
+          // type: "file",
         });
       }
       return fileInfoTree;
@@ -63,7 +63,9 @@ export function GetFilesInfoTree(
 
     items.forEach((item) => {
       const itemPath = path.join(pathInput, item);
-      const relativePath = path.join(parentRelativePath, item);
+      const relativePathWithinUserDir = path.join(parentRelativePath, item);
+
+      // Perhaps, this function should ultimately be more recursive than it is right now...
 
       try {
         const itemStats = fs.statSync(itemPath);
@@ -72,14 +74,14 @@ export function GetFilesInfoTree(
           const children = GetFilesInfoTree(
             itemPath,
             extensionsToFilterFor,
-            relativePath
+            relativePathWithinUserDir
           );
           fileInfoTree.push({
             name: item,
             path: itemPath,
-            relativePath: relativePath,
+            relativePath: relativePathWithinUserDir,
             dateModified: itemStats.mtime,
-            type: "directory",
+            // type: "directory",
             children: children,
           });
         } else {
@@ -93,9 +95,9 @@ export function GetFilesInfoTree(
             fileInfoTree.push({
               name: item,
               path: itemPath,
-              relativePath: relativePath,
+              relativePath: relativePathWithinUserDir,
               dateModified: itemStats.mtime,
-              type: "file",
+              // type: "file",
             });
           }
         }
@@ -114,7 +116,7 @@ export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
   let flatList: FileInfo[] = [];
 
   for (const node of tree) {
-    if (node.type === "file") {
+    if (!isFileNodeDirectory(node)) {
       flatList.push({
         name: node.name,
         path: node.path,
@@ -123,7 +125,7 @@ export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
       });
     }
 
-    if (node.type === "directory" && node.children) {
+    if (isFileNodeDirectory(node) && node.children) {
       flatList = flatList.concat(flattenFileInfoTree(node.children));
     }
   }

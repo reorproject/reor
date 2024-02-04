@@ -6,14 +6,14 @@ export type FileInfo = {
 };
 
 export type FileInfoNode = FileInfo & {
-  type: "file" | "directory";
   children?: FileInfoNode[];
 };
 
 export type FileInfoTree = FileInfoNode[];
 
-// So maybe we just need an abstraction to help deal with transitions between a tree and a list.
+// So the type of this thing. Each item is a FileInfo and then to make it into a tree we add in a decorator that says whether it's a file or a directory
+// but perhaps we don't need that decorator. And we can just make a function that is like isDirectory
 
-// And we could extend the FileInfoNode to basically extend the file type.
-
-// Yes that's what we'll have to do.
+export const isFileNodeDirectory = (fileInfo: FileInfoNode): boolean => {
+  return fileInfo.children !== undefined;
+};

@@ -21,10 +21,10 @@ export const FileSidebar: React.FC<FileListProps> = ({
   // Sorting function
   const sortFiles = (fileList: FileInfoTree) => {
     return fileList.sort((a, b) => {
-      if (a.type === "directory" && b.type !== "directory") {
+      if (isFileNodeDirectory(a) && !isFileNodeDirectory(b)) {
         return -1;
       }
-      if (a.type !== "directory" && b.type === "directory") {
+      if (!isFileNodeDirectory(a) && isFileNodeDirectory(b)) {
         return 1;
       }
       return b.dateModified.getTime() - a.dateModified.getTime();
@@ -116,7 +116,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
       const a = { file, indentMultiplyer };
       visibleItems.push(a);
       if (
-        file.type === "directory" &&
+        isFileNodeDirectory(file) &&
         expandedDirectories.includes(file.path)
       ) {
         if (file.children) {
@@ -197,12 +197,12 @@ const FileItem: React.FC<FileInfoProps> = ({
   indentMultiplyer,
 }) => {
   // const [isExpanded, setIsExpanded] = useState(false);
-  const isDirectory = file.type === "directory";
+  const isDirectory = isFileNodeDirectory(file);
   const isSelected = file.path === selectedFile;
   const indentation = indentMultiplyer ? 10 * indentMultiplyer : 0;
 
   const toggle = () => {
-    if (file.type === "directory") {
+    if (isFileNodeDirectory(file)) {
       // setIsExpanded(!isExpanded);
       onDirectoryToggle(file.path);
     } else {
@@ -247,4 +247,8 @@ const FileItem: React.FC<FileInfoProps> = ({
       </div>
     </div>
   );
+};
+
+export const isFileNodeDirectory = (fileInfo: FileInfoNode): boolean => {
+  return fileInfo.children !== undefined;
 };
