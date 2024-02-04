@@ -42,12 +42,7 @@ export function GetFilesInfoTree(
     const stats = fs.statSync(pathInput);
 
     if (stats.isFile()) {
-      const fileExtension = path.extname(pathInput).toLowerCase();
-      if (
-        (extensionsToFilterFor &&
-          extensionsToFilterFor.includes(fileExtension)) ||
-        !extensionsToFilterFor
-      ) {
+      if (fileHasExtensionInList(pathInput, extensionsToFilterFor)) {
         fileInfoTree.push({
           name: path.basename(pathInput),
           path: pathInput,
@@ -69,7 +64,6 @@ export function GetFilesInfoTree(
         })
         .flat();
       if (parentRelativePath === "") {
-        // If the parentRelativePath is empty, we are at the root of the directory
         return childNodes;
       }
       fileInfoTree.push({
@@ -132,14 +126,8 @@ export function startWatchingDirectory(
       ignoreInitial: true,
     });
 
-    const handleFileEvent = (eventType: string, path: string) => {
-      // Check if the file extension is in the provided list (if any)
-      if (
-        !extensionsToFilterFor ||
-        extensionsToFilterFor.some((ext) =>
-          path.toLowerCase().endsWith(ext.toLowerCase())
-        )
-      ) {
+    const handleFileEvent = (eventType: string, filePath: string) => {
+      if (fileHasExtensionInList(filePath, extensionsToFilterFor)) {
         updateFileListForRenderer(win, directory);
       }
     };
@@ -155,6 +143,14 @@ export function startWatchingDirectory(
   } catch (error) {
     console.error("Error setting up file watcher:", error);
   }
+}
+
+function fileHasExtensionInList(
+  filePath: string,
+  extensions?: string[]
+): boolean {
+  const fileExtension = path.extname(filePath).toLowerCase();
+  return !extensions || extensions.includes(fileExtension);
 }
 
 export function appendExtensionIfMissing(
