@@ -68,7 +68,10 @@ export function GetFilesInfoTree(
           );
         })
         .flat();
-
+      if (parentRelativePath === "") {
+        // If the parentRelativePath is empty, we are at the root of the directory
+        return childNodes;
+      }
       fileInfoTree.push({
         name: path.basename(pathInput),
         path: pathInput,

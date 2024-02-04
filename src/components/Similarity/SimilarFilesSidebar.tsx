@@ -31,6 +31,9 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
 
   const performSearch = async (filePath: string): Promise<DBQueryResult[]> => {
     const fileContent: string = await window.files.readFile(filePath);
+    // Ok so that wouldn't be too hard to do here: chunk the ting and just perform a search based on the chunks.
+    // And in fact, it's probably slightly wasteful to be doing all these embeddings
+    // We already have the embeddings so should just leverage the backend to show related files, leverage the embeddings we already have.
     if (!fileContent) {
       console.error("File content is empty");
       return [];
