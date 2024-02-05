@@ -55,7 +55,7 @@
     "electron-updater": "^6.1.1",
     "install": "^0.13.0",
     "langchain": "^0.1.5",
-    "node-llama-cpp": "^3.0.0-beta.5",
+    "node-llama-cpp": "3.0.0-beta.5",
     "npm": "^10.3.0",
     "openai": "^4.20.0",
     "react-icons": "^4.12.0",
