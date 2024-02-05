@@ -48,7 +48,7 @@
     "@radix-ui/colors": "^3.0.0",
     "@tailwindcss/typography": "^0.5.10",
     "@xenova/transformers": "^2.8.0",
-    "apache-arrow": "^12.0.1",
+    "apache-arrow": "^14.0.2",
     "chokidar": "^3.5.3",
     "cm6-theme-basic-dark": "^0.2.0",
     "electron-store": "^8.1.0",
@@ -64,7 +64,7 @@
     "react-rnd": "^10.4.1",
     "react-toastify": "^10.0.4",
     "react-window": "^1.8.10",
-    "vectordb": "0.4.1"
+    "vectordb": "0.4.8"
   },
   "devDependencies": {
     "@playwright/test": "^1.37.1",
