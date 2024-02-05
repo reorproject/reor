@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AIModelConfig } from "electron/main/Store/storeConfig";
 import { ISendFunctionImplementer, ISessionService } from "../Types";
+// import { getLlama } from "node-llama-cpp";
 
 export class LlamaCPPSessionService implements ISessionService {
   private session: any;
@@ -46,7 +47,9 @@ export class LlamaCPPSessionService implements ISessionService {
   private async loadModel(localModelPath: string): Promise<void> {
     // try {
     const nodeLLamaCpp = await import("node-llama-cpp");
+    const llama = await nodeLLamaCpp.getLlama();
     this.model = new nodeLLamaCpp.LlamaModel({
+      llama,
       modelPath: localModelPath,
       gpuLayers: getGPULayersToUse(),
     });

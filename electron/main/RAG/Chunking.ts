@@ -48,7 +48,7 @@ export function chunkMarkdownByHeadings(markdownContent: string): string[] {
   return chunks;
 }
 
-const chunkStringsRecursively = async (
+export const chunkStringsRecursively = async (
   strings: string[],
   chunkSize: number,
   chunkOverlap: number
