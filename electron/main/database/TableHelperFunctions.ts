@@ -99,6 +99,7 @@ const convertFileTypeToDBType = async (file: FileInfo): Promise<DBEntry[]> => {
       content: content,
       subnoteindex: index,
       timeadded: new Date(),
+      filemodified: file.dateModified,
     };
   });
   return entries;
@@ -145,6 +146,7 @@ export const updateFileInTable = async (
       content: content,
       subnoteindex: index,
       timeadded: currentTimestamp,
+      filemodified: currentTimestamp,
     };
   });
   await dbTable.add(dbEntries);

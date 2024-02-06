@@ -51,6 +51,7 @@
     "apache-arrow": "^14.0.2",
     "chokidar": "^3.5.3",
     "cm6-theme-basic-dark": "^0.2.0",
+    "date-fns": "^3.3.1",
     "electron-store": "^8.1.0",
     "electron-updater": "^6.1.1",
     "install": "^0.13.0",

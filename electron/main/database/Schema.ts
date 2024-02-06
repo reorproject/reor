@@ -15,6 +15,7 @@ export interface DBEntry {
   content: string;
   subnoteindex: number;
   timeadded: Date;
+  filemodified: Date;
 }
 export interface DBQueryResult extends DBEntry {
   _distance: number;
@@ -26,6 +27,7 @@ export enum DatabaseFields {
   CONTENT = "content",
   SUB_NOTE_INDEX = "subnoteindex",
   TIME_ADDED = "timeadded",
+  FILE_MODIFIED = "filemodified",
   DISTANCE = "_distance",
 }
 
@@ -41,6 +43,11 @@ const CreateDatabaseSchema = (vectorDim: number): Schema => {
     new Field(DatabaseFields.SUB_NOTE_INDEX, new Float64(), false),
     new Field(
       DatabaseFields.TIME_ADDED,
+      new ArrowDate(DateUnit.MILLISECOND),
+      false
+    ),
+    new Field(
+      DatabaseFields.FILE_MODIFIED,
       new ArrowDate(DateUnit.MILLISECOND),
       false
     ),
