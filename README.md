@@ -4,7 +4,7 @@
 </p> -->
 
 <h4 align="center">
-AI second brain & personal knowledge management app. </h4>
+An AI note-taking app that runs models locally.</h4>
 
 <p align="center">
     <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-GPLv3-blue.svg"></a>
