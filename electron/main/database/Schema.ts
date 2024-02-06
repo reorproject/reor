@@ -56,4 +56,23 @@ const CreateDatabaseSchema = (vectorDim: number): Schema => {
   return schema;
 };
 
+const serializeSchema = (schema: Schema): string => {
+  return JSON.stringify(
+    schema.fields.map((field) => ({
+      name: field.name,
+      type: field.type.toString(),
+      nullable: field.nullable,
+    }))
+  );
+};
+
+export const isStringifiedSchemaEqual = (
+  schema1: Schema,
+  schema2: Schema
+): boolean => {
+  const serializedSchema1 = serializeSchema(schema1);
+  const serializedSchema2 = serializeSchema(schema2);
+
+  return serializedSchema1 === serializedSchema2;
+};
 export default CreateDatabaseSchema;

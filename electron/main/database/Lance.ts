@@ -1,6 +1,5 @@
 import * as lancedb from "vectordb";
-// import { Schema } from 'apache-arrow';
-import CreateDatabaseSchema from "./Schema";
+import CreateDatabaseSchema, { isStringifiedSchemaEqual } from "./Schema";
 import { EnhancedEmbeddingFunction } from "./Embeddings";
 
 const GetOrCreateLanceTable = async (
@@ -9,20 +8,34 @@ const GetOrCreateLanceTable = async (
   userDirectory: string
 ): Promise<lancedb.Table<string>> => {
   const allTableNames = await db.tableNames();
+  const intendedSchema = CreateDatabaseSchema(embedFunc.contextLength);
+  console.log("Intended schema:", intendedSchema);
   const tableName = generateTableName(embedFunc.name, userDirectory);
-  // console.log("tableNames", tableNames);
+
   if (allTableNames.includes(tableName)) {
-    // await db.dropTable(tableName);
-    return db.openTable(tableName, embedFunc);
+    const table = await db.openTable(tableName, embedFunc);
+    const schema = await table.schema;
+    if (!isStringifiedSchemaEqual(schema, intendedSchema)) {
+      await db.dropTable(tableName);
+      console.log(`Deleted table ${tableName} due to schema mismatch.`);
+
+      const recreatedTable = await db.createTable({
+        name: tableName,
+        schema: intendedSchema,
+        embeddingFunction: embedFunc,
+      });
+      console.log(`Recreated table ${tableName} with the intended schema.`);
+      return recreatedTable;
+    }
+
+    return table;
   }
 
   const newTable = await db.createTable({
     name: tableName,
-    schema: CreateDatabaseSchema(embedFunc.contextLength),
+    schema: intendedSchema,
     embeddingFunction: embedFunc,
   });
-  // console.log("newTable", newTable);
-  // console.log(newTable)
   return newTable;
 };
 
