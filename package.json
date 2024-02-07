@@ -55,6 +55,7 @@
     "electron-store": "^8.1.0",
     "electron-updater": "^6.1.1",
     "install": "^0.13.0",
+    "js-tiktoken": "^1.0.10",
     "langchain": "^0.1.5",
     "node-llama-cpp": "v3.0.0-beta.9",
     "npm": "^10.3.0",

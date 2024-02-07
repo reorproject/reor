@@ -34,7 +34,7 @@ declare global {
       indexFilesInDirectory: () => void;
       augmentPromptWithRAG: (
         prompt: string,
-        numberOfContextItems: number,
+        llmSessionID: string,
         filter?: string
       ) => Promise<string>;
       getDatabaseFields: () => Promise<Record<string, string>>;
@@ -79,6 +79,8 @@ declare global {
       getDefaultAIModel: () => string;
       getDefaultEmbedFuncRepo: () => string;
       setDefaultEmbedFuncRepo: (repoName: string) => void;
+      getNoOfRAGExamples: () => number;
+      setNoOfRAGExamples: (noOfExamples: number) => void;
     };
   }
 }
@@ -96,13 +98,13 @@ contextBridge.exposeInMainWorld("database", {
   },
   augmentPromptWithRAG: async (
     prompt: string,
-    numberOfContextItems: number,
+    llmSessionID: string,
     filter?: string
   ): Promise<DBEntry[]> => {
     return ipcRenderer.invoke(
       "augment-prompt-with-rag",
       prompt,
-      numberOfContextItems,
+      llmSessionID,
       filter
     );
   },
@@ -157,6 +159,12 @@ contextBridge.exposeInMainWorld("electronStore", {
   },
   setDefaultEmbedFuncRepo: (repoName: string) => {
     ipcRenderer.send("set-default-embed-func-repo", repoName);
+  },
+  getNoOfRAGExamples: () => {
+    return ipcRenderer.sendSync("get-no-of-rag-examples");
+  },
+  setNoOfRAGExamples: (noOfExamples: number) => {
+    ipcRenderer.send("set-no-of-rag-examples", noOfExamples);
   },
 });
 

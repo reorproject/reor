@@ -21,6 +21,8 @@ export interface ISessionService {
    * Aborts the response.
    */
   abort(): void;
+  getContextLength(): number;
+  tokenize(text: string): number[];
 }
 
 /**

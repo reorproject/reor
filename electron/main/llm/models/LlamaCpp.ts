@@ -1,47 +1,35 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AIModelConfig } from "electron/main/Store/storeConfig";
 import { ISendFunctionImplementer, ISessionService } from "../Types";
-// import { getLlama } from "node-llama-cpp";
 
 export class LlamaCPPSessionService implements ISessionService {
   private session: any;
   private context: any;
-  private model: any; // Model instance
-  public activeContextSize?: number;
+  private model: any;
   private abortController?: AbortController;
+  private contextLength?: number;
 
   async init(storeModelConfig: AIModelConfig): Promise<void> {
-    // try {
-
+    this.contextLength = storeModelConfig.contextLength;
     await this.loadModel(storeModelConfig.localPath);
+
     if (!this.isModelLoaded()) {
       throw new Error("Model not loaded");
     }
 
-    this.activeContextSize = chooseRightContextSize(
-      this.model.trainContextSize,
-      storeModelConfig.contextLength
-    );
-    // console.log("ACTIVE CONTEXT SIZE:", this.activeContextSize);
-    console.log(
-      "MODEL: this.model.trainContextSize",
-      this.model.trainContextSize
-    );
     const nodeLLamaCpp = await import("node-llama-cpp");
-    this.context = new nodeLLamaCpp.LlamaContext({
+    this.context = await new nodeLLamaCpp.LlamaContext({
       model: this.model,
       contextSize: storeModelConfig.contextLength,
     });
-    this.session = new nodeLLamaCpp.LlamaChatSession({
+    this.session = await new nodeLLamaCpp.LlamaChatSession({
       contextSequence: this.context.getSequence(),
+      systemPrompt: "",
     });
-    // this.session = new nodeLLamaCpp.LlamaChatSession({
-    //   context: this.context,
-    // });
-    // } catch (error) {
-    //   console.error("Error thrown in initi:", error);
-    //   throw error; // Re-throw the error to propagate it up
-    // }
+  }
+
+  public getContextLength(): number {
+    return this.contextLength || 0;
   }
 
   private async loadModel(localModelPath: string): Promise<void> {
@@ -65,10 +53,9 @@ export class LlamaCPPSessionService implements ISessionService {
     return !!this.model;
   }
 
-  public tokenize(text: string): number[] {
+  public tokenize = (text: string): number[] => {
     return this.session.model.tokenize(text);
-    // return this.context.encode(text);
-  }
+  };
 
   public abort(): void {
     if (this.abortController) {
@@ -134,21 +121,4 @@ const getGPULayersToUse = (): number => {
     return 100; // NOTE: Will use fewer GPU layers if the model has fewer layers.
   }
   return 0;
-};
-
-const chooseRightContextSize = (
-  modelContextSize: number,
-  storeContextSize?: number
-): number | undefined => {
-  if (!modelContextSize) {
-    return storeContextSize;
-  }
-  if (
-    storeContextSize &&
-    storeContextSize > 0 &&
-    storeContextSize < modelContextSize
-  ) {
-    return storeContextSize;
-  }
-  return modelContextSize;
 };

@@ -119,7 +119,7 @@ async function createWindow() {
   // Apply electron-updater
   update(win);
   registerLLMSessionHandlers(store);
-  registerDBSessionHandlers(dbTable);
+  registerDBSessionHandlers(dbTable, store);
   registerStoreHandlers(store, fileWatcher);
   registerFileHandlers(store, dbTable, win);
 }

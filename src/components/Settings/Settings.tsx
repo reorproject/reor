@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Modal from "../Generic/Modal";
 import LLMSettings from "./LLMSettings";
 import EmbeddingModelManager from "./EmbeddingSettings";
+import RagSettings from "./RagSettings";
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -53,6 +54,16 @@ const SettingsModal: React.FC<ModalProps> = ({
           >
             Embedding Model
           </div>
+          <div
+            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
+              activeTab === "RAG"
+                ? "bg-gray-700 text-white font-semibold"
+                : "text-gray-200"
+            }`}
+            onClick={() => setActiveTab("RAG")}
+          >
+            RAG{" "}
+          </div>
         </div>
 
         {/* Right Content Area */}
@@ -87,6 +98,17 @@ const SettingsModal: React.FC<ModalProps> = ({
           {activeTab === "llmSettings" && (
             <div className="mt-2 w-full">
               <LLMSettings />
+            </div>
+          )}
+
+          {activeTab === "RAG" && (
+            <div className="w-full">
+              <RagSettings>
+                <h2 className="text-2xl font-semibold mb-0 text-white">RAG</h2>{" "}
+                <p className="mt-5 text-sm text-gray-100 mb-1">
+                  Maximum number of examples to use in Q&A:
+                </p>
+              </RagSettings>
             </div>
           )}
         </div>

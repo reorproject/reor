@@ -5,17 +5,23 @@ import {
   ISessionService,
   OpenAIMessage,
 } from "../Types";
+import { Tiktoken, TiktokenModel, encodingForModel } from "js-tiktoken";
+import { AIModelConfig } from "electron/main/Store/storeConfig";
 
 export class OpenAIModelSessionService implements ISessionService {
   private openai: OpenAI;
   public modelName: string;
   private messageHistory: ChatbotMessage[];
   private abortStreaming: boolean = false;
+  private tokenEncoding: Tiktoken;
+  private modelConfig: AIModelConfig;
 
-  constructor(apiKey: string, modelName: string) {
+  constructor(apiKey: string, modelName: string, modelConfig: AIModelConfig) {
     this.openai = new OpenAI({ apiKey });
+    this.modelConfig = modelConfig;
     this.modelName = modelName;
     this.messageHistory = [];
+    this.tokenEncoding = encodingForModel(this.modelName as TiktokenModel);
   }
 
   async init(): Promise<void> {
@@ -25,6 +31,14 @@ export class OpenAIModelSessionService implements ISessionService {
   private isModelLoaded(): boolean {
     // For API-based models, this can always return true as there's no "loading" process
     return true;
+  }
+
+  public tokenize = (text: string): number[] => {
+    return this.tokenEncoding.encode(text);
+  };
+
+  public getContextLength(): number {
+    return this.modelConfig.contextLength || 0;
   }
 
   public abort(): void {
@@ -56,8 +70,6 @@ export class OpenAIModelSessionService implements ISessionService {
         role: msg.role,
         content: msg.content,
       })) as OpenAIMessage[];
-
-      console.log("openAIMessages", openAIMessages);
 
       const stream = await this.openai.chat.completions.create({
         model: this.modelName,

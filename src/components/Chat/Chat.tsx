@@ -80,7 +80,7 @@ const ChatWithLLM: React.FC = () => {
     if (newMessages.length <= 1) {
       const augmentedPrompt = await window.database.augmentPromptWithRAG(
         userInput,
-        9
+        currentSessionId
       );
       startStreamingResponse(currentSessionId, augmentedPrompt);
     } else {
@@ -177,7 +177,7 @@ const ChatWithLLM: React.FC = () => {
           {messages.map((message, index) => (
             <ReactMarkdown
               key={index}
-              className={`p-1 pl-1 markdown-content rounded-lg ${
+              className={`p-1 pl-1 markdown-content rounded-lg break-words ${
                 message.messageType === "error"
                   ? "bg-red-100 text-red-800"
                   : message.role === "assistant"
@@ -190,7 +190,7 @@ const ChatWithLLM: React.FC = () => {
           ))}
           {currentBotMessage && (
             <ReactMarkdown
-              className={`p-1 pl-1 markdown-content rounded-lg ${
+              className={`p-1 pl-1 markdown-content rounded-lg break-words ${
                 currentBotMessage.messageType === "error"
                   ? "bg-red-100 text-red-800"
                   : "bg-blue-100 text-blue-800"

@@ -5,10 +5,7 @@ import { OpenAIModelSessionService } from "./models/OpenAI";
 import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 
-// const modelLoader = new ModelLoader(); // Singleton
-// modelLoader.loadModel(); // Load model on startup
-
-const sessions: { [sessionId: string]: ISessionService } = {};
+export const LLMSessions: { [sessionId: string]: ISessionService } = {};
 
 export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
   // const llamaCPPModelLoader = new LlamaCPPModelLoader();
@@ -19,17 +16,17 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
   ipcMain.handle(
     "does-session-exist",
     async (event: IpcMainInvokeEvent, sessionId: string): Promise<boolean> => {
-      return !!sessions[sessionId];
+      return !!LLMSessions[sessionId];
     }
   );
 
   ipcMain.handle(
     "delete-session",
     async (event: IpcMainInvokeEvent, sessionId: string): Promise<string> => {
-      if (sessions[sessionId]) {
-        const sessionService = sessions[sessionId];
+      if (LLMSessions[sessionId]) {
+        const sessionService = LLMSessions[sessionId];
         await sessionService.abort();
-        delete sessions[sessionId];
+        delete LLMSessions[sessionId];
       }
       return "success";
     }
@@ -45,7 +42,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
   ipcMain.handle(
     "get-or-create-session",
     async (event: IpcMainInvokeEvent, sessionId: string): Promise<string> => {
-      if (sessions[sessionId]) {
+      if (LLMSessions[sessionId]) {
         return sessionId;
       }
       return await createSession(store, sessionId);
@@ -59,7 +56,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       sessionId: string,
       prompt: string
     ): Promise<string> => {
-      const sessionService = sessions[sessionId];
+      const sessionService = LLMSessions[sessionId];
       if (!sessionService) {
         throw new Error(`Session ${sessionId} does not exist.`);
       }
@@ -97,13 +94,14 @@ async function createSession(
     }
     const sessionService = new OpenAIModelSessionService(
       openAIAPIKey,
-      defaultModelName
+      defaultModelName,
+      currentConfig
     );
-    sessions[sessionId] = sessionService;
+    LLMSessions[sessionId] = sessionService;
   } else {
     const sessionService = new LlamaCPPSessionService();
     await sessionService.init(currentConfig);
-    sessions[sessionId] = sessionService;
+    LLMSessions[sessionId] = sessionService;
   }
   return sessionId;
 }

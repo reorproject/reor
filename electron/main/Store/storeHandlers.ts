@@ -9,6 +9,7 @@ export const registerStoreHandlers = (
   store: Store<StoreSchema>,
   fileWatcher: FSWatcher | null
 ) => {
+  setupDefaultStoreValues(store);
   ipcMain.on(
     "set-user-directory",
     async (event, userDirectory: string): Promise<void> => {
@@ -24,6 +25,14 @@ export const registerStoreHandlers = (
 
   ipcMain.on("set-default-embed-func-repo", (event, repoName: string) => {
     store.set(StoreKeys.DefaultEmbedFuncRepo, repoName);
+  });
+
+  ipcMain.on("set-no-of-rag-examples", (event, noOfExamples: number) => {
+    store.set(StoreKeys.MaxRAGExamples, noOfExamples);
+  });
+
+  ipcMain.on("get-no-of-rag-examples", (event) => {
+    event.returnValue = store.get(StoreKeys.MaxRAGExamples);
   });
 
   ipcMain.on("set-default-ai-model", (event, modelName: string) => {
@@ -151,5 +160,11 @@ export async function addRemoteModelsToElectronStore(
 ) {
   for (const [modelName, modelConfig] of Object.entries(remoteAIModels)) {
     await addNewModelSchemaToStore(store, modelName, modelConfig);
+  }
+}
+
+export function setupDefaultStoreValues(store: Store<StoreSchema>) {
+  if (!store.get(StoreKeys.MaxRAGExamples)) {
+    store.set(StoreKeys.MaxRAGExamples, 10);
   }
 }

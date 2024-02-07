@@ -1,13 +1,35 @@
 import { DBEntry } from "../database/Schema";
 
-export function createRAGPrompt(entries: DBEntry[], query: string): string {
-  // Concatenate the content of each entry
-  const contents = entries.map((entry) => entry.content).join(" ");
+export function createRAGPrompt(
+  entries: DBEntry[],
+  query: string,
+  tokenize: (text: string) => number[],
+  contextLimit: number
+): string {
+  let entryContents = "";
+  const basePrompt = `Answer the question below based on the following notes:\n`;
+  const queryPart = `Question: ${query}`;
+  let tokenCount = tokenize(basePrompt + queryPart).length;
+  for (const entry of entries) {
+    // Form the entry content with the current entry
+    const tempEntryContent = `${entryContents}${entry.content}\n`;
+    const tempPrompt = basePrompt + tempEntryContent + queryPart;
+    const tempTokenCount = tokenize(tempPrompt).length;
+    if (tempTokenCount <= contextLimit) {
+      entryContents = tempEntryContent;
+      tokenCount = tempTokenCount;
+    } else {
+      break;
+    }
+  }
 
-  // Combine the contents with the query to form the final prompt
-  const prompt = `Answer the question below based on the following notes:
-${contents}
-Question: ${query}`;
+  // If the token count with only the base prompt and query exceeds the limit
+  if (tokenCount === tokenize(basePrompt + queryPart).length) {
+    throw new Error(
+      "The provided information is too long to process in a single prompt. Please shorten the query or provide fewer details."
+    );
+  }
 
-  return prompt;
+  const output = basePrompt + entryContents + queryPart;
+  return output;
 }
