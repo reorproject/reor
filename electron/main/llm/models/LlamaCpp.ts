@@ -35,9 +35,9 @@ export class LlamaCPPSessionService implements ISessionService {
   private async loadModel(localModelPath: string): Promise<void> {
     // try {
     const nodeLLamaCpp = await import("node-llama-cpp");
-    const llama = await nodeLLamaCpp.getLlama();
+    // const llama = await nodeLLamaCpp.getLlama();
     this.model = new nodeLLamaCpp.LlamaModel({
-      llama,
+      // llama,
       modelPath: localModelPath,
       gpuLayers: getGPULayersToUse(),
     });
