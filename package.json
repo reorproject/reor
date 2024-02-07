@@ -94,7 +94,6 @@
     "vite-plugin-electron-renderer": "^0.14.5"
   },
   "optionalDependencies": {
-    "@lancedb/vectordb-win32-x64-msvc": "0.3.6",
     "dmg-license": "^1.0.11"
   },
   "engines": {
