@@ -12,7 +12,7 @@
   },
   win: {
     artifactName: "${productName}_${version}.${ext}",
-    asarUnpack: ["**/node_modules/vectordb/**"],
+    asarUnpack: ["**/*.{node,dll,metal,exp,lib}"],
     target: [
       {
         target: "nsis",
