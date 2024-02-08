@@ -38,6 +38,10 @@ export class LanceDBTableWrapper {
         x.content = sanitizePathForDatabase(x.content);
         return x;
       });
+    console.log("Adding data to DB:");
+    if (data.length > 0) {
+      console.log("first item: ", data[0]);
+    }
     const recordEntry: Record<string, unknown>[] = data as unknown as Record<
       string,
       unknown
@@ -47,12 +51,17 @@ export class LanceDBTableWrapper {
     for (let i = 0; i < recordEntry.length; i += chunkSize) {
       chunks.push(recordEntry.slice(i, i + chunkSize));
     }
-
+    console.log("Chunks:");
+    if (chunks.length > 0) {
+      console.log("first chunk: ", chunks[0]);
+    }
     let index = 0;
     const totalChunks = chunks.length;
     for (const chunk of chunks) {
       try {
+        console.log("Adding chunk to DB:");
         await this.table.add(chunk);
+        console.log("Done adding chunk to DB");
       } catch (error) {
         console.error("Error adding chunk to DB:", error);
       }

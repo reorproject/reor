@@ -14,16 +14,38 @@ export const repopulateTableWithMissingItems = async (
   onProgress?: (progress: number) => void
 ) => {
   const filesInfoTree = GetFilesInfoList(directoryPath);
+  console.log("got files info list: ", filesInfoTree.length);
+  if (filesInfoTree.length > 0) {
+    console.log("files info tree length: ", filesInfoTree[0]);
+  }
   const tableArray = await getTableAsArray(table);
+  console.log("got table as array: " + tableArray.length);
+  if (tableArray.length > 0) {
+    console.log("table array length: ", tableArray[0]);
+  }
   const dbItemsToAdd = await computeDbItemsToAdd(filesInfoTree, tableArray);
+  console.log("got db items to add: ", dbItemsToAdd.length);
+  if (dbItemsToAdd.length > 0) {
+    console.log("db items to add length: ", dbItemsToAdd[0]);
+  }
   if (dbItemsToAdd.length == 0) {
     console.log("no items to add");
     onProgress && onProgress(1);
     return;
   }
   const filePathsToDelete = dbItemsToAdd.map((x) => x[0].notepath);
+  console.log("deleting db items by file paths: ", filePathsToDelete.length);
+  if (filePathsToDelete.length > 0) {
+    console.log("file paths to delete length: ", filePathsToDelete[0]);
+  }
   await table.deleteDBItemsByFilePaths(filePathsToDelete);
+  console.log("done deleting");
+
   const flattenedItemsToAdd = dbItemsToAdd.flat();
+  console.log("flattened items to add: ", flattenedItemsToAdd.length);
+  if (flattenedItemsToAdd.length > 0) {
+    console.log("flattened items to add length: ", flattenedItemsToAdd[0]);
+  }
   await table.add(flattenedItemsToAdd, onProgress);
   console.log("done adding");
   onProgress && onProgress(1);
