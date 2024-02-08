@@ -5,6 +5,7 @@ import {
   createEmbeddingFunction,
 } from "./Embeddings";
 import {
+  convertLanceEntryToDBEntry,
   convertLanceResultToDBResult,
   sanitizePathForDatabase,
 } from "./TableHelperFunctions";
@@ -103,13 +104,10 @@ export class LanceDBTableWrapper {
 
   async filter(filterString: string, limit: number = 10): Promise<DBEntry[]> {
     const rawResults = await this.table
-      .search(Array(768).fill(1)) // TODO: remove hardcoding
-      .metricType(MetricType.Cosine)
       .filter(filterString)
       .limit(limit)
       .execute();
-    const mapped = rawResults.map(convertLanceResultToDBResult);
-    // const filtered = mapped.filter((x) => x !== null);
+    const mapped = rawResults.map(convertLanceEntryToDBEntry);
     return mapped as DBEntry[];
   }
 

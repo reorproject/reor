@@ -103,8 +103,8 @@ const SettingsModal: React.FC<ModalProps> = ({
             <div className="w-full">
               <RagSettings>
                 <h2 className="text-2xl font-semibold mb-0 text-white">RAG</h2>{" "}
-                <p className="mt-5 text-sm text-gray-100 mb-1">
-                  Maximum number of examples to use in Q&A:
+                <p className="mt-2 text-sm text-gray-100 mb-1">
+                  Number of notes to feed to the LLM during Q&A:
                 </p>
               </RagSettings>
             </div>

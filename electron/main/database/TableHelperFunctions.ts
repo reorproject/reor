@@ -21,7 +21,7 @@ export const repopulateTableWithMissingItems = async (
   const tableArray = await getTableAsArray(table);
   console.log("got table as array: " + tableArray.length);
   if (tableArray.length > 0) {
-    console.log("table array length: ", tableArray[0]);
+    console.log("table array: ", tableArray[0]);
   }
   const dbItemsToAdd = await computeDbItemsToAdd(filesInfoTree, tableArray);
   console.log("got db items to add: ", dbItemsToAdd.length);
@@ -173,6 +173,25 @@ export const updateFileInTable = async (
   });
   await dbTable.add(dbEntries);
 };
+
+export function convertLanceEntryToDBEntry(
+  record: Record<string, unknown>
+): DBEntry | null {
+  if (
+    DatabaseFields.NOTE_PATH in record &&
+    DatabaseFields.VECTOR in record &&
+    DatabaseFields.CONTENT in record &&
+    DatabaseFields.SUB_NOTE_INDEX in record &&
+    DatabaseFields.TIME_ADDED in record
+  ) {
+    const recordAsDBQueryType = record as unknown as DBEntry;
+    recordAsDBQueryType.notepath = unsanitizePathForFileSystem(
+      recordAsDBQueryType.notepath
+    );
+    return recordAsDBQueryType;
+  }
+  return null;
+}
 
 export function convertLanceResultToDBResult(
   record: Record<string, unknown>
