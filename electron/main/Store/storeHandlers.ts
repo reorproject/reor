@@ -3,7 +3,6 @@ import { AIModelConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 import { validateAIModelConfig } from "../llm/llmConfig";
 import { FSWatcher } from "fs";
-import * as path from "path";
 
 export const registerStoreHandlers = (
   store: Store<StoreSchema>,
@@ -51,9 +50,9 @@ export const registerStoreHandlers = (
     return aiModelConfigs || {};
   });
 
-  ipcMain.handle("add-remote-models-to-store", async () => {
-    await addRemoteModelsToElectronStore(store);
-  });
+  // ipcMain.handle("add-remote-models-to-store", async () => {
+  //   await addRemoteModelsToElectronStore(store);
+  // });
 
   ipcMain.handle("update-ai-model-config", (event, modelName, modelConfig) => {
     console.log("updating ai model config", modelName, modelConfig);
@@ -69,32 +68,12 @@ export const registerStoreHandlers = (
 
   // Refactored ipcMain.handle to use the new function
   ipcMain.handle(
-    "setup-new-local-model",
-    async (event, modelConfig: AIModelConfig) => {
-      // ok well maybe here we could leverage the path module and use that to pass the name through.
+    "setup-new-model",
+    async (event, modelName: string, modelConfig: AIModelConfig) => {
       console.log("setting up new local model", modelConfig);
-      return addNewModelSchemaToStore(
-        store,
-        path.basename(modelConfig.localPath),
-        modelConfig
-      );
+      return await addNewModelSchemaToStore(store, modelName, modelConfig);
     }
   );
-
-  ipcMain.on("set-openai-api-key", (event, apiKey: string) => {
-    console.log("setting openai api key", apiKey);
-    try {
-      store.set(StoreKeys.UserOpenAIAPIKey, apiKey);
-    } catch (error) {
-      console.error("Error setting openai api key", error);
-    }
-    event.returnValue = "success";
-  });
-
-  ipcMain.on("get-openai-api-key", (event) => {
-    const apiKey = store.get(StoreKeys.UserOpenAIAPIKey);
-    event.returnValue = apiKey;
-  });
 
   ipcMain.on("get-user-directory", (event) => {
     const path = store.get(StoreKeys.UserDirectory);
@@ -115,13 +94,10 @@ export async function addNewModelSchemaToStore(
     (store.get(StoreKeys.AIModels) as Record<string, AIModelConfig>) || {};
 
   if (!existingModels[modelName]) {
-    console.log("validating model config");
     const isNotValid = validateAIModelConfig(modelName, modelConfig);
     if (isNotValid) {
-      console.log("invalid model config");
-      return isNotValid;
+      throw new Error(isNotValid);
     }
-    console.log("model config is valid");
 
     const updatedModels = {
       ...existingModels,
@@ -133,33 +109,6 @@ export async function addNewModelSchemaToStore(
     return "Model set up successfully";
   } else {
     return "Model already exists";
-  }
-}
-
-const remoteAIModels: { [modelName: string]: AIModelConfig } = {
-  "gpt-3.5-turbo-1106": {
-    localPath: "",
-    contextLength: 16385,
-    engine: "openai",
-  },
-
-  "gpt-4-0613": {
-    localPath: "",
-    contextLength: 8192,
-    engine: "openai",
-  },
-  "gpt-4-1106-preview": {
-    localPath: "",
-    contextLength: 128000,
-    engine: "openai",
-  },
-};
-
-export async function addRemoteModelsToElectronStore(
-  store: Store<StoreSchema>
-) {
-  for (const [modelName, modelConfig] of Object.entries(remoteAIModels)) {
-    await addNewModelSchemaToStore(store, modelName, modelConfig);
   }
 }
 

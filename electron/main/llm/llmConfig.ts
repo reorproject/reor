@@ -18,7 +18,11 @@ export function validateAIModelConfig(
   if (config.engine !== "openai" && config.engine !== "llamacpp") {
     return "Engine must be either 'openai' or 'llamacpp'.";
   }
-  if (config.engine == "llamacpp" && !config.localPath.trim()) {
+  if (
+    config.type == "local" &&
+    !config.localPath &&
+    !config.localPath?.trim()
+  ) {
     return "Local path is required.";
   }
 

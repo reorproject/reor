@@ -6,7 +6,7 @@ import {
   OpenAIMessage,
 } from "../Types";
 import { Tiktoken, TiktokenModel, encodingForModel } from "js-tiktoken";
-import { AIModelConfig } from "electron/main/Store/storeConfig";
+import { OpenAIAIModelConfig } from "electron/main/Store/storeConfig";
 
 export class OpenAIModelSessionService implements ISessionService {
   private openai: OpenAI;
@@ -14,14 +14,21 @@ export class OpenAIModelSessionService implements ISessionService {
   private messageHistory: ChatbotMessage[];
   private abortStreaming: boolean = false;
   private tokenEncoding: Tiktoken;
-  private modelConfig: AIModelConfig;
+  private modelConfig: OpenAIAIModelConfig;
 
-  constructor(apiKey: string, modelName: string, modelConfig: AIModelConfig) {
-    this.openai = new OpenAI({ apiKey });
+  constructor(modelName: string, modelConfig: OpenAIAIModelConfig) {
+    this.openai = new OpenAI({
+      apiKey: modelConfig.apiKey,
+      baseURL: modelConfig.apiURL,
+    });
     this.modelConfig = modelConfig;
     this.modelName = modelName;
     this.messageHistory = [];
-    this.tokenEncoding = encodingForModel(this.modelName as TiktokenModel);
+    try {
+      this.tokenEncoding = encodingForModel(modelName as TiktokenModel);
+    } catch (e) {
+      this.tokenEncoding = encodingForModel("gpt-3.5-turbo-1106"); // hack while we think about what to do with custom remote models' tokenizers
+    }
   }
 
   async init(): Promise<void> {
@@ -47,8 +54,7 @@ export class OpenAIModelSessionService implements ISessionService {
 
   async streamingPrompt(
     prompt: string,
-    sendFunctionImplementer: ISendFunctionImplementer,
-    apiKey?: string
+    sendFunctionImplementer: ISendFunctionImplementer
   ): Promise<string> {
     if (!this.isModelLoaded()) {
       throw new Error("Model not initialized");
@@ -63,9 +69,6 @@ export class OpenAIModelSessionService implements ISessionService {
     });
 
     try {
-      if (apiKey) {
-        this.openai.apiKey = apiKey;
-      }
       const openAIMessages = this.messageHistory.map((msg) => ({
         role: msg.role,
         content: msg.content,

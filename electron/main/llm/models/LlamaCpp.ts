@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AIModelConfig } from "electron/main/Store/storeConfig";
+import { LocalAIModelConfig } from "electron/main/Store/storeConfig";
 import { ISendFunctionImplementer, ISessionService } from "../Types";
 
 export class LlamaCPPSessionService implements ISessionService {
@@ -9,7 +9,7 @@ export class LlamaCPPSessionService implements ISessionService {
   private abortController?: AbortController;
   private contextLength?: number;
 
-  async init(storeModelConfig: AIModelConfig): Promise<void> {
+  async init(storeModelConfig: LocalAIModelConfig): Promise<void> {
     this.contextLength = storeModelConfig.contextLength;
     await this.loadModel(storeModelConfig.localPath);
 

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@material-tailwind/react";
 import Modal from "../Generic/Modal";
 import ExternalLink from "../Generic/ExternalLink";
-import { AIModelConfig } from "electron/main/Store/storeConfig";
+import { LocalAIModelConfig } from "electron/main/Store/storeConfig";
 import CustomSelect from "../Generic/Select";
 
 interface LocalModelModalProps {
@@ -44,13 +44,17 @@ const LocalModelModal: React.FC<LocalModelModalProps> = ({
       onClose();
       return;
     }
-    const newConfig: AIModelConfig = {
+
+    const newModelName = await window.path.basename(newModelPath);
+    console.log("newModelName: ", newModelName);
+    const newConfig: LocalAIModelConfig = {
+      type: "local",
       localPath: newModelPath,
       contextLength: parseInt(selectedContextLength),
       engine: "llamacpp",
     };
 
-    const res = await window.electronStore.setupNewLocalLLM(newConfig);
+    const res = await window.electronStore.setupNewLLM(newModelName, newConfig);
     console.log("setupNewLocalLLM response: ", res);
     onClose();
   };

@@ -52,6 +52,9 @@ declare global {
         destinationPath: string
       ) => Promise<void>;
     };
+    path: {
+      basename: (pathString: string) => string;
+    };
     llm: {
       createSession: (sessionId: string) => Promise<string>;
       doesSessionExist: (sessionId: string) => Promise<boolean>;
@@ -65,16 +68,15 @@ declare global {
     electronStore: {
       setUserDirectory: (path: string) => Promise<void>;
       getUserDirectory: () => string;
-      setOpenAIAPIKey: (apiKey: string) => Promise<void>;
-      getOpenAIAPIKey: () => string;
       getAIModelConfigs: () => Promise<Record<string, AIModelConfig>>;
-      addRemoteModelsToStore: () => Promise<void>;
       updateAIModelConfig: (
         modelName: string,
         modelConfig: AIModelConfig
       ) => Promise<void>;
-      setupNewLocalLLM: (modelConfig: AIModelConfig) => Promise<void>;
-
+      setupNewLLM: (
+        modelName: string,
+        modelConfig: AIModelConfig
+      ) => Promise<void>;
       setDefaultAIModel: (modelName: string) => void;
       getDefaultAIModel: () => string;
       getDefaultEmbedFuncRepo: () => string;
@@ -122,20 +124,11 @@ contextBridge.exposeInMainWorld("electronStore", {
   setUserDirectory: (path: string) => {
     return ipcRenderer.sendSync("set-user-directory", path);
   },
-  setOpenAIAPIKey: (apiKey: string) => {
-    return ipcRenderer.sendSync("set-openai-api-key", apiKey);
-  },
-  getOpenAIAPIKey: () => {
-    return ipcRenderer.sendSync("get-openai-api-key");
-  },
   getUserDirectory: () => {
     return ipcRenderer.sendSync("get-user-directory");
   },
   getAIModelConfigs: async (): Promise<AIModelConfig[]> => {
     return ipcRenderer.invoke("get-ai-model-configs");
-  },
-  addRemoteModelsToStore: async () => {
-    return ipcRenderer.invoke("add-remote-models-to-store");
   },
   updateAIModelConfig: async (
     modelName: string,
@@ -143,8 +136,8 @@ contextBridge.exposeInMainWorld("electronStore", {
   ) => {
     return ipcRenderer.invoke("update-ai-model-config", modelName, modelConfig);
   },
-  setupNewLocalLLM: async (modelConfig: AIModelConfig) => {
-    return ipcRenderer.invoke("setup-new-local-model", modelConfig);
+  setupNewLLM: async (modelName: string, modelConfig: AIModelConfig) => {
+    return ipcRenderer.invoke("setup-new-model", modelName, modelConfig);
   },
   setDefaultAIModel: (modelName: string) => {
     ipcRenderer.send("set-default-ai-model", modelName);
@@ -217,6 +210,11 @@ contextBridge.exposeInMainWorld("files", {
   moveFileOrDir: async (sourcePath: string, destinationPath: string) => {
     return ipcRenderer.invoke("move-file-or-dir", sourcePath, destinationPath);
   },
+});
+
+contextBridge.exposeInMainWorld("path", {
+  basename: (pathString: string) =>
+    ipcRenderer.invoke("path-basename", pathString),
 });
 
 contextBridge.exposeInMainWorld("llm", {

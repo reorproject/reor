@@ -13,8 +13,7 @@ export interface ISessionService {
    */
   streamingPrompt(
     prompt: string,
-    sendFunctionImplementer: ISendFunctionImplementer,
-    apiKey?: string
+    sendFunctionImplementer: ISendFunctionImplementer
   ): Promise<string>;
 
   /**

@@ -3,8 +3,9 @@ import { AIModelConfig } from "electron/main/Store/storeConfig";
 import CustomSelect from "../Generic/Select";
 import { Button } from "@material-tailwind/react";
 import LocalModelModal from "./NewLocalModel";
-import RemoteLLMModal from "./RemoteLLMSetup";
+import OpenAISetupModal from "./OpenAISetup";
 import ContextLengthModal from "./ContextLengthSettings";
+import RemoteLLMSetupModal from "./RemoteLLMSetup";
 
 interface LLMSettingsProps {
   userHasCompleted?: (completed: boolean) => void;
@@ -28,6 +29,9 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
   const [isRemoteLLMModalOpen, setIsRemoteLLMModalOpen] =
     useState<boolean>(false);
 
+  const [isOpenAIModelModalOpen, setIsOpenAIModelModalOpen] =
+    useState<boolean>(false);
+
   const [isConextLengthModalOpen, setIsContextLengthModalOpen] =
     useState<boolean>(false);
 
@@ -47,7 +51,12 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
 
   useEffect(() => {
     fetchModelConfigs();
-  }, [isConextLengthModalOpen, isNewLocalModelModalOpen, isRemoteLLMModalOpen]);
+  }, [
+    isConextLengthModalOpen,
+    isNewLocalModelModalOpen,
+    isRemoteLLMModalOpen,
+    isOpenAIModelModalOpen,
+  ]);
 
   useEffect(() => {
     // this condition may in fact be less necessary: no need for the user to use chatbot...
@@ -90,15 +99,22 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
           </p> */}
           <div className="flex">
             <Button
-              className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mr-4"
+              className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mr-2"
               onClick={() => setIsNewLocalModelModalOpen(true)}
               placeholder={""}
             >
               Attach Local LLM
             </Button>
             <Button
-              className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mb-3 mr-4"
+              className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mb-3 mr-2"
               onClick={() => setIsRemoteLLMModalOpen(true)}
+              placeholder=""
+            >
+              Attach remote LLM
+            </Button>
+            <Button
+              className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mb-3 mr-2"
+              onClick={() => setIsOpenAIModelModalOpen(true)}
               placeholder=""
             >
               Connect to OpenAI
@@ -150,7 +166,7 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
             </Button>
           </div>
 
-          <h4 className="text-gray-100 mb-0">Setup remote (OpenAI) LLMs:</h4>
+          <h4 className="text-gray-100 mb-0">Setup remote LLMs:</h4>
           <div className="flex">
             <Button
               className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
@@ -159,7 +175,14 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
             >
               Remote LLM Setup
             </Button>
-            <div className="border-none h-8 w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1"></div>
+            <Button
+              className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
+              onClick={() => setIsOpenAIModelModalOpen(true)}
+              placeholder=""
+            >
+              OpenAI Setup
+            </Button>
+            {/* <div className="border-none h-8 w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1"></div> */}
           </div>
         </div>
       )}
@@ -170,6 +193,12 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
           setIsNewLocalModelModalOpen(false);
         }}
       />
+      <RemoteLLMSetupModal
+        isOpen={isRemoteLLMModalOpen}
+        onClose={() => {
+          setIsRemoteLLMModalOpen(false);
+        }}
+      />
       <ContextLengthModal
         isOpen={isConextLengthModalOpen}
         onClose={() => {
@@ -177,10 +206,10 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
         }}
         modelConfigs={modelConfigs}
       />
-      <RemoteLLMModal
-        isOpen={isRemoteLLMModalOpen}
+      <OpenAISetupModal
+        isOpen={isOpenAIModelModalOpen}
         onClose={() => {
-          setIsRemoteLLMModalOpen(false);
+          setIsOpenAIModelModalOpen(false);
         }}
       />
       {userTriedToSubmit && !defaultModel && (

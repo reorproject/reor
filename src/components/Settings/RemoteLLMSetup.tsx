@@ -1,65 +1,131 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@material-tailwind/react";
 import Modal from "../Generic/Modal";
+import { AIModelConfig } from "electron/main/Store/storeConfig";
+import CustomSelect from "../Generic/Select";
+import { errorToString } from "@/functions/error";
+import ExternalLink from "../Generic/ExternalLink";
 
 interface RemoteLLMModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const RemoteLLMModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose }) => {
-  const [openAIKey, setOpenAIKey] = useState("");
+const contextLengthOptions = [
+  { label: "1024", value: "1024" },
+  { label: "2048", value: "2048" },
+  { label: "4096", value: "4096" },
+  { label: "8192", value: "8192" },
+  { label: "16384", value: "16384" },
+  { label: "32768", value: "32768" },
+];
 
-  useEffect(() => {
-    const key = window.electronStore.getOpenAIAPIKey() || ""; // Fallback to empty string if undefined
-    setOpenAIKey(key);
-  }, []);
+const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
+  isOpen,
+  onClose: parentOnClose,
+}) => {
+  const [modelName, setModelName] = useState<string>("");
+  const [apiURL, setApiURL] = useState<string>("");
+  const [apiKey, setApiKey] = useState<string>("");
+  const [selectedContextLength, setSelectedContextLength] = useState(
+    contextLengthOptions[1].value
+  );
+  const [currentError, setCurrentError] = useState<string>("");
 
-  const handleSave = () => {
-    if (openAIKey) {
-      window.electronStore.setOpenAIAPIKey(openAIKey);
-      window.electronStore.addRemoteModelsToStore();
+  const handleSave = async () => {
+    const modelConfig: AIModelConfig = {
+      type: "openai",
+      contextLength: parseInt(selectedContextLength),
+      apiURL,
+      apiKey,
+      engine: "openai",
+    };
+    try {
+      await window.electronStore.setupNewLLM(modelName, modelConfig);
+      parentOnClose();
+    } catch (error) {
+      console.error("Failed to save remote model configuration:", error);
+      setCurrentError(errorToString(error));
     }
-
-    onClose();
   };
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+
+  const handleClose = () => {
+    if (modelName && apiURL) {
       handleSave();
+    } else {
+      parentOnClose();
     }
   };
-
   return (
-    <Modal isOpen={isOpen} onClose={handleSave}>
-      <div className="w-[300px] ml-3 mr-2 mb-2">
-        <h3 className="font-semibold mb-0 text-white">OpenAI Setup</h3>
+    <Modal isOpen={isOpen} onClose={handleClose}>
+      <div className="w-[400px] ml-3 mr-2 mb-2">
+        <h2 className="font-semibold mb-0 text-white">Remote LLM Setup</h2>
         <p className="text-gray-100 mb-2 mt-2 text-sm">
-          Enter your OpenAI API key below:
+          Connect with a custom OpenAI-like API endpoint like{" "}
+          <ExternalLink
+            url="https://github.com/oobabooga/text-generation-webui/wiki/12-%E2%80%90-OpenAI-API"
+            label="Oobabooga"
+          />
+          .
         </p>
+
+        <h4 className="text-gray-100 mb-1">API URL</h4>
+        {/* Forc */}
         <input
           type="text"
-          className="block w-full px-3 py-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
-          value={openAIKey}
-          onChange={(e) => setOpenAIKey(e.target.value)}
-          onKeyDown={handleKeyPress}
-          placeholder="OpenAI API Key"
+          placeholder="API URL"
+          value={apiURL}
+          onChange={(e) => setApiURL(e.target.value)}
+          className="block w-full px-3 py-2 mb-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
         />
         <p className="mt-2 text-gray-100 text-xs">
-          <i>
-            You&apos;ll then be able to choose an OpenAI model in the model
-            dropdown...
-          </i>
+          (This must be an OpenAI compatible API endpoint.)
         </p>
+        <h4 className="text-gray-100 mb-1">Model Name</h4>
+        <input
+          type="text"
+          placeholder="Model Name"
+          value={modelName}
+          onChange={(e) => setModelName(e.target.value)}
+          className="block w-full px-3 py-2 mb-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
+        />
+        <p className="mt-2 text-gray-100 text-xs">
+          (Model alias like &quot;gpt-3.5-turbo-1106&quot;)
+        </p>
+
+        <h4 className="text-gray-100 mb-1">Optional API Key</h4>
+        <input
+          type="text"
+          placeholder="API Key"
+          value={apiKey}
+          onChange={(e) => setApiKey(e.target.value)}
+          className="block w-full px-3 py-2 mb-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
+        />
+        <p className="mt-2 text-gray-100 text-xs">
+          (If your endpoint requires an API key.)
+        </p>
+        <h4 className="text-gray-100 mb-1">Context Length</h4>
+        <CustomSelect
+          options={contextLengthOptions}
+          value={selectedContextLength}
+          onChange={(newValue) => {
+            setSelectedContextLength(newValue);
+          }}
+        />
+
         <Button
-          className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mt-1 w-[80px]"
+          className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mt-3 w-[80px]"
           onClick={handleSave}
           placeholder=""
         >
           Save
         </Button>
+        {currentError && (
+          <p className="text-xs text-red-500 mt-2">{currentError}</p>
+        )}
       </div>
     </Modal>
   );
 };
 
-export default RemoteLLMModal;
+export default RemoteLLMSetupModal;

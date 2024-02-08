@@ -61,8 +61,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
         throw new Error(`Session ${sessionId} does not exist.`);
       }
 
-      const apiKey: string = store.get(StoreKeys.UserOpenAIAPIKey);
-      return sessionService.streamingPrompt(prompt, event.sender, apiKey);
+      return sessionService.streamingPrompt(prompt, event.sender);
     }
   );
 };
@@ -85,15 +84,8 @@ async function createSession(
 
   const currentConfig = allConfigs[defaultModelName];
 
-  if (currentConfig.engine === "openai") {
-    const openAIAPIKey: string = store.get(StoreKeys.UserOpenAIAPIKey);
-    if (!openAIAPIKey) {
-      throw new Error(
-        "OpenAI API key not set. Please set it in settings and re-open the chat window."
-      );
-    }
+  if (currentConfig.type === "openai") {
     const sessionService = new OpenAIModelSessionService(
-      openAIAPIKey,
       defaultModelName,
       currentConfig
     );

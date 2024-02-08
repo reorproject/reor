@@ -1,9 +1,21 @@
-export interface AIModelConfig {
-  localPath: string;
-  contextLength?: number;
+interface BaseAIModelConfig {
+  contextLength: number;
   errorMsg?: string;
   engine: "openai" | "llamacpp";
 }
+
+export interface OpenAIAIModelConfig extends BaseAIModelConfig {
+  type: "openai";
+  apiURL: string;
+  apiKey: string;
+}
+
+export interface LocalAIModelConfig extends BaseAIModelConfig {
+  type: "local";
+  localPath: string;
+}
+
+export type AIModelConfig = OpenAIAIModelConfig | LocalAIModelConfig;
 
 export interface RAGConfig {
   maxRAGExamples: number;
@@ -12,7 +24,6 @@ export interface RAGConfig {
 export interface StoreSchema {
   user: {
     directory?: string;
-    openAIAPIKey?: string;
   };
   aiModels: {
     [modelName: string]: AIModelConfig;
@@ -25,7 +36,6 @@ export interface StoreSchema {
 // Enum for store keys
 export enum StoreKeys {
   UserDirectory = "user.directory",
-  UserOpenAIAPIKey = "user.openAIAPIKey",
   AIModels = "aiModels",
   DefaultAIModel = "defaultAIModel",
   DefaultEmbedFuncRepo = "defaultEmbedFuncRepo",

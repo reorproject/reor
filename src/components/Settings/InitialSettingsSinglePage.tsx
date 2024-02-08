@@ -44,7 +44,8 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
           </p>
           <DirectorySelector setErrorMsg={setErrorMsg} />
           <p className="mt-2 text-xs text-gray-100 ">
-            (Your vault directory doesn&apos;t need to be empty)
+            (Your vault directory doesn&apos;t need to be empty. Only markdown
+            files will be indexed.)
           </p>
 
           <div className="mt-8">
@@ -53,9 +54,6 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
             </EmbeddingModelManager>
           </div>
           <LLMSettings isInitialSetup={true} />
-          <p className="mt-0 text-gray-100 text-xs">
-            (You can customize your models later)
-          </p>
           <Button
             className="bg-slate-700 mt-4 mb-3  border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
             onClick={handleNext}

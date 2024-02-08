@@ -69,7 +69,11 @@ const SettingsModal: React.FC<ModalProps> = ({
         {/* Right Content Area */}
         <div className="flex-1 ml-2">
           {/* <h2 className="text-2xl font-semibold mb-4 text-white">Settings</h2> */}
-
+          {activeTab === "llmSettings" && (
+            <div className="mt-2 w-full">
+              <LLMSettings />
+            </div>
+          )}
           {activeTab === "embeddingModel" && (
             <div className="w-full">
               <EmbeddingModelManager
@@ -92,12 +96,6 @@ const SettingsModal: React.FC<ModalProps> = ({
                 {/* <EmbeddingModelManager.childrenBelowDropdown> */}
                 {/* </EmbeddingModelManager.childrenBelowDropdown> */}
               </EmbeddingModelManager>
-            </div>
-          )}
-
-          {activeTab === "llmSettings" && (
-            <div className="mt-2 w-full">
-              <LLMSettings />
             </div>
           )}
 

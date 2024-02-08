@@ -25,6 +25,15 @@ module.exports = {
         "react/prop-types": "off",
       },
     },
+    {
+      // Applies to all files
+      files: ["*"],
+      rules: {
+        "@typescript-eslint/no-unused-vars": "warn",
+        "react/no-unescaped-entities": "warn",
+        // ... add other specific rules you want as warnings here ...
+      },
+    },
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
