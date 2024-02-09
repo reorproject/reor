@@ -207,9 +207,11 @@ export const updateFileInTable = async (
 ): Promise<void> => {
   await dbTable.deleteDBItemsByFilePaths([filePath]);
   const currentTimestamp: Date = new Date();
+  console.log("starting chunk");
   const chunkedContentList = await chunkMarkdownByHeadingsAndByCharsIfBig(
     content
   );
+  console.log("done chunk");
   const dbEntries = chunkedContentList.map((content, index) => {
     return {
       notepath: filePath,
@@ -219,6 +221,7 @@ export const updateFileInTable = async (
       filemodified: currentTimestamp,
     };
   });
+  console.log("db entreis: ", dbEntries.length);
   await dbTable.add(dbEntries);
 };
 
