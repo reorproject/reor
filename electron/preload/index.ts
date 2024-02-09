@@ -46,6 +46,7 @@ declare global {
       writeFile: (filePath: string, content: string) => Promise<void>;
       readFile: (filePath: string) => Promise<string>;
       createFile: (filePath: string, content: string) => Promise<void>;
+      createDirectory: (dirPath: string) => Promise<void>;
       joinPath: (...pathSegments: string[]) => Promise<string>;
       moveFileOrDir: (
         sourcePath: string,
@@ -198,6 +199,10 @@ contextBridge.exposeInMainWorld("files", {
 
   createFile: async (filePath: string, content: string) => {
     return ipcRenderer.invoke("create-file", filePath, content);
+  },
+
+  createDirectory: async (dirPath: string) => {
+    return ipcRenderer.invoke("create-directory", dirPath);
   },
 
   // Read content from a file

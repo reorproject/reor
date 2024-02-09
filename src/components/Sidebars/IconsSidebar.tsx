@@ -7,6 +7,8 @@ import { IoFolderOutline } from "react-icons/io5";
 import { FaSearch } from "react-icons/fa";
 import { FaRegPenToSquare } from "react-icons/fa6";
 import NewNoteComponent from "../File/NewNote";
+import { PiFolderPlusDuotone } from "react-icons/pi";
+import { HiFolderPlus } from "react-icons/hi2";
 
 interface LeftSidebarProps {
   onFileSelect: (path: string) => void;
@@ -72,6 +74,20 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
           // }}
         >
           <FaRegPenToSquare className="text-gray-200" size={20} />
+        </div>
+      </div>
+      <div
+        className="bg-transparent border-none cursor-pointer flex items-center justify-center w-full h-8 mt-1"
+        onClick={toggleModal}
+      >
+        <div
+          className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-slate-700"
+          // style={{
+          //   backgroundColor: sidebarShowing === "search" ? "#334155" : "",
+          // }}
+        >
+          <HiFolderPlus className="text-gray-200" size={25} />
+          {/* <FaRegPenToSquare className="text-gray-200" size={20} /> */}
         </div>
       </div>
       <NewNoteComponent
