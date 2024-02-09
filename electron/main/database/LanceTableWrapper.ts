@@ -36,7 +36,7 @@ export class LanceDBTableWrapper {
     data = data
       .filter((x) => x.content !== "")
       .map((x) => {
-        x.content = sanitizePathForDatabase(x.content);
+        x.notepath = sanitizePathForDatabase(x.notepath);
         return x;
       });
     console.log("Adding data to DB:");
