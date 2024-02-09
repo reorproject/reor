@@ -52,19 +52,25 @@ export const repopulateTableWithMissingItems = async (
 };
 
 const getTableAsArray = async (table: LanceDBTableWrapper) => {
+  console.log("starting table count:");
   const totalRows = await table.countRows();
   if (totalRows == 0) {
+    console.log("total rows is 0");
     return [];
   }
+  console.log("total rows: ", totalRows);
   const nonEmptyResults = await table.filter(
     `${DatabaseFields.CONTENT} != ''`,
     totalRows
   );
+  console.log("non empty results: ", nonEmptyResults.length);
   const emptyResults = await table.filter(
     `${DatabaseFields.CONTENT} = ''`,
     totalRows
   );
+  console.log("empty results: ", emptyResults.length);
   const results = nonEmptyResults.concat(emptyResults);
+  console.log("concated results: ", results.length);
   return results;
 };
 
@@ -74,29 +80,71 @@ const computeDbItemsToAdd = async (
 ): Promise<DBEntry[][]> => {
   const promises = filesInfoList.map(convertFileTypeToDBType);
 
-  const convertedItems = await Promise.all(promises);
+  const filesAsChunksToAddToDB = await Promise.all(promises);
 
-  return convertedItems.filter((listOfChunks) =>
-    filterChunksNotInTable(listOfChunks, tableArray)
+  return filesAsChunksToAddToDB.filter((chunksBelongingToFile) =>
+    filterChunksNotInTable(chunksBelongingToFile, tableArray)
   );
 };
 
 const filterChunksNotInTable = (
-  listOfChunks: DBEntry[],
+  chunksBelongingToFile: DBEntry[],
   tableArray: DBEntry[]
 ): boolean => {
-  if (listOfChunks.length == 0) {
+  if (chunksBelongingToFile.length == 0) {
     return false;
   }
-  if (listOfChunks[0].content == "") {
+  if (chunksBelongingToFile[0].content == "") {
     return false;
   }
-  const notepath = listOfChunks[0].notepath;
+  const notepath = chunksBelongingToFile[0].notepath;
   const itemsAlreadyInTable = tableArray.filter(
     (item) => item.notepath == notepath
   );
-  return listOfChunks.length != itemsAlreadyInTable.length;
+  return chunksBelongingToFile.length != itemsAlreadyInTable.length;
 };
+
+// const computeDbItemsToAddWithTableReference = async (
+//   filesInfoList: FileInfo[],
+//   table: LanceDBTableWrapper
+// ): Promise<DBEntry[][]> => {
+//   const conversionPromises = filesInfoList.map(convertFileTypeToDBType);
+//   const filesAsChunksToAddToDB = await Promise.all(conversionPromises);
+
+//   const filterPromises = filesAsChunksToAddToDB.map(
+//     (chunksBelongingToFile, index) => {
+//       console.log("index is: ", index);
+//       return filterChunksNotInTableWithTableReference(
+//         chunksBelongingToFile,
+//         table
+//       );
+//     }
+//   );
+
+//   const filterResults = await Promise.all(filterPromises);
+
+//   const outputChunks = filesAsChunksToAddToDB.filter(
+//     (_, index) => filterResults[index]
+//   );
+//   return outputChunks;
+// };
+
+// const filterChunksNotInTableWithTableReference = async (
+//   chunksBelongingToFile: DBEntry[],
+//   table: LanceDBTableWrapper
+// ): Promise<boolean> => {
+//   if (chunksBelongingToFile.length == 0) {
+//     return false;
+//   }
+//   if (chunksBelongingToFile[0].content == "") {
+//     return false;
+//   }
+//   const notepath = chunksBelongingToFile[0].notepath;
+//   const itemsAlreadyInTable = await table.filter(
+//     `${DatabaseFields.NOTE_PATH} = '${notepath}'`
+//   );
+//   return chunksBelongingToFile.length != itemsAlreadyInTable.length;
+// };
 
 const convertFileTreeToDBEntries = async (
   tree: FileInfoTree
