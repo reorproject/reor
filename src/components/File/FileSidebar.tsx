@@ -18,23 +18,32 @@ export const FileSidebar: React.FC<FileListProps> = ({
 
   const directoryPath = window.electronStore.getUserDirectory();
 
-  // Sorting function
-  const sortFiles = (fileList: FileInfoTree): FileInfoTree => {
+  const sortFilesAndDirectories = (fileList: FileInfoTree): FileInfoTree => {
     fileList.sort((a, b) => {
-      if (isFileNodeDirectory(a) && !isFileNodeDirectory(b)) {
+      const aIsDirectory = isFileNodeDirectory(a);
+      const bIsDirectory = isFileNodeDirectory(b);
+
+      // Both are directories: sort alphabetically
+      if (aIsDirectory && bIsDirectory) {
+        return a.name.localeCompare(b.name);
+      }
+
+      // One is a directory and the other is a file
+      if (aIsDirectory && !bIsDirectory) {
         return -1;
       }
-      if (!isFileNodeDirectory(a) && isFileNodeDirectory(b)) {
+      if (!aIsDirectory && bIsDirectory) {
         return 1;
       }
-      // Then sort by dateModified
+
+      // Both are files: sort by dateModified
       return b.dateModified.getTime() - a.dateModified.getTime();
     });
 
     fileList.forEach((fileInfoNode) => {
       // If a node has children, sort them recursively
       if (fileInfoNode.children && fileInfoNode.children.length > 0) {
-        sortFiles(fileInfoNode.children);
+        sortFilesAndDirectories(fileInfoNode.children);
       }
     });
 
@@ -43,7 +52,7 @@ export const FileSidebar: React.FC<FileListProps> = ({
 
   useEffect(() => {
     const handleFileUpdate = (updatedFiles: FileInfoTree) => {
-      const sortedFiles = sortFiles(updatedFiles);
+      const sortedFiles = sortFilesAndDirectories(updatedFiles);
       setFiles(sortedFiles);
     };
 
@@ -56,7 +65,7 @@ export const FileSidebar: React.FC<FileListProps> = ({
 
   useEffect(() => {
     window.files.getFiles().then((fetchedFiles) => {
-      const sortedFiles = sortFiles(fetchedFiles);
+      const sortedFiles = sortFilesAndDirectories(fetchedFiles);
       setFiles(sortedFiles);
     });
   }, []);
@@ -206,13 +215,20 @@ const FileItem: React.FC<FileInfoProps> = ({
   const isDirectory = isFileNodeDirectory(file);
   const isSelected = file.path === selectedFile;
   const indentation = indentMultiplyer ? 10 * indentMultiplyer : 0;
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault(); // Necessary to allow drop
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragOver(false);
   };
 
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
+    setIsDragOver(false); // Reset drag over state
     const sourcePath = e.dataTransfer.getData("text/plain");
     let destinationPath = file.path; // Default destination path is the path of the file item itself
 
@@ -224,7 +240,7 @@ const FileItem: React.FC<FileInfoProps> = ({
     }
 
     try {
-      await moveFile(sourcePath, destinationPath);
+      moveFile(sourcePath, destinationPath);
       // Refresh file list here or in moveFile function
     } catch (error) {
       console.error("Failed to move file:", error);
@@ -252,7 +268,7 @@ const FileItem: React.FC<FileInfoProps> = ({
 
   const itemClasses = `flex items-center cursor-pointer p-2 border-b border-gray-200 hover:bg-slate-700 h-full mt-0 mb-0 ${
     isSelected ? "bg-gray-700 text-white font-semibold" : "text-gray-200"
-  }`;
+  } ${isDragOver ? "bg-blue-500" : ""}`;
 
   return (
     <div
@@ -262,6 +278,7 @@ const FileItem: React.FC<FileInfoProps> = ({
       style={{ paddingLeft: `${indentation}px` }}
       onDragOver={handleDragOver}
       onDrop={handleDrop}
+      onDragLeave={handleDragLeave}
     >
       <div onClick={toggle} className={itemClasses}>
         {isDirectory && (
