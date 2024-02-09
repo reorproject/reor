@@ -165,6 +165,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
 
   const Row: React.FC<ListChildComponentProps> = ({ index, style }) => {
     const fileObject = visibleItems[index];
+
     return (
       <div style={style}>
         <FileItem
@@ -193,6 +194,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     </List>
   );
 };
+
 interface FileInfoProps {
   file: FileInfoNode;
   selectedFile: string | null;
@@ -266,7 +268,7 @@ const FileItem: React.FC<FileInfoProps> = ({
     window.contextMenu.showFileItemContextMenu(file);
   };
 
-  const itemClasses = `flex items-center cursor-pointer p-2 border-b border-gray-200 hover:bg-slate-700 h-full mt-0 mb-0 ${
+  const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-slate-700 h-full mt-0 mb-0 ${
     isSelected ? "bg-gray-700 text-white font-semibold" : "text-gray-200"
   } ${isDragOver ? "bg-blue-500" : ""}`;
 
