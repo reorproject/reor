@@ -39,7 +39,9 @@ export const registerFileHandlers = (
   ipcMain.handle(
     "write-file",
     async (event, filePath: string, content: string): Promise<void> => {
+      console.log("Writing file", filePath);
       await fs.writeFileSync(filePath, content, "utf-8");
+      console.log("Done writing file", filePath);
       try {
         await updateFileInTable(dbTable, filePath, content);
         win?.webContents.send("vector-database-update");
