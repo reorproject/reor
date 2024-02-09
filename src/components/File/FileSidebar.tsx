@@ -77,10 +77,6 @@ export const FileSidebar: React.FC<FileListProps> = ({
 const handleDragStartImpl = (e: React.DragEvent, file: FileInfoNode) => {
   e.dataTransfer.setData("text/plain", file.path);
   e.dataTransfer.effectAllowed = "move";
-  // console.log(
-  //   "handle drag start event: ",
-  //   e.dataTransfer.getData("text/plain")
-  // );
 };
 
 export const moveFile = async (sourcePath: string, destinationPath: string) => {
@@ -211,6 +207,30 @@ const FileItem: React.FC<FileInfoProps> = ({
   const isSelected = file.path === selectedFile;
   const indentation = indentMultiplyer ? 10 * indentMultiplyer : 0;
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault(); // Necessary to allow drop
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    const sourcePath = e.dataTransfer.getData("text/plain");
+    let destinationPath = file.path; // Default destination path is the path of the file item itself
+
+    if (!isFileNodeDirectory(file)) {
+      // If the file is not a directory, get the parent directory path
+      const pathSegments = file.path.split("/");
+      pathSegments.pop(); // Remove the file name
+      destinationPath = pathSegments.join("/"); // Rejoin to get the parent directory path
+    }
+
+    try {
+      await moveFile(sourcePath, destinationPath);
+      // Refresh file list here or in moveFile function
+    } catch (error) {
+      console.error("Failed to move file:", error);
+      // Handle error (e.g., show an error message)
+    }
+  };
   const toggle = () => {
     if (isFileNodeDirectory(file)) {
       // setIsExpanded(!isExpanded);
@@ -240,6 +260,8 @@ const FileItem: React.FC<FileInfoProps> = ({
       onDragStart={localHandleDragStart}
       onContextMenu={handleContextMenu}
       style={{ paddingLeft: `${indentation}px` }}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
     >
       <div onClick={toggle} className={itemClasses}>
         {isDirectory && (
