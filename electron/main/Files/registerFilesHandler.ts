@@ -66,6 +66,37 @@ export const registerFileHandlers = (
   );
 
   ipcMain.handle(
+    "create-directory",
+    async (event, dirPath: string): Promise<void> => {
+      console.log("Creating directory", dirPath);
+
+      // Function to create directory recursively
+      const mkdirRecursiveSync = (dirPath: string) => {
+        const parentDir = path.dirname(dirPath);
+        if (!fs.existsSync(parentDir)) {
+          mkdirRecursiveSync(parentDir);
+        }
+        if (!fs.existsSync(dirPath)) {
+          fs.mkdirSync(dirPath);
+        }
+      };
+
+      try {
+        // Check if the directory already exists
+        if (!fs.existsSync(dirPath)) {
+          // If the directory does not exist, create it
+          mkdirRecursiveSync(dirPath);
+        } else {
+          // If the directory exists, log a message and do nothing
+          console.log("Directory already exists:", dirPath);
+        }
+      } catch (error) {
+        console.error("Error creating directory:", dirPath, error);
+      }
+    }
+  );
+
+  ipcMain.handle(
     "move-file-or-dir",
     async (event, sourcePath: string, destinationPath: string) => {
       try {

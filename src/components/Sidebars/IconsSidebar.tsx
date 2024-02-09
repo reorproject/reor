@@ -9,6 +9,7 @@ import { FaRegPenToSquare } from "react-icons/fa6";
 import NewNoteComponent from "../File/NewNote";
 import { PiFolderPlusDuotone } from "react-icons/pi";
 import { HiFolderPlus } from "react-icons/hi2";
+import NewDirectoryComponent from "../File/NewDirectory";
 
 interface LeftSidebarProps {
   onFileSelect: (path: string) => void;
@@ -26,9 +27,10 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
 }) => {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isNewNoteModalOpen, setIsNewNoteModalOpen] = useState(false);
-  const toggleModal = () => {
-    setIsNewNoteModalOpen(!isNewNoteModalOpen);
-  };
+  const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false);
+  // const toggleModal = () => {
+  //   setIsNewNoteModalOpen(!isNewNoteModalOpen);
+  // };
   return (
     <div className="w-full h-full bg-gray-800 flex flex-col items-center justify-between">
       <div
@@ -65,7 +67,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
       {/* )} */}
       <div
         className="bg-transparent border-none cursor-pointer flex items-center justify-center w-full h-8 "
-        onClick={toggleModal}
+        onClick={() => setIsNewNoteModalOpen(true)}
       >
         <div
           className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-slate-700"
@@ -78,7 +80,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
       </div>
       <div
         className="bg-transparent border-none cursor-pointer flex items-center justify-center w-full h-8 mt-1"
-        onClick={toggleModal}
+        onClick={() => setIsNewDirectoryModalOpen(true)}
       >
         <div
           className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-slate-700"
@@ -92,8 +94,13 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
       </div>
       <NewNoteComponent
         isOpen={isNewNoteModalOpen}
-        onClose={toggleModal}
+        onClose={() => setIsNewNoteModalOpen(false)}
         onFileSelect={onFileSelect}
+      />
+      <NewDirectoryComponent
+        isOpen={isNewDirectoryModalOpen}
+        onClose={() => setIsNewDirectoryModalOpen(false)}
+        onDirectoryCreate={() => console.log("Directory created")}
       />
       <div className="flex-grow border-1 border-yellow-300"></div>
       <SettingsModal
