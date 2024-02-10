@@ -1,8 +1,9 @@
-import path from "path";
-import fs from "fs";
+import * as path from "path";
+import * as fs from "fs";
 import { FileInfo, FileInfoTree, isFileNodeDirectory } from "./Types";
 import chokidar from "chokidar";
 import { BrowserWindow } from "electron";
+import * as fsPromises from "fs/promises";
 import {
   addTreeToTable,
   removeTreeFromTable,
@@ -135,6 +136,7 @@ export function startWatchingDirectory(
         fileHasExtensionInList(filePath, markdownExtensions) ||
         eventType.includes("directory")
       ) {
+        // TODO: add logic to update vector db
         updateFileListForRenderer(win, directoryToWatch);
       }
     };
@@ -208,35 +210,48 @@ export const orchestrateEntryMove = async (
 ) => {
   const fileSystemTree = GetFilesInfoTree(sourcePath);
   await removeTreeFromTable(table, fileSystemTree);
-  const newDestinationPath = moveFileOrDirectoryInFileSystem(
-    sourcePath,
-    destinationPath
+  moveFileOrDirectoryInFileSystem(sourcePath, destinationPath).then(
+    (newDestinationPath) => {
+      if (newDestinationPath) {
+        addTreeToTable(table, GetFilesInfoTree(newDestinationPath));
+      }
+    }
   );
-  const newFileSystemTree = GetFilesInfoTree(newDestinationPath);
-  await addTreeToTable(table, newFileSystemTree);
+
+  // const newFileSystemTree = GetFilesInfoTree(newDestinationPath);
+  // await addTreeToTable(table, newFileSystemTree);
 };
 
-export const moveFileOrDirectoryInFileSystem = (
+export const moveFileOrDirectoryInFileSystem = async (
   sourcePath: string,
   destinationPath: string
-): string => {
+): Promise<string> => {
   try {
-    if (!fs.existsSync(sourcePath)) {
+    // Check if source path exists
+    try {
+      await fsPromises.access(sourcePath);
+    } catch (error) {
       throw new Error("Source path does not exist.");
     }
 
-    if (
-      fs.existsSync(destinationPath) &&
-      fs.lstatSync(destinationPath).isFile()
-    ) {
+    // Check if destination path is a file
+    let destinationStats;
+    try {
+      destinationStats = await fsPromises.lstat(destinationPath);
+    } catch (error) {
+      // Error means destination path does not exist, which is fine
+    }
+
+    if (destinationStats && destinationStats.isFile()) {
       destinationPath = path.dirname(destinationPath);
     }
 
-    fs.mkdirSync(destinationPath, { recursive: true });
+    // Create destination directory
+    await fsPromises.mkdir(destinationPath, { recursive: true });
 
+    // Move the file or directory
     const newPath = path.join(destinationPath, path.basename(sourcePath));
-
-    fs.renameSync(sourcePath, newPath);
+    await fsPromises.rename(sourcePath, newPath);
 
     console.log(`Moved ${sourcePath} to ${newPath}`);
     return newPath;
