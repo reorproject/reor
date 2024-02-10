@@ -23,6 +23,17 @@ export const repopulateTableWithMissingItems = async (
   if (tableArray.length > 0) {
     console.log("table array: ", tableArray[0]);
   }
+  const itemsToRemove = await computeDBItemsToRemoveFromTable(
+    filesInfoTree,
+    tableArray
+  );
+  const filePathsToRemove = itemsToRemove.map((x) => x.notepath);
+  console.log("file paths to remove: ", filePathsToRemove.length);
+  if (filePathsToRemove.length > 0) {
+    console.log("file paths to remove length: ", filePathsToRemove[0]);
+  }
+  await table.deleteDBItemsByFilePaths(filePathsToRemove);
+
   const dbItemsToAdd = await computeDbItemsToAdd(filesInfoTree, tableArray);
   console.log("got db items to add: ", dbItemsToAdd.length);
   if (dbItemsToAdd.length > 0) {
@@ -85,6 +96,17 @@ const computeDbItemsToAdd = async (
   return filesAsChunksToAddToDB.filter((chunksBelongingToFile) =>
     filterChunksNotInTable(chunksBelongingToFile, tableArray)
   );
+};
+
+const computeDBItemsToRemoveFromTable = async (
+  filesInfoList: FileInfo[],
+  tableArray: DBEntry[]
+): Promise<DBEntry[]> => {
+  // these are items in the database that are not in filesInfoList
+  const notInFilesInfoList = tableArray.filter(
+    (item) => !filesInfoList.some((file) => file.path == item.notepath)
+  );
+  return notInFilesInfoList;
 };
 
 const filterChunksNotInTable = (
@@ -213,6 +235,7 @@ export const updateFileInTable = async (
   );
   console.log("done chunk");
   const dbEntries = chunkedContentList.map((content, index) => {
+    console.log("adding in content: ", content);
     return {
       notepath: filePath,
       content: content,

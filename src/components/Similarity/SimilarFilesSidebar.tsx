@@ -21,6 +21,8 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
       const searchResults = await performSearch(path);
       if (searchResults.length > 0) {
         setSimilarEntries(searchResults);
+      } else {
+        setSimilarEntries([]);
       }
     } catch (error) {
       console.error("Error:", error);

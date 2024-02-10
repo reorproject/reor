@@ -32,7 +32,7 @@ import { repopulateTableWithMissingItems } from "./database/TableHelperFunctions
 
 const store = new Store<StoreSchema>();
 // const user = store.get("user");
-// store.clear();
+// store.clear()
 
 // // Check if 'user' and 'directory' exist before attempting to delete
 // if (user && typeof user === "object" && "directory" in user) {
@@ -125,16 +125,7 @@ async function createWindow() {
 }
 
 app.whenReady().then(async () => {
-  // const userDirectory = store.get(StoreKeys.UserDirectory) as string;
   createWindow();
-
-  // if (userDirectory) {
-  //   await dbTable.initialize(dbConnection, userDirectory);
-  //   await maybeRePopulateTable(dbTable, userDirectory, markdownExtensions);
-  //   if (win) {
-  //     startWatchingDirectory(win, userDirectory);
-  //   }
-  // }
 });
 
 app.on("window-all-closed", () => {

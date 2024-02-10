@@ -44,8 +44,8 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
           </p>
           <DirectorySelector setErrorMsg={setErrorMsg} />
           <p className="mt-2 text-xs text-gray-100 ">
-            (Your vault directory doesn&apos;t need to be empty. Only markdown
-            files will be indexed.)
+            Your vault directory doesn&apos;t need to be empty. Only markdown
+            files will be indexed.
           </p>
 
           <div className="mt-8">
