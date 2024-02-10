@@ -91,7 +91,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
         <div className="flex flex-col items-center justify-center h-full">
           <div className="flex">
             <p className="text-gray-500 text-lg">
-              Waiting for related notes...
+              Related notes will appear here...
             </p>
           </div>
         </div>
