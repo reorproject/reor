@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from "react";
 import { DBSearchPreview } from "../File/DBResultPreview";
 import { DBQueryResult } from "electron/main/database/Schema";
+import { FaSearch } from "react-icons/fa";
 
 interface SearchComponentProps {
   onFileSelect: (path: string) => void;
@@ -37,17 +38,19 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
 
   return (
     <div className="p-0.5  w-full">
-      <div className="pr-1 pl-1">
+      <div className="relative pr-0 pl-1 bg-gray-800 rounded-md mr-1">
+        <span className="absolute inset-y-0 left-0 flex items-center pl-3 mt-[2px]">
+          <FaSearch className="text-gray-200 text-lg" size={14} />
+        </span>
         <input
           ref={searchInputRef}
           type="text"
-          className="mt-1 w-full mr-5 h-8 bg-gray-800 text-white p-1 rounded-md  border-[2px] border-white focus:outline-none focus:border-white focus:ring-1 focus:ring-white"
+          className="mt-1 w-full pl-7 mr-1 pr-5 h-8 bg-gray-800 text-white rounded-md border border-transparent focus:outline-none focus:border-white focus:ring-1 focus:ring-white"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Semantic search..."
         />
       </div>
-
       <div className="mt-2 w-full">
         {searchResults.length > 0 && (
           <div className="w-full">

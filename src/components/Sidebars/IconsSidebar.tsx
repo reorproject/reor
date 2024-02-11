@@ -7,7 +7,6 @@ import { IoFolderOutline } from "react-icons/io5";
 import { FaSearch } from "react-icons/fa";
 import { FaRegPenToSquare } from "react-icons/fa6";
 import NewNoteComponent from "../File/NewNote";
-import { PiFolderPlusDuotone } from "react-icons/pi";
 import { HiFolderPlus } from "react-icons/hi2";
 import NewDirectoryComponent from "../File/NewDirectory";
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { DBResultPreview } from "../File/DBResultPreview";
 import { DBQueryResult } from "electron/main/database/Schema";
+import { PiGraph } from "react-icons/pi";
 
 interface SimilarEntriesComponentProps {
   filePath: string;
@@ -78,8 +79,17 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
 
   return (
     <div className="h-full overflow-y-auto overflow-x-hidden mt-0 border-l-[0.1px] border-t-0 border-b-0 border-r-0 border-gray-600 border-solid">
+      {similarEntries.length > 0 && (
+        <div className="flex items-center justify-center bg-gray-800 mt-0 mb-0 p-0">
+          <PiGraph className="text-white mt-1" />
+
+          <p className="text-gray-200 text-sm pl-1 mb-0  mt-1 pt-0 pb-0">
+            Related Notes
+          </p>
+        </div>
+      )}
       {similarEntries.map((dbResult, index) => (
-        <div className="p-2" key={index}>
+        <div className="pb-2 pr-2 pl-2 pt-1" key={index}>
           <DBResultPreview
             key={index}
             dbResult={dbResult}

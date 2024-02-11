@@ -21,7 +21,7 @@ export const DBResultPreview: React.FC<DBResultPreview> = ({
       className="pr-2 pb-1 mt-0 text-white pt-1 rounded border-solid border-gray-600 bg-gray-800 border-[0.1px] pl-2 shadow-md cursor-pointer hover:scale-104 hover:shadow-lg hover:bg-[#262f3b] transition-transform duration-300"
       onClick={() => onSelect(entry.notepath)}
     >
-      <ReactMarkdown>{entry.content}</ReactMarkdown>
+      <ReactMarkdown className="text-gray-200">{entry.content}</ReactMarkdown>
       <div className="text-xs text-gray-400 mt-0">
         Similarity: {cosineDistanceToPercentage(entry._distance)}% |{" "}
         {modified && (
@@ -48,7 +48,7 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({
       className="bg-gray-800 border border-gray-600 rounded shadow-md hover:shadow-lg transition-transform duration-300 cursor-pointer hover:scale-104 hover:bg-[#262f3b] mt-0 mb-4 p-2"
       onClick={() => onSelect(entry.notepath)}
     >
-      <ReactMarkdown className="text-white break-words mt-0">
+      <ReactMarkdown className="text-gray-200 break-words mt-0">
         {entry.content}
       </ReactMarkdown>
       <div className="text-xs text-gray-400 mt-0">
