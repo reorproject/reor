@@ -73,6 +73,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({
               selectedFilePath={selectedFilePath}
               onFileSelect={onFileSelect}
               sidebarShowing={sidebarShowing}
+              windowVaultDirectory={windowVaultDirectory}
             />
           </div>
         </ResizableComponent>

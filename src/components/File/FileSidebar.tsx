@@ -8,13 +8,13 @@ import { FixedSizeList as List, ListChildComponentProps } from "react-window";
 interface FileListProps {
   selectedFile: string | null;
   onFileSelect: (path: string) => void;
-  windowUserDirectory: string;
+  windowVaultDirectory: string;
 }
 
 export const FileSidebar: React.FC<FileListProps> = ({
   selectedFile,
   onFileSelect,
-  windowUserDirectory,
+  windowVaultDirectory,
 }) => {
   const [files, setFiles] = useState<FileInfoTree>([]);
 
@@ -77,7 +77,7 @@ export const FileSidebar: React.FC<FileListProps> = ({
         selectedFile={selectedFile}
         onFileSelect={onFileSelect}
         handleDragStart={handleDragStartImpl}
-        directoryPath={windowUserDirectory}
+        directoryPath={windowVaultDirectory}
       />
     </div>
   );
