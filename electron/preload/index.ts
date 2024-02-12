@@ -42,7 +42,7 @@ declare global {
     files: {
       openDirectoryDialog: () => Promise<string[]>;
       openFileDialog: (fileExtensions?: string[]) => Promise<string[]>;
-      getFiles: () => Promise<FileInfoTree>;
+      getFiles: (windowVaultDirectory: string) => Promise<FileInfoTree>;
       writeFile: (filePath: string, content: string) => Promise<void>;
       readFile: (filePath: string) => Promise<string>;
       createFile: (filePath: string, content: string) => Promise<void>;
@@ -68,7 +68,7 @@ declare global {
     };
     electronStore: {
       setUserDirectory: (path: string) => Promise<void>;
-      getUserDirectory: () => string;
+      // getUserDirectory: () => string;
       getAIModelConfigs: () => Promise<Record<string, AIModelConfig>>;
       updateAIModelConfig: (
         modelName: string,
@@ -188,8 +188,8 @@ contextBridge.exposeInMainWorld("files", {
   openDirectoryDialog: () => ipcRenderer.invoke("open-directory-dialog"),
   openFileDialog: (fileExtensions?: string[]) =>
     ipcRenderer.invoke("open-file-dialog", fileExtensions),
-  getFiles: async (): Promise<FileInfoTree> => {
-    return ipcRenderer.invoke("get-files");
+  getFiles: async (windowVaultDirectory: string): Promise<FileInfoTree> => {
+    return ipcRenderer.invoke("get-files", windowVaultDirectory);
   },
 
   // Write content to a file

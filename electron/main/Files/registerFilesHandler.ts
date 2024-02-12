@@ -21,13 +21,13 @@ export const registerFileHandlers = (
     return path.join(...args);
   });
 
-  ipcMain.handle("get-files", async (): Promise<FileInfoTree> => {
-    const directoryPath: string = store.get(StoreKeys.UserDirectory);
-    if (!directoryPath) return [];
-
-    const files: FileInfoTree = GetFilesInfoTree(directoryPath);
-    return files;
-  });
+  ipcMain.handle(
+    "get-files",
+    async (event, windowVaultDirectory: string): Promise<FileInfoTree> => {
+      const files: FileInfoTree = GetFilesInfoTree(windowVaultDirectory);
+      return files;
+    }
+  );
 
   ipcMain.handle(
     "read-file",
