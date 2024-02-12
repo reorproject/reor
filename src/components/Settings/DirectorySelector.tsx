@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@material-tailwind/react";
 
 interface DirectorySelectorProps {
+  windowVaultDirectory: string;
   setErrorMsg: (error: string) => void;
 }
 
 const DirectorySelector: React.FC<DirectorySelectorProps> = ({
+  windowVaultDirectory,
   setErrorMsg,
 }) => {
   const [userDirectory, setUserDirectory] = useState<string>("");
@@ -18,9 +20,9 @@ const DirectorySelector: React.FC<DirectorySelectorProps> = ({
   };
 
   useEffect(() => {
-    const directory = window.electronStore.getUserDirectory();
-    if (directory) {
-      setUserDirectory(directory);
+    // const directory = window.electronStore.getUserDirectory();
+    if (windowVaultDirectory) {
+      setUserDirectory(windowVaultDirectory);
     }
   }, []);
 

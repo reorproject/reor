@@ -13,7 +13,6 @@ import { update } from "./update";
 import Store from "electron-store";
 import * as path from "path";
 import { StoreKeys, StoreSchema } from "./Store/storeConfig";
-// import contextMenus from "./contextMenus";
 import * as lancedb from "vectordb";
 import * as fs from "fs";
 import { LanceDBTableWrapper } from "./database/LanceTableWrapper";
@@ -24,24 +23,13 @@ import {
   updateFileListForRenderer,
 } from "./Files/Filesystem";
 import { registerLLMSessionHandlers } from "./llm/llmSessionHandlers";
-// import { FileInfoNode } from "./Files/Types";
 import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
 import { registerStoreHandlers } from "./Store/storeHandlers";
 import { registerFileHandlers } from "./Files/registerFilesHandler";
 import { repopulateTableWithMissingItems } from "./database/TableHelperFunctions";
 
 const store = new Store<StoreSchema>();
-// const user = store.get("user");
 // store.clear();
-
-// // Check if 'user' and 'directory' exist before attempting to delete
-// if (user && typeof user === "object" && "directory" in user) {
-//   // Delete the 'directory' property
-//   delete user.directory;
-
-//   // Save the updated 'user' object back to the store
-//   store.set("user", user);
-// }
 
 process.env.DIST_ELECTRON = join(__dirname, "../");
 process.env.DIST = join(process.env.DIST_ELECTRON, "../dist");
@@ -60,13 +48,7 @@ if (!app.requestSingleInstanceLock()) {
   process.exit(0);
 }
 
-// Remove electron security warnings
-// This warning only shows in development mode
-// Read more on https://www.electronjs.org/docs/latest/tutorial/security
-// process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
-
 let win: BrowserWindow | null = null;
-// Here, you can also use other preload
 const preload = join(__dirname, "../preload/index.js");
 const url = process.env.VITE_DEV_SERVER_URL;
 const indexHtml = join(process.env.DIST, "index.html");
@@ -105,9 +87,11 @@ async function createWindow() {
   // Test actively push message to the Electron-Renderer
   win.webContents.on("did-finish-load", () => {
     win?.webContents.send("main-process-message", new Date().toLocaleString());
-    const userDirectory = store.get(StoreKeys.UserDirectory) as string;
-    const files = GetFilesInfoTree(userDirectory);
-    win?.webContents.send("files-list", files);
+
+    // As far as I remember, these were also a hack to send through the user directory or something like that.
+    // const userDirectory = store.get(StoreKeys.UserDirectory) as string;
+    // const files = GetFilesInfoTree(userDirectory);
+    // win?.webContents.send("files-list", files);
   });
 
   // Make all links open with the browser, not with the application

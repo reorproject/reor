@@ -6,12 +6,14 @@ interface NewDirectoryComponentProps {
   isOpen: boolean;
   onClose: () => void;
   onDirectoryCreate: (path: string) => void;
+  windowVaultDirectory: string;
 }
 
 const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
   isOpen,
   onClose,
   onDirectoryCreate,
+  windowVaultDirectory,
 }) => {
   const [directoryName, setDirectoryName] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -40,7 +42,7 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
     }
     const normalizedDirectoryName = directoryName.replace(/\\/g, "/");
     const fullPath = await window.files.joinPath(
-      window.electronStore.getUserDirectory(),
+      windowVaultDirectory,
       normalizedDirectoryName
     );
     window.files.createDirectory(fullPath); // Assuming createDirectory is the method for directory creation

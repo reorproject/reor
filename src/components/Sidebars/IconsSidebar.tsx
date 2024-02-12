@@ -17,12 +17,14 @@ interface LeftSidebarProps {
   // toggleSimilarFiles: () => void;
   sidebarShowing: SidebarAbleToShow;
   makeSidebarShow: (show: SidebarAbleToShow) => void;
+  windowVaultDirectory: string;
 }
 
 const LeftSidebar: React.FC<LeftSidebarProps> = ({
   onFileSelect,
   sidebarShowing,
   makeSidebarShow,
+  windowVaultDirectory,
 }) => {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isNewNoteModalOpen, setIsNewNoteModalOpen] = useState(false);
@@ -95,11 +97,13 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
         onFileSelect={onFileSelect}
+        windowVaultDirectory={windowVaultDirectory}
       />
       <NewDirectoryComponent
         isOpen={isNewDirectoryModalOpen}
         onClose={() => setIsNewDirectoryModalOpen(false)}
         onDirectoryCreate={() => console.log("Directory created")}
+        windowVaultDirectory={windowVaultDirectory}
       />
       <div className="flex-grow border-1 border-yellow-300"></div>
       <SettingsModal

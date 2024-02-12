@@ -8,15 +8,15 @@ import { FixedSizeList as List, ListChildComponentProps } from "react-window";
 interface FileListProps {
   selectedFile: string | null;
   onFileSelect: (path: string) => void;
+  windowUserDirectory: string;
 }
 
 export const FileSidebar: React.FC<FileListProps> = ({
   selectedFile,
   onFileSelect,
+  windowUserDirectory,
 }) => {
   const [files, setFiles] = useState<FileInfoTree>([]);
-
-  const directoryPath = window.electronStore.getUserDirectory();
 
   const sortFilesAndDirectories = (fileList: FileInfoTree): FileInfoTree => {
     fileList.sort((a, b) => {
@@ -77,7 +77,7 @@ export const FileSidebar: React.FC<FileListProps> = ({
         selectedFile={selectedFile}
         onFileSelect={onFileSelect}
         handleDragStart={handleDragStartImpl}
-        directoryPath={directoryPath}
+        directoryPath={windowUserDirectory}
       />
     </div>
   );

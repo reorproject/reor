@@ -8,10 +8,14 @@ import ResizableComponent from "./Generic/ResizableComponent";
 import SidebarManager from "./Sidebars/MainSidebar";
 import { toast } from "react-toastify";
 
-interface FileEditorContainerProps {}
+interface FileEditorContainerProps {
+  windowVaultDirectory: string;
+}
 export type SidebarAbleToShow = "files" | "search";
 
-const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
+const FileEditorContainer: React.FC<FileEditorContainerProps> = ({
+  windowVaultDirectory,
+}) => {
   const [editorContent, setEditorContent] = useState<string>("");
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
   const lastSavedContentRef = useRef<string>("");
@@ -59,6 +63,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
             onFileSelect={onFileSelect}
             sidebarShowing={sidebarShowing}
             makeSidebarShow={setSidebarShowing}
+            windowVaultDirectory={windowVaultDirectory}
           />
         </div>
 

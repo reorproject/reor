@@ -7,12 +7,14 @@ interface NewNoteComponentProps {
   isOpen: boolean;
   onClose: () => void;
   onFileSelect: (path: string) => void;
+  windowVaultDirectory: string;
 }
 
 const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
   isOpen,
   onClose,
   onFileSelect,
+  windowVaultDirectory,
 }) => {
   const [fileName, setFileName] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -44,7 +46,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
     // Normalize the path separators to forward slashes
     const normalizedFileName = fileName.replace(/\\/g, "/");
     const fullPath = await window.files.joinPath(
-      window.electronStore.getUserDirectory(),
+      windowVaultDirectory,
       normalizedFileName + ".md"
     );
     // Create directories if they don't exist

@@ -12,6 +12,7 @@ const App: React.FC<AppProps> = () => {
     userHasConfiguredSettingsForIndexing,
     setUserHasConfiguredSettingsForIndexing,
   ] = useState<boolean>(false);
+  const [windowVaultDirectory, setWindowVaultDirectory] = useState<string>("");
 
   const [indexingProgress, setIndexingProgress] = useState<number>(0);
 
@@ -38,6 +39,9 @@ const App: React.FC<AppProps> = () => {
 
   useEffect(() => {
     const initialDirectory = window.electronStore.getUserDirectory();
+    if (initialDirectory) {
+      setWindowVaultDirectory(initialDirectory);
+    }
     const defaultEmbedFunc = window.electronStore.getDefaultEmbedFuncRepo();
     if (initialDirectory && defaultEmbedFunc) {
       setUserHasConfiguredSettingsForIndexing(true);
@@ -57,11 +61,12 @@ const App: React.FC<AppProps> = () => {
         indexingProgress < 1 ? (
           <IndexingProgress indexingProgress={indexingProgress} />
         ) : (
-          <FileEditorContainer />
+          <FileEditorContainer windowVaultDirectory={windowVaultDirectory} />
         )
       ) : (
         <InitialSetupSinglePage
           readyForIndexing={handleAllInitialSettingsAreReady}
+          windowVaultDirectory={windowVaultDirectory}
         />
       )}
     </div>

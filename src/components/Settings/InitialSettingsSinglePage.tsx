@@ -5,12 +5,14 @@ import LLMSettings from "./LLMSettings";
 import EmbeddingModelManager from "./EmbeddingSettings";
 import DirectorySelector from "./DirectorySelector";
 
-interface OldInitialSettingsProps {
+interface InitialSettingsProps {
   readyForIndexing: () => void;
+  windowVaultDirectory: string;
 }
 
-const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
+const InitialSetupSinglePage: React.FC<InitialSettingsProps> = ({
   readyForIndexing,
+  windowVaultDirectory,
 }) => {
   // const [userDirectory, setUserDirectory] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -42,7 +44,10 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
           <p className="mt-2 text-gray-100">
             Choose your vault directory here:
           </p>
-          <DirectorySelector setErrorMsg={setErrorMsg} />
+          <DirectorySelector
+            setErrorMsg={setErrorMsg}
+            windowVaultDirectory={windowVaultDirectory}
+          />
           <p className="mt-2 text-xs text-gray-100 ">
             Your vault directory doesn&apos;t need to be empty. Only markdown
             files will be indexed.
