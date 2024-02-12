@@ -56,8 +56,9 @@ const indexHtml = join(process.env.DIST, "index.html");
 let dbConnection: lancedb.Connection;
 const dbTable = new LanceDBTableWrapper();
 const fileWatcher: FSWatcher | null = null;
+const windowIDToVaultDirectory = new Map<number, string>();
 
-async function createWindow() {
+async function createWindow(windowVaultDirectory: string) {
   win = new BrowserWindow({
     title: "Main window",
     // icon: join(process.env.VITE_PUBLIC, "favicon.ico"), // oh we could also try just setting this to .ico
@@ -74,6 +75,7 @@ async function createWindow() {
     width: 1200,
     height: 800,
   });
+  windowIDToVaultDirectory.set(win.id, windowVaultDirectory);
 
   if (url) {
     // electron-vite-vue#298
@@ -86,12 +88,7 @@ async function createWindow() {
 
   // Test actively push message to the Electron-Renderer
   win.webContents.on("did-finish-load", () => {
-    win?.webContents.send("main-process-message", new Date().toLocaleString());
-
-    // As far as I remember, these were also a hack to send through the user directory or something like that.
-    // const userDirectory = store.get(StoreKeys.UserDirectory) as string;
-    // const files = GetFilesInfoTree(userDirectory);
-    // win?.webContents.send("files-list", files);
+    win?.webContents.send("window-vault-directory", windowVaultDirectory);
   });
 
   // Make all links open with the browser, not with the application
@@ -109,8 +106,11 @@ async function createWindow() {
 }
 
 app.whenReady().then(async () => {
-  createWindow();
+  const userDirectory = store.get(StoreKeys.UserDirectory) as string;
+  createWindow(userDirectory);
 });
+
+// Hello
 
 app.on("window-all-closed", () => {
   win = null;
@@ -130,9 +130,19 @@ app.on("activate", () => {
   if (allWindows.length) {
     allWindows[0].focus();
   } else {
-    createWindow();
+    const userDirectory = store.get(StoreKeys.UserDirectory) as string;
+    createWindow(userDirectory);
   }
 });
+
+// ipcMain.on("request-window-vault-directory", (event) => {
+//   const webContents = event.sender;
+//   const win = BrowserWindow.fromWebContents(webContents);
+//   if (win) {
+//     const directory = windowIDToVaultDirectory.get(win.id);
+//     event.reply("response-window-vault-directory", directory);
+//   }
+// });
 
 // New window example arg: new windows url
 ipcMain.handle("open-win", (_, arg) => {

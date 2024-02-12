@@ -13,6 +13,7 @@ const App: React.FC<AppProps> = () => {
     setUserHasConfiguredSettingsForIndexing,
   ] = useState<boolean>(false);
   const [windowVaultDirectory, setWindowVaultDirectory] = useState<string>("");
+  const [defaultEmbedFunc, setDefaultEmbedFunc] = useState<string>("");
 
   const [indexingProgress, setIndexingProgress] = useState<number>(0);
 
@@ -38,14 +39,19 @@ const App: React.FC<AppProps> = () => {
   }, []);
 
   useEffect(() => {
-    const initialDirectory = window.electronStore.getUserDirectory();
-    if (initialDirectory) {
-      setWindowVaultDirectory(initialDirectory);
-    }
-    const defaultEmbedFunc = window.electronStore.getDefaultEmbedFuncRepo();
-    if (initialDirectory && defaultEmbedFunc) {
+    if (windowVaultDirectory && defaultEmbedFunc) {
       setUserHasConfiguredSettingsForIndexing(true);
       window.database.indexFilesInDirectory();
+    }
+  }, [windowVaultDirectory, defaultEmbedFunc]);
+
+  useEffect(() => {
+    window.ipcRenderer.receive("window-vault-directory", (dir: string) => {
+      setWindowVaultDirectory(dir);
+    });
+    const defaultEmbedFunc = window.electronStore.getDefaultEmbedFuncRepo();
+    if (defaultEmbedFunc) {
+      setDefaultEmbedFunc(defaultEmbedFunc);
     }
   }, []);
 
