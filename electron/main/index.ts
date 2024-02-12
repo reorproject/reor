@@ -18,7 +18,6 @@ import * as fs from "fs";
 import { LanceDBTableWrapper } from "./database/LanceTableWrapper";
 import { FSWatcher } from "fs";
 import {
-  GetFilesInfoTree,
   startWatchingDirectory,
   updateFileListForRenderer,
 } from "./Files/Filesystem";
@@ -48,7 +47,13 @@ if (!app.requestSingleInstanceLock()) {
   process.exit(0);
 }
 
-let win: BrowserWindow | null = null;
+interface WindowInfo {
+  window: BrowserWindow;
+  vaultDirectory: string;
+}
+
+const windows = new Map<number, WindowInfo>();
+
 const preload = join(__dirname, "../preload/index.js");
 const url = process.env.VITE_DEV_SERVER_URL;
 const indexHtml = join(process.env.DIST, "index.html");
@@ -56,10 +61,9 @@ const indexHtml = join(process.env.DIST, "index.html");
 let dbConnection: lancedb.Connection;
 const dbTable = new LanceDBTableWrapper();
 const fileWatcher: FSWatcher | null = null;
-const windowIDToVaultDirectory = new Map<number, string>();
 
 async function createWindow(windowVaultDirectory: string) {
-  win = new BrowserWindow({
+  const newWin = new BrowserWindow({
     title: "Main window",
     // icon: join(process.env.VITE_PUBLIC, "favicon.ico"), // oh we could also try just setting this to .ico
     webPreferences: {
@@ -75,34 +79,36 @@ async function createWindow(windowVaultDirectory: string) {
     width: 1200,
     height: 800,
   });
-  windowIDToVaultDirectory.set(win.id, windowVaultDirectory);
+
+  const winId = newWin.id;
+  windows.set(winId, { window: newWin, vaultDirectory: windowVaultDirectory });
 
   if (url) {
     // electron-vite-vue#298
-    win.loadURL(url);
+    newWin.loadURL(url);
     // Open devTool if the app is not packaged
-    win.webContents.openDevTools();
+    newWin.webContents.openDevTools();
   } else {
-    win.loadFile(indexHtml);
+    newWin.loadFile(indexHtml);
   }
 
   // Test actively push message to the Electron-Renderer
-  win.webContents.on("did-finish-load", () => {
-    win?.webContents.send("window-vault-directory", windowVaultDirectory);
+  newWin.webContents.on("did-finish-load", () => {
+    newWin?.webContents.send("window-vault-directory", windowVaultDirectory);
   });
 
   // Make all links open with the browser, not with the application
-  win.webContents.setWindowOpenHandler(({ url }) => {
+  newWin.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith("https:")) shell.openExternal(url);
     return { action: "deny" };
   });
 
   // Apply electron-updater
-  update(win);
+  update(newWin);
   registerLLMSessionHandlers(store);
   registerDBSessionHandlers(dbTable, store);
   registerStoreHandlers(store, fileWatcher);
-  registerFileHandlers(store, dbTable, win);
+  registerFileHandlers(store, dbTable, newWin);
 }
 
 app.whenReady().then(async () => {
@@ -110,18 +116,9 @@ app.whenReady().then(async () => {
   createWindow(userDirectory);
 });
 
-// Hello
-
 app.on("window-all-closed", () => {
-  win = null;
-  if (process.platform !== "darwin") app.quit();
-});
-
-app.on("second-instance", () => {
-  if (win) {
-    // Focus on the main window if the user tried to open another
-    if (win.isMinimized()) win.restore();
-    win.focus();
+  if (process.platform !== "darwin") {
+    app.quit();
   }
 });
 
@@ -134,15 +131,6 @@ app.on("activate", () => {
     createWindow(userDirectory);
   }
 });
-
-// ipcMain.on("request-window-vault-directory", (event) => {
-//   const webContents = event.sender;
-//   const win = BrowserWindow.fromWebContents(webContents);
-//   if (win) {
-//     const directory = windowIDToVaultDirectory.get(win.id);
-//     event.reply("response-window-vault-directory", directory);
-//   }
-// });
 
 // New window example arg: new windows url
 ipcMain.handle("open-win", (_, arg) => {
@@ -161,6 +149,14 @@ ipcMain.handle("open-win", (_, arg) => {
   }
 });
 
+// ipcMain.on("request-window-vault-directory", (event) => {
+//   const webContents = event.sender;
+//   const win = BrowserWindow.fromWebContents(webContents);
+//   if (win) {
+//     const directory = windowIDToVaultDirectory.get(win.id);
+//     event.reply("response-window-vault-directory", directory);
+//   }
+// });
 ipcMain.handle("open-directory-dialog", async () => {
   const result = await dialog.showOpenDialog({
     properties: ["openDirectory", "createDirectory"],
@@ -190,10 +186,17 @@ ipcMain.handle("open-file-dialog", async (event, extensions) => {
 
 ipcMain.on("index-files-in-directory", async (event) => {
   try {
-    const userDirectory = store.get(StoreKeys.UserDirectory) as string;
-    if (!userDirectory) {
-      throw new Error("No user directory set");
+    const senderWindowId = event.sender.id;
+
+    // Retrieve the corresponding BrowserWindow instance
+    const targetWindow = windows.get(senderWindowId);
+    if (!targetWindow) {
+      throw new Error("No window found for the sender of the event");
     }
+    // const userDirectory = store.get(StoreKeys.UserDirectory) as string;
+    // if (!userDirectory) {
+    //   throw new Error("No user directory set");
+    // }
     const embedFuncRepoName = store.get(
       StoreKeys.DefaultEmbedFuncRepo
     ) as string;
@@ -204,19 +207,26 @@ ipcMain.on("index-files-in-directory", async (event) => {
     console.log("dbPath: ", dbPath);
     dbConnection = await lancedb.connect(dbPath);
     console.log("dbConnection: ", dbConnection);
-    await dbTable.initialize(dbConnection, userDirectory, embedFuncRepoName);
+    await dbTable.initialize(
+      dbConnection,
+      targetWindow?.vaultDirectory,
+      embedFuncRepoName
+    );
     console.log("initialized: ", dbTable);
     await repopulateTableWithMissingItems(
       dbTable,
-      userDirectory,
+      targetWindow?.vaultDirectory,
       (progress) => {
         event.sender.send("indexing-progress", progress);
       }
     );
     console.log("repopulated: ", dbTable);
-    if (win) {
-      startWatchingDirectory(win, userDirectory);
-      updateFileListForRenderer(win, userDirectory);
+    if (targetWindow?.window) {
+      startWatchingDirectory(targetWindow.window, targetWindow?.vaultDirectory);
+      updateFileListForRenderer(
+        targetWindow.window,
+        targetWindow?.vaultDirectory
+      );
     }
     event.sender.send("indexing-progress", 1);
   } catch (error) {
