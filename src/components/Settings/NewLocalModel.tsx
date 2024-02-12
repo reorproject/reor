@@ -103,8 +103,8 @@ const LocalModelModal: React.FC<LocalModelModalProps> = ({
         <p className="text-gray-100 text-xs mb-2 mt-2">
           <i>
             If you experience a crash, try lowering the context length. If you
-            get a context length error, increase it. You can do this in
-            Settings.
+            get a context length error, increase it. 2048 is recommended for all
+            systems to start with.
           </i>
         </p>
 
