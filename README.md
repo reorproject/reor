@@ -4,7 +4,7 @@
 </p> -->
 
 <h4 align="center">
-An AI note-taking app that runs models locally.</h4>
+A self-organizing AI note-taking app that runs models locally.</h4>
 
 <p align="center">
     <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-GPLv3-blue.svg"></a>
@@ -21,13 +21,24 @@ Reor was built right from the very start to **run models locally**. Running mode
 
 
 
+
+
+
 https://github.com/reorproject/reor/assets/17236551/1bbc1b2d-c3d9-451c-a008-7f12c84f96db
 
 
+### How can it possibly be "self-organizing"?
 
+- Everything you write is chunked and embedded into an internal [vector database](https://github.com/lancedb/lancedb).
+- Related notes are connected automatically via vector similarity.
+- LLM-powered Q&A performs full RAG with the notes in the corpus.
+- Everything can be searched semantically.
+
+  
 ### Getting Started
 1. Download from [reorproject.org](https://reorproject.org). Mac, Linux & Windows are all supported.
 2. Install like a normal App.
+
 
 
 ### Running local models
