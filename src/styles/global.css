@@ -50,8 +50,8 @@ button {
 } */
 
 .markdown-content p {
-  padding: 0.25rem; /* Apply padding to paragraphs */
-  margin: 0; /* Remove default margins */
+  padding: 0.25rem; 
+  margin: 0; 
 }
 
 
@@ -72,26 +72,12 @@ button {
   outline: none;
 }
 
-/* .milkdown .editor p {
-  margin: 0;
-  line-height: normal; 
-} */
-
-/* .milkdown .editor h1,
-.milkdown .editor h2,
-.milkdown .editor h3,
-.milkdown .editor h4,
-.milkdown .editor h5,
-.milkdown .editor h6 {
-  margin-top: 5rem; 
-      margin-bottom: 5rem; } */
 
 .milkdown .editor .paragraph {
-  margin: 0rem 0;
+  margin: 1rem 0;
   line-height: 1.5;
 }
 
-/* do the s */
 .milkdown .editor ol, .milkdown .editor ul {
   margin: 0em 0 !important;
 }
