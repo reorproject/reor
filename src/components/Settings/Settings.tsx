@@ -3,21 +3,25 @@ import Modal from "../Generic/Modal";
 import LLMSettings from "./LLMSettings";
 import EmbeddingModelManager from "./EmbeddingSettings";
 import RagSettings from "./RagSettings";
-interface ModalProps {
+interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  windowVaultDirectory: string;
 }
 
-const SettingsModal: React.FC<ModalProps> = ({
+type TabName = "llmSettings" | "embeddingModel" | "RAG" | "vault"; // Define the type for tab names
+
+const SettingsModal: React.FC<SettingsModalProps> = ({
   isOpen,
   onClose: onCloseFromParent,
+  windowVaultDirectory,
 }) => {
   const [willNeedToReIndex, setWillNeedToReIndex] = useState(false);
-  const [activeTab, setActiveTab] = useState("llmSettings");
+  const [activeTab, setActiveTab] = useState<TabName>("llmSettings");
 
   const handleSave = () => {
     if (willNeedToReIndex) {
-      window.database.indexFilesInDirectory();
+      window.database.indexFilesInDirectory(windowVaultDirectory);
     }
     onCloseFromParent();
   };
@@ -53,6 +57,16 @@ const SettingsModal: React.FC<ModalProps> = ({
             onClick={() => setActiveTab("embeddingModel")}
           >
             Embedding Model
+          </div>
+          <div
+            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
+              activeTab === "vault"
+                ? "bg-gray-700 text-white font-semibold"
+                : "text-gray-200"
+            }`}
+            onClick={() => setActiveTab("vault")}
+          >
+            Vault{" "}
           </div>
           <div
             className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
@@ -96,6 +110,23 @@ const SettingsModal: React.FC<ModalProps> = ({
                 {/* <EmbeddingModelManager.childrenBelowDropdown> */}
                 {/* </EmbeddingModelManager.childrenBelowDropdown> */}
               </EmbeddingModelManager>
+            </div>
+          )}
+
+          {activeTab === "vault" && (
+            <div className="w-full">
+              <h2 className="text-2xl font-semibold mb-0 text-white">Vault</h2>
+              <p className="mt-2 text-sm text-gray-100 mb-1">
+                Choose your vault directory here:
+              </p>
+              {/* <DirectorySelector
+                setErrorMsg={setErrorMsg}
+                windowVaultDirectory={windowVaultDirectory}
+              /> */}
+              <p className="mt-2 text-xs text-gray-100 ">
+                Your vault directory doesn&apos;t need to be empty. Only
+                markdown files will be indexed.
+              </p>
             </div>
           )}
 

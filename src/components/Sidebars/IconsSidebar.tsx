@@ -109,6 +109,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
       <SettingsModal
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
+        windowVaultDirectory={windowVaultDirectory}
       />
       <button
         className="bg-transparent border-none pb-2 cursor-pointer flex items-center justify-center w-full"

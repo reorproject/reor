@@ -4,23 +4,32 @@ import { Button } from "@material-tailwind/react";
 import LLMSettings from "./LLMSettings";
 import EmbeddingModelManager from "./EmbeddingSettings";
 import DirectorySelector from "./DirectorySelector";
+import { set } from "date-fns";
 
 interface InitialSettingsProps {
-  readyForIndexing: () => void;
-  windowVaultDirectory: string;
+  finishedSettingInitialSettings: (vaultDirectoryForWindow: string) => void;
+  // setVaultDirectory: (path: string) => void;
 }
 
 const InitialSetupSinglePage: React.FC<InitialSettingsProps> = ({
-  readyForIndexing,
-  windowVaultDirectory,
+  finishedSettingInitialSettings,
+  // setVaultDirectory,
 }) => {
   // const [userDirectory, setUserDirectory] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [showError, setShowError] = useState(false);
+  const [userDirectory, setUserDirectory] = useState<string>("");
+
+  const handleDirectorySelection = async () => {
+    const paths = await window.files.openDirectoryDialog();
+    if (paths && paths[0]) {
+      setUserDirectory(paths[0]);
+    }
+  };
 
   const handleNext = () => {
     if (errorMsg === "") {
-      readyForIndexing();
+      finishedSettingInitialSettings(userDirectory);
     } else {
       setShowError(true);
     }
@@ -44,10 +53,20 @@ const InitialSetupSinglePage: React.FC<InitialSettingsProps> = ({
           <p className="mt-2 text-gray-100">
             Choose your vault directory here:
           </p>
-          <DirectorySelector
-            setErrorMsg={setErrorMsg}
-            windowVaultDirectory={windowVaultDirectory}
-          />
+          <div>
+            <Button
+              className="bg-slate-700  border-none h-10 hover:bg-slate-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
+              onClick={handleDirectorySelection}
+              placeholder=""
+            >
+              Select Directory
+            </Button>
+            {userDirectory && (
+              <p className="mt-2 text-xs text-gray-100">
+                Selected: <strong>{userDirectory}</strong>
+              </p>
+            )}
+          </div>
           <p className="mt-2 text-xs text-gray-100 ">
             Your vault directory doesn&apos;t need to be empty. Only markdown
             files will be indexed.

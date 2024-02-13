@@ -13,7 +13,6 @@ const App: React.FC<AppProps> = () => {
     setUserHasConfiguredSettingsForIndexing,
   ] = useState<boolean>(false);
   const [windowVaultDirectory, setWindowVaultDirectory] = useState<string>("");
-  const [defaultEmbedFunc, setDefaultEmbedFunc] = useState<string>("");
 
   const [indexingProgress, setIndexingProgress] = useState<number>(0);
 
@@ -38,26 +37,27 @@ const App: React.FC<AppProps> = () => {
     window.ipcRenderer.receive("indexing-error", handleIndexingError);
   }, []);
 
-  useEffect(() => {
-    if (windowVaultDirectory && defaultEmbedFunc) {
-      setUserHasConfiguredSettingsForIndexing(true);
-      window.database.indexFilesInDirectory();
-    }
-  }, [windowVaultDirectory, defaultEmbedFunc]);
+  // TODO: perhaps this itself can be called in
+  // useEffect(() => {
+  //   if (windowVaultDirectory && defaultEmbedFunc) {
+  //     setUserHasConfiguredSettingsForIndexing(true);
+  //     window.database.indexFilesInDirectory(windowVaultDirectory);
+  //   }
+  // }, [windowVaultDirectory, defaultEmbedFunc]);
 
   useEffect(() => {
     window.ipcRenderer.receive("window-vault-directory", (dir: string) => {
       setWindowVaultDirectory(dir);
+      window.database.indexFilesInDirectory(dir);
     });
-    const defaultEmbedFunc = window.electronStore.getDefaultEmbedFuncRepo();
-    if (defaultEmbedFunc) {
-      setDefaultEmbedFunc(defaultEmbedFunc);
-    }
   }, []);
 
-  const handleAllInitialSettingsAreReady = () => {
+  const handleAllInitialSettingsAreReady = (windowVaultDir: string) => {
     setUserHasConfiguredSettingsForIndexing(true);
-    window.database.indexFilesInDirectory();
+    console.log("Setting new vault directory:", windowVaultDir);
+    window.electronStore.setNewVaultDirectory(windowVaultDir);
+    window.database.indexFilesInDirectory(windowVaultDir);
+    setWindowVaultDirectory(windowVaultDir);
   };
 
   return (
@@ -71,8 +71,8 @@ const App: React.FC<AppProps> = () => {
         )
       ) : (
         <InitialSetupSinglePage
-          readyForIndexing={handleAllInitialSettingsAreReady}
-          windowVaultDirectory={windowVaultDirectory}
+          finishedSettingInitialSettings={handleAllInitialSettingsAreReady}
+          // setVaultDirectory={setWindowVaultDirectory}
         />
       )}
     </div>

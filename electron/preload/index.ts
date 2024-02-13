@@ -31,7 +31,7 @@ declare global {
         limit: number,
         filter?: string
       ) => Promise<DBQueryResult[]>;
-      indexFilesInDirectory: () => void;
+      indexFilesInDirectory: (directoryToIndex: string) => void;
       augmentPromptWithRAG: (
         prompt: string,
         llmSessionID: string,
@@ -67,8 +67,10 @@ declare global {
       ) => Promise<string>;
     };
     electronStore: {
-      setUserDirectory: (path: string) => Promise<void>;
+      // setUserDirectory: (path: string) => Promise<void>;
       // getUserDirectory: () => string;
+      setNewVaultDirectory: (path: string) => void;
+      openNewWindow: (vaultDirectoryForWindow: string) => void;
       getAIModelConfigs: () => Promise<Record<string, AIModelConfig>>;
       updateAIModelConfig: (
         modelName: string,
@@ -96,8 +98,8 @@ contextBridge.exposeInMainWorld("database", {
   ): Promise<DBEntry[]> => {
     return ipcRenderer.invoke("search", query, limit, filter);
   },
-  indexFilesInDirectory: async () => {
-    return ipcRenderer.send("index-files-in-directory");
+  indexFilesInDirectory: async (directoryToIndex: string) => {
+    return ipcRenderer.send("index-files-in-directory", directoryToIndex);
   },
   augmentPromptWithRAG: async (
     prompt: string,
@@ -122,12 +124,18 @@ contextBridge.exposeInMainWorld("electron", {
 });
 
 contextBridge.exposeInMainWorld("electronStore", {
-  setUserDirectory: (path: string) => {
-    return ipcRenderer.sendSync("set-user-directory", path);
+  // setUserDirectory: (path: string) => {
+  //   return ipcRenderer.sendSync("set-user-directory", path);
+  // },
+  // getUserDirectory: () => {
+  //   return ipcRenderer.sendSync("get-user-directory");
+  // },
+  setNewVaultDirectory: (path: string) => {
+    return ipcRenderer.invoke("set-directory", path);
   },
-  getUserDirectory: () => {
-    return ipcRenderer.sendSync("get-user-directory");
-  },
+  // openNewWindow: (vaultDirectoryForWindow: string) => {
+  //   ipcRenderer.send("open-new-window", vaultDirectoryForWindow);
+  // },
   getAIModelConfigs: async (): Promise<AIModelConfig[]> => {
     return ipcRenderer.invoke("get-ai-model-configs");
   },

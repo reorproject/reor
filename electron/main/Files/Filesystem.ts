@@ -2,7 +2,7 @@ import * as path from "path";
 import * as fs from "fs";
 import { FileInfo, FileInfoTree, isFileNodeDirectory } from "./Types";
 import chokidar from "chokidar";
-import { BrowserWindow } from "electron";
+import { WebContents } from "electron";
 import * as fsPromises from "fs/promises";
 import {
   addTreeToTable,
@@ -123,7 +123,7 @@ export function writeFileSyncRecursive(
 }
 
 export function startWatchingDirectory(
-  win: BrowserWindow,
+  senderWebContents: WebContents,
   directoryToWatch: string
 ): void {
   try {
@@ -137,7 +137,7 @@ export function startWatchingDirectory(
         eventType.includes("directory")
       ) {
         // TODO: add logic to update vector db
-        updateFileListForRenderer(win, directoryToWatch);
+        updateFileListForRenderer(senderWebContents, directoryToWatch);
       }
     };
 
@@ -184,13 +184,11 @@ export function appendExtensionIfMissing(
 }
 
 export function updateFileListForRenderer(
-  win: BrowserWindow,
+  senderWebContents: WebContents,
   directory: string
 ): void {
   const files = GetFilesInfoTree(directory);
-  if (win) {
-    win.webContents.send("files-list", files);
-  }
+  senderWebContents.send("files-list", files);
 }
 
 export function readFile(filePath: string): string {

@@ -23,7 +23,11 @@ import {
 } from "./Files/Filesystem";
 import { registerLLMSessionHandlers } from "./llm/llmSessionHandlers";
 import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
-import { registerStoreHandlers } from "./Store/storeHandlers";
+import {
+  addDirectoryToVaultWindows,
+  registerStoreHandlers,
+  removeDirectoryFromVaultWindows,
+} from "./Store/storeHandlers";
 import { registerFileHandlers } from "./Files/registerFilesHandler";
 import { repopulateTableWithMissingItems } from "./database/TableHelperFunctions";
 
@@ -79,10 +83,15 @@ async function createWindow(windowVaultDirectory: string) {
     width: 1200,
     height: 800,
   });
-
   const winId = newWin.id;
-  windows.set(winId, { window: newWin, vaultDirectory: windowVaultDirectory });
+  if (windowVaultDirectory !== "") {
+    windows.set(winId, {
+      window: newWin,
+      vaultDirectory: windowVaultDirectory,
+    });
 
+    addDirectoryToVaultWindows(store, windowVaultDirectory);
+  }
   if (url) {
     // electron-vite-vue#298
     newWin.loadURL(url);
@@ -92,9 +101,16 @@ async function createWindow(windowVaultDirectory: string) {
     newWin.loadFile(indexHtml);
   }
 
-  // Test actively push message to the Electron-Renderer
+  // Test actively push message to the Electron-Renderer.
   newWin.webContents.on("did-finish-load", () => {
-    newWin?.webContents.send("window-vault-directory", windowVaultDirectory);
+    if (windowVaultDirectory !== "")
+      newWin?.webContents.send("window-vault-directory", windowVaultDirectory);
+  });
+
+  newWin.on("closed", () => {
+    windows.delete(winId);
+    removeDirectoryFromVaultWindows(store, windowVaultDirectory);
+    console.log(`Window with ID ${winId} was closed`);
   });
 
   // Make all links open with the browser, not with the application
@@ -112,8 +128,15 @@ async function createWindow(windowVaultDirectory: string) {
 }
 
 app.whenReady().then(async () => {
-  const userDirectory = store.get(StoreKeys.UserDirectory) as string;
-  createWindow(userDirectory);
+  const previousVaultDirectories = store.get(
+    StoreKeys.VaultDirectoriesOpenInWindows
+  ) as string[];
+  console.log("previousVaultDirectories: ", previousVaultDirectories);
+  if (previousVaultDirectories && previousVaultDirectories.length > 0) {
+    createWindow(previousVaultDirectories[0]);
+  } else {
+    createWindow("");
+  }
 });
 
 app.on("window-all-closed", () => {
@@ -123,12 +146,20 @@ app.on("window-all-closed", () => {
 });
 
 app.on("activate", () => {
+  console.log("LHUILLIER ACTIVATE");
   const allWindows = BrowserWindow.getAllWindows();
+  console.log("allWindows: ", allWindows);
   if (allWindows.length) {
     allWindows[0].focus();
   } else {
-    const userDirectory = store.get(StoreKeys.UserDirectory) as string;
-    createWindow(userDirectory);
+    const previousVaultDirectories = store.get(
+      StoreKeys.VaultDirectoriesOpenInWindows
+    ) as string[];
+    if (previousVaultDirectories && previousVaultDirectories.length > 0) {
+      createWindow(previousVaultDirectories[0]);
+    } else {
+      createWindow("");
+    }
   }
 });
 
@@ -148,6 +179,39 @@ ipcMain.handle("open-win", (_, arg) => {
     childWindow.loadFile(indexHtml, { hash: arg });
   }
 });
+
+ipcMain.handle("set-directory", (event, directory: string) => {
+  console.log("SET DIRECTORY: ", directory);
+  const webContents = event.sender;
+  const win = BrowserWindow.fromWebContents(webContents);
+
+  if (win) {
+    const windowInfoFromMapInMemory = windows.get(win.id);
+
+    if (
+      windowInfoFromMapInMemory &&
+      windowInfoFromMapInMemory.vaultDirectory !== directory
+    ) {
+      // A different directory is already associated with this window
+      // Open a new window with the new directory
+      console.log("OPENING NEW WINDOW WITH NEW DIRECTORY: ", directory);
+
+      createWindow(directory);
+    } else {
+      // No directory is associated with this window or it's the same directory
+      // Update the Map with the new directory
+      console.log("SETTING NEW DIRECTORY FOR CURRENT WINDOW: ", directory);
+      windows.set(win.id, { window: win, vaultDirectory: directory });
+      // so here we probably need to run through some of the same logic we do in other cases
+      addDirectoryToVaultWindows(store, directory);
+      // win.webContents.send("window-vault-directory", directory);
+    }
+  }
+});
+
+// ipcMain.on("open-new-window", (event, directory: string) => {
+//   createWindow(directory);
+// });
 
 // ipcMain.on("request-window-vault-directory", (event) => {
 //   const webContents = event.sender;
@@ -184,57 +248,53 @@ ipcMain.handle("open-file-dialog", async (event, extensions) => {
   }
 });
 
-ipcMain.on("index-files-in-directory", async (event) => {
-  try {
-    const senderWindowId = event.sender.id;
+// TODO: perhaps this function ought to take in a directory.
+// and that could work fairly well.
+// though perhaps we'd want to think about whether
 
-    // Retrieve the corresponding BrowserWindow instance
-    const targetWindow = windows.get(senderWindowId);
-    if (!targetWindow) {
-      throw new Error("No window found for the sender of the event");
-    }
-    // const userDirectory = store.get(StoreKeys.UserDirectory) as string;
-    // if (!userDirectory) {
-    //   throw new Error("No user directory set");
-    // }
-    const embedFuncRepoName = store.get(
-      StoreKeys.DefaultEmbedFuncRepo
-    ) as string;
-    if (!embedFuncRepoName) {
-      throw new Error("No default embed func repo set");
-    }
-    const dbPath = path.join(app.getPath("userData"), "vectordb");
-    console.log("dbPath: ", dbPath);
-    dbConnection = await lancedb.connect(dbPath);
-    console.log("dbConnection: ", dbConnection);
-    await dbTable.initialize(
-      dbConnection,
-      targetWindow?.vaultDirectory,
-      embedFuncRepoName
-    );
-    console.log("initialized: ", dbTable);
-    await repopulateTableWithMissingItems(
-      dbTable,
-      targetWindow?.vaultDirectory,
-      (progress) => {
-        event.sender.send("indexing-progress", progress);
+// Yeah we just need to reason about how it'd work to send back progress
+ipcMain.on(
+  "index-files-in-directory",
+  async (event, directoryToIndex: string) => {
+    try {
+      const embedFuncRepoName = store.get(
+        StoreKeys.DefaultEmbedFuncRepo
+      ) as string;
+      if (!embedFuncRepoName) {
+        throw new Error("No default embed func repo set");
       }
-    );
-    console.log("repopulated: ", dbTable);
-    if (targetWindow?.window) {
-      startWatchingDirectory(targetWindow.window, targetWindow?.vaultDirectory);
-      updateFileListForRenderer(
-        targetWindow.window,
-        targetWindow?.vaultDirectory
+      const dbPath = path.join(app.getPath("userData"), "vectordb");
+      console.log("dbPath: ", dbPath);
+      dbConnection = await lancedb.connect(dbPath);
+      console.log("dbConnection: ", dbConnection);
+      await dbTable.initialize(
+        dbConnection,
+        directoryToIndex,
+        embedFuncRepoName
       );
+      console.log("initialized: ", dbTable);
+      await repopulateTableWithMissingItems(
+        dbTable,
+        directoryToIndex,
+        (progress) => {
+          event.sender.send("indexing-progress", progress);
+        }
+      );
+      console.log("repopulated: ", dbTable);
+      if (event.sender) {
+        startWatchingDirectory(event.sender, directoryToIndex);
+        updateFileListForRenderer(event.sender, directoryToIndex);
+      }
+      event.sender.send("indexing-progress", 1);
+    } catch (error) {
+      event.sender.send(
+        "indexing-error",
+        `Indexing error: ${error}. Please try restarting or open an issue on GitHub.`
+      );
+      console.error("Error during file indexing:", error);
     }
-    event.sender.send("indexing-progress", 1);
-  } catch (error) {
-    const nonLinuxError = `Indexing error: ${error}. Please try restarting or send me an email with your error: samlhuillier1@gmail.com`;
-    event.sender.send("indexing-error", nonLinuxError);
-    console.error("Error during file indexing:", error);
   }
-});
+);
 
 ipcMain.on("show-context-menu-file-item", (event, file) => {
   const menu = new Menu();

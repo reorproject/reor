@@ -9,18 +9,18 @@ export const registerStoreHandlers = (
   fileWatcher: FSWatcher | null
 ) => {
   setupDefaultStoreValues(store);
-  ipcMain.on(
-    "set-user-directory",
-    async (event, userDirectory: string): Promise<void> => {
-      console.log("setting user directory", userDirectory);
-      store.set(StoreKeys.UserDirectory, userDirectory);
-      if (fileWatcher) {
-        fileWatcher.close();
-      }
+  // ipcMain.on(
+  //   "set-user-directory",
+  //   async (event, userDirectory: string): Promise<void> => {
+  //     console.log("setting user directory", userDirectory);
+  //     store.set(StoreKeys.UserDirectory, userDirectory);
+  //     if (fileWatcher) {
+  //       fileWatcher.close();
+  //     }
 
-      event.returnValue = "success";
-    }
-  );
+  //     event.returnValue = "success";
+  //   }
+  // );
 
   ipcMain.on("set-default-embed-func-repo", (event, repoName: string) => {
     store.set(StoreKeys.DefaultEmbedFuncRepo, repoName);
@@ -75,10 +75,10 @@ export const registerStoreHandlers = (
     }
   );
 
-  ipcMain.on("get-user-directory", (event) => {
-    const path = store.get(StoreKeys.UserDirectory);
-    event.returnValue = path;
-  });
+  // ipcMain.on("get-user-directory", (event) => {
+  //   const path = store.get(StoreKeys.UserDirectory);
+  //   event.returnValue = path;
+  // });
 
   ipcMain.on("get-default-embed-func-repo", (event) => {
     event.returnValue = store.get(StoreKeys.DefaultEmbedFuncRepo);
@@ -116,4 +116,46 @@ export function setupDefaultStoreValues(store: Store<StoreSchema>) {
   if (!store.get(StoreKeys.MaxRAGExamples)) {
     store.set(StoreKeys.MaxRAGExamples, 10);
   }
+}
+
+export function addDirectoryToVaultWindows(
+  store: Store<StoreSchema>,
+  directory: string
+) {
+  // Get the current array of directories
+  const vaultDirectories = store.get(
+    StoreKeys.VaultDirectoriesOpenInWindows,
+    []
+  );
+
+  // Add the new directory if it's not already in the array
+  if (!vaultDirectories.includes(directory)) {
+    vaultDirectories.push(directory);
+    store.set(StoreKeys.VaultDirectoriesOpenInWindows, vaultDirectories);
+  }
+}
+
+export function removeDirectoryFromVaultWindows(
+  store: Store<StoreSchema>,
+  directory: string,
+  ensureAtLeastOne: boolean = true
+) {
+  // Get the current array of directories
+  let vaultDirectories = store.get(StoreKeys.VaultDirectoriesOpenInWindows, []);
+
+  // If ensureAtLeastOne is true, do not remove if it's the last directory
+  if (
+    ensureAtLeastOne &&
+    vaultDirectories.length <= 1 &&
+    vaultDirectories.includes(directory)
+  ) {
+    console.warn(
+      "Cannot remove the last directory when ensureAtLeastOne is true."
+    );
+    return; // Exit the function without removing
+  }
+
+  // Remove the directory from the array
+  vaultDirectories = vaultDirectories.filter((dir) => dir !== directory);
+  store.set(StoreKeys.VaultDirectoriesOpenInWindows, vaultDirectories);
 }

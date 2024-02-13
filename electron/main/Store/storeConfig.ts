@@ -22,9 +22,7 @@ export interface RAGConfig {
 }
 
 export interface StoreSchema {
-  user: {
-    directory?: string;
-  };
+  vaultDirectoriesOpenInWindows: string[];
   aiModels: {
     [modelName: string]: AIModelConfig;
   };
@@ -35,7 +33,7 @@ export interface StoreSchema {
 
 // Enum for store keys
 export enum StoreKeys {
-  UserDirectory = "user.directory",
+  VaultDirectoriesOpenInWindows = "vaultDirectoriesOpenInWindows",
   AIModels = "aiModels",
   DefaultAIModel = "defaultAIModel",
   DefaultEmbedFuncRepo = "defaultEmbedFuncRepo",
