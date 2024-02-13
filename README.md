@@ -17,7 +17,7 @@ An AI note-taking app that runs models locally.</h4>
 ## About
 **Reor** is a private note-taking app that uses AI to organize notes: it automatically links related ideas, answers questions with your notes as context and provides full semantic search. Everything is stored locally and you can edit your notes with an Obsidian-like markdown editor. 
 
-Reor was built right from the very start to **run models locally**. We believe running models locally *(and privately)* is essential: no one entity should be in control of AGI and put it behind a black box, no matter how "open" they claim to be. 
+Reor was built right from the very start to **run models locally**. Running models locally *(and privately)* is essential: no one entity should be in control of AGI and put it behind a black box, no matter how "open" they claim to be. 
 
 
 
