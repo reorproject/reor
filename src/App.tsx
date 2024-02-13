@@ -48,6 +48,7 @@ const App: React.FC<AppProps> = () => {
   useEffect(() => {
     window.ipcRenderer.receive("window-vault-directory", (dir: string) => {
       setWindowVaultDirectory(dir);
+      setUserHasConfiguredSettingsForIndexing(true);
       window.database.indexFilesInDirectory(dir);
     });
   }, []);
