@@ -77,15 +77,16 @@ const ChatWithLLM: React.FC = () => {
     }
     if (!currentSessionId || !userInput.trim()) return;
 
-    if (newMessages.length <= 1) {
-      const augmentedPrompt = await window.database.augmentPromptWithRAG(
-        userInput,
-        currentSessionId
-      );
-      startStreamingResponse(currentSessionId, augmentedPrompt);
-    } else {
-      startStreamingResponse(currentSessionId, userInput);
-    }
+    // if (newMessages.length <= 1) {
+    const augmentedPrompt = await window.database.augmentPromptWithRAG(
+      userInput,
+      currentSessionId
+    );
+    startStreamingResponse(currentSessionId, augmentedPrompt, true);
+    // }
+    // else {
+    //   startStreamingResponse(currentSessionId, userInput);
+    // }
 
     // Add the user's message to the messages
     setMessages([
@@ -127,11 +128,19 @@ const ChatWithLLM: React.FC = () => {
     };
   }, [sessionId]);
 
-  const startStreamingResponse = async (sessionId: string, prompt: string) => {
+  const startStreamingResponse = async (
+    sessionId: string,
+    prompt: string,
+    ignoreChatHistory?: boolean
+  ) => {
     try {
       console.log("Initializing streaming response...");
       setLoadingResponse(true);
-      await window.llm.initializeStreamingResponse(sessionId, prompt);
+      await window.llm.initializeStreamingResponse(
+        sessionId,
+        prompt,
+        ignoreChatHistory
+      );
       console.log("Initialized streaming response");
       setLoadingResponse(false);
     } catch (error) {

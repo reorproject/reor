@@ -33,7 +33,6 @@ export class LlamaCPPSessionService implements ISessionService {
   }
 
   private async loadModel(localModelPath: string): Promise<void> {
-    // try {
     const nodeLLamaCpp = await import("node-llama-cpp");
     // const llama = await nodeLLamaCpp.getLlama();
     this.model = new nodeLLamaCpp.LlamaModel({
@@ -41,12 +40,6 @@ export class LlamaCPPSessionService implements ISessionService {
       modelPath: localModelPath,
       gpuLayers: getGPULayersToUse(),
     });
-    // } catch (error) {
-    //   console.log("Error:", JSON.stringify(error, null, 2));
-
-    //   console.error("Error thrown in load model:", error);
-    //   throw error; // Propagate the error up
-    // }
   }
 
   private isModelLoaded(): boolean {
@@ -66,7 +59,8 @@ export class LlamaCPPSessionService implements ISessionService {
 
   public async streamingPrompt(
     prompt: string,
-    sendFunctionImplementer: ISendFunctionImplementer
+    sendFunctionImplementer: ISendFunctionImplementer,
+    ignoreChatHistory?: boolean
   ): Promise<string> {
     if (!this.session && !this.context) {
       sendFunctionImplementer.send("tokenStream", {
@@ -75,19 +69,16 @@ export class LlamaCPPSessionService implements ISessionService {
       });
       return "Session not initialized";
     }
+    if (ignoreChatHistory) {
+      this.session.setChatHistory([]);
+    }
     console.log("starting streaming prompt");
     this.abortController = new AbortController();
 
     try {
-      const tokensInput = this.tokenize(prompt);
-      console.log("tokensInput:", tokensInput.length);
       return await this.session.prompt(prompt, {
         onToken: (chunk: any[]) => {
-          // const decodedChunk = this.context.decode(chunk);
           const decodedChunk = this.session.model.detokenize(chunk);
-          // const encodedDecode = this.context.encode(decodedChunk);
-          // console.log("ENCODED :", encodedDecode);
-          console.log("chunk out: ", chunk);
           console.log("decodedChunk:", decodedChunk);
           sendFunctionImplementer.send("tokenStream", {
             messageType: "success",

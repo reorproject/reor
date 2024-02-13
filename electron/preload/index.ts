@@ -63,7 +63,8 @@ declare global {
       getOrCreateSession: (sessionId: string) => Promise<string>;
       initializeStreamingResponse: (
         sessionId: string,
-        prompt: string
+        prompt: string,
+        ignoreChatHistory?: boolean
       ) => Promise<string>;
     };
     electronStore: {
@@ -235,11 +236,16 @@ contextBridge.exposeInMainWorld("llm", {
   getOrCreateSession: async (sessionId: string) => {
     return await ipcRenderer.invoke("get-or-create-session", sessionId);
   },
-  initializeStreamingResponse: async (sessionId: string, prompt: string) => {
+  initializeStreamingResponse: async (
+    sessionId: string,
+    prompt: string,
+    ignoreChatHistory?: boolean
+  ) => {
     return await ipcRenderer.invoke(
       "initialize-streaming-response",
       sessionId,
-      prompt
+      prompt,
+      ignoreChatHistory
     );
   },
 });

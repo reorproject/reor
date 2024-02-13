@@ -54,14 +54,19 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
     async (
       event: IpcMainInvokeEvent,
       sessionId: string,
-      prompt: string
+      prompt: string,
+      ignoreChatHistory: boolean
     ): Promise<string> => {
       const sessionService = LLMSessions[sessionId];
       if (!sessionService) {
         throw new Error(`Session ${sessionId} does not exist.`);
       }
 
-      return sessionService.streamingPrompt(prompt, event.sender);
+      return sessionService.streamingPrompt(
+        prompt,
+        event.sender,
+        ignoreChatHistory
+      );
     }
   );
 };

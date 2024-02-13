@@ -13,7 +13,8 @@ export interface ISessionService {
    */
   streamingPrompt(
     prompt: string,
-    sendFunctionImplementer: ISendFunctionImplementer
+    sendFunctionImplementer: ISendFunctionImplementer,
+    ignoreChatHistory?: boolean
   ): Promise<string>;
 
   /**

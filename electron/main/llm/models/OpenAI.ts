@@ -54,12 +54,17 @@ export class OpenAIModelSessionService implements ISessionService {
 
   async streamingPrompt(
     prompt: string,
-    sendFunctionImplementer: ISendFunctionImplementer
+    sendFunctionImplementer: ISendFunctionImplementer,
+    ignoreChatHistory?: boolean
   ): Promise<string> {
     if (!this.isModelLoaded()) {
       throw new Error("Model not initialized");
     }
     this.abortStreaming = false;
+
+    if (ignoreChatHistory) {
+      this.messageHistory = [];
+    }
 
     // Add the user's prompt to the message history
     this.messageHistory.push({
