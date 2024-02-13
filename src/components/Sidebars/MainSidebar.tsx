@@ -35,6 +35,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
           setSearchQuery={setSearchQuery}
           searchResults={searchResults}
           setSearchResults={setSearchResults}
+          windowVaultDirectory={windowVaultDirectory}
         />
       )}
     </div>

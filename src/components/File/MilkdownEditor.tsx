@@ -20,12 +20,14 @@ export interface MarkdownEditorProps {
   // content: string;
   setContentInParent: (content: string) => void;
   lastSavedContentRef: React.MutableRefObject<string>;
+  windowVaultDirectory: string;
 }
 
 const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
   filePath,
   setContentInParent,
   lastSavedContentRef,
+  windowVaultDirectory,
   // content,
   // setContent,
 }) => {
@@ -38,7 +40,7 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
     if (content !== lastSavedContentRef.current) {
       // Check for changes since last save
       console.log("calling save file:");
-      await window.files.writeFile(filePath, content);
+      await window.files.writeFile(filePath, content, windowVaultDirectory);
       lastSavedContentRef.current = content; // Update the ref to the latest saved content
     }
   };

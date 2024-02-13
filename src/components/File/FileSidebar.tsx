@@ -78,6 +78,7 @@ export const FileSidebar: React.FC<FileListProps> = ({
         onFileSelect={onFileSelect}
         handleDragStart={handleDragStartImpl}
         directoryPath={windowVaultDirectory}
+        windowVaultDirectory={windowVaultDirectory}
       />
     </div>
   );
@@ -88,8 +89,16 @@ const handleDragStartImpl = (e: React.DragEvent, file: FileInfoNode) => {
   e.dataTransfer.effectAllowed = "move";
 };
 
-export const moveFile = async (sourcePath: string, destinationPath: string) => {
-  await window.files.moveFileOrDir(sourcePath, destinationPath);
+export const moveFile = async (
+  sourcePath: string,
+  destinationPath: string,
+  windowVaultDirectory: string
+) => {
+  await window.files.moveFileOrDir(
+    sourcePath,
+    destinationPath,
+    windowVaultDirectory
+  );
 };
 
 interface FileExplorerProps {
@@ -98,6 +107,7 @@ interface FileExplorerProps {
   onFileSelect: (path: string) => void;
   handleDragStart: (e: React.DragEvent, file: FileInfoNode) => void;
   directoryPath: string;
+  windowVaultDirectory: string;
 }
 
 const FileExplorer: React.FC<FileExplorerProps> = ({
@@ -105,6 +115,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   selectedFile,
   onFileSelect,
   handleDragStart,
+  windowVaultDirectory,
 }) => {
   const [listHeight, setListHeight] = useState(window.innerHeight);
   const [expandedDirectories, setExpandedDirectories] = useState<string[]>([]);
@@ -176,6 +187,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
           onDirectoryToggle={handleDirectoryToggle}
           isExpanded={expandedDirectories.includes(fileObject.file.path)}
           indentMultiplyer={fileObject.indentMultiplyer}
+          windowVaultDirectory={windowVaultDirectory}
         />
       </div>
     );
@@ -203,6 +215,7 @@ interface FileInfoProps {
   onDirectoryToggle: (path: string) => void;
   isExpanded?: boolean;
   indentMultiplyer?: number;
+  windowVaultDirectory: string;
 }
 const FileItem: React.FC<FileInfoProps> = ({
   file,
@@ -212,6 +225,7 @@ const FileItem: React.FC<FileInfoProps> = ({
   onDirectoryToggle,
   isExpanded,
   indentMultiplyer,
+  windowVaultDirectory,
 }) => {
   // const [isExpanded, setIsExpanded] = useState(false);
   const isDirectory = isFileNodeDirectory(file);
@@ -242,7 +256,7 @@ const FileItem: React.FC<FileInfoProps> = ({
     }
 
     try {
-      moveFile(sourcePath, destinationPath);
+      moveFile(sourcePath, destinationPath, windowVaultDirectory);
       // Refresh file list here or in moveFile function
     } catch (error) {
       console.error("Failed to move file:", error);

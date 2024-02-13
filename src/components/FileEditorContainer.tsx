@@ -27,7 +27,11 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({
   const onFileSelect = async (path: string) => {
     if (selectedFilePath && editorContent !== lastSavedContentRef.current) {
       try {
-        await window.files.writeFile(selectedFilePath, editorContent); // save the current content.
+        await window.files.writeFile(
+          selectedFilePath,
+          editorContent,
+          windowVaultDirectory
+        ); // save the current content.
       } catch (e) {
         toast.error("Error saving current file! Please try again.", {
           className: "mt-5",
@@ -86,6 +90,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({
                   filePath={selectedFilePath}
                   setContentInParent={setEditorContent}
                   lastSavedContentRef={lastSavedContentRef}
+                  windowVaultDirectory={windowVaultDirectory}
                 />
               </div>
               {showSimilarFiles && (
@@ -93,6 +98,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({
                   <SimilarEntriesComponent
                     filePath={selectedFilePath}
                     onFileSelect={onFileSelect}
+                    windowVaultDirectory={windowVaultDirectory}
                   />
                 </ResizableComponent>
               )}
@@ -107,7 +113,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = ({
             // style={{ height: `calc(100vh - ${titleBarHeight})` }}
           >
             <ResizableComponent resizeSide="left" initialWidth={300}>
-              <ChatWithLLM />
+              <ChatWithLLM windowVaultDirectory={windowVaultDirectory} />
             </ResizableComponent>
           </div>
         )}

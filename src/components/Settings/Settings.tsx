@@ -3,6 +3,7 @@ import Modal from "../Generic/Modal";
 import LLMSettings from "./LLMSettings";
 import EmbeddingModelManager from "./EmbeddingSettings";
 import RagSettings from "./RagSettings";
+import { Button } from "@material-tailwind/react";
 interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -18,12 +19,20 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 }) => {
   const [willNeedToReIndex, setWillNeedToReIndex] = useState(false);
   const [activeTab, setActiveTab] = useState<TabName>("llmSettings");
+  const [userDirectory, setUserDirectory] = useState<string>("");
 
   const handleSave = () => {
     if (willNeedToReIndex) {
       window.database.indexFilesInDirectory(windowVaultDirectory);
     }
     onCloseFromParent();
+  };
+
+  const handleDirectorySelection = async () => {
+    const paths = await window.files.openDirectoryDialog();
+    if (paths && paths[0]) {
+      setUserDirectory(paths[0]);
+    }
   };
 
   if (!isOpen) return null;
@@ -123,10 +132,35 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 setErrorMsg={setErrorMsg}
                 windowVaultDirectory={windowVaultDirectory}
               /> */}
+              <div>
+                <Button
+                  className="bg-slate-700  border-none h-10 hover:bg-slate-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
+                  onClick={handleDirectorySelection}
+                  placeholder=""
+                >
+                  Select Directory
+                </Button>
+                {userDirectory && (
+                  <p className="mt-2 text-xs text-gray-100">
+                    Selected: <strong>{userDirectory}</strong>
+                  </p>
+                )}
+              </div>
               <p className="mt-2 text-xs text-gray-100 ">
                 Your vault directory doesn&apos;t need to be empty. Only
                 markdown files will be indexed.
               </p>
+              {userDirectory && (
+                <Button
+                  className="bg-slate-700  border-none h-10 hover:bg-slate-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
+                  onClick={() =>
+                    window.electronStore.setNewVaultDirectory(userDirectory)
+                  }
+                  placeholder=""
+                >
+                  Open New Vault
+                </Button>
+              )}
             </div>
           )}
 

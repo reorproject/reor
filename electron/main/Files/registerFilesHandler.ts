@@ -14,7 +14,7 @@ import { updateFileInTable } from "../database/TableHelperFunctions";
 
 export const registerFileHandlers = (
   store: Store<StoreSchema>,
-  dbTable: LanceDBTableWrapper,
+  dbTables: Map<string, LanceDBTableWrapper>,
   win: BrowserWindow
 ) => {
   ipcMain.handle("join-path", (event, ...args) => {
@@ -38,11 +38,22 @@ export const registerFileHandlers = (
 
   ipcMain.handle(
     "write-file",
-    async (event, filePath: string, content: string): Promise<void> => {
+    async (
+      event,
+      filePath: string,
+      content: string,
+      vaultDirectory: string
+    ): Promise<void> => {
       console.log("Writing file", filePath);
       await fs.writeFileSync(filePath, content, "utf-8");
       console.log("Done writing file", filePath);
       try {
+        const dbTable = dbTables.get(vaultDirectory);
+        if (!dbTable) {
+          throw new Error(
+            `No database table found for directory ${vaultDirectory}`
+          );
+        }
         await updateFileInTable(dbTable, filePath, content);
         win?.webContents.send("vector-database-update");
       } catch (error) {
@@ -98,8 +109,19 @@ export const registerFileHandlers = (
 
   ipcMain.handle(
     "move-file-or-dir",
-    async (event, sourcePath: string, destinationPath: string) => {
+    async (
+      event,
+      sourcePath: string,
+      destinationPath: string,
+      vaultDirectory: string
+    ) => {
       try {
+        const dbTable = dbTables.get(vaultDirectory);
+        if (!dbTable) {
+          throw new Error(
+            `No database table found for directory ${vaultDirectory}`
+          );
+        }
         orchestrateEntryMove(dbTable, sourcePath, destinationPath);
       } catch (error) {
         console.error("Error moving file or directory:", error);

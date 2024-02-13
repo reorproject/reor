@@ -30,6 +30,7 @@ export interface MdxEditor {
   // content: string;
   setContentInParent: (content: string) => void;
   lastSavedContentRef: React.MutableRefObject<string>;
+  windowVaultDirectory: string;
 }
 
 export const MdxEditor: React.FC<MdxEditor> = ({
@@ -37,6 +38,7 @@ export const MdxEditor: React.FC<MdxEditor> = ({
   // content,
   setContentInParent,
   lastSavedContentRef,
+  windowVaultDirectory,
 }) => {
   const [content, setContent] = useState<string>("");
   const ref = useRef<MDXEditorMethods>(null);
@@ -65,7 +67,7 @@ export const MdxEditor: React.FC<MdxEditor> = ({
     if (content !== lastSavedContentRef.current) {
       // Check for changes since last save
       console.log("calling save file:");
-      await window.files.writeFile(filePath, content);
+      await window.files.writeFile(filePath, content, windowVaultDirectory);
       lastSavedContentRef.current = content; // Update the ref to the latest saved content
     }
   };

@@ -6,7 +6,11 @@ import Textarea from "@mui/joy/Textarea";
 import CircularProgress from "@mui/material/CircularProgress";
 import ReactMarkdown from "react-markdown";
 
-const ChatWithLLM: React.FC = () => {
+interface ChatWithLLMProps {
+  windowVaultDirectory: string;
+}
+
+const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ windowVaultDirectory }) => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   // const [loadingSession, setLoadingSession] = useState<boolean>(false);
   const [userInput, setUserInput] = useState<string>("");
@@ -80,7 +84,8 @@ const ChatWithLLM: React.FC = () => {
     if (newMessages.length <= 1) {
       const augmentedPrompt = await window.database.augmentPromptWithRAG(
         userInput,
-        currentSessionId
+        currentSessionId,
+        windowVaultDirectory
       );
       startStreamingResponse(currentSessionId, augmentedPrompt);
     } else {

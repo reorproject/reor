@@ -7,7 +7,7 @@ import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 
 export const registerDBSessionHandlers = (
-  dbTable: LanceDBTableWrapper,
+  dbTables: Map<string, LanceDBTableWrapper>,
   store: Store<StoreSchema>
 ) => {
   ipcMain.handle(
@@ -16,9 +16,16 @@ export const registerDBSessionHandlers = (
       event,
       query: string,
       limit: number,
+      vaultDirectory: string,
       filter?: string
     ): Promise<DBEntry[]> => {
       try {
+        const dbTable = dbTables.get(vaultDirectory);
+        if (!dbTable) {
+          throw new Error(
+            `No database table found for directory ${vaultDirectory}`
+          );
+        }
         const searchResults = await dbTable.search(query, limit, filter);
         return searchResults;
       } catch (error) {
@@ -34,6 +41,7 @@ export const registerDBSessionHandlers = (
       event,
       query: string,
       llmSessionID: string,
+      directoryTableRepresents: string,
       filter?: string
     ): Promise<string> => {
       try {
@@ -41,6 +49,12 @@ export const registerDBSessionHandlers = (
         const maxRAGExamples: number = store.get(StoreKeys.MaxRAGExamples);
 
         if (maxRAGExamples && maxRAGExamples > 0) {
+          const dbTable = dbTables.get(directoryTableRepresents);
+          if (!dbTable) {
+            throw new Error(
+              `No database table found for directory ${directoryTableRepresents}`
+            );
+          }
           searchResults = await dbTable.search(query, maxRAGExamples, filter);
         } else {
           throw new Error("Max RAG examples is not set or is invalid.");

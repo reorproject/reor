@@ -29,12 +29,14 @@ declare global {
       search: (
         query: string,
         limit: number,
+        vaultDirectory: string,
         filter?: string
       ) => Promise<DBQueryResult[]>;
       indexFilesInDirectory: (directoryToIndex: string) => void;
       augmentPromptWithRAG: (
         prompt: string,
         llmSessionID: string,
+        vaultDirectory: string,
         filter?: string
       ) => Promise<string>;
       getDatabaseFields: () => Promise<Record<string, string>>;
@@ -43,14 +45,19 @@ declare global {
       openDirectoryDialog: () => Promise<string[]>;
       openFileDialog: (fileExtensions?: string[]) => Promise<string[]>;
       getFiles: (windowVaultDirectory: string) => Promise<FileInfoTree>;
-      writeFile: (filePath: string, content: string) => Promise<void>;
+      writeFile: (
+        filePath: string,
+        content: string,
+        vaultDirectory: string
+      ) => Promise<void>;
       readFile: (filePath: string) => Promise<string>;
       createFile: (filePath: string, content: string) => Promise<void>;
       createDirectory: (dirPath: string) => Promise<void>;
       joinPath: (...pathSegments: string[]) => Promise<string>;
       moveFileOrDir: (
         sourcePath: string,
-        destinationPath: string
+        destinationPath: string,
+        vaultDirectory: string
       ) => Promise<void>;
     };
     path: {
@@ -94,9 +101,10 @@ contextBridge.exposeInMainWorld("database", {
   search: async (
     query: string,
     limit: number,
+    vaultDirectory: string,
     filter?: string
   ): Promise<DBEntry[]> => {
-    return ipcRenderer.invoke("search", query, limit, filter);
+    return ipcRenderer.invoke("search", query, limit, vaultDirectory, filter);
   },
   indexFilesInDirectory: async (directoryToIndex: string) => {
     return ipcRenderer.send("index-files-in-directory", directoryToIndex);
@@ -104,12 +112,14 @@ contextBridge.exposeInMainWorld("database", {
   augmentPromptWithRAG: async (
     prompt: string,
     llmSessionID: string,
+    vaultDirectory: string,
     filter?: string
   ): Promise<DBEntry[]> => {
     return ipcRenderer.invoke(
       "augment-prompt-with-rag",
       prompt,
       llmSessionID,
+      vaultDirectory,
       filter
     );
   },
@@ -201,8 +211,12 @@ contextBridge.exposeInMainWorld("files", {
   },
 
   // Write content to a file
-  writeFile: async (filePath: string, content: string) => {
-    return ipcRenderer.invoke("write-file", filePath, content);
+  writeFile: async (
+    filePath: string,
+    content: string,
+    vaultDirectory: string
+  ) => {
+    return ipcRenderer.invoke("write-file", filePath, content, vaultDirectory);
   },
 
   createFile: async (filePath: string, content: string) => {
@@ -220,8 +234,17 @@ contextBridge.exposeInMainWorld("files", {
   joinPath: (...pathSegments: string[]) =>
     ipcRenderer.invoke("join-path", ...pathSegments),
 
-  moveFileOrDir: async (sourcePath: string, destinationPath: string) => {
-    return ipcRenderer.invoke("move-file-or-dir", sourcePath, destinationPath);
+  moveFileOrDir: async (
+    sourcePath: string,
+    destinationPath: string,
+    vaultDirectory: string
+  ) => {
+    return ipcRenderer.invoke(
+      "move-file-or-dir",
+      sourcePath,
+      destinationPath,
+      vaultDirectory
+    );
   },
 });
 

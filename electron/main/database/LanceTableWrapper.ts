@@ -15,17 +15,19 @@ export class LanceDBTableWrapper {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private table!: LanceDBTable<any>;
   private embedFun!: EnhancedEmbeddingFunction<string | number[]>;
+  public directoryTableRepresents: string = "";
 
   async initialize(
     dbConnection: Connection,
-    userDirectory: string,
+    directoryTableRepresents: string,
     embedFuncRepoName: string
   ) {
+    this.directoryTableRepresents = directoryTableRepresents;
     this.embedFun = await createEmbeddingFunction(embedFuncRepoName, "content");
     this.table = await GetOrCreateLanceTable(
       dbConnection,
       this.embedFun,
-      userDirectory
+      directoryTableRepresents
     );
   }
 

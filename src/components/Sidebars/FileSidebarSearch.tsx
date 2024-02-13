@@ -9,6 +9,7 @@ interface SearchComponentProps {
   setSearchQuery: (query: string) => void;
   searchResults: DBQueryResult[];
   setSearchResults: (results: DBQueryResult[]) => void;
+  windowVaultDirectory: string;
 }
 
 const SearchComponent: React.FC<SearchComponentProps> = ({
@@ -17,11 +18,16 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   setSearchQuery,
   searchResults,
   setSearchResults,
+  windowVaultDirectory,
 }) => {
   const searchInputRef = useRef<HTMLInputElement>(null); // Reference for the input field
 
   const handleSearch = async (query: string) => {
-    const results: DBQueryResult[] = await window.database.search(query, 50);
+    const results: DBQueryResult[] = await window.database.search(
+      query,
+      50,
+      windowVaultDirectory
+    );
     setSearchResults(results);
   };
 

@@ -6,11 +6,13 @@ import { PiGraph } from "react-icons/pi";
 interface SimilarEntriesComponentProps {
   filePath: string;
   onFileSelect: (path: string) => void;
+  windowVaultDirectory: string;
 }
 
 const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   filePath,
   onFileSelect,
+  windowVaultDirectory,
 }) => {
   const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -19,7 +21,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   const handleNewFileOpen = async (path: string) => {
     setLoading(true);
     try {
-      const searchResults = await performSearch(path);
+      const searchResults = await performSearch(path, windowVaultDirectory);
       if (searchResults.length > 0) {
         setSimilarEntries(searchResults);
       } else {
@@ -32,7 +34,10 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     }
   };
 
-  const performSearch = async (filePath: string): Promise<DBQueryResult[]> => {
+  const performSearch = async (
+    filePath: string,
+    windowVaultDirectory: string
+  ): Promise<DBQueryResult[]> => {
     const fileContent: string = await window.files.readFile(filePath);
     // Ok so that wouldn't be too hard to do here: chunk the ting and just perform a search based on the chunks.
     // And in fact, it's probably slightly wasteful to be doing all these embeddings
@@ -46,6 +51,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     const searchResults: DBQueryResult[] = await window.database.search(
       fileContent,
       30,
+      windowVaultDirectory,
       filterString
     );
     return searchResults;
@@ -59,7 +65,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
 
   useEffect(() => {
     const vectorDBUpdateListener = async () => {
-      const searchResults = await performSearch(filePath);
+      const searchResults = await performSearch(filePath, windowVaultDirectory);
       if (searchResults.length > 0) {
         setSimilarEntries(searchResults);
       }

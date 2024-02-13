@@ -53,6 +53,7 @@ if (!app.requestSingleInstanceLock()) {
 
 interface WindowInfo {
   window: BrowserWindow;
+  // tableForVaultDirectory: LanceDBTableWrapper
   vaultDirectory: string;
 }
 
@@ -63,13 +64,13 @@ const url = process.env.VITE_DEV_SERVER_URL;
 const indexHtml = join(process.env.DIST, "index.html");
 
 let dbConnection: lancedb.Connection;
-const dbTable = new LanceDBTableWrapper();
+
+const dbTables = new Map<string, LanceDBTableWrapper>();
 const fileWatcher: FSWatcher | null = null;
 
 async function createWindow(windowVaultDirectory: string) {
   const newWin = new BrowserWindow({
     title: "Main window",
-    // icon: join(process.env.VITE_PUBLIC, "favicon.ico"), // oh we could also try just setting this to .ico
     webPreferences: {
       preload,
     },
@@ -88,9 +89,11 @@ async function createWindow(windowVaultDirectory: string) {
     windows.set(winId, {
       window: newWin,
       vaultDirectory: windowVaultDirectory,
+      // tableForVaultDirectory: newDBTable,
     });
 
     addDirectoryToVaultWindows(store, windowVaultDirectory);
+    dbTables.set(windowVaultDirectory, new LanceDBTableWrapper());
   }
   if (url) {
     // electron-vite-vue#298
@@ -122,9 +125,9 @@ async function createWindow(windowVaultDirectory: string) {
   // Apply electron-updater
   update(newWin);
   registerLLMSessionHandlers(store);
-  registerDBSessionHandlers(dbTable, store);
+  registerDBSessionHandlers(dbTables, store);
   registerStoreHandlers(store, fileWatcher);
-  registerFileHandlers(store, dbTable, newWin);
+  registerFileHandlers(store, dbTables, newWin);
 }
 
 app.whenReady().then(async () => {
@@ -201,7 +204,10 @@ ipcMain.handle("set-directory", (event, directory: string) => {
       // No directory is associated with this window or it's the same directory
       // Update the Map with the new directory
       console.log("SETTING NEW DIRECTORY FOR CURRENT WINDOW: ", directory);
-      windows.set(win.id, { window: win, vaultDirectory: directory });
+      windows.set(win.id, {
+        window: win,
+        vaultDirectory: directory,
+      });
       // so here we probably need to run through some of the same logic we do in other cases
       addDirectoryToVaultWindows(store, directory);
       // win.webContents.send("window-vault-directory", directory);
@@ -263,10 +269,20 @@ ipcMain.on(
       if (!embedFuncRepoName) {
         throw new Error("No default embed func repo set");
       }
+      if (!directoryToIndex) {
+        throw new Error("No directory to index");
+      }
+
       const dbPath = path.join(app.getPath("userData"), "vectordb");
       console.log("dbPath: ", dbPath);
       dbConnection = await lancedb.connect(dbPath);
       console.log("dbConnection: ", dbConnection);
+
+      let dbTable = dbTables.get(directoryToIndex);
+      if (!dbTable) {
+        dbTable = new LanceDBTableWrapper();
+        dbTables.set(directoryToIndex, dbTable);
+      }
       await dbTable.initialize(
         dbConnection,
         directoryToIndex,
