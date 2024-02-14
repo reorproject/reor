@@ -67,6 +67,9 @@ npm run dev
 npm run build
 ```
 
+### Contributions
+Contributions are welcome in all areas. Please raise an issue and discuss it before beginning work on a PR :)
+
 ## License
 GPL-3.0 license. See `LICENSE` for details.
 
