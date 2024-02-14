@@ -17,7 +17,7 @@ A self-organizing AI note-taking app that runs models locally.</h4>
 ## About
 **Reor** is an AI-powered desktop note-taking app: it automatically links related ideas, answers questions on your notes and provides semantic search. Everything is stored locally and you can edit your notes with an Obsidian-like markdown editor. 
 
-The hypothesis of the project is that the only way to make AI tools for thought truly private is to **run models locally**. Reor stands on the shoulders of the giants [Llama.cpp](https://github.com/ggerganov/llama.cpp) and [Transformers.js](https://github.com/xenova/transformers.js) to enable both LLMs and embedding models to run locally. Any GGUF model file on HuggingFace can be run in Reor. (Connecting to OpenAI-compatible APIs like Oobabooga is also supported.)
+The hypothesis of the project is that the only way to make AI tools for thought truly private is to **run models locally**. Reor stands on the shoulders of the giants [Llama.cpp](https://github.com/ggerganov/llama.cpp) and [Transformers.js](https://github.com/xenova/transformers.js) to enable both LLMs and embedding models to run locally. (Connecting to OpenAI-compatible APIs like Oobabooga is also supported.)
 
 ### How can it possibly be "self-organizing"?
 
@@ -26,7 +26,7 @@ The hypothesis of the project is that the only way to make AI tools for thought 
 3.  LLM-powered Q&A does RAG on the corpus of notes.
 4.  Everything can be searched semantically.
 
-One way to think about Reor is as a RAG app with two generators: the LLM and the human. In Q&A mode, the LLM is fed retrieved context from the corpus to help answer the query. Similarly, in editor mode, the human can toggle the sidebar to reveal related notes "retrieved" from the corpus. This is quite a powerful way of "augmenting" your writing by cross-referencing ideas in a current note against related ideas from your corpus.
+One way to think about Reor is as a RAG app with two generators: the LLM and the human. In Q&A mode, the LLM is fed retrieved context from the corpus to help answer a query. Similarly, in editor mode, the human can toggle the sidebar to reveal related notes "retrieved" from the corpus. This is quite a powerful way of "augmenting" your thoughts by cross-referencing ideas in a current note against related ideas from your corpus.
 
 https://github.com/reorproject/reor/assets/17236551/1bbc1b2d-c3d9-451c-a008-7f12c84f96db
 
@@ -42,7 +42,7 @@ Reor interacts directly with [Llama.cpp](https://github.com/ggerganov/llama.cpp)
 1. Download a GGUF model file. [HuggingFace](https://huggingface.co/models?sort=downloads&search=gguf) has this nice page with the most popular models. I recommend starting with a 7B 4-bit model and see how that performs on your system.
 2. Connect it in Reor settings under "Add a new local model".
 
-You can also connect to an OpenAI-compatible API like Oobabooga or Ollama.
+You can also connect to an OpenAI-compatible API like Oobabooga, Ollama or OpenAI itself!
 
 ### Importing notes from other apps
 Reor works within a single directory in the filesystem. You choose the directory on first boot.
