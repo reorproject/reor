@@ -33,7 +33,7 @@ https://github.com/reorproject/reor/assets/17236551/1bbc1b2d-c3d9-451c-a008-7f12
 
   
 ### Getting Started
-1. Download from [reorproject.org](https://reorproject.org). Mac, Linux & Windows are all supported.
+1. Download from [reorproject.org](https://reorproject.org) or [releases](https://github.com/reorproject/reor/releases). Mac, Linux & Windows are all supported.
 2. Install like a normal App.
 
 
