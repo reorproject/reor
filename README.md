@@ -15,24 +15,25 @@ A self-organizing AI note-taking app that runs models locally.</h4>
 
 
 ## About
-**Reor** is a private note-taking app that uses AI to organize notes: it automatically links related ideas, answers questions with your notes as context and provides full semantic search. Everything is stored locally and you can edit your notes with an Obsidian-like markdown editor. 
+**Reor** is a desktop note-taking app that uses AI to help you organize your notes: it automatically links related ideas, answers questions on your notes and provides semantic search. Everything is stored locally and you can edit your notes with a standard markdown editor. 
 
-Reor was built right from the very start to **run models locally**. Running models locally *(and privately)* is essential: no one entity should be in control of AGI and put it behind a black box, no matter how "open" they claim to be. 
+From the start, Reor was built to run models locally. Where they can, tools for thought should default to being private. In the age of AI, that means keeping models on-device. Reor stands on the shoulders of giants [Llama.cpp](https://github.com/ggerganov/llama.cpp) and [Transformers.js](https://github.com/xenova/transformers.js) to enable this. (And you do have the option to connect to OpenAI models or any OpenAI-compatible API if you wish.)
+
+### How can it possibly be "self-organizing"?
+
+1.  Everything you write is chunked and embedded into an internal [vector database](https://github.com/lancedb/lancedb).
+2.  Related notes are connected automatically via vector similarity.
+3.  LLM-powered Q&A performs full RAG with the notes in the corpus.
+4.  Everything can be searched semantically.
 
 
-
-
+One way to think about Reor is as a RAG app with two generators: the LLM and the human. In Q&A mode, the LLM is fed retrieved context from the corpus based on the question. Similarly, in editor mode, the human can toggle the sidebar to also reveal "retrieved" notes from the corpus. This is quite a powerful way of "augmenting" your ideas by comparing them to related ideas from your corpus.
 
 
 https://github.com/reorproject/reor/assets/17236551/1bbc1b2d-c3d9-451c-a008-7f12c84f96db
 
 
-### How can it possibly be "self-organizing"?
 
-- Everything you write is chunked and embedded into an internal [vector database](https://github.com/lancedb/lancedb).
-- Related notes are connected automatically via vector similarity.
-- LLM-powered Q&A performs full RAG with the notes in the corpus.
-- Everything can be searched semantically.
 
   
 ### Getting Started
