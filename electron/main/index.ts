@@ -51,21 +51,14 @@ if (!app.requestSingleInstanceLock()) {
   process.exit(0);
 }
 
-interface WindowInfo {
-  window: BrowserWindow;
-  // tableForVaultDirectory: LanceDBTableWrapper
-  vaultDirectory: string;
-}
-
-const windows = new Map<number, WindowInfo>();
-
 const preload = join(__dirname, "../preload/index.js");
 const url = process.env.VITE_DEV_SERVER_URL;
 const indexHtml = join(process.env.DIST, "index.html");
 
 let dbConnection: lancedb.Connection;
 
-const dbTables = new Map<string, LanceDBTableWrapper>();
+const windowIDToVaultDirectory = new Map<number, string>();
+const vaultDirectoryTodbTable = new Map<string, LanceDBTableWrapper>();
 const fileWatcher: FSWatcher | null = null;
 
 async function createWindow(windowVaultDirectory: string) {
@@ -86,14 +79,13 @@ async function createWindow(windowVaultDirectory: string) {
   });
   const winId = newWin.id;
   if (windowVaultDirectory !== "") {
-    windows.set(winId, {
-      window: newWin,
-      vaultDirectory: windowVaultDirectory,
-      // tableForVaultDirectory: newDBTable,
-    });
+    windowIDToVaultDirectory.set(winId, windowVaultDirectory);
 
     addDirectoryToVaultWindows(store, windowVaultDirectory);
-    dbTables.set(windowVaultDirectory, new LanceDBTableWrapper());
+    vaultDirectoryTodbTable.set(
+      windowVaultDirectory,
+      new LanceDBTableWrapper()
+    );
   }
   if (url) {
     // electron-vite-vue#298
@@ -111,7 +103,7 @@ async function createWindow(windowVaultDirectory: string) {
   });
 
   newWin.on("closed", () => {
-    windows.delete(winId);
+    windowIDToVaultDirectory.delete(winId);
     removeDirectoryFromVaultWindows(store, windowVaultDirectory);
     console.log(`Window with ID ${winId} was closed`);
   });
@@ -125,9 +117,9 @@ async function createWindow(windowVaultDirectory: string) {
   // Apply electron-updater
   update(newWin);
   registerLLMSessionHandlers(store);
-  registerDBSessionHandlers(dbTables, store);
+  registerDBSessionHandlers(vaultDirectoryTodbTable, store);
   registerStoreHandlers(store, fileWatcher);
-  registerFileHandlers(store, dbTables, newWin);
+  registerFileHandlers(store, vaultDirectoryTodbTable, newWin);
 }
 
 app.whenReady().then(async () => {
@@ -149,9 +141,7 @@ app.on("window-all-closed", () => {
 });
 
 app.on("activate", () => {
-  console.log("LHUILLIER ACTIVATE");
   const allWindows = BrowserWindow.getAllWindows();
-  console.log("allWindows: ", allWindows);
   if (allWindows.length) {
     allWindows[0].focus();
   } else {
@@ -183,37 +173,41 @@ ipcMain.handle("open-win", (_, arg) => {
   }
 });
 
-ipcMain.handle("set-directory", (event, directory: string) => {
-  console.log("SET DIRECTORY: ", directory);
-  const webContents = event.sender;
-  const win = BrowserWindow.fromWebContents(webContents);
+// so this thing seems to take from the frontend a directory that the user wants to open and checks whether we already have a window associated with that directory
+ipcMain.handle(
+  "open-new-vault-directory",
+  (event, vaultDirectoryToOpen: string) => {
+    const webContents = event.sender;
+    const win = BrowserWindow.fromWebContents(webContents);
 
-  if (win) {
-    const windowInfoFromMapInMemory = windows.get(win.id);
+    if (win) {
+      const vaultDirectoryForWindow = windowIDToVaultDirectory.get(win.id);
 
-    if (
-      windowInfoFromMapInMemory &&
-      windowInfoFromMapInMemory.vaultDirectory !== directory
-    ) {
-      // A different directory is already associated with this window
-      // Open a new window with the new directory
-      console.log("OPENING NEW WINDOW WITH NEW DIRECTORY: ", directory);
-
-      createWindow(directory);
-    } else {
-      // No directory is associated with this window or it's the same directory
-      // Update the Map with the new directory
-      console.log("SETTING NEW DIRECTORY FOR CURRENT WINDOW: ", directory);
-      windows.set(win.id, {
-        window: win,
-        vaultDirectory: directory,
-      });
-      // so here we probably need to run through some of the same logic we do in other cases
-      addDirectoryToVaultWindows(store, directory);
-      // win.webContents.send("window-vault-directory", directory);
+      if (vaultDirectoryForWindow !== vaultDirectoryToOpen) {
+        createWindow(vaultDirectoryToOpen);
+      } else {
+        addDirectoryToVaultWindows(store, vaultDirectoryToOpen);
+      }
     }
   }
-});
+);
+
+// ipcMain.on(
+//   "set-current-windows-vault-directory",
+//   (event, vaultDirectoryToSet: string) => {
+//     const webContents = event.sender;
+//     const win = BrowserWindow.fromWebContents(webContents);
+//     if (win) {
+//       const windowInfoFromMapInMemory = windowIDToVaultDirectory.get(win.id);
+//       if (windowInfoFromMapInMemory) {
+//         windowInfoFromMapInMemory.vaultDirectory = vaultDirectoryToSet;
+//         addDirectoryToVaultWindows(store, vaultDirectoryToSet);
+//       }
+//     } else {
+//       throw new Error("No window found for current webContents");
+//     }
+//   }
+// );
 
 // ipcMain.on("open-new-window", (event, directory: string) => {
 //   createWindow(directory);
@@ -278,10 +272,10 @@ ipcMain.on(
       dbConnection = await lancedb.connect(dbPath);
       console.log("dbConnection: ", dbConnection);
 
-      let dbTable = dbTables.get(directoryToIndex);
+      let dbTable = vaultDirectoryTodbTable.get(directoryToIndex);
       if (!dbTable) {
         dbTable = new LanceDBTableWrapper();
-        dbTables.set(directoryToIndex, dbTable);
+        vaultDirectoryTodbTable.set(directoryToIndex, dbTable);
       }
       await dbTable.initialize(
         dbConnection,

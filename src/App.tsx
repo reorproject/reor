@@ -37,14 +37,6 @@ const App: React.FC<AppProps> = () => {
     window.ipcRenderer.receive("indexing-error", handleIndexingError);
   }, []);
 
-  // TODO: perhaps this itself can be called in
-  // useEffect(() => {
-  //   if (windowVaultDirectory && defaultEmbedFunc) {
-  //     setUserHasConfiguredSettingsForIndexing(true);
-  //     window.database.indexFilesInDirectory(windowVaultDirectory);
-  //   }
-  // }, [windowVaultDirectory, defaultEmbedFunc]);
-
   useEffect(() => {
     window.ipcRenderer.receive("window-vault-directory", (dir: string) => {
       setWindowVaultDirectory(dir);
@@ -53,10 +45,10 @@ const App: React.FC<AppProps> = () => {
     });
   }, []);
 
-  const handleAllInitialSettingsAreReady = (windowVaultDir: string) => {
+  const handleAllInitialSettingsAreConfigured = (windowVaultDir: string) => {
     setUserHasConfiguredSettingsForIndexing(true);
-    console.log("Setting new vault directory:", windowVaultDir);
-    window.electronStore.setNewVaultDirectory(windowVaultDir);
+
+    window.electronStore.setCurrentWindowsVaultDirectory(windowVaultDir);
     window.database.indexFilesInDirectory(windowVaultDir);
     setWindowVaultDirectory(windowVaultDir);
   };
@@ -72,8 +64,7 @@ const App: React.FC<AppProps> = () => {
         )
       ) : (
         <InitialSetupSinglePage
-          finishedSettingInitialSettings={handleAllInitialSettingsAreReady}
-          // setVaultDirectory={setWindowVaultDirectory}
+          finishedSettingInitialSettings={handleAllInitialSettingsAreConfigured}
         />
       )}
     </div>
