@@ -153,9 +153,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
               {userDirectory && (
                 <Button
                   className="bg-slate-700  border-none h-10 hover:bg-slate-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
-                  onClick={() =>
-                    window.electronStore.openNewVaultDirectory(userDirectory)
-                  }
+                  onClick={() => {
+                    window.electronStore.openNewVaultDirectory(userDirectory);
+                    onCloseFromParent();
+                  }}
                   placeholder=""
                 >
                   Open New Vault

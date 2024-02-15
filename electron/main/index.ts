@@ -57,7 +57,7 @@ const indexHtml = join(process.env.DIST, "index.html");
 
 let dbConnection: lancedb.Connection;
 
-const windowIDToVaultDirectory = new Map<number, string>();
+const vaultDirectoryToWindowID = new Map<string, number>();
 const vaultDirectoryTodbTable = new Map<string, LanceDBTableWrapper>();
 const fileWatcher: FSWatcher | null = null;
 
@@ -79,7 +79,7 @@ async function createWindow(windowVaultDirectory: string) {
   });
   const winId = newWin.id;
   if (windowVaultDirectory !== "") {
-    windowIDToVaultDirectory.set(winId, windowVaultDirectory);
+    vaultDirectoryToWindowID.set(windowVaultDirectory, winId);
 
     addDirectoryToVaultWindows(store, windowVaultDirectory);
     vaultDirectoryTodbTable.set(
@@ -103,7 +103,7 @@ async function createWindow(windowVaultDirectory: string) {
   });
 
   newWin.on("closed", () => {
-    windowIDToVaultDirectory.delete(winId);
+    vaultDirectoryToWindowID.delete(windowVaultDirectory);
     removeDirectoryFromVaultWindows(store, windowVaultDirectory);
     console.log(`Window with ID ${winId} was closed`);
   });
@@ -173,7 +173,6 @@ ipcMain.handle("open-win", (_, arg) => {
   }
 });
 
-// so this thing seems to take from the frontend a directory that the user wants to open and checks whether we already have a window associated with that directory
 ipcMain.handle(
   "open-new-vault-directory",
   (event, vaultDirectoryToOpen: string) => {
@@ -181,12 +180,18 @@ ipcMain.handle(
     const win = BrowserWindow.fromWebContents(webContents);
 
     if (win) {
-      const vaultDirectoryForWindow = windowIDToVaultDirectory.get(win.id);
+      const vaultIDForDirectory =
+        vaultDirectoryToWindowID.get(vaultDirectoryToOpen);
 
-      if (vaultDirectoryForWindow !== vaultDirectoryToOpen) {
-        createWindow(vaultDirectoryToOpen);
+      if (vaultIDForDirectory) {
+        const vaultWindow = BrowserWindow.fromId(vaultIDForDirectory);
+        if (vaultWindow) {
+          vaultWindow.focus();
+        } else {
+          createWindow(vaultDirectoryToOpen);
+        }
       } else {
-        addDirectoryToVaultWindows(store, vaultDirectoryToOpen);
+        createWindow(vaultDirectoryToOpen);
       }
     }
   }
