@@ -81,7 +81,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ windowVaultDirectory }) => {
     }
     if (!currentSessionId || !userInput.trim()) return;
 
-
     // if (newMessages.length <= 1) {
     const augmentedPrompt = await window.database.augmentPromptWithRAG(
       userInput,
@@ -183,7 +182,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ windowVaultDirectory }) => {
               </p>
             ) : (
               <p className="text-center text-gray-500">
-                No default model selected
+                No default model selected. If you attached a new model, please
+                close and re-open the chat window in the top right corner.
               </p>
             )}
           </div>
