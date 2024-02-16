@@ -68,6 +68,13 @@ const OpenAISetupModal: React.FC<OpenAISetupModalProps> = ({
 };
 
 const remoteAIModels: { [modelName: string]: OpenAIAIModelConfig } = {
+  "gpt-3.5-turbo-0125": {
+    contextLength: 16385,
+    engine: "openai",
+    type: "openai",
+    apiKey: "",
+    apiURL: "",
+  },
   "gpt-3.5-turbo-1106": {
     contextLength: 16385,
     engine: "openai",
@@ -75,9 +82,15 @@ const remoteAIModels: { [modelName: string]: OpenAIAIModelConfig } = {
     apiKey: "",
     apiURL: "",
   },
-
   "gpt-4-0613": {
     contextLength: 8192,
+    engine: "openai",
+    type: "openai",
+    apiKey: "",
+    apiURL: "",
+  },
+  "gpt-4-0125-preview": {
+    contextLength: 128000,
     engine: "openai",
     type: "openai",
     apiKey: "",
