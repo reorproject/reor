@@ -39,7 +39,7 @@ https://github.com/reorproject/reor/assets/17236551/1bbc1b2d-c3d9-451c-a008-7f12
 
 ### Running local models
 Reor interacts directly with [Llama.cpp](https://github.com/ggerganov/llama.cpp) libraries so there's no need to download Ollama. Although right now, we don't download models for you so you'll need to download your model of choice manually:
-1. Download a GGUF model file. [HuggingFace](https://huggingface.co/models?sort=downloads&search=gguf) has this nice page with the most popular models. I recommend starting with a 7B 4-bit model and see how that performs on your system.
+1. Download a GGUF model file. [Hugging Face](https://huggingface.co/models?sort=downloads&search=gguf) has this nice page with the most popular models. I recommend starting with a 7B 4-bit model and see how that performs on your system.
 2. Connect it in Reor settings under "Add a new local model".
 
 You can also connect to an OpenAI-compatible API like Oobabooga, Ollama or OpenAI itself!
