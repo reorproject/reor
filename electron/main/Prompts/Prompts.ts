@@ -24,7 +24,7 @@ export function createRAGPrompt(
   }
 
   // If the token count with only the base prompt and query exceeds the limit
-  if (tokenCount === tokenize(basePrompt + queryPart).length) {
+  if (tokenCount >= contextLimit) {
     throw new Error(
       "The provided information is too long to process in a single prompt. Please shorten the query or provide fewer details."
     );
