@@ -68,7 +68,7 @@ npm run build
 ```
 
 ### Contributions
-Contributions are welcome in all areas: features, ideas, bug fixes, design, etc. There are some open issues to choose from. For new features, please open an issue to discuss it before beginning work on a PR :)
+Contributions are welcome in all areas: features, ideas, bug fixes, design, etc. This is very much a community driven project. There are some open issues to choose from. For new features, please open an issue to discuss it before beginning work on a PR :)
 
 ## License
 GPL-3.0 license. See `LICENSE` for details.
