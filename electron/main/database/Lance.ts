@@ -9,7 +9,6 @@ const GetOrCreateLanceTable = async (
 ): Promise<lancedb.Table<string>> => {
   const allTableNames = await db.tableNames();
   const intendedSchema = CreateDatabaseSchema(embedFunc.contextLength);
-  console.log("Intended schema:", intendedSchema);
   const tableName = generateTableName(embedFunc.name, userDirectory);
 
   if (allTableNames.includes(tableName)) {
@@ -17,14 +16,12 @@ const GetOrCreateLanceTable = async (
     const schema = await table.schema;
     if (!isStringifiedSchemaEqual(schema, intendedSchema)) {
       await db.dropTable(tableName);
-      console.log(`Deleted table ${tableName} due to schema mismatch.`);
 
       const recreatedTable = await db.createTable({
         name: tableName,
         schema: intendedSchema,
         embeddingFunction: embedFunc,
       });
-      console.log(`Recreated table ${tableName} with the intended schema.`);
       return recreatedTable;
     }
 

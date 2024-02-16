@@ -207,11 +207,8 @@ ipcMain.on("index-files-in-directory", async (event) => {
       throw new Error("No default embed func repo set");
     }
     const dbPath = path.join(app.getPath("userData"), "vectordb");
-    console.log("dbPath: ", dbPath);
     dbConnection = await lancedb.connect(dbPath);
-    console.log("dbConnection: ", dbConnection);
     await dbTable.initialize(dbConnection, userDirectory, embedFuncRepoName);
-    console.log("initialized: ", dbTable);
     await repopulateTableWithMissingItems(
       dbTable,
       userDirectory,
@@ -219,7 +216,6 @@ ipcMain.on("index-files-in-directory", async (event) => {
         event.sender.send("indexing-progress", progress);
       }
     );
-    console.log("repopulated: ", dbTable);
     if (win) {
       startWatchingDirectory(win, userDirectory);
       updateFileListForRenderer(win, userDirectory);
