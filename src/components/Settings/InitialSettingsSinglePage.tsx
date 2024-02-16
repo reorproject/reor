@@ -24,6 +24,7 @@ const InitialSetupSinglePage: React.FC<InitialSettingsProps> = ({
     const paths = await window.files.openDirectoryDialog();
     if (paths && paths[0]) {
       setUserDirectory(paths[0]);
+      await window.electronStore.setCurrentWindowsVaultDirectory(paths[0]);
     }
   };
 

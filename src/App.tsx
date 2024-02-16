@@ -17,6 +17,18 @@ const App: React.FC<AppProps> = () => {
   const [indexingProgress, setIndexingProgress] = useState<number>(0);
 
   useEffect(() => {
+    const vaultDir = window.electronStore.getVaultDirectoryForWindow();
+    console.log("GOTTEN Vault dir:", vaultDir);
+    if (vaultDir) {
+      setUserHasConfiguredSettingsForIndexing(true);
+      setWindowVaultDirectory(vaultDir);
+      window.database.indexFilesInDirectory(vaultDir);
+    } else {
+      setUserHasConfiguredSettingsForIndexing(false);
+    }
+  }, []);
+
+  useEffect(() => {
     const handleProgressUpdate = (newProgress: number) => {
       setIndexingProgress(newProgress);
     };
@@ -37,20 +49,19 @@ const App: React.FC<AppProps> = () => {
     window.ipcRenderer.receive("indexing-error", handleIndexingError);
   }, []);
 
-  useEffect(() => {
-    window.ipcRenderer.receive("window-vault-directory", (dir: string) => {
-      setWindowVaultDirectory(dir);
-      setUserHasConfiguredSettingsForIndexing(true);
-      window.database.indexFilesInDirectory(dir);
-    });
-  }, []);
+  // useEffect(() => {
+  //   window.ipcRenderer.receive("window-vault-directory", (dir: string) => {
+  //     setWindowVaultDirectory(dir);
+  //     setUserHasConfiguredSettingsForIndexing(true);
+  //     window.database.indexFilesInDirectory(dir);
+  //   });
+  // }, []);
 
-  const handleAllInitialSettingsAreConfigured = (windowVaultDir: string) => {
+  const handleAllInitialSettingsAreConfigured = (_: string) => {
     setUserHasConfiguredSettingsForIndexing(true);
-
-    window.electronStore.setCurrentWindowsVaultDirectory(windowVaultDir);
-    window.database.indexFilesInDirectory(windowVaultDir);
-    setWindowVaultDirectory(windowVaultDir);
+    const windowDirectory = window.electronStore.getVaultDirectoryForWindow();
+    setWindowVaultDirectory(windowDirectory);
+    window.database.indexFilesInDirectory(windowDirectory);
   };
 
   return (

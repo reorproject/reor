@@ -173,30 +173,57 @@ ipcMain.handle("open-win", (_, arg) => {
   }
 });
 
+// so this handler probably needs to check whether the current
 ipcMain.handle(
   "open-new-vault-directory",
   (event, vaultDirectoryToOpen: string) => {
     const webContents = event.sender;
     const win = BrowserWindow.fromWebContents(webContents);
-
-    if (win) {
-      const vaultIDForDirectory =
-        vaultDirectoryToWindowID.get(vaultDirectoryToOpen);
-
-      if (vaultIDForDirectory) {
-        const vaultWindow = BrowserWindow.fromId(vaultIDForDirectory);
-        if (vaultWindow) {
-          vaultWindow.focus();
-        } else {
-          createWindow(vaultDirectoryToOpen);
-        }
-      } else {
-        createWindow(vaultDirectoryToOpen);
-      }
+    if (!win) {
+      throw new Error("No window found for current webContents");
     }
+    // if (win) {
+    const windowIDForDirectory =
+      vaultDirectoryToWindowID.get(vaultDirectoryToOpen);
+
+    if (windowIDForDirectory) {
+      const vaultWindow = BrowserWindow.fromId(windowIDForDirectory);
+      if (vaultWindow) {
+        // window exists for this vault
+        vaultWindow.focus();
+      } else {
+        // window doesn't exist for this vault
+        throw new Error("No window found for current webContents");
+      }
+    } else {
+      // in this case, we check whether
+      createWindow(vaultDirectoryToOpen);
+    }
+    // }
   }
 );
 
+ipcMain.on("get-vault-directory-for-window", (event) => {
+  const webContents = event.sender;
+  const win = BrowserWindow.fromWebContents(webContents);
+  if (win) {
+    // given that vaultDirectoryToWindowID is a Map<string, number> we need to invert it
+    const windowID = win.id;
+    const vaultDirectory = Array.from(vaultDirectoryToWindowID.entries()).find(
+      ([_, id]) => id === windowID
+    );
+    console.log("MAP: ", vaultDirectoryToWindowID);
+    console.log("vaultDirectory in ERE: ", vaultDirectory);
+    if (vaultDirectory) {
+      // Send the vaultDirectory back to the renderer process
+      event.returnValue = vaultDirectory;
+    } else {
+      // Handle the case where no vaultDirectory is found
+      console.log("No vault directory found for window");
+      event.returnValue = null;
+    }
+  }
+});
 // ipcMain.on(
 //   "set-current-windows-vault-directory",
 //   (event, vaultDirectoryToSet: string) => {
@@ -262,6 +289,7 @@ ipcMain.on(
   "index-files-in-directory",
   async (event, directoryToIndex: string) => {
     try {
+      console.log("indexing files in directory: ", directoryToIndex);
       const embedFuncRepoName = store.get(
         StoreKeys.DefaultEmbedFuncRepo
       ) as string;

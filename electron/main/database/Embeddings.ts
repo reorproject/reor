@@ -19,22 +19,26 @@ export async function createEmbeddingFunction(
   let tokenizer: PreTrainedTokenizer;
   let contextLength: number;
   try {
+    console.log("Creating embedding function for", repoName);
     const { pipeline, env, AutoTokenizer } = await import(
       "@xenova/transformers"
     );
     // env.localModelPath = embeddingModelsPath;
     // env.allowRemoteModels = false;
     // env.allowLocalModels = true;
+    console.log("Creating pipeline for", repoName);
     const cacheDir = path.join(app.getPath("userData"), "models", "embeddings");
     env.cacheDir = cacheDir;
     pipe = (await pipeline("feature-extraction", repoName, {
       cache_dir: cacheDir,
     })) as Pipeline;
+    console.log("Pipeline created for", repoName);
     contextLength = pipe.model.config.hidden_size;
 
     tokenizer = await AutoTokenizer.from_pretrained(repoName, {
       cache_dir: cacheDir,
     });
+    console.log("Tokenizer created for", repoName);
   } catch (error) {
     console.error("Failed to initialize pipeline", error);
     throw error;

@@ -76,6 +76,7 @@ declare global {
     };
     electronStore: {
       openNewVaultDirectory: (vaultDirectoryToOpen: string) => void;
+      getVaultDirectoryForWindow: () => string;
       setCurrentWindowsVaultDirectory: (vaultDirectory: string) => void;
       openNewWindow: (vaultDirectoryForWindow: string) => void;
       getAIModelConfigs: () => Promise<Record<string, AIModelConfig>>;
@@ -143,8 +144,11 @@ contextBridge.exposeInMainWorld("electronStore", {
   openNewVaultDirectory: (vaultDirectoryToOpen: string) => {
     return ipcRenderer.invoke("open-new-vault-directory", vaultDirectoryToOpen);
   },
+  getVaultDirectoryForWindow: () => {
+    return ipcRenderer.sendSync("get-vault-directory-for-window");
+  },
   setCurrentWindowsVaultDirectory: (vaultDirectory: string) => {
-    ipcRenderer.send("open-new-vault-directory", vaultDirectory);
+    return ipcRenderer.invoke("open-new-vault-directory", vaultDirectory);
   },
   // openNewWindow: (vaultDirectoryForWindow: string) => {
   //   ipcRenderer.send("open-new-window", vaultDirectoryForWindow);
