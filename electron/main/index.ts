@@ -30,6 +30,9 @@ import {
 } from "./Store/storeHandlers";
 import { registerFileHandlers } from "./Files/registerFilesHandler";
 import { repopulateTableWithMissingItems } from "./database/TableHelperFunctions";
+import { findKeyByValue } from "./Utility/Collections";
+
+let isAppQuitting = false;
 
 const store = new Store<StoreSchema>();
 // store.clear();
@@ -78,6 +81,7 @@ async function createWindow(windowVaultDirectory: string) {
     height: 800,
   });
   const winId = newWin.id;
+
   if (windowVaultDirectory !== "") {
     vaultDirectoryToWindowID.set(windowVaultDirectory, winId);
 
@@ -87,6 +91,7 @@ async function createWindow(windowVaultDirectory: string) {
       new LanceDBTableWrapper()
     );
   }
+
   if (url) {
     // electron-vite-vue#298
     newWin.loadURL(url);
@@ -103,9 +108,11 @@ async function createWindow(windowVaultDirectory: string) {
   });
 
   newWin.on("closed", () => {
-    vaultDirectoryToWindowID.delete(windowVaultDirectory);
-    removeDirectoryFromVaultWindows(store, windowVaultDirectory);
-    console.log(`Window with ID ${winId} was closed`);
+    if (!isAppQuitting) {
+      vaultDirectoryToWindowID.delete(windowVaultDirectory);
+      removeDirectoryFromVaultWindows(store, windowVaultDirectory);
+      console.log(`Window with ID ${winId} was closed`);
+    }
   });
 
   // Make all links open with the browser, not with the application
@@ -128,7 +135,9 @@ app.whenReady().then(async () => {
   ) as string[];
   console.log("previousVaultDirectories: ", previousVaultDirectories);
   if (previousVaultDirectories && previousVaultDirectories.length > 0) {
-    createWindow(previousVaultDirectories[0]);
+    for (const directory of previousVaultDirectories) {
+      createWindow(directory);
+    }
   } else {
     createWindow("");
   }
@@ -149,11 +158,17 @@ app.on("activate", () => {
       StoreKeys.VaultDirectoriesOpenInWindows
     ) as string[];
     if (previousVaultDirectories && previousVaultDirectories.length > 0) {
-      createWindow(previousVaultDirectories[0]);
+      for (const directory of previousVaultDirectories) {
+        createWindow(directory);
+      }
     } else {
       createWindow("");
     }
   }
+});
+
+app.on("before-quit", () => {
+  isAppQuitting = true;
 });
 
 // New window example arg: new windows url
@@ -178,54 +193,44 @@ ipcMain.handle(
   (event, vaultDirectoryToOpen: string) => {
     const webContents = event.sender;
     const win = BrowserWindow.fromWebContents(webContents);
+    if (!win) {
+      throw new Error("No window found for current webContents");
+    }
+    const windowIDForDirectory =
+      vaultDirectoryToWindowID.get(vaultDirectoryToOpen);
 
-    if (win) {
-      const vaultIDForDirectory =
-        vaultDirectoryToWindowID.get(vaultDirectoryToOpen);
-
-      if (vaultIDForDirectory) {
-        const vaultWindow = BrowserWindow.fromId(vaultIDForDirectory);
-        if (vaultWindow) {
-          vaultWindow.focus();
-        } else {
-          createWindow(vaultDirectoryToOpen);
-        }
+    if (windowIDForDirectory) {
+      const vaultWindow = BrowserWindow.fromId(windowIDForDirectory);
+      if (vaultWindow) {
+        console.log("focusing window");
+        vaultWindow.focus();
       } else {
+        throw new Error("No window found for directory, creating new window");
+      }
+    } else {
+      const vaultDirectoryForCurrentWindow = findKeyByValue(
+        vaultDirectoryToWindowID,
+        win.id
+      );
+      if (
+        vaultDirectoryForCurrentWindow !== "" &&
+        vaultDirectoryForCurrentWindow !== undefined &&
+        vaultDirectoryForCurrentWindow !== null
+      ) {
         createWindow(vaultDirectoryToOpen);
+      } else {
+        vaultDirectoryToWindowID.set(vaultDirectoryToOpen, win.id);
+
+        addDirectoryToVaultWindows(store, vaultDirectoryToOpen);
+        vaultDirectoryTodbTable.set(
+          vaultDirectoryToOpen,
+          new LanceDBTableWrapper()
+        );
       }
     }
   }
 );
 
-// ipcMain.on(
-//   "set-current-windows-vault-directory",
-//   (event, vaultDirectoryToSet: string) => {
-//     const webContents = event.sender;
-//     const win = BrowserWindow.fromWebContents(webContents);
-//     if (win) {
-//       const windowInfoFromMapInMemory = windowIDToVaultDirectory.get(win.id);
-//       if (windowInfoFromMapInMemory) {
-//         windowInfoFromMapInMemory.vaultDirectory = vaultDirectoryToSet;
-//         addDirectoryToVaultWindows(store, vaultDirectoryToSet);
-//       }
-//     } else {
-//       throw new Error("No window found for current webContents");
-//     }
-//   }
-// );
-
-// ipcMain.on("open-new-window", (event, directory: string) => {
-//   createWindow(directory);
-// });
-
-// ipcMain.on("request-window-vault-directory", (event) => {
-//   const webContents = event.sender;
-//   const win = BrowserWindow.fromWebContents(webContents);
-//   if (win) {
-//     const directory = windowIDToVaultDirectory.get(win.id);
-//     event.reply("response-window-vault-directory", directory);
-//   }
-// });
 ipcMain.handle("open-directory-dialog", async () => {
   const result = await dialog.showOpenDialog({
     properties: ["openDirectory", "createDirectory"],
@@ -253,11 +258,6 @@ ipcMain.handle("open-file-dialog", async (event, extensions) => {
   }
 });
 
-// TODO: perhaps this function ought to take in a directory.
-// and that could work fairly well.
-// though perhaps we'd want to think about whether
-
-// Yeah we just need to reason about how it'd work to send back progress
 ipcMain.on(
   "index-files-in-directory",
   async (event, directoryToIndex: string) => {

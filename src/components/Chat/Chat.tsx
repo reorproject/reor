@@ -182,8 +182,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ windowVaultDirectory }) => {
               </p>
             ) : (
               <p className="text-center text-gray-500">
-                No default model selected. If you attached a new model, please
-                close and re-open the chat window in the top right corner.
+                No default model selected. Reopen chat window to reload models.
               </p>
             )}
           </div>

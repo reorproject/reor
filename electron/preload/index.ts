@@ -144,7 +144,7 @@ contextBridge.exposeInMainWorld("electronStore", {
     return ipcRenderer.invoke("open-new-vault-directory", vaultDirectoryToOpen);
   },
   setCurrentWindowsVaultDirectory: (vaultDirectory: string) => {
-    ipcRenderer.send("open-new-vault-directory", vaultDirectory);
+    return ipcRenderer.invoke("open-new-vault-directory", vaultDirectory);
   },
   // openNewWindow: (vaultDirectoryForWindow: string) => {
   //   ipcRenderer.send("open-new-window", vaultDirectoryForWindow);
