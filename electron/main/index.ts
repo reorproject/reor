@@ -222,10 +222,13 @@ ipcMain.handle(
         vaultDirectoryToWindowID.set(vaultDirectoryToOpen, win.id);
 
         addDirectoryToVaultWindows(store, vaultDirectoryToOpen);
-        vaultDirectoryTodbTable.set(
-          vaultDirectoryToOpen,
-          new LanceDBTableWrapper()
-        );
+
+        let dbTableForWindow =
+          vaultDirectoryTodbTable.get(vaultDirectoryToOpen);
+        if (!dbTableForWindow) {
+          dbTableForWindow = new LanceDBTableWrapper();
+          vaultDirectoryTodbTable.set(vaultDirectoryToOpen, dbTableForWindow);
+        }
       }
     }
   }
