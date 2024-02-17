@@ -45,6 +45,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
       <TitleBar
         onFileSelect={onFileSelect}
         chatbotOpen={showChatbot}
+        similarFilesOpen={showSimilarFiles}
         toggleChatbot={toggleChatbot}
         toggleSimilarFiles={toggleSimilarFiles}
         makeSidebarShow={setSidebarShowing}

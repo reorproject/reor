@@ -1,6 +1,6 @@
 import NewNoteComponent from "./File/NewNote";
-import { useEffect, useState } from "react";
-import { PiSidebar } from "react-icons/pi";
+import React, { useEffect, useState } from "react";
+import { PiSidebar, PiSidebarFill } from "react-icons/pi";
 
 import { BsChatLeftDots, BsFillChatLeftDotsFill } from "react-icons/bs";
 import { SidebarAbleToShow } from "./FileEditorContainer";
@@ -9,6 +9,7 @@ export const titleBarHeight = "30px";
 interface TitleBarProps {
   onFileSelect: (path: string) => void;
   chatbotOpen: boolean;
+  similarFilesOpen: boolean;
   toggleChatbot: () => void;
   toggleSimilarFiles: () => void;
   makeSidebarShow: (show: SidebarAbleToShow) => void;
@@ -17,6 +18,7 @@ interface TitleBarProps {
 const TitleBar: React.FC<TitleBarProps> = ({
   onFileSelect,
   chatbotOpen,
+  similarFilesOpen,
   toggleChatbot,
   toggleSimilarFiles,
   // makeSidebarShow,
@@ -89,11 +91,19 @@ const TitleBar: React.FC<TitleBarProps> = ({
             toggleChatbot();
           }}
         > */}
-        <PiSidebar
-          className="text-gray-100 cursor-pointer mt-[0.1rem]"
-          size={28}
-          onClick={toggleSimilarFiles}
-        />
+        { similarFilesOpen ?
+          <PiSidebarFill
+            className="text-gray-100 cursor-pointer mt-[0.1rem]"
+            size={28}
+            onClick={toggleSimilarFiles}
+            />
+          : <PiSidebar
+            className="text-gray-100 cursor-pointer mt-[0.1rem]"
+            size={28}
+            onClick={toggleSimilarFiles}
+          />
+        }
+        
         {/* <div className="pt-[1px] mt-[1px] pb-[1px]  ml-[0.3rem] h-[90%]">
           <SimilarFilesButton onClick={toggleSimilarFiles} />
         </div> */}
@@ -119,8 +129,6 @@ const TitleBar: React.FC<TitleBarProps> = ({
 };
 
 export default TitleBar;
-
-import React from "react";
 
 // type ChatButtonProps = {
 //   onClick: () => void; // You can define the type of your onClick function more precisely if needed
