@@ -1,4 +1,9 @@
-import { Connection, Table as LanceDBTable, MetricType } from "vectordb";
+import {
+  Connection,
+  Table as LanceDBTable,
+  MetricType,
+  makeArrowTable,
+} from "vectordb";
 import GetOrCreateLanceTable from "./Lance";
 import {
   EnhancedEmbeddingFunction,
@@ -39,6 +44,7 @@ export class LanceDBTableWrapper {
         x.notepath = sanitizePathForDatabase(x.notepath);
         return x;
       });
+
     const recordEntry: Record<string, unknown>[] = data as unknown as Record<
       string,
       unknown
@@ -51,11 +57,9 @@ export class LanceDBTableWrapper {
     let index = 0;
     const totalChunks = chunks.length;
     for (const chunk of chunks) {
-      try {
-        await this.table.add(chunk);
-      } catch (error) {
-        console.error("Error adding chunk to DB:", error);
-      }
+      const arrowTableOfChunk = makeArrowTable(chunk);
+      await this.table.add(arrowTableOfChunk);
+
       index++;
       const progress = index / totalChunks;
       if (onProgress) {
