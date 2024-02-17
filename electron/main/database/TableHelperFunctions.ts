@@ -147,27 +147,50 @@ export const removeTreeFromTable = async (
 export const updateFileInTable = async (
   dbTable: LanceDBTableWrapper,
   filePath: string,
-  content: string
+  onUpdateSuccess: () => void // Adding a callback function parameter
 ): Promise<void> => {
-  await dbTable.deleteDBItemsByFilePaths([filePath]);
-  const currentTimestamp: Date = new Date();
-  console.log("starting chunk");
-  const chunkedContentList = await chunkMarkdownByHeadingsAndByCharsIfBig(
-    content
-  );
-  console.log("done chunk");
-  const dbEntries = chunkedContentList.map((content, index) => {
-    console.log("adding in content: ", content);
-    return {
-      notepath: filePath,
-      content: content,
-      subnoteindex: index,
-      timeadded: currentTimestamp,
-      filemodified: currentTimestamp,
-    };
-  });
-  console.log("db entreis: ", dbEntries.length);
-  await dbTable.add(dbEntries);
+  try {
+    await dbTable.deleteDBItemsByFilePaths([filePath]);
+    const currentTimestamp: Date = new Date();
+    const content = readFile(filePath);
+    if (content == "") {
+      return;
+    }
+    const chunkedContentList = await chunkMarkdownByHeadingsAndByCharsIfBig(
+      content
+    );
+    const dbEntries = chunkedContentList.map((content, index) => {
+      return {
+        notepath: filePath,
+        content: content,
+        subnoteindex: index,
+        timeadded: currentTimestamp,
+        filemodified: currentTimestamp,
+      };
+    });
+    console.log("db entries: ", dbEntries.length);
+    await dbTable.add(dbEntries);
+
+    // Call the callback function after successful update
+    onUpdateSuccess();
+  } catch (error) {
+    console.error("Non-breaking error updating file in table:", error);
+  }
+};
+
+export const deleteFilesFromTable = async (
+  dbTable: LanceDBTableWrapper,
+  filePaths: string[],
+  onUpdateSuccess: () => void // Adding a callback function parameter
+): Promise<void> => {
+  try {
+    await dbTable.deleteDBItemsByFilePaths(filePaths);
+
+    // Call the callback function after successful update
+    onUpdateSuccess();
+  } catch (error) {
+    console.error("Non-breaking error deleting files from table:", error);
+  }
 };
 
 export function convertLanceEntryToDBEntry(

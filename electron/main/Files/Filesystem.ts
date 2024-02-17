@@ -5,8 +5,8 @@ import chokidar from "chokidar";
 import { BrowserWindow } from "electron";
 import * as fsPromises from "fs/promises";
 import {
-  addTreeToTable,
-  removeTreeFromTable,
+  deleteFilesFromTable,
+  updateFileInTable,
 } from "../database/TableHelperFunctions";
 import { LanceDBTableWrapper } from "../database/LanceTableWrapper";
 
@@ -123,7 +123,8 @@ export function writeFileSyncRecursive(
 
 export function startWatchingDirectory(
   win: BrowserWindow,
-  directoryToWatch: string
+  directoryToWatch: string,
+  dbTable: LanceDBTableWrapper
 ): void {
   try {
     const watcher = chokidar.watch(directoryToWatch, {
@@ -135,7 +136,26 @@ export function startWatchingDirectory(
         fileHasExtensionInList(filePath, markdownExtensions) ||
         eventType.includes("directory")
       ) {
-        // TODO: add logic to update vector db
+        console.log(eventType, filePath);
+
+        switch (eventType) {
+          case "added":
+          case "changed":
+            console.log("File added or changed:", filePath);
+            updateFileInTable(dbTable, filePath, () => {
+              win.webContents.send("vector-database-update", filePath);
+            });
+            break;
+
+          case "removed":
+            console.log("File removed:", filePath);
+            deleteFilesFromTable(dbTable, [filePath], () => {
+              console.log("SENDING UPDATE FROM THIS PATH:", filePath);
+              win.webContents.send("vector-database-update", filePath);
+            });
+            break;
+        }
+
         updateFileListForRenderer(win, directoryToWatch);
       }
     };
@@ -146,8 +166,6 @@ export function startWatchingDirectory(
       .on("unlink", (path) => handleFileEvent("removed", path))
       .on("addDir", (path) => handleFileEvent("directory added", path))
       .on("unlinkDir", (path) => handleFileEvent("directory removed", path));
-
-    // No 'ready' event handler is needed here, as we're ignoring initial scan
   } catch (error) {
     console.error("Error setting up file watcher:", error);
   }
@@ -204,15 +222,7 @@ export const orchestrateEntryMove = async (
   sourcePath: string,
   destinationPath: string
 ) => {
-  const fileSystemTree = GetFilesInfoTree(sourcePath);
-  await removeTreeFromTable(table, fileSystemTree);
-  moveFileOrDirectoryInFileSystem(sourcePath, destinationPath).then(
-    (newDestinationPath) => {
-      if (newDestinationPath) {
-        addTreeToTable(table, GetFilesInfoTree(newDestinationPath));
-      }
-    }
-  );
+  await moveFileOrDirectoryInFileSystem(sourcePath, destinationPath);
 };
 
 export const moveFileOrDirectoryInFileSystem = async (

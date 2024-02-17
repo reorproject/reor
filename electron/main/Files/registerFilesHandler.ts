@@ -1,4 +1,4 @@
-import { BrowserWindow, ipcMain } from "electron";
+import { ipcMain } from "electron";
 import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 import * as path from "path";
@@ -10,12 +10,10 @@ import {
 } from "./Filesystem";
 import * as fs from "fs";
 import { LanceDBTableWrapper } from "../database/LanceTableWrapper";
-import { updateFileInTable } from "../database/TableHelperFunctions";
 
 export const registerFileHandlers = (
   store: Store<StoreSchema>,
-  dbTable: LanceDBTableWrapper,
-  win: BrowserWindow
+  dbTable: LanceDBTableWrapper
 ) => {
   ipcMain.handle("join-path", (event, ...args) => {
     return path.join(...args);
@@ -32,6 +30,7 @@ export const registerFileHandlers = (
   ipcMain.handle(
     "read-file",
     async (event, filePath: string): Promise<string> => {
+      console.log("Reading file", filePath);
       return fs.readFileSync(filePath, "utf-8");
     }
   );
@@ -42,12 +41,6 @@ export const registerFileHandlers = (
       console.log("Writing file", filePath);
       await fs.writeFileSync(filePath, content, "utf-8");
       console.log("Done writing file", filePath);
-      try {
-        await updateFileInTable(dbTable, filePath, content);
-        win?.webContents.send("vector-database-update");
-      } catch (error) {
-        console.error("Error updating file in table:", error);
-      }
     }
   );
 

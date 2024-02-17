@@ -180,6 +180,7 @@ ipcMain.handle("open-file-dialog", async (event, extensions) => {
 
 ipcMain.on("index-files-in-directory", async (event) => {
   try {
+    console.log("Path for vector db: ", app.getPath("userData"));
     const userDirectory = store.get(StoreKeys.UserDirectory) as string;
     if (!userDirectory) {
       throw new Error("No user directory set");
@@ -201,52 +202,53 @@ ipcMain.on("index-files-in-directory", async (event) => {
       }
     );
     if (win) {
-      startWatchingDirectory(win, userDirectory);
+      startWatchingDirectory(win, userDirectory, dbTable);
       updateFileListForRenderer(win, userDirectory);
     }
     event.sender.send("indexing-progress", 1);
   } catch (error) {
-    const nonLinuxError = `Indexing error: ${error}. Please try restarting or send me an email with your error: samlhuillier1@gmail.com`;
+    const nonLinuxError = `Indexing error: ${error}. Please try restarting or open an issue in the GitHub repository.`;
     event.sender.send("indexing-error", nonLinuxError);
     console.error("Error during file indexing:", error);
   }
 });
 
-ipcMain.on("show-context-menu-file-item", (event, file) => {
+function deleteFileOrDirectory(filePath: string): void {
+  console.log(filePath);
+  fs.stat(filePath, (err, stats) => {
+    if (err) {
+      console.error("An error occurred:", err);
+      return;
+    }
+
+    if (stats.isDirectory()) {
+      // For directories
+      fs.rm(filePath, { recursive: true }, (err) => {
+        if (err) {
+          console.error("An error occurred:", err);
+          return;
+        }
+        console.log(`Directory at ${filePath} was deleted successfully.`);
+      });
+    } else {
+      // For files
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("An error occurred:", err);
+          return;
+        }
+        console.log(`File at ${filePath} was deleted successfully.`);
+      });
+    }
+  });
+}
+
+ipcMain.on("show-context-menu-file-item", (event, file: File) => {
   const menu = new Menu();
   menu.append(
     new MenuItem({
       label: "Delete",
-      click: () => {
-        console.log(file.path);
-        fs.stat(file.path, (err, stats) => {
-          if (err) {
-            console.error("An error occurred:", err);
-            return;
-          }
-
-          if (stats.isDirectory()) {
-            // For directories (Node.js v14.14.0 and later)
-            fs.rm(file.path, { recursive: true }, (err) => {
-              if (err) {
-                console.error("An error occurred:", err);
-                return;
-              }
-              console.log(
-                `Directory at ${file.path} was deleted successfully.`
-              );
-            });
-          } else {
-            fs.unlink(file.path, (err) => {
-              if (err) {
-                console.error("An error occurred:", err);
-                return;
-              }
-              console.log(`File at ${file.path} was deleted successfully.`);
-            });
-          }
-        });
-      },
+      click: () => deleteFileOrDirectory(file.path),
     })
   );
 

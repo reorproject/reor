@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { DBResultPreview } from "../File/DBResultPreview";
 import { DBQueryResult } from "electron/main/database/Schema";
 import { PiGraph } from "react-icons/pi";
+import { file } from "tmp";
 
 interface SimilarEntriesComponentProps {
   filePath: string;
@@ -15,9 +16,9 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
-  const handleNewFileOpen = async (path: string) => {
+  const handleNewFileOpen = async () => {
     try {
-      const searchResults = await performSearch(path);
+      const searchResults = await performSearch();
       if (searchResults.length > 0) {
         setSimilarEntries(searchResults);
       } else {
@@ -28,7 +29,8 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     }
   };
 
-  const performSearch = async (filePath: string): Promise<DBQueryResult[]> => {
+  const performSearch = async (): Promise<DBQueryResult[]> => {
+    console.log("Performing search on file:", filePath);
     const fileContent: string = await window.files.readFile(filePath);
     // TODO: proper chunking here...
     if (!fileContent) {
@@ -46,14 +48,19 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   };
 
   useEffect(() => {
+    console.log("file path changed to:", filePath);
     if (filePath) {
-      handleNewFileOpen(filePath);
+      handleNewFileOpen();
     }
   }, [filePath]);
 
   useEffect(() => {
-    const vectorDBUpdateListener = async () => {
-      const searchResults = await performSearch(filePath);
+    const vectorDBUpdateListener = async (filePathUpdated: string) => {
+      console.log("calling performsearch here");
+      if (filePathUpdated !== filePath) {
+        return;
+      }
+      const searchResults = await performSearch();
       if (searchResults.length > 0) {
         setSimilarEntries(searchResults);
       }
@@ -69,7 +76,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
         vectorDBUpdateListener
       );
     };
-  }, [filePath]);
+  }, []);
 
   return (
     <div className="h-full overflow-y-auto overflow-x-hidden mt-0 border-l-[0.1px] border-t-0 border-b-0 border-r-0 border-gray-600 border-solid">
