@@ -32,6 +32,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     const paths = await window.files.openDirectoryDialog();
     if (paths && paths[0]) {
       setUserDirectory(paths[0]);
+      window.electronStore.openNewVaultDirectory(userDirectory);
+      onCloseFromParent();
     }
   };
 
@@ -45,8 +47,8 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
         // onCloseFromParent();
       }}
     >
-      <div className=" mt-0  flex w-[600px] ">
-        <div className="flex flex-col ml-2 pr-1 w-[100px]  bg-gray-800 text-white border-r-[0.1px] border-gray-700 border-solid border-b-0 border-t-0 border-l-0">
+      <div className="mt-0 flex w-[600px] ">
+        <div className="flex flex-col ml-2 mb-2 pr-1 w-[100px]  bg-gray-800 text-white border-r-[0.1px] border-gray-700 border-solid border-b-0 border-t-0 border-l-0">
           <div
             className={`flex items-center mt-2 rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
               activeTab === "llmSettings"
@@ -126,19 +128,16 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             <div className="w-full">
               <h2 className="text-2xl font-semibold mb-0 text-white">Vault</h2>
               <p className="mt-2 text-sm text-gray-100 mb-1">
-                Choose your vault directory here:
+                Open a new vault directory in another window:
               </p>
-              {/* <DirectorySelector
-                setErrorMsg={setErrorMsg}
-                windowVaultDirectory={windowVaultDirectory}
-              /> */}
+
               <div>
                 <Button
-                  className="bg-slate-700  border-none h-10 hover:bg-slate-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
+                  className="bg-slate-700 mt-2 border-none h-10 hover:bg-slate-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
                   onClick={handleDirectorySelection}
                   placeholder=""
                 >
-                  Select Directory
+                  Open Directory
                 </Button>
                 {userDirectory && (
                   <p className="mt-2 text-xs text-gray-100">
@@ -146,11 +145,10 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   </p>
                 )}
               </div>
-              <p className="mt-2 text-xs text-gray-100 ">
-                Your vault directory doesn&apos;t need to be empty. Only
-                markdown files will be indexed.
-              </p>
-              {userDirectory && (
+              {/* <p className="mt-2 text-xs text-gray-100 ">
+                This will open in a new window.
+              </p> */}
+              {/* {userDirectory && (
                 <Button
                   className="bg-slate-700  border-none h-10 hover:bg-slate-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
                   onClick={() => {
@@ -161,7 +159,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                 >
                   Open New Vault
                 </Button>
-              )}
+              )} */}
             </div>
           )}
 
