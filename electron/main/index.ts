@@ -206,8 +206,8 @@ ipcMain.on("index-files-in-directory", async (event) => {
     }
     event.sender.send("indexing-progress", 1);
   } catch (error) {
-    const nonLinuxError = `Indexing error: ${error}. Please try restarting or send me an email with your error: samlhuillier1@gmail.com`;
-    event.sender.send("indexing-error", nonLinuxError);
+    const errorStr = `Indexing error: ${error}. Please try restarting or open a Github issue.`;
+    event.sender.send("indexing-error", errorStr);
     console.error("Error during file indexing:", error);
   }
 });
