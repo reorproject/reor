@@ -1,6 +1,6 @@
 {
   "name": "reor-project",
-  "version": "0.1.43",
+  "version": "0.1.45",
   "productName": "Reor",
   "main": "dist-electron/main/index.js",
   "description": "A private & self-organizing note-taking app.",
@@ -66,7 +66,7 @@
     "react-rnd": "^10.4.1",
     "react-toastify": "^10.0.4",
     "react-window": "^1.8.10",
-    "vectordb": "0.4.8"
+    "vectordb": "0.4.10"
   },
   "devDependencies": {
     "@playwright/test": "^1.37.1",
