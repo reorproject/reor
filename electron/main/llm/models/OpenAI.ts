@@ -2,13 +2,13 @@ import OpenAI from "openai";
 import {
   ChatbotMessage,
   ISendFunctionImplementer,
-  ISessionService,
+  IChatSessionService,
   OpenAIMessage,
 } from "../Types";
 import { Tiktoken, TiktokenModel, encodingForModel } from "js-tiktoken";
 import { OpenAIAIModelConfig } from "electron/main/Store/storeConfig";
 
-export class OpenAIModelSessionService implements ISessionService {
+export class OpenAIModelSessionService implements IChatSessionService {
   private openai: OpenAI;
   public modelName: string;
   private messageHistory: ChatbotMessage[];

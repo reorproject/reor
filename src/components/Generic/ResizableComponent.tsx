@@ -22,7 +22,6 @@ const ResizableComponent: React.FC<ResizableComponentProps> = ({
   const onDrag = useCallback(
     (e: MouseEvent) => {
       if (isDragging) {
-        // Adjust width based on the drag side
         const deltaWidth = resizeSide === "left" ? -e.movementX : e.movementX;
         setWidth((prevWidth) => prevWidth + deltaWidth);
       }

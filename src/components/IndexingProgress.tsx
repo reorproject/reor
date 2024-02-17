@@ -2,17 +2,13 @@ import React, { useEffect, useState } from "react";
 import Modal from "./Generic/Modal";
 import CircularProgress from "@mui/material/CircularProgress";
 
-// import { ipcRenderer, IpcRendererEvent } from "electron";
-
 interface IndexingProgressProps {
   indexingProgress: number;
 }
-// Other imports...
 
 const IndexingProgress: React.FC<IndexingProgressProps> = ({
   indexingProgress,
 }) => {
-  // const [progress, setProgress] = useState<number>(0);
   const [startTime, setStartTime] = useState<number>(Date.now());
   const [eta, setEta] = useState<string>("Initializing...");
 

@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { LocalAIModelConfig } from "electron/main/Store/storeConfig";
-import { ISendFunctionImplementer, ISessionService } from "../Types";
+import { ISendFunctionImplementer, IChatSessionService } from "../Types";
 
-export class LlamaCPPSessionService implements ISessionService {
+export class LlamaCPPSessionService implements IChatSessionService {
   private session: any;
   private context: any;
   private model: any;

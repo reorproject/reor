@@ -8,7 +8,6 @@ body {
   margin: 0;
   min-height: 100%;
   min-width: 100%;
-  /* -webkit-app-region: drag; */
 }
 
 * {
@@ -28,27 +27,6 @@ button {
   -webkit-app-region: no-drag;
 }
 
-/* ::-webkit-scrollbar {
-  width: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: #3e3e3e; 
-}
-
-::-webkit-scrollbar-thumb {
-  background: #555; 
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #777; 
-}
-
-::-webkit-scrollbar-thumb:active {
-  background: #444; 
-} */
-
 .markdown-content p {
   padding: 0.25rem; 
   margin: 0; 
@@ -56,14 +34,10 @@ button {
 
 
 .milkdown .editor {
-  /* height: 100vh; */
-  /* min-height: calc(100vh - 33px); */
-  @apply min-h-below-titlebar-min; /* Apply the custom min-height */
-  /* set the background color: */
+  @apply min-h-below-titlebar-min; 
   background-color:#242c37;
   color: white;
   font-size: 17px;
-  /* border: 2px solid black; */
   overflow: auto;
   padding: 2px;
   padding-left: 5px;
@@ -85,19 +59,17 @@ button {
 .milkdown .editor blockquote {
   margin: 0.5em 0 !important;
   padding-left: 1em;
-  border-left: 3px solid #ccc; /* Example style */
-  /* Other styling as needed */
+  border-left: 3px solid #ccc; 
 }
 
 
 
 .milkdown .editor .heading {
   margin: 1rem 0 !important;
-  /* font-size: 1.4rem; */
 }
 
 .milkdown .editor h1 {
-  font-size: 1.8em !important; /* Adjust the size as needed */
+  font-size: 1.8em !important; 
 }
 
 .milkdown .editor h2 {
@@ -119,12 +91,3 @@ button {
 .milkdown .editor h6 {
   font-size: 1.0em !important;
 }
-
-
-/* .milkdown {
-  font-size: 1em;
-}
-
-h1 h2 h3 h4 h5 h6 {
-  font-size: 1em;
-} */

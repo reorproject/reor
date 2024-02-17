@@ -31,6 +31,5 @@ export function validateAIModelConfig(
     return "Error message should not be empty if provided.";
   }
 
-  // If all validations pass, return null indicating no errors
   return null;
 }

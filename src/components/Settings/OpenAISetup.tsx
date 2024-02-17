@@ -16,7 +16,6 @@ const OpenAISetupModal: React.FC<OpenAISetupModalProps> = ({
 
   const handleSave = () => {
     if (openAIKey) {
-      // So we just go through each of the models and set the key:
       for (const modelName in remoteAIModels) {
         window.electronStore.setupNewLLM(modelName, {
           ...remoteAIModels[modelName],

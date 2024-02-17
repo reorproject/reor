@@ -48,13 +48,9 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         similarFilesOpen={showSimilarFiles}
         toggleChatbot={toggleChatbot}
         toggleSimilarFiles={toggleSimilarFiles}
-        makeSidebarShow={setSidebarShowing}
       />
 
-      <div
-        className="flex h-below-titlebar"
-        // style={{ height: `calc(100vh - ${titleBarHeight})` }}
-      >
+      <div className="flex h-below-titlebar">
         <div className="w-[40px] border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-gray-600 border-solid">
           <LeftSidebar
             onFileSelect={onFileSelect}
@@ -99,7 +95,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
             className={`h-below-titlebar ${
               selectedFilePath ? "" : "absolute right-0"
             }`}
-            // style={{ height: `calc(100vh - ${titleBarHeight})` }}
           >
             <ResizableComponent resizeSide="left" initialWidth={300}>
               <ChatWithLLM />

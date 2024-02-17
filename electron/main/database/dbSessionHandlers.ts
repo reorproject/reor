@@ -66,7 +66,6 @@ export const registerDBSessionHandlers = (
   );
 
   ipcMain.handle("get-database-fields", () => {
-    // event.reply("database-fields-response", DatabaseFields);
     return DatabaseFields;
   });
 };

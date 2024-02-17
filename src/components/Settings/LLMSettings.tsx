@@ -9,14 +9,12 @@ import RemoteLLMSetupModal from "./RemoteLLMSetup";
 
 interface LLMSettingsProps {
   userHasCompleted?: (completed: boolean) => void;
-  // setCurrentError?: (error: string) => void;
   userTriedToSubmit?: boolean;
   isInitialSetup?: boolean;
 }
 
 const LLMSettings: React.FC<LLMSettingsProps> = ({
   userHasCompleted,
-  // setCurrentError,
   userTriedToSubmit,
   isInitialSetup,
 }) => {
@@ -77,7 +75,6 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
     }
   }, [defaultModel]);
 
-  // const modelNames = Object.keys(modelConfigs);
   const handleDefaultModelChange = (selectedModel: string) => {
     setDefaultModel(selectedModel);
     window.electronStore.setDefaultAIModel(selectedModel);
@@ -93,10 +90,7 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
       {isInitialSetup ? (
         <div>
           <h3 className="font-semibold mb-1 text-gray-100">LLM</h3>
-          {/* <p className="mt-0 text-gray-100 italic">
-            Choose an LLM for Q&A. Either attach a local model or an OpenAI
-            model. You can do this later too...
-          </p> */}
+
           <div className="flex">
             <Button
               className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mr-2"
@@ -182,7 +176,6 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
             >
               OpenAI Setup
             </Button>
-            {/* <div className="border-none h-8 w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1"></div> */}
           </div>
         </div>
       )}

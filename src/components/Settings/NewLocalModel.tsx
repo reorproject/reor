@@ -16,17 +16,13 @@ export const contextLengthOptions = [
   { label: "4096", value: "4096" },
   { label: "8192", value: "8192" },
   { label: "16384", value: "16384" },
-  { label: "32768", value: "32768" }, // This is slightly above 30k but included for completeness
+  { label: "32768", value: "32768" },
 ];
 
 const LocalModelModal: React.FC<LocalModelModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  // const [newModelContextLength, setNewModelContextLength] = useState<number>(
-  //   parseInt(contextLengthOptions[1].value)
-  // );
-
   const [selectedContextLength, setSelectedContextLength] = useState(
     contextLengthOptions[1].value
   );
@@ -90,9 +86,6 @@ const LocalModelModal: React.FC<LocalModelModalProps> = ({
           </p>
         )}
         <h3 className="text-gray-100 mb-2 mt-6">Context Length</h3>
-        {/* <p className="text-gray-100 text-sm mb-2 mt-0">
-          You can change this later in settings:
-        </p> */}
         <CustomSelect
           options={contextLengthOptions}
           value={selectedContextLength}

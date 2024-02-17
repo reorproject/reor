@@ -28,16 +28,15 @@ export interface StoreSchema {
   aiModels: {
     [modelName: string]: AIModelConfig;
   };
-  defaultAIModel: string; // Key of the default model
+  defaultAIModel: string;
   defaultEmbedFuncRepo: string;
-  RAG?: RAGConfig; // Optional RAG configuration
+  RAG?: RAGConfig;
 }
 
-// Enum for store keys
 export enum StoreKeys {
   UserDirectory = "user.directory",
   AIModels = "aiModels",
   DefaultAIModel = "defaultAIModel",
   DefaultEmbedFuncRepo = "defaultEmbedFuncRepo",
-  MaxRAGExamples = "RAG.maxRAGExamples", // New enum value for RAG max context length
+  MaxRAGExamples = "RAG.maxRAGExamples",
 }

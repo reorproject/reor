@@ -8,7 +8,7 @@ import { FileInfo, FileInfoTree } from "../Files/Types";
 import { chunkMarkdownByHeadingsAndByCharsIfBig } from "../RAG/Chunking";
 import { LanceDBTableWrapper } from "./LanceTableWrapper";
 
-export const repopulateTableWithMissingItems = async (
+export const RepopulateTableWithMissingItems = async (
   table: LanceDBTableWrapper,
   directoryPath: string,
   onProgress?: (progress: number) => void
@@ -24,7 +24,6 @@ export const repopulateTableWithMissingItems = async (
 
   const dbItemsToAdd = await computeDbItemsToAdd(filesInfoTree, tableArray);
   if (dbItemsToAdd.length == 0) {
-    console.log("no items to add");
     onProgress && onProgress(1);
     return;
   }
@@ -33,7 +32,6 @@ export const repopulateTableWithMissingItems = async (
 
   const flattenedItemsToAdd = dbItemsToAdd.flat();
   await table.add(flattenedItemsToAdd, onProgress);
-  console.log("done adding");
   onProgress && onProgress(1);
 };
 
@@ -71,7 +69,6 @@ const computeDBItemsToRemoveFromTable = async (
   filesInfoList: FileInfo[],
   tableArray: DBEntry[]
 ): Promise<DBEntry[]> => {
-  // these are items in the database that are not in filesInfoList
   const notInFilesInfoList = tableArray.filter(
     (item) => !filesInfoList.some((file) => file.path == item.notepath)
   );
@@ -95,57 +92,13 @@ const filterChunksNotInTable = (
   return chunksBelongingToFile.length != itemsAlreadyInTable.length;
 };
 
-// const computeDbItemsToAddWithTableReference = async (
-//   filesInfoList: FileInfo[],
-//   table: LanceDBTableWrapper
-// ): Promise<DBEntry[][]> => {
-//   const conversionPromises = filesInfoList.map(convertFileTypeToDBType);
-//   const filesAsChunksToAddToDB = await Promise.all(conversionPromises);
-
-//   const filterPromises = filesAsChunksToAddToDB.map(
-//     (chunksBelongingToFile, index) => {
-//       console.log("index is: ", index);
-//       return filterChunksNotInTableWithTableReference(
-//         chunksBelongingToFile,
-//         table
-//       );
-//     }
-//   );
-
-//   const filterResults = await Promise.all(filterPromises);
-
-//   const outputChunks = filesAsChunksToAddToDB.filter(
-//     (_, index) => filterResults[index]
-//   );
-//   return outputChunks;
-// };
-
-// const filterChunksNotInTableWithTableReference = async (
-//   chunksBelongingToFile: DBEntry[],
-//   table: LanceDBTableWrapper
-// ): Promise<boolean> => {
-//   if (chunksBelongingToFile.length == 0) {
-//     return false;
-//   }
-//   if (chunksBelongingToFile[0].content == "") {
-//     return false;
-//   }
-//   const notepath = chunksBelongingToFile[0].notepath;
-//   const itemsAlreadyInTable = await table.filter(
-//     `${DatabaseFields.NOTE_PATH} = '${notepath}'`
-//   );
-//   return chunksBelongingToFile.length != itemsAlreadyInTable.length;
-// };
-
 const convertFileTreeToDBEntries = async (
   tree: FileInfoTree
 ): Promise<DBEntry[]> => {
   const flattened = flattenFileInfoTree(tree);
 
-  // Map each file info to a promise using the async function
   const promises = flattened.map(convertFileTypeToDBType);
 
-  // Wait for all promises to resolve
   const entries = await Promise.all(promises);
 
   return entries.flat();

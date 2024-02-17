@@ -56,10 +56,8 @@ export const registerFileHandlers = (
     async (event, filePath: string, content: string): Promise<void> => {
       console.log("Creating file", filePath);
       if (!fs.existsSync(filePath)) {
-        // If the file does not exist, create it
         writeFileSyncRecursive(filePath, content, "utf-8");
       } else {
-        // If the file exists, log a message and do nothing
         console.log("File already exists:", filePath);
       }
     }
@@ -70,7 +68,6 @@ export const registerFileHandlers = (
     async (event, dirPath: string): Promise<void> => {
       console.log("Creating directory", dirPath);
 
-      // Function to create directory recursively
       const mkdirRecursiveSync = (dirPath: string) => {
         const parentDir = path.dirname(dirPath);
         if (!fs.existsSync(parentDir)) {
@@ -82,12 +79,9 @@ export const registerFileHandlers = (
       };
 
       try {
-        // Check if the directory already exists
         if (!fs.existsSync(dirPath)) {
-          // If the directory does not exist, create it
           mkdirRecursiveSync(dirPath);
         } else {
-          // If the directory exists, log a message and do nothing
           console.log("Directory already exists:", dirPath);
         }
       } catch (error) {

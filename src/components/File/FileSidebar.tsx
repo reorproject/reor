@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { FaChevronRight } from "react-icons/fa";
 import { FaChevronDown } from "react-icons/fa";
 import { FixedSizeList as List, ListChildComponentProps } from "react-window";
+import { isFileNodeDirectory, sortFilesAndDirectories } from "./fileOperations";
 
 interface FileListProps {
   selectedFile: string | null;
@@ -17,38 +18,6 @@ export const FileSidebar: React.FC<FileListProps> = ({
   const [files, setFiles] = useState<FileInfoTree>([]);
 
   const directoryPath = window.electronStore.getUserDirectory();
-
-  const sortFilesAndDirectories = (fileList: FileInfoTree): FileInfoTree => {
-    fileList.sort((a, b) => {
-      const aIsDirectory = isFileNodeDirectory(a);
-      const bIsDirectory = isFileNodeDirectory(b);
-
-      // Both are directories: sort alphabetically
-      if (aIsDirectory && bIsDirectory) {
-        return a.name.localeCompare(b.name);
-      }
-
-      // One is a directory and the other is a file
-      if (aIsDirectory && !bIsDirectory) {
-        return -1;
-      }
-      if (!aIsDirectory && bIsDirectory) {
-        return 1;
-      }
-
-      // Both are files: sort by dateModified
-      return b.dateModified.getTime() - a.dateModified.getTime();
-    });
-
-    fileList.forEach((fileInfoNode) => {
-      // If a node has children, sort them recursively
-      if (fileInfoNode.children && fileInfoNode.children.length > 0) {
-        sortFilesAndDirectories(fileInfoNode.children);
-      }
-    });
-
-    return fileList;
-  };
 
   useEffect(() => {
     const handleFileUpdate = (updatedFiles: FileInfoTree) => {
@@ -185,9 +154,8 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     <List
       height={listHeight}
       itemCount={itemCount}
-      itemSize={30} // Adjust based on your item size
+      itemSize={30}
       width={"100%"}
-      // set style to set margin and padding to 0:
       style={{ padding: 0, margin: 0 }}
     >
       {Row}
@@ -213,7 +181,6 @@ const FileItem: React.FC<FileInfoProps> = ({
   isExpanded,
   indentMultiplyer,
 }) => {
-  // const [isExpanded, setIsExpanded] = useState(false);
   const isDirectory = isFileNodeDirectory(file);
   const isSelected = file.path === selectedFile;
   const indentation = indentMultiplyer ? 10 * indentMultiplyer : 0;
@@ -235,10 +202,9 @@ const FileItem: React.FC<FileInfoProps> = ({
     let destinationPath = file.path; // Default destination path is the path of the file item itself
 
     if (!isFileNodeDirectory(file)) {
-      // If the file is not a directory, get the parent directory path
       const pathSegments = file.path.split("/");
-      pathSegments.pop(); // Remove the file name
-      destinationPath = pathSegments.join("/"); // Rejoin to get the parent directory path
+      pathSegments.pop();
+      destinationPath = pathSegments.join("/");
     }
 
     try {
@@ -298,8 +264,4 @@ const FileItem: React.FC<FileInfoProps> = ({
       </div>
     </div>
   );
-};
-
-export const isFileNodeDirectory = (fileInfo: FileInfoNode): boolean => {
-  return fileInfo.children !== undefined;
 };

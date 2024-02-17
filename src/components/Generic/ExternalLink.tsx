@@ -5,11 +5,12 @@ interface ExternalLinkProps {
   label: string;
 }
 
+// Open link in browser:
 const ExternalLink: React.FC<ExternalLinkProps> = ({ url, label }) => {
   const handleLinkClick = (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
   ) => {
-    e.preventDefault(); // Prevent the default anchor action
+    e.preventDefault();
     window.electron.openExternal(url);
   };
 

@@ -113,7 +113,6 @@ export function writeFileSyncRecursive(
   content: string,
   charset: BufferEncoding
 ): void {
-  // Ensures that the directory exists. If the directory structure does not exist, it is created.
   const dirname = path.dirname(filePath);
   if (!fs.existsSync(dirname)) {
     fs.mkdirSync(dirname, { recursive: true });
@@ -171,15 +170,12 @@ export function appendExtensionIfMissing(
   filename: string,
   extensions: string[]
 ): string {
-  // Check if the filename ends with any of the provided extensions
   const hasExtension = extensions.some((ext) => filename.endsWith(ext));
 
-  // If the filename already has one of the extensions, return it as is
   if (hasExtension) {
     return filename;
   }
 
-  // If not, append the first extension from the list to the filename
   return filename + extensions[0];
 }
 
@@ -217,9 +213,6 @@ export const orchestrateEntryMove = async (
       }
     }
   );
-
-  // const newFileSystemTree = GetFilesInfoTree(newDestinationPath);
-  // await addTreeToTable(table, newFileSystemTree);
 };
 
 export const moveFileOrDirectoryInFileSystem = async (
@@ -227,29 +220,26 @@ export const moveFileOrDirectoryInFileSystem = async (
   destinationPath: string
 ): Promise<string> => {
   try {
-    // Check if source path exists
     try {
       await fsPromises.access(sourcePath);
     } catch (error) {
       throw new Error("Source path does not exist.");
     }
 
-    // Check if destination path is a file
     let destinationStats;
     try {
       destinationStats = await fsPromises.lstat(destinationPath);
     } catch (error) {
       // Error means destination path does not exist, which is fine
+      console.error("Error accessing destination path:", error);
     }
 
     if (destinationStats && destinationStats.isFile()) {
       destinationPath = path.dirname(destinationPath);
     }
 
-    // Create destination directory
     await fsPromises.mkdir(destinationPath, { recursive: true });
 
-    // Move the file or directory
     const newPath = path.join(destinationPath, path.basename(sourcePath));
     await fsPromises.rename(sourcePath, newPath);
 

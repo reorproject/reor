@@ -1,5 +1,6 @@
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 
+// Chunk by markdown headings and then use Langchain chunker if the heading chunk is too big:
 export const chunkMarkdownByHeadingsAndByCharsIfBig = async (
   markdownContent: string
 ): Promise<string[]> => {
@@ -41,7 +42,6 @@ export function chunkMarkdownByHeadings(markdownContent: string): string[] {
     currentChunk.push(line);
   });
 
-  // Add the last chunk if it exists
   if (currentChunk.length) {
     chunks.push(currentChunk.join("\n"));
   }

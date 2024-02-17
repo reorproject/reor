@@ -66,6 +66,4 @@ describe("GetFilesInfoTree", () => {
       },
     ]);
   });
-
-  // More tests for different scenarios...
 });

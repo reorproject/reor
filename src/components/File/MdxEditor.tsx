@@ -25,22 +25,20 @@ import {
 } from "@mdxeditor/editor";
 import { LeafDirective } from "mdast-util-directive";
 
+// UNUSED RIGHT NOW. IN FAVOUR OF MILKDOWN.
 export interface MdxEditor {
   filePath: string;
-  // content: string;
   setContentInParent: (content: string) => void;
   lastSavedContentRef: React.MutableRefObject<string>;
 }
 
 export const MdxEditor: React.FC<MdxEditor> = ({
   filePath,
-  // content,
   setContentInParent,
   lastSavedContentRef,
 }) => {
   const [content, setContent] = useState<string>("");
   const ref = useRef<MDXEditorMethods>(null);
-  // const lastSavedContentRef = useRef<string>("");
 
   useEffect(() => {
     const fetchContent = async () => {

@@ -20,11 +20,8 @@ const ContextLengthModal: React.FC<ContextLengthModalProps> = ({
   >({});
 
   useEffect(() => {
-    // Initialize localModelConfigs state when modelConfigs is updated
     setLocalModelConfigs({ ...modelConfigs });
   }, [modelConfigs]);
-
-  // Options for context length dropdown
 
   const updateAIModelConfig = async (
     modelName: string,
@@ -37,7 +34,7 @@ const ContextLengthModal: React.FC<ContextLengthModalProps> = ({
       console.error(`Error updating model config for ${modelName}:`, error);
     }
   };
-  // Handle changing context length for a specific model
+
   const handleContextLengthChange = (modelKey: string, value: string) => {
     const newContextLength = parseInt(value);
     setLocalModelConfigs((prevConfigs) => ({
@@ -48,7 +45,6 @@ const ContextLengthModal: React.FC<ContextLengthModalProps> = ({
       },
     }));
 
-    // Call updateAIModelConfig with the updated model config
     updateAIModelConfig(modelKey, {
       ...localModelConfigs[modelKey],
       contextLength: newContextLength,
