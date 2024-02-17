@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Modal from "../Generic/Modal";
-// import Modal from './Modal'; // Adjust the import path as necessary
 import { Button } from "@material-tailwind/react";
 
 interface NewNoteComponentProps {
@@ -16,8 +15,6 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
 }) => {
   const [fileName, setFileName] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
-
-  // const [isValidName, setIsValidName] = useState<boolean>(true);
 
   const validNamePattern = /^[a-zA-Z0-9_\-/\s]+$/;
 
@@ -41,14 +38,11 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
     if (!fileName || errorMessage) {
       return;
     }
-    // Normalize the path separators to forward slashes
     const normalizedFileName = fileName.replace(/\\/g, "/");
     const fullPath = await window.files.joinPath(
       window.electronStore.getUserDirectory(),
       normalizedFileName + ".md"
     );
-    // Create directories if they don't exist
-    // await window.files.ensureDirectoryExists(fullPath);
     window.files.createFile(fullPath, "");
     onFileSelect(fullPath);
     onClose();
@@ -68,7 +62,6 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
           type="text"
           className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
           value={fileName}
-          // onChange={(e) => setFileName(e.target.value)}
           onChange={handleNameChange}
           onKeyDown={handleKeyPress}
           placeholder="Note Name"
@@ -88,16 +81,3 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
 };
 
 export default NewNoteComponent;
-
-// function appendExtensionIfMissing(filename: string, extensions: string[]): string {
-//   // Check if the filename ends with any of the provided extensions
-//   const hasExtension = extensions.some(ext => filename.endsWith(ext));
-
-//   // If the filename already has one of the extensions, return it as is
-//   if (hasExtension) {
-//       return filename;
-//   }
-
-//   // If not, append the first extension from the list to the filename
-//   return filename + extensions[0];
-// }

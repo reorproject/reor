@@ -28,20 +28,10 @@ import { registerLLMSessionHandlers } from "./llm/llmSessionHandlers";
 import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
 import { registerStoreHandlers } from "./Store/storeHandlers";
 import { registerFileHandlers } from "./Files/registerFilesHandler";
-import { repopulateTableWithMissingItems } from "./database/TableHelperFunctions";
+import { RepopulateTableWithMissingItems } from "./database/TableHelperFunctions";
 
 const store = new Store<StoreSchema>();
-// const user = store.get("user");
-// store.clear();
-
-// // Check if 'user' and 'directory' exist before attempting to delete
-// if (user && typeof user === "object" && "directory" in user) {
-//   // Delete the 'directory' property
-//   delete user.directory;
-
-//   // Save the updated 'user' object back to the store
-//   store.set("user", user);
-// }
+// store.clear(); // clear store for testing
 
 process.env.DIST_ELECTRON = join(__dirname, "../");
 process.env.DIST = join(process.env.DIST_ELECTRON, "../dist");
@@ -60,13 +50,8 @@ if (!app.requestSingleInstanceLock()) {
   process.exit(0);
 }
 
-// Remove electron security warnings
-// This warning only shows in development mode
-// Read more on https://www.electronjs.org/docs/latest/tutorial/security
-// process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
-
 let win: BrowserWindow | null = null;
-// Here, you can also use other preload
+
 const preload = join(__dirname, "../preload/index.js");
 const url = process.env.VITE_DEV_SERVER_URL;
 const indexHtml = join(process.env.DIST, "index.html");
@@ -78,16 +63,15 @@ const fileWatcher: FSWatcher | null = null;
 async function createWindow() {
   win = new BrowserWindow({
     title: "Main window",
-    // icon: join(process.env.VITE_PUBLIC, "favicon.ico"), // oh we could also try just setting this to .ico
     webPreferences: {
       preload,
     },
     frame: false,
-    titleBarStyle: "hidden", // or 'customButtonsOnHover'
+    titleBarStyle: "hidden",
     titleBarOverlay: {
       color: "#2f3241",
       symbolColor: "#74b1be",
-      height: 30, // Adjust height as necessary to fit your icons
+      height: 30,
     },
     width: 1200,
     height: 800,
@@ -209,7 +193,7 @@ ipcMain.on("index-files-in-directory", async (event) => {
     const dbPath = path.join(app.getPath("userData"), "vectordb");
     dbConnection = await lancedb.connect(dbPath);
     await dbTable.initialize(dbConnection, userDirectory, embedFuncRepoName);
-    await repopulateTableWithMissingItems(
+    await RepopulateTableWithMissingItems(
       dbTable,
       userDirectory,
       (progress) => {
@@ -253,7 +237,6 @@ ipcMain.on("show-context-menu-file-item", (event, file) => {
               );
             });
           } else {
-            // For files
             fs.unlink(file.path, (err) => {
               if (err) {
                 console.error("An error occurred:", err);

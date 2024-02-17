@@ -39,20 +39,14 @@ export const registerStoreHandlers = (
     store.set(StoreKeys.DefaultAIModel, modelName);
   });
 
-  // Handler to get the default AI model
   ipcMain.on("get-default-ai-model", (event) => {
     event.returnValue = store.get(StoreKeys.DefaultAIModel);
   });
 
   ipcMain.handle("get-ai-model-configs", () => {
-    // Assuming store.get() returns the value for the given key
     const aiModelConfigs = store.get(StoreKeys.AIModels);
     return aiModelConfigs || {};
   });
-
-  // ipcMain.handle("add-remote-models-to-store", async () => {
-  //   await addRemoteModelsToElectronStore(store);
-  // });
 
   ipcMain.handle("update-ai-model-config", (event, modelName, modelConfig) => {
     console.log("updating ai model config", modelName, modelConfig);
@@ -66,7 +60,6 @@ export const registerStoreHandlers = (
     }
   });
 
-  // Refactored ipcMain.handle to use the new function
   ipcMain.handle(
     "setup-new-model",
     async (event, modelName: string, modelConfig: AIModelConfig) => {

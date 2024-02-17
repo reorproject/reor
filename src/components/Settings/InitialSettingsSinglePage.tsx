@@ -12,7 +12,6 @@ interface OldInitialSettingsProps {
 const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
   readyForIndexing,
 }) => {
-  // const [userDirectory, setUserDirectory] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [showError, setShowError] = useState(false);
 

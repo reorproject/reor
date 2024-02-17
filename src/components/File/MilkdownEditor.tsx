@@ -5,19 +5,15 @@ import { commonmark } from "@milkdown/preset-commonmark";
 import { history } from "@milkdown/plugin-history";
 import { gfm } from "@milkdown/preset-gfm";
 import { ReactEditor, useEditor } from "@milkdown/react";
-import "./milkdown.css";
 import { listener, listenerCtx } from "@milkdown/plugin-listener";
 import { prism } from "@milkdown/plugin-prism";
 import { block } from "@milkdown/plugin-block";
-// import slash from "./slash"; // Uncomment if slash is used
 import { cursor } from "@milkdown/plugin-cursor";
 import { clipboard } from "@milkdown/plugin-clipboard";
 import { replaceAll } from "@milkdown/utils";
-// import { slash } from "@milkdown/plugin-slash";
 
 export interface MarkdownEditorProps {
   filePath: string;
-  // content: string;
   setContentInParent: (content: string) => void;
   lastSavedContentRef: React.MutableRefObject<string>;
 }
@@ -26,33 +22,26 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
   filePath,
   setContentInParent,
   lastSavedContentRef,
-  // content,
-  // setContent,
 }) => {
   const [content, setContent] = useState<string>("");
 
-  // const ref = useRef<MDXEditorMethods>(null);
-  // const lastSavedContentRef = useRef<string>("");
-
   const saveFile = async () => {
     if (content !== lastSavedContentRef.current) {
-      // Check for changes since last save
       console.log("calling save file:");
       await window.files.writeFile(filePath, content);
-      lastSavedContentRef.current = content; // Update the ref to the latest saved content
+      lastSavedContentRef.current = content;
     }
   };
 
   useEffect(() => {
     const saveInterval = setInterval(() => {
       saveFile();
-    }, 1000); // Every 1 second
+    }, 1000);
 
-    return () => clearInterval(saveInterval); // Clear the interval when component unmounts
-  }, [content]); // Dependency on content ensures saveFile has the latest content
+    return () => clearInterval(saveInterval);
+  }, [content]);
 
   useEffect(() => {
-    // console.log("content set to: ")
     setContentInParent(content);
   }, [content]);
 
@@ -87,14 +76,10 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
     const fetchContent = async () => {
       try {
         const fileContent = await window.files.readFile(filePath);
-        // setContent(fileContent);
         getInstance()?.action(replaceAll(fileContent));
-        // ref.current?.setMarkdown(fileContent);
-        lastSavedContentRef.current = fileContent; // Initialize with fetched content
+        lastSavedContentRef.current = fileContent;
       } catch (error) {
-        // Handle the error here
         console.error("Error reading file:", error);
-        // Optionally, you can set some state to show an error message in the UI
       }
     };
 
@@ -104,15 +89,7 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
   }, [filePath]);
 
   return (
-    <div
-      className="h-full overflow-auto"
-      // className="font-material-icons"
-      style={
-        {
-          // fontFamily: "Material Icons",
-        }
-      }
-    >
+    <div className="h-full overflow-auto">
       <ReactEditor editor={editor} />
     </div>
   );

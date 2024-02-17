@@ -1,18 +1,13 @@
 import { ipcMain, IpcMainInvokeEvent } from "electron";
-import { LlamaCPPSessionService } from "./models/LlamaCpp"; // Assuming SessionService is in the same directory
-import { ISessionService } from "./Types";
+import { LlamaCPPSessionService } from "./models/LlamaCpp";
+import { IChatSessionService } from "./Types";
 import { OpenAIModelSessionService } from "./models/OpenAI";
 import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 
-export const LLMSessions: { [sessionId: string]: ISessionService } = {};
+export const LLMSessions: { [sessionId: string]: IChatSessionService } = {};
 
 export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
-  // const llamaCPPModelLoader = new LlamaCPPModelLoader();
-  // llamaCPPModelLoader.loadModel();
-  // const gpt4SessionService = new GPT4SessionService(gpt4Model, webContents);
-  // await gpt4SessionService.init();
-
   ipcMain.handle(
     "does-session-exist",
     async (event: IpcMainInvokeEvent, sessionId: string): Promise<boolean> => {
@@ -38,7 +33,6 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
     }
   );
 
-  // Refactored get-or-create-session handler
   ipcMain.handle(
     "get-or-create-session",
     async (event: IpcMainInvokeEvent, sessionId: string): Promise<string> => {

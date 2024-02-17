@@ -1,6 +1,5 @@
 import * as lancedb from "vectordb";
 import { Pipeline, PreTrainedTokenizer } from "@xenova/transformers";
-// Import path library:
 import path from "path";
 import { app } from "electron";
 
@@ -22,9 +21,6 @@ export async function createEmbeddingFunction(
     const { pipeline, env, AutoTokenizer } = await import(
       "@xenova/transformers"
     );
-    // env.localModelPath = embeddingModelsPath;
-    // env.allowRemoteModels = false;
-    // env.allowLocalModels = true;
     const cacheDir = path.join(app.getPath("userData"), "models", "embeddings");
     env.cacheDir = cacheDir;
     pipe = (await pipeline("feature-extraction", repoName, {

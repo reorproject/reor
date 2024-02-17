@@ -29,7 +29,6 @@ const SettingsModal: React.FC<ModalProps> = ({
       isOpen={isOpen}
       onClose={() => {
         handleSave();
-        // onCloseFromParent();
       }}
     >
       <div className=" mt-0  flex w-[600px] ">
@@ -66,9 +65,7 @@ const SettingsModal: React.FC<ModalProps> = ({
           </div>
         </div>
 
-        {/* Right Content Area */}
         <div className="flex-1 ml-2">
-          {/* <h2 className="text-2xl font-semibold mb-4 text-white">Settings</h2> */}
           {activeTab === "llmSettings" && (
             <div className="mt-2 w-full">
               <LLMSettings />
@@ -93,8 +90,6 @@ const SettingsModal: React.FC<ModalProps> = ({
                 <p className="mt-5 text-gray-100">
                   If you change this, your files will be re-indexed:
                 </p>
-                {/* <EmbeddingModelManager.childrenBelowDropdown> */}
-                {/* </EmbeddingModelManager.childrenBelowDropdown> */}
               </EmbeddingModelManager>
             </div>
           )}

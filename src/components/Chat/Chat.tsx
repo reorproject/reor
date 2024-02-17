@@ -8,7 +8,6 @@ import ReactMarkdown from "react-markdown";
 
 const ChatWithLLM: React.FC = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
-  // const [loadingSession, setLoadingSession] = useState<boolean>(false);
   const [userInput, setUserInput] = useState<string>("");
   const [messages, setMessages] = useState<ChatbotMessage[]>([]);
   const [defaultModel, setDefaultModel] = useState<string>("");
@@ -25,6 +24,7 @@ const ChatWithLLM: React.FC = () => {
     };
     fetchDefaultModel();
   }, []);
+
   const initializeSession = async (): Promise<string> => {
     try {
       const sessionID = "some_unique_session_id";
@@ -77,18 +77,12 @@ const ChatWithLLM: React.FC = () => {
     }
     if (!currentSessionId || !userInput.trim()) return;
 
-    // if (newMessages.length <= 1) {
     const augmentedPrompt = await window.database.augmentPromptWithRAG(
       userInput,
       currentSessionId
     );
     startStreamingResponse(currentSessionId, augmentedPrompt, true);
-    // }
-    // else {
-    //   startStreamingResponse(currentSessionId, userInput);
-    // }
 
-    // Add the user's message to the messages
     setMessages([
       ...newMessages,
       { role: "user", messageType: "success", content: userInput },
@@ -155,7 +149,7 @@ const ChatWithLLM: React.FC = () => {
     e
   ) => {
     if (!e.shiftKey && e.key == "Enter") {
-      e.preventDefault(); // Prevents default action (new line) when pressing Enter
+      e.preventDefault();
       handleSubmitNewMessage();
     }
   };
@@ -216,7 +210,7 @@ const ChatWithLLM: React.FC = () => {
             onKeyDown={handleKeyDown}
             onChange={handleInputChange}
             value={userInput}
-            className="w-full  bg-gray-300" // 'resize-none' to prevent manual resizing
+            className="w-full  bg-gray-300"
             name="Outlined"
             placeholder="Ask your knowledge..."
             variant="outlined"
@@ -225,7 +219,6 @@ const ChatWithLLM: React.FC = () => {
               color: "rgb(209 213 219)",
             }}
           />
-          {/* <div className="w-[80px]"> */}
           <div className="flex justify-center items-center h-full ">
             {loadingResponse ? (
               <CircularProgress

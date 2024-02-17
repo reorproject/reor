@@ -14,10 +14,8 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
 }) => {
   const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [loading, setLoading] = useState<boolean>(false);
 
   const handleNewFileOpen = async (path: string) => {
-    setLoading(true);
     try {
       const searchResults = await performSearch(path);
       if (searchResults.length > 0) {
@@ -27,16 +25,12 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
       }
     } catch (error) {
       console.error("Error:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
   const performSearch = async (filePath: string): Promise<DBQueryResult[]> => {
     const fileContent: string = await window.files.readFile(filePath);
-    // Ok so that wouldn't be too hard to do here: chunk the ting and just perform a search based on the chunks.
-    // And in fact, it's probably slightly wasteful to be doing all these embeddings
-    // We already have the embeddings so should just leverage the backend to show related files, leverage the embeddings we already have.
+    // TODO: proper chunking here...
     if (!fileContent) {
       console.error("File content is empty");
       return [];

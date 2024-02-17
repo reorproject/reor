@@ -2,20 +2,14 @@ import { contextBridge, ipcRenderer } from "electron";
 import { AIModelConfig } from "electron/main/Store/storeConfig";
 import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
 import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
-// import { FileInfo } from "electron/main/Files/Types";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
 
 declare global {
   interface Window {
     ipcRenderer: {
-      // send: (channel: string, ...args: any[]) => void;
-      // sendSync: (channel: string, ...args: any[]) => any;
       on: (channel: string, listener: (...args: unknown[]) => void) => void;
-      // once: (channel: string, listener: (...args: any[]) => void) => void;
-      // invoke: (channel: string, ...args: any[]) => Promise<any>;
       removeListener: (channel: string, listener: ReceiveCallback) => void;
-      // removeAllListeners: (channel: string) => void;
       receive: (channel: string, callback: ReceiveCallback) => void;
     };
     electron: {
@@ -164,25 +158,17 @@ contextBridge.exposeInMainWorld("electronStore", {
 });
 
 contextBridge.exposeInMainWorld("ipcRenderer", {
-  // send: ipcRenderer.send,
-  // sendSync: ipcRenderer.sendSync,
   on: ipcRenderer.on,
-  // once: ipcRenderer.once,
-  // invoke: ipcRenderer.invoke,
   removeListener: ipcRenderer.removeListener,
-  // removeAllListeners: ipcRenderer.removeAllListeners,
   receive: (channel: string, callback: (...args: unknown[]) => void) => {
     ipcRenderer.on(channel, (event, ...args) => callback(...args));
   },
 });
 
 contextBridge.exposeInMainWorld("contextMenu", {
-  // Function to trigger the context menu
   showFileItemContextMenu: (file: FileInfoNode) => {
     ipcRenderer.send("show-context-menu-file-item", file);
   },
-
-  // Function to set up a listener for menu actions
 });
 
 contextBridge.exposeInMainWorld("files", {
@@ -193,7 +179,6 @@ contextBridge.exposeInMainWorld("files", {
     return ipcRenderer.invoke("get-files");
   },
 
-  // Write content to a file
   writeFile: async (filePath: string, content: string) => {
     return ipcRenderer.invoke("write-file", filePath, content);
   },
@@ -206,7 +191,6 @@ contextBridge.exposeInMainWorld("files", {
     return ipcRenderer.invoke("create-directory", dirPath);
   },
 
-  // Read content from a file
   readFile: async (filePath: string) => {
     return ipcRenderer.invoke("read-file", filePath);
   },

@@ -1,9 +1,9 @@
-export interface ISessionService {
+// Any LLM engine should implement this interface:
+export interface IChatSessionService {
   /**
    * Initializes the session.
    * @returns A promise that resolves when the initialization is complete.
    */
-  // init(): Promise<void>;
 
   /**
    * Handles the streaming of prompts.
@@ -17,17 +17,11 @@ export interface ISessionService {
     ignoreChatHistory?: boolean
   ): Promise<string>;
 
-  /**
-   * Aborts the response.
-   */
   abort(): void;
   getContextLength(): number;
   tokenize(text: string): number[];
 }
 
-/**
- * Interface for objects capable of sending messages.
- */
 export interface ISendFunctionImplementer {
   /**
    * Sends a message to the specified channel with optional arguments.
@@ -46,5 +40,3 @@ export type OpenAIMessage = {
 export type ChatbotMessage = OpenAIMessage & {
   messageType: "success" | "error";
 };
-
-// export type ChatbotMessageType = ;

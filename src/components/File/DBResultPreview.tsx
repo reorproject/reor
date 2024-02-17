@@ -8,7 +8,6 @@ interface DBResultPreview {
   onSelect: (path: string) => void;
 }
 
-// Implement the SimilarEntryItem component
 export const DBResultPreview: React.FC<DBResultPreview> = ({
   dbResult: entry,
   onSelect,
@@ -16,8 +15,6 @@ export const DBResultPreview: React.FC<DBResultPreview> = ({
   const modified = formatModifiedDate(entry.filemodified);
   return (
     <div
-      // className="pr-2 pb-1 mt-0 text-white pt-1 border-l-0 border-r-0 border-solid border-white pl-2 shadow-md cursor-pointer hover:scale-104 hover:shadow-lg hover:bg-gray-700 transition-transform duration-300"
-      // style={{ backgroundColor: "#1F2937" }}
       className="pr-2 pb-1 mt-0 text-white pt-1 rounded border-solid border-gray-600 bg-gray-800 border-[0.1px] pl-2 shadow-md cursor-pointer hover:scale-104 hover:shadow-lg hover:bg-[#262f3b] transition-transform duration-300"
       onClick={() => onSelect(entry.notepath)}
     >
@@ -61,14 +58,13 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({
   );
 };
 
-// export default DBResultPreview;
 const cosineDistanceToPercentage = (similarity: number) => {
   return ((1 - similarity) * 100).toFixed(2);
 };
 
 export function getFileName(filePath: string): string {
   const parts = filePath.split(/[/\\]/);
-  return parts.pop() || ""; // Fallback to an empty string if the array is empty
+  return parts.pop() || "";
 }
 
 const formatModifiedDate = (date: Date) => {
