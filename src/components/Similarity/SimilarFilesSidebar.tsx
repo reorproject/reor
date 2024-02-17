@@ -39,7 +39,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     const filterString = `${databaseFields.NOTE_PATH} != '${filePath}'`;
     const searchResults: DBQueryResult[] = await window.database.search(
       fileContent,
-      30,
+      20,
       filterString
     );
     return searchResults;

@@ -57,12 +57,9 @@ export class LanceDBTableWrapper {
     let index = 0;
     const totalChunks = chunks.length;
     for (const chunk of chunks) {
-      try {
-        const arrowTableOfChunk = makeArrowTable(chunk);
-        await this.table.add(arrowTableOfChunk);
-      } catch (error) {
-        console.error("Error adding chunk to DB:", error);
-      }
+      const arrowTableOfChunk = makeArrowTable(chunk);
+      await this.table.add(arrowTableOfChunk);
+
       index++;
       const progress = index / totalChunks;
       if (onProgress) {
