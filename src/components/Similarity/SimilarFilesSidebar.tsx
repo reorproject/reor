@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { DBResultPreview } from "../File/DBResultPreview";
 import { DBQueryResult } from "electron/main/database/Schema";
 import { PiGraph } from "react-icons/pi";
+import { toast } from "react-toastify";
+import { errorToString } from "@/functions/error";
 
 interface SimilarEntriesComponentProps {
   filePath: string;
@@ -29,20 +31,30 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   };
 
   const performSearch = async (filePath: string): Promise<DBQueryResult[]> => {
-    const fileContent: string = await window.files.readFile(filePath);
-    // TODO: proper chunking here...
-    if (!fileContent) {
-      console.error("File content is empty");
+    try {
+      const fileContent: string = await window.files.readFile(filePath);
+      // TODO: proper chunking here...
+      if (!fileContent) {
+        return [];
+      }
+      const databaseFields = await window.database.getDatabaseFields();
+      const filterString = `${databaseFields.NOTE_PATH} != '${filePath}'`;
+      const searchResults: DBQueryResult[] = await window.database.search(
+        fileContent,
+        20,
+        filterString
+      );
+      return searchResults;
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error(errorToString(error), {
+        className: "mt-5",
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
+      });
       return [];
     }
-    const databaseFields = await window.database.getDatabaseFields();
-    const filterString = `${databaseFields.NOTE_PATH} != '${filePath}'`;
-    const searchResults: DBQueryResult[] = await window.database.search(
-      fileContent,
-      20,
-      filterString
-    );
-    return searchResults;
   };
 
   useEffect(() => {

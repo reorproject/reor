@@ -2,6 +2,7 @@ import * as lancedb from "vectordb";
 import { Pipeline, PreTrainedTokenizer } from "@xenova/transformers";
 import path from "path";
 import { app } from "electron";
+import { errorToString } from "../Generic/error";
 
 export interface EnhancedEmbeddingFunction<T>
   extends lancedb.EmbeddingFunction<T> {
@@ -23,18 +24,36 @@ export async function createEmbeddingFunction(
     );
     const cacheDir = path.join(app.getPath("userData"), "models", "embeddings");
     env.cacheDir = cacheDir;
-    pipe = (await pipeline("feature-extraction", repoName, {
-      cache_dir: cacheDir,
-    })) as Pipeline;
-    contextLength = pipe.model.config.hidden_size;
 
-    tokenizer = await AutoTokenizer.from_pretrained(repoName, {
-      cache_dir: cacheDir,
-    });
+    try {
+      pipe = (await pipeline("feature-extraction", repoName, {
+        cache_dir: cacheDir,
+      })) as Pipeline;
+      contextLength = pipe.model.config.hidden_size;
+    } catch (error) {
+      throw new Error(
+        `Pipeline initialization failed for repo '${repoName}': ${errorToString(
+          error
+        )}`
+      );
+    }
+
+    try {
+      tokenizer = await AutoTokenizer.from_pretrained(repoName, {
+        cache_dir: cacheDir,
+      });
+    } catch (error) {
+      throw new Error(
+        `Tokenizer initialization failed for repo '${repoName}': ${errorToString(
+          error
+        )}`
+      );
+    }
   } catch (error) {
-    console.error("Failed to initialize pipeline", error);
-    throw error;
+    console.error(`Resource initialization failed: ${errorToString(error)}`);
+    throw new Error(`Resource initialization failed: ${errorToString(error)}`);
   }
+
   return {
     name: repoName,
     contextLength: contextLength,
@@ -46,33 +65,58 @@ export async function createEmbeddingFunction(
       if (typeof batch[0][0] === "number") {
         return batch as number[][];
       }
-      if (pipe === null) {
+      if (!pipe) {
         throw new Error("Pipeline not initialized");
       }
       try {
         const result: number[][] = await Promise.all(
           batch.map(async (text) => {
-            const res = await pipe(text, {
-              pooling: "mean",
-              normalize: true,
-            });
-            return Array.from(res.data);
+            try {
+              const res = await pipe(text, {
+                pooling: "mean",
+                normalize: true,
+              });
+              return Array.from(res.data);
+            } catch (error) {
+              throw new Error(
+                `Embedding process failed for text: ${errorToString(error)}`
+              );
+            }
           })
         );
         return result;
       } catch (error) {
-        console.error(error);
-        return [];
+        console.error(
+          `Embedding batch process failed: ${errorToString(error)}`
+        );
+        throw new Error(
+          `Embedding batch process failed: ${errorToString(error)}`
+        );
       }
     },
     tokenize: (data: (string | number[])[]): string[] => {
-      if (tokenizer === null) {
+      if (!tokenizer) {
         throw new Error("Tokenizer not initialized");
       }
-      return data.map((text) => {
-        const res = tokenizer(text);
-        return res;
-      });
+      try {
+        return data.map((text) => {
+          try {
+            const res = tokenizer(text);
+            return res;
+          } catch (error) {
+            throw new Error(
+              `Tokenization process failed for text: ${errorToString(error)}`
+            );
+          }
+        });
+      } catch (error) {
+        console.error(
+          `Tokenization batch process failed: ${errorToString(error)}`
+        );
+        throw new Error(
+          `Tokenization batch process failed: ${errorToString(error)}`
+        );
+      }
     },
   };
 }
