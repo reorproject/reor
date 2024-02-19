@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { LocalAIModelConfig } from "electron/main/Store/storeConfig";
 import { ISendFunctionImplementer, IChatSessionService } from "../Types";
+import { errorToString } from "../../Generic/error";
 
 export class LlamaCPPSessionService implements IChatSessionService {
   private session: any;
@@ -94,16 +95,6 @@ export class LlamaCPPSessionService implements IChatSessionService {
       });
       return "";
     }
-  }
-}
-
-export function errorToString(error: unknown): string {
-  if (error instanceof Error) {
-    // Use toString() method for Error objects
-    return error.toString();
-  } else {
-    // Convert other types of errors to string
-    return String(error);
   }
 }
 

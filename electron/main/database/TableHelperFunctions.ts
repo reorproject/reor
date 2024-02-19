@@ -7,31 +7,76 @@ import {
 import { FileInfo, FileInfoTree } from "../Files/Types";
 import { chunkMarkdownByHeadingsAndByCharsIfBig } from "../RAG/Chunking";
 import { LanceDBTableWrapper } from "./LanceTableWrapper";
+import { errorToString } from "../Generic/error";
 
 export const RepopulateTableWithMissingItems = async (
   table: LanceDBTableWrapper,
   directoryPath: string,
   onProgress?: (progress: number) => void
 ) => {
-  const filesInfoTree = GetFilesInfoList(directoryPath);
-  const tableArray = await getTableAsArray(table);
-  const itemsToRemove = await computeDBItemsToRemoveFromTable(
-    filesInfoTree,
-    tableArray
-  );
-  const filePathsToRemove = itemsToRemove.map((x) => x.notepath);
-  await table.deleteDBItemsByFilePaths(filePathsToRemove);
+  let filesInfoTree;
+  try {
+    filesInfoTree = GetFilesInfoList(directoryPath);
+  } catch (error) {
+    throw new Error(`Error getting file info list: ${errorToString(error)}`);
+  }
 
-  const dbItemsToAdd = await computeDbItemsToAdd(filesInfoTree, tableArray);
-  if (dbItemsToAdd.length == 0) {
+  let tableArray;
+  try {
+    tableArray = await getTableAsArray(table);
+  } catch (error) {
+    throw new Error(`Error converting table to array: ${errorToString(error)}`);
+  }
+
+  let itemsToRemove;
+  try {
+    itemsToRemove = await computeDBItemsToRemoveFromTable(
+      filesInfoTree,
+      tableArray
+    );
+  } catch (error) {
+    throw new Error(
+      `Error computing items to remove from table: ${errorToString(error)}`
+    );
+  }
+
+  const filePathsToRemove = itemsToRemove.map((x) => x.notepath);
+  try {
+    await table.deleteDBItemsByFilePaths(filePathsToRemove);
+  } catch (error) {
+    throw new Error(
+      `Error deleting items by file paths: ${errorToString(error)}`
+    );
+  }
+
+  let dbItemsToAdd;
+  try {
+    dbItemsToAdd = await computeDbItemsToAdd(filesInfoTree, tableArray);
+  } catch (error) {
+    throw new Error(`Error computing DB items to add: ${errorToString(error)}`);
+  }
+
+  if (dbItemsToAdd.length === 0) {
     onProgress && onProgress(1);
     return;
   }
+
   const filePathsToDelete = dbItemsToAdd.map((x) => x[0].notepath);
-  await table.deleteDBItemsByFilePaths(filePathsToDelete);
+  try {
+    await table.deleteDBItemsByFilePaths(filePathsToDelete);
+  } catch (error) {
+    throw new Error(
+      `Error deleting DB items by file paths: ${errorToString(error)}`
+    );
+  }
 
   const flattenedItemsToAdd = dbItemsToAdd.flat();
-  await table.add(flattenedItemsToAdd, onProgress);
+  try {
+    await table.add(flattenedItemsToAdd, onProgress);
+  } catch (error) {
+    throw new Error(`Error adding items to table: ${errorToString(error)}`);
+  }
+
   onProgress && onProgress(1);
 };
 
