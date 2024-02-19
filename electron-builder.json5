@@ -1,5 +1,5 @@
 {
-  appId: "YourAppID",
+  appId: "org.reorproject.reor",
   asar: true,
   directories: {
     output: "release/${version}",
