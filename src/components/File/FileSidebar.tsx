@@ -33,7 +33,7 @@ export const FileSidebar: React.FC<FileListProps> = ({
   }, []);
 
   useEffect(() => {
-    window.files.getFiles().then((fetchedFiles) => {
+    window.files.getFilesForWindow().then((fetchedFiles) => {
       const sortedFiles = sortFilesAndDirectories(fetchedFiles);
       setFiles(sortedFiles);
     });

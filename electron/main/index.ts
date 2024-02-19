@@ -16,10 +16,7 @@ import { StoreKeys, StoreSchema } from "./Store/storeConfig";
 // import contextMenus from "./contextMenus";
 import * as lancedb from "vectordb";
 import * as fs from "fs";
-import { LanceDBTableWrapper } from "./database/LanceTableWrapper";
-import { FSWatcher } from "fs";
 import {
-  GetFilesInfoTree,
   startWatchingDirectory,
   updateFileListForRenderer,
 } from "./Files/Filesystem";
@@ -29,6 +26,7 @@ import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
 import { registerStoreHandlers } from "./Store/storeHandlers";
 import { registerFileHandlers } from "./Files/registerFilesHandler";
 import { RepopulateTableWithMissingItems } from "./database/TableHelperFunctions";
+import { getWindowInfoForContents, windows } from "./windowManager";
 
 const store = new Store<StoreSchema>();
 // store.clear(); // clear store for testing
@@ -57,8 +55,6 @@ const url = process.env.VITE_DEV_SERVER_URL;
 const indexHtml = join(process.env.DIST, "index.html");
 
 let dbConnection: lancedb.Connection;
-const dbTable = new LanceDBTableWrapper();
-const fileWatcher: FSWatcher | null = null;
 
 async function createWindow() {
   win = new BrowserWindow({
@@ -87,12 +83,12 @@ async function createWindow() {
   }
 
   // Test actively push message to the Electron-Renderer
-  win.webContents.on("did-finish-load", () => {
-    win?.webContents.send("main-process-message", new Date().toLocaleString());
-    const userDirectory = store.get(StoreKeys.UserDirectory) as string;
-    const files = GetFilesInfoTree(userDirectory);
-    win?.webContents.send("files-list", files);
-  });
+  // win.webContents.on("did-finish-load", () => {
+  //   win?.webContents.send("main-process-message", new Date().toLocaleString());
+  //   const userDirectory = store.get(StoreKeys.UserDirectory) as string;
+  //   const files = GetFilesInfoTree(userDirectory);
+  //   win?.webContents.send("files-list", files);
+  // });
 
   // Make all links open with the browser, not with the application
   win.webContents.setWindowOpenHandler(({ url }) => {
@@ -103,9 +99,9 @@ async function createWindow() {
   // Apply electron-updater
   update(win);
   registerLLMSessionHandlers(store);
-  registerDBSessionHandlers(dbTable, store);
-  registerStoreHandlers(store, fileWatcher);
-  registerFileHandlers(store, dbTable, win);
+  registerDBSessionHandlers(store);
+  registerStoreHandlers(store);
+  registerFileHandlers(store, win);
 }
 
 app.whenReady().then(async () => {
@@ -180,9 +176,16 @@ ipcMain.handle("open-file-dialog", async (event, extensions) => {
 
 ipcMain.on("index-files-in-directory", async (event) => {
   try {
-    const userDirectory = store.get(StoreKeys.UserDirectory) as string;
-    if (!userDirectory) {
-      throw new Error("No user directory set");
+    const windowInfo = getWindowInfoForContents(windows, event.sender);
+    // const windowDirectory = getVaultDirectoryForContents(windows, event.sender);
+    // if (!windowDirectory) {
+    //   throw new Error("No user directory set");
+    // }
+    if (!windowInfo) {
+      throw new Error("No window info found");
+    }
+    if (!windowInfo.dbTableClient) {
+      throw new Error("No dbTableClient found"); // initially we'll return an error to test
     }
     const embedFuncRepoName = store.get(
       StoreKeys.DefaultEmbedFuncRepo
@@ -192,17 +195,21 @@ ipcMain.on("index-files-in-directory", async (event) => {
     }
     const dbPath = path.join(app.getPath("userData"), "vectordb");
     dbConnection = await lancedb.connect(dbPath);
-    await dbTable.initialize(dbConnection, userDirectory, embedFuncRepoName);
+    await windowInfo.dbTableClient.initialize(
+      dbConnection,
+      windowInfo.vaultDirectoryForWindow,
+      embedFuncRepoName
+    );
     await RepopulateTableWithMissingItems(
-      dbTable,
-      userDirectory,
+      windowInfo.dbTableClient,
+      windowInfo.vaultDirectoryForWindow,
       (progress) => {
         event.sender.send("indexing-progress", progress);
       }
     );
     if (win) {
-      startWatchingDirectory(win, userDirectory);
-      updateFileListForRenderer(win, userDirectory);
+      startWatchingDirectory(win, windowInfo.vaultDirectoryForWindow);
+      updateFileListForRenderer(win, windowInfo.vaultDirectoryForWindow);
     }
     event.sender.send("indexing-progress", 1);
   } catch (error) {

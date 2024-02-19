@@ -2,21 +2,26 @@ import { ipcMain } from "electron";
 import { AIModelConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 import { validateAIModelConfig } from "../llm/llmConfig";
-import { FSWatcher } from "fs";
+import {
+  getVaultDirectoryForContents,
+  setVaultDirectoryForContents,
+  windows,
+} from "../windowManager";
 
 export const registerStoreHandlers = (
-  store: Store<StoreSchema>,
-  fileWatcher: FSWatcher | null
+  store: Store<StoreSchema>
+  // fileWatcher: FSWatcher | null
 ) => {
   setupDefaultStoreValues(store);
   ipcMain.on(
     "set-user-directory",
     async (event, userDirectory: string): Promise<void> => {
       console.log("setting user directory", userDirectory);
-      store.set(StoreKeys.UserDirectory, userDirectory);
-      if (fileWatcher) {
-        fileWatcher.close();
-      }
+      setVaultDirectoryForContents(windows, event.sender, userDirectory);
+      // store.set(StoreKeys.UserDirectory, userDirectory);
+      // if (fileWatcher) {
+      //   fileWatcher.close();
+      // }
 
       event.returnValue = "success";
     }
@@ -68,8 +73,10 @@ export const registerStoreHandlers = (
     }
   );
 
-  ipcMain.on("get-user-directory", (event) => {
-    const path = store.get(StoreKeys.UserDirectory);
+  ipcMain.on("get-user-directory", (event: Electron.IpcMainEvent) => {
+    const path = getVaultDirectoryForContents(windows, event.sender);
+    // but should this error if null? Let's see as we further the development.
+    // here we'd check if there is a list of directories in storage and use those for this.
     event.returnValue = path;
   });
 
