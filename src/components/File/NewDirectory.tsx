@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
+import { errorToString } from "@/functions/error";
+import { toast } from "react-toastify";
 
 interface NewDirectoryComponentProps {
   isOpen: boolean;
@@ -35,17 +37,26 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
   };
 
   const sendNewDirectoryMsg = async () => {
-    if (!directoryName || errorMessage) {
-      return;
+    try {
+      if (!directoryName || errorMessage) {
+        return;
+      }
+      const normalizedDirectoryName = directoryName.replace(/\\/g, "/");
+      const fullPath = await window.files.joinPath(
+        window.electronStore.getUserDirectory(),
+        normalizedDirectoryName
+      );
+      window.files.createDirectory(fullPath);
+      onDirectoryCreate(fullPath);
+      onClose();
+    } catch (e) {
+      toast.error(errorToString(e), {
+        className: "mt-5",
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
+      });
     }
-    const normalizedDirectoryName = directoryName.replace(/\\/g, "/");
-    const fullPath = await window.files.joinPath(
-      window.electronStore.getUserDirectory(),
-      normalizedDirectoryName
-    );
-    window.files.createDirectory(fullPath); // Assuming createDirectory is the method for directory creation
-    onDirectoryCreate(fullPath);
-    onClose();
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
