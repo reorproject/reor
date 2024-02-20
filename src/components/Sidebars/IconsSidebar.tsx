@@ -6,8 +6,9 @@ import { IoFolderOutline } from "react-icons/io5";
 import { FaSearch } from "react-icons/fa";
 import { FaRegPenToSquare } from "react-icons/fa6";
 import NewNoteComponent from "../File/NewNote";
-import { HiFolderPlus } from "react-icons/hi2";
 import NewDirectoryComponent from "../File/NewDirectory";
+import { GrNewWindow } from "react-icons/gr";
+import { LuFolderPlus } from "react-icons/lu";
 
 interface LeftSidebarProps {
   onFileSelect: (path: string) => void;
@@ -62,11 +63,12 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
         </div>
       </div>
       <div
-        className="bg-transparent border-none cursor-pointer flex items-center justify-center w-full h-8 mt-1"
+        className="bg-transparent mt-[2px] border-none cursor-pointer flex items-center justify-center w-full h-8 "
         onClick={() => setIsNewDirectoryModalOpen(true)}
       >
         <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-slate-700">
-          <HiFolderPlus className="text-gray-200" size={25} />
+          <LuFolderPlus className="text-gray-200" size={23} />
+          {/* < /> */}
         </div>
       </div>
       <NewNoteComponent
@@ -84,6 +86,12 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
         isOpen={isSettingsModalOpen}
         onClose={() => setIsSettingsModalOpen(false)}
       />
+      <div
+        className="bg-transparent border-none pb-2 mb-[2px] cursor-pointer flex items-center justify-center w-full"
+        onClick={() => window.electron.openNewWindow()}
+      >
+        <GrNewWindow className="text-gray-100" size={21} />
+      </div>
       <button
         className="bg-transparent border-none pb-2 cursor-pointer flex items-center justify-center w-full"
         onClick={() => setIsSettingsModalOpen(!isSettingsModalOpen)}

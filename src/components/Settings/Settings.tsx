@@ -3,7 +3,6 @@ import Modal from "../Generic/Modal";
 import LLMSettings from "./LLMSettings";
 import EmbeddingModelManager from "./EmbeddingSettings";
 import RagSettings from "./RagSettings";
-import { Button } from "@material-tailwind/react";
 
 interface ModalProps {
   isOpen: boolean;
@@ -22,10 +21,6 @@ const SettingsModal: React.FC<ModalProps> = ({
       window.database.indexFilesInDirectory();
     }
     onCloseFromParent();
-  };
-
-  const openNewWindow = () => {
-    window.electron.openNewWindow();
   };
 
   if (!isOpen) return null;
@@ -59,16 +54,7 @@ const SettingsModal: React.FC<ModalProps> = ({
           >
             Embedding Model
           </div>
-          <div
-            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
-              activeTab === "vault"
-                ? "bg-gray-700 text-white font-semibold"
-                : "text-gray-200"
-            }`}
-            onClick={() => setActiveTab("vault")}
-          >
-            Vault{" "}
-          </div>
+
           <div
             className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
               activeTab === "RAG"
@@ -109,25 +95,6 @@ const SettingsModal: React.FC<ModalProps> = ({
                   If you change this, your files will be re-indexed:
                 </p>
               </EmbeddingModelManager>
-            </div>
-          )}
-
-          {activeTab === "vault" && (
-            <div className="w-full">
-              <h2 className="text-2xl font-semibold mb-0 text-white">Vault</h2>
-              <p className="mt-2 text-sm text-gray-100 mb-1">
-                Open a new vault directory in another window:
-              </p>
-
-              <div>
-                <Button
-                  className="bg-slate-700 mt-2 border-none h-10 hover:bg-slate-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
-                  onClick={openNewWindow}
-                  placeholder=""
-                >
-                  Open New Vault Directory
-                </Button>
-              </div>
             </div>
           )}
 
