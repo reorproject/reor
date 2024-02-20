@@ -1,0 +1,14 @@
+*
+!build
+!electron
+!public
+!src
+!package.json
+!package-lock.json
+!.npmrc
+!electron-builder.json5
+!index.html
+!tsconfig*
+!*.ts
+!*.cjs
+!*.js
