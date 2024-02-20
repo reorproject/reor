@@ -3,9 +3,10 @@ import { AIModelConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 import { validateAIModelConfig } from "../llm/llmConfig";
 import {
+  setupDirectoryFromPreviousSessionIfUnused,
   getVaultDirectoryForContents,
   setVaultDirectoryForContents,
-  windows,
+  activeWindows,
 } from "../windowManager";
 
 export const registerStoreHandlers = (
@@ -17,11 +18,7 @@ export const registerStoreHandlers = (
     "set-user-directory",
     async (event, userDirectory: string): Promise<void> => {
       console.log("setting user directory", userDirectory);
-      setVaultDirectoryForContents(windows, event.sender, userDirectory);
-      // store.set(StoreKeys.UserDirectory, userDirectory);
-      // if (fileWatcher) {
-      //   fileWatcher.close();
-      // }
+      setVaultDirectoryForContents(activeWindows, event.sender, userDirectory);
 
       event.returnValue = "success";
     }
@@ -73,10 +70,15 @@ export const registerStoreHandlers = (
     }
   );
 
-  ipcMain.on("get-user-directory", (event: Electron.IpcMainEvent) => {
-    const path = getVaultDirectoryForContents(windows, event.sender);
-    // but should this error if null? Let's see as we further the development.
-    // here we'd check if there is a list of directories in storage and use those for this.
+  ipcMain.on("get-user-directory", (event) => {
+    let path = getVaultDirectoryForContents(activeWindows, event.sender);
+    if (!path) {
+      path = setupDirectoryFromPreviousSessionIfUnused(
+        activeWindows,
+        event.sender,
+        store
+      );
+    }
     event.returnValue = path;
   });
 

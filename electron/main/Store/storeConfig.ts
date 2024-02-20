@@ -23,7 +23,8 @@ export interface RAGConfig {
 
 export interface StoreSchema {
   user: {
-    directory?: string;
+    vaultDirectories: string[];
+    directoryFromPreviousSession?: string;
   };
   aiModels: {
     [modelName: string]: AIModelConfig;
@@ -34,7 +35,8 @@ export interface StoreSchema {
 }
 
 export enum StoreKeys {
-  UserDirectory = "user.directory",
+  VaultDirectories = "user.vaultDirectories",
+  DirectoryFromPreviousSession = "user.directoryFromPreviousSession",
   AIModels = "aiModels",
   DefaultAIModel = "defaultAIModel",
   DefaultEmbedFuncRepo = "defaultEmbedFuncRepo",

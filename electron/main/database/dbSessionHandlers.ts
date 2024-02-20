@@ -4,7 +4,7 @@ import { DBEntry, DatabaseFields } from "./Schema";
 import { LLMSessions } from "../llm/llmSessionHandlers";
 import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
-import { getWindowInfoForContents, windows } from "../windowManager";
+import { getWindowInfoForContents, activeWindows } from "../windowManager";
 
 export const registerDBSessionHandlers = (
   // dbTable: LanceDBTableWrapper,
@@ -19,7 +19,10 @@ export const registerDBSessionHandlers = (
       filter?: string
     ): Promise<DBEntry[]> => {
       try {
-        const windowInfo = getWindowInfoForContents(windows, event.sender);
+        const windowInfo = getWindowInfoForContents(
+          activeWindows,
+          event.sender
+        );
         if (!windowInfo) {
           throw new Error("Window info not found.");
         }
@@ -47,7 +50,10 @@ export const registerDBSessionHandlers = (
       try {
         let searchResults: DBEntry[] = [];
         const maxRAGExamples: number = store.get(StoreKeys.MaxRAGExamples);
-        const windowInfo = getWindowInfoForContents(windows, event.sender);
+        const windowInfo = getWindowInfoForContents(
+          activeWindows,
+          event.sender
+        );
         if (!windowInfo) {
           throw new Error("Window info not found.");
         }

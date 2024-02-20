@@ -1,15 +1,38 @@
 import { BrowserWindow, WebContents } from "electron";
 import { LanceDBTableWrapper } from "./database/LanceTableWrapper";
-
+import Store from "electron-store";
+import { StoreKeys, StoreSchema } from "./Store/storeConfig";
 type WindowInfo = {
   windowID: number;
   dbTableClient: LanceDBTableWrapper;
   vaultDirectoryForWindow: string;
 };
 
-export const windows: WindowInfo[] = [];
+export const activeWindows: WindowInfo[] = [];
 
-// then as boot logic, we could just go through and create each of these
+export function setupDirectoryFromPreviousSessionIfUnused(
+  windows: WindowInfo[],
+  webContents: Electron.WebContents,
+  store: Store<StoreSchema>
+): string {
+  // If the user directory is not set, set it to the default directory
+  const lastUsedVaultDirectory = store.get(
+    StoreKeys.DirectoryFromPreviousSession
+  ) as string;
+  if (!lastUsedVaultDirectory) {
+    return "";
+  }
+  // check if any of the windows are using the user directory
+  const isUserDirectoryUsed = windows.some(
+    (w) => w.vaultDirectoryForWindow === lastUsedVaultDirectory
+  );
+  if (!isUserDirectoryUsed) {
+    // so here we need to set the windows
+    setVaultDirectoryForContents(windows, webContents, lastUsedVaultDirectory);
+    return lastUsedVaultDirectory;
+  }
+  return "";
+}
 
 export function getBrowserWindowId(webContents: WebContents): number | null {
   const browserWindow = BrowserWindow.fromWebContents(webContents);

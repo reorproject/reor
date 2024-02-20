@@ -15,6 +15,7 @@ declare global {
     electron: {
       openExternal: (url: string) => void;
       getPlatform: () => string;
+      openNewWindow: () => void;
     };
     contextMenu: {
       showFileItemContextMenu: (filePath: FileInfoNode) => void;
@@ -114,6 +115,7 @@ contextBridge.exposeInMainWorld("database", {
 contextBridge.exposeInMainWorld("electron", {
   openExternal: (url: string) => ipcRenderer.send("open-external", url),
   getPlatform: () => ipcRenderer.invoke("get-platform"),
+  openNewWindow: () => ipcRenderer.send("open-new-window"),
 });
 
 contextBridge.exposeInMainWorld("electronStore", {
