@@ -124,3 +124,14 @@ export function getNextWindowPosition() {
 
   return { x: newX, y: newY };
 }
+
+export function getWindowSize() {
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width, height } = primaryDisplay.workAreaSize;
+
+  // Calculate size as a percentage of screen size
+  const windowWidth = Math.min(1200, width * 0.8); // e.g., 80% of screen width or 1200px
+  const windowHeight = Math.min(800, height * 0.8); // e.g., 80% of screen height or 800px
+
+  return { width: windowWidth, height: windowHeight };
+}

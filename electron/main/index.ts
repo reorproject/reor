@@ -31,6 +31,7 @@ import {
   getWindowInfoForContents,
   activeWindows,
   getNextWindowPosition,
+  getWindowSize,
 } from "./windowManager";
 
 const store = new Store<StoreSchema>();
@@ -61,7 +62,7 @@ let dbConnection: lancedb.Connection;
 
 async function createWindow() {
   const { x, y } = getNextWindowPosition();
-
+  const { width, height } = getWindowSize();
   const win = new BrowserWindow({
     title: "Reor",
     x: x,
@@ -76,8 +77,8 @@ async function createWindow() {
       symbolColor: "#74b1be",
       height: 30,
     },
-    width: 1200,
-    height: 800,
+    width: width,
+    height: height,
   });
 
   if (url) {
