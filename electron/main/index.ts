@@ -96,6 +96,20 @@ async function createWindow() {
     return { action: "deny" };
   });
 
+  win.on("close", () => {
+    // Get the directory for this window's contents
+    const directoryToSave = getVaultDirectoryForContents(
+      activeWindows,
+      win.webContents
+    );
+
+    // Save the directory if found
+    if (directoryToSave) {
+      console.log("Saving directory for window:", directoryToSave);
+      store.set(StoreKeys.DirectoryFromPreviousSession, directoryToSave);
+    }
+  });
+
   if (activeWindows.length <= 0) {
     update(win);
     registerLLMSessionHandlers(store);
@@ -128,40 +142,6 @@ app.on("activate", () => {
     allWindows[0].focus();
   } else {
     createWindow();
-  }
-});
-
-app.on("before-quit", () => {
-  let directoryToSave = null;
-
-  // First, try to get the directory from the focused window
-  const focusedWindow = BrowserWindow.getFocusedWindow();
-  if (focusedWindow) {
-    directoryToSave = getVaultDirectoryForContents(
-      activeWindows,
-      focusedWindow.webContents
-    );
-  }
-
-  // If no directory from focused window, iterate over all windows
-  if (!directoryToSave) {
-    const allWindows = BrowserWindow.getAllWindows();
-    for (const window of allWindows) {
-      const potentialDirectory = getVaultDirectoryForContents(
-        activeWindows,
-        window.webContents
-      );
-      if (potentialDirectory) {
-        directoryToSave = potentialDirectory;
-        break; // Stop at the first valid directory found
-      }
-    }
-  }
-
-  // Save the directory if found
-  console.log("directoryToSave", directoryToSave);
-  if (directoryToSave) {
-    store.set(StoreKeys.DirectoryFromPreviousSession, directoryToSave);
   }
 });
 
