@@ -18,7 +18,12 @@ export const registerStoreHandlers = (
     "set-user-directory",
     async (event, userDirectory: string): Promise<void> => {
       console.log("setting user directory", userDirectory);
-      setVaultDirectoryForContents(activeWindows, event.sender, userDirectory);
+      setVaultDirectoryForContents(
+        activeWindows,
+        event.sender,
+        userDirectory,
+        store
+      );
 
       event.returnValue = "success";
     }
