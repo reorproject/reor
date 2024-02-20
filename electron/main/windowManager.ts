@@ -29,7 +29,12 @@ export function setupDirectoryFromPreviousSessionIfUnused(
   );
   if (!isUserDirectoryUsed) {
     // so here we need to set the windows
-    setVaultDirectoryForContents(windows, webContents, lastUsedVaultDirectory);
+    setVaultDirectoryForContents(
+      windows,
+      webContents,
+      lastUsedVaultDirectory,
+      store
+    );
     return lastUsedVaultDirectory;
   }
   return "";
@@ -72,7 +77,8 @@ function getVaultDirectoryForWindowID(
 export function setVaultDirectoryForContents(
   windows: WindowInfo[],
   webContents: WebContents,
-  directory: string
+  directory: string,
+  store: Store<StoreSchema>
 ): void {
   if (!webContents) {
     throw new Error("Invalid webContents provided.");
@@ -101,6 +107,8 @@ export function setVaultDirectoryForContents(
     // If found, just update the directory
     windowInfo.vaultDirectoryForWindow = directory;
   }
+
+  store.set(StoreKeys.DirectoryFromPreviousSession, directory);
 }
 
 export function getNextWindowPosition() {
@@ -116,7 +124,7 @@ export function getNextWindowPosition() {
     newY = y + windowOffset;
     return { x: newX, y: newY };
   } else {
-    return { x: null, y: null };
+    return { x: undefined, y: undefined };
   }
 }
 
