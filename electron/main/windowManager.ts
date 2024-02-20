@@ -114,15 +114,10 @@ export function getNextWindowPosition() {
     const [x, y] = focusedWin.getPosition();
     newX = x + windowOffset;
     newY = y + windowOffset;
+    return { x: newX, y: newY };
   } else {
-    // If no window is focused, set a default position (center or specific coordinate)
-    const primaryDisplay = screen.getPrimaryDisplay();
-    const { width, height } = primaryDisplay.workAreaSize;
-    newX = (width - 1200) / 2;
-    newY = (height - 800) / 2;
+    return { x: null, y: null };
   }
-
-  return { x: newX, y: newY };
 }
 
 export function getWindowSize() {

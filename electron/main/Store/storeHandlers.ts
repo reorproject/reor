@@ -24,6 +24,18 @@ export const registerStoreHandlers = (
     }
   );
 
+  ipcMain.on("get-user-directory", (event) => {
+    let path = getVaultDirectoryForContents(activeWindows, event.sender);
+    console.log("gotten user directory", path);
+    if (!path) {
+      path = setupDirectoryFromPreviousSessionIfUnused(
+        activeWindows,
+        event.sender,
+        store
+      );
+    }
+    event.returnValue = path;
+  });
   ipcMain.on("set-default-embed-func-repo", (event, repoName: string) => {
     store.set(StoreKeys.DefaultEmbedFuncRepo, repoName);
   });
@@ -69,18 +81,6 @@ export const registerStoreHandlers = (
       return await addNewModelSchemaToStore(store, modelName, modelConfig);
     }
   );
-
-  ipcMain.on("get-user-directory", (event) => {
-    let path = getVaultDirectoryForContents(activeWindows, event.sender);
-    if (!path) {
-      path = setupDirectoryFromPreviousSessionIfUnused(
-        activeWindows,
-        event.sender,
-        store
-      );
-    }
-    event.returnValue = path;
-  });
 
   ipcMain.on("get-default-embed-func-repo", (event) => {
     event.returnValue = store.get(StoreKeys.DefaultEmbedFuncRepo);
