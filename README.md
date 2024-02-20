@@ -7,7 +7,7 @@
 A self-organizing AI note-taking app that runs models locally.</h4>
 
 <p align="center">
-    <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-GPLv3-blue.svg"></a>
+    <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/reorproject/reor/total">
 <a href="https://discord.gg/dVYhyssr"><img alt="Discord" src="https://img.shields.io/discord/1208825200959955004"></a>
     <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/reorproject/reor">
 
