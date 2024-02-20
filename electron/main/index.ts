@@ -30,6 +30,7 @@ import {
   getVaultDirectoryForContents,
   getWindowInfoForContents,
   activeWindows,
+  getNextWindowPosition,
 } from "./windowManager";
 
 const store = new Store<StoreSchema>();
@@ -59,8 +60,12 @@ const indexHtml = join(process.env.DIST, "index.html");
 let dbConnection: lancedb.Connection;
 
 async function createWindow() {
+  const { x, y } = getNextWindowPosition();
+
   const win = new BrowserWindow({
-    title: "Main window",
+    title: "Reor",
+    x: x,
+    y: y,
     webPreferences: {
       preload,
     },

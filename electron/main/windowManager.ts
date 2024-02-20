@@ -2,6 +2,7 @@ import { BrowserWindow, WebContents } from "electron";
 import { LanceDBTableWrapper } from "./database/LanceTableWrapper";
 import Store from "electron-store";
 import { StoreKeys, StoreSchema } from "./Store/storeConfig";
+import { screen } from "electron";
 type WindowInfo = {
   windowID: number;
   dbTableClient: LanceDBTableWrapper;
@@ -100,4 +101,26 @@ export function setVaultDirectoryForContents(
     // If found, just update the directory
     windowInfo.vaultDirectoryForWindow = directory;
   }
+}
+
+export function getNextWindowPosition() {
+  const windowOffset = 30; // Offset for each new window
+  let newX, newY;
+
+  // Find the currently focused window
+  const focusedWin = BrowserWindow.getFocusedWindow();
+
+  if (focusedWin) {
+    const [x, y] = focusedWin.getPosition();
+    newX = x + windowOffset;
+    newY = y + windowOffset;
+  } else {
+    // If no window is focused, set a default position (center or specific coordinate)
+    const primaryDisplay = screen.getPrimaryDisplay();
+    const { width, height } = primaryDisplay.workAreaSize;
+    newX = (width - 1200) / 2;
+    newY = (height - 800) / 2;
+  }
+
+  return { x: newX, y: newY };
 }
