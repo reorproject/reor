@@ -1,13 +1,13 @@
 import { ipcMain } from "electron";
-import { LanceDBTableWrapper } from "./LanceTableWrapper";
 import { createRAGPrompt } from "../Prompts/Prompts";
 import { DBEntry, DatabaseFields } from "./Schema";
 import { LLMSessions } from "../llm/llmSessionHandlers";
 import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
+import { getWindowInfoForContents, activeWindows } from "../windowManager";
 
 export const registerDBSessionHandlers = (
-  dbTable: LanceDBTableWrapper,
+  // dbTable: LanceDBTableWrapper,
   store: Store<StoreSchema>
 ) => {
   ipcMain.handle(
@@ -19,7 +19,18 @@ export const registerDBSessionHandlers = (
       filter?: string
     ): Promise<DBEntry[]> => {
       try {
-        const searchResults = await dbTable.search(query, limit, filter);
+        const windowInfo = getWindowInfoForContents(
+          activeWindows,
+          event.sender
+        );
+        if (!windowInfo) {
+          throw new Error("Window info not found.");
+        }
+        const searchResults = await windowInfo.dbTableClient.search(
+          query,
+          limit,
+          filter
+        );
         return searchResults;
       } catch (error) {
         console.error("Error searching database:", error);
@@ -39,9 +50,20 @@ export const registerDBSessionHandlers = (
       try {
         let searchResults: DBEntry[] = [];
         const maxRAGExamples: number = store.get(StoreKeys.MaxRAGExamples);
+        const windowInfo = getWindowInfoForContents(
+          activeWindows,
+          event.sender
+        );
+        if (!windowInfo) {
+          throw new Error("Window info not found.");
+        }
 
         if (maxRAGExamples && maxRAGExamples > 0) {
-          searchResults = await dbTable.search(query, maxRAGExamples, filter);
+          searchResults = await windowInfo.dbTableClient.search(
+            query,
+            maxRAGExamples,
+            filter
+          );
         } else {
           throw new Error("Max RAG examples is not set or is invalid.");
         }

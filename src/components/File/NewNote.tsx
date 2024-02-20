@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
+import { toast } from "react-toastify";
+import { errorToString } from "@/functions/error";
 
 interface NewNoteComponentProps {
   isOpen: boolean;
@@ -35,17 +37,26 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
   };
 
   const sendNewNoteMsg = async () => {
-    if (!fileName || errorMessage) {
-      return;
+    try {
+      if (!fileName || errorMessage) {
+        return;
+      }
+      const normalizedFileName = fileName.replace(/\\/g, "/");
+      const fullPath = await window.files.joinPath(
+        window.electronStore.getUserDirectory(),
+        normalizedFileName + ".md"
+      );
+      window.files.createFile(fullPath, "");
+      onFileSelect(fullPath);
+      onClose();
+    } catch (e) {
+      toast.error(errorToString(e), {
+        className: "mt-5",
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
+      });
     }
-    const normalizedFileName = fileName.replace(/\\/g, "/");
-    const fullPath = await window.files.joinPath(
-      window.electronStore.getUserDirectory(),
-      normalizedFileName + ".md"
-    );
-    window.files.createFile(fullPath, "");
-    onFileSelect(fullPath);
-    onClose();
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {

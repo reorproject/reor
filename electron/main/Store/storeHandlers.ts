@@ -2,21 +2,23 @@ import { ipcMain } from "electron";
 import { AIModelConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 import { validateAIModelConfig } from "../llm/llmConfig";
-import { FSWatcher } from "fs";
+import {
+  setupDirectoryFromPreviousSessionIfUnused,
+  getVaultDirectoryForContents,
+  setVaultDirectoryForContents,
+  activeWindows,
+} from "../windowManager";
 
 export const registerStoreHandlers = (
-  store: Store<StoreSchema>,
-  fileWatcher: FSWatcher | null
+  store: Store<StoreSchema>
+  // fileWatcher: FSWatcher | null
 ) => {
   setupDefaultStoreValues(store);
   ipcMain.on(
     "set-user-directory",
     async (event, userDirectory: string): Promise<void> => {
       console.log("setting user directory", userDirectory);
-      store.set(StoreKeys.UserDirectory, userDirectory);
-      if (fileWatcher) {
-        fileWatcher.close();
-      }
+      setVaultDirectoryForContents(activeWindows, event.sender, userDirectory);
 
       event.returnValue = "success";
     }
@@ -69,7 +71,14 @@ export const registerStoreHandlers = (
   );
 
   ipcMain.on("get-user-directory", (event) => {
-    const path = store.get(StoreKeys.UserDirectory);
+    let path = getVaultDirectoryForContents(activeWindows, event.sender);
+    if (!path) {
+      path = setupDirectoryFromPreviousSessionIfUnused(
+        activeWindows,
+        event.sender,
+        store
+      );
+    }
     event.returnValue = path;
   });
 
