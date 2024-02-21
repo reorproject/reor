@@ -1,21 +1,21 @@
-interface BaseAIModelConfig {
+interface BaseLLMConfig {
   contextLength: number;
   errorMsg?: string;
   engine: "openai" | "llamacpp";
 }
 
-export interface OpenAIAIModelConfig extends BaseAIModelConfig {
+export interface OpenAILLMConfig extends BaseLLMConfig {
   type: "openai";
   apiURL: string;
   apiKey: string;
 }
 
-export interface LocalAIModelConfig extends BaseAIModelConfig {
+export interface LocalLLMConfig extends BaseLLMConfig {
   type: "local";
   localPath: string;
 }
 
-export type AIModelConfig = OpenAIAIModelConfig | LocalAIModelConfig;
+export type LLMModelConfig = OpenAILLMConfig | LocalLLMConfig;
 
 export interface RAGConfig {
   maxRAGExamples: number;
@@ -26,10 +26,10 @@ export interface StoreSchema {
     vaultDirectories: string[];
     directoryFromPreviousSession?: string;
   };
-  aiModels: {
-    [modelName: string]: AIModelConfig;
+  LLMs: {
+    [modelName: string]: LLMModelConfig;
   };
-  defaultAIModel: string;
+  defaultLLM: string;
   defaultEmbedFuncRepo: string;
   RAG?: RAGConfig;
 }
@@ -37,8 +37,8 @@ export interface StoreSchema {
 export enum StoreKeys {
   VaultDirectories = "user.vaultDirectories",
   DirectoryFromPreviousSession = "user.directoryFromPreviousSession",
-  AIModels = "aiModels",
-  DefaultAIModel = "defaultAIModel",
+  LLMs = "LLMs",
+  DefaultLLM = "defaultLLM",
   DefaultEmbedFuncRepo = "defaultEmbedFuncRepo",
   MaxRAGExamples = "RAG.maxRAGExamples",
 }

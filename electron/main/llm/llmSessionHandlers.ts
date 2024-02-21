@@ -69,13 +69,13 @@ async function createSession(
   store: Store<StoreSchema>,
   sessionId: string
 ): Promise<string> {
-  const defaultModelName = store.get(StoreKeys.DefaultAIModel);
+  const defaultModelName = store.get(StoreKeys.DefaultLLM);
   if (!defaultModelName) {
     throw new Error(
       "No default LLM model configured. Please choose either a local or a remote LLM in Settings."
     );
   }
-  const allConfigs = store.get(StoreKeys.AIModels);
+  const allConfigs = store.get(StoreKeys.LLMs);
 
   if (!allConfigs) {
     throw new Error("No AI models configured");

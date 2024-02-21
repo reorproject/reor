@@ -1,5 +1,5 @@
 import { ipcMain } from "electron";
-import { AIModelConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
+import { LLMModelConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 import { validateAIModelConfig } from "../llm/llmConfig";
 import {
@@ -31,7 +31,6 @@ export const registerStoreHandlers = (
 
   ipcMain.on("get-user-directory", (event) => {
     let path = getVaultDirectoryForContents(activeWindows, event.sender);
-    console.log("gotten user directory", path);
     if (!path) {
       path = setupDirectoryFromPreviousSessionIfUnused(
         activeWindows,
@@ -55,33 +54,33 @@ export const registerStoreHandlers = (
 
   ipcMain.on("set-default-ai-model", (event, modelName: string) => {
     console.log("setting default ai model", modelName);
-    store.set(StoreKeys.DefaultAIModel, modelName);
+    store.set(StoreKeys.DefaultLLM, modelName);
   });
 
   ipcMain.on("get-default-ai-model", (event) => {
-    event.returnValue = store.get(StoreKeys.DefaultAIModel);
+    event.returnValue = store.get(StoreKeys.DefaultLLM);
   });
 
   ipcMain.handle("get-ai-model-configs", () => {
-    const aiModelConfigs = store.get(StoreKeys.AIModels);
+    const aiModelConfigs = store.get(StoreKeys.LLMs);
     return aiModelConfigs || {};
   });
 
   ipcMain.handle("update-ai-model-config", (event, modelName, modelConfig) => {
     console.log("updating ai model config", modelName, modelConfig);
-    const aiModelConfigs = store.get(StoreKeys.AIModels);
+    const aiModelConfigs = store.get(StoreKeys.LLMs);
     if (aiModelConfigs) {
       const updatedModelConfigs = {
         ...aiModelConfigs,
         [modelName]: modelConfig,
       };
-      store.set(StoreKeys.AIModels, updatedModelConfigs);
+      store.set(StoreKeys.LLMs, updatedModelConfigs);
     }
   });
 
   ipcMain.handle(
     "setup-new-model",
-    async (event, modelName: string, modelConfig: AIModelConfig) => {
+    async (event, modelName: string, modelConfig: LLMModelConfig) => {
       console.log("setting up new local model", modelConfig);
       return await addNewModelSchemaToStore(store, modelName, modelConfig);
     }
@@ -95,10 +94,10 @@ export const registerStoreHandlers = (
 export async function addNewModelSchemaToStore(
   store: Store<StoreSchema>,
   modelName: string,
-  modelConfig: AIModelConfig
+  modelConfig: LLMModelConfig
 ): Promise<string> {
   const existingModels =
-    (store.get(StoreKeys.AIModels) as Record<string, AIModelConfig>) || {};
+    (store.get(StoreKeys.LLMs) as Record<string, LLMModelConfig>) || {};
 
   if (!existingModels[modelName]) {
     const isNotValid = validateAIModelConfig(modelName, modelConfig);
@@ -111,8 +110,8 @@ export async function addNewModelSchemaToStore(
       [modelName]: modelConfig,
     };
 
-    store.set(StoreKeys.AIModels, updatedModels);
-    store.set(StoreKeys.DefaultAIModel, modelName);
+    store.set(StoreKeys.LLMs, updatedModels);
+    store.set(StoreKeys.DefaultLLM, modelName);
     return "Model set up successfully";
   } else {
     return "Model already exists";

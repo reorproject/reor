@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { LocalAIModelConfig } from "electron/main/Store/storeConfig";
+import { LocalLLMConfig } from "electron/main/Store/storeConfig";
 import { ISendFunctionImplementer, IChatSessionService } from "../Types";
 import { errorToString } from "../../Generic/error";
 
@@ -10,7 +10,7 @@ export class LlamaCPPSessionService implements IChatSessionService {
   private abortController?: AbortController;
   private contextLength?: number;
 
-  async init(storeModelConfig: LocalAIModelConfig): Promise<void> {
+  async init(storeModelConfig: LocalLLMConfig): Promise<void> {
     this.contextLength = storeModelConfig.contextLength;
     await this.loadModel(storeModelConfig.localPath);
 

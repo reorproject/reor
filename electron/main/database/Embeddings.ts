@@ -24,11 +24,14 @@ export async function createEmbeddingFunction(
     );
     const cacheDir = path.join(app.getPath("userData"), "models", "embeddings");
     env.cacheDir = cacheDir;
+    env.localModelPath = "/Users/sam/Desktop/test-hf-models/all-MiniLM-L6-v2";
 
     try {
-      pipe = (await pipeline("feature-extraction", repoName, {
-        cache_dir: cacheDir,
-      })) as Pipeline;
+      pipe = (await pipeline(
+        "feature-extraction"
+        // , repoName, {
+        // cache_dir: cacheDir,
+      )) as Pipeline;
       contextLength = pipe.model.config.hidden_size;
     } catch (error) {
       throw new Error(

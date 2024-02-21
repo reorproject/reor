@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { AIModelConfig } from "electron/main/Store/storeConfig";
+import { LLMModelConfig } from "electron/main/Store/storeConfig";
 import CustomSelect from "../Generic/Select";
 import { Button } from "@material-tailwind/react";
 import LocalModelModal from "./NewLocalModel";
@@ -19,7 +19,7 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
   isInitialSetup,
 }) => {
   const [modelConfigs, setModelConfigs] = useState<
-    Record<string, AIModelConfig>
+    Record<string, LLMModelConfig>
   >({});
   const [isNewLocalModelModalOpen, setIsNewLocalModelModalOpen] =
     useState<boolean>(false);

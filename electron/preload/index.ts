@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { AIModelConfig } from "electron/main/Store/storeConfig";
+import { LLMModelConfig } from "electron/main/Store/storeConfig";
 import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
 import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -65,14 +65,14 @@ declare global {
     electronStore: {
       setUserDirectory: (path: string) => Promise<void>;
       getUserDirectory: () => string;
-      getAIModelConfigs: () => Promise<Record<string, AIModelConfig>>;
+      getAIModelConfigs: () => Promise<Record<string, LLMModelConfig>>;
       updateAIModelConfig: (
         modelName: string,
-        modelConfig: AIModelConfig
+        modelConfig: LLMModelConfig
       ) => Promise<void>;
       setupNewLLM: (
         modelName: string,
-        modelConfig: AIModelConfig
+        modelConfig: LLMModelConfig
       ) => Promise<void>;
       setDefaultAIModel: (modelName: string) => void;
       getDefaultAIModel: () => string;
@@ -125,16 +125,16 @@ contextBridge.exposeInMainWorld("electronStore", {
   getUserDirectory: () => {
     return ipcRenderer.sendSync("get-user-directory");
   },
-  getAIModelConfigs: async (): Promise<AIModelConfig[]> => {
+  getAIModelConfigs: async (): Promise<LLMModelConfig[]> => {
     return ipcRenderer.invoke("get-ai-model-configs");
   },
   updateAIModelConfig: async (
     modelName: string,
-    modelConfig: AIModelConfig
+    modelConfig: LLMModelConfig
   ) => {
     return ipcRenderer.invoke("update-ai-model-config", modelName, modelConfig);
   },
-  setupNewLLM: async (modelName: string, modelConfig: AIModelConfig) => {
+  setupNewLLM: async (modelName: string, modelConfig: LLMModelConfig) => {
     return ipcRenderer.invoke("setup-new-model", modelName, modelConfig);
   },
   setDefaultAIModel: (modelName: string) => {
