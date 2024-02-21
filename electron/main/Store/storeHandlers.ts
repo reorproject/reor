@@ -1,5 +1,11 @@
 import { ipcMain } from "electron";
-import { LLMModelConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
+import {
+  EmbeddingModelWithLocalPath,
+  EmbeddingModelWithRepo,
+  LLMModelConfig,
+  StoreKeys,
+  StoreSchema,
+} from "../Store/storeConfig";
 import Store from "electron-store";
 import { validateAIModelConfig } from "../llm/llmConfig";
 import {
@@ -42,6 +48,51 @@ export const registerStoreHandlers = (
   });
   ipcMain.on("set-default-embedding-model", (event, repoName: string) => {
     store.set(StoreKeys.DefaultEmbeddingModelAlias, repoName);
+  });
+
+  ipcMain.on(
+    "add-new-local-embedding-model",
+    (event, model: EmbeddingModelWithLocalPath) => {
+      const currentModels = store.get(StoreKeys.EmbeddingModels) || {};
+      store.set(StoreKeys.EmbeddingModels, {
+        ...currentModels,
+        [model.localPath]: model,
+      });
+    }
+  );
+
+  ipcMain.on(
+    "add-new-repo-embedding-model",
+    (event, model: EmbeddingModelWithRepo) => {
+      const currentModels = store.get(StoreKeys.EmbeddingModels) || {};
+      store.set(StoreKeys.EmbeddingModels, {
+        ...currentModels,
+        [model.repoName]: model,
+      });
+    }
+  );
+
+  ipcMain.on(
+    "update-embedding-model",
+    (
+      event,
+      modelName: string,
+      updatedModel: EmbeddingModelWithLocalPath | EmbeddingModelWithRepo
+    ) => {
+      const currentModels = store.get(StoreKeys.EmbeddingModels) || {};
+      store.set(StoreKeys.EmbeddingModels, {
+        ...currentModels,
+        [modelName]: updatedModel,
+      });
+    }
+  );
+
+  ipcMain.on("remove-embedding-model", (event, modelName: string) => {
+    const currentModels = store.get(StoreKeys.EmbeddingModels) || {};
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { [modelName]: _, ...updatedModels } = currentModels;
+
+    store.set(StoreKeys.EmbeddingModels, updatedModels);
   });
 
   ipcMain.on("set-no-of-rag-examples", (event, noOfExamples: number) => {

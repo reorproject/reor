@@ -1,5 +1,9 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { LLMModelConfig } from "electron/main/Store/storeConfig";
+import {
+  EmbeddingModelWithLocalPath,
+  EmbeddingModelWithRepo,
+  LLMModelConfig,
+} from "electron/main/Store/storeConfig";
 import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
 import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -78,6 +82,13 @@ declare global {
       getDefaultLLM: () => string;
       getDefaultEmbeddingModel: () => string;
       setDefaultEmbeddingModel: (repoName: string) => void;
+      addNewLocalEmbeddingModel: (model: EmbeddingModelWithLocalPath) => void;
+      addNewRepoEmbeddingModel: (model: EmbeddingModelWithRepo) => void;
+      updateEmbeddingModel: (
+        modelName: string,
+        updatedModel: EmbeddingModelWithLocalPath | EmbeddingModelWithRepo
+      ) => void;
+      removeEmbeddingModel: (modelName: string) => void;
       getNoOfRAGExamples: () => number;
       setNoOfRAGExamples: (noOfExamples: number) => void;
     };
@@ -148,6 +159,23 @@ contextBridge.exposeInMainWorld("electronStore", {
   setDefaultEmbeddingModel: (repoName: string) => {
     ipcRenderer.send("set-default-embedding-model", repoName);
   },
+
+  addNewLocalEmbeddingModel: (model: EmbeddingModelWithLocalPath) => {
+    ipcRenderer.send("add-new-local-embedding-model", model);
+  },
+  addNewRepoEmbeddingModel: (model: EmbeddingModelWithRepo) => {
+    ipcRenderer.send("add-new-repo-embedding-model", model);
+  },
+  updateEmbeddingModel: (
+    modelName: string,
+    updatedModel: EmbeddingModelWithLocalPath | EmbeddingModelWithRepo
+  ) => {
+    ipcRenderer.send("update-embedding-model", modelName, updatedModel);
+  },
+  removeEmbeddingModel: (modelName: string) => {
+    ipcRenderer.send("remove-embedding-model", modelName);
+  },
+
   getNoOfRAGExamples: () => {
     return ipcRenderer.sendSync("get-no-of-rag-examples");
   },
