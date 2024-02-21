@@ -17,6 +17,18 @@ export interface LocalLLMConfig extends BaseLLMConfig {
 
 export type LLMModelConfig = OpenAILLMConfig | LocalLLMConfig;
 
+export interface EmbeddingModelWithRepo {
+  repoName: string;
+}
+
+export interface EmbeddingModelWithLocalPath {
+  localPath: string;
+}
+
+export type EmbeddingModelConfig =
+  | EmbeddingModelWithRepo
+  | EmbeddingModelWithLocalPath;
+
 export interface RAGConfig {
   maxRAGExamples: number;
 }
@@ -29,6 +41,9 @@ export interface StoreSchema {
   LLMs: {
     [modelName: string]: LLMModelConfig;
   };
+  embeddingModels: {
+    [modelName: string]: EmbeddingModelConfig;
+  };
   defaultLLM: string;
   defaultEmbedFuncRepo: string;
   RAG?: RAGConfig;
@@ -37,6 +52,7 @@ export interface StoreSchema {
 export enum StoreKeys {
   DirectoryFromPreviousSession = "user.directoryFromPreviousSession",
   LLMs = "LLMs",
+  EmbeddingModels = "embeddingModels",
   DefaultLLM = "defaultLLM",
   DefaultEmbedFuncRepo = "defaultEmbedFuncRepo",
   MaxRAGExamples = "RAG.maxRAGExamples",

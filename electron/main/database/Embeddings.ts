@@ -24,13 +24,16 @@ export async function createEmbeddingFunction(
     );
     const cacheDir = path.join(app.getPath("userData"), "models", "embeddings");
     env.cacheDir = cacheDir;
-    env.localModelPath = "/Users/sam/Desktop/test-hf-models/all-MiniLM-L6-v2";
-
+    // if condition to check either local or cache model and ensure that
+    // only either localpath or reponame is set
+    env.localModelPath =
+      "/Users/sam/Desktop/test-hf-modelsa/all-MiniLM-L6-v2afds";
+    env.allowRemoteModels = false;
     try {
       pipe = (await pipeline(
         "feature-extraction"
-        // , repoName, {
-        // cache_dir: cacheDir,
+        // repoName
+        // {cache_dir: cacheDir,
       )) as Pipeline;
       contextLength = pipe.model.config.hidden_size;
     } catch (error) {
@@ -43,7 +46,7 @@ export async function createEmbeddingFunction(
 
     try {
       tokenizer = await AutoTokenizer.from_pretrained(repoName, {
-        cache_dir: cacheDir,
+        // cache_dir: cacheDir,
       });
     } catch (error) {
       throw new Error(

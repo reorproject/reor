@@ -27,6 +27,7 @@ export class LanceDBTableWrapper {
     embedFuncRepoName: string
   ) {
     this.embedFun = await createEmbeddingFunction(embedFuncRepoName, "content");
+    console.log("Embedding function created", this.embedFun);
     this.table = await GetOrCreateLanceTable(
       dbConnection,
       this.embedFun,

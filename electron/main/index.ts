@@ -174,6 +174,7 @@ ipcMain.handle("open-file-dialog", async (event, extensions) => {
 
 ipcMain.on("index-files-in-directory", async (event) => {
   try {
+    console.log("Indexing files in directory");
     const windowInfo = getWindowInfoForContents(activeWindows, event.sender);
     if (!windowInfo) {
       throw new Error("No window info found");

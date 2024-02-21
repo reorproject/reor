@@ -27,7 +27,6 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
 
   const saveFile = async () => {
     if (content !== lastSavedContentRef.current) {
-      console.log("calling save file:");
       await window.files.writeFile(filePath, content);
       lastSavedContentRef.current = content;
     }
