@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
 import LLMSettings from "./LLMSettings";
-import EmbeddingModelManager from "./EmbeddingSettings";
 import DirectorySelector from "./DirectorySelector";
+import InitialEmbeddingModelSettings from "./InitialEmbeddingSettings";
 
 interface OldInitialSettingsProps {
   readyForIndexing: () => void;
@@ -48,9 +48,7 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
           </p>
 
           <div className="mt-8">
-            <EmbeddingModelManager>
-              <h3 className="font-semibold mb-2 text-white">Embedding Model</h3>
-            </EmbeddingModelManager>
+            <InitialEmbeddingModelSettings />
           </div>
           <LLMSettings isInitialSetup={true} />
           <Button

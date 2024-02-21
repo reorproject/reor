@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from "react";
 import CustomSelect from "../Generic/Select";
 
-interface EmbeddingModelManagerProps {
+interface InitialEmbeddingModelSettingsProps {
   userHasCompleted?: (completed: boolean) => void;
   handleUserHasChangedModel?: (bool: boolean) => void;
   userTriedToSubmit?: boolean;
 }
-const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
-  userHasCompleted,
-  handleUserHasChangedModel,
-  userTriedToSubmit,
-}) => {
+const InitialEmbeddingModelSettings: React.FC<
+  InitialEmbeddingModelSettingsProps
+> = ({ userHasCompleted, handleUserHasChangedModel, userTriedToSubmit }) => {
   const [currentError, setCurrentError] = useState<string>("");
   const modelRepos = [
     {
@@ -64,23 +62,12 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
 
   return (
     <div className="w-full bg-gray-800 rounded">
-      <h2 className="text-2xl font-semibold mb-0 text-white">
-        Embedding Model
-      </h2>{" "}
-      <p className="mt-5 text-gray-100">
-        If you change this, your files will be re-indexed:
-      </p>{" "}
+      <h3 className="font-semibold mb-2 text-white">Embedding Model</h3>{" "}
       <CustomSelect
         options={modelRepos}
         value={selectedModel}
         onChange={handleChangeOnModelSelect}
       />
-      <p className=" text-gray-100 text-xs">
-        <i>
-          If you notice some lag in the editor it is likely because you chose
-          too large of a model...
-        </i>
-      </p>{" "}
       {userTriedToSubmit && !selectedModel && (
         <p className="text-red-500 text-sm mt-1">{currentError}</p>
       )}
@@ -88,4 +75,4 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
   );
 };
 
-export default EmbeddingModelSettings;
+export default InitialEmbeddingModelSettings;
