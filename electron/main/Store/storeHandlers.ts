@@ -40,8 +40,8 @@ export const registerStoreHandlers = (
     }
     event.returnValue = path;
   });
-  ipcMain.on("set-default-embed-func-repo", (event, repoName: string) => {
-    store.set(StoreKeys.DefaultEmbedFuncRepo, repoName);
+  ipcMain.on("set-default-embedding-model", (event, repoName: string) => {
+    store.set(StoreKeys.DefaultEmbeddingModelAlias, repoName);
   });
 
   ipcMain.on("set-no-of-rag-examples", (event, noOfExamples: number) => {
@@ -52,22 +52,20 @@ export const registerStoreHandlers = (
     event.returnValue = store.get(StoreKeys.MaxRAGExamples);
   });
 
-  ipcMain.on("set-default-ai-model", (event, modelName: string) => {
-    console.log("setting default ai model", modelName);
+  ipcMain.on("set-default-llm", (event, modelName: string) => {
     store.set(StoreKeys.DefaultLLM, modelName);
   });
 
-  ipcMain.on("get-default-ai-model", (event) => {
+  ipcMain.on("get-default-llm", (event) => {
     event.returnValue = store.get(StoreKeys.DefaultLLM);
   });
 
-  ipcMain.handle("get-ai-model-configs", () => {
+  ipcMain.handle("get-llm-configs", () => {
     const aiModelConfigs = store.get(StoreKeys.LLMs);
     return aiModelConfigs || {};
   });
 
-  ipcMain.handle("update-ai-model-config", (event, modelName, modelConfig) => {
-    console.log("updating ai model config", modelName, modelConfig);
+  ipcMain.handle("update-llm-config", (event, modelName, modelConfig) => {
     const aiModelConfigs = store.get(StoreKeys.LLMs);
     if (aiModelConfigs) {
       const updatedModelConfigs = {
@@ -86,8 +84,8 @@ export const registerStoreHandlers = (
     }
   );
 
-  ipcMain.on("get-default-embed-func-repo", (event) => {
-    event.returnValue = store.get(StoreKeys.DefaultEmbedFuncRepo);
+  ipcMain.on("get-default-embedding-model", (event) => {
+    event.returnValue = store.get(StoreKeys.DefaultEmbeddingModelAlias);
   });
 };
 

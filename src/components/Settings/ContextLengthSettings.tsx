@@ -28,7 +28,7 @@ const ContextLengthModal: React.FC<ContextLengthModalProps> = ({
     modelConfig: LLMModelConfig
   ) => {
     try {
-      await window.electronStore.updateAIModelConfig(modelName, modelConfig);
+      await window.electronStore.updateLLMConfig(modelName, modelConfig);
       console.log(`Model config updated for ${modelName}`);
     } catch (error) {
       console.error(`Error updating model config for ${modelName}:`, error);

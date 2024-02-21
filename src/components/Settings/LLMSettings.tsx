@@ -38,9 +38,9 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
 
   const fetchModelConfigs = async () => {
     try {
-      const configs = await window.electronStore.getAIModelConfigs();
+      const configs = await window.electronStore.getLLMConfigs();
       setModelConfigs(configs);
-      const defaultModelName = await window.electronStore.getDefaultAIModel();
+      const defaultModelName = await window.electronStore.getDefaultLLM();
       setDefaultModel(defaultModelName);
     } catch (error) {
       console.error("Failed to fetch model configurations:", error);
@@ -77,7 +77,7 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
 
   const handleDefaultModelChange = (selectedModel: string) => {
     setDefaultModel(selectedModel);
-    window.electronStore.setDefaultAIModel(selectedModel);
+    window.electronStore.setDefaultLLM(selectedModel);
   };
 
   const modelOptions = Object.keys(modelConfigs).map((key) => ({

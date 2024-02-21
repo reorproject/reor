@@ -42,7 +42,7 @@ export interface StoreSchema {
     [modelName: string]: LLMModelConfig;
   };
   embeddingModels: {
-    [modelName: string]: EmbeddingModelConfig;
+    [modelAlias: string]: EmbeddingModelConfig;
   };
   defaultLLM: string;
   defaultEmbedFuncRepo: string;
@@ -54,6 +54,6 @@ export enum StoreKeys {
   LLMs = "LLMs",
   EmbeddingModels = "embeddingModels",
   DefaultLLM = "defaultLLM",
-  DefaultEmbedFuncRepo = "defaultEmbedFuncRepo",
+  DefaultEmbeddingModelAlias = "defaultEmbeddingModelAlias",
   MaxRAGExamples = "RAG.maxRAGExamples",
 }

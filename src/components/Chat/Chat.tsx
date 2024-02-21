@@ -19,7 +19,7 @@ const ChatWithLLM: React.FC = () => {
 
   useEffect(() => {
     const fetchDefaultModel = async () => {
-      const defaultModelName = await window.electronStore.getDefaultAIModel();
+      const defaultModelName = await window.electronStore.getDefaultLLM();
       setDefaultModel(defaultModelName);
     };
     fetchDefaultModel();

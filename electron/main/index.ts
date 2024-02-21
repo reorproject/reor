@@ -180,7 +180,7 @@ ipcMain.on("index-files-in-directory", async (event) => {
       throw new Error("No window info found");
     }
     const embedFuncRepoName = store.get(
-      StoreKeys.DefaultEmbedFuncRepo
+      StoreKeys.DefaultEmbeddingModelAlias
     ) as string;
     if (!embedFuncRepoName) {
       throw new Error("No default embed func repo set");

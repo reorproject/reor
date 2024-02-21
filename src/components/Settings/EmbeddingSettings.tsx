@@ -24,12 +24,12 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
   const [selectedModel, setSelectedModel] = useState<string>("");
 
   useEffect(() => {
-    const defaultModel = window.electronStore.getDefaultEmbedFuncRepo();
+    const defaultModel = window.electronStore.getDefaultEmbeddingModel();
     if (defaultModel) {
       setSelectedModel(defaultModel);
     } else {
       setSelectedModel(modelRepos[0].value);
-      window.electronStore.setDefaultEmbedFuncRepo(modelRepos[0].value);
+      window.electronStore.setDefaultEmbeddingModel(modelRepos[0].value);
       if (handleUserHasChangedModel) {
         handleUserHasChangedModel(true);
       }
@@ -56,7 +56,7 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
 
   const handleChangeOnModelSelect = (newSelectedModel: string) => {
     setSelectedModel(newSelectedModel);
-    window.electronStore.setDefaultEmbedFuncRepo(newSelectedModel);
+    window.electronStore.setDefaultEmbeddingModel(newSelectedModel);
     if (handleUserHasChangedModel) {
       handleUserHasChangedModel(true);
     }

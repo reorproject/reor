@@ -65,8 +65,8 @@ declare global {
     electronStore: {
       setUserDirectory: (path: string) => Promise<void>;
       getUserDirectory: () => string;
-      getAIModelConfigs: () => Promise<Record<string, LLMModelConfig>>;
-      updateAIModelConfig: (
+      getLLMConfigs: () => Promise<Record<string, LLMModelConfig>>;
+      updateLLMConfig: (
         modelName: string,
         modelConfig: LLMModelConfig
       ) => Promise<void>;
@@ -74,10 +74,10 @@ declare global {
         modelName: string,
         modelConfig: LLMModelConfig
       ) => Promise<void>;
-      setDefaultAIModel: (modelName: string) => void;
-      getDefaultAIModel: () => string;
-      getDefaultEmbedFuncRepo: () => string;
-      setDefaultEmbedFuncRepo: (repoName: string) => void;
+      setDefaultLLM: (modelName: string) => void;
+      getDefaultLLM: () => string;
+      getDefaultEmbeddingModel: () => string;
+      setDefaultEmbeddingModel: (repoName: string) => void;
       getNoOfRAGExamples: () => number;
       setNoOfRAGExamples: (noOfExamples: number) => void;
     };
@@ -125,31 +125,28 @@ contextBridge.exposeInMainWorld("electronStore", {
   getUserDirectory: () => {
     return ipcRenderer.sendSync("get-user-directory");
   },
-  getAIModelConfigs: async (): Promise<LLMModelConfig[]> => {
-    return ipcRenderer.invoke("get-ai-model-configs");
+  getLLMConfigs: async (): Promise<LLMModelConfig[]> => {
+    return ipcRenderer.invoke("get-llm-configs");
   },
-  updateAIModelConfig: async (
-    modelName: string,
-    modelConfig: LLMModelConfig
-  ) => {
-    return ipcRenderer.invoke("update-ai-model-config", modelName, modelConfig);
+  updateLLMConfig: async (modelName: string, modelConfig: LLMModelConfig) => {
+    return ipcRenderer.invoke("update-llm-config", modelName, modelConfig);
   },
   setupNewLLM: async (modelName: string, modelConfig: LLMModelConfig) => {
     return ipcRenderer.invoke("setup-new-model", modelName, modelConfig);
   },
-  setDefaultAIModel: (modelName: string) => {
-    ipcRenderer.send("set-default-ai-model", modelName);
+  setDefaultLLM: (modelName: string) => {
+    ipcRenderer.send("set-default-llm", modelName);
   },
 
-  getDefaultAIModel: () => {
-    return ipcRenderer.sendSync("get-default-ai-model");
+  getDefaultLLM: () => {
+    return ipcRenderer.sendSync("get-default-llm");
   },
 
-  getDefaultEmbedFuncRepo: () => {
-    return ipcRenderer.sendSync("get-default-embed-func-repo");
+  getDefaultEmbeddingModel: () => {
+    return ipcRenderer.sendSync("get-default-embedding-model");
   },
-  setDefaultEmbedFuncRepo: (repoName: string) => {
-    ipcRenderer.send("set-default-embed-func-repo", repoName);
+  setDefaultEmbeddingModel: (repoName: string) => {
+    ipcRenderer.send("set-default-embedding-model", repoName);
   },
   getNoOfRAGExamples: () => {
     return ipcRenderer.sendSync("get-no-of-rag-examples");
