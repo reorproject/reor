@@ -35,7 +35,6 @@ export interface StoreSchema {
 }
 
 export enum StoreKeys {
-  VaultDirectories = "user.vaultDirectories",
   DirectoryFromPreviousSession = "user.directoryFromPreviousSession",
   LLMs = "LLMs",
   DefaultLLM = "defaultLLM",
