@@ -132,7 +132,7 @@ contextBridge.exposeInMainWorld("electronStore", {
     return ipcRenderer.invoke("update-llm-config", modelName, modelConfig);
   },
   setupNewLLM: async (modelName: string, modelConfig: LLMModelConfig) => {
-    return ipcRenderer.invoke("setup-new-model", modelName, modelConfig);
+    return ipcRenderer.invoke("setup-new-llm", modelName, modelConfig);
   },
   setDefaultLLM: (modelName: string) => {
     ipcRenderer.send("set-default-llm", modelName);

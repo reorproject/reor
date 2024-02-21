@@ -77,10 +77,10 @@ export const registerStoreHandlers = (
   });
 
   ipcMain.handle(
-    "setup-new-model",
+    "setup-new-llm",
     async (event, modelName: string, modelConfig: LLMModelConfig) => {
       console.log("setting up new local model", modelConfig);
-      return await addNewModelSchemaToStore(store, modelName, modelConfig);
+      return await addNewLLMSchemaToStore(store, modelName, modelConfig);
     }
   );
 
@@ -89,7 +89,7 @@ export const registerStoreHandlers = (
   });
 };
 
-export async function addNewModelSchemaToStore(
+export async function addNewLLMSchemaToStore(
   store: Store<StoreSchema>,
   modelName: string,
   modelConfig: LLMModelConfig
@@ -118,6 +118,6 @@ export async function addNewModelSchemaToStore(
 
 export function setupDefaultStoreValues(store: Store<StoreSchema>) {
   if (!store.get(StoreKeys.MaxRAGExamples)) {
-    store.set(StoreKeys.MaxRAGExamples, 10);
+    store.set(StoreKeys.MaxRAGExamples, 15);
   }
 }
