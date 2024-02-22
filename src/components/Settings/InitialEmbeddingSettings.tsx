@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import CustomSelect from "../Generic/Select";
 import { EmbeddingModelConfig } from "electron/main/Store/storeConfig";
+import NewEmbeddingModelModalBothTypes from "./ExtraModals/NewEmbeddingModelBothTypes";
 // import { modelRepos } from "./EmbeddingSettings";
 
 // export const modelRepos = [
@@ -31,6 +32,8 @@ const InitialEmbeddingModelSettings: React.FC<
   const [embeddingModels, setEmbeddingModels] = useState<
     Record<string, EmbeddingModelConfig>
   >({});
+  const [showNewEmbeddingModelModal, setShowNewEmbeddingModelModal] =
+    useState<boolean>(false);
   // useEffect(() => {
   //   const defaultModel = window.electronStore.getDefaultEmbeddingModel();
   //   if (defaultModel) {
@@ -87,18 +90,26 @@ const InitialEmbeddingModelSettings: React.FC<
         value={selectedModel}
         onChange={handleChangeOnModelSelect}
       /> */}
-      {Object.keys(embeddingModels).length > 0 && (
-        <CustomSelect
-          options={Object.keys(embeddingModels).map((model) => {
-            return { label: model, value: model };
-          })}
-          value={selectedModel}
-          onChange={handleChangeOnModelSelect}
-        />
-      )}
-      {/* {userTriedToSubmit && !selectedModel && (
-        <p className="text-red-500 text-sm mt-1">{currentError}</p>
-      )} */}
+      <CustomSelect
+        options={Object.keys(embeddingModels).map((model) => {
+          return { label: model, value: model };
+        })}
+        value={selectedModel}
+        onChange={handleChangeOnModelSelect}
+        addButton={{
+          label: "Add New Model",
+          onClick: () => setShowNewEmbeddingModelModal(true),
+        }}
+      />
+      <NewEmbeddingModelModalBothTypes
+        isOpen={showNewEmbeddingModelModal}
+        onClose={() => {
+          setShowNewEmbeddingModelModal(false);
+        }}
+        handleUserHasChangedModel={() => {
+          updateEmbeddingModels();
+        }}
+      />
     </div>
   );
 };
