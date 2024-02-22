@@ -91,13 +91,12 @@ const NewEmbeddingModelModalBothTypes: React.FC<
           </Button>
         </div>
         <p className="text-white text-xs mb-2 mt-2 italic">
-          {" "}
-          This{" "}
           <ExternalLink
             url="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=trending&search=xenova"
-            label="link"
+            label="This page on Hugging Face"
           />{" "}
-          has some suitable choices.
+          has most available models. It must be a &quot;Xenova&quot; ONNX
+          embedding model.
         </p>
 
         <Modal
@@ -122,14 +121,12 @@ const NewEmbeddingModelModalBothTypes: React.FC<
               placeholder="Embedding Model Repo"
             />
             <p className="text-gray-100 text-xs mb-2 mt-2 italic">
-              {" "}
-              This{" "}
               <ExternalLink
                 url="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=trending&search=xenova"
-                label="link"
+                label="This page on Hugging Face"
               />{" "}
-              has some suitable choices. This must be a &quot;Xenova&quot; ONNX
-              model.
+              has most available models. It must be a &quot;Xenova&quot; ONNX
+              embedding model.
             </p>
             <Button
               className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"

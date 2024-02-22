@@ -45,9 +45,9 @@ const NewRemoteEmbeddingModelModal: React.FC<
         <h2 className="text-white  font-semibold mb-0">
           New Remote Embedding Model
         </h2>
-        <p className="text-white text-sm mb-2 mt-1">
-          Provide the repo name from Huggingface. An example is
-          &quot;xenova/roberta-base-squad2&quot;.
+        <p className="text-white text-sm mb-2 mt-2">
+          Provide the repo name from Hugging Face like
+          &quot;Xenova/roberta-base-squad2&quot;.
         </p>
 
         <input
@@ -59,14 +59,12 @@ const NewRemoteEmbeddingModelModal: React.FC<
           placeholder="Embedding Model Repo"
         />
         <p className="text-white text-xs mb-2 mt-2 italic">
-          {" "}
-          This{" "}
           <ExternalLink
             url="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=trending&search=xenova"
-            label="link"
+            label="This page on Hugging Face"
           />{" "}
-          has some suitable choices. This must be a &quot;Xenova&quot; ONNX
-          model.
+          has most available models. It must be a &quot;Xenova&quot; ONNX
+          embedding model.
         </p>
 
         <Button

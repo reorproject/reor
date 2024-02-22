@@ -96,14 +96,14 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
           onClick={() => setIsNewLocalEmbeddingModelModalOpen(true)}
           placeholder={""}
         >
-          Attach Local Embedding Model
+          Attach Local Model
         </Button>
         <Button
           className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
           onClick={() => setIsContextLengthModalOpen(true)}
           placeholder={""}
         >
-          Download Hugging Face Model
+          Attach Remote Model
         </Button>
       </div>
       <NewLocalEmbeddingModelModal

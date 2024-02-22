@@ -57,13 +57,12 @@ const NewLocalEmbeddingModelModal: React.FC<
           Select Model Directory
         </Button>
         <p className="text-white text-xs mb-2 mt-2 italic">
-          {" "}
-          This{" "}
           <ExternalLink
             url="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=trending&search=xenova"
-            label="link"
+            label="This page on Hugging Face"
           />{" "}
-          has some suitable choices.
+          has most available models. It must be a &quot;Xenova&quot; ONNX
+          embedding model.
         </p>
         {newModelPath && (
           <p className="mt-2 text-xs text-gray-100">
