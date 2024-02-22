@@ -180,6 +180,7 @@ export function setupDefaultStoreValues(store: Store<StoreSchema>) {
   if (!store.get(StoreKeys.MaxRAGExamples)) {
     store.set(StoreKeys.MaxRAGExamples, 15);
   }
+  setupDefaultEmbeddingModels(store);
 }
 
 export function getDefaultEmbeddingModelConfig(
@@ -206,3 +207,35 @@ export function getDefaultEmbeddingModelConfig(
 
   return model;
 }
+
+const setupDefaultEmbeddingModels = (store: Store<StoreSchema>) => {
+  const embeddingModels = store.get(StoreKeys.EmbeddingModels);
+
+  if (!embeddingModels) {
+    store.set(StoreKeys.EmbeddingModels, modelRepos);
+  }
+
+  const defaultModel = store.get(StoreKeys.DefaultEmbeddingModelAlias);
+  if (!defaultModel) {
+    const embeddingModels = store.get(StoreKeys.EmbeddingModels) || {};
+    if (Object.keys(embeddingModels).length === 0) {
+      throw new Error("No embedding models found");
+    }
+    store.set(
+      StoreKeys.DefaultEmbeddingModelAlias,
+      Object.keys(embeddingModels)[0]
+    );
+  }
+};
+
+const modelRepos = {
+  "Xenova/bge-base-en-v1.5": {
+    type: "repo",
+    repoName: "Xenova/bge-base-en-v1.5",
+  },
+  "Xenova/UAE-Large-V1": { type: "repo", repoName: "Xenova/UAE-Large-V1" },
+  "Xenova/bge-small-en-v1.5": {
+    type: "repo",
+    repoName: "Xenova/bge-small-en-v1.5",
+  },
+};
