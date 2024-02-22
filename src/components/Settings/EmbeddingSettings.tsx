@@ -7,7 +7,7 @@ import { EmbeddingModelConfig } from "electron/main/Store/storeConfig";
 
 interface EmbeddingModelManagerProps {
   userHasCompleted?: (completed: boolean) => void;
-  handleUserHasChangedModel?: (bool: boolean) => void;
+  handleUserHasChangedModel?: () => void;
   userTriedToSubmit?: boolean;
 }
 const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
@@ -26,20 +26,6 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
   const [embeddingModels, setEmbeddingModels] = useState<
     Record<string, EmbeddingModelConfig>
   >({});
-
-  // useEffect(() => {
-  //   const defaultModel = window.electronStore.getDefaultEmbeddingModel();
-  //   if (defaultModel) {
-  //     setSelectedModel(defaultModel);
-  //   }
-  //   // else {
-  //   //   setSelectedModel(modelRepos[0].value);
-  //   //   window.electronStore.setDefaultEmbeddingModel(modelRepos[0].value);
-  //   //   if (handleUserHasChangedModel) {
-  //   //     handleUserHasChangedModel(true);
-  //   //   }
-  //   // }
-  // }, []);
 
   const updateEmbeddingModels = () => {
     console.log("updating embedding models");
@@ -82,7 +68,7 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
     setSelectedModel(newSelectedModel);
     window.electronStore.setDefaultEmbeddingModel(newSelectedModel);
     if (handleUserHasChangedModel) {
-      handleUserHasChangedModel(true);
+      handleUserHasChangedModel();
     }
   };
 
@@ -94,13 +80,15 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
       <p className="mt-5 text-gray-100">
         If you change this, your files will be re-indexed:
       </p>{" "}
-      <CustomSelect
-        options={Object.keys(embeddingModels).map((model) => {
-          return { label: model, value: model };
-        })}
-        value={selectedModel}
-        onChange={handleChangeOnModelSelect}
-      />
+      {Object.keys(embeddingModels).length > 0 && (
+        <CustomSelect
+          options={Object.keys(embeddingModels).map((model) => {
+            return { label: model, value: model };
+          })}
+          value={selectedModel}
+          onChange={handleChangeOnModelSelect}
+        />
+      )}
       <p className=" text-gray-100 text-xs">
         <i>
           If you notice some lag in the editor it is likely because you chose
@@ -127,6 +115,12 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
         isOpen={isNewLocalEmbeddingModelModalOpen}
         onClose={() => {
           setIsNewLocalEmbeddingModelModalOpen(false);
+        }}
+        handleUserHasChangedModel={() => {
+          updateEmbeddingModels();
+          if (handleUserHasChangedModel) {
+            handleUserHasChangedModel();
+          }
         }}
       />
       <ContextLengthModal

@@ -186,7 +186,22 @@ export function getDefaultEmbeddingModelConfig(
 ): EmbeddingModelConfig {
   const defaultEmbeddingModelAlias = store.get(
     StoreKeys.DefaultEmbeddingModelAlias
-  ) as string;
+  ) as string | undefined;
+
+  // Check if the default model alias is defined and not empty
+  if (!defaultEmbeddingModelAlias) {
+    throw new Error("No default embedding model is specified");
+  }
+
   const embeddingModels = store.get(StoreKeys.EmbeddingModels) || {};
-  return embeddingModels[defaultEmbeddingModelAlias];
+
+  // Check if the model with the default alias exists
+  const model = embeddingModels[defaultEmbeddingModelAlias];
+  if (!model) {
+    throw new Error(
+      `No embedding model found for alias '${defaultEmbeddingModelAlias}'`
+    );
+  }
+
+  return model;
 }

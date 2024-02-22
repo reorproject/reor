@@ -7,11 +7,12 @@ import { EmbeddingModelWithLocalPath } from "electron/main/Store/storeConfig";
 interface NewLocalEmbeddingModelModalProps {
   isOpen: boolean;
   onClose: () => void;
+  handleUserHasChangedModel?: () => void;
 }
 
 const NewLocalEmbeddingModelModal: React.FC<
   NewLocalEmbeddingModelModalProps
-> = ({ isOpen, onClose }) => {
+> = ({ isOpen, onClose, handleUserHasChangedModel }) => {
   const [newModelPath, setNewModelPath] = useState<string>("");
 
   const handleModelDirectorySelection = async () => {
@@ -32,6 +33,9 @@ const NewLocalEmbeddingModelModal: React.FC<
     };
 
     await window.electronStore.addNewLocalEmbeddingModel(modelObject);
+    if (handleUserHasChangedModel) {
+      handleUserHasChangedModel();
+    }
     onClose();
   };
 

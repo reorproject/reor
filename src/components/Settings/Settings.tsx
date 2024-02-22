@@ -78,7 +78,7 @@ const SettingsModal: React.FC<ModalProps> = ({
           {activeTab === "embeddingModel" && (
             <div className="w-full">
               <EmbeddingModelSettings
-                handleUserHasChangedModel={setWillNeedToReIndex}
+                handleUserHasChangedModel={() => setWillNeedToReIndex(true)}
               />
             </div>
           )}
