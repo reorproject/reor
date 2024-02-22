@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
 import CustomSelect from "../Generic/Select";
+import { Button } from "@material-tailwind/react";
+import ContextLengthModal from "./ExtraModals/ContextLengthSettings";
+import NewLocalEmbeddingModelModal from "./ExtraModals/NewLocalEmbeddingModel";
+import { EmbeddingModelConfig } from "electron/main/Store/storeConfig";
 
 interface EmbeddingModelManagerProps {
   userHasCompleted?: (completed: boolean) => void;
@@ -12,28 +16,48 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
   userTriedToSubmit,
 }) => {
   const [currentError, setCurrentError] = useState<string>("");
-  const modelRepos = [
-    {
-      label: "bge-base-en-v1.5 (medium, recommended)",
-      value: "Xenova/bge-base-en-v1.5",
-    },
-    { label: "UAE-Large-V1 (large) ", value: "Xenova/UAE-Large-V1" },
-    { label: "bge-small-en-v1.5 (small)", value: "Xenova/bge-small-en-v1.5" },
-  ];
-
+  const [
+    isNewLocalEmbeddingModelModalOpen,
+    setIsNewLocalEmbeddingModelModalOpen,
+  ] = useState<boolean>(false);
+  const [isConextLengthModalOpen, setIsContextLengthModalOpen] =
+    useState<boolean>(false);
   const [selectedModel, setSelectedModel] = useState<string>("");
+  const [embeddingModels, setEmbeddingModels] = useState<
+    Record<string, EmbeddingModelConfig>
+  >({});
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   const defaultModel = window.electronStore.getDefaultEmbeddingModel();
+  //   if (defaultModel) {
+  //     setSelectedModel(defaultModel);
+  //   }
+  //   // else {
+  //   //   setSelectedModel(modelRepos[0].value);
+  //   //   window.electronStore.setDefaultEmbeddingModel(modelRepos[0].value);
+  //   //   if (handleUserHasChangedModel) {
+  //   //     handleUserHasChangedModel(true);
+  //   //   }
+  //   // }
+  // }, []);
+
+  const updateEmbeddingModels = () => {
+    console.log("updating embedding models");
+    const embeddingModels = window.electronStore.getEmbeddingModels();
+    console.log("embedding models", embeddingModels);
+    if (embeddingModels) {
+      setEmbeddingModels(embeddingModels);
+    }
+    console.log("getting default model");
     const defaultModel = window.electronStore.getDefaultEmbeddingModel();
+    console.log("default model", defaultModel);
     if (defaultModel) {
       setSelectedModel(defaultModel);
-    } else {
-      setSelectedModel(modelRepos[0].value);
-      window.electronStore.setDefaultEmbeddingModel(modelRepos[0].value);
-      if (handleUserHasChangedModel) {
-        handleUserHasChangedModel(true);
-      }
     }
+  };
+
+  useEffect(() => {
+    updateEmbeddingModels();
   }, []);
 
   useEffect(() => {
@@ -71,7 +95,9 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
         If you change this, your files will be re-indexed:
       </p>{" "}
       <CustomSelect
-        options={modelRepos}
+        options={Object.keys(embeddingModels).map((model) => {
+          return { label: model, value: model };
+        })}
         value={selectedModel}
         onChange={handleChangeOnModelSelect}
       />
@@ -81,6 +107,35 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
           too large of a model...
         </i>
       </p>{" "}
+      <div className="flex">
+        <Button
+          className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
+          onClick={() => setIsNewLocalEmbeddingModelModalOpen(true)}
+          placeholder={""}
+        >
+          New Local Embedding Model
+        </Button>
+        <Button
+          className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
+          onClick={() => setIsContextLengthModalOpen(true)}
+          placeholder={""}
+        >
+          New Huggingface Model
+        </Button>
+      </div>
+      <NewLocalEmbeddingModelModal
+        isOpen={isNewLocalEmbeddingModelModalOpen}
+        onClose={() => {
+          setIsNewLocalEmbeddingModelModalOpen(false);
+        }}
+      />
+      <ContextLengthModal
+        isOpen={isConextLengthModalOpen}
+        onClose={() => {
+          setIsContextLengthModalOpen(false);
+        }}
+        modelConfigs={{}}
+      />
       {userTriedToSubmit && !selectedModel && (
         <p className="text-red-500 text-sm mt-1">{currentError}</p>
       )}

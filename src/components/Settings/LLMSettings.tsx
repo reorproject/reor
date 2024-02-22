@@ -2,10 +2,10 @@ import React, { useState, useEffect } from "react";
 import { LLMModelConfig } from "electron/main/Store/storeConfig";
 import CustomSelect from "../Generic/Select";
 import { Button } from "@material-tailwind/react";
-import LocalModelModal from "./NewLocalModel";
-import OpenAISetupModal from "./OpenAISetup";
-import ContextLengthModal from "./ContextLengthSettings";
-import RemoteLLMSetupModal from "./RemoteLLMSetup";
+import LocalModelModal from "./ExtraModals/NewLocalModel";
+import OpenAISetupModal from "./ExtraModals/OpenAISetup";
+import ContextLengthModal from "./ExtraModals/ContextLengthSettings";
+import RemoteLLMSetupModal from "./ExtraModals/RemoteLLMSetup";
 
 interface LLMSettingsProps {
   userHasCompleted?: (completed: boolean) => void;
@@ -145,14 +145,14 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
           <h4 className="text-gray-100 mb-1">Local LLM Settings:</h4>
           <div className="flex">
             <Button
-              className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mr-4"
+              className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
               onClick={() => setIsNewLocalModelModalOpen(true)}
               placeholder={""}
             >
               Add New Local LLM
             </Button>
             <Button
-              className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1"
+              className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
               onClick={() => setIsContextLengthModalOpen(true)}
               placeholder={""}
             >

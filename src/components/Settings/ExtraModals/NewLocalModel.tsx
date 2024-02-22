@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Button } from "@material-tailwind/react";
-import Modal from "../Generic/Modal";
-import ExternalLink from "../Generic/ExternalLink";
+import Modal from "../../Generic/Modal";
+import ExternalLink from "../../Generic/ExternalLink";
 import { LocalLLMConfig } from "electron/main/Store/storeConfig";
-import CustomSelect from "../Generic/Select";
+import CustomSelect from "../../Generic/Select";
 
 interface LocalModelModalProps {
   isOpen: boolean;

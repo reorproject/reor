@@ -18,10 +18,12 @@ export interface LocalLLMConfig extends BaseLLMConfig {
 export type LLMModelConfig = OpenAILLMConfig | LocalLLMConfig;
 
 export interface EmbeddingModelWithRepo {
+  type: "repo";
   repoName: string;
 }
 
 export interface EmbeddingModelWithLocalPath {
+  type: "local";
   localPath: string;
 }
 

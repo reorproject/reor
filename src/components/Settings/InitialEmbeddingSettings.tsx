@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from "react";
 import CustomSelect from "../Generic/Select";
+// import { modelRepos } from "./EmbeddingSettings";
 
+export const modelRepos = [
+  {
+    label: "bge-base-en-v1.5 (medium, recommended)",
+    value: "Xenova/bge-base-en-v1.5",
+  },
+  { label: "UAE-Large-V1 (large) ", value: "Xenova/UAE-Large-V1" },
+  { label: "bge-small-en-v1.5 (small)", value: "Xenova/bge-small-en-v1.5" },
+];
 interface InitialEmbeddingModelSettingsProps {
   userHasCompleted?: (completed: boolean) => void;
   handleUserHasChangedModel?: (bool: boolean) => void;
@@ -10,14 +19,6 @@ const InitialEmbeddingModelSettings: React.FC<
   InitialEmbeddingModelSettingsProps
 > = ({ userHasCompleted, handleUserHasChangedModel, userTriedToSubmit }) => {
   const [currentError, setCurrentError] = useState<string>("");
-  const modelRepos = [
-    {
-      label: "bge-base-en-v1.5 (medium, recommended)",
-      value: "Xenova/bge-base-en-v1.5",
-    },
-    { label: "UAE-Large-V1 (large) ", value: "Xenova/UAE-Large-V1" },
-    { label: "bge-small-en-v1.5 (small)", value: "Xenova/bge-small-en-v1.5" },
-  ];
 
   const [selectedModel, setSelectedModel] = useState<string>("");
 
@@ -27,7 +28,7 @@ const InitialEmbeddingModelSettings: React.FC<
       setSelectedModel(defaultModel);
     } else {
       setSelectedModel(modelRepos[0].value);
-      window.electronStore.setDefaultEmbeddingModel(modelRepos[0].value);
+      // window.electronStore.setDefaultEmbeddingModel(modelRepos[0].value);
       if (handleUserHasChangedModel) {
         handleUserHasChangedModel(true);
       }

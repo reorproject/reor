@@ -1,5 +1,6 @@
 import { ipcMain } from "electron";
 import {
+  EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
   LLMModelConfig,
@@ -14,6 +15,7 @@ import {
   setVaultDirectoryForContents,
   activeWindows,
 } from "../windowManager";
+import path from "path";
 
 export const registerStoreHandlers = (
   store: Store<StoreSchema>
@@ -54,10 +56,12 @@ export const registerStoreHandlers = (
     "add-new-local-embedding-model",
     (event, model: EmbeddingModelWithLocalPath) => {
       const currentModels = store.get(StoreKeys.EmbeddingModels) || {};
+      const modelAlias = path.basename(model.localPath);
       store.set(StoreKeys.EmbeddingModels, {
         ...currentModels,
-        [model.localPath]: model,
+        [modelAlias]: model,
       });
+      store.set(StoreKeys.DefaultEmbeddingModelAlias, modelAlias);
     }
   );
 
@@ -71,6 +75,10 @@ export const registerStoreHandlers = (
       });
     }
   );
+
+  ipcMain.on("get-embedding-models", (event) => {
+    event.returnValue = store.get(StoreKeys.EmbeddingModels);
+  });
 
   ipcMain.on(
     "update-embedding-model",
@@ -171,4 +179,14 @@ export function setupDefaultStoreValues(store: Store<StoreSchema>) {
   if (!store.get(StoreKeys.MaxRAGExamples)) {
     store.set(StoreKeys.MaxRAGExamples, 15);
   }
+}
+
+export function getDefaultEmbeddingModelConfig(
+  store: Store<StoreSchema>
+): EmbeddingModelConfig {
+  const defaultEmbeddingModelAlias = store.get(
+    StoreKeys.DefaultEmbeddingModelAlias
+  ) as string;
+  const embeddingModels = store.get(StoreKeys.EmbeddingModels) || {};
+  return embeddingModels[defaultEmbeddingModelAlias];
 }

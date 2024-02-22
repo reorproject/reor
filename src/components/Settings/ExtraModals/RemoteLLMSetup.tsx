@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import { Button } from "@material-tailwind/react";
-import Modal from "../Generic/Modal";
+import Modal from "../../Generic/Modal";
 import { LLMModelConfig } from "electron/main/Store/storeConfig";
-import CustomSelect from "../Generic/Select";
+import CustomSelect from "../../Generic/Select";
 import { errorToString } from "@/functions/error";
-import ExternalLink from "../Generic/ExternalLink";
+import ExternalLink from "../../Generic/ExternalLink";
 
 interface RemoteLLMModalProps {
   isOpen: boolean;

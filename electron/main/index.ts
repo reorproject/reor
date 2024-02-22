@@ -23,7 +23,10 @@ import {
 import { registerLLMSessionHandlers } from "./llm/llmSessionHandlers";
 // import { FileInfoNode } from "./Files/Types";
 import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
-import { registerStoreHandlers } from "./Store/storeHandlers";
+import {
+  getDefaultEmbeddingModelConfig,
+  registerStoreHandlers,
+} from "./Store/storeHandlers";
 import { registerFileHandlers } from "./Files/registerFilesHandler";
 import { RepopulateTableWithMissingItems } from "./database/TableHelperFunctions";
 import {
@@ -179,18 +182,14 @@ ipcMain.on("index-files-in-directory", async (event) => {
     if (!windowInfo) {
       throw new Error("No window info found");
     }
-    const embedFuncRepoName = store.get(
-      StoreKeys.DefaultEmbeddingModelAlias
-    ) as string;
-    if (!embedFuncRepoName) {
-      throw new Error("No default embed func repo set");
-    }
+    const defaultEmbeddingModelConfig = getDefaultEmbeddingModelConfig(store);
     const dbPath = path.join(app.getPath("userData"), "vectordb");
     dbConnection = await lancedb.connect(dbPath);
+
     await windowInfo.dbTableClient.initialize(
       dbConnection,
       windowInfo.vaultDirectoryForWindow,
-      embedFuncRepoName
+      defaultEmbeddingModelConfig
     );
     await RepopulateTableWithMissingItems(
       windowInfo.dbTableClient,

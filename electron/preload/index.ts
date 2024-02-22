@@ -1,5 +1,6 @@
 import { contextBridge, ipcRenderer } from "electron";
 import {
+  EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
   LLMModelConfig,
@@ -84,6 +85,7 @@ declare global {
       setDefaultEmbeddingModel: (repoName: string) => void;
       addNewLocalEmbeddingModel: (model: EmbeddingModelWithLocalPath) => void;
       addNewRepoEmbeddingModel: (model: EmbeddingModelWithRepo) => void;
+      getEmbeddingModels: () => Record<string, EmbeddingModelConfig>;
       updateEmbeddingModel: (
         modelName: string,
         updatedModel: EmbeddingModelWithLocalPath | EmbeddingModelWithRepo
@@ -162,6 +164,9 @@ contextBridge.exposeInMainWorld("electronStore", {
 
   addNewLocalEmbeddingModel: (model: EmbeddingModelWithLocalPath) => {
     ipcRenderer.send("add-new-local-embedding-model", model);
+  },
+  getEmbeddingModels: () => {
+    return ipcRenderer.sendSync("get-embedding-models");
   },
   addNewRepoEmbeddingModel: (model: EmbeddingModelWithRepo) => {
     ipcRenderer.send("add-new-repo-embedding-model", model);

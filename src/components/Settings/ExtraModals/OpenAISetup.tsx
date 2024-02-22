@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@material-tailwind/react";
-import Modal from "../Generic/Modal";
+import Modal from "../../Generic/Modal";
 import { OpenAILLMConfig } from "electron/main/Store/storeConfig";
 
 interface OpenAISetupModalProps {

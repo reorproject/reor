@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import Modal from "../Generic/Modal";
+import Modal from "../../Generic/Modal";
 import { LLMModelConfig } from "electron/main/Store/storeConfig";
-import CustomSelect from "../Generic/Select";
+import CustomSelect from "../../Generic/Select";
 import { contextLengthOptions } from "./NewLocalModel";
 
 interface ContextLengthModalProps {

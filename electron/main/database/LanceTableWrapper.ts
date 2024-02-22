@@ -15,6 +15,7 @@ import {
   sanitizePathForDatabase,
 } from "./TableHelperFunctions";
 import { DBEntry, DBQueryResult, DatabaseFields } from "./Schema";
+import { EmbeddingModelConfig } from "../Store/storeConfig";
 
 export class LanceDBTableWrapper {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -24,10 +25,12 @@ export class LanceDBTableWrapper {
   async initialize(
     dbConnection: Connection,
     userDirectory: string,
-    embedFuncRepoName: string
+    embeddingModelConfig: EmbeddingModelConfig
   ) {
-    this.embedFun = await createEmbeddingFunction(embedFuncRepoName, "content");
-    console.log("Embedding function created", this.embedFun);
+    this.embedFun = await createEmbeddingFunction(
+      embeddingModelConfig,
+      "content"
+    );
     this.table = await GetOrCreateLanceTable(
       dbConnection,
       this.embedFun,
