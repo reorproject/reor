@@ -1,77 +1,104 @@
 import React, { useState, useEffect } from "react";
 import CustomSelect from "../Generic/Select";
+import { EmbeddingModelConfig } from "electron/main/Store/storeConfig";
 // import { modelRepos } from "./EmbeddingSettings";
 
-export const modelRepos = [
-  {
-    label: "bge-base-en-v1.5 (medium, recommended)",
-    value: "Xenova/bge-base-en-v1.5",
-  },
-  { label: "UAE-Large-V1 (large) ", value: "Xenova/UAE-Large-V1" },
-  { label: "bge-small-en-v1.5 (small)", value: "Xenova/bge-small-en-v1.5" },
-];
+// export const modelRepos = [
+//   {
+//     label: "bge-base-en-v1.5 (medium, recommended)",
+//     value: "Xenova/bge-base-en-v1.5",
+//   },
+//   { label: "UAE-Large-V1 (large) ", value: "Xenova/UAE-Large-V1" },
+//   { label: "bge-small-en-v1.5 (small)", value: "Xenova/bge-small-en-v1.5" },
+// ];
 interface InitialEmbeddingModelSettingsProps {
-  userHasCompleted?: (completed: boolean) => void;
-  handleUserHasChangedModel?: (bool: boolean) => void;
-  userTriedToSubmit?: boolean;
+  // handleUserHasCompleted?: (completed: boolean) => void;
+  // handleUserHasChangedModel?: (bool: boolean) => void;
+  // userTriedToSubmit?: boolean;
+  setErrorMsg: (msg: string) => void;
 }
 const InitialEmbeddingModelSettings: React.FC<
   InitialEmbeddingModelSettingsProps
-> = ({ userHasCompleted, handleUserHasChangedModel, userTriedToSubmit }) => {
-  const [currentError, setCurrentError] = useState<string>("");
+> = ({
+  // handleUserHasCompleted,
+  // handleUserHasChangedModel,
+  // userTriedToSubmit,
+  setErrorMsg,
+}) => {
+  // const [currentError, setCurrentError] = useState<string>("");
 
   const [selectedModel, setSelectedModel] = useState<string>("");
-
-  useEffect(() => {
+  const [embeddingModels, setEmbeddingModels] = useState<
+    Record<string, EmbeddingModelConfig>
+  >({});
+  // useEffect(() => {
+  //   const defaultModel = window.electronStore.getDefaultEmbeddingModel();
+  //   if (defaultModel) {
+  //     setSelectedModel(defaultModel);
+  //   }
+  //   // else {
+  //   //   setSelectedModel(modelRepos[0].value);
+  //   //   // window.electronStore.setDefaultEmbeddingModel(modelRepos[0].value);
+  //   //   if (handleUserHasChangedModel) {
+  //   //     handleUserHasChangedModel(true);
+  //   //   }
+  //   // }
+  // }, []);
+  const updateEmbeddingModels = () => {
+    console.log("updating embedding models");
+    const embeddingModels = window.electronStore.getEmbeddingModels();
+    console.log("embedding models", embeddingModels);
+    if (embeddingModels) {
+      setEmbeddingModels(embeddingModels);
+    }
+    console.log("getting default model");
     const defaultModel = window.electronStore.getDefaultEmbeddingModel();
+    console.log("default model", defaultModel);
     if (defaultModel) {
       setSelectedModel(defaultModel);
-    } else {
-      setSelectedModel(modelRepos[0].value);
-      // window.electronStore.setDefaultEmbeddingModel(modelRepos[0].value);
-      if (handleUserHasChangedModel) {
-        handleUserHasChangedModel(true);
-      }
     }
+  };
+
+  useEffect(() => {
+    updateEmbeddingModels();
   }, []);
 
   useEffect(() => {
     if (selectedModel) {
-      if (setCurrentError) {
-        setCurrentError("");
-      }
-      if (userHasCompleted) {
-        userHasCompleted(true);
-      }
+      setErrorMsg("");
     } else {
-      if (setCurrentError) {
-        setCurrentError("No model selected");
-      }
-      if (userHasCompleted) {
-        userHasCompleted(false);
-      }
+      setErrorMsg("No embedding model selected");
     }
   }, [selectedModel]);
 
   const handleChangeOnModelSelect = (newSelectedModel: string) => {
     setSelectedModel(newSelectedModel);
     window.electronStore.setDefaultEmbeddingModel(newSelectedModel);
-    if (handleUserHasChangedModel) {
-      handleUserHasChangedModel(true);
-    }
+    // if (handleUserHasChangedModel) {
+    //   handleUserHasChangedModel(true);
+    // }
   };
 
   return (
     <div className="w-full bg-gray-800 rounded">
       <h3 className="font-semibold mb-2 text-white">Embedding Model</h3>{" "}
-      <CustomSelect
+      {/* <CustomSelect
         options={modelRepos}
         value={selectedModel}
         onChange={handleChangeOnModelSelect}
-      />
-      {userTriedToSubmit && !selectedModel && (
-        <p className="text-red-500 text-sm mt-1">{currentError}</p>
+      /> */}
+      {Object.keys(embeddingModels).length > 0 && (
+        <CustomSelect
+          options={Object.keys(embeddingModels).map((model) => {
+            return { label: model, value: model };
+          })}
+          value={selectedModel}
+          onChange={handleChangeOnModelSelect}
+        />
       )}
+      {/* {userTriedToSubmit && !selectedModel && (
+        <p className="text-red-500 text-sm mt-1">{currentError}</p>
+      )} */}
     </div>
   );
 };

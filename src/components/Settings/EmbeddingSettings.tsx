@@ -6,12 +6,12 @@ import { EmbeddingModelConfig } from "electron/main/Store/storeConfig";
 import NewRemoteEmbeddingModelModal from "./ExtraModals/NewRemoteEmbeddingModel";
 
 interface EmbeddingModelManagerProps {
-  userHasCompleted?: (completed: boolean) => void;
+  // userHasCompleted?: (completed: boolean) => void;
   handleUserHasChangedModel?: () => void;
   userTriedToSubmit?: boolean;
 }
 const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
-  userHasCompleted,
+  // userHasCompleted,
   handleUserHasChangedModel,
   userTriedToSubmit,
 }) => {
@@ -46,20 +46,15 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
     updateEmbeddingModels();
   }, []);
 
+  // TODO: perhaps this can be removed as well...
   useEffect(() => {
     if (selectedModel) {
       if (setCurrentError) {
         setCurrentError("");
       }
-      if (userHasCompleted) {
-        userHasCompleted(true);
-      }
     } else {
       if (setCurrentError) {
         setCurrentError("No model selected");
-      }
-      if (userHasCompleted) {
-        userHasCompleted(false);
       }
     }
   }, [selectedModel]);
