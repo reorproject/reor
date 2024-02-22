@@ -18,6 +18,7 @@ const SettingsModal: React.FC<ModalProps> = ({
 
   const handleSave = () => {
     if (willNeedToReIndex) {
+      console.log("reindexing files");
       window.database.indexFilesInDirectory();
     }
     onCloseFromParent();

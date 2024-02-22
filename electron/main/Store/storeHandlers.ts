@@ -73,6 +73,7 @@ export const registerStoreHandlers = (
         ...currentModels,
         [model.repoName]: model,
       });
+      store.set(StoreKeys.DefaultEmbeddingModelAlias, model.repoName);
     }
   );
 

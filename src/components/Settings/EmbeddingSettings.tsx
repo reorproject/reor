@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import CustomSelect from "../Generic/Select";
 import { Button } from "@material-tailwind/react";
-import ContextLengthModal from "./ExtraModals/ContextLengthSettings";
 import NewLocalEmbeddingModelModal from "./ExtraModals/NewLocalEmbeddingModel";
 import { EmbeddingModelConfig } from "electron/main/Store/storeConfig";
+import NewRemoteEmbeddingModelModal from "./ExtraModals/NewRemoteEmbeddingModel";
 
 interface EmbeddingModelManagerProps {
   userHasCompleted?: (completed: boolean) => void;
@@ -123,12 +123,17 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
           }
         }}
       />
-      <ContextLengthModal
+      <NewRemoteEmbeddingModelModal
         isOpen={isConextLengthModalOpen}
         onClose={() => {
           setIsContextLengthModalOpen(false);
         }}
-        modelConfigs={{}}
+        handleUserHasChangedModel={() => {
+          updateEmbeddingModels();
+          if (handleUserHasChangedModel) {
+            handleUserHasChangedModel();
+          }
+        }}
       />
       {userTriedToSubmit && !selectedModel && (
         <p className="text-red-500 text-sm mt-1">{currentError}</p>
