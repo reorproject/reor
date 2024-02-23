@@ -38,7 +38,7 @@ const App: React.FC<AppProps> = () => {
 
   useEffect(() => {
     const initialDirectory = window.electronStore.getUserDirectory();
-    const defaultEmbedFunc = window.electronStore.getDefaultEmbedFuncRepo();
+    const defaultEmbedFunc = window.electronStore.getDefaultEmbeddingModel();
     if (initialDirectory && defaultEmbedFunc) {
       setUserHasConfiguredSettingsForIndexing(true);
       window.database.indexFilesInDirectory();

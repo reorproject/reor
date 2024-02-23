@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@material-tailwind/react";
-import Modal from "../Generic/Modal";
-import { OpenAIAIModelConfig } from "electron/main/Store/storeConfig";
+import Modal from "../../Generic/Modal";
+import { OpenAILLMConfig } from "electron/main/Store/storeConfig";
 
 interface OpenAISetupModalProps {
   isOpen: boolean;
@@ -66,7 +66,7 @@ const OpenAISetupModal: React.FC<OpenAISetupModalProps> = ({
   );
 };
 
-const remoteAIModels: { [modelName: string]: OpenAIAIModelConfig } = {
+const remoteAIModels: { [modelName: string]: OpenAILLMConfig } = {
   "gpt-3.5-turbo-0125": {
     contextLength: 16385,
     engine: "openai",

@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
 import LLMSettings from "./LLMSettings";
-import EmbeddingModelManager from "./EmbeddingSettings";
 import DirectorySelector from "./DirectorySelector";
+import InitialEmbeddingModelSettings from "./InitialEmbeddingSettings";
 
 interface OldInitialSettingsProps {
   readyForIndexing: () => void;
@@ -12,11 +12,12 @@ interface OldInitialSettingsProps {
 const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
   readyForIndexing,
 }) => {
-  const [errorMsg, setErrorMsg] = useState("");
+  const [directoryErrorMsg, setDirectoryErrorMsg] = useState("");
+  const [embeddingErrorMsg, setEmbeddingErrorMsg] = useState("");
   const [showError, setShowError] = useState(false);
 
   const handleNext = () => {
-    if (errorMsg === "") {
+    if (!directoryErrorMsg && !embeddingErrorMsg) {
       readyForIndexing();
     } else {
       setShowError(true);
@@ -41,16 +42,20 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
           <p className="mt-2 text-gray-100">
             Choose your vault directory here:
           </p>
-          <DirectorySelector setErrorMsg={setErrorMsg} />
+          <DirectorySelector setErrorMsg={setDirectoryErrorMsg} />
+          {showError && directoryErrorMsg && (
+            <p className="text-xs text-red-500">{directoryErrorMsg}</p>
+          )}
           <p className="mt-2 text-xs text-gray-100 ">
             Your vault directory doesn&apos;t need to be empty. Only markdown
             files will be indexed.
           </p>
 
           <div className="mt-8">
-            <EmbeddingModelManager>
-              <h3 className="font-semibold mb-2 text-white">Embedding Model</h3>
-            </EmbeddingModelManager>
+            <InitialEmbeddingModelSettings setErrorMsg={setEmbeddingErrorMsg} />
+            {showError && embeddingErrorMsg && (
+              <p className="text-xs text-red-500">{embeddingErrorMsg}</p>
+            )}
           </div>
           <LLMSettings isInitialSetup={true} />
           <Button
@@ -60,9 +65,6 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
           >
             Next
           </Button>
-          {showError && errorMsg && (
-            <p className="text-xs text-red-500">{errorMsg}</p>
-          )}
         </div>
       </div>
     </Modal>

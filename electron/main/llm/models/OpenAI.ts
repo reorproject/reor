@@ -6,7 +6,7 @@ import {
   OpenAIMessage,
 } from "../Types";
 import { Tiktoken, TiktokenModel, encodingForModel } from "js-tiktoken";
-import { OpenAIAIModelConfig } from "electron/main/Store/storeConfig";
+import { OpenAILLMConfig } from "electron/main/Store/storeConfig";
 
 export class OpenAIModelSessionService implements IChatSessionService {
   private openai: OpenAI;
@@ -14,9 +14,9 @@ export class OpenAIModelSessionService implements IChatSessionService {
   private messageHistory: ChatbotMessage[];
   private abortStreaming: boolean = false;
   private tokenEncoding: Tiktoken;
-  private modelConfig: OpenAIAIModelConfig;
+  private modelConfig: OpenAILLMConfig;
 
-  constructor(modelName: string, modelConfig: OpenAIAIModelConfig) {
+  constructor(modelName: string, modelConfig: OpenAILLMConfig) {
     this.openai = new OpenAI({
       apiKey: modelConfig.apiKey,
       baseURL: modelConfig.apiURL,

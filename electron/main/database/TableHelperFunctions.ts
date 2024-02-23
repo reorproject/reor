@@ -15,6 +15,7 @@ export const RepopulateTableWithMissingItems = async (
   onProgress?: (progress: number) => void
 ) => {
   let filesInfoTree;
+  console.log("getting files info list");
   try {
     filesInfoTree = GetFilesInfoList(directoryPath);
   } catch (error) {

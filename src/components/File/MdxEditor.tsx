@@ -61,8 +61,6 @@ export const MdxEditor: React.FC<MdxEditor> = ({
 
   const saveFile = async () => {
     if (content !== lastSavedContentRef.current) {
-      // Check for changes since last save
-      console.log("calling save file:");
       await window.files.writeFile(filePath, content);
       lastSavedContentRef.current = content; // Update the ref to the latest saved content
     }

@@ -1,8 +1,8 @@
-import { AIModelConfig } from "../Store/storeConfig";
+import { LLMModelConfig } from "../Store/storeConfig";
 
 export function validateAIModelConfig(
   modelName: string,
-  config: AIModelConfig
+  config: LLMModelConfig
 ): string | null {
   // Validate localPath: ensure it's not empty
   if (!modelName.trim()) {

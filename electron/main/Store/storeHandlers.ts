@@ -1,5 +1,12 @@
 import { ipcMain } from "electron";
-import { AIModelConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
+import {
+  EmbeddingModelConfig,
+  EmbeddingModelWithLocalPath,
+  EmbeddingModelWithRepo,
+  LLMModelConfig,
+  StoreKeys,
+  StoreSchema,
+} from "../Store/storeConfig";
 import Store from "electron-store";
 import { validateAIModelConfig } from "../llm/llmConfig";
 import {
@@ -8,6 +15,7 @@ import {
   setVaultDirectoryForContents,
   activeWindows,
 } from "../windowManager";
+import path from "path";
 
 export const registerStoreHandlers = (
   store: Store<StoreSchema>
@@ -31,7 +39,6 @@ export const registerStoreHandlers = (
 
   ipcMain.on("get-user-directory", (event) => {
     let path = getVaultDirectoryForContents(activeWindows, event.sender);
-    console.log("gotten user directory", path);
     if (!path) {
       path = setupDirectoryFromPreviousSessionIfUnused(
         activeWindows,
@@ -41,8 +48,60 @@ export const registerStoreHandlers = (
     }
     event.returnValue = path;
   });
-  ipcMain.on("set-default-embed-func-repo", (event, repoName: string) => {
-    store.set(StoreKeys.DefaultEmbedFuncRepo, repoName);
+  ipcMain.on("set-default-embedding-model", (event, repoName: string) => {
+    store.set(StoreKeys.DefaultEmbeddingModelAlias, repoName);
+  });
+
+  ipcMain.on(
+    "add-new-local-embedding-model",
+    (event, model: EmbeddingModelWithLocalPath) => {
+      const currentModels = store.get(StoreKeys.EmbeddingModels) || {};
+      const modelAlias = path.basename(model.localPath);
+      store.set(StoreKeys.EmbeddingModels, {
+        ...currentModels,
+        [modelAlias]: model,
+      });
+      store.set(StoreKeys.DefaultEmbeddingModelAlias, modelAlias);
+    }
+  );
+
+  ipcMain.on(
+    "add-new-repo-embedding-model",
+    (event, model: EmbeddingModelWithRepo) => {
+      const currentModels = store.get(StoreKeys.EmbeddingModels) || {};
+      store.set(StoreKeys.EmbeddingModels, {
+        ...currentModels,
+        [model.repoName]: model,
+      });
+      store.set(StoreKeys.DefaultEmbeddingModelAlias, model.repoName);
+    }
+  );
+
+  ipcMain.on("get-embedding-models", (event) => {
+    event.returnValue = store.get(StoreKeys.EmbeddingModels);
+  });
+
+  ipcMain.on(
+    "update-embedding-model",
+    (
+      event,
+      modelName: string,
+      updatedModel: EmbeddingModelWithLocalPath | EmbeddingModelWithRepo
+    ) => {
+      const currentModels = store.get(StoreKeys.EmbeddingModels) || {};
+      store.set(StoreKeys.EmbeddingModels, {
+        ...currentModels,
+        [modelName]: updatedModel,
+      });
+    }
+  );
+
+  ipcMain.on("remove-embedding-model", (event, modelName: string) => {
+    const currentModels = store.get(StoreKeys.EmbeddingModels) || {};
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { [modelName]: _, ...updatedModels } = currentModels;
+
+    store.set(StoreKeys.EmbeddingModels, updatedModels);
   });
 
   ipcMain.on("set-no-of-rag-examples", (event, noOfExamples: number) => {
@@ -53,52 +112,50 @@ export const registerStoreHandlers = (
     event.returnValue = store.get(StoreKeys.MaxRAGExamples);
   });
 
-  ipcMain.on("set-default-ai-model", (event, modelName: string) => {
-    console.log("setting default ai model", modelName);
-    store.set(StoreKeys.DefaultAIModel, modelName);
+  ipcMain.on("set-default-llm", (event, modelName: string) => {
+    store.set(StoreKeys.DefaultLLM, modelName);
   });
 
-  ipcMain.on("get-default-ai-model", (event) => {
-    event.returnValue = store.get(StoreKeys.DefaultAIModel);
+  ipcMain.on("get-default-llm", (event) => {
+    event.returnValue = store.get(StoreKeys.DefaultLLM);
   });
 
-  ipcMain.handle("get-ai-model-configs", () => {
-    const aiModelConfigs = store.get(StoreKeys.AIModels);
+  ipcMain.handle("get-llm-configs", () => {
+    const aiModelConfigs = store.get(StoreKeys.LLMs);
     return aiModelConfigs || {};
   });
 
-  ipcMain.handle("update-ai-model-config", (event, modelName, modelConfig) => {
-    console.log("updating ai model config", modelName, modelConfig);
-    const aiModelConfigs = store.get(StoreKeys.AIModels);
+  ipcMain.handle("update-llm-config", (event, modelName, modelConfig) => {
+    const aiModelConfigs = store.get(StoreKeys.LLMs);
     if (aiModelConfigs) {
       const updatedModelConfigs = {
         ...aiModelConfigs,
         [modelName]: modelConfig,
       };
-      store.set(StoreKeys.AIModels, updatedModelConfigs);
+      store.set(StoreKeys.LLMs, updatedModelConfigs);
     }
   });
 
   ipcMain.handle(
-    "setup-new-model",
-    async (event, modelName: string, modelConfig: AIModelConfig) => {
+    "setup-new-llm",
+    async (event, modelName: string, modelConfig: LLMModelConfig) => {
       console.log("setting up new local model", modelConfig);
-      return await addNewModelSchemaToStore(store, modelName, modelConfig);
+      return await addNewLLMSchemaToStore(store, modelName, modelConfig);
     }
   );
 
-  ipcMain.on("get-default-embed-func-repo", (event) => {
-    event.returnValue = store.get(StoreKeys.DefaultEmbedFuncRepo);
+  ipcMain.on("get-default-embedding-model", (event) => {
+    event.returnValue = store.get(StoreKeys.DefaultEmbeddingModelAlias);
   });
 };
 
-export async function addNewModelSchemaToStore(
+export async function addNewLLMSchemaToStore(
   store: Store<StoreSchema>,
   modelName: string,
-  modelConfig: AIModelConfig
+  modelConfig: LLMModelConfig
 ): Promise<string> {
   const existingModels =
-    (store.get(StoreKeys.AIModels) as Record<string, AIModelConfig>) || {};
+    (store.get(StoreKeys.LLMs) as Record<string, LLMModelConfig>) || {};
 
   if (!existingModels[modelName]) {
     const isNotValid = validateAIModelConfig(modelName, modelConfig);
@@ -111,8 +168,8 @@ export async function addNewModelSchemaToStore(
       [modelName]: modelConfig,
     };
 
-    store.set(StoreKeys.AIModels, updatedModels);
-    store.set(StoreKeys.DefaultAIModel, modelName);
+    store.set(StoreKeys.LLMs, updatedModels);
+    store.set(StoreKeys.DefaultLLM, modelName);
     return "Model set up successfully";
   } else {
     return "Model already exists";
@@ -121,6 +178,64 @@ export async function addNewModelSchemaToStore(
 
 export function setupDefaultStoreValues(store: Store<StoreSchema>) {
   if (!store.get(StoreKeys.MaxRAGExamples)) {
-    store.set(StoreKeys.MaxRAGExamples, 10);
+    store.set(StoreKeys.MaxRAGExamples, 15);
   }
+  setupDefaultEmbeddingModels(store);
 }
+
+export function getDefaultEmbeddingModelConfig(
+  store: Store<StoreSchema>
+): EmbeddingModelConfig {
+  const defaultEmbeddingModelAlias = store.get(
+    StoreKeys.DefaultEmbeddingModelAlias
+  ) as string | undefined;
+
+  // Check if the default model alias is defined and not empty
+  if (!defaultEmbeddingModelAlias) {
+    throw new Error("No default embedding model is specified");
+  }
+
+  const embeddingModels = store.get(StoreKeys.EmbeddingModels) || {};
+
+  // Check if the model with the default alias exists
+  const model = embeddingModels[defaultEmbeddingModelAlias];
+  if (!model) {
+    throw new Error(
+      `No embedding model found for alias '${defaultEmbeddingModelAlias}'`
+    );
+  }
+
+  return model;
+}
+
+const setupDefaultEmbeddingModels = (store: Store<StoreSchema>) => {
+  const embeddingModels = store.get(StoreKeys.EmbeddingModels);
+
+  if (!embeddingModels) {
+    store.set(StoreKeys.EmbeddingModels, modelRepos);
+  }
+
+  const defaultModel = store.get(StoreKeys.DefaultEmbeddingModelAlias);
+  if (!defaultModel) {
+    const embeddingModels = store.get(StoreKeys.EmbeddingModels) || {};
+    if (Object.keys(embeddingModels).length === 0) {
+      throw new Error("No embedding models found");
+    }
+    store.set(
+      StoreKeys.DefaultEmbeddingModelAlias,
+      Object.keys(embeddingModels)[0]
+    );
+  }
+};
+
+const modelRepos = {
+  "Xenova/bge-base-en-v1.5": {
+    type: "repo",
+    repoName: "Xenova/bge-base-en-v1.5",
+  },
+  "Xenova/UAE-Large-V1": { type: "repo", repoName: "Xenova/UAE-Large-V1" },
+  "Xenova/bge-small-en-v1.5": {
+    type: "repo",
+    repoName: "Xenova/bge-small-en-v1.5",
+  },
+};

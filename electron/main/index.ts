@@ -23,7 +23,10 @@ import {
 import { registerLLMSessionHandlers } from "./llm/llmSessionHandlers";
 // import { FileInfoNode } from "./Files/Types";
 import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
-import { registerStoreHandlers } from "./Store/storeHandlers";
+import {
+  getDefaultEmbeddingModelConfig,
+  registerStoreHandlers,
+} from "./Store/storeHandlers";
 import { registerFileHandlers } from "./Files/registerFilesHandler";
 import { RepopulateTableWithMissingItems } from "./database/TableHelperFunctions";
 import {
@@ -33,6 +36,7 @@ import {
   getNextWindowPosition,
   getWindowSize,
 } from "./windowManager";
+import { errorToString } from "./Generic/error";
 
 const store = new Store<StoreSchema>();
 // store.clear(); // clear store for testing
@@ -174,22 +178,19 @@ ipcMain.handle("open-file-dialog", async (event, extensions) => {
 
 ipcMain.on("index-files-in-directory", async (event) => {
   try {
+    console.log("Indexing files in directory");
     const windowInfo = getWindowInfoForContents(activeWindows, event.sender);
     if (!windowInfo) {
       throw new Error("No window info found");
     }
-    const embedFuncRepoName = store.get(
-      StoreKeys.DefaultEmbedFuncRepo
-    ) as string;
-    if (!embedFuncRepoName) {
-      throw new Error("No default embed func repo set");
-    }
+    const defaultEmbeddingModelConfig = getDefaultEmbeddingModelConfig(store);
     const dbPath = path.join(app.getPath("userData"), "vectordb");
     dbConnection = await lancedb.connect(dbPath);
+
     await windowInfo.dbTableClient.initialize(
       dbConnection,
       windowInfo.vaultDirectoryForWindow,
-      embedFuncRepoName
+      defaultEmbeddingModelConfig
     );
     await RepopulateTableWithMissingItems(
       windowInfo.dbTableClient,
@@ -206,7 +207,13 @@ ipcMain.on("index-files-in-directory", async (event) => {
     }
     event.sender.send("indexing-progress", 1);
   } catch (error) {
-    const errorStr = `Indexing error: ${error}. Please try restarting or open a Github issue.`;
+    let errorStr = "";
+
+    if (errorToString(error).includes("Embedding function error")) {
+      errorStr = `${error}. Please try downloading an embedding model from Hugging Face and attaching it in settings. More information can be found in settings.`;
+    } else {
+      errorStr = `${error}. Please try restarting or open a Github issue.`;
+    }
     event.sender.send("indexing-error", errorStr);
     console.error("Error during file indexing:", error);
   }
