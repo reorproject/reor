@@ -48,18 +48,6 @@ export async function createEmbeddingFunction(
         `Pipeline initialization failed for repo ${errorToString(error)}`
       );
     }
-
-    // try {
-    //   tokenizer = await AutoTokenizer.from_pretrained(repoName, {
-    //     // cache_dir: cacheDir,
-    //   });
-    // } catch (error) {
-    //   throw new Error(
-    //     `Tokenizer initialization failed for repo '${repoName}': ${errorToString(
-    //       error
-    //     )}`
-    //   );
-    // }
   } catch (error) {
     console.error(`Resource initialization failed: ${errorToString(error)}`);
     throw new Error(`Resource initialization failed: ${errorToString(error)}`);

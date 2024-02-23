@@ -36,6 +36,7 @@ import {
   getNextWindowPosition,
   getWindowSize,
 } from "./windowManager";
+import { errorToString } from "./Generic/error";
 
 const store = new Store<StoreSchema>();
 // store.clear(); // clear store for testing
@@ -206,7 +207,13 @@ ipcMain.on("index-files-in-directory", async (event) => {
     }
     event.sender.send("indexing-progress", 1);
   } catch (error) {
-    const errorStr = `Indexing error: ${error}. Please try restarting or open a Github issue.`;
+    let errorStr = "";
+
+    if (errorToString(error).includes("Embedding function error")) {
+      errorStr = `${error}. Please try downloading an embedding model from Hugging Face and attaching it in settings. More information can be found in settings.`;
+    } else {
+      errorStr = `${error}. Please try restarting or open a Github issue.`;
+    }
     event.sender.send("indexing-error", errorStr);
     console.error("Error during file indexing:", error);
   }
