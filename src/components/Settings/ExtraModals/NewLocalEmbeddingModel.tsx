@@ -62,7 +62,12 @@ const NewLocalEmbeddingModelModal: React.FC<
             label="This page on Hugging Face"
           />{" "}
           has most available models. It must be a &quot;Xenova&quot; ONNX
-          embedding model.
+          embedding model. Check out{" "}
+          <ExternalLink
+            url="https://www.reorproject.org/docs/documentation/embedding"
+            label="this guide"
+          />{" "}
+          for more info.{" "}
         </p>
         {newModelPath && (
           <p className="mt-2 text-xs text-gray-100">

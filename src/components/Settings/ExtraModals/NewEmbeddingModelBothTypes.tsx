@@ -68,9 +68,9 @@ const NewEmbeddingModelModalBothTypes: React.FC<
         <h2 className="text-white  font-semibold mb-0">
           Attach a custom embedding model
         </h2>
-        <p className="text-white text-sm mb-2 mt-3">
-          You can either download a ONNX embedding model and attach it or
-          provide a Huggingface repo name:
+        <p className="text-white text-sm mb-2 mt-2">
+          You can either attach a local embedding model or provide a Hugging
+          Face repo name to be downloaded:
         </p>
         <div className="flex">
           <Button
@@ -96,7 +96,12 @@ const NewEmbeddingModelModalBothTypes: React.FC<
             label="This page on Hugging Face"
           />{" "}
           has most available models. It must be a &quot;Xenova&quot; ONNX
-          embedding model.
+          embedding model. Check out{" "}
+          <ExternalLink
+            url="https://www.reorproject.org/docs/documentation/embedding"
+            label="this guide"
+          />{" "}
+          for more info.{" "}
         </p>
 
         <Modal
@@ -106,28 +111,28 @@ const NewEmbeddingModelModalBothTypes: React.FC<
           }}
         >
           <div className="w-[300px] ml-2 mr-2 mb-2 pl-3 pt-1">
-            <h3 className="font-semibold mb-2 text-white">
-              Hugging Face Setup
+            <h3 className="font-semibold mb-3 text-white">
+              Download by Repo name
             </h3>
-            <p className="text-gray-100 mb-3 mt-2 text-sm">
-              This will download the embedding model from Hugging Face:
-            </p>
+            {/* <p className="text-gray-100 mb-3 mt-2 text-sm">
+              This will download the embedding model from Hugging Face.
+            </p> */}
             <input
               type="text"
-              className="block w-full px-3 py-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
+              className="block w-full px-3 py-2 mt-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
               value={huggingfaceRepo}
               onChange={(e) => setHuggingfaceRepo(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="Embedding Model Repo"
+              placeholder="Xenova/roberta-base-squad2"
             />
-            <p className="text-gray-100 text-xs mb-2 mt-2 italic">
+            {/* <p className="text-gray-100 text-xs mb-2 mt-2 italic">
               <ExternalLink
                 url="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=trending&search=xenova"
                 label="This page on Hugging Face"
               />{" "}
               has most available models. It must be a &quot;Xenova&quot; ONNX
               embedding model.
-            </p>
+            </p> */}
             <Button
               className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
               onClick={() => {
@@ -135,7 +140,7 @@ const NewEmbeddingModelModalBothTypes: React.FC<
               }}
               placeholder=""
             >
-              Load
+              Download
             </Button>
           </div>
         </Modal>
