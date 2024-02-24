@@ -51,6 +51,7 @@ export async function createEmbeddingFunction(
       tokenizer = pipe.tokenizer;
       // pipe.tokenizer
     } catch (error) {
+      // here we could run a catch and try manually downloading the model...
       throw new Error(
         `Pipeline initialization failed for repo ${errorToString(error)}`
       );
