@@ -20,18 +20,25 @@ export async function createEmbeddingFunction(
   let tokenizer: PreTrainedTokenizer;
   let contextLength: number;
   let repoName = "";
-
+  let functionName = "";
   try {
     const { pipeline, env } = await import("@xenova/transformers");
     env.cacheDir = path.join(app.getPath("userData"), "models", "embeddings"); // set for all. Just to deal with library and remote inconsistencies
     console.log("config is: ", embeddingModelConfig);
+
     if (embeddingModelConfig.type === "local") {
-      env.localModelPath = "";
+      const pathParts = splitDirectoryPathIntoBaseAndRepo(
+        embeddingModelConfig.localPath
+      );
+
+      env.localModelPath = pathParts.localModelPath;
+      repoName = pathParts.repoName;
       env.allowRemoteModels = false;
-      repoName = embeddingModelConfig.localPath;
+      functionName = embeddingModelConfig.localPath;
     } else if (embeddingModelConfig.type === "repo") {
       repoName = embeddingModelConfig.repoName;
       env.allowRemoteModels = true;
+      functionName = embeddingModelConfig.repoName;
     }
     try {
       pipe = (await pipeline(
@@ -54,7 +61,7 @@ export async function createEmbeddingFunction(
   }
 
   return {
-    name: repoName,
+    name: functionName,
     contextLength: contextLength,
     sourceColumn,
     embed: async (batch: (string | number[])[]): Promise<number[][]> => {
@@ -115,4 +122,27 @@ export async function createEmbeddingFunction(
       }
     },
   };
+}
+
+function splitDirectoryPathIntoBaseAndRepo(fullPath: string) {
+  const normalizedPath = path.normalize(fullPath);
+
+  const pathWithSeparator = normalizedPath.endsWith(path.sep)
+    ? normalizedPath
+    : `${normalizedPath}${path.sep}`;
+
+  if (
+    path.dirname(pathWithSeparator.slice(0, -1)) ===
+    pathWithSeparator.slice(0, -1)
+  ) {
+    return {
+      localModelPath: "", // No directory path before the root
+      repoName: path.basename(pathWithSeparator.slice(0, -1)), // Root directory name
+    };
+  }
+
+  const localModelPath = path.dirname(pathWithSeparator.slice(0, -1));
+  const repoName = path.basename(pathWithSeparator.slice(0, -1));
+
+  return { localModelPath, repoName };
 }
