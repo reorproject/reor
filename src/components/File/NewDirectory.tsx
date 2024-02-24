@@ -3,6 +3,7 @@ import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
 import { errorToString } from "@/functions/error";
 import { toast } from "react-toastify";
+import { getInvalidCharacterInFileName } from "@/functions/strings";
 
 interface NewDirectoryComponentProps {
   isOpen: boolean;
@@ -16,23 +17,17 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
   onDirectoryCreate,
 }) => {
   const [directoryName, setDirectoryName] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>("");
-
-  const validNamePattern = /^[a-zA-Z0-9_\-/\s]+$/;
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
-    if (newName === "") {
-      setDirectoryName(newName);
-      setErrorMessage("");
-    } else if (validNamePattern.test(newName) && !newName.includes("../")) {
-      setDirectoryName(newName);
-      setErrorMessage("");
+    setDirectoryName(newName);
+
+    const invalidCharacter = getInvalidCharacterInFileName(newName);
+    if (invalidCharacter) {
+      setErrorMessage(`The character [${invalidCharacter}] cannot be included in directory name.`);
     } else {
-      setDirectoryName(newName);
-      setErrorMessage(
-        "Directory name can only contain letters, numbers, underscores, hyphens, and slashes."
-      );
+      setErrorMessage(null);
     }
   };
 
