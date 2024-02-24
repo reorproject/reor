@@ -92,7 +92,7 @@ const NewEmbeddingModelModalBothTypes: React.FC<
         </div>
         <p className="text-white text-xs mb-2 mt-2 italic">
           <ExternalLink
-            url="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=trending&search=xenova"
+            url="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=downloads&search=xenova"
             label="This page on Hugging Face"
           />{" "}
           has most available models. It must be a &quot;Xenova&quot; ONNX
@@ -127,7 +127,7 @@ const NewEmbeddingModelModalBothTypes: React.FC<
             />
             {/* <p className="text-gray-100 text-xs mb-2 mt-2 italic">
               <ExternalLink
-                url="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=trending&search=xenova"
+                url="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=downloads&search=xenova"
                 label="This page on Hugging Face"
               />{" "}
               has most available models. It must be a &quot;Xenova&quot; ONNX

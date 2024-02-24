@@ -45,12 +45,12 @@ const NewLocalEmbeddingModelModal: React.FC<
         <h2 className="text-white  font-semibold mb-0">
           New Local Embedding Model
         </h2>
-        <p className="text-white text-sm mb-2 mt-1">
-          Download a ONNX embedding model and select it below:
+        <p className="text-white text-sm mb-2 mt-2">
+          Download a ONNX embedding model and select its directory below:
         </p>
 
         <Button
-          className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1"
+          className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1 mb-1"
           onClick={handleModelDirectorySelection}
           placeholder=""
         >
@@ -58,7 +58,7 @@ const NewLocalEmbeddingModelModal: React.FC<
         </Button>
         <p className="text-white text-xs mb-2 mt-2 italic">
           <ExternalLink
-            url="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=trending&search=xenova"
+            url="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=downloads&search=xenova"
             label="This page on Hugging Face"
           />{" "}
           has most available models. It must be a &quot;Xenova&quot; ONNX
