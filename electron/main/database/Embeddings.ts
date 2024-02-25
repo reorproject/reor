@@ -3,7 +3,11 @@ import { Pipeline, PreTrainedTokenizer } from "@xenova/transformers";
 import path from "path";
 import { app } from "electron";
 import { errorToString } from "../Generic/error";
-import { EmbeddingModelConfig } from "../Store/storeConfig";
+import {
+  EmbeddingModelConfig,
+  EmbeddingModelWithLocalPath,
+  EmbeddingModelWithRepo,
+} from "../Store/storeConfig";
 import { splitDirectoryPathIntoBaseAndRepo } from "../Files/Filesystem";
 
 export interface EnhancedEmbeddingFunction<T>
@@ -17,9 +21,20 @@ export async function createEmbeddingFunction(
   embeddingModelConfig: EmbeddingModelConfig,
   sourceColumn: string
 ): Promise<EnhancedEmbeddingFunction<string | number[]>> {
+  if (embeddingModelConfig.type === "local") {
+    return createEmbeddingFunctionForLocalModel(
+      embeddingModelConfig,
+      sourceColumn
+    );
+  }
+  return createEmbeddingFunctionForRepo(embeddingModelConfig, sourceColumn);
+}
+
+export async function createEmbeddingFunctionForLocalModel(
+  embeddingModelConfig: EmbeddingModelWithLocalPath,
+  sourceColumn: string
+): Promise<EnhancedEmbeddingFunction<string | number[]>> {
   let pipe: Pipeline;
-  let tokenizer: PreTrainedTokenizer;
-  let contextLength: number;
   let repoName = "";
   let functionName = "";
   try {
@@ -27,30 +42,21 @@ export async function createEmbeddingFunction(
     env.cacheDir = path.join(app.getPath("userData"), "models", "embeddings"); // set for all. Just to deal with library and remote inconsistencies
     console.log("config is: ", embeddingModelConfig);
 
-    if (embeddingModelConfig.type === "local") {
-      const pathParts = splitDirectoryPathIntoBaseAndRepo(
-        embeddingModelConfig.localPath
-      );
+    const pathParts = splitDirectoryPathIntoBaseAndRepo(
+      embeddingModelConfig.localPath
+    );
 
-      env.localModelPath = pathParts.localModelPath;
-      repoName = pathParts.repoName;
-      env.allowRemoteModels = false;
-      functionName = embeddingModelConfig.localPath;
-    } else if (embeddingModelConfig.type === "repo") {
-      repoName = embeddingModelConfig.repoName;
-      env.allowRemoteModels = true;
-      functionName = embeddingModelConfig.repoName;
-    }
+    env.localModelPath = pathParts.localModelPath;
+    repoName = pathParts.repoName;
+    env.allowRemoteModels = false;
+    functionName = embeddingModelConfig.localPath;
+
     try {
       pipe = (await pipeline(
         "feature-extraction",
         repoName
         // {cache_dir: cacheDir,
       )) as Pipeline;
-      contextLength = pipe.model.config.hidden_size;
-      // console.log("pipe tokenizer is: ", pipe.tokenizer);
-      tokenizer = pipe.tokenizer;
-      // pipe.tokenizer
     } catch (error) {
       // here we could run a catch and try manually downloading the model...
       throw new Error(
@@ -61,12 +67,50 @@ export async function createEmbeddingFunction(
     console.error(`Resource initialization failed: ${errorToString(error)}`);
     throw new Error(`Resource initialization failed: ${errorToString(error)}`);
   }
-  const tokenize = setupTokenizeFunction(tokenizer);
+  const tokenize = setupTokenizeFunction(pipe.tokenizer);
   const embed = await setupEmbedFunction(pipe);
 
   return {
     name: functionName,
-    contextLength: contextLength,
+    contextLength: pipe.model.config.hidden_size,
+    sourceColumn,
+    embed,
+    tokenize,
+  };
+}
+
+export async function createEmbeddingFunctionForRepo(
+  embeddingModelConfig: EmbeddingModelWithRepo,
+  sourceColumn: string
+): Promise<EnhancedEmbeddingFunction<string | number[]>> {
+  let pipe: Pipeline;
+  let repoName = "";
+  let functionName = "";
+  try {
+    const { pipeline, env } = await import("@xenova/transformers");
+    env.cacheDir = path.join(app.getPath("userData"), "models", "embeddings"); // set for all. Just to deal with library and remote inconsistencies
+    console.log("config is: ", embeddingModelConfig);
+
+    repoName = embeddingModelConfig.repoName;
+    env.allowRemoteModels = true;
+    functionName = embeddingModelConfig.repoName;
+    try {
+      pipe = (await pipeline("feature-extraction", repoName)) as Pipeline;
+    } catch (error) {
+      // here we could run a catch and try manually downloading the model...
+      throw new Error(
+        `Pipeline initialization failed for repo ${errorToString(error)}`
+      );
+    }
+  } catch (error) {
+    throw new Error(`Resource initialization failed: ${errorToString(error)}`);
+  }
+  const tokenize = setupTokenizeFunction(pipe.tokenizer);
+  const embed = await setupEmbedFunction(pipe);
+
+  return {
+    name: functionName,
+    contextLength: pipe.model.config.hidden_size,
     sourceColumn,
     embed,
     tokenize,
