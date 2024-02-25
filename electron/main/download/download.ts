@@ -5,13 +5,12 @@ import * as path from "path";
 
 export const DownloadModelFilesFromHFRepo = async (
   repo: string,
-  // path: string,
-  saveDirectory: string
+  saveDirectory: string,
+  quantized = true
 ) => {
   // List the files:
   const fileList = await listFiles({
     repo: repo,
-    // path: path,
     recursive: true,
     fetch: customFetch,
   });
@@ -19,10 +18,19 @@ export const DownloadModelFilesFromHFRepo = async (
   const files = [];
   for await (const file of fileList) {
     if (file.type === "file") {
-      files.push(file);
+      if (file.path.endsWith("onnx")) {
+        const isQuantizedFile = file.path.includes("quantized");
+        if (quantized === isQuantizedFile) {
+          files.push(file);
+        }
+      } else {
+        files.push(file);
+      }
     }
   }
+
   console.log("files: ", files);
+
   // Create an array of promises for each file download:
   const downloadPromises = files.map((file) =>
     downloadAndSaveFile(repo, file.path, path.join(saveDirectory, repo))
