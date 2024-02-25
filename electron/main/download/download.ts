@@ -3,6 +3,35 @@ import { listFiles, downloadFile } from "@huggingface/hub";
 import fs from "fs";
 import * as path from "path";
 
+export const DownloadModelFilesFromHFRepo = async (
+  repo: string,
+  // path: string,
+  saveDirectory: string
+) => {
+  // List the files:
+  const fileList = await listFiles({
+    repo: repo,
+    // path: path,
+    recursive: true,
+    fetch: customFetch,
+  });
+
+  const files = [];
+  for await (const file of fileList) {
+    if (file.type === "file") {
+      files.push(file);
+    }
+  }
+  console.log("files: ", files);
+  // Create an array of promises for each file download:
+  const downloadPromises = files.map((file) =>
+    downloadAndSaveFile(repo, file.path, path.join(saveDirectory, repo))
+  );
+
+  // Execute all download promises in parallel:
+  await Promise.all(downloadPromises);
+};
+
 async function downloadAndSaveFile(
   repo: string,
   HFFilePath: string,
@@ -33,38 +62,10 @@ async function downloadAndSaveFile(
   }
   // Save the Buffer to the full path
   fs.writeFileSync(fullPath, buffer);
+  console.log(`Saved file to ${fullPath}`);
 }
 
-export const DownloadModelFilesFromHFRepo = async (
-  repo: string,
-  // path: string,
-  saveDirectory: string
-) => {
-  // List the files:
-  const fileList = await listFiles({
-    repo: repo,
-    // path: path,
-    recursive: true,
-    fetch: customFetch,
-  });
-
-  const files = [];
-  for await (const file of fileList) {
-    if (file.type === "file") {
-      files.push(file);
-    }
-  }
-
-  // Create an array of promises for each file download:
-  const downloadPromises = files.map((file) =>
-    downloadAndSaveFile(repo, file.path, path.join(saveDirectory, repo))
-  );
-
-  // Execute all download promises in parallel:
-  await Promise.all(downloadPromises);
-};
-
-const customFetch = async (
+export const customFetch = async (
   input: RequestInfo | URL,
   init?: RequestInit
 ): Promise<Response> => {
@@ -81,9 +82,8 @@ const customFetch = async (
 
     // Set headers
     if (options.headers) {
-      const headers = new Headers(options.headers);
-      headers.forEach((value, key) => {
-        request.setHeader(key, value);
+      Object.entries(options.headers).forEach(([key, value]) => {
+        request.setHeader(key, value as string);
       });
     }
 
@@ -91,29 +91,29 @@ const customFetch = async (
     if (options.body) {
       let bodyData;
       if (options.body instanceof ArrayBuffer) {
-        // Convert ArrayBuffer to Buffer
         bodyData = Buffer.from(options.body);
       } else if (
         typeof options.body === "string" ||
         Buffer.isBuffer(options.body)
       ) {
         bodyData = options.body;
+      } else if (typeof options.body === "object") {
+        bodyData = JSON.stringify(options.body);
+        request.setHeader("Content-Type", "application/json");
       } else {
-        console.warn("Unsupported body type:", typeof options.body);
         reject(new Error("Unsupported body type"));
         return;
       }
       request.write(bodyData);
     }
 
-    // Handle the response
     request.on("response", (response) => {
       const chunks: Buffer[] = [];
-      response.on("data", (chunk) => chunks.push(chunk));
+      response.on("data", (chunk) => chunks.push(chunk as Buffer));
       response.on("end", () => {
-        const body = Buffer.concat(chunks).toString();
+        const buffer = Buffer.concat(chunks);
         resolve(
-          new Response(body, {
+          new Response(buffer, {
             status: response.statusCode,
             statusText: response.statusMessage,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -123,10 +123,7 @@ const customFetch = async (
       });
     });
 
-    // Handle request errors
     request.on("error", (error) => reject(error));
-
-    // End the request
     request.end();
   });
 };
