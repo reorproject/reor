@@ -96,15 +96,10 @@ export async function createEmbeddingFunctionForRepo(
     env.allowRemoteModels = true;
     functionName = embeddingModelConfig.repoName;
     try {
-      console.log("DOWNLOADING");
-      await DownloadModelFilesFromHFRepo(repoName, env.cacheDir);
-      console.log("FINISHED DOWNLOADING");
       pipe = (await pipeline("feature-extraction", repoName)) as Pipeline;
-      console.log("PIPELINE INITIALIZED");
     } catch (error) {
-      // here we could run a catch and try manually downloading the model...And perhaps we could start to think about issues that could arise with the
-      // directory already existing or something like that...
       try {
+        await DownloadModelFilesFromHFRepo(repoName, env.cacheDir); // try to manual download to use system proxy
         pipe = (await pipeline("feature-extraction", repoName)) as Pipeline;
       } catch (error) {
         throw new Error(

@@ -1,11 +1,11 @@
 {
   "name": "reor-project",
-  "version": "0.1.49",
+  "version": "0.1.50",
   "productName": "Reor",
   "main": "dist-electron/main/index.js",
-  "description": "A private & self-organizing note-taking app.",
+  "description": "An AI note-taking app that runs models locally.",
   "author": "Sam L'Huillier",
-  "license": "GPL-3.0",
+  "license": "AGPL-3.0",
   "private": false,
   "debug": {
     "env": {
