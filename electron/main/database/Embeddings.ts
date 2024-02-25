@@ -4,6 +4,7 @@ import path from "path";
 import { app } from "electron";
 import { errorToString } from "../Generic/error";
 import { EmbeddingModelConfig } from "../Store/storeConfig";
+import { splitDirectoryPathIntoBaseAndRepo } from "../Files/Filesystem";
 
 export interface EnhancedEmbeddingFunction<T>
   extends lancedb.EmbeddingFunction<T> {
@@ -60,90 +61,71 @@ export async function createEmbeddingFunction(
     console.error(`Resource initialization failed: ${errorToString(error)}`);
     throw new Error(`Resource initialization failed: ${errorToString(error)}`);
   }
+  const tokenize = setupTokenizeFunction(tokenizer);
+  const embed = await setupEmbedFunction(pipe);
 
   return {
     name: functionName,
     contextLength: contextLength,
     sourceColumn,
-    embed: async (batch: (string | number[])[]): Promise<number[][]> => {
-      if (batch.length === 0 || batch[0].length === 0) {
-        return [];
-      }
-      if (typeof batch[0][0] === "number") {
-        return batch as number[][];
-      }
-      if (!pipe) {
-        throw new Error("Pipeline not initialized");
-      }
-      try {
-        const result: number[][] = await Promise.all(
-          batch.map(async (text) => {
-            try {
-              const res = await pipe(text, {
-                pooling: "mean",
-                normalize: true,
-              });
-              return Array.from(res.data);
-            } catch (error) {
-              throw new Error(
-                `Embedding process failed for text: ${errorToString(error)}`
-              );
-            }
-          })
-        );
-        return result;
-      } catch (error) {
-        throw new Error(
-          `Embedding batch process failed: ${errorToString(error)}`
-        );
-      }
-    },
-    tokenize: (data: (string | number[])[]): string[] => {
-      if (!tokenizer) {
-        throw new Error("Tokenizer not initialized");
-      }
-      try {
-        return data.map((text) => {
-          try {
-            const res = tokenizer(text);
-            return res;
-          } catch (error) {
-            throw new Error(
-              `Tokenization process failed for text: ${errorToString(error)}`
-            );
-          }
-        });
-      } catch (error) {
-        console.error(
-          `Tokenization batch process failed: ${errorToString(error)}`
-        );
-        throw new Error(
-          `Tokenization batch process failed: ${errorToString(error)}`
-        );
-      }
-    },
+    embed,
+    tokenize,
   };
 }
 
-function splitDirectoryPathIntoBaseAndRepo(fullPath: string) {
-  const normalizedPath = path.normalize(fullPath);
+function setupTokenizeFunction(
+  tokenizer: PreTrainedTokenizer
+): (data: (string | number[])[]) => string[] {
+  return (data: (string | number[])[]): string[] => {
+    if (!tokenizer) {
+      throw new Error("Tokenizer not initialized");
+    }
 
-  const pathWithSeparator = normalizedPath.endsWith(path.sep)
-    ? normalizedPath
-    : `${normalizedPath}${path.sep}`;
+    return data.map((text) => {
+      try {
+        const res = tokenizer(text);
+        return res;
+      } catch (error) {
+        throw new Error(
+          `Tokenization process failed for text: ${errorToString(error)}`
+        );
+      }
+    });
+  };
+}
 
-  if (
-    path.dirname(pathWithSeparator.slice(0, -1)) ===
-    pathWithSeparator.slice(0, -1)
-  ) {
-    return {
-      localModelPath: "", // No directory path before the root
-      repoName: path.basename(pathWithSeparator.slice(0, -1)), // Root directory name
-    };
-  }
+async function setupEmbedFunction(
+  pipe: Pipeline
+): Promise<(batch: (string | number[])[]) => Promise<number[][]>> {
+  return async (batch: (string | number[])[]): Promise<number[][]> => {
+    if (batch.length === 0 || batch[0].length === 0) {
+      return [];
+    }
 
-  const localModelPath = path.dirname(pathWithSeparator.slice(0, -1));
-  const repoName = path.basename(pathWithSeparator.slice(0, -1));
+    if (typeof batch[0][0] === "number") {
+      return batch as number[][];
+    }
 
-  return { localModelPath, repoName };
+    if (!pipe) {
+      throw new Error("Pipeline not initialized");
+    }
+
+    const result: number[][] = await Promise.all(
+      batch.map(async (text) => {
+        try {
+          const res = await pipe(text, {
+            pooling: "mean",
+            normalize: true,
+          });
+          return Array.from(res.data);
+        } catch (error) {
+          throw new Error(
+            `Embedding process failed for text: ${errorToString(error)}`
+          );
+        }
+      })
+    );
+
+    return result;
+  };
 }

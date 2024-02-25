@@ -250,3 +250,26 @@ export const moveFileOrDirectoryInFileSystem = async (
     return "";
   }
 };
+
+export function splitDirectoryPathIntoBaseAndRepo(fullPath: string) {
+  const normalizedPath = path.normalize(fullPath);
+
+  const pathWithSeparator = normalizedPath.endsWith(path.sep)
+    ? normalizedPath
+    : `${normalizedPath}${path.sep}`;
+
+  if (
+    path.dirname(pathWithSeparator.slice(0, -1)) ===
+    pathWithSeparator.slice(0, -1)
+  ) {
+    return {
+      localModelPath: "", // No directory path before the root
+      repoName: path.basename(pathWithSeparator.slice(0, -1)), // Root directory name
+    };
+  }
+
+  const localModelPath = path.dirname(pathWithSeparator.slice(0, -1));
+  const repoName = path.basename(pathWithSeparator.slice(0, -1));
+
+  return { localModelPath, repoName };
+}
