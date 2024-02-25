@@ -37,7 +37,6 @@ import {
   getWindowSize,
 } from "./windowManager";
 import { errorToString } from "./Generic/error";
-import { DownloadModelFilesFromHFRepo } from "./download/download";
 
 const store = new Store<StoreSchema>();
 // store.clear(); // clear store for testing
@@ -126,10 +125,6 @@ async function createWindow() {
 
 app.whenReady().then(async () => {
   createWindow();
-  // const repo = "Xenova/all-MiniLM-L6-v2";
-  // const saveDirectory = "testDir";
-
-  // await DownloadModelFilesFromHFRepo(repo, saveDirectory);
 });
 
 app.on("window-all-closed", () => {

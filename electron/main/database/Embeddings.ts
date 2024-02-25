@@ -9,6 +9,7 @@ import {
   EmbeddingModelWithRepo,
 } from "../Store/storeConfig";
 import { splitDirectoryPathIntoBaseAndRepo } from "../Files/Filesystem";
+import { DownloadModelFilesFromHFRepo } from "../download/download";
 
 export interface EnhancedEmbeddingFunction<T>
   extends lancedb.EmbeddingFunction<T> {
@@ -95,12 +96,21 @@ export async function createEmbeddingFunctionForRepo(
     env.allowRemoteModels = true;
     functionName = embeddingModelConfig.repoName;
     try {
+      console.log("DOWNLOADING");
+      await DownloadModelFilesFromHFRepo(repoName, env.cacheDir);
+      console.log("FINISHED DOWNLOADING");
       pipe = (await pipeline("feature-extraction", repoName)) as Pipeline;
+      console.log("PIPELINE INITIALIZED");
     } catch (error) {
-      // here we could run a catch and try manually downloading the model...
-      throw new Error(
-        `Pipeline initialization failed for repo ${errorToString(error)}`
-      );
+      // here we could run a catch and try manually downloading the model...And perhaps we could start to think about issues that could arise with the
+      // directory already existing or something like that...
+      try {
+        pipe = (await pipeline("feature-extraction", repoName)) as Pipeline;
+      } catch (error) {
+        throw new Error(
+          `Pipeline initialization failed for repo ${errorToString(error)}`
+        );
+      }
     }
   } catch (error) {
     throw new Error(`Resource initialization failed: ${errorToString(error)}`);
