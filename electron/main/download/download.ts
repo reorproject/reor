@@ -12,7 +12,7 @@ export const DownloadModelFilesFromHFRepo = async (
   const fileList = await listFiles({
     repo: repo,
     recursive: true,
-    fetch: customFetch,
+    fetch: customFetchUsingElectronNet,
   });
 
   const files = [];
@@ -49,7 +49,7 @@ async function downloadAndSaveFile(
   const res = await downloadFile({
     repo: repo,
     path: HFFilePath,
-    fetch: customFetch,
+    fetch: customFetchUsingElectronNet,
   });
 
   if (!res) {
@@ -73,10 +73,12 @@ async function downloadAndSaveFile(
   console.log(`Saved file to ${fullPath}`);
 }
 
-export const customFetch = async (
+export const customFetchUsingElectronNet = async (
   input: RequestInfo | URL,
   init?: RequestInit
 ): Promise<Response> => {
+  console.log("input: ", input);
+  console.log("init: ", init);
   const url = input instanceof URL ? input.href : input.toString();
   const options = init || {};
 
