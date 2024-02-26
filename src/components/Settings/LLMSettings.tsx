@@ -80,13 +80,20 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
     window.electronStore.setDefaultLLM(selectedModel);
   };
 
+  const handleDeleteModel = async (selectedModel: string) => {
+    const configs = await window.electronStore.getLLMConfigs();
+    console.log(configs);
+    setDefaultModel("");
+    window.electronStore.deleteLocalLLM(selectedModel, configs[selectedModel]);
+  };
+
   const modelOptions = Object.keys(modelConfigs).map((key) => ({
     label: key, // Assuming displayName exists in AIModelConfig
     value: key,
   }));
 
   return (
-    <div className="w-full  bg-gray-800 rounded">
+    <div className="w-full bg-gray-800 rounded">
       {isInitialSetup ? (
         <div>
           <h3 className="font-semibold mb-1 text-gray-100">LLM</h3>
@@ -142,6 +149,17 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
               </div>
             </div>
           )}
+          <h4 className="text-gray-100 mb-1">General LLM Settings:</h4>
+          <div className="flex">
+            <Button
+                className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
+                onClick={() => handleDeleteModel(defaultModel)}
+                placeholder=""
+              >
+                Remove LLM
+            </Button>
+            <div className="w-full pr-2 pl-2 mt-2 mb-3 mr-4"></div>
+          </div>
           <h4 className="text-gray-100 mb-1">Local LLM Settings:</h4>
           <div className="flex">
             <Button
@@ -205,9 +223,7 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
           setIsOpenAIModelModalOpen(false);
         }}
       />
-      {userTriedToSubmit && !defaultModel && (
-        <p className="text-red-500 text-sm mt-1">{currentError}</p>
-      )}
+      {userTriedToSubmit && !defaultModel && <p className="text-red-500 text-sm mt-1">{currentError}</p>}
     </div>
   );
 };

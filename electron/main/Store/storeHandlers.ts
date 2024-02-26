@@ -144,6 +144,16 @@ export const registerStoreHandlers = (
     }
   );
 
+  ipcMain.handle(
+    "delete-local-llm",
+    async (event, modelName: string, modelConfig: LLMModelConfig) => {
+      console.log("deleting local model", modelConfig);
+      return await deleteLLMSchemafromStore(store, modelName);
+    }
+  );
+
+
+
   ipcMain.on("get-default-embedding-model", (event) => {
     event.returnValue = store.get(StoreKeys.DefaultEmbeddingModelAlias);
   });
@@ -175,6 +185,25 @@ export async function addNewLLMSchemaToStore(
     return "Model already exists";
   }
 }
+
+export async function deleteLLMSchemafromStore(
+  store: Store<StoreSchema>,
+  modelName: string,
+): Promise<string> {
+  const existingModels =
+    (store.get(StoreKeys.LLMs) as Record<string, LLMModelConfig>) || {};
+
+  if (existingModels[modelName]) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { [modelName]: _, ...remainingModels } = existingModels;
+    store.set(StoreKeys.LLMs, remainingModels);
+    return "Model deleted successfully";
+  } else {
+    return "Model does not exist";
+  }
+}
+
+
 
 export function setupDefaultStoreValues(store: Store<StoreSchema>) {
   if (!store.get(StoreKeys.MaxRAGExamples)) {

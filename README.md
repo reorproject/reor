@@ -70,6 +70,21 @@ npm run build
 ### Contributions
 Contributions are welcome in all areas: features, ideas, bug fixes, design, etc. This is very much a community driven project. There are some open issues to choose from. For new features, please open an issue to discuss it before beginning work on a PR :)
 
+### Folder Structure
+The main components of the project are located in the following directories:
+
+- `/electron`: Contains the backend functions that manage all the filesystem as well as the Low-Level Module (LLM).
+- `/src`: Contains the frontend of the application, which is a React app.
+
+#### Backend
+The backend of the application is located in the `/electron` directory. It is divided into several subdirectories:
+
+- `/Store`: Handles the main functions for the backend in the `storeHandler.ts` file.
+- `/preload`: Acts as a middleware that exposes the backend functions to the frontend.
+
+#### Frontend
+The frontend of the application is a React app located in the `/src` folder. It communicates with the backend through the functions exposed by the `/preload` middleware inside the `/electron` folder.
+
 ## License
 GPL-3.0 license. See `LICENSE` for details.
 
