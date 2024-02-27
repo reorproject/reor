@@ -4,6 +4,7 @@ import Switch from "@mui/material/Switch";
 import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import { Button } from "@material-tailwind/react";
+import ExternalLink from "../Generic/ExternalLink";
 
 interface HardwareSettingsProps {}
 
@@ -64,9 +65,6 @@ const HardwareSettings: React.FC<HardwareSettingsProps> = () => {
   const handleSave = () => {
     // Execute the save function here
     window.electronStore.setHardwareConfig(hardware);
-
-    // Set changesPending to false after saving
-    setChangesPending(false);
   };
 
   const customSwitchStyle = (color: string) => ({
@@ -84,7 +82,10 @@ const HardwareSettings: React.FC<HardwareSettingsProps> = () => {
   return (
     <div className="w-full  bg-gray-800 rounded text-gray-100">
       <h2 className="text-2xl font-semibold mb-0">Hardware</h2>
-      <FormGroup>
+      <p className="mt-2 text-sm text-gray-100 mb-1">
+        This is the hardware that the will be used to run local LLMs:
+      </p>
+      <FormGroup className="mb-4">
         <FormControlLabel
           control={
             <Switch
@@ -93,7 +94,7 @@ const HardwareSettings: React.FC<HardwareSettingsProps> = () => {
               sx={customSwitchStyle("white")} // Teal for GPU
             />
           }
-          label="GPU"
+          label="Use GPU"
           labelPlacement="start"
           className="justify-between"
         />
@@ -122,6 +123,15 @@ const HardwareSettings: React.FC<HardwareSettingsProps> = () => {
           className="justify-between"
         />
       </FormGroup>
+      <p className="text-xs text-gray-100">
+        You don&apos;t need to worry about this unless you have a dedicated GPU.
+        Enable CUDA for NVIDIA GPUs and Vulkan for AMD. See{" "}
+        <ExternalLink
+          url="https://reorproject.org/docs/documentation/gpus"
+          label="docs"
+        />{" "}
+        for more info.
+      </p>
       {changesPending && (
         <Button
           // variant="contained"
