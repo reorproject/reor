@@ -12,8 +12,8 @@ const RagSettings: React.FC<RagSettingsProps> = ({ children }) => {
     if (defaultNoOfRAGExamples) {
       setNoOfRAGExamples(defaultNoOfRAGExamples);
     } else {
-      setNoOfRAGExamples(9);
-      window.electronStore.setNoOfRAGExamples(9);
+      setNoOfRAGExamples(15);
+      window.electronStore.setNoOfRAGExamples(15);
     }
   }, []);
 

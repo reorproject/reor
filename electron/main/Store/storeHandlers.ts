@@ -147,6 +147,14 @@ export const registerStoreHandlers = (
   ipcMain.on("get-default-embedding-model", (event) => {
     event.returnValue = store.get(StoreKeys.DefaultEmbeddingModelAlias);
   });
+
+  ipcMain.on("get-hardware-config", (event) => {
+    event.returnValue = store.get(StoreKeys.Hardware);
+  });
+
+  ipcMain.on("set-hardware-config", (event, hardwareConfig) => {
+    store.set(StoreKeys.Hardware, hardwareConfig);
+  });
 };
 
 export async function addNewLLMSchemaToStore(

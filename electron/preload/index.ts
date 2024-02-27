@@ -3,6 +3,7 @@ import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
+  HardwareConfig,
   LLMModelConfig,
 } from "electron/main/Store/storeConfig";
 import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
@@ -93,6 +94,8 @@ declare global {
       removeEmbeddingModel: (modelName: string) => void;
       getNoOfRAGExamples: () => number;
       setNoOfRAGExamples: (noOfExamples: number) => void;
+      getHardwareConfig: () => HardwareConfig;
+      setHardwareConfig: (config: HardwareConfig) => void;
     };
   }
 }
@@ -186,6 +189,12 @@ contextBridge.exposeInMainWorld("electronStore", {
   },
   setNoOfRAGExamples: (noOfExamples: number) => {
     ipcRenderer.send("set-no-of-rag-examples", noOfExamples);
+  },
+  getHardwareConfig: () => {
+    return ipcRenderer.sendSync("get-hardware-config");
+  },
+  setHardwareConfig: (config: HardwareConfig) => {
+    ipcRenderer.send("set-hardware-config", config);
   },
 });
 
