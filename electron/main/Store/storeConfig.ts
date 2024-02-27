@@ -1,4 +1,4 @@
-interface BaseLLMConfig {
+export interface BaseLLMConfig {
   contextLength: number;
   errorMsg?: string;
   engine: "openai" | "llamacpp";

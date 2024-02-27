@@ -10,7 +10,10 @@ export class LlamaCPPSessionService implements IChatSessionService {
   private abortController?: AbortController;
   private contextLength?: number;
 
-  async init(storeModelConfig: LocalLLMConfig): Promise<void> {
+  async init(
+    modelName: string,
+    storeModelConfig: LocalLLMConfig
+  ): Promise<void> {
     this.contextLength = storeModelConfig.contextLength;
     await this.loadModel(storeModelConfig.localPath);
 
