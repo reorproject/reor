@@ -83,13 +83,15 @@ async function createSession(
 
   const currentConfig = allConfigs[defaultModelName];
 
+  const hardwareConfig = store.get(StoreKeys.Hardware);
+
   if (currentConfig.type === "openai") {
     const sessionService = new OpenAIModelSessionService();
     await sessionService.init(defaultModelName, currentConfig);
     LLMSessions[sessionId] = sessionService;
   } else {
     const sessionService = new LlamaCPPSessionService();
-    await sessionService.init(defaultModelName, currentConfig);
+    await sessionService.init(defaultModelName, currentConfig, hardwareConfig);
     LLMSessions[sessionId] = sessionService;
   }
   return sessionId;
