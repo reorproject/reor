@@ -82,9 +82,10 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
 
   const handleDeleteModel = async (selectedModel: string) => {
     const configs = await window.electronStore.getLLMConfigs();
-    console.log(configs);
-    setDefaultModel("");
-    window.electronStore.deleteLocalLLM(selectedModel, configs[selectedModel]);
+    fetchModelConfigs();
+    await window.electronStore.deleteLocalLLM(selectedModel, configs[selectedModel]);
+    const configsAfter = await window.electronStore.getLLMConfigs();
+    setModelConfigs(configsAfter);
   };
 
   const modelOptions = Object.keys(modelConfigs).map((key) => ({
@@ -142,24 +143,16 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
               <h4 className="text-gray-100 mb-1">Default LLM:</h4>
               <div className="w-full mb-1">
                 <CustomSelect
+                  isLLMDropdown={true}
                   options={modelOptions}
                   value={defaultModel}
                   onChange={handleDefaultModelChange}
+                  onDelete={handleDeleteModel}
                 />
               </div>
             </div>
           )}
-          <h4 className="text-gray-100 mb-1">General LLM Settings:</h4>
-          <div className="flex">
-            <Button
-                className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
-                onClick={() => handleDeleteModel(defaultModel)}
-                placeholder=""
-              >
-                Remove LLM
-            </Button>
-            <div className="w-full pr-2 pl-2 mt-2 mb-3 mr-4"></div>
-          </div>
+
           <h4 className="text-gray-100 mb-1">Local LLM Settings:</h4>
           <div className="flex">
             <Button
@@ -177,7 +170,6 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
               Context Length Settings
             </Button>
           </div>
-
           <h4 className="text-gray-100 mb-0">Setup remote LLMs:</h4>
           <div className="flex">
             <Button

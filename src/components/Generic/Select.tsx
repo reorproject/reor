@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { FaTrash } from "react-icons/fa";
 
 type OptionType = {
   label: string;
@@ -9,6 +10,8 @@ type CustomSelectProps = {
   options: OptionType[];
   value: string;
   onChange: (value: string) => void;
+  onDelete?: (value: string) => void;
+  isLLMDropdown?: boolean;
   addButton?: {
     label: string;
     onClick: () => void;
@@ -20,6 +23,8 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   value,
   onChange,
   addButton,
+  onDelete = () => {}, 
+  isLLMDropdown = false 
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -46,6 +51,11 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
     setIsOpen(false);
   };
 
+  const handleDeleteModelInDropdown = async (selectedModel: string) => {
+    onDelete(selectedModel);
+    setIsOpen(false);
+  };
+
   return (
     <div className="relative w-full " ref={wrapperRef}>
       <div
@@ -63,15 +73,17 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       {isOpen && (
         <div className="absolute w-full text-[13px] border text-gray-600 border-gray-300 rounded-md shadow-lg z-10 bg-white max-h-60 overflow-auto">
           {options.map((option, index) => (
-            <div
-              key={index}
-              className="flex justify-between items-center py-2 pl-2 pr-2 hover:bg-gray-100 cursor-pointer rounded-md"
-              onClick={() => handleOptionClick(option.value)}
-            >
-              {option.label}
-              {value === option.value && (
+            <div key={index} className="flex justify-between items-center py-2 pl-2 pr-2 hover:bg-gray-100 cursor-pointer rounded-md">
+              <span className="w-full" onClick={() => handleOptionClick(option.value)}>
+                {option.label}
+              </span>
+              {value === option.value ? (
                 <span className="text-blue-500">&#10003;</span> // Tick mark
-              )}
+              ) : isLLMDropdown ? (
+                <span onClick={() => handleDeleteModelInDropdown(option.value)} className="ml-2 text-[13px] text-red-700">
+                  <FaTrash />
+                </span>
+              ) : null}
             </div>
           ))}
 
