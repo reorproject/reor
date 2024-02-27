@@ -35,9 +35,9 @@ export class LlamaCPPSessionService implements IChatSessionService {
 
   private async loadModel(localModelPath: string): Promise<void> {
     const nodeLLamaCpp = await import("node-llama-cpp");
-    // const llama = await nodeLLamaCpp.getLlama();
+    const llama = await nodeLLamaCpp.getLlama();
     this.model = new nodeLLamaCpp.LlamaModel({
-      // llama,
+      llama,
       modelPath: localModelPath,
       gpuLayers: getGPULayersToUse(),
     });
