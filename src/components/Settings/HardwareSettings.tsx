@@ -1,6 +1,9 @@
 import { HardwareConfig } from "electron/main/Store/storeConfig";
 import React, { useEffect, useState } from "react";
-import Switch from "react-switch"; // Import the switch component
+import Switch from "@mui/material/Switch";
+import FormGroup from "@mui/material/FormGroup";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import { Button } from "@material-tailwind/react";
 
 interface HardwareSettingsProps {}
 
@@ -11,6 +14,7 @@ const HardwareSettings: React.FC<HardwareSettingsProps> = () => {
     useVulkan: false,
   });
   const [error, setError] = useState<string | null>(null); // State to handle errors
+  const [changesPending, setChangesPending] = useState(false);
 
   useEffect(() => {
     const hardwareConfig = window.electronStore.getHardwareConfig();
@@ -50,37 +54,85 @@ const HardwareSettings: React.FC<HardwareSettingsProps> = () => {
 
     // Finally, update the state and persist the new configuration
     setHardware(updatedHardware);
-    window.electronStore.setHardwareConfig(updatedHardware);
+    // window.electronStore.setHardwareConfig(updatedHardware);
+    setChangesPending(true);
 
     // Reset or set error message as needed
     setError(null);
   };
 
+  const handleSave = () => {
+    // Execute the save function here
+    window.electronStore.setHardwareConfig(hardware);
+
+    // Set changesPending to false after saving
+    setChangesPending(false);
+  };
+
+  const customSwitchStyle = (color: string) => ({
+    "& .MuiSwitch-switchBase.Mui-checked": {
+      color: color,
+      "&:hover": {
+        backgroundColor: "rgba(255, 255, 255, 0.08)",
+      },
+    },
+    "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+      backgroundColor: color,
+    },
+  });
+
   return (
-    <div className="w-full bg-gray-800 rounded pb-7">
-      <div className="flex items-center justify-between p-4">
-        <label>Use GPU</label>
-        <Switch
-          checked={hardware.useGPU}
-          onChange={() => handleToggle("useGPU")}
-          // No need for disabled here, as manual control is allowed
+    <div className="w-full  bg-gray-800 rounded text-gray-100">
+      <h2 className="text-2xl font-semibold mb-0">Hardware</h2>
+      <FormGroup>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={hardware?.useGPU}
+              onChange={() => handleToggle("useGPU")}
+              sx={customSwitchStyle("white")} // Teal for GPU
+            />
+          }
+          label="GPU"
+          labelPlacement="start"
+          className="justify-between"
         />
-      </div>
-      <div className="flex items-center justify-between p-4">
-        <label>Use CUDA</label>
-        <Switch
-          checked={hardware.useCUDA}
-          onChange={() => handleToggle("useCUDA")}
+        <FormControlLabel
+          control={
+            <Switch
+              checked={hardware?.useCUDA}
+              onChange={() => handleToggle("useCUDA")}
+              sx={customSwitchStyle("white")} // Green for CUDA
+            />
+          }
+          label="CUDA"
+          labelPlacement="start"
+          className="justify-between"
         />
-      </div>
-      <div className="flex items-center justify-between p-4">
-        <label>Use Vulkan</label>
-        <Switch
-          checked={hardware.useVulkan}
-          onChange={() => handleToggle("useVulkan")}
+        <FormControlLabel
+          control={
+            <Switch
+              checked={hardware?.useVulkan}
+              onChange={() => handleToggle("useVulkan")}
+              sx={customSwitchStyle("white")} // Purple for Vulkan
+            />
+          }
+          label="Vulkan"
+          labelPlacement="start"
+          className="justify-between"
         />
-      </div>
-      {error && <div className="text-red-500 text-center">{error}</div>}
+      </FormGroup>
+      {changesPending && (
+        <Button
+          // variant="contained"
+          placeholder={""}
+          onClick={handleSave}
+          className="bg-slate-700 w-[120px] border-none h-8 hover:bg-slate-900 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
+        >
+          Save Changes
+        </Button>
+      )}
+      {error && <div className="text-red-500">{error}</div>}
     </div>
   );
 };
