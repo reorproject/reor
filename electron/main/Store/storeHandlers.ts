@@ -189,6 +189,8 @@ export function setupDefaultStoreValues(store: Store<StoreSchema>) {
     store.set(StoreKeys.MaxRAGExamples, 15);
   }
   setupDefaultEmbeddingModels(store);
+
+  setupDefaultHardwareConfig(store);
 }
 
 export function getDefaultEmbeddingModelConfig(
@@ -215,6 +217,18 @@ export function getDefaultEmbeddingModelConfig(
 
   return model;
 }
+
+const setupDefaultHardwareConfig = (store: Store<StoreSchema>) => {
+  const hardwareConfig = store.get(StoreKeys.Hardware);
+
+  if (!hardwareConfig) {
+    store.set(StoreKeys.Hardware, {
+      useGPU: process.platform === "darwin" && process.arch === "arm64",
+      useCUDA: false,
+      useVulkan: false,
+    });
+  }
+};
 
 const setupDefaultEmbeddingModels = (store: Store<StoreSchema>) => {
   const embeddingModels = store.get(StoreKeys.EmbeddingModels);
