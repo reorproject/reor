@@ -80,6 +80,10 @@ declare global {
         modelName: string,
         modelConfig: LLMModelConfig
       ) => Promise<void>;
+      deleteLocalLLM: (
+        modelName: string,
+        modelConfig: LLMModelConfig
+      ) => Promise<void>;
       setDefaultLLM: (modelName: string) => void;
       getDefaultLLM: () => string;
       getDefaultEmbeddingModel: () => string;
@@ -149,6 +153,9 @@ contextBridge.exposeInMainWorld("electronStore", {
   },
   setupNewLLM: async (modelName: string, modelConfig: LLMModelConfig) => {
     return ipcRenderer.invoke("setup-new-llm", modelName, modelConfig);
+  },
+  deleteLocalLLM: async (modelName: string, modelConfig: LLMModelConfig) => {
+    return ipcRenderer.invoke("delete-local-llm", modelName, modelConfig);
   },
   setDefaultLLM: (modelName: string) => {
     ipcRenderer.send("set-default-llm", modelName);
