@@ -5,8 +5,8 @@ import chokidar from "chokidar";
 import { BrowserWindow } from "electron";
 import * as fsPromises from "fs/promises";
 import {
-  addTreeToTable,
-  removeTreeFromTable,
+  addFileTreeToDBTable,
+  removeFileTreeFromDBTable,
 } from "../database/TableHelperFunctions";
 import { LanceDBTableWrapper } from "../database/LanceTableWrapper";
 
@@ -205,11 +205,11 @@ export const orchestrateEntryMove = async (
   destinationPath: string
 ) => {
   const fileSystemTree = GetFilesInfoTree(sourcePath);
-  await removeTreeFromTable(table, fileSystemTree);
+  await removeFileTreeFromDBTable(table, fileSystemTree);
   moveFileOrDirectoryInFileSystem(sourcePath, destinationPath).then(
     (newDestinationPath) => {
       if (newDestinationPath) {
-        addTreeToTable(table, GetFilesInfoTree(newDestinationPath));
+        addFileTreeToDBTable(table, GetFilesInfoTree(newDestinationPath));
       }
     }
   );

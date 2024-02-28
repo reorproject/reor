@@ -3,6 +3,7 @@ import { LanceDBTableWrapper } from "./database/LanceTableWrapper";
 import Store from "electron-store";
 import { StoreKeys, StoreSchema } from "./Store/storeConfig";
 import { screen } from "electron";
+
 type WindowInfo = {
   windowID: number;
   dbTableClient: LanceDBTableWrapper;

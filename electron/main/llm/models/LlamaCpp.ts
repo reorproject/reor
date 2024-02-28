@@ -3,10 +3,10 @@ import {
   HardwareConfig,
   LocalLLMConfig,
 } from "electron/main/Store/storeConfig";
-import { ISendFunctionImplementer, IChatSessionService } from "../Types";
+import { ISendFunctionImplementer, LLMSessionService } from "../Types";
 import { errorToString } from "../../Generic/error";
 
-export class LlamaCPPSessionService implements IChatSessionService {
+export class LlamaCPPSessionService implements LLMSessionService {
   private session: any;
   private context: any;
   private model: any;

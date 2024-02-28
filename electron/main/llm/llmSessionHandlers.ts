@@ -1,11 +1,11 @@
 import { ipcMain, IpcMainInvokeEvent } from "electron";
 import { LlamaCPPSessionService } from "./models/LlamaCpp";
-import { IChatSessionService } from "./Types";
+import { LLMSessionService } from "./Types";
 import { OpenAIModelSessionService } from "./models/OpenAI";
 import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 
-export const LLMSessions: { [sessionId: string]: IChatSessionService } = {};
+export const LLMSessions: { [sessionId: string]: LLMSessionService } = {};
 
 export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
   ipcMain.handle(
@@ -81,17 +81,21 @@ async function createSession(
     throw new Error("No AI models configured");
   }
 
-  const currentConfig = allConfigs[defaultModelName];
+  const currentModelConfig = allConfigs[defaultModelName];
 
   const hardwareConfig = store.get(StoreKeys.Hardware);
 
-  if (currentConfig.type === "openai") {
+  if (currentModelConfig.type === "openai") {
     const sessionService = new OpenAIModelSessionService();
-    await sessionService.init(defaultModelName, currentConfig);
+    await sessionService.init(defaultModelName, currentModelConfig);
     LLMSessions[sessionId] = sessionService;
   } else {
     const sessionService = new LlamaCPPSessionService();
-    await sessionService.init(defaultModelName, currentConfig, hardwareConfig);
+    await sessionService.init(
+      defaultModelName,
+      currentModelConfig,
+      hardwareConfig
+    );
     LLMSessions[sessionId] = sessionService;
   }
   return sessionId;

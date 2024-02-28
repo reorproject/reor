@@ -1,7 +1,7 @@
 import { BaseLLMConfig, HardwareConfig } from "../Store/storeConfig";
 
 // Any LLM engine should implement this interface:
-export interface IChatSessionService {
+export interface LLMSessionService {
   /**
    * Initializes the session.
    * @returns A promise that resolves when the initialization is complete.

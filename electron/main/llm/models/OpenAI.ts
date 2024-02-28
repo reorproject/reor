@@ -2,15 +2,16 @@ import OpenAI from "openai";
 import {
   ChatbotMessage,
   ISendFunctionImplementer,
-  IChatSessionService,
+  LLMSessionService,
   OpenAIMessage,
 } from "../Types";
 import { Tiktoken, TiktokenModel, encodingForModel } from "js-tiktoken";
 import { OpenAILLMConfig } from "electron/main/Store/storeConfig";
 import { net } from "electron";
 import { ClientRequestConstructorOptions } from "electron/main";
+import { Readable } from "stream";
 
-export class OpenAIModelSessionService implements IChatSessionService {
+export class OpenAIModelSessionService implements LLMSessionService {
   private openai!: OpenAI;
   public modelName!: string;
   private messageHistory!: ChatbotMessage[];
@@ -116,7 +117,6 @@ export class OpenAIModelSessionService implements IChatSessionService {
     }
   }
 }
-import { Readable } from "stream";
 
 export const customFetchUsingElectronNetStreaming = async (
   input: RequestInfo | URL,

@@ -173,7 +173,7 @@ export function unsanitizePathForFileSystem(dbPath: string): string {
   return dbPath.replace(/''/g, "'");
 }
 
-export const addTreeToTable = async (
+export const addFileTreeToDBTable = async (
   dbTable: LanceDBTableWrapper,
   fileTree: FileInfoTree
 ): Promise<void> => {
@@ -181,7 +181,7 @@ export const addTreeToTable = async (
   await dbTable.add(dbEntries);
 };
 
-export const removeTreeFromTable = async (
+export const removeFileTreeFromDBTable = async (
   dbTable: LanceDBTableWrapper,
   fileTree: FileInfoTree
 ): Promise<void> => {
