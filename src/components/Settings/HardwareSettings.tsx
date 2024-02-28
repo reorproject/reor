@@ -134,14 +134,19 @@ const HardwareSettings: React.FC<HardwareSettingsProps> = () => {
         for more info.
       </p>
       {changesPending && (
-        <Button
-          // variant="contained"
-          placeholder={""}
-          onClick={handleSave}
-          className="bg-slate-700 w-[120px] border-none h-8 hover:bg-slate-900 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
-        >
-          Save Changes
-        </Button>
+        <div className="flex">
+          <Button
+            // variant="contained"
+            placeholder={""}
+            onClick={handleSave}
+            className="bg-slate-700 w-[150px] border-none h-8 hover:bg-slate-900 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
+          >
+            Save Changes
+          </Button>
+          <p className="text-xs text-gray-100 mt-2">
+            You&apos;ll need to refresh the chat window to apply these changes.
+          </p>
+        </div>
       )}
       {error && <div className="text-red-500">{error}</div>}
     </div>
