@@ -93,7 +93,6 @@ const ChatWithLLM: React.FC = () => {
   useEffect(() => {
     if (sessionId) {
       const updateStream = (newMessage: ChatbotMessage) => {
-        console.log("Received new message from token stream:", newMessage);
         setCurrentBotMessage((prev) => {
           return {
             role: "assistant",
