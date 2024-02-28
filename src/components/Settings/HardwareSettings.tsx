@@ -65,6 +65,7 @@ const HardwareSettings: React.FC<HardwareSettingsProps> = () => {
   const handleSave = () => {
     // Execute the save function here
     window.electronStore.setHardwareConfig(hardware);
+    setChangesPending(false);
   };
 
   const customSwitchStyle = (color: string) => ({

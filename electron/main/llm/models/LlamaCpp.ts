@@ -45,6 +45,7 @@ export class LlamaCPPSessionService implements IChatSessionService {
     hardwareConfig: HardwareConfig
   ): Promise<void> {
     const nodeLLamaCpp = await import("node-llama-cpp");
+    console.log("hardwareConfig:", hardwareConfig);
     const llama = await nodeLLamaCpp.getLlama({
       cuda: hardwareConfig.useCUDA,
       vulkan: hardwareConfig.useVulkan,
