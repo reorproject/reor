@@ -21,6 +21,7 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
   const [modelConfigs, setModelConfigs] = useState<
     Record<string, LLMModelConfig>
   >({});
+  const [userMadeChanges, setUserMadeChanges] = useState<boolean>(false);
   const [isNewLocalModelModalOpen, setIsNewLocalModelModalOpen] =
     useState<boolean>(false);
 
@@ -40,7 +41,11 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
     try {
       const configs = await window.electronStore.getLLMConfigs();
       setModelConfigs(configs);
+      if (configs !== modelConfigs && Object.keys(modelConfigs).length > 0) {
+        setUserMadeChanges(true);
+      }
       const defaultModelName = await window.electronStore.getDefaultLLM();
+
       setDefaultModel(defaultModelName);
     } catch (error) {
       console.error("Failed to fetch model configurations:", error);
@@ -77,13 +82,17 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
 
   const handleDefaultModelChange = (selectedModel: string) => {
     setDefaultModel(selectedModel);
+    setUserMadeChanges(true);
     window.electronStore.setDefaultLLM(selectedModel);
   };
 
   const handleDeleteModel = async (selectedModel: string) => {
     const configs = await window.electronStore.getLLMConfigs();
     fetchModelConfigs();
-    await window.electronStore.deleteLocalLLM(selectedModel, configs[selectedModel]);
+    await window.electronStore.deleteLocalLLM(
+      selectedModel,
+      configs[selectedModel]
+    );
     const configsAfter = await window.electronStore.getLLMConfigs();
     setModelConfigs(configsAfter);
   };
@@ -215,7 +224,14 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
           setIsOpenAIModelModalOpen(false);
         }}
       />
-      {userTriedToSubmit && !defaultModel && <p className="text-red-500 text-sm mt-1">{currentError}</p>}
+      {userMadeChanges && (
+        <p className="text-xs text-slate-100 mt-1">
+          You&apos;ll need to refresh the chat window to apply these changes.
+        </p>
+      )}
+      {userTriedToSubmit && !defaultModel && (
+        <p className="text-red-500 text-sm mt-1">{currentError}</p>
+      )}
     </div>
   );
 };
