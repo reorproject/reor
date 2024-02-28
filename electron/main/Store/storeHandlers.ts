@@ -137,10 +137,10 @@ export const registerStoreHandlers = (
   });
 
   ipcMain.handle(
-    "setup-new-llm",
+    "add-or-update-llm",
     async (event, modelName: string, modelConfig: LLMModelConfig) => {
       console.log("setting up new local model", modelConfig);
-      return await addNewLLMSchemaToStore(store, modelName, modelConfig);
+      return await addOrUpdateLLMSchemaInStore(store, modelName, modelConfig);
     }
   );
 
@@ -167,7 +167,7 @@ export const registerStoreHandlers = (
   });
 };
 
-export async function addNewLLMSchemaToStore(
+export async function addOrUpdateLLMSchemaInStore(
   store: Store<StoreSchema>,
   modelName: string,
   modelConfig: LLMModelConfig
@@ -175,23 +175,23 @@ export async function addNewLLMSchemaToStore(
   const existingModels =
     (store.get(StoreKeys.LLMs) as Record<string, LLMModelConfig>) || {};
 
-  if (!existingModels[modelName]) {
-    const isNotValid = validateAIModelConfig(modelName, modelConfig);
-    if (isNotValid) {
-      throw new Error(isNotValid);
-    }
-
-    const updatedModels = {
-      ...existingModels,
-      [modelName]: modelConfig,
-    };
-
-    store.set(StoreKeys.LLMs, updatedModels);
-    store.set(StoreKeys.DefaultLLM, modelName);
-    return "Model set up successfully";
-  } else {
-    return "Model already exists";
+  const isNotValid = validateAIModelConfig(modelName, modelConfig);
+  if (isNotValid) {
+    throw new Error(isNotValid);
   }
+
+  const updatedModels = {
+    ...existingModels,
+    [modelName]: modelConfig,
+  };
+
+  store.set(StoreKeys.LLMs, updatedModels);
+
+  store.set(StoreKeys.DefaultLLM, modelName);
+
+  return existingModels[modelName]
+    ? "Model updated successfully"
+    : "Model set up successfully";
 }
 
 export async function deleteLLMSchemafromStore(

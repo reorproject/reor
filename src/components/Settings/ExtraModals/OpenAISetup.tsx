@@ -16,9 +16,9 @@ const OpenAISetupModal: React.FC<OpenAISetupModalProps> = ({
 
   const handleSave = () => {
     if (openAIKey) {
-      for (const modelName in remoteAIModels) {
-        window.electronStore.setupNewLLM(modelName, {
-          ...remoteAIModels[modelName],
+      for (const modelName in openAIDefaultModels) {
+        window.electronStore.addOrUpdateLLM(modelName, {
+          ...openAIDefaultModels[modelName],
           apiKey: openAIKey,
         });
       }
@@ -66,7 +66,7 @@ const OpenAISetupModal: React.FC<OpenAISetupModalProps> = ({
   );
 };
 
-const remoteAIModels: { [modelName: string]: OpenAILLMConfig } = {
+const openAIDefaultModels: { [modelName: string]: OpenAILLMConfig } = {
   "gpt-3.5-turbo-0125": {
     contextLength: 16385,
     engine: "openai",

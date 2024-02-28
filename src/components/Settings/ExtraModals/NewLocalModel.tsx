@@ -50,7 +50,10 @@ const LocalModelModal: React.FC<LocalModelModalProps> = ({
       engine: "llamacpp",
     };
 
-    const res = await window.electronStore.setupNewLLM(newModelName, newConfig);
+    const res = await window.electronStore.addOrUpdateLLM(
+      newModelName,
+      newConfig
+    );
     console.log("setupNewLocalLLM response: ", res);
     onClose();
   };

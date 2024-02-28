@@ -76,7 +76,7 @@ declare global {
         modelName: string,
         modelConfig: LLMModelConfig
       ) => Promise<void>;
-      setupNewLLM: (
+      addOrUpdateLLM: (
         modelName: string,
         modelConfig: LLMModelConfig
       ) => Promise<void>;
@@ -151,8 +151,8 @@ contextBridge.exposeInMainWorld("electronStore", {
   updateLLMConfig: async (modelName: string, modelConfig: LLMModelConfig) => {
     return ipcRenderer.invoke("update-llm-config", modelName, modelConfig);
   },
-  setupNewLLM: async (modelName: string, modelConfig: LLMModelConfig) => {
-    return ipcRenderer.invoke("setup-new-llm", modelName, modelConfig);
+  addOrUpdateLLM: async (modelName: string, modelConfig: LLMModelConfig) => {
+    return ipcRenderer.invoke("add-or-update-llm", modelName, modelConfig);
   },
   deleteLocalLLM: async (modelName: string, modelConfig: LLMModelConfig) => {
     return ipcRenderer.invoke("delete-local-llm", modelName, modelConfig);
