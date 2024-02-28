@@ -17,12 +17,11 @@ const ChatWithLLM: React.FC = () => {
 
   const [currentBotMessage, setCurrentBotMessage] =
     useState<ChatbotMessage | null>(null);
-
+  const fetchDefaultModel = async () => {
+    const defaultModelName = await window.electronStore.getDefaultLLM();
+    setDefaultModel(defaultModelName);
+  };
   useEffect(() => {
-    const fetchDefaultModel = async () => {
-      const defaultModelName = await window.electronStore.getDefaultLLM();
-      setDefaultModel(defaultModelName);
-    };
     fetchDefaultModel();
   }, []);
 
@@ -131,6 +130,7 @@ const ChatWithLLM: React.FC = () => {
     }
     const newSessionId = await initializeSession();
     setSessionId(newSessionId);
+    fetchDefaultModel();
   };
 
   const startStreamingResponse = async (
@@ -174,7 +174,7 @@ const ChatWithLLM: React.FC = () => {
   return (
     <div className="flex flex-col w-full h-full mx-auto border shadow-lg overflow-hidden bg-gray-700">
       <div className="flex w-full justify-between items-center">
-        <div className="m-0 mt-1 ml-1 p-0">
+        <div className="m-0 mt-1 ml-2 mb-1 p-0">
           {defaultModel ? (
             <p className="m-0 p-0 text-gray-500">Model: {defaultModel}</p>
           ) : (
