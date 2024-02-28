@@ -1,5 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { LocalLLMConfig } from "electron/main/Store/storeConfig";
+import {
+  HardwareConfig,
+  LocalLLMConfig,
+} from "electron/main/Store/storeConfig";
 import { ISendFunctionImplementer, IChatSessionService } from "../Types";
 import { errorToString } from "../../Generic/error";
 
@@ -10,9 +13,13 @@ export class LlamaCPPSessionService implements IChatSessionService {
   private abortController?: AbortController;
   private contextLength?: number;
 
-  async init(storeModelConfig: LocalLLMConfig): Promise<void> {
+  async init(
+    modelName: string,
+    storeModelConfig: LocalLLMConfig,
+    hardwareConfig: HardwareConfig
+  ): Promise<void> {
     this.contextLength = storeModelConfig.contextLength;
-    await this.loadModel(storeModelConfig.localPath);
+    await this.loadModel(storeModelConfig.localPath, hardwareConfig);
 
     if (!this.isModelLoaded()) {
       throw new Error("Model not loaded");
@@ -33,13 +40,20 @@ export class LlamaCPPSessionService implements IChatSessionService {
     return this.contextLength || 0;
   }
 
-  private async loadModel(localModelPath: string): Promise<void> {
+  private async loadModel(
+    localModelPath: string,
+    hardwareConfig: HardwareConfig
+  ): Promise<void> {
     const nodeLLamaCpp = await import("node-llama-cpp");
-    // const llama = await nodeLLamaCpp.getLlama();
+    console.log("hardwareConfig:", hardwareConfig);
+    const llama = await nodeLLamaCpp.getLlama({
+      cuda: hardwareConfig.useCUDA,
+      vulkan: hardwareConfig.useVulkan,
+    });
     this.model = new nodeLLamaCpp.LlamaModel({
-      // llama,
+      llama,
       modelPath: localModelPath,
-      gpuLayers: getGPULayersToUse(),
+      gpuLayers: hardwareConfig.useGPU ? 100 : 0,
     });
   }
 
@@ -98,9 +112,9 @@ export class LlamaCPPSessionService implements IChatSessionService {
   }
 }
 
-const getGPULayersToUse = (): number => {
-  if (process.platform === "darwin" && process.arch === "arm64") {
-    return 100; // NOTE: Will use fewer GPU layers if the model has fewer layers.
-  }
-  return 0;
-};
+// const getGPULayersToUse = (): number => {
+//   if (process.platform === "darwin" && process.arch === "arm64") {
+//     return 100; // NOTE: Will use fewer GPU layers if the model has fewer layers.
+//   }
+//   return 0;
+// };

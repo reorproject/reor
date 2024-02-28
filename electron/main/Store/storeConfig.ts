@@ -1,4 +1,4 @@
-interface BaseLLMConfig {
+export interface BaseLLMConfig {
   contextLength: number;
   errorMsg?: string;
   engine: "openai" | "llamacpp";
@@ -35,6 +35,12 @@ export interface RAGConfig {
   maxRAGExamples: number;
 }
 
+export interface HardwareConfig {
+  useGPU: boolean;
+  useCUDA: boolean;
+  useVulkan: boolean;
+}
+
 export interface StoreSchema {
   user: {
     vaultDirectories: string[];
@@ -49,6 +55,7 @@ export interface StoreSchema {
   defaultLLM: string;
   defaultEmbedFuncRepo: string;
   RAG?: RAGConfig;
+  hardware: HardwareConfig;
 }
 
 export enum StoreKeys {
@@ -58,4 +65,5 @@ export enum StoreKeys {
   DefaultLLM = "defaultLLM",
   DefaultEmbeddingModelAlias = "defaultEmbeddingModelAlias",
   MaxRAGExamples = "RAG.maxRAGExamples",
+  Hardware = "hardware",
 }

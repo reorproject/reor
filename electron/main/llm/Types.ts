@@ -1,10 +1,16 @@
+import { BaseLLMConfig, HardwareConfig } from "../Store/storeConfig";
+
 // Any LLM engine should implement this interface:
 export interface IChatSessionService {
   /**
    * Initializes the session.
    * @returns A promise that resolves when the initialization is complete.
    */
-
+  init(
+    modelName: string,
+    modelConfig: BaseLLMConfig,
+    hardwareConfig: HardwareConfig
+  ): Promise<void>;
   /**
    * Handles the streaming of prompts.
    * @param prompt The prompt to be streamed.

@@ -11,14 +11,14 @@ import { net } from "electron";
 import { ClientRequestConstructorOptions } from "electron/main";
 
 export class OpenAIModelSessionService implements IChatSessionService {
-  private openai: OpenAI;
-  public modelName: string;
-  private messageHistory: ChatbotMessage[];
+  private openai!: OpenAI;
+  public modelName!: string;
+  private messageHistory!: ChatbotMessage[];
   private abortStreaming: boolean = false;
-  private tokenEncoding: Tiktoken;
-  private modelConfig: OpenAILLMConfig;
+  private tokenEncoding!: Tiktoken;
+  private modelConfig!: OpenAILLMConfig;
 
-  constructor(modelName: string, modelConfig: OpenAILLMConfig) {
+  async init(modelName: string, modelConfig: OpenAILLMConfig) {
     this.openai = new OpenAI({
       apiKey: modelConfig.apiKey,
       baseURL: modelConfig.apiURL,
@@ -32,10 +32,6 @@ export class OpenAIModelSessionService implements IChatSessionService {
     } catch (e) {
       this.tokenEncoding = encodingForModel("gpt-3.5-turbo-1106"); // hack while we think about what to do with custom remote models' tokenizers
     }
-  }
-
-  async init(): Promise<void> {
-    // Since there's no model loading process for OpenAI, we can consider it initialized here
   }
 
   private isModelLoaded(): boolean {
