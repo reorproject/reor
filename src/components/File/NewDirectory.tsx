@@ -23,12 +23,13 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
     const newName = e.target.value;
     setDirectoryName(newName);
 
-    const invalidCharacter = getInvalidCharacterInFileName(newName);
-    if (invalidCharacter) {
-      setErrorMessage(`The character [${invalidCharacter}] cannot be included in directory name.`);
-    } else {
-      setErrorMessage(null);
-    }
+    getInvalidCharacterInFileName(newName).then(invalidCharacter => {
+      if (invalidCharacter) {
+        setErrorMessage(`The character [${invalidCharacter}] cannot be included in directory name.`);
+      } else {
+        setErrorMessage(null);
+      }
+    });
   };
 
   const sendNewDirectoryMsg = async () => {

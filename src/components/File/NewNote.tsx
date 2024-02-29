@@ -23,12 +23,13 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
     const newName = e.target.value;
     setFileName(newName);
 
-    const invalidCharacter = getInvalidCharacterInFileName(newName);
-    if (invalidCharacter) {
-      setErrorMessage(`The character [${invalidCharacter}] cannot be included in note name.`);
-    } else {
-      setErrorMessage(null);
-    }
+    getInvalidCharacterInFileName(newName).then(invalidCharacter => {
+      if (invalidCharacter) {
+        setErrorMessage(`The character [${invalidCharacter}] cannot be included in note name.`);
+      } else {
+        setErrorMessage(null);
+      }
+    });
   };
 
   const sendNewNoteMsg = async () => {
