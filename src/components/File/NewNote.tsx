@@ -3,6 +3,7 @@ import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
 import { toast } from "react-toastify";
 import { errorToString } from "@/functions/error";
+import { getInvalidCharacterInFileName } from "@/functions/strings";
 
 interface NewNoteComponentProps {
   isOpen: boolean;
@@ -16,24 +17,19 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
   onFileSelect,
 }) => {
   const [fileName, setFileName] = useState<string>("");
-  const [errorMessage, setErrorMessage] = useState<string>("");
-
-  const validNamePattern = /^[a-zA-Z0-9_\-/\s]+$/;
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
-    if (newName === "") {
-      setFileName(newName);
-      setErrorMessage("");
-    } else if (validNamePattern.test(newName) && !newName.includes("../")) {
-      setFileName(newName);
-      setErrorMessage("");
-    } else {
-      setFileName(newName);
-      setErrorMessage(
-        "Note name can only contain letters, numbers, underscores, hyphens, and slashes."
-      );
-    }
+    setFileName(newName);
+
+    getInvalidCharacterInFileName(newName).then(invalidCharacter => {
+      if (invalidCharacter) {
+        setErrorMessage(`The character [${invalidCharacter}] cannot be included in note name.`);
+      } else {
+        setErrorMessage(null);
+      }
+    });
   };
 
   const sendNewNoteMsg = async () => {
