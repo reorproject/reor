@@ -60,7 +60,7 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
       .use(history)
       .use(listener)
       .use(prism)
-      // // .use(menu)
+      // .use(menu)
       .use(block)
       .use(cursor)
       .use(clipboard)
