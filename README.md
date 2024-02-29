@@ -50,6 +50,8 @@ To import notes/files from another app, you'll need to populate that directory m
 
 
 ### Building from source
+
+Make sure you have [nodejs](https://nodejs.org/en/download) installed.
 #### Clone repo:
 ```
 git clone https://github.com/reorproject/reor.git
