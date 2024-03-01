@@ -4,7 +4,8 @@ import { DBQueryResult } from "electron/main/database/Schema";
 import { PiGraph } from "react-icons/pi";
 import { toast } from "react-toastify";
 import { errorToString } from "@/functions/error";
-
+import { FiRefreshCw } from "react-icons/fi";
+// import performance:
 interface SimilarEntriesComponentProps {
   filePath: string;
   onFileSelect: (path: string) => void;
@@ -39,11 +40,18 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
       }
       const databaseFields = await window.database.getDatabaseFields();
       const filterString = `${databaseFields.NOTE_PATH} != '${filePath}'`;
+      const startTime = performance.now(); // Start timing
+
       const searchResults: DBQueryResult[] = await window.database.search(
         fileContent,
         20,
         filterString
       );
+
+      const endTime = performance.now(); // End timing
+
+      const duration = endTime - startTime; // Calculate duration
+      console.log(`Search took ${duration} milliseconds.`);
       return searchResults;
     } catch (error) {
       console.error("Error:", error);
@@ -65,10 +73,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
 
   useEffect(() => {
     const vectorDBUpdateListener = async () => {
-      const searchResults = await performSearch(filePath);
-      if (searchResults.length > 0) {
-        setSimilarEntries(searchResults);
-      }
+      updateSimilarEntries();
     };
 
     window.ipcRenderer.receive(
@@ -83,15 +88,38 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     };
   }, [filePath]);
 
+  const updateSimilarEntries = async () => {
+    const searchResults = await performSearch(filePath);
+    if (searchResults.length > 0) {
+      setSimilarEntries(searchResults);
+    }
+  };
+
   return (
     <div className="h-full overflow-y-auto overflow-x-hidden mt-0 border-l-[0.1px] border-t-0 border-b-0 border-r-0 border-gray-600 border-solid">
       {similarEntries.length > 0 && (
-        <div className="flex items-center justify-center bg-gray-800 mt-0 mb-0 p-0">
-          <PiGraph className="text-white mt-1" />
+        <div className="flex items-center bg-gray-800 p-0">
+          {/* Invisible Spacer */}
+          <div className="flex-1"></div>
 
-          <p className="text-gray-200 text-sm pl-1 mb-0  mt-1 pt-0 pb-0">
-            Related Notes
-          </p>
+          {/* Centered content: PiGraph icon and Related Notes text */}
+          <div className="flex items-center justify-center px-4">
+            <PiGraph className="text-gray-300 mt-1" />
+            <p className="text-gray-300 text-sm pl-1 mb-0 mt-1">
+              Related Notes
+            </p>
+          </div>
+
+          {/* Refresh icon aligned to the right with flex-1 to take up space equivalently to the invisible spacer */}
+          <div
+            className="flex-1 flex justify-end pr-3 pt-1 cursor-pointer"
+            onClick={() => {
+              setSimilarEntries([]);
+              updateSimilarEntries();
+            }}
+          >
+            <FiRefreshCw className="text-gray-300" /> {/* Icon */}
+          </div>
         </div>
       )}
       {similarEntries.map((dbResult, index) => (

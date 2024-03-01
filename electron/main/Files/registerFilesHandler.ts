@@ -43,7 +43,12 @@ export const registerFileHandlers = () => {
 
   ipcMain.handle(
     "write-file",
-    async (event, filePath: string, content: string) => {
+    async (
+      event,
+      filePath: string,
+      content: string,
+      indexFileToo: boolean = false
+    ) => {
       try {
         fs.writeFileSync(filePath, content, "utf-8");
 
@@ -56,10 +61,12 @@ export const registerFileHandlers = () => {
         }
 
         // Update file in table
-        await updateFileInTable(windowInfo.dbTableClient, filePath, content);
+        if (indexFileToo) {
+          await updateFileInTable(windowInfo.dbTableClient, filePath, content);
 
-        // Respond directly to the sender
-        event.sender.send("vector-database-update");
+          // Respond directly to the sender
+          event.sender.send("vector-database-update");
+        }
       } catch (error) {
         console.error("Error updating file in table:", error);
 
