@@ -4,6 +4,7 @@ import { pipeline } from "@xenova/transformers";
 
 let pipe;
 let embedFunc;
+let tokenize;
 
 async function initializePipeline(repoName) {
   // Assuming this function initializes your pipeline and stores it in the `pipe` variable
@@ -12,6 +13,7 @@ async function initializePipeline(repoName) {
     /* env settings */
   });
   embedFunc = await setupEmbedFunction(pipe);
+  tokenize = await setupTokenizeFunction(pipe.tokenizer);
 }
 
 workers.parentPort.on("message", async (task) => {
@@ -28,7 +30,7 @@ workers.parentPort.on("message", async (task) => {
     } else if (task.type === "tokenize") {
       // Perform tokenization
       if (!pipe) throw new Error("Pipeline not initialized");
-      const result = pipe.tokenize(task.data); // Simplified for illustration
+      const result = await tokenize(task.data); // Simplified for illustration
       workers.parentPort.postMessage({ success: true, result });
     }
   } catch (error) {
@@ -65,5 +67,22 @@ async function setupEmbedFunction(pipe) {
     }
 
     return result;
+  };
+}
+
+function setupTokenizeFunction(tokenizer) {
+  return (data) => {
+    if (!tokenizer) {
+      throw new Error("Tokenizer not initialized");
+    }
+
+    return data.map((text) => {
+      try {
+        const res = tokenizer(text);
+        return res;
+      } catch (error) {
+        throw new Error(`Tokenization process failed for text: ${error}`);
+      }
+    });
   };
 }
