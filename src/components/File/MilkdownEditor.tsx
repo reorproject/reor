@@ -12,6 +12,10 @@ import { cursor } from "@milkdown/plugin-cursor";
 import { clipboard } from "@milkdown/plugin-clipboard";
 import { replaceAll } from "@milkdown/utils";
 
+import { BlockView } from './Block';
+
+import { usePluginViewFactory, ProsemirrorAdapterProvider } from '@prosemirror-adapter/react';
+
 export interface MarkdownEditorProps {
   filePath: string;
   setContentInParent: (content: string) => void;
@@ -44,6 +48,8 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
     setContentInParent(content);
   }, [content]);
 
+  const pluginViewFactory = usePluginViewFactory();
+
   const { get } = useEditor((root) => {
     return Editor
       .make()
@@ -52,6 +58,11 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
         ctx.set(defaultValueCtx, content);
         ctx.get(listenerCtx).markdownUpdated((ctx, markdown) => {
           setContent(markdown)
+        })
+        ctx.set(block.key, {
+          view: pluginViewFactory({
+          component: BlockView,
+          })
         })
       })
       .config(nord)
@@ -97,7 +108,9 @@ const MilkdownEditorWrapper: React.FC<MarkdownEditorProps> = ({
 }) => {
   return (
     <MilkdownProvider>
-      <MilkdownEditor filePath={filePath} setContentInParent={setContentInParent} lastSavedContentRef={lastSavedContentRef} />
+      <ProsemirrorAdapterProvider>
+        <MilkdownEditor filePath={filePath} setContentInParent={setContentInParent} lastSavedContentRef={lastSavedContentRef} />
+      </ProsemirrorAdapterProvider>
     </MilkdownProvider>
   );
 };

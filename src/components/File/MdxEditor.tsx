@@ -1,6 +1,5 @@
 import "@mdxeditor/editor/style.css";
 import React, { useEffect, useRef, useState } from "react";
-import "./dark-editor.css";
 
 import {
   AdmonitionDirectiveDescriptor,
