@@ -44,8 +44,8 @@ button {
   color: white;
   font-size: 17px;
   overflow: auto;
-  padding: 2px;
-  padding-left: 5px;
+  padding-top: 50px !important;
+  padding-left: 20px !important;
 }
 .milkdown .editor:focus {
   outline: none;
