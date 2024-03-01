@@ -19,7 +19,7 @@ a {
 }
 
 ::marker {
-  color: lightskyblue
+  color:rgba(94, 129, 172, 1);
 }
 
 #customTitleBar {

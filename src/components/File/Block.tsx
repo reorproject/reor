@@ -1,3 +1,4 @@
+import React from "react";
 import { BlockProvider } from "@milkdown/plugin-block"
 import { useInstance } from '@milkdown/react'
 import { usePluginViewContext } from "@prosemirror-adapter/react"
