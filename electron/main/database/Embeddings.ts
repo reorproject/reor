@@ -11,6 +11,48 @@ import {
 import { splitDirectoryPathIntoBaseAndRepo } from "../Files/Filesystem";
 import { DownloadModelFilesFromHFRepo } from "../download/download";
 
+import { Worker } from "worker_threads";
+
+const worker = new Worker("./electron/main/database/textProcessingWorker.mjs");
+const repoName = "Xenova/all-MiniLM-L6-v2";
+
+function sendMessageToWorker(task: any) {
+  return new Promise((resolve, reject) => {
+    worker.on("message", (message) => {
+      if (message.success) {
+        resolve(message.result);
+      } else {
+        reject(new Error(message.error));
+      }
+    });
+    worker.on("error", reject);
+    worker.postMessage(task);
+  });
+}
+
+async function embedText(text: string) {
+  return sendMessageToWorker({ type: "embed", data: text });
+}
+
+// Initialize the worker with your pipeline
+sendMessageToWorker({ type: "initialize", repoName })
+  .then(() => {
+    console.log("Worker initialized successfully");
+    embedText("Hello, world!").then((result) => {
+      console.log("EMBEDDING RESULT: ", result);
+    });
+  })
+  .catch(console.error);
+
+// Example usage for embedding
+
+// Example usage for tokenization
+async function tokenizeText(text: string) {
+  return sendMessageToWorker({ type: "tokenize", data: text });
+}
+
+// console.log("HELLO WORLD EMBEDDED: ", embeddedText);
+
 export interface EnhancedEmbeddingFunction<T>
   extends lancedb.EmbeddingFunction<T> {
   name: string;
