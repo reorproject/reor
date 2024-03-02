@@ -62,9 +62,7 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
         ctx.set(rootCtx, root)
         ctx.set(defaultValueCtx, content);
         ctx.get(listenerCtx).markdownUpdated((_ctx, markdown) => {
-          debounce(() => {
-            setContent(markdown);
-          }, 1000)();
+          debounce(setContent, 1000)(markdown);
         })
         
         ctx.set(block.key, {
