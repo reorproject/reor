@@ -43,7 +43,6 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
       }
       const databaseFields = await window.database.getDatabaseFields();
       const filterString = `${databaseFields.NOTE_PATH} != '${filePath}'`;
-      const startTime = performance.now(); // Start timing
 
       const searchResults: DBQueryResult[] = await window.database.search(
         fileContent,
@@ -51,10 +50,6 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
         filterString
       );
 
-      const endTime = performance.now(); // End timing
-
-      const duration = endTime - startTime; // Calculate duration
-      console.log(`Search took ${duration} milliseconds.`);
       return searchResults;
     } catch (error) {
       console.error("Error:", error);
