@@ -6,6 +6,7 @@ import Textarea from "@mui/joy/Textarea";
 import CircularProgress from "@mui/material/CircularProgress";
 import ReactMarkdown from "react-markdown";
 import { FiRefreshCw } from "react-icons/fi"; // Importing refresh icon from React Icons
+import { ChatPrompt } from "./Chat-Prompts";
 
 const ChatWithLLM: React.FC = () => {
   const [sessionId, setSessionId] = useState<string | null>(null);
@@ -184,7 +185,7 @@ const ChatWithLLM: React.FC = () => {
           <FiRefreshCw className="text-white" /> {/* Icon */}
         </div>
       </div>
-      <div className="flex-1 overflow-auto p-4 pt-0 bg-transparent">
+      <div className="flex flex-col overflow-auto p-4 pt-0 bg-transparent h-full">
         {/* {messages.length === 0 && !currentBotMessage && (
           <div>
             {defaultModel ? (
@@ -198,7 +199,7 @@ const ChatWithLLM: React.FC = () => {
             )}
           </div>
         )} */}
-        <div className="space-y-2 mt-4">
+        <div className="space-y-2 mt-4 flex-grow">
           {messages.map((message, index) => (
             <ReactMarkdown
               key={index}
