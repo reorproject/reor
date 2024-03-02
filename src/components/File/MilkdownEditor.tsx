@@ -92,7 +92,7 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
         )
       );
       // .use(slash)
-  }, [setContent, content])
+  }, [])
   
   useEffect(() => {
     const fetchContent = async () => {

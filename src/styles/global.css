@@ -18,6 +18,10 @@ a {
   color: #0f82af;
 }
 
+ul {
+  padding-inline-start: 0.5rem;
+}
+
 ::marker {
   color:rgba(94, 129, 172, 1);
 }
