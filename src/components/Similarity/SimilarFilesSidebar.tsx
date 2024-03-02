@@ -5,7 +5,7 @@ import { PiGraph } from "react-icons/pi";
 import { toast } from "react-toastify";
 import { errorToString } from "@/functions/error";
 import { FiRefreshCw } from "react-icons/fi";
-// import performance:
+
 interface SimilarEntriesComponentProps {
   filePath: string;
   onFileSelect: (path: string) => void;
@@ -16,8 +16,11 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   onFileSelect,
 }) => {
   const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([]);
+  const [hitRefresh, setHitRefresh] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-
+  useEffect(() => {
+    setHitRefresh(false);
+  }, [filePath]);
   const handleNewFileOpen = async (path: string) => {
     try {
       const searchResults = await performSearch(path);
@@ -96,32 +99,34 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   };
 
   return (
-    <div className="h-full overflow-y-auto overflow-x-hidden mt-0 border-l-[0.1px] border-t-0 border-b-0 border-r-0 border-gray-600 border-solid">
-      {similarEntries.length > 0 && (
-        <div className="flex items-center bg-gray-800 p-0">
-          {/* Invisible Spacer */}
-          <div className="flex-1"></div>
+    <div
+      className={`h-below-titlebar ${
+        similarEntries.length > 0 ? "overflow-y-auto" : "overflow-y-hidden"
+      } overflow-x-hidden mt-0 border-l-[0.1px] border-t-0 border-b-0 border-r-0 border-gray-600 border-solid`}
+    >
+      {" "}
+      {/* {similarEntries.length > 0 && ( */}
+      <div className="flex items-center bg-gray-800 p-0">
+        {/* Invisible Spacer */}
+        <div className="flex-1"></div>
 
-          {/* Centered content: PiGraph icon and Related Notes text */}
-          <div className="flex items-center justify-center px-4">
-            <PiGraph className="text-gray-300 mt-1" />
-            <p className="text-gray-300 text-sm pl-1 mb-0 mt-1">
-              Related Notes
-            </p>
-          </div>
-
-          {/* Refresh icon aligned to the right with flex-1 to take up space equivalently to the invisible spacer */}
-          <div
-            className="flex-1 flex justify-end pr-3 pt-1 cursor-pointer"
-            onClick={() => {
-              setSimilarEntries([]);
-              updateSimilarEntries();
-            }}
-          >
-            <FiRefreshCw className="text-gray-300" /> {/* Icon */}
-          </div>
+        {/* Centered content: PiGraph icon and Related Notes text */}
+        <div className="flex items-center justify-center px-4">
+          <PiGraph className="text-gray-300 mt-1" />
+          <p className="text-gray-300 text-sm pl-1 mb-0 mt-1">Related Notes</p>
         </div>
-      )}
+
+        <div
+          className="flex-1 flex justify-end pr-3 pt-1 cursor-pointer"
+          onClick={() => {
+            setHitRefresh(true);
+            setSimilarEntries([]); // simulate refresh
+            updateSimilarEntries();
+          }}
+        >
+          <FiRefreshCw className="text-gray-300" /> {/* Icon */}
+        </div>
+      </div>
       {similarEntries.map((dbResult, index) => (
         <div className="pb-2 pr-2 pl-2 pt-1" key={index}>
           <DBResultPreview
@@ -137,7 +142,11 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
             className="flex justify-center items-center text-gray-500 text-lg mx-auto text-center"
             style={{ width: "fit-content" }}
           >
-            Related notes will appear here...
+            {!hitRefresh ? (
+              <>Hit refresh to show related notes...</>
+            ) : (
+              <>Make sure your note is not empty...</>
+            )}
           </p>
         </div>
       )}
