@@ -97,14 +97,12 @@ export class LanceDBTableWrapper {
 
   async search(
     query: string,
-    //   metricType: string,
     limit: number,
     filter?: string
   ): Promise<DBQueryResult[]> {
     const lanceQuery = await this.table
       .search(query)
       .metricType(MetricType.Cosine)
-      // .metricType(metricType)
       .limit(limit);
     if (filter) {
       lanceQuery.filter(filter);

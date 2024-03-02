@@ -64,6 +64,8 @@ export const registerDBSessionHandlers = (
             maxRAGExamples,
             filter
           );
+        } else if (maxRAGExamples === 0) {
+          searchResults = [];
         } else {
           throw new Error("Max RAG examples is not set or is invalid.");
         }

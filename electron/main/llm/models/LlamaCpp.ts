@@ -12,6 +12,7 @@ export class LlamaCPPSessionService implements LLMSessionService {
   private model: any;
   private abortController?: AbortController;
   private contextLength?: number;
+  private nodeLLamaCpp: any;
 
   async init(
     modelName: string,
@@ -26,6 +27,7 @@ export class LlamaCPPSessionService implements LLMSessionService {
     }
 
     const nodeLLamaCpp = await import("node-llama-cpp");
+    this.nodeLLamaCpp = nodeLLamaCpp;
     this.context = await new nodeLLamaCpp.LlamaContext({
       model: this.model,
       contextSize: storeModelConfig.contextLength,
@@ -75,6 +77,7 @@ export class LlamaCPPSessionService implements LLMSessionService {
   public async streamingPrompt(
     prompt: string,
     sendFunctionImplementer: ISendFunctionImplementer,
+    systemPrompt?: string,
     ignoreChatHistory?: boolean
   ): Promise<string> {
     if (!this.session && !this.context) {
@@ -87,10 +90,28 @@ export class LlamaCPPSessionService implements LLMSessionService {
     if (ignoreChatHistory) {
       this.session.setChatHistory([]);
     }
+    // systemPrompt = "Respond only in Spanish.";
+    // if (systemPrompt) {
+    //   // console.log("SETTING SYSTEM PROMPT");
+    //   // this.session.setChatHistory([
+    //   //   ...this.session.getChatHistory(),
+    //   //   {
+    //   //     role: "assistant",
+    //   //     content: systemPrompt,
+    //   //     messageType: "success",
+    //   //   },
+    //   // ]);
+    //   this.session = await new this.nodeLLamaCpp.LlamaChatSession({
+    //     contextSequence: this.context.getSequence(),
+    //     systemPrompt: "Respond only in German.",
+    //   });
+    //   // this.session.sojfaosdfj();
+    // }
     console.log("starting streaming prompt");
     this.abortController = new AbortController();
 
     try {
+      console.log("prompt:", prompt);
       return await this.session.prompt(prompt, {
         onToken: (chunk: any[]) => {
           const decodedChunk = this.session.model.detokenize(chunk);

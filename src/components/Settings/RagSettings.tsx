@@ -9,7 +9,7 @@ const RagSettings: React.FC<RagSettingsProps> = ({ children }) => {
 
   useEffect(() => {
     const defaultNoOfRAGExamples = window.electronStore.getNoOfRAGExamples();
-    if (defaultNoOfRAGExamples) {
+    if (defaultNoOfRAGExamples != null) {
       setNoOfRAGExamples(defaultNoOfRAGExamples);
     } else {
       setNoOfRAGExamples(15);
@@ -17,25 +17,26 @@ const RagSettings: React.FC<RagSettingsProps> = ({ children }) => {
     }
   }, []);
 
-  const handleChangeOnModelSelect = (ragExamples: string) => {
+  const handleChange = (ragExamples: string) => {
     const numberVersion = parseInt(ragExamples);
+    console.log("numberVersion:", numberVersion);
     setNoOfRAGExamples(numberVersion);
     window.electronStore.setNoOfRAGExamples(numberVersion);
   };
 
-  const possibleNoOfExamples = Array.from({ length: 30 }, (_, i) => i + 1);
+  const possibleNoOfExamples = Array.from({ length: 31 }, (_, i) => i);
 
   return (
     <div className="w-full bg-gray-800 rounded pb-7">
       {children}
-      {noOfRAGExamples && (
+      {noOfRAGExamples !== null && (
         <CustomSelect
           options={possibleNoOfExamples.map((num) => ({
             label: num.toString(),
             value: num.toString(),
           }))}
-          value={noOfRAGExamples?.toString()}
-          onChange={handleChangeOnModelSelect}
+          value={noOfRAGExamples?.toString() ?? ""}
+          onChange={handleChange}
         />
       )}
     </div>

@@ -152,8 +152,6 @@ export const registerStoreHandlers = (
     }
   );
 
-
-
   ipcMain.on("get-default-embedding-model", (event) => {
     event.returnValue = store.get(StoreKeys.DefaultEmbeddingModelAlias);
   });
@@ -196,7 +194,7 @@ export async function addOrUpdateLLMSchemaInStore(
 
 export async function deleteLLMSchemafromStore(
   store: Store<StoreSchema>,
-  modelName: string,
+  modelName: string
 ): Promise<string> {
   const existingModels =
     (store.get(StoreKeys.LLMs) as Record<string, LLMModelConfig>) || {};
@@ -210,8 +208,6 @@ export async function deleteLLMSchemafromStore(
     return "Model does not exist";
   }
 }
-
-
 
 export function setupDefaultStoreValues(store: Store<StoreSchema>) {
   if (!store.get(StoreKeys.MaxRAGExamples)) {

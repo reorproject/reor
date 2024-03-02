@@ -55,6 +55,7 @@ export class OpenAIModelSessionService implements LLMSessionService {
   async streamingPrompt(
     prompt: string,
     sendFunctionImplementer: ISendFunctionImplementer,
+    systemPrompt?: string,
     ignoreChatHistory?: boolean
   ): Promise<string> {
     if (!this.isModelLoaded()) {
@@ -64,6 +65,14 @@ export class OpenAIModelSessionService implements LLMSessionService {
 
     if (ignoreChatHistory) {
       this.messageHistory = [];
+    }
+
+    if (systemPrompt) {
+      this.messageHistory.push({
+        role: "assistant",
+        content: systemPrompt,
+        messageType: "success",
+      });
     }
 
     // Add the user's prompt to the message history
@@ -83,6 +92,7 @@ export class OpenAIModelSessionService implements LLMSessionService {
         model: this.modelName,
         messages: openAIMessages,
         stream: true,
+        // tools,
       });
 
       let result = "";
