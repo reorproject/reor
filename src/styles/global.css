@@ -22,6 +22,19 @@ a {
   color:rgba(94, 129, 172, 1);
 }
 
+/*custom rule to manage the paragraph spacing inside of node view*/
+div[data-node-view-content="true"] p {
+  margin-block-start: 0.5rem;
+  margin-block-end: 0.5rem;
+}
+
+.custom-li::before {
+  content: "•"; /* Add your custom marker */
+  color: rgba(94, 129, 172, 1); /* Customize the marker color */
+  font-size: 0.75rem; /* Adjust the marker size */
+  margin-right: 0.5rem; /* Add some space between the marker and the list item text */
+}
+
 #customTitleBar {
   -webkit-app-region: drag;
 }
@@ -51,6 +64,9 @@ button {
   outline: none;
 }
 
+.milkdown .editor ul li {
+  color: white;
+}
 
 .milkdown .editor .paragraph {
   margin: 1rem 0;

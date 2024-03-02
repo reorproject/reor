@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Editor, rootCtx, defaultValueCtx } from "@milkdown/core";
 import { nord } from "@milkdown/theme-nord";
-import { commonmark } from "@milkdown/preset-commonmark";
+import { commonmark, listItemSchema} from "@milkdown/preset-commonmark";
+import debounce from "lodash.debounce";
 import { history } from "@milkdown/plugin-history";
 import { gfm } from "@milkdown/preset-gfm";
 import { useEditor, Milkdown, MilkdownProvider } from "@milkdown/react";
@@ -10,11 +11,12 @@ import { prism } from "@milkdown/plugin-prism";
 import { block } from "@milkdown/plugin-block";
 import { cursor } from "@milkdown/plugin-cursor";
 import { clipboard } from "@milkdown/plugin-clipboard";
-import { replaceAll } from "@milkdown/utils";
+import { $view, replaceAll } from "@milkdown/utils";
 
 import { BlockView } from './Block';
 
-import { usePluginViewFactory, ProsemirrorAdapterProvider } from '@prosemirror-adapter/react';
+import { usePluginViewFactory, useNodeViewFactory, ProsemirrorAdapterProvider } from '@prosemirror-adapter/react';
+import { ListItem } from "./Todo/ListItem";
 
 export interface MarkdownEditorProps {
   filePath: string;
@@ -37,6 +39,7 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
   };
 
   useEffect(() => {
+    
     const saveInterval = setInterval(() => {
       saveFile();
     }, 1000);
@@ -49,6 +52,7 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
   }, [content]);
 
   const pluginViewFactory = usePluginViewFactory();
+  const nodeViewFactory = useNodeViewFactory();
 
   const { get } = useEditor((root) => {
     return Editor
@@ -56,9 +60,12 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
       .config(ctx => {
         ctx.set(rootCtx, root)
         ctx.set(defaultValueCtx, content);
-        ctx.get(listenerCtx).markdownUpdated((ctx, markdown) => {
-          setContent(markdown)
+        ctx.get(listenerCtx).markdownUpdated((_ctx, markdown) => {
+          debounce(() => {
+            setContent(markdown);
+          }, 1000)();
         })
+        
         ctx.set(block.key, {
           view: pluginViewFactory({
           component: BlockView,
@@ -75,6 +82,9 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
       .use(block)
       .use(cursor)
       .use(clipboard)
+      .use($view(listItemSchema.node, () =>
+        nodeViewFactory({ component: ListItem })
+      ))
       // .use(slash)
   }, [])
   
