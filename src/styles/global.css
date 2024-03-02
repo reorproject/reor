@@ -59,6 +59,8 @@ button {
   overflow: auto;
   padding-top: 50px !important;
   padding-left: 20px !important;
+  padding-right: 20px !important;
+
 }
 .milkdown .editor:focus {
   outline: none;

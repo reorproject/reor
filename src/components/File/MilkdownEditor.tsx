@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Editor, rootCtx, defaultValueCtx } from "@milkdown/core";
 import { nord } from "@milkdown/theme-nord";
-import { commonmark, listItemSchema} from "@milkdown/preset-commonmark";
+import { codeBlockSchema, commonmark, listItemSchema} from "@milkdown/preset-commonmark";
 import debounce from "lodash.debounce";
 import { history } from "@milkdown/plugin-history";
 import { gfm } from "@milkdown/preset-gfm";
@@ -17,6 +17,7 @@ import { BlockView } from './Block';
 
 import { usePluginViewFactory, useNodeViewFactory, ProsemirrorAdapterProvider } from '@prosemirror-adapter/react';
 import { ListItem } from "./Todo/ListItem";
+import { CodeBlock } from "./Codeblock";
 
 export interface MarkdownEditorProps {
   filePath: string;
@@ -85,8 +86,13 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
       .use($view(listItemSchema.node, () =>
         nodeViewFactory({ component: ListItem })
       ))
+      .use(
+        $view(codeBlockSchema.node, () =>
+          nodeViewFactory({ component: CodeBlock })
+        )
+      );
       // .use(slash)
-  }, [])
+  }, [setContent, content])
   
   useEffect(() => {
     const fetchContent = async () => {
