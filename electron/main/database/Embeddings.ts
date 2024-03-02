@@ -13,69 +13,85 @@ import { DownloadModelFilesFromHFRepo } from "../download/download";
 
 import { Worker } from "worker_threads";
 
-const worker = new Worker("./electron/main/database/textProcessingWorker.mjs");
-// const repoName = "Xenova/all-MiniLM-L6-v2";
+import * as os from "os";
 
-function sendMessageToWorker(task: any) {
+// Determine the optimal number of workers (e.g., number of CPU cores)
+const numCPUCores = 2; //os.cpus().length;
+
+// Create a pool of worker threads
+const workers: Worker[] = [];
+for (let i = 0; i < numCPUCores; i++) {
+  workers.push(new Worker("./electron/main/database/textProcessingWorker.mjs"));
+}
+
+function sendMessageToWorker(worker: Worker, task: any): Promise<any> {
   return new Promise((resolve, reject) => {
-    worker.on("message", (message) => {
+    worker.once("message", (message) => {
+      console.log("message: ", message);
       if (message.success) {
         resolve(message.result);
       } else {
         reject(new Error(message.error));
       }
     });
-    worker.on("error", reject);
+    worker.once("error", reject);
     worker.postMessage(task);
   });
 }
 
+let roundRobinIndex = 0;
+function getNextWorker(): Worker {
+  const worker = workers[roundRobinIndex % workers.length];
+  roundRobinIndex++;
+  return worker;
+}
+
 function embedText() {
-  // Directly return the function that takes a batch and returns a Promise<number[][]>
   return async (data: (string | number[])[]): Promise<number[][]> => {
     if (!data.length) {
       return Promise.resolve([]);
     }
 
-    // Assuming sendMessageToWorker correctly handles the batch and returns the desired format
-
-    // Send the batch to the worker and wait for the processed result
-    const response = await sendMessageToWorker({ type: "embed", data: data });
-    // Assuming the response is in the format number[][]
-    return response as number[][]; // Or process it as needed to fit the format
+    // Select a worker for the task
+    const worker = getNextWorker();
+    const response = await sendMessageToWorker(worker, {
+      type: "embed",
+      data: data,
+    });
+    return response as number[][];
   };
 }
 
 function getContextLength() {
-  const response = sendMessageToWorker({ type: "contextLength" });
+  // Select a worker for the task
+  const worker = getNextWorker();
+  const response = sendMessageToWorker(worker, { type: "contextLength" });
   return response as unknown as number;
 }
-// Initialize the worker with your pipeline
-// sendMessageToWorker({ type: "initialize", repoName })
-//   .then(() => {
-//     console.log("Worker initialized successfully");
-//     // embedText("Hello, world!").then((result) => {
-//     //   console.log("EMBEDDING RESULT: ", result);
-//     // });
-//   })
-//   .catch(console.error);
 
 export async function createEmbeddingFunctionFromWorker(
   embeddingModelConfig: EmbeddingModelWithRepo,
   sourceColumn: string
 ): Promise<EnhancedEmbeddingFunction<string | number[]>> {
-  const repoName = embeddingModelConfig.repoName;
-  await sendMessageToWorker({ type: "initialize", repoName });
-  const contextLength = await getContextLength();
+  // Initialize each worker with the model configuration
+  await Promise.all(
+    workers.map((worker) =>
+      sendMessageToWorker(worker, {
+        type: "initialize",
+        repoName: embeddingModelConfig.repoName,
+      })
+    )
+  );
+
+  const contextLength = await getContextLength(); // This might need adjustment to ensure consistency across workers
+
   return {
     name: embeddingModelConfig.repoName,
-    contextLength: contextLength, // TODO: update this to use the thread
+    contextLength: contextLength,
     sourceColumn,
     embed: embedText(),
-    // tokenize: tokenizeText,
   };
 }
-
 // Example usage for embedding
 
 // Example usage for tokenization

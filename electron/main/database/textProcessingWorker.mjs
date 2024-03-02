@@ -18,27 +18,37 @@ async function initializePipeline(repoName) {
 
 workers.parentPort.on("message", async (task) => {
   try {
+    console.log("Received task", task);
+    // Common response structure including task ID
+    const response = { id: task.id, success: true };
+
     if (task.type === "initialize") {
       await initializePipeline(task.repoName);
-      workers.parentPort.postMessage({ success: true });
+      console.log("Pipeline initialized");
+      workers.parentPort.postMessage({ ...response });
     } else if (task.type === "embed") {
       // Perform embedding
       if (!pipe) throw new Error("Pipeline not initialized");
       const result = await embedFunc(task.data); // Simplified for illustration
-      workers.parentPort.postMessage({ success: true, result });
+      workers.parentPort.postMessage({ ...response, result });
     } else if (task.type === "tokenize") {
       // Perform tokenization
       if (!pipe) throw new Error("Pipeline not initialized");
       const result = await tokenize(task.data); // Simplified for illustration
-      workers.parentPort.postMessage({ success: true, result });
+      workers.parentPort.postMessage({ ...response, result });
     } else if (task.type === "contextLength") {
-      // Perform tokenization
+      // Perform context length retrieval
       if (!pipe) throw new Error("Pipeline not initialized");
       const result = pipe.model.config.hidden_size; // Simplified for illustration
-      workers.parentPort.postMessage({ success: true, result });
+      workers.parentPort.postMessage({ ...response, result });
     }
   } catch (error) {
-    workers.parentPort.postMessage({ success: false, error: error.message });
+    // Include the task ID in error responses as well
+    workers.parentPort.postMessage({
+      id: task.id,
+      success: false,
+      error: error.message,
+    });
   }
 });
 
