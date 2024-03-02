@@ -82,11 +82,16 @@ export class LanceDBTableWrapper {
       .map((filePath) => sanitizePathForDatabase(filePath))
       .map((filePath) => `'${filePath}'`)
       .join(", ");
+    if (quotedFilePaths === "") {
+      return;
+    }
     const filterString = `${DatabaseFields.NOTE_PATH} IN (${quotedFilePaths})`;
     try {
       await this.table.delete(filterString);
     } catch (error) {
-      console.error("Error deleting items from DB:", error);
+      console.error(
+        `Error deleting items from DB: ${error} using filter string: ${filterString}`
+      );
     }
   }
 
