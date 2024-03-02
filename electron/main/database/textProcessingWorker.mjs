@@ -25,12 +25,16 @@ workers.parentPort.on("message", async (task) => {
       // Perform embedding
       if (!pipe) throw new Error("Pipeline not initialized");
       const result = await embedFunc(task.data); // Simplified for illustration
-      console.log("RESULT IN WORKER THREAD", result);
       workers.parentPort.postMessage({ success: true, result });
     } else if (task.type === "tokenize") {
       // Perform tokenization
       if (!pipe) throw new Error("Pipeline not initialized");
       const result = await tokenize(task.data); // Simplified for illustration
+      workers.parentPort.postMessage({ success: true, result });
+    } else if (task.type === "contextLength") {
+      // Perform tokenization
+      if (!pipe) throw new Error("Pipeline not initialized");
+      const result = pipe.model.config.hidden_size; // Simplified for illustration
       workers.parentPort.postMessage({ success: true, result });
     }
   } catch (error) {

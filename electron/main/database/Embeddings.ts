@@ -45,6 +45,11 @@ function embedText() {
     return response as number[][]; // Or process it as needed to fit the format
   };
 }
+
+function getContextLength() {
+  const response = sendMessageToWorker({ type: "contextLength" });
+  return response as unknown as number;
+}
 // Initialize the worker with your pipeline
 // sendMessageToWorker({ type: "initialize", repoName })
 //   .then(() => {
@@ -61,10 +66,10 @@ export async function createEmbeddingFunctionFromWorker(
 ): Promise<EnhancedEmbeddingFunction<string | number[]>> {
   const repoName = embeddingModelConfig.repoName;
   await sendMessageToWorker({ type: "initialize", repoName });
-
+  const contextLength = await getContextLength();
   return {
     name: embeddingModelConfig.repoName,
-    contextLength: 384, // TODO: update this to use the thread
+    contextLength: contextLength, // TODO: update this to use the thread
     sourceColumn,
     embed: embedText(),
     // tokenize: tokenizeText,
