@@ -81,7 +81,9 @@ export const RepopulateTableWithMissingItems = async (
   onProgress && onProgress(1);
 };
 
-const getTableAsArray = async (table: LanceDBTableWrapper) => {
+const getTableAsArray = async (
+  table: LanceDBTableWrapper
+): Promise<DBEntry[]> => {
   const totalRows = await table.countRows();
   if (totalRows == 0) {
     return [];
@@ -160,6 +162,7 @@ const convertFileTypeToDBType = async (file: FileInfo): Promise<DBEntry[]> => {
       subnoteindex: index,
       timeadded: new Date(),
       filemodified: file.dateModified,
+      filecreated: file.dateCreated,
     };
   });
   return entries;
