@@ -7,6 +7,7 @@ import {
 } from "@material-tailwind/react";
 import { ChatbotMessage } from "electron/main/llm/Types";
 import { errorToString } from "@/functions/error";
+import { toast } from "react-toastify";
 import Textarea from "@mui/joy/Textarea";
 import CircularProgress from "@mui/material/CircularProgress";
 import ReactMarkdown from "react-markdown";
@@ -97,17 +98,26 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
     }
     if (!currentSessionId || !userInput.trim()) return;
 
-    let filterString = "";
+    let augmentedPrompt: string = '';
     if (askText === AskOptions.AskFile) {
-      const databaseFields = await window.database.getDatabaseFields();
-      filterString = `${databaseFields.NOTE_PATH} = '${currentFilePath}'`; // undefined current file will let the model deal with no context
+      if (!currentFilePath) {
+        console.error("No current file selected. The lack of a file means that there is no context being loaded into the prompt. Please open a file before trying again");
+
+        toast.error("No current file selected. Please open a file before trying again.")
+        return;
+      }
+      augmentedPrompt = await window.files.augmentPromptWithFile(
+        userInput,
+        currentSessionId,
+        currentFilePath
+      );
+    } else if (askText === AskOptions.Ask){
+      augmentedPrompt = await window.database.augmentPromptWithRAG(
+        userInput,
+        currentSessionId,
+      );
     }
 
-    const augmentedPrompt = await window.database.augmentPromptWithRAG(
-      userInput,
-      currentSessionId,
-      filterString
-    );
     startStreamingResponse(currentSessionId, augmentedPrompt, true);
 
     setMessages([

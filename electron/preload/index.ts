@@ -53,6 +53,11 @@ declare global {
         sourcePath: string,
         destinationPath: string
       ) => Promise<void>;
+      augmentPromptWithFile: (
+        prompt: string,
+        llmSessionID: string,
+        filePath: string
+      ) => Promise<string>;
     };
     path: {
       basename: (pathString: string) => string;
@@ -247,6 +252,18 @@ contextBridge.exposeInMainWorld("files", {
 
   moveFileOrDir: async (sourcePath: string, destinationPath: string) => {
     return ipcRenderer.invoke("move-file-or-dir", sourcePath, destinationPath);
+  },
+  augmentPromptWithFile: async (
+    prompt: string,
+    llmSessionID: string,
+    filePath: string
+  ): Promise<string> => {
+    return ipcRenderer.invoke(
+      "augment-prompt-with-file",
+      prompt,
+      llmSessionID,
+      filePath
+    );
   },
 });
 

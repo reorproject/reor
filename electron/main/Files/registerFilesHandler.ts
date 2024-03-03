@@ -14,6 +14,8 @@ import {
   activeWindows,
 } from "../windowManager";
 import { errorToString } from "../Generic/error";
+import { LLMSessions } from "../llm/llmSessionHandlers";
+import { createFilePrompt, createRAGPrompt } from "../Prompts/Prompts";
 
 export const registerFileHandlers = () => {
   ipcMain.handle("join-path", (event, ...args) => {
@@ -113,4 +115,42 @@ export const registerFileHandlers = () => {
       );
     }
   );
+
+  ipcMain.handle(
+    "augment-prompt-with-file",
+    async (
+      event,
+      query: string,
+      llmSessionID: string,
+      filePath: string
+    ): Promise<string> => {
+      try {
+        const windowInfo = getWindowInfoForContents(
+          activeWindows,
+          event.sender
+        );
+        if (!windowInfo) {
+          throw new Error("Window info not found.");
+        }
+        const content = fs.readFileSync(filePath, "utf-8");
+
+        const llmSession = LLMSessions[llmSessionID];
+        if (!llmSession) {
+          throw new Error(`Session ${llmSessionID} does not exist.`);
+        }
+
+        const filePrompt = createFilePrompt(
+          content,
+          query,
+          llmSession.tokenize,
+          llmSession.getContextLength()
+        );
+        return filePrompt;
+      } catch (error) {
+        console.error("Error searching database:", error);
+        throw error;
+      }
+    }
+  );
+
 };

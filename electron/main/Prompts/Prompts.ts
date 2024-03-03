@@ -33,3 +33,29 @@ export function createRAGPrompt(
   const output = basePrompt + entryContents + queryPrompt;
   return output;
 }
+
+
+
+export function createFilePrompt(
+  content: string,
+  query: string,
+  tokenize: (text: string) => number[],
+  contextLimit: number
+): string {
+  let entryContents = "";
+
+  const basePrompt = `Answer the question below based on the following notes:\n ${content}\n`;
+  const queryPrompt = `Question: ${query}`;
+
+  let tokenCount = tokenize(basePrompt + queryPrompt).length;
+
+  if (tokenCount >= contextLimit) {
+    throw new Error(
+      "The provided information is too long to process in a single prompt. Please shorten the query or provide fewer details."
+    );
+  }
+
+  const output = basePrompt + entryContents + queryPrompt;
+  return output;
+}
+
