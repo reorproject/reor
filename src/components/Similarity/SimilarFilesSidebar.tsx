@@ -16,11 +16,8 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   onFileSelect,
 }) => {
   const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([]);
-  const [hitRefresh, setHitRefresh] = useState<boolean>(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  useEffect(() => {
-    setHitRefresh(false);
-  }, [filePath]);
+  const [userHitRefresh, setUserHitRefresh] = useState<boolean>(false);
+
   const handleNewFileOpen = async (path: string) => {
     try {
       const searchResults = await performSearch(path);
@@ -67,6 +64,8 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     if (filePath) {
       handleNewFileOpen(filePath);
     }
+
+    setUserHitRefresh(false);
   }, [filePath]);
 
   useEffect(() => {
@@ -114,7 +113,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
         <div
           className="flex-1 flex justify-end pr-3 pt-1 cursor-pointer"
           onClick={() => {
-            setHitRefresh(true);
+            setUserHitRefresh(true);
             setSimilarEntries([]); // simulate refresh
             updateSimilarEntries();
           }}
@@ -137,7 +136,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
             className="flex justify-center items-center text-gray-500 text-lg mx-auto text-center"
             style={{ width: "fit-content" }}
           >
-            {!hitRefresh ? (
+            {!userHitRefresh ? (
               <>Hit refresh to show related notes...</>
             ) : (
               <>Make sure your note is not empty...</>
