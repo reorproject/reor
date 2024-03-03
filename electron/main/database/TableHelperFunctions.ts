@@ -204,7 +204,6 @@ export const updateFileInTable = async (
   const chunkedContentList = await chunkMarkdownByHeadingsAndByCharsIfBig(
     content
   );
-  // so here, perhaps we'll need to get out the actual fileinfo object or like read the time it was created...There is no other way I don't think...
   const stats = fs.statSync(filePath);
   const dbEntries = chunkedContentList.map((content, index) => {
     return {
