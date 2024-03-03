@@ -14,7 +14,7 @@ A self-organizing AI note-taking app that runs models locally.</h4>
 </p>
 
 <h2 align="center">
-    New: We are now accessible via discord, hop by to give ❤️feedback❤️ or discuss our upcoming features!
+    New: We are now accessible via <a href="https://discord.gg/QBhGUFJYuH" target="_blank">discord</a>, hop by to give ❤️feedback❤️ or discuss our upcoming features!
 </h2>
 
 ## About
