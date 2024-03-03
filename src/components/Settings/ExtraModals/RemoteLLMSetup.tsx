@@ -66,6 +66,11 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
             url="https://github.com/oobabooga/text-generation-webui/wiki/12-%E2%80%90-OpenAI-API"
             label="Oobabooga"
           />
+          . A guide to doing this is on the{" "}
+          <ExternalLink
+            url="https://www.reorproject.org/docs/documentation/openai-like-api"
+            label="docs"
+          />
           .
         </p>
 
@@ -79,7 +84,9 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
           className="block w-full px-3 py-2 mb-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
         />
         <p className="mt-2 text-gray-100 text-xs">
-          (This must be an OpenAI compatible API endpoint.)
+          (This must be an OpenAI compatible API endpoint. That typically is the
+          part of the url before /chat/completions like for example
+          http://127.0.0.1:1337/v1)
         </p>
         <h4 className="text-gray-100 mb-1">Model Name</h4>
         <input

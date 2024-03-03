@@ -64,7 +64,12 @@ const LocalModelModal: React.FC<LocalModelModalProps> = ({
         <h2 className="text-white  font-semibold mb-0">New Local Model</h2>
         <p className="text-white text-sm mb-2 mt-1">
           To use a local model you need to download a GGUF model file and attach
-          it here:
+          it here. More info is available in the{" "}
+          <ExternalLink
+            url="https://www.reorproject.org/docs/documentation/llm"
+            label="docs"
+          />
+          .
         </p>
 
         <Button
