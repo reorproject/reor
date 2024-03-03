@@ -15,7 +15,7 @@ import {
 } from "../windowManager";
 import { errorToString } from "../Generic/error";
 import { LLMSessions } from "../llm/llmSessionHandlers";
-import { createFilePrompt, createRAGPrompt } from "../Prompts/Prompts";
+import { createFilePrompt } from "../Prompts/Prompts";
 
 export const registerFileHandlers = () => {
   ipcMain.handle("join-path", (event, ...args) => {

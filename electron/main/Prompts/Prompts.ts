@@ -42,12 +42,10 @@ export function createFilePrompt(
   tokenize: (text: string) => number[],
   contextLimit: number
 ): string {
-  let entryContents = "";
-
   const basePrompt = `Answer the question below based on the following notes:\n ${content}\n`;
   const queryPrompt = `Question: ${query}`;
 
-  let tokenCount = tokenize(basePrompt + queryPrompt).length;
+  const tokenCount = tokenize(basePrompt + queryPrompt).length;
 
   if (tokenCount >= contextLimit) {
     throw new Error(
@@ -55,7 +53,7 @@ export function createFilePrompt(
     );
   }
 
-  const output = basePrompt + entryContents + queryPrompt;
+  const output = basePrompt + queryPrompt;
   return output;
 }
 
