@@ -31,6 +31,7 @@ describe("GetFilesInfoTree", () => {
         path: filePath,
         relativePath: filename,
         dateModified: expect.anything(),
+        dateCreated: expect.anything(),
         // children: undefined,
       },
     ]);
@@ -54,12 +55,14 @@ describe("GetFilesInfoTree", () => {
         path: nestedDirPath,
         relativePath: "nested",
         dateModified: expect.anything(),
+        dateCreated: expect.anything(),
         children: [
           {
             name: filename,
             path: nestedFilePath,
             relativePath: path.join(dirName, filename),
             dateModified: expect.anything(),
+            dateCreated: expect.anything(),
             children: undefined,
           },
         ],
