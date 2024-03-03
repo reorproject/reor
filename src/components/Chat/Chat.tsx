@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Button, Menu, MenuHandler, MenuItem, MenuList } from "@material-tailwind/react";
+import { Menu, MenuHandler, MenuItem, MenuList } from "@material-tailwind/react";
 import { ChatbotMessage } from "electron/main/llm/Types";
 import { errorToString } from "@/functions/error";
 import Textarea from "@mui/joy/Textarea";
