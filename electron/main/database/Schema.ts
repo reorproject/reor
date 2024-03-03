@@ -16,6 +16,7 @@ export interface DBEntry {
   subnoteindex: number;
   timeadded: Date;
   filemodified: Date;
+  filecreated: Date;
 }
 export interface DBQueryResult extends DBEntry {
   _distance: number;
@@ -28,6 +29,7 @@ export enum DatabaseFields {
   SUB_NOTE_INDEX = "subnoteindex",
   TIME_ADDED = "timeadded",
   FILE_MODIFIED = "filemodified",
+  FILE_CREATED = "filecreated",
   DISTANCE = "_distance",
 }
 
@@ -48,6 +50,11 @@ const CreateDatabaseSchema = (vectorDim: number): Schema => {
     ),
     new Field(
       DatabaseFields.FILE_MODIFIED,
+      new ArrowDate(DateUnit.MILLISECOND),
+      false
+    ),
+    new Field(
+      DatabaseFields.FILE_CREATED,
       new ArrowDate(DateUnit.MILLISECOND),
       false
     ),
@@ -73,6 +80,8 @@ export const isStringifiedSchemaEqual = (
   const serializedSchema1 = serializeSchema(schema1);
   const serializedSchema2 = serializeSchema(schema2);
 
-  return serializedSchema1 === serializedSchema2;
+  const areEqual = serializedSchema1 === serializedSchema2;
+  return areEqual;
 };
+
 export default CreateDatabaseSchema;

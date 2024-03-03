@@ -3,6 +3,7 @@ export type FileInfo = {
   path: string;
   relativePath: string;
   dateModified: Date;
+  dateCreated: Date;
 };
 
 export type FileInfoNode = FileInfo & {
