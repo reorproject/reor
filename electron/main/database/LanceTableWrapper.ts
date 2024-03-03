@@ -107,6 +107,7 @@ export class LanceDBTableWrapper {
       // .metricType(metricType)
       .limit(limit);
     if (filter) {
+      lanceQuery.prefilter(true);
       lanceQuery.filter(filter);
     }
     const rawResults = await lanceQuery.execute();
