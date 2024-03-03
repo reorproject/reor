@@ -4,10 +4,9 @@ import type { FC } from "react";
 interface Props {
   promptText: string;
   onClick?: () => void;
-  disabled?: boolean;
 }
 
-export const ChatPrompt: FC<Props> = ({ promptText, onClick, disabled } : Props) => {
+export const ChatPrompt: FC<Props> = ({ promptText, onClick } : Props) => {
     return (
       <button
         className={`
@@ -15,7 +14,6 @@ export const ChatPrompt: FC<Props> = ({ promptText, onClick, disabled } : Props)
             hover:bg-gray-300 hover:text-black mt-2
             border-solid border border-white border-opacity-50`}
           onClick={onClick}
-          disabled={disabled}
       >
         {promptText}
       </button>
