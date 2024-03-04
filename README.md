@@ -13,6 +13,9 @@ A self-organizing AI note-taking app that runs models locally.</h4>
 
 </p>
 
+<h2 align="center">
+    New: We are now accessible via <a href="https://discord.gg/QBhGUFJYuH" target="_blank">discord</a>, hop by to give ❤️feedback❤️ or discuss our upcoming features!
+</h2>
 
 ## About
 **Reor** is an AI-powered desktop note-taking app: it automatically links related ideas, answers questions on your notes and provides semantic search. Everything is stored locally and you can edit your notes with an Obsidian-like markdown editor. 

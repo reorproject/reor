@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Menu,
   MenuHandler,
@@ -12,6 +12,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import ReactMarkdown from "react-markdown";
 import { FiRefreshCw } from "react-icons/fi"; // Importing refresh icon from React Icons
 import { ChatPrompt } from "./Chat-Prompts";
+import { toast } from "react-toastify";
 
 // convert ask options to enum
 enum AskOptions {
@@ -20,7 +21,7 @@ enum AskOptions {
 }
 const ASK_OPTIONS = Object.values(AskOptions);
 
-const PROMPT_OPTIONS = ["Generate weekly 1-1 talking points from this file"]; // more options to come
+const PROMPT_OPTIONS = ["Generate weekly 1-1 talking points from this file", "Separate concepts from todos"]; // more options to come
 
 interface ChatWithLLMProps {
   currentFilePath: string | null;
@@ -44,6 +45,15 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
   useEffect(() => {
     fetchDefaultModel();
   }, []);
+
+  const fileNotSelectedToastId = useRef<string| null>(null);
+  useEffect(() => {
+    if (!currentFilePath && askText === AskOptions.AskFile) {
+      fileNotSelectedToastId.current = toast.error("Please open a file before asking questions in ask file mode", {}) as string;
+    } else if (currentFilePath && askText === AskOptions.AskFile && fileNotSelectedToastId.current) {
+      toast.dismiss(fileNotSelectedToastId.current);
+    }
+  }, [currentFilePath, askText])
 
   const initializeSession = async (): Promise<string> => {
     try {
@@ -252,7 +262,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
             </ReactMarkdown>
           )}
         </div>
-        {userInput === "" && askText === AskOptions.AskFile ? (
+        {userInput === "" && askText === AskOptions.AskFile && messages.length == 0 ? (
           <>
             {PROMPT_OPTIONS.map((option, index) => {
               return (
@@ -329,7 +339,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
                         <MenuItem
                           key={index}
                           placeholder=""
-                          className="bg-slate-600 border-none h-full w-full hover:bg-slate-700 cursor-pointer text-white text-left"
+                          className="bg-slate-600 border-none h-full w-full hover:bg-slate-700 cursor-pointer text-white text-left p-2"
                           onClick={() => setAskText(option)}
                         >
                           {option}
