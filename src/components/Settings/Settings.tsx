@@ -4,6 +4,7 @@ import LLMSettings from "./LLMSettings";
 import EmbeddingModelSettings from "./EmbeddingSettings";
 import RagSettings from "./RagSettings";
 import HardwareSettings from "./HardwareSettings";
+import TextGenerationSettings from "./TextGenerationSettings";
 
 interface ModalProps {
   isOpen: boolean;
@@ -68,7 +69,16 @@ const SettingsModal: React.FC<ModalProps> = ({
           >
             Hardware
           </div>
-
+          <div
+            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
+              activeTab === "textGeneration"
+                ? "bg-gray-700 text-white font-semibold"
+                : "text-gray-200"
+            }`}
+            onClick={() => setActiveTab("textGeneration")}
+          >
+            Text Generation{" "}
+          </div>
           <div
             className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
               activeTab === "RAG"
@@ -107,6 +117,14 @@ const SettingsModal: React.FC<ModalProps> = ({
                   Number of notes to feed to the LLM during Q&A:
                 </p>
               </HardwareSettings>
+            </div>
+          )}
+
+          {activeTab === "textGeneration" && (
+            <div className="w-full">
+              <div>
+                <TextGenerationSettings />
+              </div>
             </div>
           )}
 

@@ -82,7 +82,6 @@ export class OpenAIModelSessionService implements LLMSessionService {
         role: msg.role,
         content: msg.content,
       })) as OpenAIMessage[];
-
       const stream = await this.openai.chat.completions.create({
         model: this.modelName,
         messages: openAIMessages,
