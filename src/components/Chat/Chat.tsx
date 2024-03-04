@@ -108,10 +108,11 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
           return;
         }
         augmentedPrompt = await window.files.augmentPromptWithFile(
-          userInput,
-          currentSessionId,
-          currentFilePath
-        );
+          { 
+            prompt: userInput,
+            llmSessionID: currentSessionId,
+            filePath: currentFilePath
+          });
       } else if (askText === AskOptions.Ask){
         augmentedPrompt = await window.database.augmentPromptWithRAG(
           userInput,

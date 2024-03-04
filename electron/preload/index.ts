@@ -6,7 +6,7 @@ import {
   HardwareConfig,
   LLMModelConfig,
 } from "electron/main/Store/storeConfig";
-import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
+import { AugmentPromptWithFileProps, FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
 import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
@@ -54,9 +54,7 @@ declare global {
         destinationPath: string
       ) => Promise<void>;
       augmentPromptWithFile: (
-        prompt: string,
-        llmSessionID: string,
-        filePath: string
+        augmentPromptWithFileProps: AugmentPromptWithFileProps
       ) => Promise<string>;
     };
     path: {
@@ -254,16 +252,9 @@ contextBridge.exposeInMainWorld("files", {
     return ipcRenderer.invoke("move-file-or-dir", sourcePath, destinationPath);
   },
   augmentPromptWithFile: async (
-    prompt: string,
-    llmSessionID: string,
-    filePath: string
+    augmentPromptWithFileProps : AugmentPromptWithFileProps
   ): Promise<string> => {
-    return ipcRenderer.invoke(
-      "augment-prompt-with-file",
-      prompt,
-      llmSessionID,
-      filePath
-    );
+    return ipcRenderer.invoke("augment-prompt-with-file", augmentPromptWithFileProps);
   },
 });
 

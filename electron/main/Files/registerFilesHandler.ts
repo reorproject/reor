@@ -1,6 +1,6 @@
 import { ipcMain } from "electron";
 import * as path from "path";
-import { FileInfoTree } from "./Types";
+import { FileInfoTree, AugmentPromptWithFileProps } from "./Types";
 import {
   GetFilesInfoTree,
   orchestrateEntryMove,
@@ -120,9 +120,7 @@ export const registerFileHandlers = () => {
     "augment-prompt-with-file",
     async (
       event,
-      query: string,
-      llmSessionID: string,
-      filePath: string
+     { prompt, llmSessionID, filePath }: AugmentPromptWithFileProps
     ): Promise<string> => {
       try {
         const windowInfo = getWindowInfoForContents(
@@ -141,7 +139,7 @@ export const registerFileHandlers = () => {
 
         const filePrompt = createFilePrompt(
           content,
-          query,
+          prompt,
           llmSession.tokenize,
           llmSession.getContextLength()
         );
