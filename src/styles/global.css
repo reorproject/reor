@@ -18,7 +18,8 @@ a {
   color: #0f82af;
 }
 
-.milkdown .editor ul {
+.milkdown .editor ul,
+.milkdown .editor ol {
   padding-inline-start: 0.5rem;
 }
 
@@ -36,8 +37,13 @@ div[data-node-view-content="true"] p {
   content: "•"; /* Add your custom marker */
   color: rgba(94, 129, 172, 1); /* Customize the marker color */
   font-size: 0.75rem; /* Adjust the marker size */
-  margin-right: 0.5rem; /* Add some space between the marker and the list item text */
 }
+
+.custom-oli {
+  color: rgba(94, 129, 172, 1); /* Customize the marker color */
+  font-size: 1rem; /* Adjust the marker size */
+}
+
 
 #customTitleBar {
   -webkit-app-region: drag;
