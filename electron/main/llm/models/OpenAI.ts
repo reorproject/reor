@@ -92,9 +92,10 @@ export class OpenAIModelSessionService implements LLMSessionService {
       tool_choice: "auto", // auto is default, but we'll be explicit
     });
     const responseMessage = response.choices[0].message;
-
+    console.log("responseMessage:", responseMessage);
     // Step 2: check if the model wanted to call a function
     const toolCalls = responseMessage.tool_calls;
+    console.log("toolCalls:", toolCalls);
     if (responseMessage.tool_calls) {
       // Step 3: call the function
       // Note: the JSON response may not always be valid; be sure to handle errors
@@ -120,6 +121,7 @@ export class OpenAIModelSessionService implements LLMSessionService {
           content: functionResponse,
         }); // extend conversation with function response
       }
+      console.log("MESSAGES BEFORE SECOND RESPONSE:", messages);
       const secondResponse = await this.openai.chat.completions.create({
         model: "gpt-3.5-turbo-0125",
         messages: messages,
@@ -185,7 +187,7 @@ export class OpenAIModelSessionService implements LLMSessionService {
 
       let result = "";
       for await (const chunk of stream) {
-        console.log("chunk:", chunk);
+        // console.log("chunk:", chunk);
         if (this.abortStreaming) {
           break; // Exit the loop if the flag is set
         }
