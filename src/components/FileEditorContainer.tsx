@@ -101,7 +101,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
             }`}
           >
             <ResizableComponent resizeSide="left" initialWidth={300}>
-              <ChatWithLLM />
+              <ChatWithLLM currentFilePath={selectedFilePath} />
             </ResizableComponent>
           </div>
         )}

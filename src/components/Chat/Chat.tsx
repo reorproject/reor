@@ -1,17 +1,37 @@
 import React, { useState, useEffect } from "react";
-import { Button } from "@material-tailwind/react";
+import {
+  Menu,
+  MenuHandler,
+  MenuItem,
+  MenuList,
+} from "@material-tailwind/react";
 import { ChatbotMessage } from "electron/main/llm/Types";
 import { errorToString } from "@/functions/error";
 import Textarea from "@mui/joy/Textarea";
 import CircularProgress from "@mui/material/CircularProgress";
 import ReactMarkdown from "react-markdown";
 import { FiRefreshCw } from "react-icons/fi"; // Importing refresh icon from React Icons
+import { ChatPrompt } from "./Chat-Prompts";
 
-const ChatWithLLM: React.FC = () => {
+// convert ask options to enum
+enum AskOptions {
+  Ask = "Ask",
+  AskFile = "Ask file",
+}
+const ASK_OPTIONS = Object.values(AskOptions);
+
+const PROMPT_OPTIONS = ["Generate weekly 1-1 talking points from this file"]; // more options to come
+
+interface ChatWithLLMProps {
+  currentFilePath: string | null;
+}
+
+const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [userInput, setUserInput] = useState<string>("");
   const [messages, setMessages] = useState<ChatbotMessage[]>([]);
   const [defaultModel, setDefaultModel] = useState<string>("");
+  const [askText, setAskText] = useState<string>("Ask");
 
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
 
@@ -77,9 +97,16 @@ const ChatWithLLM: React.FC = () => {
     }
     if (!currentSessionId || !userInput.trim()) return;
 
+    let filterString = "";
+    if (askText === AskOptions.AskFile) {
+      const databaseFields = await window.database.getDatabaseFields();
+      filterString = `${databaseFields.NOTE_PATH} = '${currentFilePath}'`; // undefined current file will let the model deal with no context
+    }
+
     const augmentedPrompt = await window.database.augmentPromptWithRAG(
       userInput,
-      currentSessionId
+      currentSessionId,
+      filterString
     );
     startStreamingResponse(currentSessionId, augmentedPrompt, true);
 
@@ -184,8 +211,7 @@ const ChatWithLLM: React.FC = () => {
           <FiRefreshCw className="text-gray-300" /> {/* Icon */}
         </div>
       </div>
-
-      <div className="flex-1 overflow-auto p-4 pt-0 bg-transparent">
+      <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
         {/* {messages.length === 0 && !currentBotMessage && (
           <div>
             {defaultModel ? (
@@ -199,7 +225,7 @@ const ChatWithLLM: React.FC = () => {
             )}
           </div>
         )} */}
-        <div className="space-y-2 mt-4">
+        <div className="space-y-2 mt-4 flex-grow">
           {messages.map((message, index) => (
             <ReactMarkdown
               key={index}
@@ -226,6 +252,23 @@ const ChatWithLLM: React.FC = () => {
             </ReactMarkdown>
           )}
         </div>
+        {userInput === "" && askText === AskOptions.AskFile ? (
+          <>
+            {PROMPT_OPTIONS.map((option, index) => {
+              return (
+                <ChatPrompt
+                  key={index}
+                  promptText={option}
+                  onClick={() => {
+                    console.log(option);
+                    setUserInput(option);
+                  }}
+                />
+              );
+            })}
+            {/** if user has written something already, dont bother prompting with template */}
+          </>
+        ) : undefined}
       </div>
       <div className="p-3 bg-gray-500">
         <div className="flex space-x-2 h-full">
@@ -251,13 +294,51 @@ const ChatWithLLM: React.FC = () => {
                 className="h-full w-full m-x-auto color-gray-500 "
               />
             ) : (
-              <Button
-                className="bg-slate-700 w-[70px] border-none h-full hover:bg-slate-900 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2"
-                onClick={handleSubmitNewMessage}
-                placeholder=""
-              >
-                Ask
-              </Button>
+              <>
+                <button
+                  aria-expanded="false"
+                  aria-haspopup="menu"
+                  className={`align-middle select-none font-sans font-bold transition-all 
+                  text-xs py-3 px-6 rounded-tl rounded-bl text-white shadow-md shadow-gray-900/10 
+                  hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] 
+                  active:shadow-none bg-slate-700 border-none h-full hover:bg-slate-900 cursor-pointer text-center 
+                  pt-0 pb-0 pr-2 pl-2`}
+                  type="button"
+                  onClick={handleSubmitNewMessage}
+                >
+                  {askText}
+                </button>
+                <Menu placement="top-end">
+                  <MenuHandler>
+                    <button
+                      aria-expanded="false"
+                      aria-haspopup="menu"
+                      className={`align-middle select-none font-sans font-bold uppercase transition-all 
+                  text-xs py-3 px-6 rounded-tr rounded-br text-white shadow-md shadow-gray-900/10 
+                  hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] 
+                  active:shadow-none bg-slate-700 border-none h-full hover:bg-slate-900 cursor-pointer text-center 
+                  pt-0 pb-0 pr-2 pl-2`}
+                      type="button"
+                    >
+                      <div className="mb-1">⌄</div>
+                    </button>
+                  </MenuHandler>
+                  <MenuList placeholder="" className="bg-slate-600">
+                    {ASK_OPTIONS.map((option, index) => {
+                      return (
+                        <MenuItem
+                          key={index}
+                          placeholder=""
+                          className="bg-slate-600 border-none h-full w-full hover:bg-slate-700 cursor-pointer text-white text-left"
+                          onClick={() => setAskText(option)}
+                        >
+                          {option}
+                        </MenuItem>
+                      );
+                    })}
+                  </MenuList>
+                </Menu>
+              </>
             )}
           </div>
         </div>

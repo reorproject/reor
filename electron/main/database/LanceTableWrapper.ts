@@ -82,11 +82,16 @@ export class LanceDBTableWrapper {
       .map((filePath) => sanitizePathForDatabase(filePath))
       .map((filePath) => `'${filePath}'`)
       .join(", ");
+    if (quotedFilePaths === "") {
+      return;
+    }
     const filterString = `${DatabaseFields.NOTE_PATH} IN (${quotedFilePaths})`;
     try {
       await this.table.delete(filterString);
     } catch (error) {
-      console.error("Error deleting items from DB:", error);
+      console.error(
+        `Error deleting items from DB: ${error} using filter string: ${filterString}`
+      );
     }
   }
 
@@ -102,6 +107,7 @@ export class LanceDBTableWrapper {
       // .metricType(metricType)
       .limit(limit);
     if (filter) {
+      lanceQuery.prefilter(true);
       lanceQuery.filter(filter);
     }
     const rawResults = await lanceQuery.execute();

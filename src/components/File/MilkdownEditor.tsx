@@ -1,16 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { Editor, rootCtx, defaultValueCtx } from "@milkdown/core";
 import { nord } from "@milkdown/theme-nord";
-import { commonmark } from "@milkdown/preset-commonmark";
+import { codeBlockSchema, commonmark, listItemSchema} from "@milkdown/preset-commonmark";
+import debounce from "lodash.debounce";
 import { history } from "@milkdown/plugin-history";
 import { gfm } from "@milkdown/preset-gfm";
-import { ReactEditor, useEditor } from "@milkdown/react";
+import { useEditor, Milkdown, MilkdownProvider } from "@milkdown/react";
 import { listener, listenerCtx } from "@milkdown/plugin-listener";
 import { prism } from "@milkdown/plugin-prism";
 import { block } from "@milkdown/plugin-block";
 import { cursor } from "@milkdown/plugin-cursor";
 import { clipboard } from "@milkdown/plugin-clipboard";
-import { replaceAll } from "@milkdown/utils";
+import { $view, replaceAll } from "@milkdown/utils";
+
+import { BlockView } from './Block';
+
+import { usePluginViewFactory, useNodeViewFactory, ProsemirrorAdapterProvider } from '@prosemirror-adapter/react';
+import { ListItem } from "./Todo/ListItem";
+import { CodeBlock } from "./Codeblock";
 
 export interface MarkdownEditorProps {
   filePath: string;
@@ -37,6 +44,7 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
   };
 
   useEffect(() => {
+    
     const saveInterval = setInterval(() => {
       saveFile();
     }, 1000);
@@ -48,38 +56,51 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
     setContentInParent(content);
   }, [content]);
 
-  const { editor, getInstance } = useEditor(
-    (root) =>
-      Editor.make()
-        .config((ctx) => {
-          ctx.set(rootCtx, root);
-          ctx.set(defaultValueCtx, content);
-          ctx
-            .get(listenerCtx)
+  const pluginViewFactory = usePluginViewFactory();
+  const nodeViewFactory = useNodeViewFactory();
 
-            .markdownUpdated((ctx, markdown) => {
-              setContent(markdown);
-            });
+  const { get } = useEditor((root) => {
+    return Editor
+      .make()
+      .config(ctx => {
+        ctx.set(rootCtx, root)
+        ctx.set(defaultValueCtx, content);
+        ctx.get(listenerCtx).markdownUpdated((_ctx, markdown) => {
+          debounce(setContent, 1000)(markdown);
         })
-
-        .use(nord)
-        .use(commonmark)
-        .use(gfm)
-        .use(history)
-        .use(listener)
-        .use(prism)
-        // .use(menu)
-        .use(block)
-        .use(cursor)
-        .use(clipboard)
-    // .use(slash)
-  );
-
+        
+        ctx.set(block.key, {
+          view: pluginViewFactory({
+          component: BlockView,
+          })
+        })
+      })
+      .config(nord)
+      .use(commonmark)
+      .use(gfm)
+      .use(history)
+      .use(listener)
+      .use(prism)
+      // .use(menu)
+      .use(block)
+      .use(cursor)
+      .use(clipboard)
+      .use($view(listItemSchema.node, () =>
+        nodeViewFactory({ component: ListItem })
+      ))
+      .use(
+        $view(codeBlockSchema.node, () =>
+          nodeViewFactory({ component: CodeBlock })
+        )
+      );
+      // .use(slash)
+  }, [])
+  
   useEffect(() => {
     const fetchContent = async () => {
       try {
         const fileContent = await window.files.readFile(filePath);
-        getInstance()?.action(replaceAll(fileContent));
+        get()?.action(replaceAll(fileContent));
         lastSavedContentRef.current = fileContent;
       } catch (error) {
         console.error("Error reading file:", error);
@@ -93,9 +114,23 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
 
   return (
     <div className="h-full overflow-auto">
-      <ReactEditor editor={editor} />
+        <Milkdown />
     </div>
   );
 };
 
-export default MilkdownEditor;
+const MilkdownEditorWrapper: React.FC<MarkdownEditorProps> = ({
+  filePath,
+  setContentInParent,
+  lastSavedContentRef,
+}) => {
+  return (
+    <MilkdownProvider>
+      <ProsemirrorAdapterProvider>
+        <MilkdownEditor filePath={filePath} setContentInParent={setContentInParent} lastSavedContentRef={lastSavedContentRef} />
+      </ProsemirrorAdapterProvider>
+    </MilkdownProvider>
+  );
+};
+
+export default MilkdownEditorWrapper;

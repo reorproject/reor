@@ -1,4 +1,5 @@
 import { DBEntry, DBQueryResult, DatabaseFields } from "./Schema";
+import * as fs from "fs";
 import {
   GetFilesInfoList,
   flattenFileInfoTree,
@@ -81,7 +82,9 @@ export const RepopulateTableWithMissingItems = async (
   onProgress && onProgress(1);
 };
 
-const getTableAsArray = async (table: LanceDBTableWrapper) => {
+const getTableAsArray = async (
+  table: LanceDBTableWrapper
+): Promise<DBEntry[]> => {
   const totalRows = await table.countRows();
   if (totalRows == 0) {
     return [];
@@ -160,6 +163,7 @@ const convertFileTypeToDBType = async (file: FileInfo): Promise<DBEntry[]> => {
       subnoteindex: index,
       timeadded: new Date(),
       filemodified: file.dateModified,
+      filecreated: file.dateCreated,
     };
   });
   return entries;
@@ -200,13 +204,15 @@ export const updateFileInTable = async (
   const chunkedContentList = await chunkMarkdownByHeadingsAndByCharsIfBig(
     content
   );
+  const stats = fs.statSync(filePath);
   const dbEntries = chunkedContentList.map((content, index) => {
     return {
       notepath: filePath,
       content: content,
       subnoteindex: index,
       timeadded: currentTimestamp,
-      filemodified: currentTimestamp,
+      filemodified: stats.mtime,
+      filecreated: stats.birthtime,
     };
   });
   await dbTable.add(dbEntries);
