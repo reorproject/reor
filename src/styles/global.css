@@ -1,6 +1,6 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
 
 html,
 body {
@@ -18,12 +18,12 @@ a {
   color: #0f82af;
 }
 
-ul {
+.milkdown .editor ul {
   padding-inline-start: 0.5rem;
 }
 
 ::marker {
-  color:rgba(94, 129, 172, 1);
+  color: rgba(94, 129, 172, 1);
 }
 
 /*custom rule to manage the paragraph spacing inside of node view*/
@@ -52,10 +52,9 @@ button {
 }
 
 .markdown-content p {
-  padding: 0.25rem; 
-  margin: 0; 
+  padding: 0.25rem;
+  margin: 0;
 }
-
 
 .milkdown .editor {
   color: white;
@@ -64,7 +63,9 @@ button {
   padding-top: 50px !important;
   padding-left: 20px !important;
   padding-right: 20px !important;
-
+  /* make sure words and text doesn't overflow: */
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 .milkdown .editor:focus {
   outline: none;
@@ -79,14 +80,15 @@ button {
   line-height: 1.5;
 }
 
-.milkdown .editor ol, .milkdown .editor ul {
+.milkdown .editor ol,
+.milkdown .editor ul {
   margin: 0em 0 !important;
 }
 
 .milkdown .editor blockquote {
   margin: 0.5em 0 !important;
   padding-left: 1em;
-  border-left: 3px solid #ccc; 
+  border-left: 3px solid #ccc;
 }
 
 .milkdown .editor .heading {
@@ -94,7 +96,7 @@ button {
 }
 
 .milkdown .editor h1 {
-  font-size: 1.8em !important; 
+  font-size: 1.8em !important;
 }
 
 .milkdown .editor h2 {
@@ -114,5 +116,5 @@ button {
 }
 
 .milkdown .editor h6 {
-  font-size: 1.0em !important;
+  font-size: 1em !important;
 }
