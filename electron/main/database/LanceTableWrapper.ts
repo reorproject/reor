@@ -105,6 +105,7 @@ export class LanceDBTableWrapper {
       .metricType(MetricType.Cosine)
       .limit(limit);
     if (filter) {
+      lanceQuery.prefilter(true);
       lanceQuery.filter(filter);
     }
     const rawResults = await lanceQuery.execute();
