@@ -51,7 +51,7 @@ export function createFilePrompt(
 
   if (tokenCount >= contextLimit) {
     throw new Error(
-      `The provided information is too long to process in a single prompt. Please shorten the query or provide fewer details. Current token count: ${tokenCount}, Limit: ${contextLimit}`
+      `The provided information is too long to process in a single prompt. Please shorten the query or shorten the file. Current token count: ${tokenCount}, Limit: ${contextLimit}`
     );
   }
 
