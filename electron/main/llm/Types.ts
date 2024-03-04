@@ -20,7 +20,6 @@ export interface LLMSessionService {
   streamingPrompt(
     prompt: string,
     sendFunctionImplementer: ISendFunctionImplementer,
-    systemPrompt?: string,
     ignoreChatHistory?: boolean
   ): Promise<string>;
 

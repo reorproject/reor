@@ -59,7 +59,6 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       return sessionService.streamingPrompt(
         prompt,
         event.sender,
-        "",
         ignoreChatHistory
       );
     }

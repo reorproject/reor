@@ -77,7 +77,6 @@ export class LlamaCPPSessionService implements LLMSessionService {
   public async streamingPrompt(
     prompt: string,
     sendFunctionImplementer: ISendFunctionImplementer,
-    systemPrompt?: string,
     ignoreChatHistory?: boolean
   ): Promise<string> {
     if (!this.session && !this.context) {

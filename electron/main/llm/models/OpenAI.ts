@@ -56,12 +56,12 @@ export class OpenAIModelSessionService implements LLMSessionService {
     this.abortStreaming = true;
   }
 
-  async runConversation() {
+  async runToolUseConversation() {
     // Step 1: send the conversation and available functions to the model
     const messages: Array<ChatCompletionMessageParam> = [
       {
         role: "user",
-        content: "What's the weather like in San Francisco, Tokyo, and Paris?",
+        content: "What's the weather like in San Fran?",
       },
     ];
     const tools: Array<ChatCompletionTool> = [
@@ -108,7 +108,10 @@ export class OpenAIModelSessionService implements LLMSessionService {
       }
       for (const toolCall of toolCalls) {
         // const functionName = toolCall.function.name;
-        const functionToCall = availableFunctions["get_current_weather"];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const functionToCall = availableFunctions[
+          toolCall.function.name
+        ] as any;
         const functionArgs = JSON.parse(toolCall.function.arguments);
         const functionResponse = functionToCall(
           functionArgs.location,
@@ -133,10 +136,9 @@ export class OpenAIModelSessionService implements LLMSessionService {
   async streamingPrompt(
     prompt: string,
     sendFunctionImplementer: ISendFunctionImplementer,
-    systemPrompt?: string,
     ignoreChatHistory?: boolean
   ): Promise<string> {
-    const funcCallResponse = await this.runConversation();
+    const funcCallResponse = await this.runToolUseConversation();
     console.log("funcCallResponse:", funcCallResponse);
     if (!this.isModelLoaded()) {
       throw new Error("Model not initialized");
@@ -145,14 +147,6 @@ export class OpenAIModelSessionService implements LLMSessionService {
 
     if (ignoreChatHistory) {
       this.messageHistory = [];
-    }
-
-    if (systemPrompt) {
-      this.messageHistory.push({
-        role: "assistant",
-        content: systemPrompt,
-        messageType: "success",
-      });
     }
 
     // Add the user's prompt to the message history
