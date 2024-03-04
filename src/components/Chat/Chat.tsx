@@ -13,7 +13,6 @@ import CircularProgress from "@mui/material/CircularProgress";
 import ReactMarkdown from "react-markdown";
 import { FiRefreshCw } from "react-icons/fi"; // Importing refresh icon from React Icons
 import { ChatPrompt } from "./Chat-Prompts";
-import { toast } from "react-toastify";
 
 // convert ask options to enum
 enum AskOptions {
