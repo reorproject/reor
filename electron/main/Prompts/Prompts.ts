@@ -1,5 +1,9 @@
+import { file } from "tmp";
+import { chunkMarkdownByHeadingsAndByCharsIfBig } from "../RAG/Chunking";
 import { DBEntry } from "../database/Schema";
 
+
+const TOKEN_LIMIT_MESSAGE = "The provided information is too long to process in a single prompt. Please shorten the query or provide fewer details."
 export function createRAGPrompt(
   entries: DBEntry[],
   query: string,
@@ -25,9 +29,7 @@ export function createRAGPrompt(
   }
 
   if (tokenCount >= contextLimit) {
-    throw new Error(
-      "The provided information is too long to process in a single prompt. Please shorten the query or provide fewer details."
-    );
+    throw new Error(TOKEN_LIMIT_MESSAGE);
   }
 
   const output = basePrompt + entryContents + queryPrompt;
@@ -49,7 +51,7 @@ export function createFilePrompt(
 
   if (tokenCount >= contextLimit) {
     throw new Error(
-      "The provided information is too long to process in a single prompt. Please shorten the query or provide fewer details."
+      `The provided information is too long to process in a single prompt. Please shorten the query or provide fewer details. Current token count: ${tokenCount}, Limit: ${contextLimit}`
     );
   }
 

@@ -99,24 +99,36 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
     if (!currentSessionId || !userInput.trim()) return;
 
     let augmentedPrompt: string = '';
-    if (askText === AskOptions.AskFile) {
-      if (!currentFilePath) {
-        console.error("No current file selected. The lack of a file means that there is no context being loaded into the prompt. Please open a file before trying again");
-
-        toast.error("No current file selected. Please open a file before trying again.")
-        return;
+    try {
+      if (askText === AskOptions.AskFile) {
+        if (!currentFilePath) {
+          console.error("No current file selected. The lack of a file means that there is no context being loaded into the prompt. Please open a file before trying again");
+  
+          toast.error("No current file selected. Please open a file before trying again.")
+          return;
+        }
+        augmentedPrompt = await window.files.augmentPromptWithFile(
+          userInput,
+          currentSessionId,
+          currentFilePath
+        );
+      } else if (askText === AskOptions.Ask){
+        augmentedPrompt = await window.database.augmentPromptWithRAG(
+          userInput,
+          currentSessionId,
+        );
       }
-      augmentedPrompt = await window.files.augmentPromptWithFile(
-        userInput,
-        currentSessionId,
-        currentFilePath
-      );
-    } else if (askText === AskOptions.Ask){
-      augmentedPrompt = await window.database.augmentPromptWithRAG(
-        userInput,
-        currentSessionId,
-      );
+    } catch (error) {
+      console.error("Failed to augment prompt:", error);
+      toast.error(errorToString(error), {
+        className: "mt-5",
+        autoClose: false,
+        closeOnClick: true,
+        draggable: false,
+      });
+      return;
     }
+    
 
     startStreamingResponse(currentSessionId, augmentedPrompt, true);
 
