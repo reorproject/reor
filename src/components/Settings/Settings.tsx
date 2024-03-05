@@ -11,6 +11,14 @@ interface ModalProps {
   onClose: () => void;
 }
 
+enum SettingsTab {
+  LLMSettings = "llmSettings",
+  EmbeddingModel = "embeddingModel",
+  Hardware = "hardware",
+  TextGeneration = "textGeneration",
+  RAG = "RAG",
+}
+
 const SettingsModal: React.FC<ModalProps> = ({
   isOpen,
   onClose: onCloseFromParent,
@@ -39,21 +47,21 @@ const SettingsModal: React.FC<ModalProps> = ({
         <div className="flex flex-col ml-2 mb-2 pr-1 w-[100px]  bg-gray-800 text-white border-r-[0.1px] border-gray-700 border-solid border-b-0 border-t-0 border-l-0">
           <div
             className={`flex items-center mt-2 rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
-              activeTab === "llmSettings"
+              activeTab === SettingsTab.LLMSettings
                 ? "bg-gray-700 text-white font-semibold"
                 : "text-gray-200"
             }`}
-            onClick={() => setActiveTab("llmSettings")}
+            onClick={() => setActiveTab(SettingsTab.LLMSettings)}
           >
             LLM
           </div>
           <div
             className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
-              activeTab === "embeddingModel"
+              activeTab === SettingsTab.EmbeddingModel
                 ? "bg-gray-700 text-white font-semibold"
                 : "text-gray-200"
             }`}
-            onClick={() => setActiveTab("embeddingModel")}
+            onClick={() => setActiveTab(SettingsTab.EmbeddingModel)}
           >
             Embedding Model
           </div>
@@ -61,31 +69,31 @@ const SettingsModal: React.FC<ModalProps> = ({
           {/* gpu settings: */}
           <div
             className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
-              activeTab === "hardware"
+              activeTab === SettingsTab.Hardware
                 ? "bg-gray-700 text-white font-semibold"
                 : "text-gray-200"
             }`}
-            onClick={() => setActiveTab("hardware")}
+            onClick={() => setActiveTab(SettingsTab.Hardware)}
           >
             Hardware
           </div>
           <div
             className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
-              activeTab === "textGeneration"
+              activeTab === SettingsTab.TextGeneration
                 ? "bg-gray-700 text-white font-semibold"
                 : "text-gray-200"
             }`}
-            onClick={() => setActiveTab("textGeneration")}
+            onClick={() => setActiveTab(SettingsTab.TextGeneration)}
           >
             Text Generation{" "}
           </div>
           <div
             className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
-              activeTab === "RAG"
+              activeTab === SettingsTab.RAG
                 ? "bg-gray-700 text-white font-semibold"
                 : "text-gray-200"
             }`}
-            onClick={() => setActiveTab("RAG")}
+            onClick={() => setActiveTab(SettingsTab.RAG)}
           >
             RAG{" "}
           </div>
@@ -94,12 +102,12 @@ const SettingsModal: React.FC<ModalProps> = ({
         {/* Right Content Area */}
         <div className="flex-1 ml-2">
           {/* <h2 className="text-2xl font-semibold mb-4 text-white">Settings</h2> */}
-          {activeTab === "llmSettings" && (
+          {activeTab === SettingsTab.LLMSettings && (
             <div className="mt-2 w-full">
               <LLMSettings />
             </div>
           )}
-          {activeTab === "embeddingModel" && (
+          {activeTab === SettingsTab.EmbeddingModel && (
             <div className="w-full">
               <EmbeddingModelSettings
                 handleUserHasChangedModel={() => setWillNeedToReIndex(true)}
@@ -107,7 +115,7 @@ const SettingsModal: React.FC<ModalProps> = ({
             </div>
           )}
 
-          {activeTab === "hardware" && (
+          {activeTab === SettingsTab.Hardware && (
             <div className="w-full">
               <HardwareSettings>
                 <h2 className="text-2xl font-semibold mb-0 text-white">
@@ -120,7 +128,7 @@ const SettingsModal: React.FC<ModalProps> = ({
             </div>
           )}
 
-          {activeTab === "textGeneration" && (
+          {activeTab === SettingsTab.TextGeneration && (
             <div className="w-full">
               <div>
                 <TextGenerationSettings />
@@ -128,7 +136,7 @@ const SettingsModal: React.FC<ModalProps> = ({
             </div>
           )}
 
-          {activeTab === "RAG" && (
+          {activeTab === SettingsTab.RAG && (
             <div className="w-full">
               <RagSettings>
                 <h2 className="text-2xl font-semibold mb-0 text-white">RAG</h2>{" "}
