@@ -32,28 +32,48 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
   };
 
   return (
-    <div className="w-full bg-gray-800 rounded pb-7">
+    <div className="w-full bg-gray-800 rounded pb-7 ">
       <h2 className="text-2xl font-semibold mb-0 text-white">
         Text Generation
       </h2>{" "}
       <p className="mt-2 text-sm text-gray-100 mb-1">Temperature:</p>
-      <Slider
-        aria-label="Temperature"
-        value={textGenerationParams.temperature}
-        valueLabelDisplay="auto"
-        step={0.1}
-        marks
-        min={0}
-        max={2}
-        onChange={(event, val) => {
-          setUserHasMadeUpdate(true);
-          const newTemperature = Array.isArray(val) ? val[0] : val;
-          setTextGenerationParams({
-            ...textGenerationParams,
-            temperature: newTemperature,
-          });
-        }}
-      />
+      <div className="pl-1 mt-6">
+        <Slider
+          aria-label="Temperature"
+          value={textGenerationParams.temperature}
+          valueLabelDisplay="on" // Changed from "auto" to "on" to always show the value label
+          step={0.1}
+          marks
+          min={0}
+          max={2}
+          onChange={(event, val) => {
+            setUserHasMadeUpdate(true);
+            const newTemperature = Array.isArray(val) ? val[0] : val;
+            setTextGenerationParams({
+              ...textGenerationParams,
+              temperature: newTemperature,
+            });
+          }}
+          sx={{
+            // Targeting the value label component
+            "& .MuiSlider-thumb": {
+              "&:focus, &:hover, &.Mui-active, &.Mui-focusVisible": {
+                boxShadow: "none",
+              },
+              // If you need to remove the ripple effect explicitly
+              "&::after": {
+                content: "none",
+              },
+            },
+            "& .MuiSlider-valueLabel": {
+              fontSize: "0.75rem", // Reduce font size
+              padding: "3px 6px", // Adjust padding to make the label smaller
+              // You may need to adjust lineHeight if the text is not vertically aligned
+              lineHeight: "1.2em",
+            },
+          }}
+        />
+      </div>
       <p className="mt-0 text-xs text-gray-100 mb-3">
         Higher temperature means more randomess in generated text.
       </p>
@@ -73,7 +93,7 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
         // onKeyDown={handleKeyPress}
         placeholder="Value between 0 and 2048"
       />
-      <p className="mt-1 text-xs text-gray-100 mb-3">
+      <p className="mt-1 text-xs text-gray-100 mb-0">
         Maximum number of tokens to generate.
       </p>
       {userHasMadeUpdate && (
