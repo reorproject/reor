@@ -8,7 +8,7 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
   const [textGenerationParams, setTextGenerationParams] =
     useState<LLMGenerationParameters>({
       temperature: 0.7, // Default temperature value
-      maxTokens: 2048, // Default maxTokens value
+      // maxTokens: 2048, // Default maxTokens value
       // Include other default values as necessary
     });
 
@@ -81,17 +81,34 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
       <input
         type="text"
         className="block w-full px-3 py-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
-        value={textGenerationParams?.maxTokens || 2048}
+        value={textGenerationParams?.maxTokens}
         onChange={(e) => {
           setUserHasMadeUpdate(true);
-          const newMaxTokens = parseInt(e.target.value);
+          const inputVal = e.target.value;
+          let newMaxTokens;
+
+          // Check if the input value is an empty string, set newMaxTokens to undefined.
+          if (inputVal === "") {
+            newMaxTokens = undefined;
+          } else {
+            // Parse the input value to an integer and use it if it's a valid number
+            const parsedValue = parseInt(inputVal, 10);
+            if (!isNaN(parsedValue)) {
+              newMaxTokens = parsedValue;
+            } else {
+              // Optional: handle the case for invalid input that's not empty, e.g., non-numeric characters.
+              // For now, we'll just return to avoid setting newMaxTokens to an invalid value.
+              return;
+            }
+          }
+
           setTextGenerationParams({
             ...textGenerationParams,
             maxTokens: newMaxTokens,
           });
         }}
         // onKeyDown={handleKeyPress}
-        placeholder="Value between 0 and 2048"
+        placeholder="Maximum tokens to generate"
       />
       <p className="mt-1 text-xs text-gray-100 mb-0">
         Maximum number of tokens to generate.
