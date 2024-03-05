@@ -130,9 +130,7 @@ const SettingsModal: React.FC<ModalProps> = ({
 
           {activeTab === SettingsTab.TextGeneration && (
             <div className="w-full">
-              <div>
-                <TextGenerationSettings />
-              </div>
+              <TextGenerationSettings />
             </div>
           )}
 
