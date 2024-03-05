@@ -87,9 +87,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
 
   const updateSimilarEntries = async () => {
     const searchResults = await performSearch(filePath);
-    if (searchResults.length > 0) {
-      setSimilarEntries(searchResults);
-    }
+    setSimilarEntries(searchResults);
   };
 
   return (
