@@ -23,7 +23,11 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const onFileSelect = async (path: string) => {
     if (selectedFilePath && editorContent !== lastSavedContentRef.current) {
       try {
-        await window.files.writeFile(selectedFilePath, editorContent); // save the current content.
+        await window.files.writeFile({
+          filePath: selectedFilePath,
+          content: editorContent,
+          indexFileAlongsideSave: true,
+        });
       } catch (e) {
         toast.error("Error saving current file! Please try again.", {
           className: "mt-5",

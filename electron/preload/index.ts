@@ -6,7 +6,11 @@ import {
   HardwareConfig,
   LLMModelConfig,
 } from "electron/main/Store/storeConfig";
-import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
+import {
+  FileInfoNode,
+  FileInfoTree,
+  WriteFileProps,
+} from "electron/main/Files/Types";
 import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
@@ -44,7 +48,7 @@ declare global {
       openDirectoryDialog: () => Promise<string[]>;
       openFileDialog: (fileExtensions?: string[]) => Promise<string[]>;
       getFilesForWindow: () => Promise<FileInfoTree>;
-      writeFile: (filePath: string, content: string) => Promise<void>;
+      writeFile: (writeFileProps: WriteFileProps) => Promise<void>;
       readFile: (filePath: string) => Promise<string>;
       createFile: (filePath: string, content: string) => Promise<void>;
       createDirectory: (dirPath: string) => Promise<void>;
@@ -227,8 +231,8 @@ contextBridge.exposeInMainWorld("files", {
     return ipcRenderer.invoke("get-files-for-window");
   },
 
-  writeFile: async (filePath: string, content: string) => {
-    return ipcRenderer.invoke("write-file", filePath, content);
+  writeFile: async (writeFileProps: WriteFileProps) => {
+    return ipcRenderer.invoke("write-file", writeFileProps);
   },
 
   createFile: async (filePath: string, content: string) => {

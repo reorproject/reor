@@ -15,3 +15,9 @@ export type FileInfoTree = FileInfoNode[];
 export const isFileNodeDirectory = (fileInfo: FileInfoNode): boolean => {
   return fileInfo.children !== undefined;
 };
+
+export type WriteFileProps = {
+  filePath: string;
+  content: string;
+  indexFileAlongsideSave: boolean;
+};

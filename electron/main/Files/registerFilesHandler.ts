@@ -1,6 +1,6 @@
 import { ipcMain } from "electron";
 import * as path from "path";
-import { FileInfoTree } from "./Types";
+import { FileInfoTree, WriteFileProps } from "./Types";
 import {
   GetFilesInfoTree,
   orchestrateEntryMove,
@@ -43,9 +43,13 @@ export const registerFileHandlers = () => {
 
   ipcMain.handle(
     "write-file",
-    async (event, filePath: string, content: string) => {
+    async (event, writeFileProps: WriteFileProps) => {
       try {
-        fs.writeFileSync(filePath, content, "utf-8");
+        fs.writeFileSync(
+          writeFileProps.filePath,
+          writeFileProps.content,
+          "utf-8"
+        );
 
         const windowInfo = getWindowInfoForContents(
           activeWindows,
@@ -56,10 +60,16 @@ export const registerFileHandlers = () => {
         }
 
         // Update file in table
-        await updateFileInTable(windowInfo.dbTableClient, filePath, content);
+        if (writeFileProps.indexFileAlongsideSave) {
+          await updateFileInTable(
+            windowInfo.dbTableClient,
+            writeFileProps.filePath,
+            writeFileProps.content
+          );
 
-        // Respond directly to the sender
-        event.sender.send("vector-database-update");
+          // Respond directly to the sender
+          event.sender.send("vector-database-update");
+        }
       } catch (error) {
         console.error("Error updating file in table:", error);
 

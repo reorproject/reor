@@ -209,7 +209,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
 
   return (
     <div className="flex flex-col w-full h-full mx-auto border shadow-lg overflow-hidden bg-gray-700">
-      <div className="flex w-full items-center">
+      <div className="flex w-full items-center border-t-0 border-r-0 border-l-0 border-solid border-b-[1px] border-gray-600">
         <div className="flex-grow flex justify-center items-center m-0 mt-1 ml-2 mb-1 p-0">
           {defaultModel ? (
             <p className="m-0 p-0 text-gray-500">{defaultModel}</p>
@@ -218,7 +218,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
           )}
         </div>
         <div className="pr-2 pt-1 cursor-pointer" onClick={restartSession}>
-          <FiRefreshCw className="text-white" /> {/* Icon */}
+          <FiRefreshCw className="text-gray-300" /> {/* Icon */}
         </div>
       </div>
       <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
