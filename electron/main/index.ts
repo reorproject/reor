@@ -224,7 +224,7 @@ ipcMain.on("show-context-menu-file-item", (event, file) => {
   menu.append(
     new MenuItem({
       label: "Delete",
-      click: () => {
+      click: async () => {
         console.log(file.path);
         fs.stat(file.path, (err, stats) => {
           if (err) {
@@ -244,13 +244,19 @@ ipcMain.on("show-context-menu-file-item", (event, file) => {
               );
             });
           } else {
-            fs.unlink(file.path, (err) => {
+            fs.unlink(file.path, async (err) => {
               if (err) {
                 console.error("An error occurred:", err);
                 return;
               }
               console.log(`File at ${file.path} was deleted successfully.`);
-              // TODO: Update table.
+
+              const windowInfo = getWindowInfoForContents(activeWindows, event.sender);
+              if (!windowInfo) {
+                throw new Error("No window info found");
+              }
+              await windowInfo.dbTableClient.deleteDBItemsByFilePaths([file.path]);
+              event.sender.send("vector-database-update")
             });
           }
         });

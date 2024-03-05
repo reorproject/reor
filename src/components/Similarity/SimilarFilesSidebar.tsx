@@ -32,6 +32,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
 
   const performSearch = async (filePath: string): Promise<DBQueryResult[]> => {
     try {
+      // console.log("Performing search for:", filePath);
       const fileContent: string = await window.files.readFile(filePath);
       // TODO: proper chunking here...
       if (!fileContent) {
@@ -57,25 +58,33 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     }
   };
 
+
   useEffect(() => {
     if (filePath) {
       handleNewFileOpen(filePath);
-    }
+    }  
+    
   }, [filePath]);
 
+
+
   useEffect(() => {
+    let active = true;
     const vectorDBUpdateListener = async () => {
+      if (!active) return;
+      console.log("vectorDBUpdateListener filePath: ", filePath)
       const searchResults = await performSearch(filePath);
       if (searchResults.length > 0) {
         setSimilarEntries(searchResults);
       }
     };
-
     window.ipcRenderer.receive(
       "vector-database-update",
       vectorDBUpdateListener
     );
     return () => {
+      active = false;
+
       window.ipcRenderer.removeListener(
         "vector-database-update",
         vectorDBUpdateListener

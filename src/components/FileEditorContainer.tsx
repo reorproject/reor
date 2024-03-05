@@ -40,6 +40,8 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     setShowSimilarFiles(!showSimilarFiles);
   };
 
+  console.log("FileEditorContainer filePath: ", selectedFilePath)
+
   return (
     <div>
       <TitleBar
