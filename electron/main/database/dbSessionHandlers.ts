@@ -1,5 +1,5 @@
 import { ipcMain } from "electron";
-import { createRAGPrompt } from "../Prompts/Prompts";
+import { createPromptWithContextLimitFromContent } from "../Prompts/Prompts";
 import { DBEntry, DatabaseFields } from "./Schema";
 import { LLMSessions } from "../llm/llmSessionHandlers";
 import { StoreKeys, StoreSchema } from "../Store/storeConfig";
@@ -73,7 +73,7 @@ export const registerDBSessionHandlers = (
           throw new Error(`Session ${llmSessionID} does not exist.`);
         }
 
-        const ragPrompt = createRAGPrompt(
+        const { prompt: ragPrompt } = createPromptWithContextLimitFromContent(
           searchResults,
           query,
           llmSession.tokenize,

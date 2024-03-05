@@ -8,6 +8,7 @@ import {
 } from "electron/main/Store/storeConfig";
 import { AugmentPromptWithFileProps, FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
 import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
+import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
 
@@ -55,7 +56,7 @@ declare global {
       ) => Promise<void>;
       augmentPromptWithFile: (
         augmentPromptWithFileProps: AugmentPromptWithFileProps
-      ) => Promise<string>;
+      ) => Promise<PromptWithContextLimit>;
     };
     path: {
       basename: (pathString: string) => string;
@@ -253,7 +254,7 @@ contextBridge.exposeInMainWorld("files", {
   },
   augmentPromptWithFile: async (
     augmentPromptWithFileProps : AugmentPromptWithFileProps
-  ): Promise<string> => {
+  ): Promise<PromptWithContextLimit> => {
     return ipcRenderer.invoke("augment-prompt-with-file", augmentPromptWithFileProps);
   },
 });

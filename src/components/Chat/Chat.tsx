@@ -116,12 +116,16 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
           toast.error("No current file selected. Please open a file before trying again.")
           return;
         }
-        augmentedPrompt = await window.files.augmentPromptWithFile(
+        const { prompt, contextCutoffAt } = await window.files.augmentPromptWithFile(
           { 
             prompt: userInput,
             llmSessionID: currentSessionId,
             filePath: currentFilePath
           });
+        if (contextCutoffAt) {
+          toast.warning(`The file is too large to be used as context. It got cut off at: ${contextCutoffAt}`)
+        }
+        augmentedPrompt = prompt;
       } else if (askText === AskOptions.Ask){
         augmentedPrompt = await window.database.augmentPromptWithRAG(
           userInput,

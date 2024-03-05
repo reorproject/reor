@@ -15,7 +15,7 @@ import {
 } from "../windowManager";
 import { errorToString } from "../Generic/error";
 import { LLMSessions } from "../llm/llmSessionHandlers";
-import { createFilePrompt } from "../Prompts/Prompts";
+import { PromptWithContextLimit, createPromptWithContextLimitFromContent } from "../Prompts/Prompts";
 
 export const registerFileHandlers = () => {
   ipcMain.handle("join-path", (event, ...args) => {
@@ -119,17 +119,10 @@ export const registerFileHandlers = () => {
   ipcMain.handle(
     "augment-prompt-with-file",
     async (
-      event,
+      _event,
      { prompt, llmSessionID, filePath }: AugmentPromptWithFileProps
-    ): Promise<string> => {
+    ): Promise<PromptWithContextLimit> => {
       try {
-        const windowInfo = getWindowInfoForContents(
-          activeWindows,
-          event.sender
-        );
-        if (!windowInfo) {
-          throw new Error("Window info not found.");
-        }
         const content = fs.readFileSync(filePath, "utf-8");
 
         const llmSession = LLMSessions[llmSessionID];
@@ -137,13 +130,13 @@ export const registerFileHandlers = () => {
           throw new Error(`Session ${llmSessionID} does not exist.`);
         }
 
-        const filePrompt = createFilePrompt(
+        const { prompt: filePrompt , contextCutoffAt } = createPromptWithContextLimitFromContent(
           content,
           prompt,
           llmSession.tokenize,
           llmSession.getContextLength()
         );
-        return filePrompt;
+        return { prompt: filePrompt, contextCutoffAt };
       } catch (error) {
         console.error("Error searching database:", error);
         throw error;
