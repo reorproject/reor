@@ -6,7 +6,10 @@ import {
   OpenAIMessage,
 } from "../Types";
 import { Tiktoken, TiktokenModel, encodingForModel } from "js-tiktoken";
-import { OpenAILLMConfig } from "electron/main/Store/storeConfig";
+import {
+  LLMGenerationParameters,
+  OpenAILLMConfig,
+} from "electron/main/Store/storeConfig";
 import { net } from "electron";
 import { ClientRequestConstructorOptions } from "electron/main";
 import { Readable } from "stream";
@@ -55,6 +58,7 @@ export class OpenAIModelSessionService implements LLMSessionService {
   async streamingPrompt(
     prompt: string,
     sendFunctionImplementer: ISendFunctionImplementer,
+    generationParams?: LLMGenerationParameters,
     ignoreChatHistory?: boolean
   ): Promise<string> {
     if (!this.isModelLoaded()) {
@@ -78,11 +82,12 @@ export class OpenAIModelSessionService implements LLMSessionService {
         role: msg.role,
         content: msg.content,
       })) as OpenAIMessage[];
-
       const stream = await this.openai.chat.completions.create({
         model: this.modelName,
         messages: openAIMessages,
         stream: true,
+        max_tokens: generationParams?.maxTokens,
+        temperature: generationParams?.temperature,
       });
 
       let result = "";

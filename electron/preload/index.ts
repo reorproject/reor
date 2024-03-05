@@ -4,6 +4,7 @@ import {
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
   HardwareConfig,
+  LLMGenerationParameters,
   LLMModelConfig,
 } from "electron/main/Store/storeConfig";
 import {
@@ -104,6 +105,8 @@ declare global {
       setNoOfRAGExamples: (noOfExamples: number) => void;
       getHardwareConfig: () => HardwareConfig;
       setHardwareConfig: (config: HardwareConfig) => void;
+      getLLMGenerationParams: () => LLMGenerationParameters;
+      setLLMGenerationParams: (params: LLMGenerationParameters) => void;
     };
   }
 }
@@ -206,6 +209,12 @@ contextBridge.exposeInMainWorld("electronStore", {
   },
   setHardwareConfig: (config: HardwareConfig) => {
     ipcRenderer.send("set-hardware-config", config);
+  },
+  getLLMGenerationParams: () => {
+    return ipcRenderer.sendSync("get-llm-generation-params");
+  },
+  setLLMGenerationParams: (params: LLMGenerationParameters) => {
+    ipcRenderer.send("set-llm-generation-params", params);
   },
 });
 

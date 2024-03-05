@@ -1,4 +1,8 @@
-import { BaseLLMConfig, HardwareConfig } from "../Store/storeConfig";
+import {
+  BaseLLMConfig,
+  HardwareConfig,
+  LLMGenerationParameters,
+} from "../Store/storeConfig";
 
 // Any LLM engine should implement this interface:
 export interface LLMSessionService {
@@ -20,6 +24,7 @@ export interface LLMSessionService {
   streamingPrompt(
     prompt: string,
     sendFunctionImplementer: ISendFunctionImplementer,
+    generationParams?: LLMGenerationParameters,
     ignoreChatHistory?: boolean
   ): Promise<string>;
 
