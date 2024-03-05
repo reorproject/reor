@@ -1,6 +1,6 @@
 {
   "name": "reor-project",
-  "version": "0.1.52",
+  "version": "0.1.53",
   "productName": "Reor",
   "main": "dist-electron/main/index.js",
   "description": "An AI note-taking app that runs models locally.",
