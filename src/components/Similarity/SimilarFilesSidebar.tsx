@@ -4,6 +4,7 @@ import { DBQueryResult } from "electron/main/database/Schema";
 import { PiGraph } from "react-icons/pi";
 import { toast } from "react-toastify";
 import { errorToString } from "@/functions/error";
+import { FiRefreshCw } from "react-icons/fi";
 
 interface SimilarEntriesComponentProps {
   filePath: string;
@@ -15,7 +16,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   onFileSelect,
 }) => {
   const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [userHitRefresh, setUserHitRefresh] = useState<boolean>(false);
 
   const handleNewFileOpen = async (path: string) => {
     try {
@@ -39,11 +40,13 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
       }
       const databaseFields = await window.database.getDatabaseFields();
       const filterString = `${databaseFields.NOTE_PATH} != '${filePath}'`;
+
       const searchResults: DBQueryResult[] = await window.database.search(
         fileContent,
         20,
         filterString
       );
+
       return searchResults;
     } catch (error) {
       console.error("Error:", error);
@@ -61,14 +64,13 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     if (filePath) {
       handleNewFileOpen(filePath);
     }
+
+    setUserHitRefresh(false);
   }, [filePath]);
 
   useEffect(() => {
     const vectorDBUpdateListener = async () => {
-      const searchResults = await performSearch(filePath);
-      if (searchResults.length > 0) {
-        setSimilarEntries(searchResults);
-      }
+      updateSimilarEntries();
     };
 
     window.ipcRenderer.receive(
@@ -83,17 +85,40 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     };
   }, [filePath]);
 
-  return (
-    <div className="h-full overflow-y-auto overflow-x-hidden mt-0 border-l-[0.1px] border-t-0 border-b-0 border-r-0 border-gray-600 border-solid">
-      {similarEntries.length > 0 && (
-        <div className="flex items-center justify-center bg-gray-800 mt-0 mb-0 p-0">
-          <PiGraph className="text-white mt-1" />
+  const updateSimilarEntries = async () => {
+    const searchResults = await performSearch(filePath);
+    setSimilarEntries(searchResults);
+  };
 
-          <p className="text-gray-200 text-sm pl-1 mb-0  mt-1 pt-0 pb-0">
-            Related Notes
-          </p>
+  return (
+    <div
+      className={`h-below-titlebar ${
+        similarEntries.length > 0 ? "overflow-y-auto" : "overflow-y-hidden"
+      } overflow-x-hidden mt-0 border-l-[0.1px] border-t-0 border-b-0 border-r-0 border-gray-600 border-solid`}
+    >
+      {" "}
+      {/* {similarEntries.length > 0 && ( */}
+      <div className="flex items-center bg-gray-800 p-0">
+        {/* Invisible Spacer */}
+        <div className="flex-1"></div>
+
+        {/* Centered content: PiGraph icon and Related Notes text */}
+        <div className="flex items-center justify-center px-4">
+          <PiGraph className="text-gray-300 mt-1" />
+          <p className="text-gray-300 text-sm pl-1 mb-0 mt-1">Related Notes</p>
         </div>
-      )}
+
+        <div
+          className="flex-1 flex justify-end pr-3 pt-1 cursor-pointer"
+          onClick={() => {
+            setUserHitRefresh(true);
+            setSimilarEntries([]); // simulate refresh
+            updateSimilarEntries();
+          }}
+        >
+          <FiRefreshCw className="text-gray-300" /> {/* Icon */}
+        </div>
+      </div>
       {similarEntries.map((dbResult, index) => (
         <div className="pb-2 pr-2 pl-2 pt-1" key={index}>
           <DBResultPreview
@@ -109,7 +134,11 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
             className="flex justify-center items-center text-gray-500 text-lg mx-auto text-center"
             style={{ width: "fit-content" }}
           >
-            Related notes will appear here...
+            {!userHitRefresh ? (
+              <>Hit refresh to show related notes...</>
+            ) : (
+              <>Make sure your note is not empty...</>
+            )}
           </p>
         </div>
       )}

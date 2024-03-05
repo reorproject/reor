@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   HardwareConfig,
+  LLMGenerationParameters,
   LocalLLMConfig,
 } from "electron/main/Store/storeConfig";
 import { ISendFunctionImplementer, LLMSessionService } from "../Types";
@@ -75,6 +76,7 @@ export class LlamaCPPSessionService implements LLMSessionService {
   public async streamingPrompt(
     prompt: string,
     sendFunctionImplementer: ISendFunctionImplementer,
+    generationParams?: LLMGenerationParameters,
     ignoreChatHistory?: boolean
   ): Promise<string> {
     if (!this.session && !this.context) {
@@ -92,6 +94,8 @@ export class LlamaCPPSessionService implements LLMSessionService {
 
     try {
       return await this.session.prompt(prompt, {
+        temperature: generationParams?.temperature,
+        maxTokens: generationParams?.maxTokens,
         onToken: (chunk: any[]) => {
           const decodedChunk = this.session.model.detokenize(chunk);
           console.log("decodedChunk:", decodedChunk);

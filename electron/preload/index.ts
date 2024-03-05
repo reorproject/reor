@@ -4,9 +4,10 @@ import {
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
   HardwareConfig,
+  LLMGenerationParameters,
   LLMModelConfig,
 } from "electron/main/Store/storeConfig";
-import { AugmentPromptWithFileProps, FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
+import { AugmentPromptWithFileProps, FileInfoNode, FileInfoTree, WriteFileProps } from "electron/main/Files/Types";
 import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,7 +46,7 @@ declare global {
       openDirectoryDialog: () => Promise<string[]>;
       openFileDialog: (fileExtensions?: string[]) => Promise<string[]>;
       getFilesForWindow: () => Promise<FileInfoTree>;
-      writeFile: (filePath: string, content: string) => Promise<void>;
+      writeFile: (writeFileProps: WriteFileProps) => Promise<void>;
       readFile: (filePath: string) => Promise<string>;
       createFile: (filePath: string, content: string) => Promise<void>;
       createDirectory: (dirPath: string) => Promise<void>;
@@ -104,6 +105,8 @@ declare global {
       setNoOfRAGExamples: (noOfExamples: number) => void;
       getHardwareConfig: () => HardwareConfig;
       setHardwareConfig: (config: HardwareConfig) => void;
+      getLLMGenerationParams: () => LLMGenerationParameters;
+      setLLMGenerationParams: (params: LLMGenerationParameters) => void;
     };
   }
 }
@@ -207,6 +210,12 @@ contextBridge.exposeInMainWorld("electronStore", {
   setHardwareConfig: (config: HardwareConfig) => {
     ipcRenderer.send("set-hardware-config", config);
   },
+  getLLMGenerationParams: () => {
+    return ipcRenderer.sendSync("get-llm-generation-params");
+  },
+  setLLMGenerationParams: (params: LLMGenerationParameters) => {
+    ipcRenderer.send("set-llm-generation-params", params);
+  },
 });
 
 contextBridge.exposeInMainWorld("ipcRenderer", {
@@ -231,8 +240,8 @@ contextBridge.exposeInMainWorld("files", {
     return ipcRenderer.invoke("get-files-for-window");
   },
 
-  writeFile: async (filePath: string, content: string) => {
-    return ipcRenderer.invoke("write-file", filePath, content);
+  writeFile: async (writeFileProps: WriteFileProps) => {
+    return ipcRenderer.invoke("write-file", writeFileProps);
   },
 
   createFile: async (filePath: string, content: string) => {

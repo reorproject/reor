@@ -17,6 +17,11 @@ export interface LocalLLMConfig extends BaseLLMConfig {
 
 export type LLMModelConfig = OpenAILLMConfig | LocalLLMConfig;
 
+export type LLMGenerationParameters = {
+  maxTokens?: number;
+  temperature?: number;
+};
+
 export interface EmbeddingModelWithRepo {
   type: "repo";
   repoName: string;
@@ -56,6 +61,7 @@ export interface StoreSchema {
   defaultEmbedFuncRepo: string;
   RAG?: RAGConfig;
   hardware: HardwareConfig;
+  llmGenerationParameters: LLMGenerationParameters;
 }
 
 export enum StoreKeys {
@@ -66,4 +72,5 @@ export enum StoreKeys {
   DefaultEmbeddingModelAlias = "defaultEmbeddingModelAlias",
   MaxRAGExamples = "RAG.maxRAGExamples",
   Hardware = "hardware",
+  LLMGenerationParameters = "llmGenerationParameters",
 }

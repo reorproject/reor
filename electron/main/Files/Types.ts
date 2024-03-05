@@ -21,3 +21,10 @@ export interface AugmentPromptWithFileProps {
   llmSessionID: string;
   filePath: string;
 }
+
+export type WriteFileProps = {
+  filePath: string;
+  content: string;
+  indexFileAlongsideSave: boolean;
+};
+
