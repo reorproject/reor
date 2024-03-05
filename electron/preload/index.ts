@@ -7,12 +7,9 @@ import {
   LLMGenerationParameters,
   LLMModelConfig,
 } from "electron/main/Store/storeConfig";
-import {
-  FileInfoNode,
-  FileInfoTree,
-  WriteFileProps,
-} from "electron/main/Files/Types";
+import { AugmentPromptWithFileProps, FileInfoNode, FileInfoTree, WriteFileProps } from "electron/main/Files/Types";
 import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
+import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
 
@@ -58,6 +55,9 @@ declare global {
         sourcePath: string,
         destinationPath: string
       ) => Promise<void>;
+      augmentPromptWithFile: (
+        augmentPromptWithFileProps: AugmentPromptWithFileProps
+      ) => Promise<PromptWithContextLimit>;
     };
     path: {
       basename: (pathString: string) => string;
@@ -260,6 +260,11 @@ contextBridge.exposeInMainWorld("files", {
 
   moveFileOrDir: async (sourcePath: string, destinationPath: string) => {
     return ipcRenderer.invoke("move-file-or-dir", sourcePath, destinationPath);
+  },
+  augmentPromptWithFile: async (
+    augmentPromptWithFileProps : AugmentPromptWithFileProps
+  ): Promise<PromptWithContextLimit> => {
+    return ipcRenderer.invoke("augment-prompt-with-file", augmentPromptWithFileProps);
   },
 });
 

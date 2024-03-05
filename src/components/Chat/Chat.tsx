@@ -7,12 +7,12 @@ import {
 } from "@material-tailwind/react";
 import { ChatbotMessage } from "electron/main/llm/Types";
 import { errorToString } from "@/functions/error";
+import { toast } from "react-toastify";
 import Textarea from "@mui/joy/Textarea";
 import CircularProgress from "@mui/material/CircularProgress";
 import ReactMarkdown from "react-markdown";
 import { FiRefreshCw } from "react-icons/fi"; // Importing refresh icon from React Icons
 import { ChatPrompt } from "./Chat-Prompts";
-import { toast } from "react-toastify";
 
 // convert ask options to enum
 enum AskOptions {
@@ -107,17 +107,43 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
     }
     if (!currentSessionId || !userInput.trim()) return;
 
-    let filterString = "";
-    if (askText === AskOptions.AskFile) {
-      const databaseFields = await window.database.getDatabaseFields();
-      filterString = `${databaseFields.NOTE_PATH} = '${currentFilePath}'`; // undefined current file will let the model deal with no context
+    let augmentedPrompt: string = '';
+    try {
+      if (askText === AskOptions.AskFile) {
+        if (!currentFilePath) {
+          console.error("No current file selected. The lack of a file means that there is no context being loaded into the prompt. Please open a file before trying again");
+  
+          toast.error("No current file selected. Please open a file before trying again.")
+          return;
+        }
+        const { prompt, contextCutoffAt } = await window.files.augmentPromptWithFile(
+          { 
+            prompt: userInput,
+            llmSessionID: currentSessionId,
+            filePath: currentFilePath
+          });
+        if (contextCutoffAt) {
+          toast.warning(`The file is too large to be used as context. It got cut off at: ${contextCutoffAt}`)
+        }
+        augmentedPrompt = prompt;
+      } else if (askText === AskOptions.Ask){
+        augmentedPrompt = await window.database.augmentPromptWithRAG(
+          userInput,
+          currentSessionId,
+        );
+      }
+    } catch (error) {
+      console.error("Failed to augment prompt:", error);
+      toast.error(errorToString(error), {
+        className: "mt-5",
+        autoClose: false,
+        closeOnClick: true,
+        draggable: false,
+      });
+      return;
     }
+    
 
-    const augmentedPrompt = await window.database.augmentPromptWithRAG(
-      userInput,
-      currentSessionId,
-      filterString
-    );
     startStreamingResponse(currentSessionId, augmentedPrompt, true);
 
     setMessages([

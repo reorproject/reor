@@ -1,6 +1,6 @@
 import { ipcMain } from "electron";
 import * as path from "path";
-import { FileInfoTree, WriteFileProps } from "./Types";
+import { FileInfoTree, AugmentPromptWithFileProps, WriteFileProps } from "./Types";
 import {
   GetFilesInfoTree,
   orchestrateEntryMove,
@@ -14,6 +14,8 @@ import {
   activeWindows,
 } from "../windowManager";
 import { errorToString } from "../Generic/error";
+import { LLMSessions } from "../llm/llmSessionHandlers";
+import { PromptWithContextLimit, createPromptWithContextLimitFromContent } from "../Prompts/Prompts";
 
 export const registerFileHandlers = () => {
   ipcMain.handle("join-path", (event, ...args) => {
@@ -123,4 +125,33 @@ export const registerFileHandlers = () => {
       );
     }
   );
+
+  ipcMain.handle(
+    "augment-prompt-with-file",
+    async (
+      _event,
+     { prompt, llmSessionID, filePath }: AugmentPromptWithFileProps
+    ): Promise<PromptWithContextLimit> => {
+      try {
+        const content = fs.readFileSync(filePath, "utf-8");
+
+        const llmSession = LLMSessions[llmSessionID];
+        if (!llmSession) {
+          throw new Error(`Session ${llmSessionID} does not exist.`);
+        }
+
+        const { prompt: filePrompt , contextCutoffAt } = createPromptWithContextLimitFromContent(
+          content,
+          prompt,
+          llmSession.tokenize,
+          llmSession.getContextLength()
+        );
+        return { prompt: filePrompt, contextCutoffAt };
+      } catch (error) {
+        console.error("Error searching database:", error);
+        throw error;
+      }
+    }
+  );
+
 };

@@ -16,8 +16,15 @@ export const isFileNodeDirectory = (fileInfo: FileInfoNode): boolean => {
   return fileInfo.children !== undefined;
 };
 
+export interface AugmentPromptWithFileProps {
+  prompt: string;
+  llmSessionID: string;
+  filePath: string;
+}
+
 export type WriteFileProps = {
   filePath: string;
   content: string;
   indexFileAlongsideSave: boolean;
 };
+
