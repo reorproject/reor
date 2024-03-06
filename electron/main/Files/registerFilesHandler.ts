@@ -52,15 +52,11 @@ export const registerFileHandlers = () => {
   ipcMain.handle(
     "write-file",
     async (event, writeFileProps: WriteFileProps) => {
-      try {
-        fs.writeFileSync(
-          writeFileProps.filePath,
-          writeFileProps.content,
-          "utf-8"
-        );
-      } catch (error) {
-        console.error("Error updating file in table:", error);
-      }
+      fs.writeFileSync(
+        writeFileProps.filePath,
+        writeFileProps.content,
+        "utf-8"
+      );
     }
   );
 

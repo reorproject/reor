@@ -23,19 +23,28 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const onFileSelect = async (path: string) => {
     if (selectedFilePath) {
       if (editorContent !== lastSavedContentRef.current) {
-        try {
-          await window.files.writeFile({
+        window.files
+          .writeFile({
             filePath: selectedFilePath,
             content: editorContent,
+          })
+          .then(() => {
+            window.files.indexFileInDatabase(selectedFilePath);
+          })
+          .catch((e) => {
+            const errorMessage = `Error saving current file! Please open a Github issue. Details: ${
+              e.message || e.toString()
+            }`;
+            toast.error(errorMessage, {
+              className: "mt-5",
+              autoClose: false,
+              closeOnClick: false,
+              draggable: false,
+            });
           });
-        } catch (e) {
-          toast.error("Error saving current file! Please try again.", {
-            className: "mt-5",
-          });
-          return;
-        }
+      } else {
+        window.files.indexFileInDatabase(selectedFilePath);
       }
-      await window.files.indexFileInDatabase(selectedFilePath); // always index file in table on file change
     }
     setSelectedFilePath(path);
   };
