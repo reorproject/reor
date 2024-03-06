@@ -110,10 +110,10 @@ export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
   return flatList;
 }
 
-export function writeFileSyncRecursive(
+export function createFileRecursive(
   filePath: string,
   content: string,
-  charset: BufferEncoding
+  charset?: BufferEncoding
 ): void {
   const dirname = path.dirname(filePath);
   if (!fs.existsSync(dirname)) {

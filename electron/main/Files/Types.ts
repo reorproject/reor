@@ -25,6 +25,4 @@ export interface AugmentPromptWithFileProps {
 export type WriteFileProps = {
   filePath: string;
   content: string;
-  indexFileAlongsideSave: boolean;
 };
-

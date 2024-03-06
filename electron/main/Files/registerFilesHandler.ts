@@ -1,10 +1,14 @@
 import { ipcMain } from "electron";
 import * as path from "path";
-import { FileInfoTree, AugmentPromptWithFileProps, WriteFileProps } from "./Types";
+import {
+  FileInfoTree,
+  AugmentPromptWithFileProps,
+  WriteFileProps,
+} from "./Types";
 import {
   GetFilesInfoTree,
   orchestrateEntryMove,
-  writeFileSyncRecursive,
+  createFileRecursive,
 } from "./Filesystem";
 import * as fs from "fs";
 import { updateFileInTable } from "../database/TableHelperFunctions";
@@ -15,7 +19,10 @@ import {
 } from "../windowManager";
 import { errorToString } from "../Generic/error";
 import { LLMSessions } from "../llm/llmSessionHandlers";
-import { PromptWithContextLimit, createPromptWithContextLimitFromContent } from "../Prompts/Prompts";
+import {
+  PromptWithContextLimit,
+  createPromptWithContextLimitFromContent,
+} from "../Prompts/Prompts";
 
 export const registerFileHandlers = () => {
   ipcMain.handle("join-path", (event, ...args) => {
@@ -47,31 +54,12 @@ export const registerFileHandlers = () => {
     "write-file",
     async (event, writeFileProps: WriteFileProps) => {
       try {
+        console.log("CALLING STANDARD WRITE-FILE: ", writeFileProps.filePath);
         fs.writeFileSync(
           writeFileProps.filePath,
           writeFileProps.content,
           "utf-8"
         );
-
-        const windowInfo = getWindowInfoForContents(
-          activeWindows,
-          event.sender
-        );
-        if (!windowInfo) {
-          throw new Error("Window info not found.");
-        }
-
-        // Update file in table
-        if (writeFileProps.indexFileAlongsideSave) {
-          await updateFileInTable(
-            windowInfo.dbTableClient,
-            writeFileProps.filePath,
-            writeFileProps.content
-          );
-
-          // Respond directly to the sender
-          event.sender.send("vector-database-update");
-        }
       } catch (error) {
         console.error("Error updating file in table:", error);
 
@@ -81,10 +69,19 @@ export const registerFileHandlers = () => {
     }
   );
 
+  ipcMain.handle("index-file-in-database", async (event, filePath: string) => {
+    const windowInfo = getWindowInfoForContents(activeWindows, event.sender);
+    if (!windowInfo) {
+      throw new Error("Window info not found.");
+    }
+    await updateFileInTable(windowInfo.dbTableClient, filePath);
+    event.sender.send("vector-database-update");
+  });
+
   ipcMain.handle(
     "create-file",
     async (event, filePath: string, content: string): Promise<void> => {
-      writeFileSyncRecursive(filePath, content, "utf-8");
+      createFileRecursive(filePath, content, "utf-8");
     }
   );
 
@@ -130,7 +127,7 @@ export const registerFileHandlers = () => {
     "augment-prompt-with-file",
     async (
       _event,
-     { prompt, llmSessionID, filePath }: AugmentPromptWithFileProps
+      { prompt, llmSessionID, filePath }: AugmentPromptWithFileProps
     ): Promise<PromptWithContextLimit> => {
       try {
         const content = fs.readFileSync(filePath, "utf-8");
@@ -140,12 +137,13 @@ export const registerFileHandlers = () => {
           throw new Error(`Session ${llmSessionID} does not exist.`);
         }
 
-        const { prompt: filePrompt , contextCutoffAt } = createPromptWithContextLimitFromContent(
-          content,
-          prompt,
-          llmSession.tokenize,
-          llmSession.getContextLength()
-        );
+        const { prompt: filePrompt, contextCutoffAt } =
+          createPromptWithContextLimitFromContent(
+            content,
+            prompt,
+            llmSession.tokenize,
+            llmSession.getContextLength()
+          );
         return { prompt: filePrompt, contextCutoffAt };
       } catch (error) {
         console.error("Error searching database:", error);
@@ -153,5 +151,4 @@ export const registerFileHandlers = () => {
       }
     }
   );
-
 };

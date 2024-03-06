@@ -7,7 +7,12 @@ import {
   LLMGenerationParameters,
   LLMModelConfig,
 } from "electron/main/Store/storeConfig";
-import { AugmentPromptWithFileProps, FileInfoNode, FileInfoTree, WriteFileProps } from "electron/main/Files/Types";
+import {
+  AugmentPromptWithFileProps,
+  FileInfoNode,
+  FileInfoTree,
+  WriteFileProps,
+} from "electron/main/Files/Types";
 import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,6 +52,7 @@ declare global {
       openFileDialog: (fileExtensions?: string[]) => Promise<string[]>;
       getFilesForWindow: () => Promise<FileInfoTree>;
       writeFile: (writeFileProps: WriteFileProps) => Promise<void>;
+      indexFileInDatabase: (filePath: string) => Promise<void>;
       readFile: (filePath: string) => Promise<string>;
       createFile: (filePath: string, content: string) => Promise<void>;
       createDirectory: (dirPath: string) => Promise<void>;
@@ -244,6 +250,10 @@ contextBridge.exposeInMainWorld("files", {
     return ipcRenderer.invoke("write-file", writeFileProps);
   },
 
+  indexFileInDatabase: async (filePath: string) => {
+    return ipcRenderer.invoke("index-file-in-database", filePath);
+  },
+
   createFile: async (filePath: string, content: string) => {
     return ipcRenderer.invoke("create-file", filePath, content);
   },
@@ -262,9 +272,12 @@ contextBridge.exposeInMainWorld("files", {
     return ipcRenderer.invoke("move-file-or-dir", sourcePath, destinationPath);
   },
   augmentPromptWithFile: async (
-    augmentPromptWithFileProps : AugmentPromptWithFileProps
+    augmentPromptWithFileProps: AugmentPromptWithFileProps
   ): Promise<PromptWithContextLimit> => {
-    return ipcRenderer.invoke("augment-prompt-with-file", augmentPromptWithFileProps);
+    return ipcRenderer.invoke(
+      "augment-prompt-with-file",
+      augmentPromptWithFileProps
+    );
   },
 });
 

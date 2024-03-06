@@ -53,7 +53,7 @@ export const RepopulateTableWithMissingItems = async (
 
   let dbItemsToAdd;
   try {
-    dbItemsToAdd = await computeDbItemsToAdd(filesInfoTree, tableArray);
+    dbItemsToAdd = await computeDbItemsToAddOrUpdate(filesInfoTree, tableArray);
   } catch (error) {
     throw new Error(`Error computing DB items to add: ${errorToString(error)}`);
   }
@@ -101,44 +101,62 @@ const getTableAsArray = async (
   return results;
 };
 
-const computeDbItemsToAdd = async (
+const computeDbItemsToAddOrUpdate = async (
   filesInfoList: FileInfo[],
   tableArray: DBEntry[]
 ): Promise<DBEntry[][]> => {
-  const promises = filesInfoList.map(convertFileTypeToDBType);
+  const filesAsChunks = await convertFileInfoListToDBItems(filesInfoList); // basically gives us each file as a list of chunks. When all we probably want to do is compare the file modified time to the table's file modified time and see if the file modified time is greater
 
-  const filesAsChunksToAddToDB = await Promise.all(promises);
-
-  return filesAsChunksToAddToDB.filter((chunksBelongingToFile) =>
-    filterChunksNotInTable(chunksBelongingToFile, tableArray)
+  const fileChunksMissingFromTable = filesAsChunks.filter(
+    (chunksBelongingToFile) =>
+      areChunksMissingFromTable(chunksBelongingToFile, tableArray)
   );
+
+  return fileChunksMissingFromTable;
+};
+
+const convertFileInfoListToDBItems = async (
+  filesInfoList: FileInfo[]
+): Promise<DBEntry[][]> => {
+  const promises = filesInfoList.map(convertFileTypeToDBType);
+  const filesAsChunksToAddToDB = await Promise.all(promises);
+  return filesAsChunksToAddToDB;
 };
 
 const computeDBItemsToRemoveFromTable = async (
   filesInfoList: FileInfo[],
   tableArray: DBEntry[]
 ): Promise<DBEntry[]> => {
-  const notInFilesInfoList = tableArray.filter(
+  const itemsInTableAndNotInFilesInfoList = tableArray.filter(
     (item) => !filesInfoList.some((file) => file.path == item.notepath)
   );
-  return notInFilesInfoList;
+  return itemsInTableAndNotInFilesInfoList;
 };
 
-const filterChunksNotInTable = (
-  chunksBelongingToFile: DBEntry[],
+const areChunksMissingFromTable = (
+  chunksToCheck: DBEntry[],
   tableArray: DBEntry[]
 ): boolean => {
-  if (chunksBelongingToFile.length == 0) {
+  // checking whether th
+  if (chunksToCheck.length == 0) {
+    // if there are no chunks and we are checking whether the table
     return false;
   }
-  if (chunksBelongingToFile[0].content == "") {
+
+  if (chunksToCheck[0].content === "") {
     return false;
   }
-  const notepath = chunksBelongingToFile[0].notepath;
+  // then we'd check if the filepaths are not present in the table at all:
+  const notepath = chunksToCheck[0].notepath;
   const itemsAlreadyInTable = tableArray.filter(
     (item) => item.notepath == notepath
   );
-  return chunksBelongingToFile.length != itemsAlreadyInTable.length;
+  if (itemsAlreadyInTable.length == 0) {
+    // if we find no items in the table with the same notepath, then we should add the chunks to the table
+    return true;
+  }
+
+  return chunksToCheck[0].filemodified > itemsAlreadyInTable[0].filemodified;
 };
 
 const convertFileTreeToDBEntries = async (
@@ -196,11 +214,10 @@ export const removeFileTreeFromDBTable = async (
 
 export const updateFileInTable = async (
   dbTable: LanceDBTableWrapper,
-  filePath: string,
-  content: string
+  filePath: string
 ): Promise<void> => {
   await dbTable.deleteDBItemsByFilePaths([filePath]);
-  const currentTimestamp: Date = new Date();
+  const content = readFile(filePath);
   const chunkedContentList = await chunkMarkdownByHeadingsAndByCharsIfBig(
     content
   );
@@ -210,7 +227,7 @@ export const updateFileInTable = async (
       notepath: filePath,
       content: content,
       subnoteindex: index,
-      timeadded: currentTimestamp,
+      timeadded: new Date(), // time now
       filemodified: stats.mtime,
       filecreated: stats.birthtime,
     };
