@@ -26,6 +26,8 @@ import {
 } from "@prosemirror-adapter/react";
 import { ListItem } from "./Todo/ListItem";
 import { CodeBlock } from "./Codeblock";
+import { toast } from "react-toastify";
+import { errorToString } from "@/functions/error";
 
 export interface MarkdownEditorProps {
   filePath: string;
@@ -42,11 +44,23 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
 
   const saveFile = async () => {
     if (content !== lastSavedContentRef.current) {
-      await window.files.writeFile({
-        filePath: filePath,
-        content: content,
-        indexFileAlongsideSave: false,
-      });
+      try {
+        await window.files.writeFile({
+          filePath: filePath,
+          content: content,
+        });
+      } catch (error) {
+        // Constructing the error message with specific error details
+        const errorMessage = `Error saving current file. Please try again or report the issue on Github. Details: ${errorToString(
+          error
+        )}`;
+        toast.error(errorMessage, {
+          className: "mt-5",
+          autoClose: false,
+          closeOnClick: false,
+          draggable: false,
+        });
+      }
       lastSavedContentRef.current = content;
     }
   };
