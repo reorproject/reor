@@ -54,7 +54,6 @@ export const registerFileHandlers = () => {
     "write-file",
     async (event, writeFileProps: WriteFileProps) => {
       try {
-        console.log("CALLING STANDARD WRITE-FILE: ", writeFileProps.filePath);
         fs.writeFileSync(
           writeFileProps.filePath,
           writeFileProps.content,
@@ -62,9 +61,6 @@ export const registerFileHandlers = () => {
         );
       } catch (error) {
         console.error("Error updating file in table:", error);
-
-        // Optionally, send an error response back to the sender
-        event.sender.send("vector-database-error", errorToString(error));
       }
     }
   );
