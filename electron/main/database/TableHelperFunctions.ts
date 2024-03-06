@@ -105,7 +105,7 @@ const computeDbItemsToAddOrUpdate = async (
   filesInfoList: FileInfo[],
   tableArray: DBEntry[]
 ): Promise<DBEntry[][]> => {
-  const filesAsChunks = await convertFileInfoListToDBItems(filesInfoList); // basically gives us each file as a list of chunks. When all we probably want to do is compare the file modified time to the table's file modified time and see if the file modified time is greater
+  const filesAsChunks = await convertFileInfoListToDBItems(filesInfoList);
 
   const fileChunksMissingFromTable = filesAsChunks.filter(
     (chunksBelongingToFile) =>
