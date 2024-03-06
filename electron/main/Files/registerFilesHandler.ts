@@ -17,7 +17,6 @@ import {
   getWindowInfoForContents,
   activeWindows,
 } from "../windowManager";
-import { errorToString } from "../Generic/error";
 import { LLMSessions } from "../llm/llmSessionHandlers";
 import {
   PromptWithContextLimit,
