@@ -251,7 +251,7 @@ const FileItem: React.FC<FileInfoProps> = ({
       <div onClick={toggle} className={itemClasses}>
         {isDirectory && (
           <span className={`mr-2 mt-1 text-[13px] `}>
-            {isExpanded ? <FaChevronDown /> : <FaChevronRight />}
+            {isExpanded ? <FaChevronDown title="Collapse Directory" /> : <FaChevronRight title="Open Directory" />}
           </span>
         )}
         <span

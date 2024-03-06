@@ -63,12 +63,14 @@ const TitleBar: React.FC<TitleBarProps> = ({
             className="text-gray-100 cursor-pointer mt-[0.1rem]"
             size={28}
             onClick={toggleSimilarFiles}
+            title="Hide Similar Files"
           />
         ) : (
           <PiSidebar
             className="text-gray-100 cursor-pointer mt-[0.1rem]"
             size={28}
             onClick={toggleSimilarFiles}
+            title="Show Similar Files"
           />
         )}
 
@@ -78,12 +80,14 @@ const TitleBar: React.FC<TitleBarProps> = ({
               size={22}
               className="text-gray-100 cursor-pointer"
               onClick={toggleChatbot}
+              title="Open Chatbot"
             />
           ) : (
             <BsChatLeftDots
               className="text-gray-100 cursor-pointer "
               size={22}
               onClick={toggleChatbot}
+              title="Close Chatbot"
             />
           )}
         </div>

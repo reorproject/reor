@@ -37,7 +37,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
             backgroundColor: sidebarShowing === "files" ? "#334155" : "",
           }}
         >
-          <IoFolderOutline className="mx-auto text-gray-200 " size={22} />
+          <IoFolderOutline className="mx-auto text-gray-200 " size={22} title="Files" />
         </div>
       </div>
 
@@ -51,7 +51,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
             backgroundColor: sidebarShowing === "search" ? "#334155" : "",
           }}
         >
-          <FaSearch size={18} className=" text-gray-200" />
+          <FaSearch size={18} className=" text-gray-200" title="Semantic Search"/>
         </div>
       </div>
       <div
@@ -59,7 +59,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
         onClick={() => setIsNewNoteModalOpen(true)}
       >
         <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-slate-700">
-          <FaRegPenToSquare className="text-gray-200" size={20} />
+          <FaRegPenToSquare className="text-gray-200" size={20} title="New Note" />
         </div>
       </div>
       <div
@@ -67,7 +67,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
         onClick={() => setIsNewDirectoryModalOpen(true)}
       >
         <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-slate-700">
-          <LuFolderPlus className="text-gray-200" size={23} />
+          <LuFolderPlus className="text-gray-200" size={23} title="New Directory" />
           {/* < /> */}
         </div>
       </div>
@@ -90,13 +90,13 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
         className="bg-transparent border-none pb-2 mb-[2px] cursor-pointer flex items-center justify-center w-full"
         onClick={() => window.electron.openNewWindow()}
       >
-        <GrNewWindow className="text-gray-100" size={21} />
+        <GrNewWindow className="text-gray-100" size={21} title="Open New Vault" />
       </div>
       <button
         className="bg-transparent border-none pb-2 cursor-pointer flex items-center justify-center w-full"
         onClick={() => setIsSettingsModalOpen(!isSettingsModalOpen)}
       >
-        <MdSettings className="h-6 w-6 text-gray-100" />
+        <MdSettings className="h-6 w-6 text-gray-100" title="Settings" />
       </button>
     </div>
   );
