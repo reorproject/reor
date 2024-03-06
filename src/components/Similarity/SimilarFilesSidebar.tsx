@@ -70,9 +70,15 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
 
   useEffect(() => {
     let active = true;
-    const vectorDBUpdateListener = async () => {
+    const vectorDBUpdateListener = async (deletedFilePath: string) => {
+      if (deletedFilePath === filePath) {
+        setSimilarEntries([]);
+        //clear the contents in the current file
+        return;
+      }
+      console.log("deletedFilepath: ", deletedFilePath);
+      console.log("vectorDBUpdateListener filePath: ", filePath);
       if (!active) return;
-      console.log("vectorDBUpdateListener filePath: ", filePath)
       const searchResults = await performSearch(filePath);
       if (searchResults.length > 0) {
         setSimilarEntries(searchResults);

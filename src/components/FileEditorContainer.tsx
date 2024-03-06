@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 import ChatWithLLM from "./Chat/Chat";
@@ -6,31 +6,18 @@ import LeftSidebar from "./Sidebars/IconsSidebar";
 import MilkdownEditor from "./File/MilkdownEditor";
 import ResizableComponent from "./Generic/ResizableComponent";
 import SidebarManager from "./Sidebars/MainSidebar";
-import { toast } from "react-toastify";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search";
 
 const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
-  const [editorContent, setEditorContent] = useState<string>("");
   const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
-  const lastSavedContentRef = useRef<string>("");
   const [showChatbot, setShowChatbot] = useState<boolean>(true);
   const [showSimilarFiles, setShowSimilarFiles] = useState<boolean>(true);
   const [sidebarShowing, setSidebarShowing] =
     useState<SidebarAbleToShow>("files");
 
   const onFileSelect = async (path: string) => {
-    if (selectedFilePath && editorContent !== lastSavedContentRef.current) {
-      try {
-        await window.files.writeFile(selectedFilePath, editorContent); // save the current content.
-      } catch (e) {
-        toast.error("Error saving current file! Please try again.", {
-          className: "mt-5",
-        });
-        return;
-      }
-    }
     setSelectedFilePath(path);
   };
   const toggleChatbot = () => {
@@ -40,8 +27,26 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     setShowSimilarFiles(!showSimilarFiles);
   };
 
-  console.log("FileEditorContainer filePath: ", selectedFilePath)
 
+  useEffect(() => {
+    //checks if file has been deleted, and takes actions accordingly, such as always clearing the related side bar and then clearing the content of the editor
+    const vectorDBUpdateListener = async (deletedFilePath: string) => {
+      if (deletedFilePath === selectedFilePath) {
+        setSelectedFilePath(null);
+      }
+    }
+    window.ipcRenderer.receive(
+      "vector-database-update",
+      vectorDBUpdateListener
+    );
+    return () => {
+      window.ipcRenderer.removeListener(
+        "vector-database-update",
+        vectorDBUpdateListener
+      );
+    };
+  },[selectedFilePath, setSelectedFilePath])
+  
   return (
     <div>
       <TitleBar
@@ -77,8 +82,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
               <div className="h-full w-full">
                 <MilkdownEditor
                   filePath={selectedFilePath}
-                  setContentInParent={setEditorContent}
-                  lastSavedContentRef={lastSavedContentRef}
                 />
               </div>
               {showSimilarFiles && (

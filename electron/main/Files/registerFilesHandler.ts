@@ -40,7 +40,12 @@ export const registerFileHandlers = () => {
       return fs.readFileSync(filePath, "utf-8");
     }
   );
-
+  ipcMain.handle(
+    "check-file-exists",
+    async (event, filePath: string): Promise<boolean> => {
+      return fs.existsSync(filePath);
+  });
+  
   ipcMain.handle(
     "write-file",
     async (event, filePath: string, content: string) => {

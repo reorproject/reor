@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Editor, rootCtx, defaultValueCtx } from "@milkdown/core";
+import React, { useEffect } from "react";
+import { Editor, rootCtx } from "@milkdown/core";
 import { nord } from "@milkdown/theme-nord";
 import { codeBlockSchema, commonmark, listItemSchema} from "@milkdown/preset-commonmark";
 import debounce from "lodash.debounce";
@@ -21,36 +21,16 @@ import { CodeBlock } from "./Codeblock";
 
 export interface MarkdownEditorProps {
   filePath: string;
-  setContentInParent: (content: string) => void;
-  lastSavedContentRef: React.MutableRefObject<string>;
 }
 
 const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
   filePath,
-  setContentInParent,
-  lastSavedContentRef,
 }) => {
-  const [content, setContent] = useState<string>("");
 
-  const saveFile = async () => {
-    if (content !== lastSavedContentRef.current) {
-      await window.files.writeFile(filePath, content);
-      lastSavedContentRef.current = content;
-    }
+  const saveFile = async (fileContent:string) => {
+    await window.files.writeFile(filePath, fileContent);  
   };
 
-  useEffect(() => {
-    
-    const saveInterval = setInterval(() => {
-      saveFile();
-    }, 1000);
-
-    return () => clearInterval(saveInterval);
-  }, [content]);
-
-  useEffect(() => {
-    setContentInParent(content);
-  }, [content]);
 
   const pluginViewFactory = usePluginViewFactory();
   const nodeViewFactory = useNodeViewFactory();
@@ -60,9 +40,9 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
       .make()
       .config(ctx => {
         ctx.set(rootCtx, root)
-        ctx.set(defaultValueCtx, content);
+        // ctx.set(defaultValueCtx, lastSavedContentRef.current);
         ctx.get(listenerCtx).markdownUpdated((_ctx, markdown) => {
-          debounce(setContent, 1000)(markdown);
+          debounce(saveFile, 1000)(markdown);
         })
         
         ctx.set(block.key, {
@@ -92,17 +72,19 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
       // .use(slash)
   }, [])
   
+  //initial file read and set content
   useEffect(() => {
+    
     const fetchContent = async () => {
       try {
         const fileContent = await window.files.readFile(filePath);
         get()?.action(replaceAll(fileContent));
-        lastSavedContentRef.current = fileContent;
       } catch (error) {
         console.error("Error reading file:", error);
       }
     };
 
+    console.log("fetching content for filepath: ", filePath)
     if (filePath) {
       fetchContent();
     }
@@ -117,13 +99,11 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
 
 const MilkdownEditorWrapper: React.FC<MarkdownEditorProps> = ({
   filePath,
-  setContentInParent,
-  lastSavedContentRef,
 }) => {
   return (
     <MilkdownProvider>
       <ProsemirrorAdapterProvider>
-        <MilkdownEditor filePath={filePath} setContentInParent={setContentInParent} lastSavedContentRef={lastSavedContentRef} />
+        <MilkdownEditor filePath={filePath} />
       </ProsemirrorAdapterProvider>
     </MilkdownProvider>
   );

@@ -243,6 +243,7 @@ ipcMain.on("show-context-menu-file-item", (event, file) => {
                 `Directory at ${file.path} was deleted successfully.`
               );
             });
+            event.sender.send("vector-database-update", file.path);
           } else {
             fs.unlink(file.path, async (err) => {
               if (err) {
@@ -256,7 +257,7 @@ ipcMain.on("show-context-menu-file-item", (event, file) => {
                 throw new Error("No window info found");
               }
               await windowInfo.dbTableClient.deleteDBItemsByFilePaths([file.path]);
-              event.sender.send("vector-database-update")
+              event.sender.send("vector-database-update", file.path)
             });
           }
         });
