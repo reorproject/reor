@@ -10,7 +10,7 @@ import {
   LLMGenerationParameters,
   OpenAILLMConfig,
 } from "electron/main/Store/storeConfig";
-import { customFetchUsingElectronNetStreamingForOpenAIReqs } from "electron/main/networking/fetch";
+import { customFetchUsingElectronNetStreamingForOpenAIReqs } from "../../networking/fetch";
 
 export class OpenAIModelSessionService implements LLMSessionService {
   private openai!: OpenAI;

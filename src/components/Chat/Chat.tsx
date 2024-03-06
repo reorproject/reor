@@ -21,7 +21,10 @@ enum AskOptions {
 }
 const ASK_OPTIONS = Object.values(AskOptions);
 
-const PROMPT_OPTIONS = ["Generate weekly 1-1 talking points from this file", "Separate concepts from todos"]; // more options to come
+const PROMPT_OPTIONS = [
+  "Generate weekly 1-1 talking points from this file",
+  "Separate concepts from todos",
+]; // more options to come
 
 interface ChatWithLLMProps {
   currentFilePath: string | null;
@@ -46,14 +49,21 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
     fetchDefaultModel();
   }, []);
 
-  const fileNotSelectedToastId = useRef<string| null>(null);
+  const fileNotSelectedToastId = useRef<string | null>(null);
   useEffect(() => {
     if (!currentFilePath && askText === AskOptions.AskFile) {
-      fileNotSelectedToastId.current = toast.error("Please open a file before asking questions in ask file mode", {}) as string;
-    } else if (currentFilePath && askText === AskOptions.AskFile && fileNotSelectedToastId.current) {
+      fileNotSelectedToastId.current = toast.error(
+        "Please open a file before asking questions in ask file mode",
+        {}
+      ) as string;
+    } else if (
+      currentFilePath &&
+      askText === AskOptions.AskFile &&
+      fileNotSelectedToastId.current
+    ) {
       toast.dismiss(fileNotSelectedToastId.current);
     }
-  }, [currentFilePath, askText])
+  }, [currentFilePath, askText]);
 
   const initializeSession = async (): Promise<string> => {
     try {
@@ -72,10 +82,11 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
       return newSessionId;
     } catch (error) {
       console.error("Failed to create a new session:", error);
-      setCurrentBotMessage({
-        messageType: "error",
-        content: errorToString(error),
-        role: "assistant",
+      toast.error(errorToString(error), {
+        className: "mt-5",
+        autoClose: false,
+        closeOnClick: true,
+        draggable: false,
       });
       return "";
     }
@@ -107,29 +118,35 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
     }
     if (!currentSessionId || !userInput.trim()) return;
 
-    let augmentedPrompt: string = '';
+    let augmentedPrompt: string = "";
     try {
       if (askText === AskOptions.AskFile) {
         if (!currentFilePath) {
-          console.error("No current file selected. The lack of a file means that there is no context being loaded into the prompt. Please open a file before trying again");
-  
-          toast.error("No current file selected. Please open a file before trying again.")
+          console.error(
+            "No current file selected. The lack of a file means that there is no context being loaded into the prompt. Please open a file before trying again"
+          );
+
+          toast.error(
+            "No current file selected. Please open a file before trying again."
+          );
           return;
         }
-        const { prompt, contextCutoffAt } = await window.files.augmentPromptWithFile(
-          { 
+        const { prompt, contextCutoffAt } =
+          await window.files.augmentPromptWithFile({
             prompt: userInput,
             llmSessionID: currentSessionId,
-            filePath: currentFilePath
+            filePath: currentFilePath,
           });
         if (contextCutoffAt) {
-          toast.warning(`The file is too large to be used as context. It got cut off at: ${contextCutoffAt}`)
+          toast.warning(
+            `The file is too large to be used as context. It got cut off at: ${contextCutoffAt}`
+          );
         }
         augmentedPrompt = prompt;
-      } else if (askText === AskOptions.Ask){
+      } else if (askText === AskOptions.Ask) {
         augmentedPrompt = await window.database.augmentPromptWithRAG(
           userInput,
-          currentSessionId,
+          currentSessionId
         );
       }
     } catch (error) {
@@ -142,7 +159,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
       });
       return;
     }
-    
 
     startStreamingResponse(currentSessionId, augmentedPrompt, true);
 
@@ -288,7 +304,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
             </ReactMarkdown>
           )}
         </div>
-        {userInput === "" && askText === AskOptions.AskFile && messages.length == 0 ? (
+        {userInput === "" &&
+        askText === AskOptions.AskFile &&
+        messages.length == 0 ? (
           <>
             {PROMPT_OPTIONS.map((option, index) => {
               return (
