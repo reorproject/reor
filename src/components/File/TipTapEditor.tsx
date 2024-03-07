@@ -23,62 +23,30 @@ export const TipTapEditor: React.FC<EditorProps> = ({
   lastSavedContentRef,
 }) => {
   const [content, setContent] = useState<string>("");
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [Markdown, setMarkdown] = useState<any>(null); // To store the dynamically loaded module
-
-  // useEffect(() => {
-  //   // Dynamically import tiptap-markdown
-  //   import("tiptap-markdown")
-  //     .then((module) => {
-  //       setMarkdown(module.Markdown); // Set the loaded module to state
-  //     })
-  //     .catch((error) => {
-  //       console.error("Failed to load tiptap-markdown", error);
-  //     });
-  // }, []);
-
-  // useEffect(() => {
-  //   if (Markdown) {
-  //     Markdown.configure({
-  //       html: true, // Allow HTML input/output
-  //       tightLists: true, // No <p> inside <li> in markdown output
-  //       tightListClass: "tight", // Add class to <ul> allowing you to remove <p> margins when tight
-  //       bulletListMarker: "-", // <li> prefix in markdown output
-  //       linkify: false, // Create links from "https://..." text
-  //       breaks: false, // New lines (\n) in markdown input are converted to <br>
-  //       transformPastedText: false, // Allow to paste markdown text in the editor
-  //       transformCopiedText: false, // Copied text is transformed to markdown
-  //     });
-  //   }
-  // }, [Markdown]);
-
-  const ref = useRef(null);
   const editor = useEditor({
-    extensions: Markdown
-      ? [
-          StarterKit,
-          // Markdown(),
-          Document,
-          Paragraph,
-          Text,
-          TaskList,
-          TaskItem.configure({
-            nested: true,
-          }),
-        ]
-      : [
-          StarterKit,
-          Document,
-          Paragraph,
-          Text,
-          TaskList,
-          TaskItem.configure({
-            nested: true,
-          }),
-        ],
+    extensions: [
+      StarterKit,
+      Document,
+      Paragraph,
+      Text,
+      TaskList,
+      TaskItem.configure({
+        nested: true,
+      }),
+    ],
 
     content: tiptapContent,
   });
+  // const ref = useRef(null);
+
+  // useEffect(() => {
+  //   console.log("content is: ", content);
+  //   if (editor) {
+  //     editor.commands.setContent(content);
+  //   }
+  // }, [editor, content]);
+
+  // editor?
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -86,6 +54,8 @@ export const TipTapEditor: React.FC<EditorProps> = ({
         const fileContent = await window.files.readFile(filePath);
         setContent(fileContent);
         // ref.current?.setMarkdown(fileContent);
+        editor?.commands.setContent(content);
+
         lastSavedContentRef.current = fileContent; // Initialize with fetched content
       } catch (error) {
         // Handle the error here
@@ -97,34 +67,38 @@ export const TipTapEditor: React.FC<EditorProps> = ({
     if (filePath) {
       fetchContent();
     }
-  }, [filePath]);
+  }, [editor, filePath]);
 
   const saveFile = async () => {
-    if (content !== lastSavedContentRef.current) {
-      await window.files.writeFile({
-        filePath: filePath,
-        content: content,
-      });
-      lastSavedContentRef.current = content; // Update the ref to the latest saved content
-    }
+    const htmlContent = editor?.getHTML();
+    console.log("htmlContent is: ", htmlContent);
+    // if (content !== lastSavedContentRef.current) {
+    //   await window.files.writeFile({
+    //     filePath: filePath,
+    //     content: content,
+    //   });
+    //   lastSavedContentRef.current = content; // Update the ref to the latest saved content
+    // }
   };
 
   useEffect(() => {
     const saveInterval = setInterval(() => {
-      saveFile();
+      const htmlContent = editor?.getHTML();
+      console.log("htmlContent is: ", htmlContent);
+      // saveFile();
     }, 1000);
 
     return () => clearInterval(saveInterval); // Clear the interval when component unmounts
-  }, [content]); // Dependency on content ensures saveFile has the latest content
+  }, [editor, content]); // Dependency on content ensures saveFile has the latest content
 
   useEffect(() => {
     setContentInParent(content);
   }, [content]);
 
   const handleDivClick = () => {
-    if (ref.current) {
-      // ref.current.focus(); // Programmatically trigger a click on the MDXEditor
-    }
+    // if (ref.current) {
+    // ref.current.focus(); // Programmatically trigger a click on the MDXEditor
+    // }
   };
 
   return (
