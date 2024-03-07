@@ -23,13 +23,18 @@ export const RepopulateTableWithMissingItems = async (
     throw new Error(`Error getting file info list: ${errorToString(error)}`);
   }
 
+  console.time("STARTING TO COMPUTE ITEMS");
+
+  const fileInfoestimatedSize = estimateMemoryUsageInMB(filesInfoTree);
+  console.log("file info estimated size:", fileInfoestimatedSize);
   let tableArray;
   try {
     tableArray = await getTableAsArray(table);
   } catch (error) {
     throw new Error(`Error converting table to array: ${errorToString(error)}`);
   }
-
+  const estimatedSize = estimateMemoryUsageInMB(tableArray);
+  console.log("estimated size of table:", estimatedSize);
   let itemsToRemove;
   try {
     itemsToRemove = await computeDBItemsToRemoveFromTable(
@@ -57,6 +62,7 @@ export const RepopulateTableWithMissingItems = async (
   } catch (error) {
     throw new Error(`Error computing DB items to add: ${errorToString(error)}`);
   }
+  console.timeEnd("STARTING TO COMPUTE ITEMS");
 
   if (dbItemsToAdd.length === 0) {
     onProgress && onProgress(1);
@@ -82,28 +88,48 @@ export const RepopulateTableWithMissingItems = async (
   onProgress && onProgress(1);
 };
 
+function estimateMemoryUsageInMB(object: any): number {
+  const jsonString = JSON.stringify(object);
+  const sizeInBytes = new Blob([jsonString]).size;
+  return sizeInBytes / (1024 * 1024); // Convert bytes to megabytes
+}
+
+// const getTableAsArray = async (
+//   table: LanceDBTableWrapper
+// ): Promise<DBEntry[]> => {
+//   const totalRows = await table.countRows();
+//   if (totalRows == 0) {
+//     return [];
+//   }
+//   const nonEmptyResults = await table.filter(
+//     `${DatabaseFields.CONTENT} != ''`,
+//     totalRows
+//   );
+//   const emptyResults = await table.filter(
+//     `${DatabaseFields.CONTENT} = ''`,
+//     totalRows
+//   );
+//   const results = nonEmptyResults.concat(emptyResults);
+
+//   return results;
+// };
+
 const getTableAsArray = async (
   table: LanceDBTableWrapper
-): Promise<DBEntry[]> => {
-  const totalRows = await table.countRows();
-  if (totalRows == 0) {
-    return [];
-  }
-  const nonEmptyResults = await table.filter(
-    `${DatabaseFields.CONTENT} != ''`,
-    totalRows
-  );
-  const emptyResults = await table.filter(
-    `${DatabaseFields.CONTENT} = ''`,
-    totalRows
-  );
-  const results = nonEmptyResults.concat(emptyResults);
-  return results;
+): Promise<{ notepath: string; filemodified: Date }[]> => {
+  const nonEmptyResults = await table.lanceTable
+    .filter(`${DatabaseFields.NOTE_PATH} != ''`)
+    .select([DatabaseFields.NOTE_PATH, DatabaseFields.FILE_MODIFIED])
+    .execute();
+
+  const mapped = nonEmptyResults.map(convertLanceEntryToLightDBEntry);
+
+  return mapped as { notepath: string; filemodified: Date }[];
 };
 
 const computeDbItemsToAddOrUpdate = async (
   filesInfoList: FileInfo[],
-  tableArray: DBEntry[]
+  tableArray: { notepath: string; filemodified: Date }[]
 ): Promise<DBEntry[][]> => {
   const filesAsChunks = await convertFileInfoListToDBItems(filesInfoList);
 
@@ -125,8 +151,8 @@ const convertFileInfoListToDBItems = async (
 
 const computeDBItemsToRemoveFromTable = async (
   filesInfoList: FileInfo[],
-  tableArray: DBEntry[]
-): Promise<DBEntry[]> => {
+  tableArray: { notepath: string; filemodified: Date }[]
+): Promise<{ notepath: string; filemodified: Date }[]> => {
   const itemsInTableAndNotInFilesInfoList = tableArray.filter(
     (item) => !filesInfoList.some((file) => file.path == item.notepath)
   );
@@ -135,7 +161,7 @@ const computeDBItemsToRemoveFromTable = async (
 
 const areChunksMissingFromTable = (
   chunksToCheck: DBEntry[],
-  tableArray: DBEntry[]
+  tableArray: { notepath: string; filemodified: Date }[]
 ): boolean => {
   // checking whether th
   if (chunksToCheck.length == 0) {
@@ -235,17 +261,43 @@ export const updateFileInTable = async (
   await dbTable.add(dbEntries);
 };
 
+function hasRequiredFields(
+  record: Record<string, unknown>,
+  requiredFields: string[]
+): boolean {
+  return requiredFields.every((field) => field in record);
+}
+
 export function convertLanceEntryToDBEntry(
   record: Record<string, unknown>
 ): DBEntry | null {
-  if (
-    DatabaseFields.NOTE_PATH in record &&
-    DatabaseFields.VECTOR in record &&
-    DatabaseFields.CONTENT in record &&
-    DatabaseFields.SUB_NOTE_INDEX in record &&
-    DatabaseFields.TIME_ADDED in record
-  ) {
+  // Define the required fields based on your DatabaseFields enum/constants
+  const requiredFieldsForDBEntry = [
+    DatabaseFields.NOTE_PATH,
+    DatabaseFields.VECTOR,
+    DatabaseFields.CONTENT,
+    DatabaseFields.SUB_NOTE_INDEX,
+    DatabaseFields.TIME_ADDED,
+  ];
+
+  if (hasRequiredFields(record, requiredFieldsForDBEntry)) {
     const recordAsDBQueryType = record as unknown as DBEntry;
+    recordAsDBQueryType.notepath = unsanitizePathForFileSystem(
+      recordAsDBQueryType.notepath
+    );
+    return recordAsDBQueryType;
+  }
+  return null;
+}
+
+export function convertLanceEntryToLightDBEntry(
+  record: Record<string, unknown>
+): { notepath: string; filemodified: Date } | null {
+  if (DatabaseFields.NOTE_PATH in record) {
+    const recordAsDBQueryType = record as unknown as {
+      notepath: string;
+      filemodified: Date;
+    };
     recordAsDBQueryType.notepath = unsanitizePathForFileSystem(
       recordAsDBQueryType.notepath
     );
