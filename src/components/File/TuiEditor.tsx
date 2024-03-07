@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   AdmonitionDirectiveDescriptor,
   DirectiveDescriptor,
-  MDXEditor,
   MDXEditorMethods,
   SandpackConfig,
   codeBlockPlugin,
@@ -23,15 +22,12 @@ import {
   thematicBreakPlugin,
 } from "@mdxeditor/editor";
 import { LeafDirective } from "mdast-util-directive";
+import { EditorProps } from "./MdxEditor";
+import "@toast-ui/editor/dist/toastui-editor.css";
 
-// UNUSED RIGHT NOW. IN FAVOUR OF MILKDOWN.
-export interface EditorProps {
-  filePath: string;
-  setContentInParent: (content: string) => void;
-  lastSavedContentRef: React.MutableRefObject<string>;
-}
+import { Editor } from "@toast-ui/react-editor";
 
-export const MdxEditor: React.FC<EditorProps> = ({
+export const TuiEditor: React.FC<EditorProps> = ({
   filePath,
   setContentInParent,
   lastSavedContentRef,
@@ -91,14 +87,12 @@ export const MdxEditor: React.FC<EditorProps> = ({
       className="h-full overflow-y-auto w-full cursor-text bg-slate-800 "
       onClick={handleDivClick}
     >
-      <MDXEditor
-        ref={ref}
-        className="dark-theme dark-editor"
-        onChange={setContent}
-        markdown={content}
-        suppressHtmlProcessing={true}
-        onError={(error) => console.log("error", error)}
-        plugins={ALL_PLUGINS}
+      <Editor
+        initialValue="hello react editor world!"
+        previewStyle="vertical"
+        height="600px"
+        initialEditType="markdown"
+        useCommandShortcut={true}
       />
     </div>
   );

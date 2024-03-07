@@ -7,6 +7,10 @@ import MilkdownEditor from "./File/MilkdownEditor";
 import ResizableComponent from "./Generic/ResizableComponent";
 import SidebarManager from "./Sidebars/MainSidebar";
 import { toast } from "react-toastify";
+import { TuiEditor } from "./File/TuiEditor";
+import QuillEditor from "./File/QuillEditor";
+import { MdxEditor } from "./File/MdxEditor";
+import TipTapEditor from "./File/TipTapEditor";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search";
@@ -88,7 +92,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
           <div className="w-full h-full flex overflow-x-hidden">
             <div className="w-full flex h-full">
               <div className="h-full w-full">
-                <MilkdownEditor
+                <TipTapEditor
                   filePath={selectedFilePath}
                   setContentInParent={setEditorContent}
                   lastSavedContentRef={lastSavedContentRef}
