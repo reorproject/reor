@@ -19,7 +19,7 @@ turndownService.addRule("paragraph", {
   replacement: (content) => `\n\n${content}\n\n`, // Adjust replacement as needed
 });
 
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 // const extensions = [StarterKit];
 
@@ -67,13 +67,13 @@ export const TipTapEditor: React.FC<EditorProps> = ({
   }, [markdownContent]);
 
   useEffect(() => {
-    const fetchContent = async () => {
+    const fetchContent = async (filePath: string, editor: Editor) => {
       try {
         const fileContent = await window.files.readFile(filePath);
         const htmlContent = marked.parse(fileContent);
 
-        setMarkdownContent(fileContent);
         editor?.commands.setContent(htmlContent);
+
         lastSavedContentRef.current = fileContent; // Initialize with fetched content
       } catch (error) {
         // Handle the error here
@@ -82,10 +82,10 @@ export const TipTapEditor: React.FC<EditorProps> = ({
       }
     };
 
-    if (filePath) {
-      fetchContent();
+    if (filePath && editor) {
+      fetchContent(filePath, editor);
     }
-  }, [filePath]);
+  }, [filePath, editor]);
 
   const saveFile = async () => {
     if (markdownContent !== lastSavedContentRef.current) {

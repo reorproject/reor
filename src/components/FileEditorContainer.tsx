@@ -3,13 +3,9 @@ import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 import ChatWithLLM from "./Chat/Chat";
 import LeftSidebar from "./Sidebars/IconsSidebar";
-import MilkdownEditor from "./File/MilkdownEditor";
 import ResizableComponent from "./Generic/ResizableComponent";
 import SidebarManager from "./Sidebars/MainSidebar";
 import { toast } from "react-toastify";
-import { TuiEditor } from "./File/TuiEditor";
-import QuillEditor from "./File/QuillEditor";
-import { MdxEditor } from "./File/MdxEditor";
 import TipTapEditor from "./File/TipTapEditor";
 
 interface FileEditorContainerProps {}
@@ -52,6 +48,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     }
     setSelectedFilePath(path);
   };
+
   const toggleChatbot = () => {
     setShowChatbot(!showChatbot);
   };

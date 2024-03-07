@@ -2,6 +2,8 @@
   // make all text white:
   color: white;
   height: 100%;
+  outline: none;
+  padding: 0.5rem;
   > * + * {
     margin-top: 0.75em;
   }
