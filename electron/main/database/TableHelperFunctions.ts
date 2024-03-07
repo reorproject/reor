@@ -103,7 +103,7 @@ const getTableAsArray = async (
     .select([DatabaseFields.NOTE_PATH, DatabaseFields.FILE_MODIFIED])
     .execute();
 
-  const mapped = nonEmptyResults.map(convertLanceEntryToDBEntry);
+  const mapped = nonEmptyResults.map(convertRecordToType<DBEntry>);
 
   return mapped as { notepath: string; filemodified: Date }[];
 };
@@ -242,23 +242,12 @@ export const updateFileInTable = async (
   await dbTable.add(dbEntries);
 };
 
-export function convertLanceEntryToDBEntry(
+export function convertRecordToType<T extends DBEntry | DBQueryResult>(
   record: Record<string, unknown>
-): DBEntry | null {
-  // Define the required fields based on your DatabaseFields enum/constants
-  const recordAsDBQueryType = record as unknown as DBEntry;
-  recordAsDBQueryType.notepath = unsanitizePathForFileSystem(
-    recordAsDBQueryType.notepath
+): T | null {
+  const recordWithType = record as T;
+  recordWithType.notepath = unsanitizePathForFileSystem(
+    recordWithType.notepath
   );
-  return recordAsDBQueryType;
-}
-
-export function convertLanceResultToDBResult(
-  record: Record<string, unknown>
-): DBQueryResult | null {
-  const recordAsDBQueryType = record as unknown as DBQueryResult;
-  recordAsDBQueryType.notepath = unsanitizePathForFileSystem(
-    recordAsDBQueryType.notepath
-  );
-  return recordAsDBQueryType;
+  return recordWithType;
 }
