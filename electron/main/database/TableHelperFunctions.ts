@@ -29,8 +29,6 @@ export const RepopulateTableWithMissingItems = async (
   } catch (error) {
     throw new Error(`Error converting table to array: ${errorToString(error)}`);
   }
-  const estimatedSize = estimateMemoryUsageInMB(tableArray);
-  console.log("estimated size of table:", estimatedSize);
   let itemsToRemove;
   try {
     itemsToRemove = await computeDBItemsToRemoveFromTable(
@@ -83,13 +81,6 @@ export const RepopulateTableWithMissingItems = async (
   onProgress && onProgress(1);
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function estimateMemoryUsageInMB(object: any): number {
-  const jsonString = JSON.stringify(object);
-  const sizeInBytes = new Blob([jsonString]).size;
-  return sizeInBytes / (1024 * 1024); // Convert bytes to megabytes
-}
-
 const getTableAsArray = async (
   table: LanceDBTableWrapper
 ): Promise<{ notepath: string; filemodified: Date }[]> => {
@@ -98,7 +89,7 @@ const getTableAsArray = async (
     .select([DatabaseFields.NOTE_PATH, DatabaseFields.FILE_MODIFIED])
     .execute();
 
-  const mapped = nonEmptyResults.map(convertRecordToType<DBEntry>);
+  const mapped = nonEmptyResults.map(convertRecordToDBType<DBEntry>);
 
   return mapped as { notepath: string; filemodified: Date }[];
 };
@@ -237,7 +228,7 @@ export const updateFileInTable = async (
   await dbTable.add(dbEntries);
 };
 
-export function convertRecordToType<T extends DBEntry | DBQueryResult>(
+export function convertRecordToDBType<T extends DBEntry | DBQueryResult>(
   record: Record<string, unknown>
 ): T | null {
   const recordWithType = record as T;

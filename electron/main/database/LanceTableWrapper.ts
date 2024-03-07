@@ -10,7 +10,7 @@ import {
   createEmbeddingFunction,
 } from "./Embeddings";
 import {
-  convertRecordToType,
+  convertRecordToDBType,
   sanitizePathForDatabase,
 } from "./TableHelperFunctions";
 import { DBEntry, DBQueryResult, DatabaseFields } from "./Schema";
@@ -110,7 +110,7 @@ export class LanceDBTableWrapper {
       lanceQuery.filter(filter);
     }
     const rawResults = await lanceQuery.execute();
-    const mapped = rawResults.map(convertRecordToType<DBQueryResult>);
+    const mapped = rawResults.map(convertRecordToDBType<DBQueryResult>);
     return mapped as DBQueryResult[];
   }
 
@@ -119,7 +119,7 @@ export class LanceDBTableWrapper {
       .filter(filterString)
       .limit(limit)
       .execute();
-    const mapped = rawResults.map(convertRecordToType<DBEntry>);
+    const mapped = rawResults.map(convertRecordToDBType<DBEntry>);
     return mapped as DBEntry[];
   }
 
