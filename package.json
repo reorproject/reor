@@ -87,6 +87,7 @@
     "react-toastify": "^10.0.4",
     "react-window": "^1.8.10",
     "tiptap-markdown": "^0.8.9",
+    "turndown": "^7.1.2",
     "vectordb": "0.4.10"
   },
   "devDependencies": {
@@ -96,6 +97,7 @@
     "@types/react-dom": "^18.2.7",
     "@types/react-window": "^1.8.8",
     "@types/tmp": "^0.2.6",
+    "@types/turndown": "^5.0.4",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
     "@vitejs/plugin-react": "^4.0.4",
