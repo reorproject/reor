@@ -88,31 +88,12 @@ export const RepopulateTableWithMissingItems = async (
   onProgress && onProgress(1);
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function estimateMemoryUsageInMB(object: any): number {
   const jsonString = JSON.stringify(object);
   const sizeInBytes = new Blob([jsonString]).size;
   return sizeInBytes / (1024 * 1024); // Convert bytes to megabytes
 }
-
-// const getTableAsArray = async (
-//   table: LanceDBTableWrapper
-// ): Promise<DBEntry[]> => {
-//   const totalRows = await table.countRows();
-//   if (totalRows == 0) {
-//     return [];
-//   }
-//   const nonEmptyResults = await table.filter(
-//     `${DatabaseFields.CONTENT} != ''`,
-//     totalRows
-//   );
-//   const emptyResults = await table.filter(
-//     `${DatabaseFields.CONTENT} = ''`,
-//     totalRows
-//   );
-//   const results = nonEmptyResults.concat(emptyResults);
-
-//   return results;
-// };
 
 const getTableAsArray = async (
   table: LanceDBTableWrapper
@@ -122,7 +103,7 @@ const getTableAsArray = async (
     .select([DatabaseFields.NOTE_PATH, DatabaseFields.FILE_MODIFIED])
     .execute();
 
-  const mapped = nonEmptyResults.map(convertLanceEntryToLightDBEntry);
+  const mapped = nonEmptyResults.map(convertLanceEntryToDBEntry);
 
   return mapped as { notepath: string; filemodified: Date }[];
 };
@@ -261,67 +242,23 @@ export const updateFileInTable = async (
   await dbTable.add(dbEntries);
 };
 
-function hasRequiredFields(
-  record: Record<string, unknown>,
-  requiredFields: string[]
-): boolean {
-  return requiredFields.every((field) => field in record);
-}
-
 export function convertLanceEntryToDBEntry(
   record: Record<string, unknown>
 ): DBEntry | null {
   // Define the required fields based on your DatabaseFields enum/constants
-  const requiredFieldsForDBEntry = [
-    DatabaseFields.NOTE_PATH,
-    DatabaseFields.VECTOR,
-    DatabaseFields.CONTENT,
-    DatabaseFields.SUB_NOTE_INDEX,
-    DatabaseFields.TIME_ADDED,
-  ];
-
-  if (hasRequiredFields(record, requiredFieldsForDBEntry)) {
-    const recordAsDBQueryType = record as unknown as DBEntry;
-    recordAsDBQueryType.notepath = unsanitizePathForFileSystem(
-      recordAsDBQueryType.notepath
-    );
-    return recordAsDBQueryType;
-  }
-  return null;
-}
-
-export function convertLanceEntryToLightDBEntry(
-  record: Record<string, unknown>
-): { notepath: string; filemodified: Date } | null {
-  if (DatabaseFields.NOTE_PATH in record) {
-    const recordAsDBQueryType = record as unknown as {
-      notepath: string;
-      filemodified: Date;
-    };
-    recordAsDBQueryType.notepath = unsanitizePathForFileSystem(
-      recordAsDBQueryType.notepath
-    );
-    return recordAsDBQueryType;
-  }
-  return null;
+  const recordAsDBQueryType = record as unknown as DBEntry;
+  recordAsDBQueryType.notepath = unsanitizePathForFileSystem(
+    recordAsDBQueryType.notepath
+  );
+  return recordAsDBQueryType;
 }
 
 export function convertLanceResultToDBResult(
   record: Record<string, unknown>
 ): DBQueryResult | null {
-  if (
-    DatabaseFields.NOTE_PATH in record &&
-    DatabaseFields.VECTOR in record &&
-    DatabaseFields.CONTENT in record &&
-    DatabaseFields.SUB_NOTE_INDEX in record &&
-    DatabaseFields.TIME_ADDED in record &&
-    DatabaseFields.DISTANCE in record
-  ) {
-    const recordAsDBQueryType = record as unknown as DBQueryResult;
-    recordAsDBQueryType.notepath = unsanitizePathForFileSystem(
-      recordAsDBQueryType.notepath
-    );
-    return recordAsDBQueryType;
-  }
-  return null;
+  const recordAsDBQueryType = record as unknown as DBQueryResult;
+  recordAsDBQueryType.notepath = unsanitizePathForFileSystem(
+    recordAsDBQueryType.notepath
+  );
+  return recordAsDBQueryType;
 }
