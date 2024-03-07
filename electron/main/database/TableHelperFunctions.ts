@@ -23,10 +23,6 @@ export const RepopulateTableWithMissingItems = async (
     throw new Error(`Error getting file info list: ${errorToString(error)}`);
   }
 
-  console.time("STARTING TO COMPUTE ITEMS");
-
-  const fileInfoestimatedSize = estimateMemoryUsageInMB(filesInfoTree);
-  console.log("file info estimated size:", fileInfoestimatedSize);
   let tableArray;
   try {
     tableArray = await getTableAsArray(table);
@@ -62,7 +58,6 @@ export const RepopulateTableWithMissingItems = async (
   } catch (error) {
     throw new Error(`Error computing DB items to add: ${errorToString(error)}`);
   }
-  console.timeEnd("STARTING TO COMPUTE ITEMS");
 
   if (dbItemsToAdd.length === 0) {
     onProgress && onProgress(1);
