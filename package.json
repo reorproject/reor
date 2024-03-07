@@ -71,6 +71,7 @@
     "langchain": "^0.1.5",
     "lit": "^3.0.0",
     "lodash.debounce": "^4.0.8",
+    "marked": "^12.0.1",
     "node-llama-cpp": "3.0.0-beta.12",
     "npm": "^10.3.0",
     "openai": "^4.20.0",
