@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 import ChatWithLLM from "./Chat/Chat";
@@ -6,20 +6,21 @@ import LeftSidebar from "./Sidebars/IconsSidebar";
 import MilkdownEditor from "./File/MilkdownEditor";
 import ResizableComponent from "./Generic/ResizableComponent";
 import SidebarManager from "./Sidebars/MainSidebar";
+import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search";
 
+
+
 const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
-  const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
+  const  { fileContent, setFileContent, filePath: selectedFilePath, onFileSelect, deleteFile } = useFileByFilepath();
+
   const [showChatbot, setShowChatbot] = useState<boolean>(true);
   const [showSimilarFiles, setShowSimilarFiles] = useState<boolean>(true);
   const [sidebarShowing, setSidebarShowing] =
     useState<SidebarAbleToShow>("files");
 
-  const onFileSelect = async (path: string) => {
-    setSelectedFilePath(path);
-  };
   const toggleChatbot = () => {
     setShowChatbot(!showChatbot);
   };
@@ -27,26 +28,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     setShowSimilarFiles(!showSimilarFiles);
   };
 
-
-  useEffect(() => {
-    //checks if file has been deleted, and takes actions accordingly, such as always clearing the related side bar and then clearing the content of the editor
-    const vectorDBUpdateListener = async (deletedFilePath: string) => {
-      if (deletedFilePath === selectedFilePath) {
-        setSelectedFilePath(null);
-      }
-    }
-    window.ipcRenderer.receive(
-      "vector-database-update",
-      vectorDBUpdateListener
-    );
-    return () => {
-      window.ipcRenderer.removeListener(
-        "vector-database-update",
-        vectorDBUpdateListener
-      );
-    };
-  },[selectedFilePath, setSelectedFilePath])
-  
   return (
     <div>
       <TitleBar
@@ -72,6 +53,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
               selectedFilePath={selectedFilePath}
               onFileSelect={onFileSelect}
               sidebarShowing={sidebarShowing}
+              deleteFile={deleteFile}
             />
           </div>
         </ResizableComponent>
@@ -81,7 +63,8 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
             <div className="w-full flex h-full">
               <div className="h-full w-full">
                 <MilkdownEditor
-                  filePath={selectedFilePath}
+                  fileContent={fileContent}
+                  setFileContent={setFileContent}
                 />
               </div>
               {showSimilarFiles && (

@@ -124,3 +124,26 @@ button {
 .milkdown .editor h6 {
   font-size: 1em !important;
 }
+
+
+.popover-container {
+  position: relative;
+  display: inline-block;
+ }
+
+.trigger {
+  cursor: pointer;
+  padding: 10px;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+}
+
+.popover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  z-index: 10000;
+}

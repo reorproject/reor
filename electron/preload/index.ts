@@ -45,6 +45,7 @@ declare global {
       openFileDialog: (fileExtensions?: string[]) => Promise<string[]>;
       getFilesForWindow: () => Promise<FileInfoTree>;
       writeFile: (filePath: string, content: string) => Promise<void>;
+      deleteFile: (filePath: string) => Promise<void>;
       readFile: (filePath: string) => Promise<string>;
       createFile: (filePath: string, content: string) => Promise<void>;
       checkFileExists: (filePath: string) => Promise<boolean>;
@@ -230,6 +231,9 @@ contextBridge.exposeInMainWorld("files", {
 
   writeFile: async (filePath: string, content: string) => {
     return ipcRenderer.invoke("write-file", filePath, content);
+  },
+  deleteFile: async (filePath: string) => {
+    return ipcRenderer.invoke("delete-file", filePath);
   },
 
   createFile: async (filePath: string, content: string) => {

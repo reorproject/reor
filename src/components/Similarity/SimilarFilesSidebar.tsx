@@ -32,7 +32,6 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
 
   const performSearch = async (filePath: string): Promise<DBQueryResult[]> => {
     try {
-      // console.log("Performing search for:", filePath);
       const fileContent: string = await window.files.readFile(filePath);
       // TODO: proper chunking here...
       if (!fileContent) {
@@ -72,11 +71,9 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     let active = true;
     const vectorDBUpdateListener = async (deletedFilePath: string) => {
       if (deletedFilePath === filePath) {
-        setSimilarEntries([]);
-        //clear the contents in the current file
+        setSimilarEntries([]); //clear the contents in the current file
         return;
       }
-      console.log("deletedFilepath: ", deletedFilePath);
       console.log("vectorDBUpdateListener filePath: ", filePath);
       if (!active) return;
       const searchResults = await performSearch(filePath);

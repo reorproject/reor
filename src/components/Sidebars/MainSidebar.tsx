@@ -7,12 +7,14 @@ interface SidebarManagerProps {
   selectedFilePath: string | null;
   onFileSelect: (path: string) => void;
   sidebarShowing: "files" | "search";
+  deleteFile: () => Promise<void>;
 }
 
 const SidebarManager: React.FC<SidebarManagerProps> = ({
   selectedFilePath,
   onFileSelect,
   sidebarShowing,
+  deleteFile,
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<DBQueryResult[]>([]);
@@ -23,6 +25,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
         <FileSidebar
           selectedFile={selectedFilePath}
           onFileSelect={onFileSelect}
+          deleteFile={deleteFile}
         />
       )}
       {sidebarShowing === "search" && (

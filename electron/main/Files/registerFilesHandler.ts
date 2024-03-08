@@ -75,6 +75,47 @@ export const registerFileHandlers = () => {
   );
 
   ipcMain.handle(
+    'delete-file',
+    async (event, filePath: string) => {
+      fs.stat(filePath, (err, stats) => {
+        if (err) {
+          console.error("An error occurred:", err);
+          return;
+        }
+
+        if (stats.isDirectory()) {
+          // For directories (Node.js v14.14.0 and later)
+          fs.rm(filePath, { recursive: true }, (err) => {
+            if (err) {
+              console.error("An error occurred:", err);
+              return;
+            }
+            console.log(
+              `Directory at ${filePath} was deleted successfully.`
+            );
+          });
+          event.sender.send("vector-database-update", filePath);
+        } else {
+          fs.unlink(filePath, async (err) => {
+            if (err) {
+              console.error("An error occurred:", err);
+              return;
+            }
+            console.log(`File at ${filePath} was deleted successfully.`);
+
+            const windowInfo = getWindowInfoForContents(activeWindows, event.sender);
+            if (!windowInfo) {
+              throw new Error("No window info found");
+            }
+            await windowInfo.dbTableClient.deleteDBItemsByFilePaths([filePath]);
+            event.sender.send("vector-database-update", filePath)
+          });
+        }
+      }
+    )}
+    ); 
+
+  ipcMain.handle(
     "create-file",
     async (event, filePath: string, content: string): Promise<void> => {
       writeFileSyncRecursive(filePath, content, "utf-8");

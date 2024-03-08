@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Editor, rootCtx } from "@milkdown/core";
+import React from "react";
+import { Editor, defaultValueCtx, rootCtx } from "@milkdown/core";
 import { nord } from "@milkdown/theme-nord";
 import { codeBlockSchema, commonmark, listItemSchema} from "@milkdown/preset-commonmark";
 import debounce from "lodash.debounce";
@@ -11,7 +11,7 @@ import { prism } from "@milkdown/plugin-prism";
 import { block } from "@milkdown/plugin-block";
 import { cursor } from "@milkdown/plugin-cursor";
 import { clipboard } from "@milkdown/plugin-clipboard";
-import { $view, replaceAll } from "@milkdown/utils";
+import { $view } from "@milkdown/utils";
 
 import { BlockView } from './Block';
 
@@ -20,29 +20,26 @@ import { ListItem } from "./Todo/ListItem";
 import { CodeBlock } from "./Codeblock";
 
 export interface MarkdownEditorProps {
-  filePath: string;
+  fileContent: string;
+  setFileContent: (content: string) => void;
 }
 
 const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
-  filePath,
+  fileContent,
+  setFileContent,
 }) => {
-
-  const saveFile = async (fileContent:string) => {
-    await window.files.writeFile(filePath, fileContent);  
-  };
-
 
   const pluginViewFactory = usePluginViewFactory();
   const nodeViewFactory = useNodeViewFactory();
 
-  const { get } = useEditor((root) => {
+  useEditor((root) => {
     return Editor
       .make()
       .config(ctx => {
         ctx.set(rootCtx, root)
-        // ctx.set(defaultValueCtx, lastSavedContentRef.current);
+        ctx.set(defaultValueCtx, fileContent);
         ctx.get(listenerCtx).markdownUpdated((_ctx, markdown) => {
-          debounce(saveFile, 1000)(markdown);
+          debounce(setFileContent, 1000)(markdown);
         })
         
         ctx.set(block.key, {
@@ -71,24 +68,6 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
       );
       // .use(slash)
   }, [])
-  
-  //initial file read and set content
-  useEffect(() => {
-    
-    const fetchContent = async () => {
-      try {
-        const fileContent = await window.files.readFile(filePath);
-        get()?.action(replaceAll(fileContent));
-      } catch (error) {
-        console.error("Error reading file:", error);
-      }
-    };
-
-    console.log("fetching content for filepath: ", filePath)
-    if (filePath) {
-      fetchContent();
-    }
-  }, [filePath]);
 
   return (
     <div className="h-full overflow-auto">
@@ -98,12 +77,13 @@ const MilkdownEditor: React.FC<MarkdownEditorProps> = ({
 };
 
 const MilkdownEditorWrapper: React.FC<MarkdownEditorProps> = ({
-  filePath,
+  fileContent,
+  setFileContent,
 }) => {
   return (
     <MilkdownProvider>
       <ProsemirrorAdapterProvider>
-        <MilkdownEditor filePath={filePath} />
+        <MilkdownEditor fileContent={fileContent} setFileContent={setFileContent} />
       </ProsemirrorAdapterProvider>
     </MilkdownProvider>
   );
