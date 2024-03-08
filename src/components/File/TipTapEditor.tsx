@@ -10,28 +10,18 @@ import Text from "@tiptap/extension-text";
 import TurndownService from "turndown";
 import { marked } from "marked";
 
-// import { Markdown } from "tiptap-markdown";
-
-// import "@toast-ui/editor/dist/toastui-editor.css";
-const turndownService = new TurndownService();
-turndownService.addRule("paragraph", {
-  filter: "p",
-  replacement: (content) => `\n\n${content}\n\n`, // Adjust replacement as needed
-});
-
 import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-// const extensions = [StarterKit];
 
-// const tiptapContent = "Hello World!";
+const turndownService = new TurndownService();
 
 export const TipTapEditor: React.FC<EditorProps> = ({
   filePath,
   setContentInParent,
   lastSavedContentRef,
 }) => {
-  // const [content, setContent] = useState<string>("");
   const [markdownContent, setMarkdownContent] = useState<string>("");
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -55,16 +45,8 @@ export const TipTapEditor: React.FC<EditorProps> = ({
           setMarkdownContent(markdown);
         }
       }
-      // send the content to an API here
     },
-
-    // content: tiptapContent,
   });
-
-  useEffect(() => {
-    // setContentInParent(content);
-    console.log("content is: ", markdownContent);
-  }, [markdownContent]);
 
   useEffect(() => {
     const fetchContent = async (filePath: string, editor: Editor) => {
@@ -76,9 +58,7 @@ export const TipTapEditor: React.FC<EditorProps> = ({
 
         lastSavedContentRef.current = fileContent; // Initialize with fetched content
       } catch (error) {
-        // Handle the error here
         console.error("Error reading file:", error);
-        // Optionally, you can set some state to show an error message in the UI
       }
     };
 
@@ -110,13 +90,8 @@ export const TipTapEditor: React.FC<EditorProps> = ({
   }, [markdownContent]);
 
   return (
-    <div
-      className="h-full overflow-y-auto w-full cursor-text bg-slate-800 "
-      // onClick={handleDivClick}
-    >
+    <div className="h-full overflow-y-auto w-full cursor-text bg-slate-800 ">
       <EditorContent editor={editor} />
-      {/* <FloatingMenu editor={editor}>This is the floating menu</FloatingMenu> */}
-      {/* <BubbleMenu editor={editor}>This is the bubble menu</BubbleMenu> */}
     </div>
   );
 };
