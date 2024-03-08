@@ -244,7 +244,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
           )}
         </div>
         <div className="pr-2 pt-1 cursor-pointer" onClick={restartSession}>
-          <FiRefreshCw className="text-gray-300" /> {/* Icon */}
+          <FiRefreshCw className="text-gray-300" title="Restart Session" /> {/* Icon */}
         </div>
       </div>
       <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">

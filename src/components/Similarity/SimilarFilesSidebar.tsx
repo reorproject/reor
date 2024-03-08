@@ -116,7 +116,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
             updateSimilarEntries();
           }}
         >
-          <FiRefreshCw className="text-gray-300" /> {/* Icon */}
+          <FiRefreshCw className="text-gray-300" title="Refresh Related Notes" /> {/* Icon */}
         </div>
       </div>
       {similarEntries.map((dbResult, index) => (
