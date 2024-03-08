@@ -35,8 +35,6 @@ export const TipTapEditor: React.FC<EditorProps> = ({
     ],
     onUpdate: ({ editor }) => {
       const htmlContent = editor?.getHTML();
-      console.log("htmlContent is: ", htmlContent);
-      // saveFile();
       if (htmlContent) {
         const markdown = turndownService.turndown(htmlContent);
         console.log("markdown is: ", markdown);
