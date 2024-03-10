@@ -34,16 +34,6 @@ export const useFileByFilepath = () => {
         nested: true,
       }),
     ],
-    // content: fileContent, // modify this to be in HTML format
-
-    // onUpdate: ({ editor }) => {
-    //   const htmlContent = editor?.getHTML();
-    //   if (htmlContent) {
-    //     const markdown = turndownService.turndown(htmlContent);
-    //     console.log("markdown is: ", markdown);
-    //     debounce(setFileContent, 1000)(markdown);
-    //   }
-    // },
   });
 
   // read file, load content into fileContent
@@ -116,10 +106,13 @@ export const useFileByFilepath = () => {
   // 2. on the FE, receives win.webContents.send("prepare-for-window-close", files);
   // 3. FE after saving, alerts backend that is ready for close
   useEffect(() => {
+    let active = true;
     const handleWindowClose = async () => {
+      if (!active) return;
       console.log("saving file", {
         filePath: currentlyOpenedFilePath,
         fileContent: editor?.getHTML() || "",
+        editor: editor,
       });
       if (
         currentlyOpenedFilePath !== null &&
@@ -132,18 +125,18 @@ export const useFileByFilepath = () => {
         });
         await window.files.indexFileInDatabase(currentlyOpenedFilePath);
       }
-      window.electron.destroyWindow();
     };
 
     window.ipcRenderer.receive("prepare-for-window-close", handleWindowClose);
 
     return () => {
+      active = false;
       window.ipcRenderer.removeListener(
         "prepare-for-window-close",
         handleWindowClose
       );
     };
-  }, [currentlyOpenedFilePath]);
+  }, [currentlyOpenedFilePath, editor]);
 
   return {
     filePath: currentlyOpenedFilePath,

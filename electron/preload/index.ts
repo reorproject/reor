@@ -128,9 +128,7 @@ contextBridge.exposeInMainWorld("database", {
   ): Promise<DBEntry[]> => {
     return ipcRenderer.invoke("search", query, limit, filter);
   },
-  deleteLanceDBEntriesByFilePath: async (
-    filePath: string,
-  ): Promise<void> => {
+  deleteLanceDBEntriesByFilePath: async (filePath: string): Promise<void> => {
     return ipcRenderer.invoke("delete-lance-db-entries-by-filepath", filePath);
   },
   indexFilesInDirectory: async () => {
@@ -151,10 +149,6 @@ contextBridge.exposeInMainWorld("database", {
   getDatabaseFields: async (): Promise<Record<string, string>> => {
     return ipcRenderer.invoke("get-database-fields");
   },
-});
-
-ipcRenderer.on('delete-file-listener', (event, filePath) => {
-  console.log(`Received delete-file-listener event with file path: ${filePath}`);
 });
 
 contextBridge.exposeInMainWorld("electron", {
