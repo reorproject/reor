@@ -39,6 +39,28 @@ export const registerDBSessionHandlers = (
     }
   );
 
+  // ipcMain.handle(
+  //   "delete-lance-db-entries-by-filepath",
+  //   async (
+  //     event,
+  //     filePath: string,
+  //   ): Promise<void> => {
+  //     try {
+  //       const windowInfo = getWindowInfoForContents(
+  //         activeWindows,
+  //         event.sender
+  //       );
+  //       if (!windowInfo) {
+  //         throw new Error("Window info not found.");
+  //       }
+  //       await windowInfo.dbTableClient.deleteDBItemsByFilePaths([filePath]);
+  //     } catch (error) {
+  //       console.error("Error deleting chunks from database:", error);
+  //       throw error;
+  //     }
+  //   }
+  // );
+
   ipcMain.handle(
     "augment-prompt-with-rag",
     async (

@@ -50,6 +50,58 @@ export const registerFileHandlers = () => {
   );
 
   ipcMain.handle(
+    "delete-file",
+    async (event, filePath: string): Promise<void> => {
+      console.log("Deleting file", filePath);
+      fs.stat(filePath, async (err, stats) => {
+        if (err) {
+          console.error("An error occurred:", err);
+          return;
+        }
+
+        if (stats.isDirectory()) {
+          // For directories (Node.js v14.14.0 and later)
+          fs.rm(filePath, { recursive: true }, (err) => {
+            if (err) {
+              console.error("An error occurred:", err);
+              return;
+            }
+            console.log(
+              `Directory at ${filePath} was deleted successfully.`
+            );
+          });
+
+          const windowInfo = getWindowInfoForContents(
+            activeWindows,
+            event.sender
+          );
+          if (!windowInfo) {
+            throw new Error("Window info not found.");
+          }
+          await windowInfo.dbTableClient.deleteDBItemsByFilePaths([filePath]);
+        } else {
+          fs.unlink(filePath, (err) => {
+            if (err) {
+              console.error("An error occurred:", err);
+              return;
+            }
+            console.log(`File at ${filePath} was deleted successfully.`);            
+          });
+
+          const windowInfo = getWindowInfoForContents(
+            activeWindows,
+            event.sender
+          );
+          if (!windowInfo) {
+            throw new Error("Window info not found.");
+          }
+          await windowInfo.dbTableClient.deleteDBItemsByFilePaths([filePath]);
+        }
+      });
+    }
+  );
+
+  ipcMain.handle(
     "write-file",
     async (event, writeFileProps: WriteFileProps) => {
       fs.writeFileSync(
