@@ -12,9 +12,6 @@ interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search";
 
 const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
-  // const [editorContent, setEditorContent] = useState<string>("");
-  // const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
-  // const lastSavedContentRef = useRef<string>("");
   const [showChatbot, setShowChatbot] = useState<boolean>(true);
   const [showSimilarFiles, setShowSimilarFiles] = useState<boolean>(true);
   const [sidebarShowing, setSidebarShowing] =
@@ -24,7 +21,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     filePath,
     setEditor,
     fileContent,
-    // deleteFile,
     openFileByPath,
   } = useFileByFilepath();
 
@@ -53,7 +49,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
             makeSidebarShow={setSidebarShowing}
           />
         </div>
-        {/* <button onClick={() => deleteFile(filePath || '')}>Delete File</button> */}
 
         <ResizableComponent resizeSide="right">
           <div className="h-full border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-gray-600 border-solid w-full">
