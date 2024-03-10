@@ -8,13 +8,16 @@ import TaskList from "@tiptap/extension-task-list";
 import Text from "@tiptap/extension-text";
 import "../tiptap.scss";
 
+import TurndownService from "turndown";
+import { marked } from "marked";
+
+const turndownService = new TurndownService();
+
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
     string | null
   >(null);
-  //   const [initialFileContent, setInitialFileContent] = useState<string | null>(
-  //     null
-  //   );
+
   /**
 	 * with this editor, we want to take the HTML on the following scenarios:
 		1. when the file path changes, causing a re-render
@@ -41,15 +44,17 @@ export const useFileByFilepath = () => {
     //if the fileContent is null or if there is no file currently selected
     console.log("opening file: ");
     if (editor?.getHTML() !== null && currentlyOpenedFilePath !== null) {
+      const markdown = turndownService.turndown(editor?.getHTML() || "");
+      console.log("markdown is: ", markdown);
       //save file content
       console.log("saving file", {
         filePath: currentlyOpenedFilePath,
-        fileContent: editor?.getHTML() || "",
+        fileContent: markdown,
       });
       window.files
         .writeFile({
           filePath: currentlyOpenedFilePath,
-          content: editor?.getHTML() || "",
+          content: markdown,
         })
         .then(() => {
           window.files.indexFileInDatabase(currentlyOpenedFilePath);
@@ -57,14 +62,14 @@ export const useFileByFilepath = () => {
     }
 
     console.log("reading file: ", newFilePath);
-    const content = (await window.files.readFile(newFilePath)) ?? "";
-    console.log("fileContent read: ", content);
+    const fileContent = (await window.files.readFile(newFilePath)) ?? "";
+    const htmlContent = await marked.parse(fileContent);
+    console.log("fileContent read: ", htmlContent);
 
     setCurrentlyOpenedFilePath(newFilePath);
-    // setInitialFileContent(content);
 
     //set the file content to null
-    editor?.commands.setContent(content);
+    editor?.commands.setContent(htmlContent);
   };
 
   // delete file depending on file path returned by the listener
@@ -117,14 +122,17 @@ export const useFileByFilepath = () => {
       if (
         currentlyOpenedFilePath !== null &&
         editor &&
-        editor?.getHTML() !== null
+        editor.getHTML() !== null
       ) {
+        const markdown = turndownService.turndown(editor.getHTML() || "");
         await window.files.writeFile({
           filePath: currentlyOpenedFilePath,
-          content: editor?.getHTML() || "",
+          content: markdown,
         });
         await window.files.indexFileInDatabase(currentlyOpenedFilePath);
       }
+
+      window.electron.destroyWindow();
     };
 
     window.ipcRenderer.receive("prepare-for-window-close", handleWindowClose);
@@ -141,8 +149,6 @@ export const useFileByFilepath = () => {
   return {
     filePath: currentlyOpenedFilePath,
     editor,
-    // fileContent: initialFileContent,
-    // deleteFile,
     openFileByPath,
   };
 };
