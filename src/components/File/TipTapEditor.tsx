@@ -1,5 +1,5 @@
 import "@mdxeditor/editor/style.css";
-import React, { useEffect, /**editor */ } from "react";
+import React, { useEffect /**editor */ } from "react";
 import "./tiptap.scss";
 // import { EditorProps } from "./MdxEditor";
 import Document from "@tiptap/extension-document";
@@ -16,17 +16,12 @@ import StarterKit from "@tiptap/starter-kit";
 
 // const turndownService = new TurndownService();
 interface EditorProps {
-  fileContent: string;
+  // fileContent: string;
   // setFileContent: (content: string) => void;
   setEditor: (editor: Editor | null) => void;
 }
 
-export const TipTapEditor: React.FC<EditorProps> = ({
-  fileContent,
-  // setFileContent,
-  setEditor,
-}) => {
-
+export const TipTapEditor: React.FC<EditorProps> = ({ setEditor }) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -38,8 +33,8 @@ export const TipTapEditor: React.FC<EditorProps> = ({
         nested: true,
       }),
     ],
-    content: fileContent, // modify this to be in HTML format
-    
+    // content: fileContent, // modify this to be in HTML format
+
     // onUpdate: ({ editor }) => {
     //   const htmlContent = editor?.getHTML();
     //   if (htmlContent) {
@@ -53,7 +48,7 @@ export const TipTapEditor: React.FC<EditorProps> = ({
   useEffect(() => {
     setEditor(editor);
   }, [editor]);
-  
+
   return (
     <div className="h-full overflow-y-auto w-full cursor-text bg-slate-800 ">
       <EditorContent editor={editor} />

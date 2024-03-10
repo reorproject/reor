@@ -59,7 +59,7 @@ export function getWindowInfoForContents(
   return windowInfo || null;
 }
 
-export function getVaultDirectoryForContents(
+export function getVaultDirectoryForWinContents(
   windows: WindowInfo[],
   webContents: WebContents
 ): string | null {

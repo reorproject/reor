@@ -29,7 +29,7 @@ import {
 import { registerFileHandlers } from "./Files/registerFilesHandler";
 import { RepopulateTableWithMissingItems } from "./database/TableHelperFunctions";
 import {
-  getVaultDirectoryForContents,
+  getVaultDirectoryForWinContents,
   getWindowInfoForContents,
   activeWindows,
   getNextWindowPosition,
@@ -99,11 +99,13 @@ async function createWindow() {
     return { action: "deny" };
   });
 
-  win.on("close", (event) => {
-    event.preventDefault(); // this actually stops the hot reload from working. comment it out if you want hot reload
-    
+  win.on("close", () => {
+    win.webContents.send("prepare-for-window-close");
+
+    // event.preventDefault(); // this actually stops the hot reload from working. comment it out if you want hot reload
+
     // Get the directory for this window's contents
-    const directoryToSave = getVaultDirectoryForContents(
+    const directoryToSave = getVaultDirectoryForWinContents(
       activeWindows,
       win.webContents
     );
@@ -114,10 +116,9 @@ async function createWindow() {
       store.set(StoreKeys.DirectoryFromPreviousSession, directoryToSave);
     }
     ipcMain.on("destroy-window", () => {
-      win.destroy();
-    })
-
-    win.webContents.send("prepare-for-window-close");
+      // win.destroy();
+      console.log("EVERTYHING HAS BEEN SAVED");
+    });
   });
 
   if (activeWindows.length <= 0) {

@@ -5,8 +5,8 @@ import ChatWithLLM from "./Chat/Chat";
 import LeftSidebar from "./Sidebars/IconsSidebar";
 import ResizableComponent from "./Generic/ResizableComponent";
 import SidebarManager from "./Sidebars/MainSidebar";
-import TipTapEditor from "./File/TipTapEditor";
 import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
+import { EditorContent } from "@tiptap/react";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search";
@@ -17,12 +17,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const [sidebarShowing, setSidebarShowing] =
     useState<SidebarAbleToShow>("files");
 
-  const {
-    filePath,
-    setEditor,
-    fileContent,
-    openFileByPath,
-  } = useFileByFilepath();
+  const { filePath, editor, openFileByPath } = useFileByFilepath();
 
   const toggleChatbot = () => {
     setShowChatbot(!showChatbot);
@@ -60,14 +55,11 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
           </div>
         </ResizableComponent>
 
-        {filePath && (fileContent || fileContent === '') && (
+        {filePath && (
           <div className="w-full h-full flex overflow-x-hidden">
             <div className="w-full flex h-full">
               <div className="h-full w-full">
-                <TipTapEditor
-                  fileContent={fileContent}
-                  setEditor={setEditor}
-                />
+                <EditorContent editor={editor} />
               </div>
               {showSimilarFiles && (
                 <ResizableComponent resizeSide="left" initialWidth={400}>
@@ -82,9 +74,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         )}
         {showChatbot && (
           <div
-            className={`h-below-titlebar ${
-              filePath ? "" : "absolute right-0"
-            }`}
+            className={`h-below-titlebar ${filePath ? "" : "absolute right-0"}`}
           >
             <ResizableComponent resizeSide="left" initialWidth={300}>
               <ChatWithLLM currentFilePath={filePath} />
