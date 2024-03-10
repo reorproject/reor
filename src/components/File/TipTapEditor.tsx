@@ -1,27 +1,27 @@
 import "@mdxeditor/editor/style.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect /**editor */ } from "react";
 import "./tiptap.scss";
-import { EditorProps } from "./MdxEditor";
+// import { EditorProps } from "./MdxEditor";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import Text from "@tiptap/extension-text";
-import TurndownService from "turndown";
-import { marked } from "marked";
+// import TurndownService from "turndown";
+// import { marked } from "marked";
 
 import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+// import debounce from "lodash.debounce";
 
-const turndownService = new TurndownService();
+// const turndownService = new TurndownService();
+interface EditorProps {
+  // fileContent: string;
+  // setFileContent: (content: string) => void;
+  setEditor: (editor: Editor | null) => void;
+}
 
-export const TipTapEditor: React.FC<EditorProps> = ({
-  filePath,
-  setContentInParent,
-  lastSavedContentRef,
-}) => {
-  const [markdownContent, setMarkdownContent] = useState<string>("");
-
+export const TipTapEditor: React.FC<EditorProps> = ({ setEditor }) => {
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -33,59 +33,21 @@ export const TipTapEditor: React.FC<EditorProps> = ({
         nested: true,
       }),
     ],
-    onUpdate: ({ editor }) => {
-      const htmlContent = editor?.getHTML();
-      if (htmlContent) {
-        const markdown = turndownService.turndown(htmlContent);
-        console.log("markdown is: ", markdown);
-        if (markdown !== lastSavedContentRef.current) {
-          // setContentInParent(markdown);
-          setMarkdownContent(markdown);
-        }
-      }
-    },
+    // content: fileContent, // modify this to be in HTML format
+
+    // onUpdate: ({ editor }) => {
+    //   const htmlContent = editor?.getHTML();
+    //   if (htmlContent) {
+    //     const markdown = turndownService.turndown(htmlContent);
+    //     console.log("markdown is: ", markdown);
+    //     debounce(setFileContent, 1000)(markdown);
+    //   }
+    // },
   });
 
   useEffect(() => {
-    const fetchContent = async (filePath: string, editor: Editor) => {
-      try {
-        const fileContent = await window.files.readFile(filePath);
-        const htmlContent = marked.parse(fileContent);
-
-        editor?.commands.setContent(htmlContent);
-
-        lastSavedContentRef.current = fileContent; // Initialize with fetched content
-      } catch (error) {
-        console.error("Error reading file:", error);
-      }
-    };
-
-    if (filePath && editor) {
-      fetchContent(filePath, editor);
-    }
-  }, [filePath, editor]);
-
-  const saveFile = async () => {
-    if (markdownContent !== lastSavedContentRef.current) {
-      await window.files.writeFile({
-        filePath: filePath,
-        content: markdownContent,
-      });
-      lastSavedContentRef.current = markdownContent; // Update the ref to the latest saved content
-    }
-  };
-
-  useEffect(() => {
-    const saveInterval = setInterval(() => {
-      saveFile();
-    }, 1000);
-
-    return () => clearInterval(saveInterval); // Clear the interval when component unmounts
-  }, [markdownContent]);
-
-  useEffect(() => {
-    setContentInParent(markdownContent);
-  }, [markdownContent]);
+    setEditor(editor);
+  }, [editor]);
 
   return (
     <div className="h-full overflow-y-auto w-full cursor-text bg-slate-800 ">

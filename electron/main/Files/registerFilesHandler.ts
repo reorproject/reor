@@ -13,7 +13,7 @@ import {
 import * as fs from "fs";
 import { updateFileInTable } from "../database/TableHelperFunctions";
 import {
-  getVaultDirectoryForContents,
+  getVaultDirectoryForWinContents,
   getWindowInfoForContents,
   activeWindows,
 } from "../windowManager";
@@ -31,7 +31,7 @@ export const registerFileHandlers = () => {
   ipcMain.handle(
     "get-files-for-window",
     async (event): Promise<FileInfoTree> => {
-      const directoryPath = getVaultDirectoryForContents(
+      const directoryPath = getVaultDirectoryForWinContents(
         activeWindows,
         event.sender
       );
@@ -46,6 +46,56 @@ export const registerFileHandlers = () => {
     "read-file",
     async (event, filePath: string): Promise<string> => {
       return fs.readFileSync(filePath, "utf-8");
+    }
+  );
+
+  ipcMain.handle(
+    "delete-file",
+    async (event, filePath: string): Promise<void> => {
+      console.log("Deleting file", filePath);
+      fs.stat(filePath, async (err, stats) => {
+        if (err) {
+          console.error("An error occurred:", err);
+          return;
+        }
+
+        if (stats.isDirectory()) {
+          // For directories (Node.js v14.14.0 and later)
+          fs.rm(filePath, { recursive: true }, (err) => {
+            if (err) {
+              console.error("An error occurred:", err);
+              return;
+            }
+            console.log(`Directory at ${filePath} was deleted successfully.`);
+          });
+
+          const windowInfo = getWindowInfoForContents(
+            activeWindows,
+            event.sender
+          );
+          if (!windowInfo) {
+            throw new Error("Window info not found.");
+          }
+          await windowInfo.dbTableClient.deleteDBItemsByFilePaths([filePath]);
+        } else {
+          fs.unlink(filePath, (err) => {
+            if (err) {
+              console.error("An error occurred:", err);
+              return;
+            }
+            console.log(`File at ${filePath} was deleted successfully.`);
+          });
+
+          const windowInfo = getWindowInfoForContents(
+            activeWindows,
+            event.sender
+          );
+          if (!windowInfo) {
+            throw new Error("Window info not found.");
+          }
+          await windowInfo.dbTableClient.deleteDBItemsByFilePaths([filePath]);
+        }
+      });
     }
   );
 

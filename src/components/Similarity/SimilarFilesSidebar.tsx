@@ -69,8 +69,11 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   }, [filePath]);
 
   useEffect(() => {
+    let active = true
     const vectorDBUpdateListener = async () => {
-      updateSimilarEntries();
+      if (!active) return;
+      console.log("Vector DB update listener path: ", filePath)
+      updateSimilarEntries(filePath);
     };
 
     window.ipcRenderer.receive(
@@ -78,6 +81,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
       vectorDBUpdateListener
     );
     return () => {
+      active = false;
       window.ipcRenderer.removeListener(
         "vector-database-update",
         vectorDBUpdateListener
@@ -85,8 +89,8 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     };
   }, [filePath]);
 
-  const updateSimilarEntries = async () => {
-    const searchResults = await performSearch(filePath);
+  const updateSimilarEntries = async (currentFilePath: string) => {
+    const searchResults = await performSearch(currentFilePath);
     setSimilarEntries(searchResults);
   };
 
@@ -113,7 +117,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
           onClick={() => {
             setUserHitRefresh(true);
             setSimilarEntries([]); // simulate refresh
-            updateSimilarEntries();
+            updateSimilarEntries(filePath);
           }}
         >
           <FiRefreshCw className="text-gray-300" /> {/* Icon */}
