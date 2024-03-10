@@ -46,8 +46,10 @@ export const useFileByFilepath = () => {
 		let active = true
 		console.log("now active")
 		const deleteFile = async (path: string) => {
-			console.log("listener got file path: ", path);	
-			if (!active) return;		
+			console.log("listener got file path: ", path)
+			if (!active) return;
+			console.log("listener is active");	
+		
 			await window.files.deleteFile(path);
 
 			// if it is the current file, clear the content and set filepath to null so that it won't save anything else
