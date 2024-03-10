@@ -100,8 +100,7 @@ async function createWindow() {
   });
 
   win.on("close", (event) => {
-    // event.preventDefault(); // this actually stops the hot reload from working. comment it out if you want hot reload
-    console.log(event)
+    event.preventDefault(); // this actually stops the hot reload from working. comment it out if you want hot reload
     
     // Get the directory for this window's contents
     const directoryToSave = getVaultDirectoryForContents(
