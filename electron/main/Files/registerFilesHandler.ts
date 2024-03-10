@@ -13,7 +13,7 @@ import {
 import * as fs from "fs";
 import { updateFileInTable } from "../database/TableHelperFunctions";
 import {
-  getVaultDirectoryForContents,
+  getVaultDirectoryForWinContents,
   getWindowInfoForContents,
   activeWindows,
 } from "../windowManager";
@@ -31,7 +31,7 @@ export const registerFileHandlers = () => {
   ipcMain.handle(
     "get-files-for-window",
     async (event): Promise<FileInfoTree> => {
-      const directoryPath = getVaultDirectoryForContents(
+      const directoryPath = getVaultDirectoryForWinContents(
         activeWindows,
         event.sender
       );
@@ -66,9 +66,7 @@ export const registerFileHandlers = () => {
               console.error("An error occurred:", err);
               return;
             }
-            console.log(
-              `Directory at ${filePath} was deleted successfully.`
-            );
+            console.log(`Directory at ${filePath} was deleted successfully.`);
           });
 
           const windowInfo = getWindowInfoForContents(
@@ -85,7 +83,7 @@ export const registerFileHandlers = () => {
               console.error("An error occurred:", err);
               return;
             }
-            console.log(`File at ${filePath} was deleted successfully.`);            
+            console.log(`File at ${filePath} was deleted successfully.`);
           });
 
           const windowInfo = getWindowInfoForContents(
