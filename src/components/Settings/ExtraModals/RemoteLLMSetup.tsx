@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@material-tailwind/react";
 import Modal from "../../Generic/Modal";
-import { LLMModelConfig } from "electron/main/Store/storeConfig";
+import { LLMConfig } from "electron/main/Store/storeConfig";
 import CustomSelect from "../../Generic/Select";
 import { errorToString } from "@/functions/error";
 import ExternalLink from "../../Generic/ExternalLink";
@@ -33,7 +33,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
   const [currentError, setCurrentError] = useState<string>("");
 
   const handleSave = async () => {
-    const modelConfig: LLMModelConfig = {
+    const modelConfig: LLMConfig = {
       type: "openai",
       contextLength: parseInt(selectedContextLength),
       apiURL,

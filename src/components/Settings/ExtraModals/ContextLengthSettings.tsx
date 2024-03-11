@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import Modal from "../../Generic/Modal";
-import { LLMModelConfig } from "electron/main/Store/storeConfig";
+import { LLMConfig } from "electron/main/Store/storeConfig";
 import CustomSelect from "../../Generic/Select";
 import { contextLengthOptions } from "./NewLocalModel";
 
 interface ContextLengthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  modelConfigs: Record<string, LLMModelConfig>;
+  modelConfigs: Record<string, LLMConfig>;
 }
 
 const ContextLengthModal: React.FC<ContextLengthModalProps> = ({
@@ -16,7 +16,7 @@ const ContextLengthModal: React.FC<ContextLengthModalProps> = ({
   modelConfigs,
 }) => {
   const [localModelConfigs, setLocalModelConfigs] = useState<
-    Record<string, LLMModelConfig>
+    Record<string, LLMConfig>
   >({});
 
   useEffect(() => {
@@ -25,7 +25,7 @@ const ContextLengthModal: React.FC<ContextLengthModalProps> = ({
 
   const updateAIModelConfig = async (
     modelName: string,
-    modelConfig: LLMModelConfig
+    modelConfig: LLMConfig
   ) => {
     try {
       await window.electronStore.updateLLMConfig(modelName, modelConfig);

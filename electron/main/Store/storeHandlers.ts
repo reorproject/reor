@@ -3,7 +3,7 @@ import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
-  LLMModelConfig,
+  LLMConfig,
   StoreKeys,
   StoreSchema,
 } from "../Store/storeConfig";
@@ -138,7 +138,7 @@ export const registerStoreHandlers = (
 
   ipcMain.handle(
     "add-or-update-llm",
-    async (event, modelName: string, modelConfig: LLMModelConfig) => {
+    async (event, modelName: string, modelConfig: LLMConfig) => {
       console.log("setting up new local model", modelConfig);
       return await addOrUpdateLLMSchemaInStore(store, modelName, modelConfig);
     }
@@ -146,7 +146,7 @@ export const registerStoreHandlers = (
 
   ipcMain.handle(
     "delete-local-llm",
-    async (event, modelName: string, modelConfig: LLMModelConfig) => {
+    async (event, modelName: string, modelConfig: LLMConfig) => {
       console.log("deleting local model", modelConfig);
       return await deleteLLMSchemafromStore(store, modelName);
     }
@@ -181,10 +181,10 @@ export const registerStoreHandlers = (
 export async function addOrUpdateLLMSchemaInStore(
   store: Store<StoreSchema>,
   modelName: string,
-  modelConfig: LLMModelConfig
+  modelConfig: LLMConfig
 ): Promise<string> {
   const existingModels =
-    (store.get(StoreKeys.LLMs) as Record<string, LLMModelConfig>) || {};
+    (store.get(StoreKeys.LLMs) as Record<string, LLMConfig>) || {};
 
   const isNotValid = validateAIModelConfig(modelName, modelConfig);
   if (isNotValid) {
@@ -210,7 +210,7 @@ export async function deleteLLMSchemafromStore(
   modelName: string
 ): Promise<string> {
   const existingModels =
-    (store.get(StoreKeys.LLMs) as Record<string, LLMModelConfig>) || {};
+    (store.get(StoreKeys.LLMs) as Record<string, LLMConfig>) || {};
 
   if (existingModels[modelName]) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

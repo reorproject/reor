@@ -13,6 +13,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import ReactMarkdown from "react-markdown";
 import { FiRefreshCw } from "react-icons/fi"; // Importing refresh icon from React Icons
 import { ChatPrompt } from "./Chat-Prompts";
+import { ChatCompletionChunk } from "openai/resources/chat/completions";
 
 // convert ask options to enum
 enum AskOptions {
@@ -21,14 +22,17 @@ enum AskOptions {
 }
 const ASK_OPTIONS = Object.values(AskOptions);
 
-const PROMPT_OPTIONS = ["Generate weekly 1-1 talking points from this file", "Separate concepts from todos"]; // more options to come
+const PROMPT_OPTIONS = [
+  "Generate weekly 1-1 talking points from this file",
+  "Separate concepts from todos",
+]; // more options to come
 
 interface ChatWithLLMProps {
   currentFilePath: string | null;
 }
 
 const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  // const [sessionId, setSessionId] = useState<string | null>(null);
   const [userInput, setUserInput] = useState<string>("");
   const [messages, setMessages] = useState<ChatbotMessage[]>([]);
   const [defaultModel, setDefaultModel] = useState<string>("");
@@ -38,6 +42,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
 
   const [currentBotMessage, setCurrentBotMessage] =
     useState<ChatbotMessage | null>(null);
+
   const fetchDefaultModel = async () => {
     const defaultModelName = await window.electronStore.getDefaultLLM();
     setDefaultModel(defaultModelName);
@@ -46,47 +51,55 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
     fetchDefaultModel();
   }, []);
 
-  const fileNotSelectedToastId = useRef<string| null>(null);
+  const fileNotSelectedToastId = useRef<string | null>(null);
   useEffect(() => {
     if (!currentFilePath && askText === AskOptions.AskFile) {
-      fileNotSelectedToastId.current = toast.error("Please open a file before asking questions in ask file mode", {}) as string;
-    } else if (currentFilePath && askText === AskOptions.AskFile && fileNotSelectedToastId.current) {
+      fileNotSelectedToastId.current = toast.error(
+        "Please open a file before asking questions in ask file mode",
+        {}
+      ) as string;
+    } else if (
+      currentFilePath &&
+      askText === AskOptions.AskFile &&
+      fileNotSelectedToastId.current
+    ) {
       toast.dismiss(fileNotSelectedToastId.current);
     }
-  }, [currentFilePath, askText])
+  }, [currentFilePath, askText]);
 
-  const initializeSession = async (): Promise<string> => {
-    try {
-      const sessionID = "some_unique_session_id";
-      const sessionExists = await window.llm.doesSessionExist(sessionID);
-      if (sessionExists) {
-        await window.llm.deleteSession(sessionID);
-      }
-      console.log("Creating a new session...");
-      const newSessionId = await window.llm.createSession(
-        "some_unique_session_id"
-      );
-      console.log("Created a new session with id:", newSessionId);
-      setSessionId(newSessionId);
+  // const initializeSession = async (): Promise<string> => {
+  //   throw new Error("Not implemented");
+  //   // try {
+  //   //   const sessionID = "some_unique_session_id";
+  //   //   const sessionExists = await window.llm.doesSessionExist(sessionID);
+  //   //   if (sessionExists) {
+  //   //     await window.llm.deleteSession(sessionID);
+  //   //   }
+  //   //   console.log("Creating a new session...");
+  //   //   const newSessionId = await window.llm.createSession(
+  //   //     "some_unique_session_id"
+  //   //   );
+  //   //   console.log("Created a new session with id:", newSessionId);
+  //   //   // setSessionId(newSessionId);
 
-      return newSessionId;
-    } catch (error) {
-      console.error("Failed to create a new session:", error);
-      setCurrentBotMessage({
-        messageType: "error",
-        content: errorToString(error),
-        role: "assistant",
-      });
-      return "";
-    }
-  };
+  //   //   return newSessionId;
+  //   // } catch (error) {
+  //   //   console.error("Failed to create a new session:", error);
+  //   //   setCurrentBotMessage({
+  //   //     messageType: "error",
+  //   //     content: errorToString(error),
+  //   //     role: "assistant",
+  //   //   });
+  //   //   return "";
+  //   // }
+  // };
 
   const handleSubmitNewMessage = async () => {
     if (loadingResponse) return;
-    let currentSessionId = sessionId;
-    if (!currentSessionId) {
-      currentSessionId = await initializeSession();
-    }
+    // let currentSessionId = sessionId;
+    // if (!currentSessionId) {
+    //   currentSessionId = await initializeSession();
+    // }
     let newMessages = messages;
     if (currentBotMessage) {
       newMessages = [
@@ -105,32 +118,41 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
         role: "assistant",
       });
     }
-    if (!currentSessionId || !userInput.trim()) return;
+    if (!userInput.trim()) return;
 
-    let augmentedPrompt: string = '';
+    let augmentedPrompt: string = "";
     try {
       if (askText === AskOptions.AskFile) {
         if (!currentFilePath) {
-          console.error("No current file selected. The lack of a file means that there is no context being loaded into the prompt. Please open a file before trying again");
-  
-          toast.error("No current file selected. Please open a file before trying again.")
+          console.error(
+            "No current file selected. The lack of a file means that there is no context being loaded into the prompt. Please open a file before trying again"
+          );
+
+          toast.error(
+            "No current file selected. Please open a file before trying again."
+          );
           return;
         }
-        const { prompt, contextCutoffAt } = await window.files.augmentPromptWithFile(
-          { 
-            prompt: userInput,
-            llmSessionID: currentSessionId,
-            filePath: currentFilePath
-          });
+        // const { prompt, contextCutoffAt } = {userInput, 0}
+        const prompt = userInput;
+        const contextCutoffAt = 0;
+        // await window.files.augmentPromptWithFile({
+        //   prompt: userInput,
+        //   llmSessionID: currentSessionId,
+        //   filePath: currentFilePath,
+        // });
         if (contextCutoffAt) {
-          toast.warning(`The file is too large to be used as context. It got cut off at: ${contextCutoffAt}`)
+          toast.warning(
+            `The file is too large to be used as context. It got cut off at: ${contextCutoffAt}`
+          );
         }
         augmentedPrompt = prompt;
-      } else if (askText === AskOptions.Ask){
-        augmentedPrompt = await window.database.augmentPromptWithRAG(
-          userInput,
-          currentSessionId,
-        );
+      } else if (askText === AskOptions.Ask) {
+        augmentedPrompt = userInput;
+        // await window.database.augmentPromptWithRAG(
+        //   userInput,
+        //   currentSessionId
+        // );
       }
     } catch (error) {
       console.error("Failed to augment prompt:", error);
@@ -142,9 +164,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
       });
       return;
     }
-    
 
-    startStreamingResponse(currentSessionId, augmentedPrompt, true);
+    startStreamingResponse(augmentedPrompt);
 
     setMessages([
       ...newMessages,
@@ -154,59 +175,59 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
   };
 
   useEffect(() => {
-    if (sessionId) {
-      const updateStream = (newMessage: ChatbotMessage) => {
-        setCurrentBotMessage((prev) => {
-          return {
-            role: "assistant",
-            messageType: newMessage.messageType,
-            content: prev?.content
-              ? prev.content + newMessage.content
-              : newMessage.content,
-          };
-        });
-      };
-
-      window.ipcRenderer.receive("tokenStream", updateStream);
-
-      return () => {
-        window.ipcRenderer.removeListener("tokenStream", updateStream);
-      };
-    }
-  }, [sessionId]);
-
-  useEffect(() => {
-    return () => {
-      if (sessionId) {
-        console.log("Deleting session:", sessionId);
-        window.llm.deleteSession(sessionId);
-      }
-      console.log("Component is unmounted (hidden)");
+    const updateStream = (chunk: ChatCompletionChunk) => {
+      const newMsgContent = chunk.choices[0].delta.content;
+      if (!newMsgContent) return;
+      setCurrentBotMessage((prev) => {
+        return {
+          role: "assistant",
+          messageType: "success",
+          content: prev?.content ? prev.content + newMsgContent : newMsgContent,
+        };
+      });
     };
-  }, [sessionId]);
+
+    window.ipcRenderer.receive("tokenStream", updateStream);
+
+    return () => {
+      window.ipcRenderer.removeListener("tokenStream", updateStream);
+    };
+  }, []);
+
+  // useEffect(() => {
+  //   return () => {
+  //     if (sessionId) {
+  //       console.log("Deleting session:", sessionId);
+  //       window.llm.deleteSession(sessionId);
+  //     }
+  //     console.log("Component is unmounted (hidden)");
+  //   };
+  // }, [sessionId]);
 
   const restartSession = async () => {
-    if (sessionId) {
-      console.log("Deleting session:", sessionId);
-      await window.llm.deleteSession(sessionId);
-    }
-    const newSessionId = await initializeSession();
-    setSessionId(newSessionId);
+    // if (sessionId) {
+    //   console.log("Deleting session:", sessionId);
+    //   await window.llm.deleteSession(sessionId);
+    // }
+    // const newSessionId = await initializeSession();
+    // setSessionId(newSessionId);
     fetchDefaultModel();
   };
 
   const startStreamingResponse = async (
-    sessionId: string,
-    prompt: string,
-    ignoreChatHistory?: boolean
+    // sessionId: string,
+    prompt: string
   ) => {
     try {
       console.log("Initializing streaming response...");
       setLoadingResponse(true);
-      await window.llm.initializeStreamingResponse(
-        sessionId,
-        prompt,
-        ignoreChatHistory
+      const defaultModelName = await window.electronStore.getDefaultLLM();
+      const modelConfigs = await window.electronStore.getLLMConfigs();
+      const defaultModelConfig = modelConfigs[defaultModelName];
+      await window.llm.streamingLLMResponse(
+        defaultModelName,
+        defaultModelConfig,
+        [{ role: "user", content: prompt }]
       );
       console.log("Initialized streaming response");
       setLoadingResponse(false);
@@ -288,7 +309,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
             </ReactMarkdown>
           )}
         </div>
-        {userInput === "" && askText === AskOptions.AskFile && messages.length == 0 ? (
+        {userInput === "" &&
+        askText === AskOptions.AskFile &&
+        messages.length == 0 ? (
           <>
             {PROMPT_OPTIONS.map((option, index) => {
               return (

@@ -1,7 +1,12 @@
 import {
+  ChatCompletionChunk,
+  ChatCompletionMessageParam,
+} from "openai/resources/chat/completions";
+import {
   BaseLLMConfig,
   HardwareConfig,
   LLMGenerationParameters,
+  LLMConfig,
 } from "../Store/storeConfig";
 
 // Any LLM engine should implement this interface:
@@ -22,11 +27,12 @@ export interface LLMSessionService {
    * @returns A promise that resolves to a string response.
    */
   streamingPrompt(
-    prompt: string,
-    sendFunctionImplementer: ISendFunctionImplementer,
-    generationParams?: LLMGenerationParameters,
-    ignoreChatHistory?: boolean
-  ): Promise<string>;
+    modelName: string,
+    modelConfig: LLMConfig,
+    messageHistory: Array<ChatCompletionMessageParam>,
+    chunkResponse: (chunk: ChatCompletionChunk) => void,
+    generationParams?: LLMGenerationParameters
+  ): Promise<void>;
 
   abort(): void;
   getContextLength(): number;

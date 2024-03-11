@@ -1,12 +1,16 @@
 import { ipcMain, IpcMainInvokeEvent } from "electron";
-import { LlamaCPPSessionService } from "./models/LlamaCpp";
 import { LLMSessionService } from "./Types";
 import { OpenAIModelSessionService } from "./models/OpenAI";
-import { StoreKeys, StoreSchema } from "../Store/storeConfig";
+import { LLMConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
+import {
+  ChatCompletionChunk,
+  ChatCompletionMessageParam,
+} from "openai/resources/chat/completions";
 
 export const LLMSessions: { [sessionId: string]: LLMSessionService } = {};
 
+const openAISession = new OpenAIModelSessionService();
 export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
   ipcMain.handle(
     "does-session-exist",
@@ -44,23 +48,26 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
   );
 
   ipcMain.handle(
-    "initialize-streaming-response",
+    "streaming-llm-response",
     async (
       event: IpcMainInvokeEvent,
-      sessionId: string,
-      prompt: string,
-      ignoreChatHistory: boolean
-    ): Promise<string> => {
-      const sessionService = LLMSessions[sessionId];
-      if (!sessionService) {
-        throw new Error(`Session ${sessionId} does not exist.`);
+      llmName: string,
+      llmConfig: LLMConfig,
+      messageHistory: ChatCompletionMessageParam[]
+    ): Promise<void> => {
+      if (llmConfig.type === "local") {
+        throw new Error("Local LLMs do not support streaming");
       }
 
-      return sessionService.streamingPrompt(
-        prompt,
-        event.sender,
-        store.get(StoreKeys.LLMGenerationParameters),
-        ignoreChatHistory
+      const handleChunk = (chunk: ChatCompletionChunk) => {
+        event.sender.send("tokenStream", chunk);
+      };
+      await openAISession.streamingResponse(
+        llmName,
+        llmConfig,
+        messageHistory,
+        handleChunk,
+        store.get(StoreKeys.LLMGenerationParameters)
       );
     }
   );
@@ -70,34 +77,35 @@ async function createSession(
   store: Store<StoreSchema>,
   sessionId: string
 ): Promise<string> {
-  const defaultModelName = store.get(StoreKeys.DefaultLLM);
-  if (!defaultModelName) {
-    throw new Error(
-      "No default LLM model configured. Please choose either a local or a remote LLM in Settings."
-    );
-  }
-  const allConfigs = store.get(StoreKeys.LLMs);
+  throw new Error("Not implemented");
+  // const defaultModelName = store.get(StoreKeys.DefaultLLM);
+  // if (!defaultModelName) {
+  //   throw new Error(
+  //     "No default LLM model configured. Please choose either a local or a remote LLM in Settings."
+  //   );
+  // }
+  // const allConfigs = store.get(StoreKeys.LLMs);
 
-  if (!allConfigs) {
-    throw new Error("No AI models configured");
-  }
+  // if (!allConfigs) {
+  //   throw new Error("No AI models configured");
+  // }
 
-  const currentModelConfig = allConfigs[defaultModelName];
+  // const currentModelConfig = allConfigs[defaultModelName];
 
-  const hardwareConfig = store.get(StoreKeys.Hardware);
+  // const hardwareConfig = store.get(StoreKeys.Hardware);
 
-  if (currentModelConfig.type === "openai") {
-    const sessionService = new OpenAIModelSessionService();
-    await sessionService.init(defaultModelName, currentModelConfig);
-    LLMSessions[sessionId] = sessionService;
-  } else {
-    const sessionService = new LlamaCPPSessionService();
-    await sessionService.init(
-      defaultModelName,
-      currentModelConfig,
-      hardwareConfig
-    );
-    LLMSessions[sessionId] = sessionService;
-  }
-  return sessionId;
+  // if (currentModelConfig.type === "openai") {
+  //   const sessionService = new OpenAIModelSessionService();
+  //   await sessionService.init(defaultModelName, currentModelConfig);
+  //   LLMSessions[sessionId] = sessionService;
+  // } else {
+  //   const sessionService = new LlamaCPPSessionService();
+  //   await sessionService.init(
+  //     defaultModelName,
+  //     currentModelConfig,
+  //     hardwareConfig
+  //   );
+  //   LLMSessions[sessionId] = sessionService;
+  // }
+  // return sessionId;
 }

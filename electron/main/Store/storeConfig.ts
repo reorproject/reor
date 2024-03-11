@@ -15,7 +15,7 @@ export interface LocalLLMConfig extends BaseLLMConfig {
   localPath: string;
 }
 
-export type LLMModelConfig = OpenAILLMConfig | LocalLLMConfig;
+export type LLMConfig = OpenAILLMConfig | LocalLLMConfig;
 
 export type LLMGenerationParameters = {
   maxTokens?: number;
@@ -52,7 +52,7 @@ export interface StoreSchema {
     directoryFromPreviousSession?: string;
   };
   LLMs: {
-    [modelName: string]: LLMModelConfig;
+    [modelName: string]: LLMConfig;
   };
   embeddingModels: {
     [modelAlias: string]: EmbeddingModelConfig;
