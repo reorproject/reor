@@ -190,8 +190,15 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
       setLoadingResponse(false);
     } catch (error) {
       setLoadingResponse(false);
-
-      console.error("Failed to initialize streaming response:", error);
+      setCurrentBotMessage((prev) => {
+        return {
+          role: "assistant",
+          messageType: "error",
+          content: prev?.content
+            ? prev.content + "\n" + errorToString(error)
+            : errorToString(error),
+        };
+      });
     }
   };
 

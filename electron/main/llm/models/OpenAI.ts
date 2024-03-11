@@ -45,22 +45,16 @@ export class OpenAIModelSessionService implements LLMSessionService {
     });
     // const tokenEncoding = this.getTokenizer(modelName);
 
-    try {
-      const stream = await openai.chat.completions.create({
-        model: modelName,
-        messages: messageHistory,
-        stream: true,
-        max_tokens: generationParams?.maxTokens,
-        temperature: generationParams?.temperature,
-      });
+    const stream = await openai.chat.completions.create({
+      model: modelName,
+      messages: messageHistory,
+      stream: true,
+      max_tokens: generationParams?.maxTokens,
+      temperature: generationParams?.temperature,
+    });
 
-      for await (const chunk of stream) {
-        handleChunk(chunk);
-      }
-
-      // return result;
-    } catch (error) {
-      console.error("Error during OpenAI streaming session:", error);
+    for await (const chunk of stream) {
+      handleChunk(chunk);
     }
   }
 }
