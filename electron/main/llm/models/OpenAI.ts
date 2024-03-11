@@ -1,10 +1,5 @@
 import OpenAI from "openai";
-import {
-  ChatbotMessage,
-  ISendFunctionImplementer,
-  LLMSessionService,
-  OpenAIMessage,
-} from "../Types";
+import { LLMSessionService } from "../Types";
 import { Tiktoken, TiktokenModel, encodingForModel } from "js-tiktoken";
 import {
   LLMGenerationParameters,
@@ -26,20 +21,20 @@ export class OpenAIModelSessionService implements LLMSessionService {
   private tokenEncoding!: Tiktoken;
   private modelConfig!: OpenAILLMConfig;
 
-  async init(modelName: string, modelConfig: OpenAILLMConfig) {
-    // this.openai = new OpenAI({
-    //   apiKey: modelConfig.apiKey,
-    //   baseURL: modelConfig.apiURL,
-    //   fetch: customFetchUsingElectronNetStreaming,
-    // });
-    // this.modelConfig = modelConfig;
-    // this.modelName = modelName;
-    try {
-      this.tokenEncoding = encodingForModel(modelName as TiktokenModel);
-    } catch (e) {
-      this.tokenEncoding = encodingForModel("gpt-3.5-turbo-1106"); // hack while we think about what to do with custom remote models' tokenizers
-    }
-  }
+  // async init(modelName: string, modelConfig: OpenAILLMConfig) {
+  //   // this.openai = new OpenAI({
+  //   //   apiKey: modelConfig.apiKey,
+  //   //   baseURL: modelConfig.apiURL,
+  //   //   fetch: customFetchUsingElectronNetStreaming,
+  //   // });
+  //   // this.modelConfig = modelConfig;
+  //   // this.modelName = modelName;
+  //   try {
+  //     this.tokenEncoding = encodingForModel(modelName as TiktokenModel);
+  //   } catch (e) {
+  //     this.tokenEncoding = encodingForModel("gpt-3.5-turbo-1106"); // hack while we think about what to do with custom remote models' tokenizers
+  //   }
+  // }
 
   private isModelLoaded(): boolean {
     // For API-based models, this can always return true as there's no "loading" process

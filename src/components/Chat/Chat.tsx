@@ -69,10 +69,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
 
   const handleSubmitNewMessage = async () => {
     if (loadingResponse) return;
-    // let currentSessionId = sessionId;
-    // if (!currentSessionId) {
-    //   currentSessionId = await initializeSession();
-    // }
     let newMessages = messages;
     if (currentBotMessage) {
       newMessages = [

@@ -119,7 +119,7 @@ async function createWindow() {
     registerLLMSessionHandlers(store);
     registerDBSessionHandlers(store);
     registerStoreHandlers(store);
-    registerFileHandlers();
+    registerFileHandlers(store);
   }
 }
 
