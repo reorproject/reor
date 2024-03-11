@@ -67,33 +67,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
     }
   }, [currentFilePath, askText]);
 
-  // const initializeSession = async (): Promise<string> => {
-  //   throw new Error("Not implemented");
-  //   // try {
-  //   //   const sessionID = "some_unique_session_id";
-  //   //   const sessionExists = await window.llm.doesSessionExist(sessionID);
-  //   //   if (sessionExists) {
-  //   //     await window.llm.deleteSession(sessionID);
-  //   //   }
-  //   //   console.log("Creating a new session...");
-  //   //   const newSessionId = await window.llm.createSession(
-  //   //     "some_unique_session_id"
-  //   //   );
-  //   //   console.log("Created a new session with id:", newSessionId);
-  //   //   // setSessionId(newSessionId);
-
-  //   //   return newSessionId;
-  //   // } catch (error) {
-  //   //   console.error("Failed to create a new session:", error);
-  //   //   setCurrentBotMessage({
-  //   //     messageType: "error",
-  //   //     content: errorToString(error),
-  //   //     role: "assistant",
-  //   //   });
-  //   //   return "";
-  //   // }
-  // };
-
   const handleSubmitNewMessage = async () => {
     if (loadingResponse) return;
     // let currentSessionId = sessionId;
@@ -175,7 +148,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
   };
 
   useEffect(() => {
+    let active = true;
     const updateStream = (chunk: ChatCompletionChunk) => {
+      if (!active) return;
       const newMsgContent = chunk.choices[0].delta.content;
       if (!newMsgContent) return;
       setCurrentBotMessage((prev) => {
@@ -190,27 +165,12 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
     window.ipcRenderer.receive("tokenStream", updateStream);
 
     return () => {
+      active = false;
       window.ipcRenderer.removeListener("tokenStream", updateStream);
     };
   }, []);
 
-  // useEffect(() => {
-  //   return () => {
-  //     if (sessionId) {
-  //       console.log("Deleting session:", sessionId);
-  //       window.llm.deleteSession(sessionId);
-  //     }
-  //     console.log("Component is unmounted (hidden)");
-  //   };
-  // }, [sessionId]);
-
   const restartSession = async () => {
-    // if (sessionId) {
-    //   console.log("Deleting session:", sessionId);
-    //   await window.llm.deleteSession(sessionId);
-    // }
-    // const newSessionId = await initializeSession();
-    // setSessionId(newSessionId);
     fetchDefaultModel();
   };
 
