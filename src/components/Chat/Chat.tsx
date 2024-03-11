@@ -5,7 +5,6 @@ import {
   MenuItem,
   MenuList,
 } from "@material-tailwind/react";
-import { ChatbotMessage } from "electron/main/llm/Types";
 import { errorToString } from "@/functions/error";
 import { toast } from "react-toastify";
 import Textarea from "@mui/joy/Textarea";
@@ -27,21 +26,25 @@ const PROMPT_OPTIONS = [
   "Separate concepts from todos",
 ]; // more options to come
 
+type ChatUIMessage = {
+  role: "user" | "assistant";
+  content: string;
+  messageType: "success" | "error";
+};
+
 interface ChatWithLLMProps {
   currentFilePath: string | null;
 }
 
 const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
-  // const [sessionId, setSessionId] = useState<string | null>(null);
-  const [userInput, setUserInput] = useState<string>("");
-  const [messages, setMessages] = useState<ChatbotMessage[]>([]);
+  const [userTextFieldInput, setUserTextFieldInput] = useState<string>("");
+  const [messages, setMessages] = useState<ChatUIMessage[]>([]);
   const [defaultModel, setDefaultModel] = useState<string>("");
   const [askText, setAskText] = useState<string>("Ask");
-
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
-
   const [currentBotMessage, setCurrentBotMessage] =
-    useState<ChatbotMessage | null>(null);
+    useState<ChatUIMessage | null>(null);
+  const fileNotSelectedToastId = useRef<string | null>(null);
 
   const fetchDefaultModel = async () => {
     const defaultModelName = await window.electronStore.getDefaultLLM();
@@ -51,7 +54,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
     fetchDefaultModel();
   }, []);
 
-  const fileNotSelectedToastId = useRef<string | null>(null);
   useEffect(() => {
     if (!currentFilePath && askText === AskOptions.AskFile) {
       fileNotSelectedToastId.current = toast.error(
@@ -87,7 +89,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
         role: "assistant",
       });
     }
-    if (!userInput.trim()) return;
+    if (!userTextFieldInput.trim()) return;
     const llmName = await window.electronStore.getDefaultLLM();
 
     let augmentedPrompt: string = "";
@@ -105,7 +107,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
         }
         const { prompt, contextCutoffAt } =
           await window.files.augmentPromptWithFile({
-            prompt: userInput,
+            prompt: userTextFieldInput,
             llmName: llmName,
             filePath: currentFilePath,
           });
@@ -117,7 +119,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
         augmentedPrompt = prompt;
       } else if (askText === AskOptions.Ask) {
         augmentedPrompt = await window.database.augmentPromptWithRAG(
-          userInput,
+          userTextFieldInput,
           llmName
         );
       }
@@ -132,15 +134,13 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
       return;
     }
 
-    console.log("Augmented prompt:", augmentedPrompt);
-
     startStreamingResponse(llmName, augmentedPrompt);
 
     setMessages([
       ...newMessages,
-      { role: "user", messageType: "success", content: userInput },
+      { role: "user", messageType: "success", content: userTextFieldInput },
     ]);
-    setUserInput("");
+    setUserTextFieldInput("");
   };
 
   useEffect(() => {
@@ -208,7 +208,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
   const handleInputChange: React.ChangeEventHandler<HTMLTextAreaElement> = (
     e
   ) => {
-    setUserInput(e.target.value);
+    setUserTextFieldInput(e.target.value);
   };
 
   return (
@@ -226,19 +226,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
         </div>
       </div>
       <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
-        {/* {messages.length === 0 && !currentBotMessage && (
-          <div>
-            {defaultModel ? (
-              <p className="text-center text-gray-500">
-                Using default model: {defaultModel}
-              </p>
-            ) : (
-              <p className="text-center text-gray-500">
-                No default model selected
-              </p>
-            )}
-          </div>
-        )} */}
         <div className="space-y-2 mt-4 flex-grow">
           {messages.map((message, index) => (
             <ReactMarkdown
@@ -266,7 +253,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
             </ReactMarkdown>
           )}
         </div>
-        {userInput === "" &&
+        {userTextFieldInput === "" &&
         askText === AskOptions.AskFile &&
         messages.length == 0 ? (
           <>
@@ -277,7 +264,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
                   promptText={option}
                   onClick={() => {
                     console.log(option);
-                    setUserInput(option);
+                    setUserTextFieldInput(option);
                   }}
                 />
               );
@@ -291,7 +278,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
           <Textarea
             onKeyDown={handleKeyDown}
             onChange={handleInputChange}
-            value={userInput}
+            value={userTextFieldInput}
             className="w-full  bg-gray-300"
             name="Outlined"
             placeholder="Ask your knowledge..."
