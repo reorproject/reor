@@ -1,15 +1,12 @@
 import { ipcMain } from "electron";
 import { createPromptWithContextLimitFromContent } from "../Prompts/Prompts";
 import { DBEntry, DatabaseFields } from "./Schema";
-import { LLMSessions } from "../llm/llmSessionHandlers";
+import { openAISession } from "../llm/llmSessionHandlers";
 import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 import { getWindowInfoForContents, activeWindows } from "../windowManager";
 
-export const registerDBSessionHandlers = (
-  // dbTable: LanceDBTableWrapper,
-  store: Store<StoreSchema>
-) => {
+export const registerDBSessionHandlers = (store: Store<StoreSchema>) => {
   ipcMain.handle(
     "search",
     async (
@@ -44,7 +41,7 @@ export const registerDBSessionHandlers = (
     async (
       event,
       query: string,
-      llmSessionID: string,
+      llmName: string,
       filter?: string
     ): Promise<string> => {
       try {
@@ -68,17 +65,19 @@ export const registerDBSessionHandlers = (
           throw new Error("Max RAG examples is not set or is invalid.");
         }
 
-        const llmSession = LLMSessions[llmSessionID];
-        if (!llmSession) {
-          throw new Error(`Session ${llmSessionID} does not exist.`);
+        const llmSession = openAISession;
+        const llmConfig = store.get(StoreKeys.LLMs)[llmName];
+        console.log("llmConfig", llmConfig);
+        if (!llmConfig) {
+          throw new Error(`LLM ${llmName} not configured.`);
         }
-
         const { prompt: ragPrompt } = createPromptWithContextLimitFromContent(
           searchResults,
           query,
-          llmSession.tokenize,
-          llmSession.getContextLength()
+          llmSession.getTokenizer(llmName),
+          llmConfig.contextLength
         );
+        console.log("ragPrompt", ragPrompt);
         return ragPrompt;
       } catch (error) {
         console.error("Error searching database:", error);

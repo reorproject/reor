@@ -119,6 +119,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
       });
     }
     if (!userInput.trim()) return;
+    const llmName = await window.electronStore.getDefaultLLM();
 
     let augmentedPrompt: string = "";
     try {
@@ -133,14 +134,12 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
           );
           return;
         }
-        // const { prompt, contextCutoffAt } = {userInput, 0}
-        const prompt = userInput;
-        const contextCutoffAt = 0;
-        // await window.files.augmentPromptWithFile({
-        //   prompt: userInput,
-        //   llmSessionID: currentSessionId,
-        //   filePath: currentFilePath,
-        // });
+        const { prompt, contextCutoffAt } =
+          await window.files.augmentPromptWithFile({
+            prompt: userInput,
+            llmName: llmName,
+            filePath: currentFilePath,
+          });
         if (contextCutoffAt) {
           toast.warning(
             `The file is too large to be used as context. It got cut off at: ${contextCutoffAt}`
@@ -148,11 +147,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
         }
         augmentedPrompt = prompt;
       } else if (askText === AskOptions.Ask) {
-        augmentedPrompt = userInput;
-        // await window.database.augmentPromptWithRAG(
-        //   userInput,
-        //   currentSessionId
-        // );
+        augmentedPrompt = await window.database.augmentPromptWithRAG(
+          userInput,
+          llmName
+        );
       }
     } catch (error) {
       console.error("Failed to augment prompt:", error);
@@ -165,7 +163,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
       return;
     }
 
-    startStreamingResponse(augmentedPrompt);
+    console.log("Augmented prompt:", augmentedPrompt);
+
+    startStreamingResponse(llmName, augmentedPrompt);
 
     setMessages([
       ...newMessages,
@@ -216,19 +216,20 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
 
   const startStreamingResponse = async (
     // sessionId: string,
+    llmName: string,
     prompt: string
   ) => {
     try {
       console.log("Initializing streaming response...");
       setLoadingResponse(true);
-      const defaultModelName = await window.electronStore.getDefaultLLM();
       const modelConfigs = await window.electronStore.getLLMConfigs();
-      const defaultModelConfig = modelConfigs[defaultModelName];
-      await window.llm.streamingLLMResponse(
-        defaultModelName,
-        defaultModelConfig,
-        [{ role: "user", content: prompt }]
-      );
+      const defaultModelConfig = modelConfigs[llmName];
+      if (!defaultModelConfig) {
+        throw new Error(`No model config found for model: ${llmName}`);
+      }
+      await window.llm.streamingLLMResponse(llmName, defaultModelConfig, [
+        { role: "user", content: prompt },
+      ]);
       console.log("Initialized streaming response");
       setLoadingResponse(false);
     } catch (error) {

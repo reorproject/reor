@@ -123,27 +123,22 @@ export class OpenAIModelSessionService implements LLMSessionService {
   //   }
   // }
 
-  public tokenize = (tokenizer: Tiktoken, text: string): number[] => {
-    return tokenizer.encode(text);
+  public getTokenizer = (llmName: string): ((text: string) => number[]) => {
+    let tokenEncoding: Tiktoken;
+    try {
+      tokenEncoding = encodingForModel(llmName as TiktokenModel);
+    } catch (e) {
+      tokenEncoding = encodingForModel("gpt-3.5-turbo-1106"); // hack while we think about what to do with custom remote models' tokenizers
+    }
+    const tokenize = (text: string): number[] => {
+      return tokenEncoding.encode(text);
+    };
+    return tokenize;
   };
-
-  public getContextLength(): number {
-    return this.modelConfig.contextLength || 0;
-  }
 
   public abort(): void {
     this.abortStreaming = true;
   }
-
-  public getTokenizer = (modelName: string): Tiktoken => {
-    let tokenEncoding: Tiktoken;
-    try {
-      tokenEncoding = encodingForModel(modelName as TiktokenModel);
-    } catch (e) {
-      tokenEncoding = encodingForModel("gpt-3.5-turbo-1106"); // hack while we think about what to do with custom remote models' tokenizers
-    }
-    return tokenEncoding;
-  };
 
   async streamingResponse(
     modelName: string,

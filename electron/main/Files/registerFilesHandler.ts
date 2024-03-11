@@ -17,13 +17,15 @@ import {
   getWindowInfoForContents,
   activeWindows,
 } from "../windowManager";
-import { LLMSessions } from "../llm/llmSessionHandlers";
+import { openAISession } from "../llm/llmSessionHandlers";
 import {
   PromptWithContextLimit,
   createPromptWithContextLimitFromContent,
 } from "../Prompts/Prompts";
+import Store from "electron-store";
+import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 
-export const registerFileHandlers = () => {
+export const registerFileHandlers = (store: Store<StoreSchema>) => {
   ipcMain.handle("join-path", (event, ...args) => {
     return path.join(...args);
   });
@@ -118,22 +120,27 @@ export const registerFileHandlers = () => {
     "augment-prompt-with-file",
     async (
       _event,
-      { prompt, llmSessionID, filePath }: AugmentPromptWithFileProps
+      { prompt, llmName, filePath }: AugmentPromptWithFileProps
     ): Promise<PromptWithContextLimit> => {
       try {
         const content = fs.readFileSync(filePath, "utf-8");
 
-        const llmSession = LLMSessions[llmSessionID];
-        if (!llmSession) {
-          throw new Error(`Session ${llmSessionID} does not exist.`);
-        }
+        // const llmSession = LLMSessions[llmName];
+        // if (!llmSession) {
+        //   throw new Error(`Session ${llmName} does not exist.`);
+        // }
 
+        const llmSession = openAISession;
+        const llmConfig = store.get(StoreKeys.LLMs)[llmName];
+        if (!llmConfig) {
+          throw new Error(`LLM ${llmName} not configured.`);
+        }
         const { prompt: filePrompt, contextCutoffAt } =
           createPromptWithContextLimitFromContent(
             content,
             prompt,
-            llmSession.tokenize,
-            llmSession.getContextLength()
+            llmSession.getTokenizer(llmName),
+            llmConfig.contextLength
           );
         return { prompt: filePrompt, contextCutoffAt };
       } catch (error) {

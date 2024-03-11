@@ -35,7 +35,6 @@ export interface LLMSessionService {
   ): Promise<void>;
 
   abort(): void;
-  getContextLength(): number;
   tokenize(text: string): number[];
 }
 

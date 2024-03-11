@@ -43,7 +43,7 @@ declare global {
       indexFilesInDirectory: () => void;
       augmentPromptWithRAG: (
         prompt: string,
-        llmSessionID: string,
+        llmName: string,
         filter?: string
       ) => Promise<string>;
       getDatabaseFields: () => Promise<Record<string, string>>;
@@ -131,13 +131,13 @@ contextBridge.exposeInMainWorld("database", {
   },
   augmentPromptWithRAG: async (
     prompt: string,
-    llmSessionID: string,
+    llmName: string,
     filter?: string
   ): Promise<DBEntry[]> => {
     return ipcRenderer.invoke(
       "augment-prompt-with-rag",
       prompt,
-      llmSessionID,
+      llmName,
       filter
     );
   },
