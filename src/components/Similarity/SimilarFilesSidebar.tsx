@@ -139,10 +139,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
       </div>
       {similarEntries.length === 0 && (
         <div className="flex flex-col items-center justify-center h-full w-full">
-          <p
-            className="flex justify-center items-center text-gray-500 text-lg mx-auto text-center w-full"
-            // style={{ width: "fit-content" }}
-          >
+          <p className="flex justify-center items-center text-gray-500 text-lg mx-auto text-center">
             {!userHitRefresh ? (
               <>Hit refresh to show related notes...</>
             ) : (
