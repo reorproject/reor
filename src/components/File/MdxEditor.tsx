@@ -25,13 +25,13 @@ import {
 import { LeafDirective } from "mdast-util-directive";
 
 // UNUSED RIGHT NOW. IN FAVOUR OF MILKDOWN.
-export interface MdxEditor {
+export interface EditorProps {
   filePath: string;
   setContentInParent: (content: string) => void;
   lastSavedContentRef: React.MutableRefObject<string>;
 }
 
-export const MdxEditor: React.FC<MdxEditor> = ({
+export const MdxEditor: React.FC<EditorProps> = ({
   filePath,
   setContentInParent,
   lastSavedContentRef,

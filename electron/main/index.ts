@@ -15,7 +15,6 @@ import * as path from "path";
 import { StoreKeys, StoreSchema } from "./Store/storeConfig";
 // import contextMenus from "./contextMenus";
 import * as lancedb from "vectordb";
-import * as fs from "fs";
 import {
   startWatchingDirectory,
   updateFileListForRenderer,
@@ -30,7 +29,7 @@ import {
 import { registerFileHandlers } from "./Files/registerFilesHandler";
 import { RepopulateTableWithMissingItems } from "./database/TableHelperFunctions";
 import {
-  getVaultDirectoryForContents,
+  getVaultDirectoryForWinContents,
   getWindowInfoForContents,
   activeWindows,
   getNextWindowPosition,
@@ -100,9 +99,13 @@ async function createWindow() {
     return { action: "deny" };
   });
 
-  win.on("close", () => {
+  win.on("close", (event) => {
+    win.webContents.send("prepare-for-window-close");
+
+    event.preventDefault(); // this actually stops the hot reload from working. comment it out if you want hot reload
+
     // Get the directory for this window's contents
-    const directoryToSave = getVaultDirectoryForContents(
+    const directoryToSave = getVaultDirectoryForWinContents(
       activeWindows,
       win.webContents
     );
@@ -112,6 +115,10 @@ async function createWindow() {
       console.log("Saving directory for window:", directoryToSave);
       store.set(StoreKeys.DirectoryFromPreviousSession, directoryToSave);
     }
+    ipcMain.on("destroy-window", () => {
+      console.log("EVERTYHING HAS BEEN SAVED");
+      win.destroy();
+    });
   });
 
   if (activeWindows.length <= 0) {
@@ -226,34 +233,7 @@ ipcMain.on("show-context-menu-file-item", (event, file) => {
       label: "Delete",
       click: () => {
         console.log(file.path);
-        fs.stat(file.path, (err, stats) => {
-          if (err) {
-            console.error("An error occurred:", err);
-            return;
-          }
-
-          if (stats.isDirectory()) {
-            // For directories (Node.js v14.14.0 and later)
-            fs.rm(file.path, { recursive: true }, (err) => {
-              if (err) {
-                console.error("An error occurred:", err);
-                return;
-              }
-              console.log(
-                `Directory at ${file.path} was deleted successfully.`
-              );
-            });
-          } else {
-            fs.unlink(file.path, (err) => {
-              if (err) {
-                console.error("An error occurred:", err);
-                return;
-              }
-              console.log(`File at ${file.path} was deleted successfully.`);
-              // TODO: Update table.
-            });
-          }
-        });
+        event.sender.send("delete-file-listener", file.path);
       },
     })
   );

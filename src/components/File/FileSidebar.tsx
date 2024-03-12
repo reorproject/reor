@@ -220,6 +220,7 @@ const FileItem: React.FC<FileInfoProps> = ({
       // setIsExpanded(!isExpanded);
       onDirectoryToggle(file.path);
     } else {
+      console.log('file.path', file.path)
       onFileSelect(file.path);
     }
   };

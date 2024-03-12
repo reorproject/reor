@@ -11,7 +11,7 @@ import Store from "electron-store";
 import { validateAIModelConfig } from "../llm/llmConfig";
 import {
   setupDirectoryFromPreviousSessionIfUnused,
-  getVaultDirectoryForContents,
+  getVaultDirectoryForWinContents,
   setVaultDirectoryForContents,
   activeWindows,
 } from "../windowManager";
@@ -38,7 +38,7 @@ export const registerStoreHandlers = (
   );
 
   ipcMain.on("get-user-directory", (event) => {
-    let path = getVaultDirectoryForContents(activeWindows, event.sender);
+    let path = getVaultDirectoryForWinContents(activeWindows, event.sender);
     if (!path) {
       path = setupDirectoryFromPreviousSessionIfUnused(
         activeWindows,
