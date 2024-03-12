@@ -7,15 +7,23 @@ import {
   ChatCompletionChunk,
   ChatCompletionMessageParam,
 } from "openai/resources/chat/completions";
-// import { OllamaService } from "./models/Ollama";
+import { OllamaService } from "./models/Ollama";
 
 export const LLMSessions: { [sessionId: string]: LLMSessionService } = {};
 
 export const openAISession = new OpenAIModelSessionService();
 
-// export const ollamaSession = new OllamaService();
+export const ollamaSession = new OllamaService();
+ollamaSession.serve();
 
-export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
+console.log("process.resourcesPath: ", process.resourcesPath);
+
+export const registerLLMSessionHandlers = async (store: Store<StoreSchema>) => {
+  // sleep for 3 seconds:
+  await new Promise((resolve) => setTimeout(resolve, 3000));
+  await ollamaSession.initClient();
+  const ollamaModels = await ollamaSession.listModels();
+  console.log("OLLAMA MODELS: ", ollamaModels);
   ipcMain.handle(
     "streaming-llm-response",
     async (

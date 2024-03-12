@@ -67,6 +67,7 @@
     "lodash.debounce": "^4.0.8",
     "node-llama-cpp": "3.0.0-beta.12",
     "npm": "^10.3.0",
+    "ollama": "^0.4.9",
     "openai": "^4.20.0",
     "prosemirror-model": "1.19.4",
     "prosemirror-view": "^1.33.1",

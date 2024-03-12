@@ -10,7 +10,7 @@ import {
   ChatCompletionChunk,
   ChatCompletionMessageParam,
 } from "openai/resources/chat/completions";
-import { customFetchUsingElectronNetStreaming } from "electron/main/Generic/network";
+import { customFetchUsingElectronNetStreaming } from "../../Generic/network";
 
 export class OpenAIModelSessionService implements LLMSessionService {
   public getTokenizer = (llmName: string): ((text: string) => number[]) => {
