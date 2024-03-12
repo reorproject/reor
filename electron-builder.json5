@@ -28,7 +28,7 @@
     ],
     extraResources: [
       {
-        from: "./binaries/win32/",
+        from: "./binaries/windows/",
         to: "ollama",
         filter: ["**/*"],
       },
