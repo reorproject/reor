@@ -6,6 +6,7 @@ import Paragraph from "@tiptap/extension-paragraph";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import Text from "@tiptap/extension-text";
+import Link from "@tiptap/extension-link";
 import "../tiptap.scss";
 
 import TurndownService from "turndown";
@@ -25,7 +26,6 @@ export const useFileByFilepath = () => {
 		3. when the file is deleted
 	 */
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  //   const [editor, setEditor] = useState<Editor | null>(null);
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -35,6 +35,10 @@ export const useFileByFilepath = () => {
       TaskList,
       TaskItem.configure({
         nested: true,
+      }),
+      Link.configure({
+        linkOnPaste: true,
+        openOnClick: true,
       }),
     ],
   });

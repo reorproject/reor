@@ -52,6 +52,7 @@
     "@prosemirror-adapter/react": "0.2.5",
     "@radix-ui/colors": "^3.0.0",
     "@tailwindcss/typography": "^0.5.10",
+    "@tiptap/extension-link": "^2.2.4",
     "@tiptap/extension-task-item": "^2.2.4",
     "@tiptap/extension-task-list": "^2.2.4",
     "@tiptap/pm": "^2.2.4",
