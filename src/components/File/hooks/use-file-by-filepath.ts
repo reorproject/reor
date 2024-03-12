@@ -39,6 +39,16 @@ export const useFileByFilepath = () => {
     ],
   });
 
+  const saveCurrentlyOpenedFile = async () => {
+    if (currentlyOpenedFilePath !== null && editor !== null) {
+      const markdown = turndownService.turndown(editor.getHTML() || "");
+      await window.files.writeFile({
+        filePath: currentlyOpenedFilePath,
+        content: markdown,
+      });
+      await window.files.indexFileInDatabase(currentlyOpenedFilePath);
+    }
+  };
   // read file, load content into fileContent
   const openFileByPath = async (newFilePath: string) => {
     //if the fileContent is null or if there is no file currently selected
@@ -148,6 +158,7 @@ export const useFileByFilepath = () => {
 
   return {
     filePath: currentlyOpenedFilePath,
+    saveCurrentlyOpenedFile,
     editor,
     openFileByPath,
   };

@@ -9,11 +9,13 @@ import { FiRefreshCw } from "react-icons/fi";
 interface SimilarEntriesComponentProps {
   filePath: string;
   onFileSelect: (path: string) => void;
+  saveCurrentFile: () => Promise<void>;
 }
 
 const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   filePath,
   onFileSelect,
+  saveCurrentFile,
 }) => {
   const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([]);
   const [userHitRefresh, setUserHitRefresh] = useState<boolean>(false);
@@ -69,10 +71,10 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   }, [filePath]);
 
   useEffect(() => {
-    let active = true
+    let active = true;
     const vectorDBUpdateListener = async () => {
       if (!active) return;
-      console.log("Vector DB update listener path: ", filePath)
+      console.log("Vector DB update listener path: ", filePath);
       updateSimilarEntries(filePath);
     };
 
@@ -114,29 +116,32 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
 
         <div
           className="flex-1 flex justify-end pr-3 pt-1 cursor-pointer"
-          onClick={() => {
+          onClick={async () => {
             setUserHitRefresh(true);
             setSimilarEntries([]); // simulate refresh
+            await saveCurrentFile();
             updateSimilarEntries(filePath);
           }}
         >
           <FiRefreshCw className="text-gray-300" /> {/* Icon */}
         </div>
       </div>
-      {similarEntries.map((dbResult, index) => (
-        <div className="pb-2 pr-2 pl-2 pt-1" key={index}>
-          <DBResultPreview
-            key={index}
-            dbResult={dbResult}
-            onSelect={onFileSelect}
-          />
-        </div>
-      ))}
+      <div className="h-full w-full">
+        {similarEntries.map((dbResult, index) => (
+          <div className="pb-2 pr-2 pl-2 pt-1" key={index}>
+            <DBResultPreview
+              key={index}
+              dbResult={dbResult}
+              onSelect={onFileSelect}
+            />
+          </div>
+        ))}
+      </div>
       {similarEntries.length === 0 && (
         <div className="flex flex-col items-center justify-center h-full w-full">
           <p
-            className="flex justify-center items-center text-gray-500 text-lg mx-auto text-center"
-            style={{ width: "fit-content" }}
+            className="flex justify-center items-center text-gray-500 text-lg mx-auto text-center w-full"
+            // style={{ width: "fit-content" }}
           >
             {!userHitRefresh ? (
               <>Hit refresh to show related notes...</>

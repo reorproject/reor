@@ -17,7 +17,8 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const [sidebarShowing, setSidebarShowing] =
     useState<SidebarAbleToShow>("files");
 
-  const { filePath, editor, openFileByPath } = useFileByFilepath();
+  const { filePath, editor, openFileByPath, saveCurrentlyOpenedFile } =
+    useFileByFilepath();
 
   const toggleChatbot = () => {
     setShowChatbot(!showChatbot);
@@ -58,14 +59,20 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         {filePath && (
           <div className="w-full h-full flex overflow-x-hidden">
             <div className="w-full flex h-full">
-              <div className="h-full w-full">
-                <EditorContent editor={editor} />
+              <div className="h-full w-full overflow-y-auto">
+                <EditorContent
+                  style={{ wordBreak: "break-word" }}
+                  editor={editor}
+                />
               </div>
               {showSimilarFiles && (
                 <ResizableComponent resizeSide="left" initialWidth={400}>
                   <SimilarEntriesComponent
                     filePath={filePath}
                     onFileSelect={openFileByPath}
+                    saveCurrentFile={async () => {
+                      await saveCurrentlyOpenedFile();
+                    }}
                   />
                 </ResizableComponent>
               )}

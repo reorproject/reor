@@ -124,3 +124,16 @@ button {
 .milkdown .editor h6 {
   font-size: 1em !important;
 }
+
+::-webkit-scrollbar {
+  width: 10px; /* Adjust the width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* Make the scrollbar track transparent */
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgb(164, 164, 164); /* Set the thumb color */
+  border-radius: 10px;
+}
