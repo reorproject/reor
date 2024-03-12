@@ -41,19 +41,19 @@ export class OllamaService implements LLMSessionService {
       case "win32":
         exeName = "ollama.exe";
         exePath = app.isPackaged
-          ? path.join(process.resourcesPath, "binaries")
+          ? path.join(process.resourcesPath, "ollama")
           : path.join(app.getAppPath(), "binaries", "windows");
         break;
       case "darwin":
         exeName = "ollama-darwin";
         exePath = app.isPackaged
-          ? path.join(process.resourcesPath, "binaries")
+          ? path.join(process.resourcesPath, "ollama")
           : path.join(app.getAppPath(), "binaries", "darwin");
         break;
       case "linux":
         exeName = "ollama-linux";
         exePath = app.isPackaged
-          ? path.join(process.resourcesPath, "binaries")
+          ? path.join(process.resourcesPath, "ollama")
           : path.join(app.getAppPath(), "binaries", "linux");
         break;
       default:
