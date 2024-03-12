@@ -12,7 +12,7 @@
     extraResources: [
       {
         from: "./binaries/darwin/",
-        to: "ollama",
+        to: "binaries",
         filter: ["**/*"],
       },
     ],
@@ -28,8 +28,8 @@
     ],
     extraResources: [
       {
-        from: "./binaries/windows/",
-        to: "ollama",
+        from: "./binaries/win32/",
+        to: "binaries",
         filter: ["**/*"],
       },
     ],
@@ -54,7 +54,7 @@
     extraResources: [
       {
         from: "./binaries/linux/",
-        to: "ollama",
+        to: "binaries",
         filter: ["**/*"],
       },
     ],
