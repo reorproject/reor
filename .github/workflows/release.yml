@@ -69,10 +69,6 @@ jobs:
         run: |
           npm run build
 
-      - name: Run Linux Specific Command
-        if: matrix.os == 'ubuntu-latest'
-        run: npx --no node-llama-cpp download
-
       - name: Set version as env
         run: echo "APP_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
