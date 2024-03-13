@@ -23,7 +23,8 @@ import {
   createPromptWithContextLimitFromContent,
 } from "../Prompts/Prompts";
 import Store from "electron-store";
-import { StoreKeys, StoreSchema } from "../Store/storeConfig";
+import { StoreSchema } from "../Store/storeConfig";
+import { getLLMConfig } from "../Store/storeHandlers";
 
 export const registerFileHandlers = (store: Store<StoreSchema>) => {
   ipcMain.handle("join-path", (event, ...args) => {
@@ -125,13 +126,8 @@ export const registerFileHandlers = (store: Store<StoreSchema>) => {
       try {
         const content = fs.readFileSync(filePath, "utf-8");
 
-        // const llmSession = LLMSessions[llmName];
-        // if (!llmSession) {
-        //   throw new Error(`Session ${llmName} does not exist.`);
-        // }
-
         const llmSession = openAISession;
-        const llmConfig = store.get(StoreKeys.LLMs)[llmName];
+        const llmConfig = getLLMConfig(store, llmName);
         if (!llmConfig) {
           throw new Error(`LLM ${llmName} not configured.`);
         }

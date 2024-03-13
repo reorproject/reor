@@ -14,6 +14,7 @@ import * as path from "path";
 import * as os from "os";
 import { spawn } from "child_process";
 // import ollama,"ollama";
+import { ModelResponse } from "ollama";
 
 export class OllamaService implements LLMSessionService {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -26,10 +27,10 @@ export class OllamaService implements LLMSessionService {
 
   public initClient = async () => {
     console.log("Initializing Ollama client...");
-    const ollama = await import("ollama");
+    this.client = await import("ollama");
     console.log("Ollama client: ", this.client);
-    const models = await ollama.default.list();
-    console.log("Ollama models: ", models);
+    // const models = await this.client.default.list();
+    // console.log("Ollama models: ", models);
     // const lists = await this.client.
     // console.log("Ollama models: ", lists);
   };
@@ -78,8 +79,18 @@ export class OllamaService implements LLMSessionService {
     });
   };
 
-  public listModels = async () => {
-    return null;
+  public getAvailableModels = async (): Promise<OpenAILLMConfig> => {
+    const ollamaModelsResponse = await this.client.default.list();
+
+    const output = ollamaModelsResponse.models.map((model: ModelResponse) => {
+      return {
+        type: "openai",
+        contextLength: 2048,
+        engine: "openai",
+        apiURL: "http://127.0.0.1:11434",
+      };
+    });
+    return output;
   };
 
   public getTokenizer = (llmName: string): ((text: string) => number[]) => {

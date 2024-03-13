@@ -22,7 +22,7 @@ export const registerLLMSessionHandlers = async (store: Store<StoreSchema>) => {
   // sleep for 3 seconds:
   await new Promise((resolve) => setTimeout(resolve, 3000));
   await ollamaSession.initClient();
-  const ollamaModels = await ollamaSession.listModels();
+  const ollamaModels = await ollamaSession.getAvailableModels();
   console.log("OLLAMA MODELS: ", ollamaModels);
   ipcMain.handle(
     "streaming-llm-response",

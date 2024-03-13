@@ -16,11 +16,11 @@ const OpenAISetupModal: React.FC<OpenAISetupModalProps> = ({
 
   const handleSave = () => {
     if (openAIKey) {
-      for (const modelName in openAIDefaultModels) {
-        window.electronStore.addOrUpdateLLM(modelName, {
-          ...openAIDefaultModels[modelName],
-          apiKey: openAIKey,
-        });
+      openAIDefaultModels.forEach((modelConfig) => {
+        window.electronStore.addOrUpdateLLM(modelConfig);
+      });
+      if (openAIDefaultModels.length > 0) {
+        window.electronStore.setDefaultLLM(openAIDefaultModels[0].modelName);
       }
     }
 
@@ -66,42 +66,47 @@ const OpenAISetupModal: React.FC<OpenAISetupModalProps> = ({
   );
 };
 
-const openAIDefaultModels: { [modelName: string]: OpenAILLMConfig } = {
-  "gpt-3.5-turbo-0125": {
+const openAIDefaultModels: OpenAILLMConfig[] = [
+  {
     contextLength: 16385,
+    modelName: "gpt-3.5-turbo-0125",
     engine: "openai",
     type: "openai",
     apiKey: "",
     apiURL: "",
   },
-  "gpt-3.5-turbo-1106": {
+  {
     contextLength: 16385,
+    modelName: "gpt-3.5-turbo-1106",
     engine: "openai",
     type: "openai",
     apiKey: "",
     apiURL: "",
   },
-  "gpt-4-0613": {
+  {
     contextLength: 8192,
+    modelName: "gpt-4-0613",
     engine: "openai",
     type: "openai",
     apiKey: "",
     apiURL: "",
   },
-  "gpt-4-0125-preview": {
+  {
     contextLength: 128000,
+    modelName: "gpt-4-0125-preview",
     engine: "openai",
     type: "openai",
     apiKey: "",
     apiURL: "",
   },
-  "gpt-4-1106-preview": {
+  {
     contextLength: 128000,
+    modelName: "gpt-4-1106-preview",
     engine: "openai",
     type: "openai",
     apiKey: "",
     apiURL: "",
   },
-};
+];
 
 export default OpenAISetupModal;

@@ -16,12 +16,13 @@ import {
   activeWindows,
 } from "../windowManager";
 import path from "path";
+import { initializeAndMaybeMigrateStore } from "./storeMigrator";
 
 export const registerStoreHandlers = (
   store: Store<StoreSchema>
   // fileWatcher: FSWatcher | null
 ) => {
-  setupDefaultStoreValues(store);
+  initializeAndMaybeMigrateStore(store);
   ipcMain.on(
     "set-user-directory",
     async (event, userDirectory: string): Promise<void> => {
@@ -116,7 +117,7 @@ export const registerStoreHandlers = (
     store.set(StoreKeys.DefaultLLM, modelName);
   });
 
-  ipcMain.on("get-default-llm", (event) => {
+  ipcMain.on("get-default-llm-name", (event) => {
     event.returnValue = store.get(StoreKeys.DefaultLLM);
   });
 
@@ -125,30 +126,37 @@ export const registerStoreHandlers = (
     return aiModelConfigs || {};
   });
 
-  ipcMain.handle("update-llm-config", (event, modelName, modelConfig) => {
-    const aiModelConfigs = store.get(StoreKeys.LLMs);
-    if (aiModelConfigs) {
-      const updatedModelConfigs = {
-        ...aiModelConfigs,
-        [modelName]: modelConfig,
-      };
-      store.set(StoreKeys.LLMs, updatedModelConfigs);
+  ipcMain.handle("get-llm-config-by-name", (event, modelName: string) => {
+    const llmConfig = getLLMConfig(store, modelName);
+    return llmConfig;
+  });
+
+  ipcMain.handle("update-llm-config", (event, config: LLMConfig) => {
+    const currentConfigs = store.get(StoreKeys.LLMs);
+    const index = currentConfigs.findIndex(
+      (c) => c.modelName === config.modelName
+    );
+
+    if (index > -1) {
+      // If found, replace the existing config
+      currentConfigs[index] = config;
+    } else {
+      // If not found, add the new config to the list
+      currentConfigs.push(config);
     }
+    store.set(StoreKeys.LLMs, currentConfigs);
+  });
+
+  ipcMain.handle("add-or-update-llm", async (event, modelConfig: LLMConfig) => {
+    console.log("setting up new local model", modelConfig);
+    await addOrUpdateLLMSchemaInStore(store, modelConfig);
   });
 
   ipcMain.handle(
-    "add-or-update-llm",
-    async (event, modelName: string, modelConfig: LLMConfig) => {
-      console.log("setting up new local model", modelConfig);
-      return await addOrUpdateLLMSchemaInStore(store, modelName, modelConfig);
-    }
-  );
-
-  ipcMain.handle(
     "delete-local-llm",
-    async (event, modelName: string, modelConfig: LLMConfig) => {
-      console.log("deleting local model", modelConfig);
-      return await deleteLLMSchemafromStore(store, modelName);
+    async (event, modelNameToDelete: string) => {
+      console.log("deleting local model", modelNameToDelete);
+      return await deleteLLMSchemafromStore(store, modelNameToDelete);
     }
   );
 
@@ -180,55 +188,56 @@ export const registerStoreHandlers = (
 
 export async function addOrUpdateLLMSchemaInStore(
   store: Store<StoreSchema>,
-  modelName: string,
   modelConfig: LLMConfig
-): Promise<string> {
-  const existingModels =
-    (store.get(StoreKeys.LLMs) as Record<string, LLMConfig>) || {};
+): Promise<void> {
+  const existingModels = (store.get(StoreKeys.LLMs) as LLMConfig[]) || [];
 
-  const isNotValid = validateAIModelConfig(modelName, modelConfig);
+  const isNotValid = validateAIModelConfig(modelConfig);
   if (isNotValid) {
     throw new Error(isNotValid);
   }
 
-  const updatedModels = {
-    ...existingModels,
-    [modelName]: modelConfig,
-  };
+  const foundModel = getLLMConfig(store, modelConfig.modelName);
 
-  store.set(StoreKeys.LLMs, updatedModels);
-
-  store.set(StoreKeys.DefaultLLM, modelName);
-
-  return existingModels[modelName]
-    ? "Model updated successfully"
-    : "Model set up successfully";
+  if (foundModel) {
+    const updatedModels = existingModels.map((model) =>
+      model.modelName === modelConfig.modelName ? modelConfig : model
+    );
+    store.set(StoreKeys.LLMs, updatedModels);
+  } else {
+    const updatedModels = [...existingModels, modelConfig];
+    store.set(StoreKeys.LLMs, updatedModels);
+  }
 }
 
 export async function deleteLLMSchemafromStore(
   store: Store<StoreSchema>,
   modelName: string
-): Promise<string> {
-  const existingModels =
-    (store.get(StoreKeys.LLMs) as Record<string, LLMConfig>) || {};
+): Promise<void> {
+  const existingModels = (store.get(StoreKeys.LLMs) as LLMConfig[]) || [];
 
-  if (existingModels[modelName]) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { [modelName]: _, ...remainingModels } = existingModels;
-    store.set(StoreKeys.LLMs, remainingModels);
-    return "Model deleted successfully";
-  } else {
-    return "Model does not exist";
+  const foundModel = getLLMConfig(store, modelName);
+
+  if (!foundModel) {
+    return;
   }
+
+  const updatedModels = existingModels.filter(
+    (model) => model.modelName !== modelName
+  );
+  store.set(StoreKeys.LLMs, updatedModels);
 }
 
-export function setupDefaultStoreValues(store: Store<StoreSchema>) {
-  if (!store.get(StoreKeys.MaxRAGExamples)) {
-    store.set(StoreKeys.MaxRAGExamples, 15);
+export function getLLMConfig(
+  store: Store<StoreSchema>,
+  modelName: string
+): LLMConfig | undefined {
+  const llmConfigs = store.get(StoreKeys.LLMs);
+  console.log("llmConfigs: ", llmConfigs);
+  if (llmConfigs) {
+    return llmConfigs.find((model: LLMConfig) => model.modelName === modelName);
   }
-  setupDefaultEmbeddingModels(store);
-
-  setupDefaultHardwareConfig(store);
+  return undefined;
 }
 
 export function getDefaultEmbeddingModelConfig(
@@ -255,47 +264,3 @@ export function getDefaultEmbeddingModelConfig(
 
   return model;
 }
-
-const setupDefaultHardwareConfig = (store: Store<StoreSchema>) => {
-  const hardwareConfig = store.get(StoreKeys.Hardware);
-
-  if (!hardwareConfig) {
-    store.set(StoreKeys.Hardware, {
-      useGPU: process.platform === "darwin" && process.arch === "arm64",
-      useCUDA: false,
-      useVulkan: false,
-    });
-  }
-};
-
-const setupDefaultEmbeddingModels = (store: Store<StoreSchema>) => {
-  const embeddingModels = store.get(StoreKeys.EmbeddingModels);
-
-  if (!embeddingModels) {
-    store.set(StoreKeys.EmbeddingModels, modelRepos);
-  }
-
-  const defaultModel = store.get(StoreKeys.DefaultEmbeddingModelAlias);
-  if (!defaultModel) {
-    const embeddingModels = store.get(StoreKeys.EmbeddingModels) || {};
-    if (Object.keys(embeddingModels).length === 0) {
-      throw new Error("No embedding models found");
-    }
-    store.set(
-      StoreKeys.DefaultEmbeddingModelAlias,
-      Object.keys(embeddingModels)[0]
-    );
-  }
-};
-
-const modelRepos = {
-  "Xenova/bge-base-en-v1.5": {
-    type: "repo",
-    repoName: "Xenova/bge-base-en-v1.5",
-  },
-  "Xenova/UAE-Large-V1": { type: "repo", repoName: "Xenova/UAE-Large-V1" },
-  "Xenova/bge-small-en-v1.5": {
-    type: "repo",
-    repoName: "Xenova/bge-small-en-v1.5",
-  },
-};

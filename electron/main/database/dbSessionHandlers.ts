@@ -5,6 +5,7 @@ import { openAISession } from "../llm/llmSessionHandlers";
 import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 import { getWindowInfoForContents, activeWindows } from "../windowManager";
+import { getLLMConfig } from "../Store/storeHandlers";
 
 export const registerDBSessionHandlers = (store: Store<StoreSchema>) => {
   ipcMain.handle(
@@ -66,7 +67,8 @@ export const registerDBSessionHandlers = (store: Store<StoreSchema>) => {
         }
 
         const llmSession = openAISession;
-        const llmConfig = store.get(StoreKeys.LLMs)[llmName];
+        const llmConfig = getLLMConfig(store, llmName);
+
         console.log("llmConfig", llmConfig);
         if (!llmConfig) {
           throw new Error(`LLM ${llmName} not configured.`);

@@ -4,7 +4,6 @@ import CustomSelect from "../Generic/Select";
 import { Button } from "@material-tailwind/react";
 import LocalModelModal from "./ExtraModals/NewLocalModel";
 import OpenAISetupModal from "./ExtraModals/OpenAISetup";
-import ContextLengthModal from "./ExtraModals/ContextLengthSettings";
 import RemoteLLMSetupModal from "./ExtraModals/RemoteLLMSetup";
 
 interface LLMSettingsProps {
@@ -18,9 +17,7 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
   userTriedToSubmit,
   isInitialSetup,
 }) => {
-  const [modelConfigs, setModelConfigs] = useState<Record<string, LLMConfig>>(
-    {}
-  );
+  const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([]);
   const [userMadeChanges, setUserMadeChanges] = useState<boolean>(false);
   const [isNewLocalModelModalOpen, setIsNewLocalModelModalOpen] =
     useState<boolean>(false);
@@ -31,20 +28,17 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
   const [isOpenAIModelModalOpen, setIsOpenAIModelModalOpen] =
     useState<boolean>(false);
 
-  const [isConextLengthModalOpen, setIsContextLengthModalOpen] =
-    useState<boolean>(false);
-
   const [defaultModel, setDefaultModel] = useState<string>("");
   const [currentError, setCurrentError] = useState<string>("");
 
-  const fetchModelConfigs = async () => {
+  const fetchAndUpdateModelConfigs = async () => {
     try {
-      const configs = await window.electronStore.getLLMConfigs();
-      setModelConfigs(configs);
-      if (configs !== modelConfigs && Object.keys(modelConfigs).length > 0) {
+      const fetchedLLMConfigs = await window.electronStore.getLLMConfigs();
+      setLLMConfigs(fetchedLLMConfigs);
+      if (fetchedLLMConfigs !== llmConfigs && llmConfigs.length > 0) {
         setUserMadeChanges(true);
       }
-      const defaultModelName = await window.electronStore.getDefaultLLM();
+      const defaultModelName = await window.electronStore.getDefaultLLMName();
 
       setDefaultModel(defaultModelName);
     } catch (error) {
@@ -53,13 +47,8 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
   };
 
   useEffect(() => {
-    fetchModelConfigs();
-  }, [
-    isConextLengthModalOpen,
-    isNewLocalModelModalOpen,
-    isRemoteLLMModalOpen,
-    isOpenAIModelModalOpen,
-  ]);
+    fetchAndUpdateModelConfigs();
+  }, [isNewLocalModelModalOpen, isRemoteLLMModalOpen, isOpenAIModelModalOpen]);
 
   useEffect(() => {
     // this condition may in fact be less necessary: no need for the user to use chatbot...
@@ -86,22 +75,18 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
     window.electronStore.setDefaultLLM(selectedModel);
   };
 
-  const handleDeleteModel = async (selectedModel: string) => {
-    const configs = await window.electronStore.getLLMConfigs();
-    fetchModelConfigs();
-    await window.electronStore.deleteLocalLLM(
-      selectedModel,
-      configs[selectedModel]
-    );
-    const configsAfter = await window.electronStore.getLLMConfigs();
-    setModelConfigs(configsAfter);
+  const handleDeleteModel = async (modelToDelete: string) => {
+    await window.electronStore.deleteLocalLLM(modelToDelete);
+    fetchAndUpdateModelConfigs();
   };
 
-  const modelOptions = Object.keys(modelConfigs).map((key) => ({
-    label: key, // Assuming displayName exists in AIModelConfig
-    value: key,
-  }));
-
+  const modelOptions = llmConfigs.map((config) => {
+    return {
+      label: config.modelName,
+      value: config.modelName,
+    };
+  });
+  console.log("modelOptions: ", modelOptions);
   return (
     <div className="w-full bg-gray-800 rounded">
       {isInitialSetup ? (
@@ -131,7 +116,7 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
               Connect to OpenAI
             </Button>
           </div>
-          {Object.keys(modelConfigs).length > 0 && (
+          {llmConfigs.length > 0 && (
             <div>
               <h4 className="text-gray-100 mb-1">Default LLM:</h4>
               <div className="w-full mb-1">
@@ -147,7 +132,7 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
       ) : (
         <div>
           <h2 className="font-semibold mb-4 text-white">LLM</h2>
-          {Object.keys(modelConfigs).length > 0 && (
+          {llmConfigs.length > 0 && (
             <div>
               <h4 className="text-gray-100 mb-1">Default LLM:</h4>
               <div className="w-full mb-1">
@@ -171,13 +156,13 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
             >
               Add New Local LLM
             </Button>
-            <Button
+            {/* <Button
               className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
               onClick={() => setIsContextLengthModalOpen(true)}
               placeholder={""}
             >
               Context Length Settings
-            </Button>
+            </Button> */}
           </div>
           <h4 className="text-gray-100 mb-0">Setup remote LLMs:</h4>
           <div className="flex">
@@ -211,13 +196,13 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
           setIsRemoteLLMModalOpen(false);
         }}
       />
-      <ContextLengthModal
+      {/* <ContextLengthModal
         isOpen={isConextLengthModalOpen}
         onClose={() => {
           setIsContextLengthModalOpen(false);
         }}
-        modelConfigs={modelConfigs}
-      />
+        modelConfigs={llmConfigs}
+      /> */}
       <OpenAISetupModal
         isOpen={isOpenAIModelModalOpen}
         onClose={() => {
