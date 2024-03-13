@@ -99,10 +99,8 @@ async function createWindow() {
     return { action: "deny" };
   });
 
-  win.on("close", (event) => {
+  win.on("close", () => {
     win.webContents.send("prepare-for-window-close");
-
-    event.preventDefault(); // this actually stops the hot reload from working. comment it out if you want hot reload
 
     // Get the directory for this window's contents
     const directoryToSave = getVaultDirectoryForWinContents(
@@ -117,7 +115,6 @@ async function createWindow() {
     }
     ipcMain.on("destroy-window", () => {
       console.log("EVERTYHING HAS BEEN SAVED");
-      win.destroy();
     });
   });
 
