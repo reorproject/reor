@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FileSidebar } from "../File/FileSidebar";
+import { FileSidebar } from "../File/FileSideBar";
 import SearchComponent from "./FileSidebarSearch";
 import { DBQueryResult } from "electron/main/database/Schema";
 
@@ -21,7 +21,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
     <div className="w-full">
       {sidebarShowing === "files" && (
         <FileSidebar
-          selectedFile={selectedFilePath}
+          selectedFilePath={selectedFilePath}
           onFileSelect={onFileSelect}
         />
       )}
