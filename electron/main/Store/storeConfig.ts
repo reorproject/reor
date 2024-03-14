@@ -23,6 +23,10 @@ export type LLMGenerationParameters = {
   temperature?: number;
 };
 
+export type EmbeddingModelConfig =
+  | EmbeddingModelWithRepo
+  | EmbeddingModelWithLocalPath;
+
 export interface EmbeddingModelWithRepo {
   type: "repo";
   repoName: string;
@@ -32,11 +36,6 @@ export interface EmbeddingModelWithLocalPath {
   type: "local";
   localPath: string;
 }
-
-export type EmbeddingModelConfig =
-  | EmbeddingModelWithRepo
-  | EmbeddingModelWithLocalPath;
-
 export type RAGConfig = {
   maxRAGExamples: number;
 };

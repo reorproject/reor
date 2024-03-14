@@ -70,10 +70,6 @@ declare global {
       basename: (pathString: string) => string;
     };
     llm: {
-      createSession: (sessionId: string) => Promise<string>;
-      doesSessionExist: (sessionId: string) => Promise<boolean>;
-      deleteSession: (sessionId: string) => Promise<string>;
-      getOrCreateSession: (sessionId: string) => Promise<string>;
       streamingLLMResponse: (
         llmName: string,
         llmConfig: LLMConfig,
@@ -85,7 +81,6 @@ declare global {
       getUserDirectory: () => string;
       getLLMConfigs: () => Promise<LLMConfig[]>;
       getLLMConfigByName: (modelName: string) => LLMConfig;
-      updateLLMConfig: (modelConfig: LLMConfig) => Promise<void>;
       addOrUpdateLLM: (modelConfig: LLMConfig) => Promise<void>;
       deleteLocalLLM: (modelNameToDelete: string) => Promise<void>;
       setDefaultLLM: (modelName: string) => void;
@@ -156,9 +151,6 @@ contextBridge.exposeInMainWorld("electronStore", {
   },
   getLLMConfigByName: (modelName: string) => {
     return ipcRenderer.sendSync("get-llm-config-by-name", modelName);
-  },
-  updateLLMConfig: async (modelConfig: LLMConfig) => {
-    return ipcRenderer.invoke("update-llm-config", modelConfig);
   },
   addOrUpdateLLM: async (modelConfig: LLMConfig) => {
     return ipcRenderer.invoke("add-or-update-llm", modelConfig);
@@ -283,18 +275,6 @@ contextBridge.exposeInMainWorld("path", {
 });
 
 contextBridge.exposeInMainWorld("llm", {
-  createSession: async (sessionId: string) => {
-    return await ipcRenderer.invoke("create-session", sessionId);
-  },
-  doesSessionExist: async (sessionId: string) => {
-    return await ipcRenderer.invoke("does-session-exist", sessionId);
-  },
-  deleteSession: async (sessionId: string) => {
-    return await ipcRenderer.invoke("delete-session", sessionId);
-  },
-  getOrCreateSession: async (sessionId: string) => {
-    return await ipcRenderer.invoke("get-or-create-session", sessionId);
-  },
   streamingLLMResponse: async (
     llmName: string,
     llmConfig: LLMConfig,

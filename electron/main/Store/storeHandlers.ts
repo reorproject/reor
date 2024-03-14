@@ -131,22 +131,6 @@ export const registerStoreHandlers = (
     return llmConfig;
   });
 
-  ipcMain.handle("update-llm-config", (event, config: LLMConfig) => {
-    const currentConfigs = store.get(StoreKeys.LLMs);
-    const index = currentConfigs.findIndex(
-      (c) => c.modelName === config.modelName
-    );
-
-    if (index > -1) {
-      // If found, replace the existing config
-      currentConfigs[index] = config;
-    } else {
-      // If not found, add the new config to the list
-      currentConfigs.push(config);
-    }
-    store.set(StoreKeys.LLMs, currentConfigs);
-  });
-
   ipcMain.handle("add-or-update-llm", async (event, modelConfig: LLMConfig) => {
     console.log("setting up new local model", modelConfig);
     await addOrUpdateLLMSchemaInStore(store, modelConfig);
