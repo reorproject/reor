@@ -95,6 +95,18 @@ class WindowsManager {
     store.set(StoreKeys.DirectoryFromPreviousSession, directory);
   }
 
+  prepareWindowForClose(store: Store<StoreSchema>, win: BrowserWindow) {
+    const directoryToSave = this.getVaultDirectoryForWinContents(
+      win.webContents
+    );
+
+    // Save the directory if found
+    if (directoryToSave) {
+      store.set(StoreKeys.DirectoryFromPreviousSession, directoryToSave);
+      this.removeActiveWindowByDirectory(directoryToSave);
+    }
+  }
+
   removeActiveWindowByDirectory(directory: string): void {
     this.activeWindows = this.activeWindows.filter(
       (w) => w.vaultDirectoryForWindow !== directory

@@ -12,7 +12,7 @@ import { join } from "node:path";
 import { update } from "./update";
 import Store from "electron-store";
 import * as path from "path";
-import { StoreKeys, StoreSchema } from "./Store/storeConfig";
+import { StoreSchema } from "./Store/storeConfig";
 // import contextMenus from "./contextMenus";
 import * as lancedb from "vectordb";
 import {
@@ -97,17 +97,7 @@ async function createWindow() {
   win.on("close", () => {
     win.webContents.send("prepare-for-window-close");
 
-    // Get the directory for this window's contents
-    const directoryToSave = windowsManager.getVaultDirectoryForWinContents(
-      win.webContents
-    );
-
-    // Save the directory if found
-    if (directoryToSave) {
-      console.log("Saving directory for window:", directoryToSave);
-      store.set(StoreKeys.DirectoryFromPreviousSession, directoryToSave);
-      windowsManager.removeActiveWindowByDirectory(directoryToSave);
-    }
+    windowsManager.prepareWindowForClose(store, win);
   });
 
   if (windowsManager.activeWindows.length <= 0) {
