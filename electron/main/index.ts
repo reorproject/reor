@@ -28,17 +28,12 @@ import {
 } from "./Store/storeHandlers";
 import { registerFileHandlers } from "./Files/registerFilesHandler";
 import { RepopulateTableWithMissingItems } from "./database/TableHelperFunctions";
-import {
-  getVaultDirectoryForWinContents,
-  getWindowInfoForContents,
-  activeWindows,
-  getNextWindowPosition,
-  getWindowSize,
-} from "./windowManager";
+import WindowsManager from "./windowManager";
 import { errorToString } from "./Generic/error";
 
 const store = new Store<StoreSchema>();
 // store.clear(); // clear store for testing
+const windowsManager = new WindowsManager();
 
 process.env.DIST_ELECTRON = join(__dirname, "../");
 process.env.DIST = join(process.env.DIST_ELECTRON, "../dist");
@@ -64,8 +59,8 @@ const indexHtml = join(process.env.DIST, "index.html");
 let dbConnection: lancedb.Connection;
 
 async function createWindow() {
-  const { x, y } = getNextWindowPosition();
-  const { width, height } = getWindowSize();
+  const { x, y } = windowsManager.getNextWindowPosition();
+  const { width, height } = windowsManager.getWindowSize();
   const win = new BrowserWindow({
     title: "Reor",
     x: x,
@@ -103,8 +98,7 @@ async function createWindow() {
     win.webContents.send("prepare-for-window-close");
 
     // Get the directory for this window's contents
-    const directoryToSave = getVaultDirectoryForWinContents(
-      activeWindows,
+    const directoryToSave = windowsManager.getVaultDirectoryForWinContents(
       win.webContents
     );
 
@@ -112,18 +106,19 @@ async function createWindow() {
     if (directoryToSave) {
       console.log("Saving directory for window:", directoryToSave);
       store.set(StoreKeys.DirectoryFromPreviousSession, directoryToSave);
+      // windowsManager.removeWindow(directoryToSave);
+      // activeWindows = activeWindows.filter(
+      //   (w) => w.vaultDirectoryForWindow !== directoryToSave
+      // );
     }
-    ipcMain.on("destroy-window", () => {
-      console.log("EVERTYHING HAS BEEN SAVED");
-    });
   });
 
-  if (activeWindows.length <= 0) {
+  if (windowsManager.activeWindows.length <= 0) {
     update(win);
     registerLLMSessionHandlers(store);
-    registerDBSessionHandlers(store);
-    registerStoreHandlers(store);
-    registerFileHandlers();
+    registerDBSessionHandlers(store, windowsManager);
+    registerStoreHandlers(store, windowsManager);
+    registerFileHandlers(windowsManager);
   }
 }
 
@@ -183,7 +178,7 @@ ipcMain.handle("open-file-dialog", async (event, extensions) => {
 ipcMain.on("index-files-in-directory", async (event) => {
   try {
     console.log("Indexing files in directory");
-    const windowInfo = getWindowInfoForContents(activeWindows, event.sender);
+    const windowInfo = windowsManager.getWindowInfoForContents(event.sender);
     if (!windowInfo) {
       throw new Error("No window info found");
     }

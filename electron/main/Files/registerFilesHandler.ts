@@ -12,18 +12,14 @@ import {
 } from "./Filesystem";
 import * as fs from "fs";
 import { updateFileInTable } from "../database/TableHelperFunctions";
-import {
-  getVaultDirectoryForWinContents,
-  getWindowInfoForContents,
-  activeWindows,
-} from "../windowManager";
 import { LLMSessions } from "../llm/llmSessionHandlers";
 import {
   PromptWithContextLimit,
   createPromptWithContextLimitFromContent,
 } from "../Prompts/Prompts";
+import WindowsManager from "../windowManager";
 
-export const registerFileHandlers = () => {
+export const registerFileHandlers = (windowsManager: WindowsManager) => {
   ipcMain.handle("join-path", (event, ...args) => {
     return path.join(...args);
   });
@@ -31,8 +27,7 @@ export const registerFileHandlers = () => {
   ipcMain.handle(
     "get-files-for-window",
     async (event): Promise<FileInfoTree> => {
-      const directoryPath = getVaultDirectoryForWinContents(
-        activeWindows,
+      const directoryPath = windowsManager.getVaultDirectoryForWinContents(
         event.sender
       );
       if (!directoryPath) return [];
@@ -69,8 +64,7 @@ export const registerFileHandlers = () => {
             console.log(`Directory at ${filePath} was deleted successfully.`);
           });
 
-          const windowInfo = getWindowInfoForContents(
-            activeWindows,
+          const windowInfo = windowsManager.getWindowInfoForContents(
             event.sender
           );
           if (!windowInfo) {
@@ -86,8 +80,7 @@ export const registerFileHandlers = () => {
             console.log(`File at ${filePath} was deleted successfully.`);
           });
 
-          const windowInfo = getWindowInfoForContents(
-            activeWindows,
+          const windowInfo = windowsManager.getWindowInfoForContents(
             event.sender
           );
           if (!windowInfo) {
@@ -111,7 +104,7 @@ export const registerFileHandlers = () => {
   );
 
   ipcMain.handle("index-file-in-database", async (event, filePath: string) => {
-    const windowInfo = getWindowInfoForContents(activeWindows, event.sender);
+    const windowInfo = windowsManager.getWindowInfoForContents(event.sender);
     if (!windowInfo) {
       throw new Error("Window info not found.");
     }
@@ -152,7 +145,7 @@ export const registerFileHandlers = () => {
   ipcMain.handle(
     "move-file-or-dir",
     async (event, sourcePath: string, destinationPath: string) => {
-      const windowInfo = getWindowInfoForContents(activeWindows, event.sender);
+      const windowInfo = windowsManager.getWindowInfoForContents(event.sender);
       if (!windowInfo) {
         throw new Error("Window info not found.");
       }
