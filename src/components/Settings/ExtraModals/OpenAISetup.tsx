@@ -17,10 +17,10 @@ const OpenAISetupModal: React.FC<OpenAISetupModalProps> = ({
   const handleSave = () => {
     if (openAIKey) {
       openAIDefaultModels.forEach((modelConfig) => {
-        window.electronStore.addOrUpdateLLM(modelConfig);
+        window.llm.addOrUpdateLLM(modelConfig);
       });
       if (openAIDefaultModels.length > 0) {
-        window.electronStore.setDefaultLLM(openAIDefaultModels[0].modelName);
+        window.llm.setDefaultLLM(openAIDefaultModels[0].modelName);
       }
     }
 

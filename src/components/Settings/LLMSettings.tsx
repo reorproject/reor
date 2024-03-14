@@ -33,12 +33,12 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
 
   const fetchAndUpdateModelConfigs = async () => {
     try {
-      const fetchedLLMConfigs = await window.electronStore.getLLMConfigs();
+      const fetchedLLMConfigs = await window.llm.getLLMConfigs();
       setLLMConfigs(fetchedLLMConfigs);
       if (fetchedLLMConfigs !== llmConfigs && llmConfigs.length > 0) {
         setUserMadeChanges(true);
       }
-      const defaultModelName = await window.electronStore.getDefaultLLMName();
+      const defaultModelName = await window.llm.getDefaultLLMName();
 
       setDefaultModel(defaultModelName);
     } catch (error) {
@@ -72,11 +72,11 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
   const handleDefaultModelChange = (selectedModel: string) => {
     setDefaultModel(selectedModel);
     setUserMadeChanges(true);
-    window.electronStore.setDefaultLLM(selectedModel);
+    window.llm.setDefaultLLM(selectedModel);
   };
 
   const handleDeleteModel = async (modelToDelete: string) => {
-    await window.electronStore.deleteLocalLLM(modelToDelete);
+    await window.llm.deleteLocalLLM(modelToDelete);
     fetchAndUpdateModelConfigs();
   };
 

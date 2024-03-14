@@ -25,8 +25,13 @@ export class OllamaService implements LLMSessionService {
     // this.client = new ollama.Client();
   }
 
-  public initClient = async () => {
+  public init = async () => {
     console.log("Initializing Ollama client...");
+    try {
+      this.serve();
+    } catch (e) {
+      console.error("Error starting Ollama server: ", e);
+    }
     this.client = await import("ollama");
     console.log("Ollama client: ", this.client);
     // const models = await this.client.default.list();
@@ -35,7 +40,7 @@ export class OllamaService implements LLMSessionService {
     // console.log("Ollama models: ", lists);
   };
 
-  public serve = async () => {
+  private serve = async () => {
     let exePath: string;
     let exeName: string;
     switch (process.platform) {

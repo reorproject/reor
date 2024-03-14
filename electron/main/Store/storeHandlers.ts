@@ -113,37 +113,6 @@ export const registerStoreHandlers = (
     event.returnValue = store.get(StoreKeys.MaxRAGExamples);
   });
 
-  ipcMain.on("set-default-llm", (event, modelName: string) => {
-    store.set(StoreKeys.DefaultLLM, modelName);
-  });
-
-  ipcMain.on("get-default-llm-name", (event) => {
-    event.returnValue = store.get(StoreKeys.DefaultLLM);
-  });
-
-  ipcMain.handle("get-llm-configs", () => {
-    const aiModelConfigs = store.get(StoreKeys.LLMs);
-    return aiModelConfigs || {};
-  });
-
-  ipcMain.handle("get-llm-config-by-name", (event, modelName: string) => {
-    const llmConfig = getLLMConfig(store, modelName);
-    return llmConfig;
-  });
-
-  ipcMain.handle("add-or-update-llm", async (event, modelConfig: LLMConfig) => {
-    console.log("setting up new local model", modelConfig);
-    await addOrUpdateLLMSchemaInStore(store, modelConfig);
-  });
-
-  ipcMain.handle(
-    "delete-local-llm",
-    async (event, modelNameToDelete: string) => {
-      console.log("deleting local model", modelNameToDelete);
-      return await deleteLLMSchemafromStore(store, modelNameToDelete);
-    }
-  );
-
   ipcMain.on("get-default-embedding-model", (event) => {
     event.returnValue = store.get(StoreKeys.DefaultEmbeddingModelAlias);
   });

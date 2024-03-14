@@ -75,16 +75,16 @@ declare global {
         llmConfig: LLMConfig,
         messageHistory: ChatCompletionMessageParam[]
       ) => Promise<string>;
-    };
-    electronStore: {
-      setUserDirectory: (path: string) => Promise<void>;
-      getUserDirectory: () => string;
       getLLMConfigs: () => Promise<LLMConfig[]>;
       getLLMConfigByName: (modelName: string) => LLMConfig;
       addOrUpdateLLM: (modelConfig: LLMConfig) => Promise<void>;
       deleteLocalLLM: (modelNameToDelete: string) => Promise<void>;
       setDefaultLLM: (modelName: string) => void;
       getDefaultLLMName: () => string;
+    };
+    electronStore: {
+      setUserDirectory: (path: string) => Promise<void>;
+      getUserDirectory: () => string;
       getDefaultEmbeddingModel: () => string;
       setDefaultEmbeddingModel: (repoName: string) => void;
       addNewLocalEmbeddingModel: (model: EmbeddingModelWithLocalPath) => void;
@@ -145,25 +145,6 @@ contextBridge.exposeInMainWorld("electronStore", {
   },
   getUserDirectory: () => {
     return ipcRenderer.sendSync("get-user-directory");
-  },
-  getLLMConfigs: async (): Promise<LLMConfig[]> => {
-    return ipcRenderer.invoke("get-llm-configs");
-  },
-  getLLMConfigByName: (modelName: string) => {
-    return ipcRenderer.sendSync("get-llm-config-by-name", modelName);
-  },
-  addOrUpdateLLM: async (modelConfig: LLMConfig) => {
-    return ipcRenderer.invoke("add-or-update-llm", modelConfig);
-  },
-  deleteLocalLLM: async (modelNameToDelete: string) => {
-    return ipcRenderer.invoke("delete-local-llm", modelNameToDelete);
-  },
-  setDefaultLLM: (modelName: string) => {
-    ipcRenderer.send("set-default-llm", modelName);
-  },
-
-  getDefaultLLMName: () => {
-    return ipcRenderer.sendSync("get-default-llm-name");
   },
 
   getDefaultEmbeddingModel: () => {
@@ -286,5 +267,25 @@ contextBridge.exposeInMainWorld("llm", {
       llmConfig,
       messageHistory
     );
+  },
+  getLLMConfigs: async (): Promise<LLMConfig[]> => {
+    console.log("INVOKING HERE");
+    return ipcRenderer.invoke("get-llm-configs");
+  },
+  getLLMConfigByName: (modelName: string) => {
+    return ipcRenderer.sendSync("get-llm-config-by-name", modelName);
+  },
+  addOrUpdateLLM: async (modelConfig: LLMConfig) => {
+    return ipcRenderer.invoke("add-or-update-llm", modelConfig);
+  },
+  deleteLocalLLM: async (modelNameToDelete: string) => {
+    return ipcRenderer.invoke("delete-local-llm", modelNameToDelete);
+  },
+  setDefaultLLM: (modelName: string) => {
+    ipcRenderer.send("set-default-llm", modelName);
+  },
+
+  getDefaultLLMName: () => {
+    return ipcRenderer.sendSync("get-default-llm-name");
   },
 });

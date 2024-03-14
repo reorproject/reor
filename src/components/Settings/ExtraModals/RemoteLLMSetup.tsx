@@ -42,7 +42,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
       engine: "openai",
     };
     try {
-      await window.electronStore.addOrUpdateLLM(modelConfig);
+      await window.llm.addOrUpdateLLM(modelConfig);
       parentOnClose();
     } catch (error) {
       console.error("Failed to save remote model configuration:", error);
