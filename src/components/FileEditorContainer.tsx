@@ -59,7 +59,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         {filePath && (
           <div className="w-full h-full flex overflow-x-hidden">
             <div className="w-full flex h-full">
-              <div className="h-full w-full overflow-y-auto">
+              <div
+                className="h-full w-full overflow-y-auto cursor-text"
+                onClick={() => editor?.commands.focus()}
+              >
                 <EditorContent
                   style={{ wordBreak: "break-word" }}
                   editor={editor}

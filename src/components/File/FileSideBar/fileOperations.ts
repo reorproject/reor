@@ -1,7 +1,8 @@
 import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
 
 export const sortFilesAndDirectories = (
-  fileList: FileInfoTree
+  fileList: FileInfoTree,
+  currentFilePath: string | null
 ): FileInfoTree => {
   fileList.sort((a, b) => {
     const aIsDirectory = isFileNodeDirectory(a);
@@ -20,6 +21,16 @@ export const sortFilesAndDirectories = (
       return 1;
     }
 
+    // if current file path is not null and one of the files is the current file path, then it should be sorted as the first file after all directories
+    if (currentFilePath !== null) {
+      if (a.path === currentFilePath) {
+        return -1;
+      }
+      if (b.path === currentFilePath) {
+        return 1;
+      }
+    }
+
     // Both are files: sort by dateModified
     return b.dateModified.getTime() - a.dateModified.getTime();
   });
@@ -27,7 +38,7 @@ export const sortFilesAndDirectories = (
   fileList.forEach((fileInfoNode) => {
     // If a node has children, sort them recursively
     if (fileInfoNode.children && fileInfoNode.children.length > 0) {
-      sortFilesAndDirectories(fileInfoNode.children);
+      sortFilesAndDirectories(fileInfoNode.children, currentFilePath);
     }
   });
 
@@ -36,4 +47,8 @@ export const sortFilesAndDirectories = (
 
 export const isFileNodeDirectory = (fileInfo: FileInfoNode): boolean => {
   return fileInfo.children !== undefined;
+};
+
+export const moveFile = async (sourcePath: string, destinationPath: string) => {
+  await window.files.moveFileOrDir(sourcePath, destinationPath);
 };
