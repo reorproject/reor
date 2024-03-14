@@ -95,6 +95,12 @@ class WindowsManager {
     store.set(StoreKeys.DirectoryFromPreviousSession, directory);
   }
 
+  removeActiveWindowByDirectory(directory: string): void {
+    this.activeWindows = this.activeWindows.filter(
+      (w) => w.vaultDirectoryForWindow !== directory
+    );
+  }
+
   getNextWindowPosition(): { x: number | undefined; y: number | undefined } {
     const windowOffset = 30; // Offset for each new window
     const focusedWin = BrowserWindow.getFocusedWindow();

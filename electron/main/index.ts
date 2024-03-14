@@ -106,10 +106,7 @@ async function createWindow() {
     if (directoryToSave) {
       console.log("Saving directory for window:", directoryToSave);
       store.set(StoreKeys.DirectoryFromPreviousSession, directoryToSave);
-      // windowsManager.removeWindow(directoryToSave);
-      // activeWindows = activeWindows.filter(
-      //   (w) => w.vaultDirectoryForWindow !== directoryToSave
-      // );
+      windowsManager.removeActiveWindowByDirectory(directoryToSave);
     }
   });
 
