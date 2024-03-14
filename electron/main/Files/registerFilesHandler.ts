@@ -17,14 +17,14 @@ import {
   getWindowInfoForContents,
   activeWindows,
 } from "../windowManager";
-import { openAISession } from "../llm/llmSessionHandlers";
+import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
 import {
   PromptWithContextLimit,
   createPromptWithContextLimitFromContent,
 } from "../Prompts/Prompts";
 import Store from "electron-store";
 import { StoreSchema } from "../Store/storeConfig";
-import { getLLMConfig } from "../Store/storeHandlers";
+import { getLLMConfig } from "../llm/llmConfig";
 
 export const registerFileHandlers = (store: Store<StoreSchema>) => {
   ipcMain.handle("join-path", (event, ...args) => {
@@ -127,7 +127,7 @@ export const registerFileHandlers = (store: Store<StoreSchema>) => {
         const content = fs.readFileSync(filePath, "utf-8");
 
         const llmSession = openAISession;
-        const llmConfig = getLLMConfig(store, llmName);
+        const llmConfig = await getLLMConfig(store, ollamaService, llmName);
         if (!llmConfig) {
           throw new Error(`LLM ${llmName} not configured.`);
         }

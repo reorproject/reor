@@ -3,12 +3,10 @@ import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
-  LLMConfig,
   StoreKeys,
   StoreSchema,
 } from "../Store/storeConfig";
 import Store from "electron-store";
-import { validateAIModelConfig } from "../llm/llmConfig";
 import {
   setupDirectoryFromPreviousSessionIfUnused,
   getVaultDirectoryForContents,
@@ -138,60 +136,6 @@ export const registerStoreHandlers = (
     event.returnValue = store.get(StoreKeys.LLMGenerationParameters);
   });
 };
-
-export async function addOrUpdateLLMSchemaInStore(
-  store: Store<StoreSchema>,
-  modelConfig: LLMConfig
-): Promise<void> {
-  const existingModels = (store.get(StoreKeys.LLMs) as LLMConfig[]) || [];
-
-  const isNotValid = validateAIModelConfig(modelConfig);
-  if (isNotValid) {
-    throw new Error(isNotValid);
-  }
-
-  const foundModel = getLLMConfig(store, modelConfig.modelName);
-
-  if (foundModel) {
-    const updatedModels = existingModels.map((model) =>
-      model.modelName === modelConfig.modelName ? modelConfig : model
-    );
-    store.set(StoreKeys.LLMs, updatedModels);
-  } else {
-    const updatedModels = [...existingModels, modelConfig];
-    store.set(StoreKeys.LLMs, updatedModels);
-  }
-}
-
-export async function deleteLLMSchemafromStore(
-  store: Store<StoreSchema>,
-  modelName: string
-): Promise<void> {
-  const existingModels = (store.get(StoreKeys.LLMs) as LLMConfig[]) || [];
-
-  const foundModel = getLLMConfig(store, modelName);
-
-  if (!foundModel) {
-    return;
-  }
-
-  const updatedModels = existingModels.filter(
-    (model) => model.modelName !== modelName
-  );
-  store.set(StoreKeys.LLMs, updatedModels);
-}
-
-export function getLLMConfig(
-  store: Store<StoreSchema>,
-  modelName: string
-): LLMConfig | undefined {
-  const llmConfigs = store.get(StoreKeys.LLMs);
-  console.log("llmConfigs: ", llmConfigs);
-  if (llmConfigs) {
-    return llmConfigs.find((model: LLMConfig) => model.modelName === modelName);
-  }
-  return undefined;
-}
 
 export function getDefaultEmbeddingModelConfig(
   store: Store<StoreSchema>

@@ -1,4 +1,6 @@
-import { LLMConfig } from "../Store/storeConfig";
+import Store from "electron-store";
+import { LLMConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
+import { OllamaService } from "./models/Ollama";
 
 export function validateAIModelConfig(config: LLMConfig): string | null {
   // Validate localPath: ensure it's not empty
@@ -29,4 +31,74 @@ export function validateAIModelConfig(config: LLMConfig): string | null {
   }
 
   return null;
+}
+
+export async function addOrUpdateLLMSchemaInStore(
+  store: Store<StoreSchema>,
+  modelConfig: LLMConfig
+): Promise<void> {
+  const existingModels = (store.get(StoreKeys.LLMs) as LLMConfig[]) || [];
+  console.log("existingModels: ", existingModels);
+  const isNotValid = validateAIModelConfig(modelConfig);
+  if (isNotValid) {
+    throw new Error(isNotValid);
+  }
+
+  // so here, we'd actually need to call the ollamaService to actually setup the model.
+  // but for now, we can just do it manually - which means we probably don't want to call this for now.
+  // yes because adding in this config will interfere with our actual setp
+
+  // const foundModel = getLLMConfig(store, ollamaService, modelConfig.modelName);
+
+  // if (foundModel) {
+  //   const updatedModels = existingModels.map((model) =>
+  //     model.modelName === modelConfig.modelName ? modelConfig : model
+  //   );
+  //   store.set(StoreKeys.LLMs, updatedModels);
+  // } else {
+  //   const updatedModels = [...existingModels, modelConfig];
+  //   store.set(StoreKeys.LLMs, updatedModels);
+  // }
+}
+
+export async function deleteLLMSchemafromStore(
+  store: Store<StoreSchema>,
+  ollamaService: OllamaService,
+  modelName: string
+): Promise<void> {
+  const existingModels = (store.get(StoreKeys.LLMs) as LLMConfig[]) || [];
+
+  const foundModel = await getLLMConfig(store, ollamaService, modelName);
+
+  if (!foundModel) {
+    return;
+  }
+
+  const updatedModels = existingModels.filter(
+    (model) => model.modelName !== modelName
+  );
+  store.set(StoreKeys.LLMs, updatedModels);
+}
+
+export async function getAllLLMConfigs(
+  store: Store<StoreSchema>,
+  ollamaSession: OllamaService
+): Promise<LLMConfig[]> {
+  const llmConfigsFromStore = store.get(StoreKeys.LLMs);
+  const ollamaLLMConfigs = await ollamaSession.getAvailableModels();
+
+  return [...llmConfigsFromStore, ...ollamaLLMConfigs];
+}
+
+export async function getLLMConfig(
+  store: Store<StoreSchema>,
+  ollamaSession: OllamaService,
+  modelName: string
+): Promise<LLMConfig | undefined> {
+  const llmConfigs = await getAllLLMConfigs(store, ollamaSession);
+  console.log("llmConfigs: ", llmConfigs);
+  if (llmConfigs) {
+    return llmConfigs.find((model: LLMConfig) => model.modelName === modelName);
+  }
+  return undefined;
 }

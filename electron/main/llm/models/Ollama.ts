@@ -84,15 +84,16 @@ export class OllamaService implements LLMSessionService {
     });
   };
 
-  public getAvailableModels = async (): Promise<OpenAILLMConfig> => {
+  public getAvailableModels = async (): Promise<OpenAILLMConfig[]> => {
     const ollamaModelsResponse = await this.client.default.list();
 
     const output = ollamaModelsResponse.models.map((model: ModelResponse) => {
       return {
+        modelName: model.name,
         type: "openai",
-        contextLength: 2048,
+        contextLength: 4096,
         engine: "openai",
-        apiURL: "http://127.0.0.1:11434",
+        apiURL: "http://localhost:11434/v1/",
       };
     });
     return output;

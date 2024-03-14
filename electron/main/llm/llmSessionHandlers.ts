@@ -11,21 +11,19 @@ import { OllamaService } from "./models/Ollama";
 import {
   addOrUpdateLLMSchemaInStore,
   deleteLLMSchemafromStore,
+  getAllLLMConfigs,
   getLLMConfig,
-} from "../Store/storeHandlers";
+} from "./llmConfig";
 
 export const LLMSessions: { [sessionId: string]: LLMSessionService } = {};
 
 export const openAISession = new OpenAIModelSessionService();
 
-export const ollamaSession = new OllamaService();
-
-console.log("process.resourcesPath: ", process.resourcesPath);
+export const ollamaService = new OllamaService();
 
 export const registerLLMSessionHandlers = async (store: Store<StoreSchema>) => {
-  await ollamaSession.init();
-  const ollamaModels = await ollamaSession.getAvailableModels();
-  console.log("OLLAMA MODELS: ", ollamaModels);
+  await ollamaService.init();
+
   ipcMain.handle(
     "streaming-llm-response",
     async (
@@ -58,13 +56,12 @@ export const registerLLMSessionHandlers = async (store: Store<StoreSchema>) => {
     event.returnValue = store.get(StoreKeys.DefaultLLM);
   });
 
-  ipcMain.handle("get-llm-configs", () => {
-    const aiModelConfigs = store.get(StoreKeys.LLMs);
-    return aiModelConfigs || {};
+  ipcMain.handle("get-llm-configs", async () => {
+    return await getAllLLMConfigs(store, ollamaService);
   });
 
   ipcMain.handle("get-llm-config-by-name", (event, modelName: string) => {
-    const llmConfig = getLLMConfig(store, modelName);
+    const llmConfig = getLLMConfig(store, ollamaService, modelName);
     return llmConfig;
   });
 
@@ -77,7 +74,11 @@ export const registerLLMSessionHandlers = async (store: Store<StoreSchema>) => {
     "delete-local-llm",
     async (event, modelNameToDelete: string) => {
       console.log("deleting local model", modelNameToDelete);
-      return await deleteLLMSchemafromStore(store, modelNameToDelete);
+      return await deleteLLMSchemafromStore(
+        store,
+        ollamaService,
+        modelNameToDelete
+      );
     }
   );
 };
