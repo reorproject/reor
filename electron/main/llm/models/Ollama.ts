@@ -14,11 +14,11 @@ import * as path from "path";
 import * as os from "os";
 import { spawn } from "child_process";
 // import ollama,"ollama";
-import { ModelResponse } from "ollama";
+import { ModelResponse, ProgressResponse, Ollama } from "ollama";
 
 export class OllamaService implements LLMSessionService {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private client!: any;
+  private client!: Ollama;
 
   constructor() {
     // this.client = await import("ollama");
@@ -32,7 +32,8 @@ export class OllamaService implements LLMSessionService {
     } catch (e) {
       console.error("Error starting Ollama server: ", e);
     }
-    this.client = await import("ollama");
+    const ollamaLib = await import("ollama");
+    this.client = new ollamaLib.Ollama();
     console.log("Ollama client: ", this.client);
     // const models = await this.client.default.list();
     // console.log("Ollama models: ", models);
@@ -85,18 +86,34 @@ export class OllamaService implements LLMSessionService {
   };
 
   public getAvailableModels = async (): Promise<OpenAILLMConfig[]> => {
-    const ollamaModelsResponse = await this.client.default.list();
+    const ollamaModelsResponse = await this.client.list();
 
-    const output = ollamaModelsResponse.models.map((model: ModelResponse) => {
-      return {
-        modelName: model.name,
-        type: "openai",
-        contextLength: 4096,
-        engine: "openai",
-        apiURL: "http://localhost:11434/v1/",
-      };
-    });
+    const output = ollamaModelsResponse.models.map(
+      (model: ModelResponse): OpenAILLMConfig => {
+        return {
+          modelName: model.name,
+          type: "openai",
+          apiKey: "",
+          contextLength: 4096,
+          engine: "openai",
+          apiURL: "http://localhost:11434/v1/",
+        };
+      }
+    );
     return output;
+  };
+
+  public pullModel = async (
+    modelName: string,
+    handleProgress: (chunk: ProgressResponse) => void
+  ): Promise<void> => {
+    const stream = await this.client.pull({
+      model: modelName,
+      stream: true,
+    });
+    for await (const progress of stream) {
+      handleProgress(progress);
+    }
   };
 
   public getTokenizer = (llmName: string): ((text: string) => number[]) => {

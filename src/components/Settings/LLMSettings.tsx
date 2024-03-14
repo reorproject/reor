@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { LLMConfig } from "electron/main/Store/storeConfig";
 import CustomSelect from "../Generic/Select";
 import { Button } from "@material-tailwind/react";
-import LocalModelModal from "./ExtraModals/NewLocalModel";
 import OpenAISetupModal from "./ExtraModals/OpenAISetup";
 import RemoteLLMSetupModal from "./ExtraModals/RemoteLLMSetup";
+import NewOllamaModelModal from "./ExtraModals/NewOllamaModel";
 
 interface LLMSettingsProps {
   userHasCompleted?: (completed: boolean) => void;
@@ -184,7 +184,7 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
         </div>
       )}
 
-      <LocalModelModal
+      <NewOllamaModelModal
         isOpen={isNewLocalModelModalOpen}
         onClose={() => {
           setIsNewLocalModelModalOpen(false);

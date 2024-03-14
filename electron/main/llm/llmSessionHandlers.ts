@@ -14,6 +14,7 @@ import {
   getAllLLMConfigs,
   getLLMConfig,
 } from "./llmConfig";
+import { ProgressResponse } from "ollama";
 
 export const LLMSessions: { [sessionId: string]: LLMSessionService } = {};
 
@@ -49,11 +50,19 @@ export const registerLLMSessionHandlers = async (store: Store<StoreSchema>) => {
     }
   );
   ipcMain.on("set-default-llm", (event, modelName: string) => {
+    // TODO: validate that the model exists
     store.set(StoreKeys.DefaultLLM, modelName);
   });
 
   ipcMain.on("get-default-llm-name", (event) => {
     event.returnValue = store.get(StoreKeys.DefaultLLM);
+  });
+
+  ipcMain.handle("pull-ollama-model", async (event, modelName: string) => {
+    const handleProgress = (progress: ProgressResponse) => {
+      event.sender.send("ollamaDownloadProgress", progress);
+    };
+    await ollamaService.pullModel(modelName, handleProgress);
   });
 
   ipcMain.handle("get-llm-configs", async () => {

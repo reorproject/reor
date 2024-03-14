@@ -77,6 +77,7 @@ declare global {
       ) => Promise<string>;
       getLLMConfigs: () => Promise<LLMConfig[]>;
       getLLMConfigByName: (modelName: string) => LLMConfig;
+      pullOllamaModel: (modelName: string) => Promise<void>;
       addOrUpdateLLM: (modelConfig: LLMConfig) => Promise<void>;
       deleteLocalLLM: (modelNameToDelete: string) => Promise<void>;
       setDefaultLLM: (modelName: string) => void;
@@ -268,12 +269,16 @@ contextBridge.exposeInMainWorld("llm", {
       messageHistory
     );
   },
+
   getLLMConfigs: async (): Promise<LLMConfig[]> => {
-    console.log("INVOKING HERE");
     return ipcRenderer.invoke("get-llm-configs");
   },
   getLLMConfigByName: (modelName: string) => {
     return ipcRenderer.sendSync("get-llm-config-by-name", modelName);
+  },
+
+  pullOllamaModel: async (modelName: string) => {
+    return await ipcRenderer.invoke("pull-ollama-model", modelName);
   },
   addOrUpdateLLM: async (modelConfig: LLMConfig) => {
     return ipcRenderer.invoke("add-or-update-llm", modelConfig);
