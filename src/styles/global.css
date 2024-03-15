@@ -19,26 +19,9 @@ a {
 }
 
 ::marker {
-  color: rgba(94, 129, 172, 1);
-}
+  color: rgb(163 163 163);
 
-/*custom rule to manage the paragraph spacing inside of node view*/
-div[data-node-view-content="true"] p {
-  margin-block-start: 0.5rem;
-  margin-block-end: 0.5rem;
 }
-
-.custom-li::before {
-  content: "•"; /* Add your custom marker */
-  color: rgba(94, 129, 172, 1); /* Customize the marker color */
-  font-size: 0.75rem; /* Adjust the marker size */
-}
-
-.custom-oli {
-  color: rgba(94, 129, 172, 1); /* Customize the marker color */
-  font-size: 1rem; /* Adjust the marker size */
-}
-
 
 #customTitleBar {
   -webkit-app-region: drag;
