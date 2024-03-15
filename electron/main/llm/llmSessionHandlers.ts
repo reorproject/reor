@@ -10,7 +10,7 @@ import {
 import { OllamaService } from "./models/Ollama";
 import {
   addOrUpdateLLMSchemaInStore,
-  deleteLLMSchemafromStore,
+  removeLLM,
   getAllLLMConfigs,
   getLLMConfig,
 } from "./llmConfig";
@@ -79,15 +79,8 @@ export const registerLLMSessionHandlers = async (store: Store<StoreSchema>) => {
     await addOrUpdateLLMSchemaInStore(store, modelConfig);
   });
 
-  ipcMain.handle(
-    "delete-local-llm",
-    async (event, modelNameToDelete: string) => {
-      console.log("deleting local model", modelNameToDelete);
-      return await deleteLLMSchemafromStore(
-        store,
-        ollamaService,
-        modelNameToDelete
-      );
-    }
-  );
+  ipcMain.handle("remove-llm", async (event, modelNameToDelete: string) => {
+    console.log("deleting local model", modelNameToDelete);
+    await removeLLM(store, ollamaService, modelNameToDelete);
+  });
 };

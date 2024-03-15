@@ -116,6 +116,10 @@ export class OllamaService implements LLMSessionService {
     }
   };
 
+  public deleteModel = async (modelName: string): Promise<void> => {
+    await this.client.delete({ model: modelName });
+  };
+
   public getTokenizer = (llmName: string): ((text: string) => number[]) => {
     let tokenEncoding: Tiktoken;
     try {

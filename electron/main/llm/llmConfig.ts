@@ -61,7 +61,7 @@ export async function addOrUpdateLLMSchemaInStore(
   // }
 }
 
-export async function deleteLLMSchemafromStore(
+export async function removeLLM(
   store: Store<StoreSchema>,
   ollamaService: OllamaService,
   modelName: string
@@ -78,6 +78,8 @@ export async function deleteLLMSchemafromStore(
     (model) => model.modelName !== modelName
   );
   store.set(StoreKeys.LLMs, updatedModels);
+
+  ollamaService.deleteModel(modelName);
 }
 
 export async function getAllLLMConfigs(

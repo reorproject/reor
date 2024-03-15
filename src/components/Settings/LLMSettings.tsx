@@ -76,7 +76,7 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
   };
 
   const handleDeleteModel = async (modelToDelete: string) => {
-    await window.llm.deleteLocalLLM(modelToDelete);
+    await window.llm.removeLLM(modelToDelete);
     fetchAndUpdateModelConfigs();
   };
 
