@@ -6,6 +6,7 @@ import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 import { getWindowInfoForContents, activeWindows } from "../windowManager";
 import { getLLMConfig } from "../llm/llmConfig";
+import { errorToString } from "../Generic/error";
 
 export const registerDBSessionHandlers = (store: Store<StoreSchema>) => {
   ipcMain.handle(
@@ -83,7 +84,7 @@ export const registerDBSessionHandlers = (store: Store<StoreSchema>) => {
         return ragPrompt;
       } catch (error) {
         console.error("Error searching database:", error);
-        throw error;
+        throw errorToString(error);
       }
     }
   );
