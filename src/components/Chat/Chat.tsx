@@ -21,7 +21,10 @@ enum AskOptions {
 }
 const ASK_OPTIONS = Object.values(AskOptions);
 
-const PROMPT_OPTIONS = ["Generate weekly 1-1 talking points from this file", "Separate concepts from todos"]; // more options to come
+const PROMPT_OPTIONS = [
+  "Generate weekly 1-1 talking points from this file",
+  "Separate concepts from todos",
+]; // more options to come
 
 interface ChatWithLLMProps {
   currentFilePath: string | null;
@@ -46,14 +49,21 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
     fetchDefaultModel();
   }, []);
 
-  const fileNotSelectedToastId = useRef<string| null>(null);
+  const fileNotSelectedToastId = useRef<string | null>(null);
   useEffect(() => {
     if (!currentFilePath && askText === AskOptions.AskFile) {
-      fileNotSelectedToastId.current = toast.error("Please open a file before asking questions in ask file mode", {}) as string;
-    } else if (currentFilePath && askText === AskOptions.AskFile && fileNotSelectedToastId.current) {
+      fileNotSelectedToastId.current = toast.error(
+        "Please open a file before asking questions in ask file mode",
+        {}
+      ) as string;
+    } else if (
+      currentFilePath &&
+      askText === AskOptions.AskFile &&
+      fileNotSelectedToastId.current
+    ) {
       toast.dismiss(fileNotSelectedToastId.current);
     }
-  }, [currentFilePath, askText])
+  }, [currentFilePath, askText]);
 
   const initializeSession = async (): Promise<string> => {
     try {
@@ -107,29 +117,35 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
     }
     if (!currentSessionId || !userInput.trim()) return;
 
-    let augmentedPrompt: string = '';
+    let augmentedPrompt: string = "";
     try {
       if (askText === AskOptions.AskFile) {
         if (!currentFilePath) {
-          console.error("No current file selected. The lack of a file means that there is no context being loaded into the prompt. Please open a file before trying again");
-  
-          toast.error("No current file selected. Please open a file before trying again.")
+          console.error(
+            "No current file selected. The lack of a file means that there is no context being loaded into the prompt. Please open a file before trying again"
+          );
+
+          toast.error(
+            "No current file selected. Please open a file before trying again."
+          );
           return;
         }
-        const { prompt, contextCutoffAt } = await window.files.augmentPromptWithFile(
-          { 
+        const { prompt, contextCutoffAt } =
+          await window.files.augmentPromptWithFile({
             prompt: userInput,
             llmSessionID: currentSessionId,
-            filePath: currentFilePath
+            filePath: currentFilePath,
           });
         if (contextCutoffAt) {
-          toast.warning(`The file is too large to be used as context. It got cut off at: ${contextCutoffAt}`)
+          toast.warning(
+            `The file is too large to be used as context. It got cut off at: ${contextCutoffAt}`
+          );
         }
         augmentedPrompt = prompt;
-      } else if (askText === AskOptions.Ask){
+      } else if (askText === AskOptions.Ask) {
         augmentedPrompt = await window.database.augmentPromptWithRAG(
           userInput,
-          currentSessionId,
+          currentSessionId
         );
       }
     } catch (error) {
@@ -142,7 +158,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
       });
       return;
     }
-    
 
     startStreamingResponse(currentSessionId, augmentedPrompt, true);
 
@@ -234,8 +249,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
   };
 
   return (
-    <div className="flex flex-col w-full h-full mx-auto border shadow-lg overflow-hidden bg-gray-700">
-      <div className="flex w-full items-center border-t-0 border-r-0 border-l-0 border-solid border-b-[1px] border-gray-600">
+    <div className="flex flex-col w-full h-full mx-auto border shadow-lg overflow-hidden bg-neutral-800 border-solid border-b-[1px] border-gray-600">
+      <div className="flex w-full items-center border-t-0 border-r-0 border-l-0">
         <div className="flex-grow flex justify-center items-center m-0 mt-1 ml-2 mb-1 p-0">
           {defaultModel ? (
             <p className="m-0 p-0 text-gray-500">{defaultModel}</p>
@@ -244,7 +259,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
           )}
         </div>
         <div className="pr-2 pt-1 cursor-pointer" onClick={restartSession}>
-          <FiRefreshCw className="text-gray-300" title="Restart Session" /> {/* Icon */}
+          <FiRefreshCw className="text-gray-300" title="Restart Session" />{" "}
+          {/* Icon */}
         </div>
       </div>
       <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
@@ -288,7 +304,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
             </ReactMarkdown>
           )}
         </div>
-        {userInput === "" && askText === AskOptions.AskFile && messages.length == 0 ? (
+        {userInput === "" &&
+        askText === AskOptions.AskFile &&
+        messages.length == 0 ? (
           <>
             {PROMPT_OPTIONS.map((option, index) => {
               return (
@@ -306,19 +324,19 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
           </>
         ) : undefined}
       </div>
-      <div className="p-3 bg-gray-500">
+      <div className="p-3 bg-neutral-500">
         <div className="flex space-x-2 h-full">
           <Textarea
             onKeyDown={handleKeyDown}
             onChange={handleInputChange}
             value={userInput}
-            className="w-full  bg-gray-300"
+            className="w-full bg-neutral-300"
             name="Outlined"
             placeholder="Ask your knowledge..."
             variant="outlined"
             style={{
-              backgroundColor: "rgb(55 65 81 / var(--tw-bg-opacity))",
-              color: "rgb(209 213 219)",
+              backgroundColor: "rgb(64 64 64)",
+              color: "rgb(212 212 212)",
             }}
           />
           <div className="flex justify-center items-center h-full ">
@@ -337,7 +355,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
                   className={`align-middle select-none font-sans font-bold transition-all 
                   text-xs py-3 px-6 rounded-tl rounded-bl text-white shadow-md shadow-gray-900/10 
                   hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] 
-                  active:shadow-none bg-slate-700 border-none h-full hover:bg-slate-900 cursor-pointer text-center 
+                  active:shadow-none bg-neutral-700 border-none h-full hover:bg-neutral-900 cursor-pointer text-center 
                   pt-0 pb-0 pr-2 pl-2`}
                   type="button"
                   onClick={handleSubmitNewMessage}
@@ -352,20 +370,20 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
                       className={`align-middle select-none font-sans font-bold uppercase transition-all 
                   text-xs py-3 px-6 rounded-tr rounded-br text-white shadow-md shadow-gray-900/10 
                   hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] 
-                  active:shadow-none bg-slate-700 border-none h-full hover:bg-slate-900 cursor-pointer text-center 
+                  active:shadow-none bg-neutral-700 border-none h-full hover:bg-neutral-900 cursor-pointer text-center 
                   pt-0 pb-0 pr-2 pl-2`}
                       type="button"
                     >
                       <div className="mb-1">⌄</div>
                     </button>
                   </MenuHandler>
-                  <MenuList placeholder="" className="bg-slate-600">
+                  <MenuList placeholder="" className="bg-neutral-600">
                     {ASK_OPTIONS.map((option, index) => {
                       return (
                         <MenuItem
                           key={index}
                           placeholder=""
-                          className="bg-slate-600 border-none h-full w-full hover:bg-slate-700 cursor-pointer text-white text-left p-2"
+                          className="bg-neutral-600 border-none h-full w-full hover:bg-neutral-700 cursor-pointer text-white text-left p-2"
                           onClick={() => setAskText(option)}
                         >
                           {option}

@@ -104,7 +104,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     >
       {" "}
       {/* {similarEntries.length > 0 && ( */}
-      <div className="flex items-center bg-gray-800 p-0">
+      <div className="flex items-center bg-neutral-800 p-0">
         {/* Invisible Spacer */}
         <div className="flex-1"></div>
 
@@ -123,7 +123,11 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
             updateSimilarEntries(filePath);
           }}
         >
-          <FiRefreshCw className="text-gray-300" title="Refresh Related Notes" /> {/* Icon */}
+          <FiRefreshCw
+            className="text-gray-300"
+            title="Refresh Related Notes"
+          />{" "}
+          {/* Icon */}
         </div>
       </div>
       <div className="h-full w-full">

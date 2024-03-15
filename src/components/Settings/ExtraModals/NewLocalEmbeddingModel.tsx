@@ -50,7 +50,7 @@ const NewLocalEmbeddingModelModal: React.FC<
         </p>
 
         <Button
-          className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1 mb-1"
+          className="bg-neutral-700 border-none h-8 hover:bg-neutral-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1 mb-1"
           onClick={handleModelDirectorySelection}
           placeholder=""
         >
@@ -76,7 +76,7 @@ const NewLocalEmbeddingModelModal: React.FC<
         )}
 
         <Button
-          className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
+          className="bg-neutral-700 border-none h-8 hover:bg-neutral-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
           onClick={saveModelConfigToElectronStore}
           placeholder=""
         >

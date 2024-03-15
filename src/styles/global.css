@@ -18,11 +18,6 @@ a {
   color: #0f82af;
 }
 
-.milkdown .editor ul,
-.milkdown .editor ol {
-  padding-inline-start: 0.5rem;
-}
-
 ::marker {
   color: rgba(94, 129, 172, 1);
 }
@@ -60,69 +55,6 @@ button {
 .markdown-content p {
   padding: 0.25rem;
   margin: 0;
-}
-
-.milkdown .editor {
-  color: white;
-  font-size: 17px;
-  overflow: auto;
-  padding-top: 50px !important;
-  padding-left: 20px !important;
-  padding-right: 20px !important;
-  /* make sure words and text doesn't overflow: */
-  overflow-wrap: break-word;
-  word-break: break-word;
-}
-.milkdown .editor:focus {
-  outline: none;
-}
-
-.milkdown .editor ul li {
-  color: white;
-}
-
-.milkdown .editor .paragraph {
-  margin: 1rem 0;
-  line-height: 1.5;
-}
-
-.milkdown .editor ol,
-.milkdown .editor ul {
-  margin: 0em 0 !important;
-}
-
-.milkdown .editor blockquote {
-  margin: 0.5em 0 !important;
-  padding-left: 1em;
-  border-left: 3px solid #ccc;
-}
-
-.milkdown .editor .heading {
-  margin: 1rem 0 !important;
-}
-
-.milkdown .editor h1 {
-  font-size: 1.8em !important;
-}
-
-.milkdown .editor h2 {
-  font-size: 1.6em !important;
-}
-
-.milkdown .editor h3 {
-  font-size: 1.4em !important;
-}
-
-.milkdown .editor h4 {
-  font-size: 1.2em !important;
-}
-
-.milkdown .editor h5 {
-  font-size: 1.1em !important;
-}
-
-.milkdown .editor h6 {
-  font-size: 1em !important;
 }
 
 ::-webkit-scrollbar {

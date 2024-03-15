@@ -32,7 +32,7 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
   };
 
   return (
-    <div className="w-full bg-gray-800 rounded pb-7 ">
+    <div className="w-full bg-neutral-800 rounded pb-7 ">
       <h2 className="text-2xl font-semibold mb-0 text-white">
         Text Generation
       </h2>{" "}
@@ -119,7 +119,7 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
             // variant="contained"
             placeholder={""}
             onClick={handleSave}
-            className="bg-slate-700 w-[150px] border-none h-8 hover:bg-slate-900 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mb-0 mr-4 mt-2"
+            className="bg-neutral-700 w-[150px] border-none h-8 hover:bg-neutral-900 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mb-0 mr-4 mt-2"
           >
             Save
           </Button>

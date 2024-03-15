@@ -23,9 +23,11 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
     const newName = e.target.value;
     setDirectoryName(newName);
 
-    getInvalidCharacterInFileName(newName).then(invalidCharacter => {
+    getInvalidCharacterInFileName(newName).then((invalidCharacter) => {
       if (invalidCharacter) {
-        setErrorMessage(`The character [${invalidCharacter}] cannot be included in directory name.`);
+        setErrorMessage(
+          `The character [${invalidCharacter}] cannot be included in directory name.`
+        );
       } else {
         setErrorMessage(null);
       }
@@ -74,7 +76,7 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
           placeholder="Directory Name"
         />
         <Button
-          className="bg-slate-700 mt-3 mb-2 border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
+          className="bg-neutral-700 mt-3 mb-2 border-none h-10 hover:bg-neutral-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
           onClick={sendNewDirectoryMsg}
           placeholder={""}
         >

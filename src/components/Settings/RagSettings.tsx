@@ -26,7 +26,7 @@ const RagSettings: React.FC<RagSettingsProps> = ({ children }) => {
   const possibleNoOfExamples = Array.from({ length: 30 }, (_, i) => i + 1);
 
   return (
-    <div className="w-full bg-gray-800 rounded pb-7">
+    <div className="w-full bg-neutral-800 rounded pb-7">
       {children}
       {noOfRAGExamples && (
         <CustomSelect

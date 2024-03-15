@@ -60,7 +60,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
           <div className="w-full h-full flex overflow-x-hidden">
             <div className="w-full flex h-full">
               <div
-                className="h-full w-full overflow-y-auto cursor-text"
+                className="h-full w-full overflow-y-auto cursor-text bg-neutral-800"
                 onClick={() => editor?.commands.focus()}
               >
                 <EditorContent
