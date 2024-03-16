@@ -23,9 +23,11 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
     const newName = e.target.value;
     setFileName(newName);
 
-    getInvalidCharacterInFileName(newName).then(invalidCharacter => {
+    getInvalidCharacterInFileName(newName).then((invalidCharacter) => {
       if (invalidCharacter) {
-        setErrorMessage(`The character [${invalidCharacter}] cannot be included in note name.`);
+        setErrorMessage(
+          `The character [${invalidCharacter}] cannot be included in note name.`
+        );
       } else {
         setErrorMessage(null);
       }
@@ -75,7 +77,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
         />
 
         <Button
-          className="bg-slate-700 mt-3 mb-2 border-none h-10 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
+          className="bg-orange-700 mt-3 mb-2 border-none h-10 hover:bg-orange-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
           onClick={sendNewNoteMsg}
           placeholder=""
         >
