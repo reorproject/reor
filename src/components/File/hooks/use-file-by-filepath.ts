@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useEditor } from "@tiptap/react";
+import { useEditor, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
@@ -8,6 +8,7 @@ import TaskList from "@tiptap/extension-task-list";
 import Text from "@tiptap/extension-text";
 import Link from "@tiptap/extension-link";
 import "../tiptap.scss";
+import { useDebounce } from "use-debounce";
 
 import TurndownService from "turndown";
 import { marked } from "marked";
@@ -43,46 +44,44 @@ export const useFileByFilepath = () => {
     ],
   });
 
+  const [debouncedEditor] = useDebounce(editor?.state.doc.content, 4000);
+
+  useEffect(() => {
+    if (debouncedEditor) {
+      saveEditorContentToPath(editor, currentlyOpenedFilePath, false);
+    }
+  }, [debouncedEditor, currentlyOpenedFilePath, editor]);
+
   const saveCurrentlyOpenedFile = async () => {
-    if (currentlyOpenedFilePath !== null && editor !== null) {
-      const markdown = turndownService.turndown(editor.getHTML() || "");
+    saveEditorContentToPath(editor, currentlyOpenedFilePath);
+  };
+
+  const saveEditorContentToPath = async (
+    editor: Editor | null,
+    filePath: string | null,
+    indexFileInDatabase: boolean = false
+  ) => {
+    if (editor?.getHTML() !== null && filePath !== null) {
+      const markdown = turndownService.turndown(editor?.getHTML() || "");
       await window.files.writeFile({
-        filePath: currentlyOpenedFilePath,
+        filePath: filePath,
         content: markdown,
       });
-      await window.files.indexFileInDatabase(currentlyOpenedFilePath);
+      if (indexFileInDatabase) {
+        await window.files.indexFileInDatabase(filePath);
+      }
     }
   };
   // read file, load content into fileContent
   const openFileByPath = async (newFilePath: string) => {
     //if the fileContent is null or if there is no file currently selected
-    console.log("opening file: ");
-    if (editor?.getHTML() !== null && currentlyOpenedFilePath !== null) {
-      const markdown = turndownService.turndown(editor?.getHTML() || "");
-      console.log("markdown is: ", markdown);
-      //save file content
-      console.log("saving file", {
-        filePath: currentlyOpenedFilePath,
-        fileContent: markdown,
-      });
-      window.files
-        .writeFile({
-          filePath: currentlyOpenedFilePath,
-          content: markdown,
-        })
-        .then(() => {
-          window.files.indexFileInDatabase(currentlyOpenedFilePath);
-        });
-    }
 
-    console.log("reading file: ", newFilePath);
+    saveEditorContentToPath(editor, currentlyOpenedFilePath, true);
+
     const fileContent = (await window.files.readFile(newFilePath)) ?? "";
     const htmlContent = await marked.parse(fileContent);
-    console.log("fileContent read: ", htmlContent);
-
     setCurrentlyOpenedFilePath(newFilePath);
 
-    //set the file content to null
     editor?.commands.setContent(htmlContent);
   };
 
