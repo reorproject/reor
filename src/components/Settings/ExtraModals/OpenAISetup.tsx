@@ -14,11 +14,13 @@ const OpenAISetupModal: React.FC<OpenAISetupModalProps> = ({
 }) => {
   const [openAIKey, setOpenAIKey] = useState("");
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (openAIKey) {
-      openAIDefaultModels.forEach((modelConfig) => {
-        window.llm.addOrUpdateLLM(modelConfig);
-      });
+      for (const modelConfig of openAIDefaultModels) {
+        console.log("modelConfig:", modelConfig);
+        modelConfig.apiKey = openAIKey;
+        await window.llm.addOrUpdateLLM(modelConfig);
+      }
       if (openAIDefaultModels.length > 0) {
         window.llm.setDefaultLLM(openAIDefaultModels[0].modelName);
       }

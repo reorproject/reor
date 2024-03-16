@@ -37,28 +37,30 @@ export async function addOrUpdateLLMSchemaInStore(
   store: Store<StoreSchema>,
   modelConfig: LLMConfig
 ): Promise<void> {
-  const existingModels = (store.get(StoreKeys.LLMs) as LLMConfig[]) || [];
-  console.log("existingModels: ", existingModels);
+  const existingModelsInStore = await store.get(StoreKeys.LLMs);
+  console.log("existingModels: ", existingModelsInStore);
   const isNotValid = validateAIModelConfig(modelConfig);
   if (isNotValid) {
     throw new Error(isNotValid);
   }
 
-  // so here, we'd actually need to call the ollamaService to actually setup the model.
-  // but for now, we can just do it manually - which means we probably don't want to call this for now.
-  // yes because adding in this config will interfere with our actual setp
+  const foundModel = existingModelsInStore.find(
+    (model) => model.modelName === modelConfig.modelName
+  );
 
-  // const foundModel = getLLMConfig(store, ollamaService, modelConfig.modelName);
+  console.log("foundModel: ", foundModel);
 
-  // if (foundModel) {
-  //   const updatedModels = existingModels.map((model) =>
-  //     model.modelName === modelConfig.modelName ? modelConfig : model
-  //   );
-  //   store.set(StoreKeys.LLMs, updatedModels);
-  // } else {
-  //   const updatedModels = [...existingModels, modelConfig];
-  //   store.set(StoreKeys.LLMs, updatedModels);
-  // }
+  if (foundModel) {
+    console.log("updating model");
+    const updatedModels = existingModelsInStore.map((model) =>
+      model.modelName === modelConfig.modelName ? modelConfig : model
+    );
+    store.set(StoreKeys.LLMs, updatedModels);
+  } else {
+    console.log("adding model");
+    const updatedModels = [...existingModelsInStore, modelConfig];
+    store.set(StoreKeys.LLMs, updatedModels);
+  }
 }
 
 export async function removeLLM(
@@ -87,7 +89,7 @@ export async function getAllLLMConfigs(
   ollamaSession: OllamaService
 ): Promise<LLMConfig[]> {
   const llmConfigsFromStore = store.get(StoreKeys.LLMs);
-  const ollamaLLMConfigs = await ollamaSession.getAvailableModels();
+  const ollamaLLMConfigs = await ollamaSession?.getAvailableModels();
 
   return [...llmConfigsFromStore, ...ollamaLLMConfigs];
 }
