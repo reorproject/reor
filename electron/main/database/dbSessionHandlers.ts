@@ -91,12 +91,7 @@ export const registerDBSessionHandlers = (store: Store<StoreSchema>) => {
 
   ipcMain.handle(
     "augment-prompt-with-temporal-agent",
-    async (
-      event,
-      query: string,
-      llmName: string,
-      filter?: string
-    ): Promise<string> => {
+    async (event, query: string, llmName: string): Promise<string> => {
       const llmSession = openAISession;
       const llmConfig = await getLLMConfig(store, ollamaService, llmName);
       console.log("llmConfig", llmConfig);
