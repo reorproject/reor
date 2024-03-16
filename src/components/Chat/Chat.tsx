@@ -18,6 +18,7 @@ import { ChatCompletionChunk } from "openai/resources/chat/completions";
 enum AskOptions {
   Ask = "Ask",
   AskFile = "Ask file",
+  TemporalAgent = "Temporal Agent",
 }
 const ASK_OPTIONS = Object.values(AskOptions);
 
@@ -119,6 +120,11 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
         augmentedPrompt = prompt;
       } else if (askText === AskOptions.Ask) {
         augmentedPrompt = await window.database.augmentPromptWithRAG(
+          userTextFieldInput,
+          llmName
+        );
+      } else if (askText === AskOptions.TemporalAgent) {
+        augmentedPrompt = await window.database.augmentPromptWithTemporalAgent(
           userTextFieldInput,
           llmName
         );

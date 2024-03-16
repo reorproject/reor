@@ -16,7 +16,7 @@ export interface LocalLLMConfig extends BaseLLMConfig {
   localPath: string;
 }
 
-export type LLMConfig = OpenAILLMConfig | LocalLLMConfig;
+export type LLMConfig = OpenAILLMConfig;
 
 export type LLMGenerationParameters = {
   maxTokens?: number;
