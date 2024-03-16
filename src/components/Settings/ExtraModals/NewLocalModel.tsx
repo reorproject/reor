@@ -73,7 +73,7 @@ const LocalModelModal: React.FC<LocalModelModalProps> = ({
         </p>
 
         <Button
-          className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1"
+          className="bg-orange-700 border-none h-8 hover:bg-orange-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1"
           onClick={handleModelFileSelection}
           placeholder=""
         >
@@ -110,7 +110,7 @@ const LocalModelModal: React.FC<LocalModelModalProps> = ({
         </p>
 
         <Button
-          className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
+          className="bg-orange-700 border-none h-8 hover:bg-orange-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
           onClick={saveModelConfigToElectronStore}
           placeholder=""
         >

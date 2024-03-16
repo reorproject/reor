@@ -60,8 +60,11 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
           <div className="w-full h-full flex overflow-x-hidden">
             <div className="w-full flex h-full">
               <div
-                className="h-full w-full overflow-y-auto cursor-text"
+                className="h-full w-full overflow-y-auto cursor-text text-slate-400"
                 onClick={() => editor?.commands.focus()}
+                style={{
+                  backgroundColor: "rgb(30, 30, 30)",
+                }}
               >
                 <EditorContent
                   style={{ wordBreak: "break-word" }}
