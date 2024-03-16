@@ -249,8 +249,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
   };
 
   return (
-    <div className="flex flex-col w-full h-full mx-auto border shadow-lg overflow-hidden bg-neutral-800 border-solid border-b-[1px] border-gray-600">
-      <div className="flex w-full items-center border-t-0 border-r-0 border-l-0">
+    <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border border-solid border-gray-600">
+      <div className="flex w-full items-center">
         <div className="flex-grow flex justify-center items-center m-0 mt-1 ml-2 mb-1 p-0">
           {defaultModel ? (
             <p className="m-0 p-0 text-gray-500">{defaultModel}</p>

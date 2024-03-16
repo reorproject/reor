@@ -77,7 +77,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
         />
 
         <Button
-          className="bg-neutral-700 mt-3 mb-2 border-none h-10 hover:bg-neutral-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
+          className="bg-orange-700 mt-3 mb-2 border-none h-10 hover:bg-orange-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
           onClick={sendNewNoteMsg}
           placeholder=""
         >

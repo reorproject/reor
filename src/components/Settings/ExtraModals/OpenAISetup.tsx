@@ -55,7 +55,7 @@ const OpenAISetupModal: React.FC<OpenAISetupModalProps> = ({
         </p>
 
         <Button
-          className="bg-neutral-700 border-none h-8 hover:bg-neutral-900 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mt-1 w-[80px]"
+          className="bg-orange-700 border-none h-8 hover:bg-orange-900 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mt-1 w-[80px]"
           onClick={handleSave}
           placeholder=""
         >

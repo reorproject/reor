@@ -110,21 +110,21 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
 
           <div className="flex">
             <Button
-              className="bg-neutral-700 border-none h-8 hover:bg-neutral-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mr-2"
+              className="bg-orange-700 border-none h-8 hover:bg-orange-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mr-2"
               onClick={() => setIsNewLocalModelModalOpen(true)}
               placeholder={""}
             >
               Attach Local LLM
             </Button>
             <Button
-              className="bg-neutral-700  border-none h-8 hover:bg-neutral-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mb-3 mr-2"
+              className="bg-orange-700  border-none h-8 hover:bg-orange-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mb-3 mr-2"
               onClick={() => setIsRemoteLLMModalOpen(true)}
               placeholder=""
             >
               Attach remote LLM
             </Button>
             <Button
-              className="bg-neutral-700  border-none h-8 hover:bg-neutral-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mb-3 mr-2"
+              className="bg-orange-700  border-none h-8 hover:bg-orange-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mb-3 mr-2"
               onClick={() => setIsOpenAIModelModalOpen(true)}
               placeholder=""
             >
@@ -165,14 +165,14 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
           <h4 className="text-gray-100 mb-1">Local LLM Settings:</h4>
           <div className="flex">
             <Button
-              className="bg-neutral-700  border-none h-8 hover:bg-neutral-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
+              className="bg-orange-700  border-none h-8 hover:bg-orange-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
               onClick={() => setIsNewLocalModelModalOpen(true)}
               placeholder={""}
             >
               Add New Local LLM
             </Button>
             <Button
-              className="bg-neutral-700  border-none h-8 hover:bg-neutral-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
+              className="bg-orange-700  border-none h-8 hover:bg-orange-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
               onClick={() => setIsContextLengthModalOpen(true)}
               placeholder={""}
             >
@@ -182,14 +182,14 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
           <h4 className="text-gray-100 mb-0">Setup remote LLMs:</h4>
           <div className="flex">
             <Button
-              className="bg-neutral-700  border-none h-8 hover:bg-neutral-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
+              className="bg-orange-700  border-none h-8 hover:bg-orange-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
               onClick={() => setIsRemoteLLMModalOpen(true)}
               placeholder=""
             >
               Remote LLM Setup
             </Button>
             <Button
-              className="bg-neutral-700  border-none h-8 hover:bg-neutral-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
+              className="bg-orange-700  border-none h-8 hover:bg-orange-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
               onClick={() => setIsOpenAIModelModalOpen(true)}
               placeholder=""
             >

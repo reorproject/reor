@@ -68,7 +68,7 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
   };
 
   return (
-    <div className="w-full bg-neutral-900 rounded">
+    <div className="w-full bg-neutral-800 rounded">
       <h2 className="text-2xl font-semibold mb-0 text-white">
         Embedding Model
       </h2>{" "}
@@ -92,14 +92,14 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
       </p>{" "}
       <div className="flex">
         <Button
-          className="bg-neutral-700  border-none h-8 hover:bg-neutral-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
+          className="bg-orange-700  border-none h-8 hover:bg-orange-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
           onClick={() => setIsNewLocalEmbeddingModelModalOpen(true)}
           placeholder={""}
         >
           Attach Local Model
         </Button>
         <Button
-          className="bg-neutral-700  border-none h-8 hover:bg-neutral-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
+          className="bg-orange-700  border-none h-8 hover:bg-orange-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
           onClick={() => setIsContextLengthModalOpen(true)}
           placeholder={""}
         >

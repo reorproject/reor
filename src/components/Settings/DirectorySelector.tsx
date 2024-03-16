@@ -36,7 +36,7 @@ const DirectorySelector: React.FC<DirectorySelectorProps> = ({
   return (
     <div>
       <Button
-        className="bg-neutral-700  border-none h-10 hover:bg-neutral-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
+        className="bg-orange-700  border-none h-10 hover:bg-orange-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
         onClick={handleDirectorySelection}
         placeholder=""
       >

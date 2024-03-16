@@ -81,7 +81,7 @@ const HardwareSettings: React.FC<HardwareSettingsProps> = () => {
   });
 
   return (
-    <div className="w-full bg-neutral-900 rounded text-gray-100">
+    <div className="w-full bg-neutral-800 rounded text-gray-100">
       <h2 className="text-2xl font-semibold mb-0">Hardware</h2>
       <p className="mt-2 text-sm text-gray-100 mb-1">
         This is the hardware that the will be used to run local LLMs:

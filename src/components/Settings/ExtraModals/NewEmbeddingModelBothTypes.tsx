@@ -74,14 +74,14 @@ const NewEmbeddingModelModalBothTypes: React.FC<
         </p>
         <div className="flex">
           <Button
-            className="bg-neutral-700 border-none h-8 hover:bg-neutral-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1 mr-2"
+            className="bg-orange-700 border-none h-8 hover:bg-orange-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1 mr-2"
             onClick={handleModelDirectorySelection}
             placeholder=""
           >
             Attach Local Model
           </Button>
           <Button
-            className="bg-neutral-700 border-none h-8 hover:bg-neutral-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1"
+            className="bg-orange-700 border-none h-8 hover:bg-orange-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1"
             onClick={() => {
               setIsRepoModalOpen(true);
             }}
@@ -134,7 +134,7 @@ const NewEmbeddingModelModalBothTypes: React.FC<
               embedding model.
             </p> */}
             <Button
-              className="bg-neutral-700 border-none h-8 hover:bg-neutral-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
+              className="bg-orange-700 border-none h-8 hover:bg-orange-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
               onClick={() => {
                 if (huggingfaceRepo) handleSaveHuggingFaceRepo();
               }}
