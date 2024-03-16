@@ -44,7 +44,7 @@ export const useFileByFilepath = () => {
     ],
   });
 
-  const [debouncedEditor] = useDebounce(editor?.state.doc.content, 2000);
+  const [debouncedEditor] = useDebounce(editor?.state.doc.content, 4000);
 
   useEffect(() => {
     if (debouncedEditor) {
