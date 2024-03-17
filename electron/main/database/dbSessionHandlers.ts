@@ -1,6 +1,6 @@
 import { ipcMain } from "electron";
 import { createPromptWithContextLimitFromContent } from "../Prompts/Prompts";
-import { DBEntry, DatabaseFields } from "./Schema";
+import { DBEntry, DBQueryResult, DatabaseFields } from "./Schema";
 import { LLMSessions } from "../llm/llmSessionHandlers";
 import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
@@ -51,7 +51,7 @@ export const registerDBSessionHandlers = (
       filter?: string
     ): Promise<PromptWithRagResults> => {
       try {
-        let searchResults: DBEntry[] = [];
+        let searchResults: DBQueryResult[] = [];
         const maxRAGExamples: number = store.get(StoreKeys.MaxRAGExamples);
         const windowInfo = windowManager.getWindowInfoForContents(event.sender);
         if (!windowInfo) {
@@ -73,8 +73,12 @@ export const registerDBSessionHandlers = (
           throw new Error(`Session ${llmSessionID} does not exist.`);
         }
 
+        const filteredResults = searchResults.filter(
+          (entry) => entry._distance < 0.4
+        );
+
         const { prompt: ragPrompt } = createPromptWithContextLimitFromContent(
-          searchResults,
+          filteredResults,
           query,
           llmSession.tokenize,
           llmSession.getContextLength()
@@ -82,7 +86,7 @@ export const registerDBSessionHandlers = (
 
         // organize the search results by file path - which will include file path previews
         const uniqueFilesReferenced = [
-          ...new Set(searchResults.map((entry) => entry.notepath)),
+          ...new Set(filteredResults.map((entry) => entry.notepath)),
         ];
         return { ragPrompt, uniqueFilesReferenced };
       } catch (error) {
