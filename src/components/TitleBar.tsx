@@ -60,14 +60,14 @@ const TitleBar: React.FC<TitleBarProps> = ({
       >
         {similarFilesOpen ? (
           <PiSidebarFill
-            className="text-gray-100 cursor-pointer mt-[0.1rem]"
+            className="text-gray-100 cursor-pointer mt-[0.04rem]"
             size={28}
             onClick={toggleSimilarFiles}
             title="Hide Similar Files"
           />
         ) : (
           <PiSidebar
-            className="text-gray-100 cursor-pointer mt-[0.1rem]"
+            className="text-gray-100 cursor-pointer mt-[0.04rem]"
             size={28}
             onClick={toggleSimilarFiles}
             title="Show Similar Files"
