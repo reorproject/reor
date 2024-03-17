@@ -81,13 +81,14 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
           Download
         </Button>
         {downloadProgress && !error && (
-          <p className="text-white text-xs mt-2">
+          <p className="text-white text-sm mt-2">
             {downloadProgress.status === "success" ? (
               "Download complete! Refrsh the chat window to use the new model."
             ) : (
               <>
                 Download Progress:{" "}
-                {downloadPercentage(downloadProgress).toFixed(2)}%
+                {downloadPercentage(downloadProgress).toFixed(2)}%.
+                <p className="text-xs">(You can close this Window)</p>
               </>
             )}
           </p>
