@@ -324,7 +324,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
           </>
         ) : undefined}
       </div>
-      <div className="p-3 bg-neutral-500">
+      <div className="p-3 bg-neutral-600">
         <div className="flex space-x-2 h-full">
           <Textarea
             onKeyDown={handleKeyDown}
