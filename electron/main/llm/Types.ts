@@ -42,12 +42,14 @@ export interface ISendFunctionImplementer {
   send(channel: string, ...args: unknown[]): void;
 }
 
+export type MessageRole = "user" | "assistant";
+
 export type OpenAIMessage = {
-  role: "user" | "assistant";
+  role: MessageRole;
   content: string;
 };
 
 // Extend OpenAIMessage to create ChatbotMessage, adding messageType property
 export type ChatbotMessage = OpenAIMessage & {
-  messageType: "success" | "error";
+  messageType: "success" | "error" | "COMPLETED";
 };

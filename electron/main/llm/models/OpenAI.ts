@@ -111,6 +111,11 @@ export class OpenAIModelSessionService implements LLMSessionService {
         });
       }
 
+      sendFunctionImplementer.send("tokenStream", {
+        messageType: "COMPLETED",
+        content: "",
+      });
+
       return result;
     } catch (error) {
       console.error("Error during OpenAI streaming session:", error);

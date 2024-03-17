@@ -5,7 +5,11 @@ import { LLMSessions } from "../llm/llmSessionHandlers";
 import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 import WindowsManager from "../windowManager";
-// import { getWindowInfoForContents, activeWindows } from "../windowManager";
+
+export interface PromptWithRagResults {
+  ragPrompt: string;
+  uniqueFilesReferenced: string[];
+}
 
 export const registerDBSessionHandlers = (
   // dbTable: LanceDBTableWrapper,
@@ -38,28 +42,6 @@ export const registerDBSessionHandlers = (
     }
   );
 
-  // ipcMain.handle(
-  //   "delete-lance-db-entries-by-filepath",
-  //   async (
-  //     event,
-  //     filePath: string,
-  //   ): Promise<void> => {
-  //     try {
-  //       const windowInfo = getWindowInfoForContents(
-  //         activeWindows,
-  //         event.sender
-  //       );
-  //       if (!windowInfo) {
-  //         throw new Error("Window info not found.");
-  //       }
-  //       await windowInfo.dbTableClient.deleteDBItemsByFilePaths([filePath]);
-  //     } catch (error) {
-  //       console.error("Error deleting chunks from database:", error);
-  //       throw error;
-  //     }
-  //   }
-  // );
-
   ipcMain.handle(
     "augment-prompt-with-rag",
     async (
@@ -67,7 +49,7 @@ export const registerDBSessionHandlers = (
       query: string,
       llmSessionID: string,
       filter?: string
-    ): Promise<string> => {
+    ): Promise<PromptWithRagResults> => {
       try {
         let searchResults: DBEntry[] = [];
         const maxRAGExamples: number = store.get(StoreKeys.MaxRAGExamples);
@@ -97,7 +79,12 @@ export const registerDBSessionHandlers = (
           llmSession.tokenize,
           llmSession.getContextLength()
         );
-        return ragPrompt;
+
+        // organize the search results by file path - which will include file path previews
+        const uniqueFilesReferenced = [
+          ...new Set(searchResults.map((entry) => entry.notepath)),
+        ];
+        return { ragPrompt, uniqueFilesReferenced };
       } catch (error) {
         console.error("Error searching database:", error);
         throw error;

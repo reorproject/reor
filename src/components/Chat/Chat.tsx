@@ -5,7 +5,7 @@ import {
   MenuItem,
   MenuList,
 } from "@material-tailwind/react";
-import { ChatbotMessage } from "electron/main/llm/Types";
+import { ChatbotMessage, MessageRole } from "electron/main/llm/Types";
 import { errorToString } from "@/functions/error";
 import { toast } from "react-toastify";
 import Textarea from "@mui/joy/Textarea";
@@ -13,6 +13,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import ReactMarkdown from "react-markdown";
 import { FiRefreshCw } from "react-icons/fi"; // Importing refresh icon from React Icons
 import { ChatPrompt } from "./Chat-Prompts";
+import { CustomLinkMarkdown } from "./CustomLinkMarkdown";
 
 // convert ask options to enum
 enum AskOptions {
@@ -28,9 +29,13 @@ const PROMPT_OPTIONS = [
 
 interface ChatWithLLMProps {
   currentFilePath: string | null;
+  openFileByPath: (path: string) => Promise<void>;
 }
 
-const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
+const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
+  currentFilePath,
+  openFileByPath,
+}) => {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [userInput, setUserInput] = useState<string>("");
   const [messages, setMessages] = useState<ChatbotMessage[]>([]);
@@ -38,7 +43,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
   const [askText, setAskText] = useState<string>("Ask");
 
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
-
+  const [filesReferenced, setFilesReferenced] = useState<string[]>([]);
   const [currentBotMessage, setCurrentBotMessage] =
     useState<ChatbotMessage | null>(null);
   const fetchDefaultModel = async () => {
@@ -143,10 +148,17 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
         }
         augmentedPrompt = prompt;
       } else if (askText === AskOptions.Ask) {
-        augmentedPrompt = await window.database.augmentPromptWithRAG(
-          userInput,
-          currentSessionId
-        );
+        const { ragPrompt, uniqueFilesReferenced } =
+          await window.database.augmentPromptWithRAG(
+            userInput,
+            currentSessionId
+          );
+
+        console.log("RAG Prompt:", ragPrompt);
+
+        setFilesReferenced(uniqueFilesReferenced);
+        console.log("Unique files referenced:", filesReferenced);
+        augmentedPrompt = ragPrompt;
       }
     } catch (error) {
       console.error("Failed to augment prompt:", error);
@@ -168,16 +180,45 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
     setUserInput("");
   };
 
+  // const handleCustomLinkClick = (event: React.MouseEvent) => {
+  //   event.preventDefault(); // Prevent default link behavior
+  //   const link = (event.target as HTMLAnchorElement).innerText;
+  //   return link;
+  // };
+
   useEffect(() => {
     if (sessionId) {
+      let active = true;
       const updateStream = (newMessage: ChatbotMessage) => {
+        let context = "";
+        if (!active) return;
+
         setCurrentBotMessage((prev) => {
+          if (
+            newMessage.messageType === "COMPLETED" &&
+            filesReferenced.length > 0
+          ) {
+            const newBulletedFiles = filesReferenced.map((file) => {
+              return ` - [${file}](#)`;
+            });
+            context = `  \n -- -- --  \n Files referenced:  \n ${newBulletedFiles.join(
+              "  \n"
+            )}`;
+            // compare files content with the generated response and filter out the contents that dont have high enough similarity
+
+            //how to embed links
+            setFilesReferenced([]);
+          }
+
           return {
-            role: "assistant",
             messageType: newMessage.messageType,
-            content: prev?.content
-              ? prev.content + newMessage.content
-              : newMessage.content,
+            role: "user" as MessageRole,
+            content:
+              `${
+                prev?.content
+                  ? prev.content + newMessage.content
+                  : newMessage.content
+              }` + `${context}`,
           };
         });
       };
@@ -185,10 +226,11 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
       window.ipcRenderer.receive("tokenStream", updateStream);
 
       return () => {
+        active = false;
         window.ipcRenderer.removeListener("tokenStream", updateStream);
       };
     }
-  }, [sessionId]);
+  }, [sessionId, filesReferenced]);
 
   useEffect(() => {
     return () => {
@@ -260,7 +302,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
         </div>
         <div className="pr-2 pt-1 cursor-pointer" onClick={restartSession}>
           <FiRefreshCw className="text-gray-300" title="Restart Session" />{" "}
-          {/* Icon */}
         </div>
       </div>
       <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
@@ -299,6 +340,15 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
                   ? "bg-red-100 text-red-800"
                   : "bg-blue-100 text-blue-800"
               } `}
+              components={{
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                a: ({ node, ...props }) => (
+                  <CustomLinkMarkdown
+                    props={props}
+                    openFileByPath={openFileByPath}
+                  />
+                ),
+              }}
             >
               {currentBotMessage.content}
             </ReactMarkdown>
