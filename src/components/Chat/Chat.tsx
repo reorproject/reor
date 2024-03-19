@@ -179,7 +179,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
       console.log("Initializing streaming response...");
       setLoadingResponse(true);
       const modelConfigs = await window.electronStore.getLLMConfigs();
-      const defaultModelConfig = modelConfigs[llmName];
+      const currentModelConfig = modelConfigs[llmName];
       if (!defaultModelConfig) {
         throw new Error(`No model config found for model: ${llmName}`);
       }
