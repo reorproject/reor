@@ -37,7 +37,8 @@ const TitleBar: React.FC<TitleBarProps> = ({
   return (
     <div
       id="customTitleBar"
-      className={`h-titlebar bg-neutral-800 flex justify-between`}
+      className={`h-titlebar  flex justify-between`}
+      style={{ backgroundColor: "#303030" }}
     >
       <div
         className=" flex"
