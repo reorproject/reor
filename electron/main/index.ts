@@ -71,8 +71,8 @@ async function createWindow() {
     frame: false,
     titleBarStyle: "hidden",
     titleBarOverlay: {
-      color: "#2f3241",
-      symbolColor: "#74b1be",
+      color: "#303030",
+      symbolColor: "#fff",
       height: 30,
     },
     width: width,
