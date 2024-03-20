@@ -186,7 +186,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
       if (!defaultModelConfig) {
         throw new Error(`No model config found for model: ${llmName}`);
       }
-      await window.llm.streamingLLMResponse(llmName, defaultModelConfig, [
+      await window.llm.streamingLLMResponse(llmName, currentModelConfig, [
         { role: "user", content: prompt },
       ]);
       console.log("Initialized streaming response");
