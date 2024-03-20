@@ -7,15 +7,24 @@ import {
   ChatCompletionChunk,
   ChatCompletionMessageParam,
 } from "openai/resources/chat/completions";
-// import { OllamaService } from "./models/Ollama";
+import { OllamaService } from "./models/Ollama";
+import {
+  addOrUpdateLLMSchemaInStore,
+  removeLLM,
+  getAllLLMConfigs,
+  getLLMConfig,
+} from "./llmConfig";
+import { ProgressResponse } from "ollama";
 
 export const LLMSessions: { [sessionId: string]: LLMSessionService } = {};
 
 export const openAISession = new OpenAIModelSessionService();
 
-// export const ollamaSession = new OllamaService();
+export const ollamaService = new OllamaService();
 
-export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
+export const registerLLMSessionHandlers = async (store: Store<StoreSchema>) => {
+  await ollamaService.init();
+
   ipcMain.handle(
     "streaming-llm-response",
     async (
@@ -40,4 +49,38 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       );
     }
   );
+  ipcMain.on("set-default-llm", (event, modelName: string) => {
+    // TODO: validate that the model exists
+    store.set(StoreKeys.DefaultLLM, modelName);
+  });
+
+  ipcMain.on("get-default-llm-name", (event) => {
+    event.returnValue = store.get(StoreKeys.DefaultLLM);
+  });
+
+  ipcMain.handle("pull-ollama-model", async (event, modelName: string) => {
+    const handleProgress = (progress: ProgressResponse) => {
+      event.sender.send("ollamaDownloadProgress", progress);
+    };
+    await ollamaService.pullModel(modelName, handleProgress);
+  });
+
+  ipcMain.handle("get-llm-configs", async () => {
+    return await getAllLLMConfigs(store, ollamaService);
+  });
+
+  ipcMain.handle("get-llm-config-by-name", (event, modelName: string) => {
+    const llmConfig = getLLMConfig(store, ollamaService, modelName);
+    return llmConfig;
+  });
+
+  ipcMain.handle("add-or-update-llm", async (event, modelConfig: LLMConfig) => {
+    console.log("setting up new local model", modelConfig);
+    await addOrUpdateLLMSchemaInStore(store, modelConfig);
+  });
+
+  ipcMain.handle("remove-llm", async (event, modelNameToDelete: string) => {
+    console.log("deleting local model", modelNameToDelete);
+    await removeLLM(store, ollamaService, modelNameToDelete);
+  });
 };

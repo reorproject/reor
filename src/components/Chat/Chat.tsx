@@ -47,7 +47,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
   const fileNotSelectedToastId = useRef<string | null>(null);
 
   const fetchDefaultModel = async () => {
-    const defaultModelName = await window.electronStore.getDefaultLLM();
+    const defaultModelName = await window.llm.getDefaultLLMName();
     setDefaultModel(defaultModelName);
   };
   useEffect(() => {
@@ -90,7 +90,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
       });
     }
     if (!userTextFieldInput.trim()) return;
-    const llmName = await window.electronStore.getDefaultLLM();
+    const llmName = await window.llm.getDefaultLLMName();
 
     let augmentedPrompt: string = "";
     try {
@@ -178,9 +178,12 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
     try {
       console.log("Initializing streaming response...");
       setLoadingResponse(true);
-      const modelConfigs = await window.electronStore.getLLMConfigs();
-      const currentModelConfig = modelConfigs[llmName];
-      if (!currentModelConfig) {
+      const llmConfigs = await window.llm.getLLMConfigs();
+      const defaultLLMName = await window.llm.getDefaultLLMName();
+      const defaultModelConfig = llmConfigs.find(
+        (config) => config.modelName === defaultLLMName
+      );
+      if (!defaultModelConfig) {
         throw new Error(`No model config found for model: ${llmName}`);
       }
       await window.llm.streamingLLMResponse(llmName, currentModelConfig, [

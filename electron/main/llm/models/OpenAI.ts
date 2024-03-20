@@ -10,7 +10,7 @@ import {
   ChatCompletionChunk,
   ChatCompletionMessageParam,
 } from "openai/resources/chat/completions";
-import { customFetchUsingElectronNetStreaming } from "electron/main/Generic/network";
+import { customFetchUsingElectronNetStreaming } from "../../Generic/network";
 
 export class OpenAIModelSessionService implements LLMSessionService {
   public getTokenizer = (llmName: string): ((text: string) => number[]) => {
@@ -37,6 +37,7 @@ export class OpenAIModelSessionService implements LLMSessionService {
     handleChunk: (chunk: ChatCompletionChunk) => void,
     generationParams?: LLMGenerationParameters
   ): Promise<void> {
+    console.log("making call to url: ", modelConfig);
     const openai = new OpenAI({
       apiKey: modelConfig.apiKey,
       baseURL: modelConfig.apiURL,

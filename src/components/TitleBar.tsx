@@ -60,19 +60,19 @@ const TitleBar: React.FC<TitleBarProps> = ({
       >
         {similarFilesOpen ? (
           <PiSidebarFill
-            className="text-gray-100 cursor-pointer mt-[0.1rem]"
+            className="text-gray-100 cursor-pointer mt-[0.06rem]"
             size={28}
             onClick={toggleSimilarFiles}
           />
         ) : (
           <PiSidebar
-            className="text-gray-100 cursor-pointer mt-[0.1rem]"
+            className="text-gray-100 cursor-pointer mt-[0.06rem]"
             size={28}
             onClick={toggleSimilarFiles}
           />
         )}
 
-        <div className="mt-[0.33rem] mr-[0.5rem] ml-[0.3rem]">
+        <div className="mt-[0.34rem] mr-[0.5rem] ml-[0.3rem]">
           {chatbotOpen ? (
             <BsFillChatLeftDotsFill
               size={22}

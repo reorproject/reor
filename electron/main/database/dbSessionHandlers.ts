@@ -1,10 +1,12 @@
 import { ipcMain } from "electron";
 import { createPromptWithContextLimitFromContent } from "../Prompts/Prompts";
 import { DBEntry, DatabaseFields } from "./Schema";
-import { openAISession } from "../llm/llmSessionHandlers";
+import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
 import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 import { getWindowInfoForContents, activeWindows } from "../windowManager";
+import { getLLMConfig } from "../llm/llmConfig";
+import { errorToString } from "../Generic/error";
 
 export const registerDBSessionHandlers = (store: Store<StoreSchema>) => {
   ipcMain.handle(
@@ -66,7 +68,8 @@ export const registerDBSessionHandlers = (store: Store<StoreSchema>) => {
         }
 
         const llmSession = openAISession;
-        const llmConfig = store.get(StoreKeys.LLMs)[llmName];
+        const llmConfig = await getLLMConfig(store, ollamaService, llmName);
+
         console.log("llmConfig", llmConfig);
         if (!llmConfig) {
           throw new Error(`LLM ${llmName} not configured.`);
@@ -81,7 +84,7 @@ export const registerDBSessionHandlers = (store: Store<StoreSchema>) => {
         return ragPrompt;
       } catch (error) {
         console.error("Error searching database:", error);
-        throw error;
+        throw errorToString(error);
       }
     }
   );

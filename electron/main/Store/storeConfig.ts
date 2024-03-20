@@ -1,4 +1,5 @@
 export interface BaseLLMConfig {
+  modelName: string;
   contextLength: number;
   errorMsg?: string;
   engine: "openai" | "llamacpp";
@@ -22,6 +23,10 @@ export type LLMGenerationParameters = {
   temperature?: number;
 };
 
+export type EmbeddingModelConfig =
+  | EmbeddingModelWithRepo
+  | EmbeddingModelWithLocalPath;
+
 export interface EmbeddingModelWithRepo {
   type: "repo";
   repoName: string;
@@ -31,29 +36,23 @@ export interface EmbeddingModelWithLocalPath {
   type: "local";
   localPath: string;
 }
-
-export type EmbeddingModelConfig =
-  | EmbeddingModelWithRepo
-  | EmbeddingModelWithLocalPath;
-
-export interface RAGConfig {
+export type RAGConfig = {
   maxRAGExamples: number;
-}
+};
 
-export interface HardwareConfig {
+export type HardwareConfig = {
   useGPU: boolean;
   useCUDA: boolean;
   useVulkan: boolean;
-}
+};
 
 export interface StoreSchema {
+  schemaVersion: number;
   user: {
     vaultDirectories: string[];
     directoryFromPreviousSession?: string;
   };
-  LLMs: {
-    [modelName: string]: LLMConfig;
-  };
+  LLMs: LLMConfig[];
   embeddingModels: {
     [modelAlias: string]: EmbeddingModelConfig;
   };
@@ -65,6 +64,7 @@ export interface StoreSchema {
 }
 
 export enum StoreKeys {
+  SchemaVersion = "schemaVersion",
   DirectoryFromPreviousSession = "user.directoryFromPreviousSession",
   LLMs = "LLMs",
   EmbeddingModels = "embeddingModels",
