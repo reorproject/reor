@@ -3,11 +3,12 @@ import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
-  LLMModelConfig,
   StoreKeys,
   StoreSchema,
 } from "../Store/storeConfig";
 import Store from "electron-store";
+import path from "path";
+import { initializeAndMaybeMigrateStore } from "./storeMigrator";
 import { validateAIModelConfig } from "../llm/llmConfig";
 import path from "path";
 import WindowsManager from "../windowManager";
@@ -17,7 +18,7 @@ export const registerStoreHandlers = (
   windowsManager: WindowsManager
   // fileWatcher: FSWatcher | null
 ) => {
-  setupDefaultStoreValues(store);
+  initializeAndMaybeMigrateStore(store);
   ipcMain.on(
     "set-user-directory",
     async (event, userDirectory: string): Promise<void> => {
@@ -106,46 +107,6 @@ export const registerStoreHandlers = (
     event.returnValue = store.get(StoreKeys.MaxRAGExamples);
   });
 
-  ipcMain.on("set-default-llm", (event, modelName: string) => {
-    store.set(StoreKeys.DefaultLLM, modelName);
-  });
-
-  ipcMain.on("get-default-llm", (event) => {
-    event.returnValue = store.get(StoreKeys.DefaultLLM);
-  });
-
-  ipcMain.handle("get-llm-configs", () => {
-    const aiModelConfigs = store.get(StoreKeys.LLMs);
-    return aiModelConfigs || {};
-  });
-
-  ipcMain.handle("update-llm-config", (event, modelName, modelConfig) => {
-    const aiModelConfigs = store.get(StoreKeys.LLMs);
-    if (aiModelConfigs) {
-      const updatedModelConfigs = {
-        ...aiModelConfigs,
-        [modelName]: modelConfig,
-      };
-      store.set(StoreKeys.LLMs, updatedModelConfigs);
-    }
-  });
-
-  ipcMain.handle(
-    "add-or-update-llm",
-    async (event, modelName: string, modelConfig: LLMModelConfig) => {
-      console.log("setting up new local model", modelConfig);
-      return await addOrUpdateLLMSchemaInStore(store, modelName, modelConfig);
-    }
-  );
-
-  ipcMain.handle(
-    "delete-local-llm",
-    async (event, modelName: string, modelConfig: LLMModelConfig) => {
-      console.log("deleting local model", modelConfig);
-      return await deleteLLMSchemafromStore(store, modelName);
-    }
-  );
-
   ipcMain.on("get-default-embedding-model", (event) => {
     event.returnValue = store.get(StoreKeys.DefaultEmbeddingModelAlias);
   });
@@ -172,59 +133,6 @@ export const registerStoreHandlers = (
   });
 };
 
-export async function addOrUpdateLLMSchemaInStore(
-  store: Store<StoreSchema>,
-  modelName: string,
-  modelConfig: LLMModelConfig
-): Promise<string> {
-  const existingModels =
-    (store.get(StoreKeys.LLMs) as Record<string, LLMModelConfig>) || {};
-
-  const isNotValid = validateAIModelConfig(modelName, modelConfig);
-  if (isNotValid) {
-    throw new Error(isNotValid);
-  }
-
-  const updatedModels = {
-    ...existingModels,
-    [modelName]: modelConfig,
-  };
-
-  store.set(StoreKeys.LLMs, updatedModels);
-
-  store.set(StoreKeys.DefaultLLM, modelName);
-
-  return existingModels[modelName]
-    ? "Model updated successfully"
-    : "Model set up successfully";
-}
-
-export async function deleteLLMSchemafromStore(
-  store: Store<StoreSchema>,
-  modelName: string
-): Promise<string> {
-  const existingModels =
-    (store.get(StoreKeys.LLMs) as Record<string, LLMModelConfig>) || {};
-
-  if (existingModels[modelName]) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { [modelName]: _, ...remainingModels } = existingModels;
-    store.set(StoreKeys.LLMs, remainingModels);
-    return "Model deleted successfully";
-  } else {
-    return "Model does not exist";
-  }
-}
-
-export function setupDefaultStoreValues(store: Store<StoreSchema>) {
-  if (!store.get(StoreKeys.MaxRAGExamples)) {
-    store.set(StoreKeys.MaxRAGExamples, 15);
-  }
-  setupDefaultEmbeddingModels(store);
-
-  setupDefaultHardwareConfig(store);
-}
-
 export function getDefaultEmbeddingModelConfig(
   store: Store<StoreSchema>
 ): EmbeddingModelConfig {
@@ -249,47 +157,3 @@ export function getDefaultEmbeddingModelConfig(
 
   return model;
 }
-
-const setupDefaultHardwareConfig = (store: Store<StoreSchema>) => {
-  const hardwareConfig = store.get(StoreKeys.Hardware);
-
-  if (!hardwareConfig) {
-    store.set(StoreKeys.Hardware, {
-      useGPU: process.platform === "darwin" && process.arch === "arm64",
-      useCUDA: false,
-      useVulkan: false,
-    });
-  }
-};
-
-const setupDefaultEmbeddingModels = (store: Store<StoreSchema>) => {
-  const embeddingModels = store.get(StoreKeys.EmbeddingModels);
-
-  if (!embeddingModels) {
-    store.set(StoreKeys.EmbeddingModels, modelRepos);
-  }
-
-  const defaultModel = store.get(StoreKeys.DefaultEmbeddingModelAlias);
-  if (!defaultModel) {
-    const embeddingModels = store.get(StoreKeys.EmbeddingModels) || {};
-    if (Object.keys(embeddingModels).length === 0) {
-      throw new Error("No embedding models found");
-    }
-    store.set(
-      StoreKeys.DefaultEmbeddingModelAlias,
-      Object.keys(embeddingModels)[0]
-    );
-  }
-};
-
-const modelRepos = {
-  "Xenova/bge-base-en-v1.5": {
-    type: "repo",
-    repoName: "Xenova/bge-base-en-v1.5",
-  },
-  "Xenova/UAE-Large-V1": { type: "repo", repoName: "Xenova/UAE-Large-V1" },
-  "Xenova/bge-small-en-v1.5": {
-    type: "repo",
-    repoName: "Xenova/bge-small-en-v1.5",
-  },
-};

@@ -1,8 +1,8 @@
 import {
-  BaseLLMConfig,
-  HardwareConfig,
-  LLMGenerationParameters,
-} from "../Store/storeConfig";
+  ChatCompletionChunk,
+  ChatCompletionMessageParam,
+} from "openai/resources/chat/completions";
+import { LLMGenerationParameters, LLMConfig } from "../Store/storeConfig";
 
 // Any LLM engine should implement this interface:
 export interface LLMSessionService {
@@ -10,27 +10,27 @@ export interface LLMSessionService {
    * Initializes the session.
    * @returns A promise that resolves when the initialization is complete.
    */
-  init(
-    modelName: string,
-    modelConfig: BaseLLMConfig,
-    hardwareConfig: HardwareConfig
-  ): Promise<void>;
+  // init(
+  //   modelName: string,
+  //   modelConfig: BaseLLMConfig,
+  //   hardwareConfig: HardwareConfig
+  // ): Promise<void>;
   /**
    * Handles the streaming of prompts.
    * @param prompt The prompt to be streamed.
    * @param sendFunctionImplementer The implementer of the send function.
    * @returns A promise that resolves to a string response.
    */
-  streamingPrompt(
-    prompt: string,
-    sendFunctionImplementer: ISendFunctionImplementer,
-    generationParams?: LLMGenerationParameters,
-    ignoreChatHistory?: boolean
-  ): Promise<string>;
+  streamingResponse(
+    modelName: string,
+    modelConfig: LLMConfig,
+    messageHistory: Array<ChatCompletionMessageParam>,
+    chunkResponse: (chunk: ChatCompletionChunk) => void,
+    generationParams?: LLMGenerationParameters
+  ): Promise<void>;
 
+  getTokenizer: (llmName: string) => (text: string) => number[];
   abort(): void;
-  getContextLength(): number;
-  tokenize(text: string): number[];
 }
 
 export interface ISendFunctionImplementer {
@@ -41,13 +41,3 @@ export interface ISendFunctionImplementer {
    */
   send(channel: string, ...args: unknown[]): void;
 }
-
-export type OpenAIMessage = {
-  role: "user" | "assistant";
-  content: string;
-};
-
-// Extend OpenAIMessage to create ChatbotMessage, adding messageType property
-export type ChatbotMessage = OpenAIMessage & {
-  messageType: "success" | "error";
-};

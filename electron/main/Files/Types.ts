@@ -18,7 +18,7 @@ export const isFileNodeDirectory = (fileInfo: FileInfoNode): boolean => {
 
 export interface AugmentPromptWithFileProps {
   prompt: string;
-  llmSessionID: string;
+  llmName: string;
   filePath: string;
 }
 

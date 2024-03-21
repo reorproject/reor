@@ -102,10 +102,10 @@ async function createWindow() {
 
   if (windowsManager.activeWindows.length <= 0) {
     update(win);
-    registerLLMSessionHandlers(store);
-    registerDBSessionHandlers(store, windowsManager);
-    registerStoreHandlers(store, windowsManager);
-    registerFileHandlers(windowsManager);
+    await registerLLMSessionHandlers(store);
+    await registerDBSessionHandlers(store, windowsManager);
+    await registerStoreHandlers(store, windowsManager);
+    await registerFileHandlers(windowsManager);
   }
 }
 
