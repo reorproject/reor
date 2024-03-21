@@ -105,7 +105,7 @@ async function createWindow() {
     await registerLLMSessionHandlers(store);
     await registerDBSessionHandlers(store, windowsManager);
     await registerStoreHandlers(store, windowsManager);
-    await registerFileHandlers(windowsManager);
+    await registerFileHandlers(store, windowsManager);
   }
 }
 

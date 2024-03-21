@@ -44,7 +44,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
   const [currentBotMessage, setCurrentBotMessage] =
     useState<ChatUIMessage | null>(null);
-  const fileNotSelectedToastId = useRef<string | null>(null);
 
   const fetchDefaultModel = async () => {
     const defaultModelName = await window.llm.getDefaultLLMName();
@@ -69,7 +68,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
       toast.dismiss(fileNotSelectedToastId.current);
     }
   }, [currentFilePath, askText]);
-
 
   const handleSubmitNewMessage = async () => {
     if (loadingResponse) return;
@@ -182,10 +180,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
       setLoadingResponse(true);
       const llmConfigs = await window.llm.getLLMConfigs();
       const defaultLLMName = await window.llm.getDefaultLLMName();
-      const defaultModelConfig = llmConfigs.find(
+      const currentModelConfig = llmConfigs.find(
         (config) => config.modelName === defaultLLMName
       );
-      if (!defaultModelConfig) {
+      if (!currentModelConfig) {
         throw new Error(`No model config found for model: ${llmName}`);
       }
       await window.llm.streamingLLMResponse(llmName, currentModelConfig, [

@@ -20,11 +20,12 @@ import {
 import Store from "electron-store";
 import { StoreSchema } from "../Store/storeConfig";
 import { getLLMConfig } from "../llm/llmConfig";
-
-export const registerFileHandlers = (store: Store<StoreSchema>) => {
 import WindowsManager from "../windowManager";
 
-export const registerFileHandlers = (windowsManager: WindowsManager) => {
+export const registerFileHandlers = (
+  store: Store<StoreSchema>,
+  windowsManager: WindowsManager
+) => {
   ipcMain.handle("join-path", (event, ...args) => {
     return path.join(...args);
   });

@@ -6,10 +6,7 @@ import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 import { getLLMConfig } from "../llm/llmConfig";
 import { errorToString } from "../Generic/error";
-
-export const registerDBSessionHandlers = (store: Store<StoreSchema>) => {
 import WindowsManager from "../windowManager";
-// import { getWindowInfoForContents, activeWindows } from "../windowManager";
 
 export const registerDBSessionHandlers = (
   // dbTable: LanceDBTableWrapper,

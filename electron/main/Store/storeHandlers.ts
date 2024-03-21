@@ -9,8 +9,6 @@ import {
 import Store from "electron-store";
 import path from "path";
 import { initializeAndMaybeMigrateStore } from "./storeMigrator";
-import { validateAIModelConfig } from "../llm/llmConfig";
-import path from "path";
 import WindowsManager from "../windowManager";
 
 export const registerStoreHandlers = (
