@@ -112,7 +112,10 @@ If there is no temporal component in the query, you must return an empty string.
 An example of a temporal filter is:
 ${DatabaseFields.FILE_MODIFIED} > timestamp '2024-03-16 13:00:00'
 
-Please generate only the temporal filter using the same format as the example given this query:
+Please generate ONLY the temporal filter using the same format as the example given. Please also make sure you only use the ${
+              DatabaseFields.FILE_MODIFIED
+            } field in the filter. If you don't know or there is no temporal component in the query, please return an empty string.
+Query:
 ${query}
 Filter:
 `,
