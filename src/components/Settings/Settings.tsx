@@ -44,11 +44,11 @@ const SettingsModal: React.FC<ModalProps> = ({
       }}
     >
       <div className="mt-0 flex w-[600px] ">
-        <div className="flex flex-col ml-2 mb-2 pr-1 w-[100px]  bg-gray-800 text-white border-r-[0.1px] border-gray-700 border-solid border-b-0 border-t-0 border-l-0">
+        <div className="flex flex-col ml-2 mb-2 pr-1 w-[100px]  bg-neutral-800 text-white border-r-[0.1px] border-gray-700 border-solid border-b-0 border-t-0 border-l-0">
           <div
-            className={`flex items-center mt-2 rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
+            className={`flex items-center mt-2 rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
               activeTab === SettingsTab.LLMSettings
-                ? "bg-gray-700 text-white font-semibold"
+                ? "bg-neutral-700 text-white font-semibold"
                 : "text-gray-200"
             }`}
             onClick={() => setActiveTab(SettingsTab.LLMSettings)}
@@ -56,9 +56,9 @@ const SettingsModal: React.FC<ModalProps> = ({
             LLM
           </div>
           <div
-            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
+            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
               activeTab === SettingsTab.EmbeddingModel
-                ? "bg-gray-700 text-white font-semibold"
+                ? "bg-neutral-700 text-white font-semibold"
                 : "text-gray-200"
             }`}
             onClick={() => setActiveTab(SettingsTab.EmbeddingModel)}
@@ -68,9 +68,9 @@ const SettingsModal: React.FC<ModalProps> = ({
 
           {/* gpu settings: */}
           <div
-            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
+            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
               activeTab === SettingsTab.Hardware
-                ? "bg-gray-700 text-white font-semibold"
+                ? "bg-neutral-700 text-white font-semibold"
                 : "text-gray-200"
             }`}
             onClick={() => setActiveTab(SettingsTab.Hardware)}
@@ -78,9 +78,9 @@ const SettingsModal: React.FC<ModalProps> = ({
             Hardware
           </div>
           <div
-            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
+            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
               activeTab === SettingsTab.TextGeneration
-                ? "bg-gray-700 text-white font-semibold"
+                ? "bg-neutral-700 text-white font-semibold"
                 : "text-gray-200"
             }`}
             onClick={() => setActiveTab(SettingsTab.TextGeneration)}
@@ -88,9 +88,9 @@ const SettingsModal: React.FC<ModalProps> = ({
             Text Generation{" "}
           </div>
           <div
-            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-600 text-sm ${
+            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
               activeTab === SettingsTab.RAG
-                ? "bg-gray-700 text-white font-semibold"
+                ? "bg-neutral-700 text-white font-semibold"
                 : "text-gray-200"
             }`}
             onClick={() => setActiveTab(SettingsTab.RAG)}

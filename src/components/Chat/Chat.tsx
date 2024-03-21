@@ -54,6 +54,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
     fetchDefaultModel();
   }, []);
 
+  const fileNotSelectedToastId = useRef<string | null>(null);
   useEffect(() => {
     if (!currentFilePath && askText === AskOptions.AskFile) {
       fileNotSelectedToastId.current = toast.error(
@@ -68,6 +69,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
       toast.dismiss(fileNotSelectedToastId.current);
     }
   }, [currentFilePath, askText]);
+
 
   const handleSubmitNewMessage = async () => {
     if (loadingResponse) return;
@@ -222,8 +224,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
   };
 
   return (
-    <div className="flex flex-col w-full h-full mx-auto border shadow-lg overflow-hidden bg-gray-700">
-      <div className="flex w-full items-center border-t-0 border-r-0 border-l-0 border-solid border-b-[1px] border-gray-600">
+    <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid">
+      <div className="flex w-full items-center">
         <div className="flex-grow flex justify-center items-center m-0 mt-1 ml-2 mb-1 p-0">
           {defaultModel ? (
             <p className="m-0 p-0 text-gray-500">{defaultModel}</p>
@@ -232,7 +234,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
           )}
         </div>
         <div className="pr-2 pt-1 cursor-pointer" onClick={restartSession}>
-          <FiRefreshCw className="text-gray-300" /> {/* Icon */}
+          <FiRefreshCw className="text-gray-300" title="Restart Session" />{" "}
+          {/* Icon */}
         </div>
       </div>
       <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
@@ -283,7 +286,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
           </>
         ) : undefined}
       </div>
-      <div className="p-3 bg-gray-500">
+      <div className="p-3 bg-neutral-600">
         <div className="flex space-x-2 h-full">
           <Textarea
             onKeyDown={handleKeyDown}
@@ -294,8 +297,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
             placeholder="Ask your knowledge..."
             variant="outlined"
             style={{
-              backgroundColor: "rgb(55 65 81 / var(--tw-bg-opacity))",
-              color: "rgb(209 213 219)",
+              backgroundColor: "rgb(64 64 64)",
+              color: "rgb(212 212 212)",
             }}
           />
           <div className="flex justify-center items-center h-full ">
@@ -314,7 +317,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
                   className={`align-middle select-none font-sans font-bold transition-all 
                   text-xs py-3 px-6 rounded-tl rounded-bl text-white shadow-md shadow-gray-900/10 
                   hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] 
-                  active:shadow-none bg-slate-700 border-none h-full hover:bg-slate-900 cursor-pointer text-center 
+                  active:shadow-none bg-neutral-700 border-none h-full hover:bg-neutral-900 cursor-pointer text-center 
                   pt-0 pb-0 pr-2 pl-2`}
                   type="button"
                   onClick={handleSubmitNewMessage}
@@ -329,20 +332,20 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
                       className={`align-middle select-none font-sans font-bold uppercase transition-all 
                   text-xs py-3 px-6 rounded-tr rounded-br text-white shadow-md shadow-gray-900/10 
                   hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] 
-                  active:shadow-none bg-slate-700 border-none h-full hover:bg-slate-900 cursor-pointer text-center 
+                  active:shadow-none bg-neutral-700 border-none h-full hover:bg-neutral-900 cursor-pointer text-center 
                   pt-0 pb-0 pr-2 pl-2`}
                       type="button"
                     >
                       <div className="mb-1">⌄</div>
                     </button>
                   </MenuHandler>
-                  <MenuList placeholder="" className="bg-slate-600">
+                  <MenuList placeholder="" className="bg-neutral-600">
                     {ASK_OPTIONS.map((option, index) => {
                       return (
                         <MenuItem
                           key={index}
                           placeholder=""
-                          className="bg-slate-600 border-none h-full w-full hover:bg-slate-700 cursor-pointer text-white text-left p-2"
+                          className="bg-neutral-600 border-none h-full w-full hover:bg-neutral-700 cursor-pointer text-white text-left p-2"
                           onClick={() => setAskText(option)}
                         >
                           {option}

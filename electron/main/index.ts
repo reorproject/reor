@@ -12,10 +12,9 @@ import { join } from "node:path";
 import { update } from "./update";
 import Store from "electron-store";
 import * as path from "path";
-import { StoreKeys, StoreSchema } from "./Store/storeConfig";
+import { StoreSchema } from "./Store/storeConfig";
 // import contextMenus from "./contextMenus";
 import * as lancedb from "vectordb";
-import * as fs from "fs";
 import {
   startWatchingDirectory,
   updateFileListForRenderer,
@@ -29,17 +28,12 @@ import {
 } from "./Store/storeHandlers";
 import { registerFileHandlers } from "./Files/registerFilesHandler";
 import { RepopulateTableWithMissingItems } from "./database/TableHelperFunctions";
-import {
-  getVaultDirectoryForContents,
-  getWindowInfoForContents,
-  activeWindows,
-  getNextWindowPosition,
-  getWindowSize,
-} from "./windowManager";
+import WindowsManager from "./windowManager";
 import { errorToString } from "./Generic/error";
 
 const store = new Store<StoreSchema>();
 // store.clear(); // clear store for testing
+const windowsManager = new WindowsManager();
 
 process.env.DIST_ELECTRON = join(__dirname, "../");
 process.env.DIST = join(process.env.DIST_ELECTRON, "../dist");
@@ -65,8 +59,8 @@ const indexHtml = join(process.env.DIST, "index.html");
 let dbConnection: lancedb.Connection;
 
 async function createWindow() {
-  const { x, y } = getNextWindowPosition();
-  const { width, height } = getWindowSize();
+  const { x, y } = windowsManager.getNextWindowPosition();
+  const { width, height } = windowsManager.getWindowSize();
   const win = new BrowserWindow({
     title: "Reor",
     x: x,
@@ -77,8 +71,8 @@ async function createWindow() {
     frame: false,
     titleBarStyle: "hidden",
     titleBarOverlay: {
-      color: "#2f3241",
-      symbolColor: "#74b1be",
+      color: "#303030",
+      symbolColor: "#fff",
       height: 30,
     },
     width: width,
@@ -101,25 +95,17 @@ async function createWindow() {
   });
 
   win.on("close", () => {
-    // Get the directory for this window's contents
-    const directoryToSave = getVaultDirectoryForContents(
-      activeWindows,
-      win.webContents
-    );
+    win.webContents.send("prepare-for-window-close");
 
-    // Save the directory if found
-    if (directoryToSave) {
-      console.log("Saving directory for window:", directoryToSave);
-      store.set(StoreKeys.DirectoryFromPreviousSession, directoryToSave);
-    }
+    windowsManager.prepareWindowForClose(store, win);
   });
 
-  if (activeWindows.length <= 0) {
+  if (windowsManager.activeWindows.length <= 0) {
     update(win);
     await registerLLMSessionHandlers(store);
-    await registerDBSessionHandlers(store);
-    await registerStoreHandlers(store);
-    await registerFileHandlers(store);
+    await registerDBSessionHandlers(store, windowsManager);
+    await registerStoreHandlers(store, windowsManager);
+    await registerFileHandlers(windowsManager);
   }
 }
 
@@ -179,7 +165,7 @@ ipcMain.handle("open-file-dialog", async (event, extensions) => {
 ipcMain.on("index-files-in-directory", async (event) => {
   try {
     console.log("Indexing files in directory");
-    const windowInfo = getWindowInfoForContents(activeWindows, event.sender);
+    const windowInfo = windowsManager.getWindowInfoForContents(event.sender);
     if (!windowInfo) {
       throw new Error("No window info found");
     }
@@ -226,34 +212,7 @@ ipcMain.on("show-context-menu-file-item", (event, file) => {
       label: "Delete",
       click: () => {
         console.log(file.path);
-        fs.stat(file.path, (err, stats) => {
-          if (err) {
-            console.error("An error occurred:", err);
-            return;
-          }
-
-          if (stats.isDirectory()) {
-            // For directories (Node.js v14.14.0 and later)
-            fs.rm(file.path, { recursive: true }, (err) => {
-              if (err) {
-                console.error("An error occurred:", err);
-                return;
-              }
-              console.log(
-                `Directory at ${file.path} was deleted successfully.`
-              );
-            });
-          } else {
-            fs.unlink(file.path, (err) => {
-              if (err) {
-                console.error("An error occurred:", err);
-                return;
-              }
-              console.log(`File at ${file.path} was deleted successfully.`);
-              // TODO: Update table.
-            });
-          }
-        });
+        event.sender.send("delete-file-listener", file.path);
       },
     })
   );

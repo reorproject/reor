@@ -10,8 +10,7 @@ import {
   createEmbeddingFunction,
 } from "./Embeddings";
 import {
-  convertLanceEntryToDBEntry,
-  convertLanceResultToDBResult,
+  convertRecordToDBType,
   sanitizePathForDatabase,
 } from "./TableHelperFunctions";
 import { DBEntry, DBQueryResult, DatabaseFields } from "./Schema";
@@ -19,7 +18,7 @@ import { EmbeddingModelConfig } from "../Store/storeConfig";
 
 export class LanceDBTableWrapper {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private table!: LanceDBTable<any>;
+  public lanceTable!: LanceDBTable<any>;
   private embedFun!: EnhancedEmbeddingFunction<string | number[]>;
 
   async initialize(
@@ -36,7 +35,7 @@ export class LanceDBTableWrapper {
       throw new Error("Embedding function error: " + error);
     }
 
-    this.table = await GetOrCreateLanceTable(
+    this.lanceTable = await GetOrCreateLanceTable(
       dbConnection,
       this.embedFun,
       userDirectory
@@ -67,7 +66,7 @@ export class LanceDBTableWrapper {
     const totalChunks = chunks.length;
     for (const chunk of chunks) {
       const arrowTableOfChunk = makeArrowTable(chunk);
-      await this.table.add(arrowTableOfChunk);
+      await this.lanceTable.add(arrowTableOfChunk);
 
       index++;
       const progress = index / totalChunks;
@@ -87,7 +86,7 @@ export class LanceDBTableWrapper {
     }
     const filterString = `${DatabaseFields.NOTE_PATH} IN (${quotedFilePaths})`;
     try {
-      await this.table.delete(filterString);
+      await this.lanceTable.delete(filterString);
     } catch (error) {
       console.error(
         `Error deleting items from DB: ${error} using filter string: ${filterString}`
@@ -101,7 +100,7 @@ export class LanceDBTableWrapper {
     limit: number,
     filter?: string
   ): Promise<DBQueryResult[]> {
-    const lanceQuery = await this.table
+    const lanceQuery = await this.lanceTable
       .search(query)
       .metricType(MetricType.Cosine)
       // .metricType(metricType)
@@ -111,21 +110,21 @@ export class LanceDBTableWrapper {
       lanceQuery.filter(filter);
     }
     const rawResults = await lanceQuery.execute();
-    const mapped = rawResults.map(convertLanceResultToDBResult);
+    const mapped = rawResults.map(convertRecordToDBType<DBQueryResult>);
     return mapped as DBQueryResult[];
   }
 
   async filter(filterString: string, limit: number = 10): Promise<DBEntry[]> {
-    const rawResults = await this.table
+    const rawResults = await this.lanceTable
       .filter(filterString)
       .limit(limit)
       .execute();
-    const mapped = rawResults.map(convertLanceEntryToDBEntry);
+    const mapped = rawResults.map(convertRecordToDBType<DBEntry>);
     return mapped as DBEntry[];
   }
 
   async countRows(): Promise<number> {
-    this.table.countRows;
-    return await this.table.countRows();
+    this.lanceTable.countRows;
+    return await this.lanceTable.countRows();
   }
 }

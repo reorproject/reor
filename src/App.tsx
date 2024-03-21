@@ -51,8 +51,8 @@ const App: React.FC<AppProps> = () => {
   };
 
   return (
-    <div className="max-h-screen font-sans bg-gray-800">
-      <ToastContainer />
+    <div className="max-h-screen font-sans bg-neutral-800">
+      <ToastContainer className="mt-4" />
       {userHasConfiguredSettingsForIndexing ? (
         indexingProgress < 1 ? (
           <IndexingProgress indexingProgress={indexingProgress} />

@@ -122,7 +122,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
         />
 
         <Button
-          className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mt-3 w-[80px]"
+          className="bg-orange-700 border-none h-8 hover:bg-orange-900 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mt-3 w-[80px]"
           onClick={handleSave}
           placeholder=""
         >
