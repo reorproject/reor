@@ -12,14 +12,20 @@ import {
 } from "./Filesystem";
 import * as fs from "fs";
 import { updateFileInTable } from "../database/TableHelperFunctions";
-import { LLMSessions } from "../llm/llmSessionHandlers";
+import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
 import {
   PromptWithContextLimit,
   createPromptWithContextLimitFromContent,
 } from "../Prompts/Prompts";
+import Store from "electron-store";
+import { StoreSchema } from "../Store/storeConfig";
+import { getLLMConfig } from "../llm/llmConfig";
 import WindowsManager from "../windowManager";
 
-export const registerFileHandlers = (windowsManager: WindowsManager) => {
+export const registerFileHandlers = (
+  store: Store<StoreSchema>,
+  windowsManager: WindowsManager
+) => {
   ipcMain.handle("join-path", (event, ...args) => {
     return path.join(...args);
   });
@@ -161,22 +167,22 @@ export const registerFileHandlers = (windowsManager: WindowsManager) => {
     "augment-prompt-with-file",
     async (
       _event,
-      { prompt, llmSessionID, filePath }: AugmentPromptWithFileProps
+      { prompt, llmName, filePath }: AugmentPromptWithFileProps
     ): Promise<PromptWithContextLimit> => {
       try {
         const content = fs.readFileSync(filePath, "utf-8");
 
-        const llmSession = LLMSessions[llmSessionID];
-        if (!llmSession) {
-          throw new Error(`Session ${llmSessionID} does not exist.`);
+        const llmSession = openAISession;
+        const llmConfig = await getLLMConfig(store, ollamaService, llmName);
+        if (!llmConfig) {
+          throw new Error(`LLM ${llmName} not configured.`);
         }
-
         const { prompt: filePrompt, contextCutoffAt } =
           createPromptWithContextLimitFromContent(
             content,
             prompt,
-            llmSession.tokenize,
-            llmSession.getContextLength()
+            llmSession.getTokenizer(llmName),
+            llmConfig.contextLength
           );
         return { prompt: filePrompt, contextCutoffAt };
       } catch (error) {

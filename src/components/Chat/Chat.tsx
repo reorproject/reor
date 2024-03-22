@@ -14,6 +14,7 @@ import ReactMarkdown from "react-markdown";
 import { FiRefreshCw } from "react-icons/fi"; // Importing refresh icon from React Icons
 import { ChatPrompt } from "./Chat-Prompts";
 import { CustomLinkMarkdown } from "./CustomLinkMarkdown";
+import { ChatCompletionChunk } from "openai/resources/chat/completions";
 
 // convert ask options to enum
 enum AskOptions {
@@ -27,27 +28,30 @@ const PROMPT_OPTIONS = [
   "Separate concepts from todos",
 ]; // more options to come
 
+type ChatUIMessage = {
+  role: "user" | "assistant";
+  content: string;
+  messageType: "success" | "error";
+};
+
 interface ChatWithLLMProps {
   currentFilePath: string | null;
   openFileByPath: (path: string) => Promise<void>;
 }
 
-const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
-  currentFilePath,
-  openFileByPath,
-}) => {
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [userInput, setUserInput] = useState<string>("");
-  const [messages, setMessages] = useState<ChatbotMessage[]>([]);
+
+const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath, openFileByPath }) => {
+  const [userTextFieldInput, setUserTextFieldInput] = useState<string>("");
+  const [messages, setMessages] = useState<ChatUIMessage[]>([]);
   const [defaultModel, setDefaultModel] = useState<string>("");
   const [askText, setAskText] = useState<string>("Ask");
-
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
   const [filesReferenced, setFilesReferenced] = useState<string[]>([]);
   const [currentBotMessage, setCurrentBotMessage] =
-    useState<ChatbotMessage | null>(null);
+    useState<ChatUIMessage | null>(null);
+
   const fetchDefaultModel = async () => {
-    const defaultModelName = await window.electronStore.getDefaultLLM();
+    const defaultModelName = await window.llm.getDefaultLLMName();
     setDefaultModel(defaultModelName);
   };
   useEffect(() => {
@@ -70,38 +74,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     }
   }, [currentFilePath, askText]);
 
-  const initializeSession = async (): Promise<string> => {
-    try {
-      const sessionID = "some_unique_session_id";
-      const sessionExists = await window.llm.doesSessionExist(sessionID);
-      if (sessionExists) {
-        await window.llm.deleteSession(sessionID);
-      }
-      console.log("Creating a new session...");
-      const newSessionId = await window.llm.createSession(
-        "some_unique_session_id"
-      );
-      console.log("Created a new session with id:", newSessionId);
-      setSessionId(newSessionId);
-
-      return newSessionId;
-    } catch (error) {
-      console.error("Failed to create a new session:", error);
-      setCurrentBotMessage({
-        messageType: "error",
-        content: errorToString(error),
-        role: "assistant",
-      });
-      return "";
-    }
-  };
-
   const handleSubmitNewMessage = async () => {
     if (loadingResponse) return;
-    let currentSessionId = sessionId;
-    if (!currentSessionId) {
-      currentSessionId = await initializeSession();
-    }
     let newMessages = messages;
     if (currentBotMessage) {
       newMessages = [
@@ -120,7 +94,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         role: "assistant",
       });
     }
-    if (!currentSessionId || !userInput.trim()) return;
+    if (!userTextFieldInput.trim()) return;
+    const llmName = await window.llm.getDefaultLLMName();
 
     let augmentedPrompt: string = "";
     try {
@@ -137,8 +112,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         }
         const { prompt, contextCutoffAt } =
           await window.files.augmentPromptWithFile({
-            prompt: userInput,
-            llmSessionID: currentSessionId,
+            prompt: userTextFieldInput,
+            llmName: llmName,
             filePath: currentFilePath,
           });
         if (contextCutoffAt) {
@@ -150,8 +125,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       } else if (askText === AskOptions.Ask) {
         const { ragPrompt, uniqueFilesReferenced } =
           await window.database.augmentPromptWithRAG(
-            userInput,
-            currentSessionId
+            userTextFieldInput,
+            llmName
           );
 
         console.log("RAG Prompt:", ragPrompt);
@@ -159,6 +134,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         setFilesReferenced(uniqueFilesReferenced);
         console.log("Unique files referenced:", filesReferenced);
         augmentedPrompt = ragPrompt;
+
       }
     } catch (error) {
       console.error("Failed to augment prompt:", error);
@@ -171,13 +147,13 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       return;
     }
 
-    startStreamingResponse(currentSessionId, augmentedPrompt, true);
+    startStreamingResponse(llmName, augmentedPrompt);
 
     setMessages([
       ...newMessages,
-      { role: "user", messageType: "success", content: userInput },
+      { role: "user", messageType: "success", content: userTextFieldInput },
     ]);
-    setUserInput("");
+    setUserTextFieldInput("");
   };
 
   // const handleCustomLinkClick = (event: React.MouseEvent) => {
@@ -187,90 +163,63 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   // };
 
   useEffect(() => {
-    if (sessionId) {
-      let active = true;
-      const updateStream = (newMessage: ChatbotMessage) => {
-        let context = "";
-        if (!active) return;
-
-        setCurrentBotMessage((prev) => {
-          if (
-            newMessage.messageType === "COMPLETED" &&
-            filesReferenced.length > 0
-          ) {
-            const newBulletedFiles = filesReferenced.map((file) => {
-              return ` - [${file}](#)`;
-            });
-            context = `  \n -- -- --  \n Files referenced:  \n ${newBulletedFiles.join(
-              "  \n"
-            )}`;
-            // compare files content with the generated response and filter out the contents that dont have high enough similarity
-
-            //how to embed links
-            setFilesReferenced([]);
-          }
-
-          return {
-            messageType: newMessage.messageType,
-            role: "user" as MessageRole,
-            content:
-              `${
-                prev?.content
-                  ? prev.content + newMessage.content
-                  : newMessage.content
-              }` + `${context}`,
-          };
-        });
-      };
-
-      window.ipcRenderer.receive("tokenStream", updateStream);
-
-      return () => {
-        active = false;
-        window.ipcRenderer.removeListener("tokenStream", updateStream);
-      };
-    }
-  }, [sessionId, filesReferenced]);
-
-  useEffect(() => {
-    return () => {
-      if (sessionId) {
-        console.log("Deleting session:", sessionId);
-        window.llm.deleteSession(sessionId);
-      }
-      console.log("Component is unmounted (hidden)");
+    let active = true;
+    const updateStream = (chunk: ChatCompletionChunk) => {
+      if (!active) return;
+      const newMsgContent = chunk.choices[0].delta.content;
+      if (!newMsgContent) return;
+      setCurrentBotMessage((prev) => {
+        return {
+          role: "assistant",
+          messageType: "success",
+          content: prev?.content ? prev.content + newMsgContent : newMsgContent,
+        };
+      });
     };
-  }, [sessionId]);
+
+    window.ipcRenderer.receive("tokenStream", updateStream);
+    return () => {
+      active = false;
+      window.ipcRenderer.removeListener("tokenStream", updateStream);
+    };
+  }, []);
 
   const restartSession = async () => {
-    if (sessionId) {
-      console.log("Deleting session:", sessionId);
-      await window.llm.deleteSession(sessionId);
-    }
-    const newSessionId = await initializeSession();
-    setSessionId(newSessionId);
     fetchDefaultModel();
   };
 
   const startStreamingResponse = async (
-    sessionId: string,
-    prompt: string,
-    ignoreChatHistory?: boolean
+    // sessionId: string,
+    llmName: string,
+    prompt: string
   ) => {
     try {
       console.log("Initializing streaming response...");
       setLoadingResponse(true);
-      await window.llm.initializeStreamingResponse(
-        sessionId,
-        prompt,
-        ignoreChatHistory
+      const llmConfigs = await window.llm.getLLMConfigs();
+      const defaultLLMName = await window.llm.getDefaultLLMName();
+      const currentModelConfig = llmConfigs.find(
+        (config) => config.modelName === defaultLLMName
       );
+      if (!currentModelConfig) {
+        throw new Error(`No model config found for model: ${llmName}`);
+      }
+      await window.llm.streamingLLMResponse(llmName, currentModelConfig, [
+        { role: "user", content: prompt },
+      ]);
       console.log("Initialized streaming response");
       setLoadingResponse(false);
     } catch (error) {
       setLoadingResponse(false);
-
-      console.error("Failed to initialize streaming response:", error);
+      setCurrentBotMessage((prev) => {
+        return {
+          role: "assistant",
+          messageType: "error",
+          content: prev?.content
+            ? prev.content + "\n" + errorToString(error)
+            : errorToString(error),
+        };
+      });
     }
   };
 
@@ -287,11 +236,11 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const handleInputChange: React.ChangeEventHandler<HTMLTextAreaElement> = (
     e
   ) => {
-    setUserInput(e.target.value);
+    setUserTextFieldInput(e.target.value);
   };
 
   return (
-    <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border border-solid border-gray-600">
+    <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid">
       <div className="flex w-full items-center">
         <div className="flex-grow flex justify-center items-center m-0 mt-1 ml-2 mb-1 p-0">
           {defaultModel ? (
@@ -305,19 +254,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         </div>
       </div>
       <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
-        {/* {messages.length === 0 && !currentBotMessage && (
-          <div>
-            {defaultModel ? (
-              <p className="text-center text-gray-500">
-                Using default model: {defaultModel}
-              </p>
-            ) : (
-              <p className="text-center text-gray-500">
-                No default model selected
-              </p>
-            )}
-          </div>
-        )} */}
         <div className="space-y-2 mt-4 flex-grow">
           {messages.map((message, index) => (
             <ReactMarkdown
@@ -354,7 +290,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             </ReactMarkdown>
           )}
         </div>
-        {userInput === "" &&
+        {userTextFieldInput === "" &&
         askText === AskOptions.AskFile &&
         messages.length == 0 ? (
           <>
@@ -365,7 +301,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                   promptText={option}
                   onClick={() => {
                     console.log(option);
-                    setUserInput(option);
+                    setUserTextFieldInput(option);
                   }}
                 />
               );
@@ -374,13 +310,13 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           </>
         ) : undefined}
       </div>
-      <div className="p-3 bg-neutral-500">
+      <div className="p-3 bg-neutral-600">
         <div className="flex space-x-2 h-full">
           <Textarea
             onKeyDown={handleKeyDown}
             onChange={handleInputChange}
-            value={userInput}
-            className="w-full bg-neutral-300"
+            value={userTextFieldInput}
+            className="w-full  bg-gray-300"
             name="Outlined"
             placeholder="Ask your knowledge..."
             variant="outlined"

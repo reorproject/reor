@@ -38,7 +38,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
       />
 
       <div className="flex h-below-titlebar">
-        <div className="w-[40px] border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-gray-600 border-solid">
+        <div className="w-[40px] border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid">
           <LeftSidebar
             onFileSelect={openFileByPath}
             sidebarShowing={sidebarShowing}
@@ -47,7 +47,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         </div>
 
         <ResizableComponent resizeSide="right">
-          <div className="h-full border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-gray-600 border-solid w-full">
+          <div className="h-full border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid w-full">
             <SidebarManager
               selectedFilePath={filePath}
               onFileSelect={openFileByPath}

@@ -1,6 +1,6 @@
 {
   "name": "reor-project",
-  "version": "0.1.55",
+  "version": "0.1.56",
   "productName": "Reor",
   "main": "dist-electron/main/index.js",
   "description": "An AI note-taking app that runs models locally.",
@@ -49,9 +49,10 @@
     "js-tiktoken": "^1.0.10",
     "langchain": "^0.1.5",
     "lit": "^3.0.0",
+    "lodash.debounce": "^4.0.8",
     "marked": "^12.0.1",
-    "node-llama-cpp": "3.0.0-beta.12",
     "npm": "^10.3.0",
+    "ollama": "^0.4.9",
     "openai": "^4.20.0",
     "react-icons": "^4.12.0",
     "react-markdown": "^9.0.1",
@@ -60,6 +61,7 @@
     "react-switch": "^7.0.0",
     "react-toastify": "^10.0.4",
     "react-window": "^1.8.10",
+    "tiptap-markdown": "^0.8.10",
     "turndown": "^7.1.2",
     "use-debounce": "^10.0.0",
     "vectordb": "0.4.10"

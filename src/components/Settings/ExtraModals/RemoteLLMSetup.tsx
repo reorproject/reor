@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "@material-tailwind/react";
 import Modal from "../../Generic/Modal";
-import { LLMModelConfig } from "electron/main/Store/storeConfig";
+import { LLMConfig } from "electron/main/Store/storeConfig";
 import CustomSelect from "../../Generic/Select";
 import { errorToString } from "@/functions/error";
 import ExternalLink from "../../Generic/ExternalLink";
@@ -33,15 +33,16 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
   const [currentError, setCurrentError] = useState<string>("");
 
   const handleSave = async () => {
-    const modelConfig: LLMModelConfig = {
+    const modelConfig: LLMConfig = {
       type: "openai",
+      modelName,
       contextLength: parseInt(selectedContextLength),
       apiURL,
       apiKey,
       engine: "openai",
     };
     try {
-      await window.electronStore.addOrUpdateLLM(modelName, modelConfig);
+      await window.llm.addOrUpdateLLM(modelConfig);
       parentOnClose();
     } catch (error) {
       console.error("Failed to save remote model configuration:", error);

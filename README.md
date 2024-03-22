@@ -22,6 +22,14 @@ A self-organizing AI note-taking app that runs models locally.</h4>
 
 The hypothesis of the project is that AI tools for thought should **run models locally** by default. Reor stands on the shoulders of the giants [Llama.cpp](https://github.com/ggerganov/llama.cpp), [Transformers.js](https://github.com/xenova/transformers.js) & [LanceDB](https://github.com/lancedb/lancedb) to enable both LLMs and embedding models to run locally. (Connecting to OpenAI-compatible APIs like Oobabooga is also supported.)
 
+
+
+https://github.com/reorproject/reor/assets/17236551/94a1dfeb-3361-45cd-8ebc-5cfed81ed9cb
+
+
+
+
+
 ### How can it possibly be "self-organizing"?
 
 1.  Every note you write is chunked and embedded into an internal vector database.
@@ -30,9 +38,6 @@ The hypothesis of the project is that AI tools for thought should **run models l
 4.  Everything can be searched semantically.
 
 One way to think about Reor is as a RAG app with two generators: the LLM and the human. In Q&A mode, the LLM is fed retrieved context from the corpus to help answer a query. Similarly, in editor mode, the human can toggle the sidebar to reveal related notes "retrieved" from the corpus. This is quite a powerful way of "augmenting" your thoughts by cross-referencing ideas in a current note against related ideas from your corpus.
-
-https://github.com/reorproject/reor/assets/17236551/1bbc1b2d-c3d9-451c-a008-7f12c84f96db
-
 
   
 ### Getting Started
@@ -78,17 +83,8 @@ Contributions are welcome in all areas: features, ideas, bug fixes, design, etc.
 ### Folder Structure
 The main components of the project are located in the following directories:
 
-- `/electron`: Contains the backend functions that manage all the filesystem as well as the Low-Level Module (LLM).
+- `/electron`: Contains the main process functions that manage all the filesystem interactions, LLMs, Embedding Models and the vector database.
 - `/src`: Contains the frontend of the application, which is a React app.
-
-#### Backend
-The backend of the application is located in the `/electron` directory. It is divided into several subdirectories:
-
-- `/Store`: Handles the main functions for the backend in the `storeHandler.ts` file.
-- `/preload`: Acts as a middleware that exposes the backend functions to the frontend.
-
-#### Frontend
-The frontend of the application is a React app located in the `/src` folder. It communicates with the backend through the functions exposed by the `/preload` middleware inside the `/electron` folder.
 
 ## License
 GPL-3.0 license. See `LICENSE` for details.

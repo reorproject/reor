@@ -71,8 +71,8 @@ async function createWindow() {
     frame: false,
     titleBarStyle: "hidden",
     titleBarOverlay: {
-      color: "#2f3241",
-      symbolColor: "#74b1be",
+      color: "#303030",
+      symbolColor: "#fff",
       height: 30,
     },
     width: width,
@@ -102,10 +102,10 @@ async function createWindow() {
 
   if (windowsManager.activeWindows.length <= 0) {
     update(win);
-    registerLLMSessionHandlers(store);
-    registerDBSessionHandlers(store, windowsManager);
-    registerStoreHandlers(store, windowsManager);
-    registerFileHandlers(windowsManager);
+    await registerLLMSessionHandlers(store);
+    await registerDBSessionHandlers(store, windowsManager);
+    await registerStoreHandlers(store, windowsManager);
+    await registerFileHandlers(store, windowsManager);
   }
 }
 

@@ -1,11 +1,10 @@
-import { LLMModelConfig } from "../Store/storeConfig";
+import Store from "electron-store";
+import { LLMConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
+import { OllamaService } from "./models/Ollama";
 
-export function validateAIModelConfig(
-  modelName: string,
-  config: LLMModelConfig
-): string | null {
+export function validateAIModelConfig(config: LLMConfig): string | null {
   // Validate localPath: ensure it's not empty
-  if (!modelName.trim()) {
+  if (!config.modelName.trim()) {
     return "Model name is required.";
   }
 
@@ -32,4 +31,78 @@ export function validateAIModelConfig(
   }
 
   return null;
+}
+
+export async function addOrUpdateLLMSchemaInStore(
+  store: Store<StoreSchema>,
+  modelConfig: LLMConfig
+): Promise<void> {
+  const existingModelsInStore = await store.get(StoreKeys.LLMs);
+  console.log("existingModels: ", existingModelsInStore);
+  const isNotValid = validateAIModelConfig(modelConfig);
+  if (isNotValid) {
+    throw new Error(isNotValid);
+  }
+
+  const foundModel = existingModelsInStore.find(
+    (model) => model.modelName === modelConfig.modelName
+  );
+
+  console.log("foundModel: ", foundModel);
+
+  if (foundModel) {
+    console.log("updating model");
+    const updatedModels = existingModelsInStore.map((model) =>
+      model.modelName === modelConfig.modelName ? modelConfig : model
+    );
+    store.set(StoreKeys.LLMs, updatedModels);
+  } else {
+    console.log("adding model");
+    const updatedModels = [...existingModelsInStore, modelConfig];
+    store.set(StoreKeys.LLMs, updatedModels);
+  }
+}
+
+export async function removeLLM(
+  store: Store<StoreSchema>,
+  ollamaService: OllamaService,
+  modelName: string
+): Promise<void> {
+  const existingModels = (store.get(StoreKeys.LLMs) as LLMConfig[]) || [];
+
+  const foundModel = await getLLMConfig(store, ollamaService, modelName);
+
+  if (!foundModel) {
+    return;
+  }
+
+  const updatedModels = existingModels.filter(
+    (model) => model.modelName !== modelName
+  );
+  store.set(StoreKeys.LLMs, updatedModels);
+
+  ollamaService.deleteModel(modelName);
+}
+
+export async function getAllLLMConfigs(
+  store: Store<StoreSchema>,
+  ollamaSession: OllamaService
+): Promise<LLMConfig[]> {
+  const llmConfigsFromStore = store.get(StoreKeys.LLMs);
+  const ollamaLLMConfigs = await ollamaSession.getAvailableModels();
+
+  return [...llmConfigsFromStore, ...ollamaLLMConfigs];
+}
+
+export async function getLLMConfig(
+  store: Store<StoreSchema>,
+  ollamaSession: OllamaService,
+  modelName: string
+): Promise<LLMConfig | undefined> {
+  const llmConfigs = await getAllLLMConfigs(store, ollamaSession);
+  console.log("llmConfigs: ", llmConfigs);
+  if (llmConfigs) {
+    return llmConfigs.find((model: LLMConfig) => model.modelName === modelName);
+  }
+  return undefined;
 }

@@ -1,9 +1,15 @@
-export function errorToString(error: unknown): string {
+export function errorToString(error: unknown, depth: number = 0): string {
   if (error instanceof Error) {
-    // Use toString() method for Error objects
-    return error.toString();
+    let errorString = `${error.name}: ${error.message}`;
+    if (error.cause) {
+      errorString += `\nCaused by: ${errorToString(error.cause, depth + 1)}`;
+    }
+    if (depth === 0) {
+      // Optionally include the stack trace at the top level
+      errorString += `\nStack Trace:\n${error.stack}`;
+    }
+    return errorString;
   } else {
-    // Convert other types of errors to string
     return String(error);
   }
 }

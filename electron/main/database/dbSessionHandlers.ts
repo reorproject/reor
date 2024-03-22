@@ -1,9 +1,11 @@
 import { ipcMain } from "electron";
 import { createPromptWithContextLimitFromContent } from "../Prompts/Prompts";
 import { DBEntry, DBQueryResult, DatabaseFields } from "./Schema";
-import { LLMSessions } from "../llm/llmSessionHandlers";
+import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
 import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
+import { getLLMConfig } from "../llm/llmConfig";
+import { errorToString } from "../Generic/error";
 import WindowsManager from "../windowManager";
 
 export interface PromptWithRagResults {
@@ -47,7 +49,7 @@ export const registerDBSessionHandlers = (
     async (
       event,
       query: string,
-      llmSessionID: string,
+      llmName: string,
       filter?: string
     ): Promise<PromptWithRagResults> => {
       try {
@@ -68,30 +70,33 @@ export const registerDBSessionHandlers = (
           throw new Error("Max RAG examples is not set or is invalid.");
         }
 
-        const llmSession = LLMSessions[llmSessionID];
-        if (!llmSession) {
-          throw new Error(`Session ${llmSessionID} does not exist.`);
+        const llmSession = openAISession;
+        const llmConfig = await getLLMConfig(store, ollamaService, llmName);
+        console.log("llmConfig", llmConfig);
+        if (!llmConfig) {
+          throw new Error(`LLM ${llmName} not configured.`);
         }
-
+        
         const filteredResults = searchResults.filter(
           (entry) => entry._distance < 0.4
         );
-
         const { prompt: ragPrompt } = createPromptWithContextLimitFromContent(
           filteredResults,
           query,
-          llmSession.tokenize,
-          llmSession.getContextLength()
+          llmSession.getTokenizer(llmName),
+          llmConfig.contextLength
         );
 
         // organize the search results by file path - which will include file path previews
         const uniqueFilesReferenced = [
           ...new Set(filteredResults.map((entry) => entry.notepath)),
         ];
+        console.log("ragPrompt", ragPrompt);
+
         return { ragPrompt, uniqueFilesReferenced };
       } catch (error) {
         console.error("Error searching database:", error);
-        throw error;
+        throw errorToString(error);
       }
     }
   );

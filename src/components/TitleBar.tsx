@@ -37,7 +37,8 @@ const TitleBar: React.FC<TitleBarProps> = ({
   return (
     <div
       id="customTitleBar"
-      className={`h-titlebar bg-neutral-700 flex justify-between`}
+      className={`h-titlebar  flex justify-between`}
+      style={{ backgroundColor: "#303030" }}
     >
       <div
         className=" flex"
@@ -60,21 +61,23 @@ const TitleBar: React.FC<TitleBarProps> = ({
       >
         {similarFilesOpen ? (
           <PiSidebarFill
-            className="text-gray-100 cursor-pointer mt-[0.1rem]"
+
+            className="text-gray-100 cursor-pointer mt-[0.04rem]"
             size={28}
             onClick={toggleSimilarFiles}
             title="Hide Similar Files"
           />
         ) : (
           <PiSidebar
-            className="text-gray-100 cursor-pointer mt-[0.1rem]"
+
+            className="text-gray-100 cursor-pointer mt-[0.04rem]"
             size={28}
             onClick={toggleSimilarFiles}
             title="Show Similar Files"
           />
         )}
 
-        <div className="mt-[0.33rem] mr-[0.5rem] ml-[0.3rem]">
+        <div className="mt-[0.34rem] mr-[0.5rem] ml-[0.3rem]">
           {chatbotOpen ? (
             <BsFillChatLeftDotsFill
               size={22}
