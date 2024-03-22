@@ -5,7 +5,6 @@ import {
   MenuItem,
   MenuList,
 } from "@material-tailwind/react";
-import { ChatbotMessage, MessageRole } from "electron/main/llm/Types";
 import { errorToString } from "@/functions/error";
 import { toast } from "react-toastify";
 import Textarea from "@mui/joy/Textarea";
@@ -15,6 +14,7 @@ import { FiRefreshCw } from "react-icons/fi"; // Importing refresh icon from Rea
 import { ChatPrompt } from "./Chat-Prompts";
 import { CustomLinkMarkdown } from "./CustomLinkMarkdown";
 import { ChatCompletionChunk } from "openai/resources/chat/completions";
+import { CompletedMessageType } from "electron/main/llm/Types";
 
 // convert ask options to enum
 enum AskOptions {
@@ -39,8 +39,10 @@ interface ChatWithLLMProps {
   openFileByPath: (path: string) => Promise<void>;
 }
 
-
-const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath, openFileByPath }) => {
+const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
+  currentFilePath,
+  openFileByPath,
+}) => {
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>("");
   const [messages, setMessages] = useState<ChatUIMessage[]>([]);
   const [defaultModel, setDefaultModel] = useState<string>("");
@@ -54,6 +56,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath, openFileByPa
     const defaultModelName = await window.llm.getDefaultLLMName();
     setDefaultModel(defaultModelName);
   };
+
   useEffect(() => {
     fetchDefaultModel();
   }, []);
@@ -130,11 +133,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath, openFileByPa
           );
 
         console.log("RAG Prompt:", ragPrompt);
+        console.log("Unique files referenced:", uniqueFilesReferenced);
 
         setFilesReferenced(uniqueFilesReferenced);
-        console.log("Unique files referenced:", filesReferenced);
         augmentedPrompt = ragPrompt;
-
       }
     } catch (error) {
       console.error("Failed to augment prompt:", error);
@@ -156,23 +158,42 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath, openFileByPa
     setUserTextFieldInput("");
   };
 
-  // const handleCustomLinkClick = (event: React.MouseEvent) => {
-  //   event.preventDefault(); // Prevent default link behavior
-  //   const link = (event.target as HTMLAnchorElement).innerText;
-  //   return link;
-  // };
-
   useEffect(() => {
     let active = true;
-    const updateStream = (chunk: ChatCompletionChunk) => {
+    const updateStream = (
+      chunk: ChatCompletionChunk | CompletedMessageType
+    ) => {
       if (!active) return;
-      const newMsgContent = chunk.choices[0].delta.content;
-      if (!newMsgContent) return;
+      let filesContext = "";
+      if (
+        (chunk as CompletedMessageType).messageType === "COMPLETED" &&
+        filesReferenced.length > 0
+      ) {
+        const newBulletedFiles = filesReferenced.map((file, index) => {
+          const simplifiedFilePath = file.startsWith(
+            window.electronStore.getUserDirectory()
+          )
+            ? file.replace(window.electronStore.getUserDirectory() + "/", "")
+            : file;
+          return ` ${index + 1}. [${simplifiedFilePath}](#)`;
+        });
+        filesContext = `  \n -- -- --  \n  Files referenced:  \n ${newBulletedFiles.join(
+          "  \n"
+        )}`;
+        setFilesReferenced([]); // clear the files referenced after this message
+      }
+      const newMsgContent = (chunk as ChatCompletionChunk).choices
+        ? (chunk as ChatCompletionChunk).choices[0].delta.content
+        : "";
+
+      if (!newMsgContent && !filesContext) return;
       setCurrentBotMessage((prev) => {
         return {
           role: "assistant",
           messageType: "success",
-          content: prev?.content ? prev.content + newMsgContent : newMsgContent,
+          content:
+            `${prev?.content ? prev.content + newMsgContent : newMsgContent}` +
+            `${filesContext}`,
         };
       });
     };
@@ -182,7 +203,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath, openFileByPa
       active = false;
       window.ipcRenderer.removeListener("tokenStream", updateStream);
     };
-  }, []);
+  }, [filesReferenced]);
 
   const restartSession = async () => {
     fetchDefaultModel();

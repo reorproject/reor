@@ -35,6 +35,7 @@ export class OpenAIModelSessionService implements LLMSessionService {
     modelConfig: OpenAILLMConfig,
     messageHistory: ChatCompletionMessageParam[],
     handleChunk: (chunk: ChatCompletionChunk) => void,
+    onComplete: () => void,
     generationParams?: LLMGenerationParameters
   ): Promise<void> {
     console.log("making call to url: ", modelConfig);
@@ -53,9 +54,9 @@ export class OpenAIModelSessionService implements LLMSessionService {
       temperature: generationParams?.temperature,
     });
 
-
     for await (const chunk of stream) {
       handleChunk(chunk);
     }
+    onComplete();
   }
 }

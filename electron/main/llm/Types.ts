@@ -26,6 +26,7 @@ export interface LLMSessionService {
     modelConfig: LLMConfig,
     messageHistory: Array<ChatCompletionMessageParam>,
     chunkResponse: (chunk: ChatCompletionChunk) => void,
+    onComplete: () => void,
     generationParams?: LLMGenerationParameters
   ): Promise<void>;
 
@@ -42,4 +43,6 @@ export interface ISendFunctionImplementer {
   send(channel: string, ...args: unknown[]): void;
 }
 
-export type MessageRole = "user" | "assistant";
+export interface CompletedMessageType {
+  messageType: "COMPLETED";
+}

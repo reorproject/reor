@@ -13,6 +13,8 @@ export interface PromptWithRagResults {
   uniqueFilesReferenced: string[];
 }
 
+const MAX_COSINE_DISTANCE = 0.4;
+
 export const registerDBSessionHandlers = (
   // dbTable: LanceDBTableWrapper,
   store: Store<StoreSchema>,
@@ -76,9 +78,9 @@ export const registerDBSessionHandlers = (
         if (!llmConfig) {
           throw new Error(`LLM ${llmName} not configured.`);
         }
-        
+
         const filteredResults = searchResults.filter(
-          (entry) => entry._distance < 0.4
+          (entry) => entry._distance < MAX_COSINE_DISTANCE
         );
         const { prompt: ragPrompt } = createPromptWithContextLimitFromContent(
           filteredResults,
