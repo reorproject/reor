@@ -22,7 +22,10 @@ A self-organizing AI note-taking app that runs models locally.</h4>
 
 The hypothesis of the project is that AI tools for thought should **run models locally** by default. Reor stands on the shoulders of the giants [Llama.cpp](https://github.com/ggerganov/llama.cpp), [Transformers.js](https://github.com/xenova/transformers.js) & [LanceDB](https://github.com/lancedb/lancedb) to enable both LLMs and embedding models to run locally. (Connecting to OpenAI-compatible APIs like Oobabooga is also supported.)
 
-https://github.com/reorproject/reor/assets/17236551/9edf769e-3cdb-4a44-bdd9-76a2359b19ea
+
+https://github.com/reorproject/reor/assets/17236551/92913cc7-5d53-4e17-a26d-e2c813533aeb
+
+
 
 ### How can it possibly be "self-organizing"?
 
