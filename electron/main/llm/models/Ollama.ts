@@ -12,13 +12,22 @@ import {
 import { app } from "electron";
 import * as path from "path";
 import * as os from "os";
-import { spawn } from "child_process";
+import * as fs from "fs";
+import { exec } from "child_process";
 // import ollama,"ollama";
 import { ModelResponse, ProgressResponse, Ollama } from "ollama";
+
+const OllamaServeType = {
+  SYSTEM: "system", // ollama is installed on the system
+  PACKAGED: "packaged", // ollama is packaged with the app
+};
 
 export class OllamaService implements LLMSessionService {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private client!: Ollama;
+  private host = "http://127.0.0.1:11434";
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private childProcess: any;
 
   constructor() {
     // this.client = await import("ollama");
@@ -27,11 +36,8 @@ export class OllamaService implements LLMSessionService {
 
   public init = async () => {
     console.log("Initializing Ollama client...");
-    try {
-      this.serve();
-    } catch (e) {
-      console.error("Error starting Ollama server: ", e);
-    }
+    await this.serve();
+
     const ollamaLib = await import("ollama");
     this.client = new ollamaLib.Ollama();
     console.log("Ollama client: ", this.client);
@@ -41,49 +47,136 @@ export class OllamaService implements LLMSessionService {
     // console.log("Ollama models: ", lists);
   };
 
-  private serve = async () => {
-    let exePath: string;
-    let exeName: string;
+  async ping() {
+    const response = await fetch(this.host, {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    if (response.status !== 200) {
+      throw new Error(`failed to ping ollama server: ${response.status}`);
+    }
+
+    return true;
+  }
+
+  async serve() {
+    try {
+      // see if ollama is already running
+      await this.ping();
+      return OllamaServeType.SYSTEM;
+    } catch (err) {
+      // throw new Error(`Failed to start Ollama: ${err}`);
+      // this is fine, we just need to start ollama
+    }
+
+    try {
+      // See if 'ollama serve' command is available on the system
+      await this.execServe("olladsfaddsfasma");
+      console.log("Ollama is installed on the system");
+      return OllamaServeType.SYSTEM;
+    } catch (err) {
+      // ollama is not installed, run the binary directly
+      console.log("Ollama is not installed on the system: ", err);
+      // logInfo(`/ is not installed on the system: ${err}`);
+    }
+
+    let exeName = "";
+    let exeDir = "";
+    let appDataPath = "";
     switch (process.platform) {
       case "win32":
         exeName = "ollama.exe";
-        exePath = app.isPackaged
+        exeDir = app.isPackaged
           ? path.join(process.resourcesPath, "binaries")
           : path.join(app.getAppPath(), "binaries", "win32");
+        appDataPath = path.join(os.homedir(), "AppData", "Local", "chatd");
+
         break;
       case "darwin":
         exeName = "ollama-darwin";
-        exePath = app.isPackaged
+        exeDir = app.isPackaged
           ? path.join(process.resourcesPath, "binaries")
           : path.join(app.getAppPath(), "binaries", "darwin");
+        appDataPath = path.join(
+          os.homedir(),
+          "Library",
+          "Application Support",
+          "chatd"
+        );
         break;
       case "linux":
         exeName = "ollama-linux";
-        exePath = app.isPackaged
+        exeDir = app.isPackaged
           ? path.join(process.resourcesPath, "binaries")
           : path.join(app.getAppPath(), "binaries", "linux");
+        appDataPath = path.join(os.homedir(), ".config", "chatd");
+
         break;
       default:
         throw new Error("Unsupported platform");
     }
-    const exe = path.join(exePath, exeName);
-    console.log("app path: ", app.getAppPath());
-    console.log("resources path: ", process.resourcesPath);
-    console.log("dirname is: ", __dirname);
-    console.log("Starting Ollama server with: ", exe);
-    const child = spawn(exe, ["serve"]);
-    child.stdout.on("data", (data) => {
-      console.log(`stdout: ${data}`);
-    });
+    const exePath = path.join(exeDir, exeName);
+    try {
+      await this.execServe(exePath, appDataPath);
+      return OllamaServeType.PACKAGED;
+    } catch (err) {
+      throw new Error(`Failed to start Ollama: ${err}`);
+    }
+  }
 
-    child.stderr.on("data", (data) => {
-      console.error(`stderr: ${data}`);
-    });
+  async execServe(path: string, appDataDirectory?: string) {
+    return new Promise((resolve, reject) => {
+      if (appDataDirectory && !fs.existsSync(appDataDirectory)) {
+        fs.mkdirSync(appDataDirectory, { recursive: true });
+      }
+      const env = {
+        ...process.env,
+        OLLAMA_MODELS: appDataDirectory,
+      };
+      this.childProcess = exec(
+        path + " serve",
+        { env },
+        (err, stdout, stderr) => {
+          if (err) {
+            reject(`exec error: ${err}`);
+            return;
+          }
 
-    child.on("close", (code) => {
-      console.log(`child process exited with code ${code}`);
+          if (stderr) {
+            reject(`ollama stderr: ${stderr}`);
+            return;
+          }
+
+          reject(`ollama stdout: ${stdout}`);
+        }
+      );
+
+      // Once the process is started, try to ping Ollama server.
+      this.waitForPing()
+        .then(() => {
+          resolve(void 0);
+        })
+        .catch((pingError) => {
+          if (this.childProcess && !this.childProcess.killed) {
+            this.childProcess.kill();
+          }
+          reject(pingError);
+        });
     });
-  };
+  }
+
+  async waitForPing(delay = 1000, retries = 5) {
+    for (let i = 0; i < retries; i++) {
+      try {
+        await this.ping();
+        return;
+      } catch (err) {
+        await new Promise((resolve) => setTimeout(resolve, delay));
+      }
+    }
+    throw new Error("Max retries reached. Ollama server didn't respond.");
+  }
 
   public getAvailableModels = async (): Promise<OpenAILLMConfig[]> => {
     const ollamaModelsResponse = await this.client.list();

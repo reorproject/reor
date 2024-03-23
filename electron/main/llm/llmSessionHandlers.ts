@@ -23,8 +23,6 @@ export const openAISession = new OpenAIModelSessionService();
 export const ollamaService = new OllamaService();
 
 export const registerLLMSessionHandlers = async (store: Store<StoreSchema>) => {
-  await ollamaService.init();
-
   ipcMain.handle(
     "streaming-llm-response",
     async (

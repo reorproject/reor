@@ -9,7 +9,6 @@ import {
 } from "electron";
 import { release } from "node:os";
 import { join } from "node:path";
-import { update } from "./update";
 import Store from "electron-store";
 import * as path from "path";
 import { StoreSchema } from "./Store/storeConfig";
@@ -19,7 +18,10 @@ import {
   startWatchingDirectory,
   updateFileListForRenderer,
 } from "./Files/Filesystem";
-import { registerLLMSessionHandlers } from "./llm/llmSessionHandlers";
+import {
+  ollamaService,
+  registerLLMSessionHandlers,
+} from "./llm/llmSessionHandlers";
 // import { FileInfoNode } from "./Files/Types";
 import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
 import {
@@ -59,8 +61,27 @@ const indexHtml = join(process.env.DIST, "index.html");
 let dbConnection: lancedb.Connection;
 
 async function createWindow() {
+  const errorsToSendWindow: string[] = [];
+  try {
+    if (windowsManager.activeWindows.length <= 0) {
+      await registerLLMSessionHandlers(store);
+      await registerDBSessionHandlers(store, windowsManager);
+      await registerStoreHandlers(store, windowsManager);
+      await registerFileHandlers(store, windowsManager);
+    }
+  } catch (error) {
+    errorsToSendWindow.push(errorToString(error));
+  }
+  try {
+    if (windowsManager.activeWindows.length <= 0) {
+      await ollamaService.init();
+    }
+  } catch (error) {
+    errorsToSendWindow.push(errorToString(error));
+  }
   const { x, y } = windowsManager.getNextWindowPosition();
   const { width, height } = windowsManager.getWindowSize();
+
   const win = new BrowserWindow({
     title: "Reor",
     x: x,
@@ -100,12 +121,15 @@ async function createWindow() {
     windowsManager.prepareWindowForClose(store, win);
   });
 
-  if (windowsManager.activeWindows.length <= 0) {
-    update(win);
-    await registerLLMSessionHandlers(store);
-    await registerDBSessionHandlers(store, windowsManager);
-    await registerStoreHandlers(store, windowsManager);
-    await registerFileHandlers(store, windowsManager);
+  if (errorsToSendWindow.length > 0) {
+    win.webContents.on("did-finish-load", () => {
+      errorsToSendWindow.forEach((errorStrToSendWindow) => {
+        win.webContents.send(
+          "error-to-display-in-window",
+          errorStrToSendWindow
+        );
+      });
+    });
   }
 }
 
@@ -200,7 +224,7 @@ ipcMain.on("index-files-in-directory", async (event) => {
     } else {
       errorStr = `${error}. Please try restarting or open a Github issue.`;
     }
-    event.sender.send("indexing-error", errorStr);
+    event.sender.send("error-to-display-in-window", errorStr);
     console.error("Error during file indexing:", error);
   }
 });
