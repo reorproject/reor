@@ -82,14 +82,12 @@ export class OllamaService implements LLMSessionService {
 
     let exeName = "";
     let exeDir = "";
-    let appDataPath = "";
     switch (process.platform) {
       case "win32":
         exeName = "ollama.exe";
         exeDir = app.isPackaged
           ? path.join(process.resourcesPath, "binaries")
           : path.join(app.getAppPath(), "binaries", "win32");
-        appDataPath = path.join(os.homedir(), "AppData", "Local", "chatd");
 
         break;
       case "darwin":
@@ -97,19 +95,12 @@ export class OllamaService implements LLMSessionService {
         exeDir = app.isPackaged
           ? path.join(process.resourcesPath, "binaries")
           : path.join(app.getAppPath(), "binaries", "darwin");
-        appDataPath = path.join(
-          os.homedir(),
-          "Library",
-          "Application Support",
-          "chatd"
-        );
         break;
       case "linux":
         exeName = "ollama-linux";
         exeDir = app.isPackaged
           ? path.join(process.resourcesPath, "binaries")
           : path.join(app.getAppPath(), "binaries", "linux");
-        appDataPath = path.join(os.homedir(), ".config", "chatd");
 
         break;
       default:
@@ -117,21 +108,17 @@ export class OllamaService implements LLMSessionService {
     }
     const exePath = path.join(exeDir, exeName);
     try {
-      await this.execServe(exePath, appDataPath);
+      await this.execServe(exePath);
       return OllamaServeType.PACKAGED;
     } catch (err) {
       throw new Error(`Failed to start Ollama: ${err}`);
     }
   }
 
-  async execServe(path: string, appDataDirectory?: string) {
+  async execServe(path: string) {
     return new Promise((resolve, reject) => {
-      if (appDataDirectory && !fs.existsSync(appDataDirectory)) {
-        fs.mkdirSync(appDataDirectory, { recursive: true });
-      }
       const env = {
         ...process.env,
-        OLLAMA_MODELS: appDataDirectory,
       };
       this.childProcess = exec(
         path + " serve",
