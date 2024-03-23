@@ -178,6 +178,24 @@ export class OllamaService implements LLMSessionService {
     throw new Error("Max retries reached. Ollama server didn't respond.");
   }
 
+  stop() {
+    if (!this.childProcess) {
+      return;
+    }
+
+    if (os.platform() === "win32") {
+      exec(`taskkill /pid ${this.childProcess.pid} /f /t`, (err) => {
+        if (err) {
+          console.log("Failed to kill Ollama process: ", err);
+        }
+      });
+    } else {
+      this.childProcess.kill();
+    }
+    console.log("Ollama process killed");
+    this.childProcess = null;
+  }
+
   public getAvailableModels = async (): Promise<OpenAILLMConfig[]> => {
     const ollamaModelsResponse = await this.client.list();
 

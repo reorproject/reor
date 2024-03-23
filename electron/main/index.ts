@@ -61,24 +61,6 @@ const indexHtml = join(process.env.DIST, "index.html");
 let dbConnection: lancedb.Connection;
 
 async function createWindow() {
-  const errorsToSendWindow: string[] = [];
-  try {
-    if (windowsManager.activeWindows.length <= 0) {
-      await registerLLMSessionHandlers(store);
-      await registerDBSessionHandlers(store, windowsManager);
-      await registerStoreHandlers(store, windowsManager);
-      await registerFileHandlers(store, windowsManager);
-    }
-  } catch (error) {
-    errorsToSendWindow.push(errorToString(error));
-  }
-  try {
-    if (windowsManager.activeWindows.length <= 0) {
-      await ollamaService.init();
-    }
-  } catch (error) {
-    errorsToSendWindow.push(errorToString(error));
-  }
   const { x, y } = windowsManager.getNextWindowPosition();
   const { width, height } = windowsManager.getWindowSize();
 
@@ -121,34 +103,30 @@ async function createWindow() {
     windowsManager.prepareWindowForClose(store, win);
   });
 
-  if (errorsToSendWindow.length > 0) {
-    win.webContents.on("did-finish-load", () => {
-      errorsToSendWindow.forEach((errorStrToSendWindow) => {
-        win.webContents.send(
-          "error-to-display-in-window",
-          errorStrToSendWindow
-        );
-      });
+  win.webContents.on("did-finish-load", () => {
+    const errorsToSendWindow = windowsManager.getAndClearErrorStrings();
+    errorsToSendWindow.forEach((errorStrToSendWindow) => {
+      win.webContents.send("error-to-display-in-window", errorStrToSendWindow);
     });
-  }
+  });
 }
 
 app.whenReady().then(async () => {
+  try {
+    await ollamaService.init();
+  } catch (error) {
+    windowsManager.appendNewErrorToDisplayInWindow(errorToString(error));
+  }
   createWindow();
 });
 
 app.on("window-all-closed", () => {
-  // win = null;
   if (process.platform !== "darwin") app.quit();
 });
 
-// app.on("second-instance", () => {
-//   if (windows) {
-//     // Focus on the main window if the user tried to open another
-//     if (win.isMinimized()) win.restore();
-//     win.focus();
-//   }
-// });
+app.on("before-quit", async () => {
+  ollamaService.stop();
+});
 
 app.on("activate", () => {
   const allWindows = BrowserWindow.getAllWindows();
@@ -158,6 +136,11 @@ app.on("activate", () => {
     createWindow();
   }
 });
+
+registerLLMSessionHandlers(store);
+registerDBSessionHandlers(store, windowsManager);
+registerStoreHandlers(store, windowsManager);
+registerFileHandlers(store, windowsManager);
 
 ipcMain.handle("open-directory-dialog", async () => {
   const result = await dialog.showOpenDialog({

@@ -11,8 +11,9 @@ type WindowInfo = {
 
 class WindowsManager {
   activeWindows: WindowInfo[] = [];
+  private errorStringsToSendWindow: string[] = [];
 
-  getAndSetupDirectoryFromPreviousSessionIfUnused(
+  getAndSetupDirectoryForWindowFromPreviousAppSession(
     webContents: Electron.WebContents,
     store: Store<StoreSchema>
   ): string {
@@ -34,6 +35,16 @@ class WindowsManager {
       return lastUsedVaultDirectory;
     }
     return "";
+  }
+
+  appendNewErrorToDisplayInWindow(errorString: string) {
+    this.errorStringsToSendWindow.push(errorString);
+  }
+
+  getAndClearErrorStrings(): string[] {
+    const errorStrings = this.errorStringsToSendWindow;
+    this.errorStringsToSendWindow = [];
+    return errorStrings;
   }
 
   getBrowserWindowId(webContents: WebContents): number | null {

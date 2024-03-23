@@ -88,7 +88,10 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
               <>
                 Download Progress:{" "}
                 {downloadPercentage(downloadProgress).toFixed(2)}%.
-                <p className="text-xs">(You can close this Window)</p>
+                <p className="text-xs">
+                  (You can close this. The download will continue in the
+                  background)
+                </p>
               </>
             )}
           </p>
