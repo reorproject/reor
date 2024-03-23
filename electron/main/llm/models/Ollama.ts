@@ -66,7 +66,6 @@ export class OllamaService implements LLMSessionService {
       await this.ping();
       return OllamaServeType.SYSTEM;
     } catch (err) {
-      // throw new Error(`Failed to start Ollama: ${err}`);
       // this is fine, we just need to start ollama
     }
 

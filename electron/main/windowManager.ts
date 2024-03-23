@@ -1,4 +1,4 @@
-import { BrowserWindow, WebContents, screen } from "electron";
+import { BrowserWindow, WebContents, screen, shell } from "electron";
 import { LanceDBTableWrapper } from "./database/LanceTableWrapper";
 import Store from "electron-store";
 import { StoreKeys, StoreSchema } from "./Store/storeConfig";
@@ -12,6 +12,65 @@ type WindowInfo = {
 class WindowsManager {
   activeWindows: WindowInfo[] = [];
   private errorStringsToSendWindow: string[] = [];
+
+  async createWindow(
+    store: Store<StoreSchema>,
+    preload: string,
+    url: string | undefined,
+    indexHtml: string
+  ) {
+    const { x, y } = this.getNextWindowPosition();
+    const { width, height } = this.getWindowSize();
+
+    const win = new BrowserWindow({
+      title: "Reor",
+      x: x,
+      y: y,
+      webPreferences: {
+        preload,
+      },
+      frame: false,
+      titleBarStyle: "hidden",
+      titleBarOverlay: {
+        color: "#303030",
+        symbolColor: "#fff",
+        height: 30,
+      },
+      width: width,
+      height: height,
+    });
+
+    if (url) {
+      // electron-vite-vue#298
+      win.loadURL(url);
+      // Open devTool if the app is not packaged
+      win.webContents.openDevTools();
+    } else {
+      win.loadFile(indexHtml);
+    }
+
+    // Make all links open with the browser, not with the application
+    win.webContents.setWindowOpenHandler(({ url }) => {
+      if (url.startsWith("https:")) shell.openExternal(url);
+      return { action: "deny" };
+    });
+
+    win.on("close", () => {
+      win.webContents.send("prepare-for-window-close");
+
+      this.prepareWindowForClose(store, win);
+    });
+
+    win.webContents.on("did-finish-load", () => {
+      const errorsToSendWindow = this.getAndClearErrorStrings();
+      errorsToSendWindow.forEach((errorStrToSendWindow) => {
+        win.webContents.send(
+          "error-to-display-in-window",
+          errorStrToSendWindow
+        );
+      });
+    });
+  }
 
   getAndSetupDirectoryForWindowFromPreviousAppSession(
     webContents: Electron.WebContents,

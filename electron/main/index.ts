@@ -56,60 +56,10 @@ if (!app.requestSingleInstanceLock()) {
 
 const preload = join(__dirname, "../preload/index.js");
 const url = process.env.VITE_DEV_SERVER_URL;
+console.log("process.env.DIST", process.env.DIST);
 const indexHtml = join(process.env.DIST, "index.html");
 
 let dbConnection: lancedb.Connection;
-
-async function createWindow() {
-  const { x, y } = windowsManager.getNextWindowPosition();
-  const { width, height } = windowsManager.getWindowSize();
-
-  const win = new BrowserWindow({
-    title: "Reor",
-    x: x,
-    y: y,
-    webPreferences: {
-      preload,
-    },
-    frame: false,
-    titleBarStyle: "hidden",
-    titleBarOverlay: {
-      color: "#303030",
-      symbolColor: "#fff",
-      height: 30,
-    },
-    width: width,
-    height: height,
-  });
-
-  if (url) {
-    // electron-vite-vue#298
-    win.loadURL(url);
-    // Open devTool if the app is not packaged
-    win.webContents.openDevTools();
-  } else {
-    win.loadFile(indexHtml);
-  }
-
-  // Make all links open with the browser, not with the application
-  win.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.startsWith("https:")) shell.openExternal(url);
-    return { action: "deny" };
-  });
-
-  win.on("close", () => {
-    win.webContents.send("prepare-for-window-close");
-
-    windowsManager.prepareWindowForClose(store, win);
-  });
-
-  win.webContents.on("did-finish-load", () => {
-    const errorsToSendWindow = windowsManager.getAndClearErrorStrings();
-    errorsToSendWindow.forEach((errorStrToSendWindow) => {
-      win.webContents.send("error-to-display-in-window", errorStrToSendWindow);
-    });
-  });
-}
 
 app.whenReady().then(async () => {
   try {
@@ -117,7 +67,7 @@ app.whenReady().then(async () => {
   } catch (error) {
     windowsManager.appendNewErrorToDisplayInWindow(errorToString(error));
   }
-  createWindow();
+  windowsManager.createWindow(store, preload, url, indexHtml);
 });
 
 app.on("window-all-closed", () => {
@@ -133,7 +83,7 @@ app.on("activate", () => {
   if (allWindows.length) {
     allWindows[0].focus();
   } else {
-    createWindow();
+    windowsManager.createWindow(store, preload, url, indexHtml);
   }
 });
 
@@ -241,7 +191,7 @@ ipcMain.handle("get-platform", async () => {
 });
 
 ipcMain.on("open-new-window", () => {
-  createWindow();
+  windowsManager.createWindow(store, preload, url, indexHtml);
 });
 
 ipcMain.handle("path-basename", (event, pathString: string) => {
