@@ -1,4 +1,4 @@
-import { removeFileExtension } from "@/functions/strings";
+import { readableFileName } from "@/functions/strings";
 import { FileInfoNode } from "electron/main/Files/Types";
 import React, { useState } from "react";
 import { FaChevronRight } from "react-icons/fa";
@@ -105,7 +105,7 @@ export const FileItem: React.FC<FileInfoProps> = ({
             isDirectory ? "font-semibold" : ""
           }`}
         >
-          {removeFileExtension(file.name)}
+          {readableFileName(file.name)}
         </span>
       </div>
     </div>

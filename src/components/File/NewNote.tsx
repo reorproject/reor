@@ -3,7 +3,7 @@ import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
 import { toast } from "react-toastify";
 import { errorToString } from "@/functions/error";
-import { getInvalidCharacterInFileName } from "@/functions/strings";
+import { getInvalidCharacterInFileName, sanitizeFilename } from "@/functions/strings";
 
 interface NewNoteComponentProps {
   isOpen: boolean;
@@ -39,12 +39,12 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
       if (!fileName || errorMessage) {
         return;
       }
-      const normalizedFileName = fileName.replace(/\\/g, "/");
+      const normalizedFileName = sanitizeFilename(fileName);
       const fullPath = await window.files.joinPath(
         window.electronStore.getUserDirectory(),
         normalizedFileName + ".md"
       );
-      window.files.createFile(fullPath, "");
+      window.files.createFile(fullPath, `# ${fileName}\n`);
       onFileSelect(fullPath);
       onClose();
     } catch (e) {
