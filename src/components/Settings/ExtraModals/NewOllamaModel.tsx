@@ -86,8 +86,7 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
               "Download complete! Refresh the chat window to use the new model."
             ) : (
               <>
-                Download Progress:{" "}
-                {downloadPercentage(downloadProgress).toFixed(2)}%.
+                Download progress: {downloadPercentage(downloadProgress)}
                 <p className="text-xs">
                   (You can close this. The download will continue in the
                   background)
@@ -104,23 +103,21 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
 
 export default NewOllamaModelModal;
 
-const downloadPercentage = (progress: ProgressResponse): number => {
-  if (progress.status === "success") {
-    return 100;
-  }
-
+const downloadPercentage = (progress: ProgressResponse): string => {
   // Check if `total` is 0, undefined, or not a number to avoid division by zero or invalid operations
-  if (!progress.total || isNaN(progress.total) || progress.total === 0) {
+  if (
+    !progress.total ||
+    isNaN(progress.total) ||
+    progress.total === 0 ||
+    !progress.completed ||
+    isNaN(progress.completed)
+  ) {
     // Depending on your logic, you might want to return 0, or handle this case differently
-    return 0;
+    return "checking...";
   }
 
-  // Similarly, ensure `completed` is a valid number
-  const completed = isNaN(progress.completed) ? 0 : progress.completed;
+  console.log("return percentage");
+  const percentage = (100 * progress.completed) / progress.total;
 
-  // Calculate the download percentage
-  const percentage = (100 * completed) / progress.total;
-
-  // Optional: clamp the value between 0 and 100 if needed
-  return Math.max(0, Math.min(percentage, 100));
+  return percentage.toFixed(2) + "%";
 };
