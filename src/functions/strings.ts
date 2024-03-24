@@ -12,7 +12,7 @@ export function removeFileExtension(filename: string): string {
 
 export function readableFileName(filename: string): string {
   return `-${removeFileExtension(filename)}`
-    .replace(/-[a-z]/g, (str) => str.replace("-", " ").toUpperCase())
+    .replace(/-[a-zA-Z0-9]/g, (str) => str.replace("-", " ").toUpperCase())
     .trim();
 }
 

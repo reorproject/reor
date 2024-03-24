@@ -3,7 +3,7 @@ import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
 import { errorToString } from "@/functions/error";
 import { toast } from "react-toastify";
-import { getInvalidCharacterInFileName } from "@/functions/strings";
+import { getInvalidCharacterInFileName, sanitizeFilename } from "@/functions/strings";
 
 interface NewDirectoryComponentProps {
   isOpen: boolean;
@@ -39,7 +39,7 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
       if (!directoryName || errorMessage) {
         return;
       }
-      const normalizedDirectoryName = directoryName.replace(/\\/g, "/");
+      const normalizedDirectoryName = sanitizeFilename(directoryName);
       const fullPath = await window.files.joinPath(
         window.electronStore.getUserDirectory(),
         normalizedDirectoryName
