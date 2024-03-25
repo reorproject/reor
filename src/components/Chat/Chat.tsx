@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import rehypeRaw from "rehype-raw";
 import {
   Menu,
   MenuHandler,
@@ -158,6 +159,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     setUserTextFieldInput("");
   };
 
+  const addCollapsibleDetailsInMarkdown = (content: string, title: string) => {
+    return `<details> <summary> *${title.trim()}* </summary> \n ${content} </details>`;
+  };
+
   useEffect(() => {
     let active = true;
     const updateStream = (
@@ -177,9 +182,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             : file;
           return ` ${index + 1}. [${simplifiedFilePath}](#)`;
         });
-        filesContext = `  \n -- -- --  \n  Files referenced:  \n ${newBulletedFiles.join(
-          "  \n"
-        )}`;
+        filesContext = addCollapsibleDetailsInMarkdown(
+          newBulletedFiles.join("  \n"),
+          "Files referenced:"
+        );
         setFilesReferenced([]); // clear the files referenced after this message
       }
       const newMsgContent = (chunk as ChatCompletionChunk).choices
@@ -279,6 +285,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           {messages.map((message, index) => (
             <ReactMarkdown
               key={index}
+              rehypePlugins={[rehypeRaw]}
               className={`p-1 pl-1 markdown-content rounded-lg break-words ${
                 message.messageType === "error"
                   ? "bg-red-100 text-red-800"
@@ -292,6 +299,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           ))}
           {currentBotMessage && (
             <ReactMarkdown
+              rehypePlugins={[rehypeRaw]}
               className={`p-1 pl-1 markdown-content rounded-lg break-words ${
                 currentBotMessage.messageType === "error"
                   ? "bg-red-100 text-red-800"
