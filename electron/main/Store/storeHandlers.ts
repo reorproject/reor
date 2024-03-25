@@ -34,7 +34,7 @@ export const registerStoreHandlers = (
   ipcMain.on("get-user-directory", (event) => {
     let path = windowsManager.getVaultDirectoryForWinContents(event.sender);
     if (!path) {
-      path = windowsManager.getAndSetupDirectoryFromPreviousSessionIfUnused(
+      path = windowsManager.getAndSetupDirectoryForWindowFromPreviousAppSession(
         event.sender,
         store
       );
