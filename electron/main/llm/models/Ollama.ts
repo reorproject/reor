@@ -204,6 +204,7 @@ export class OllamaService implements LLMSessionService {
     modelName: string,
     handleProgress: (chunk: ProgressResponse) => void
   ): Promise<void> => {
+    console.log("Pulling model: ", modelName);
     const stream = await this.client.pull({
       model: modelName,
       stream: true,

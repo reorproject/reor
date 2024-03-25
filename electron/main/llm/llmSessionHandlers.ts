@@ -58,7 +58,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
 
   ipcMain.handle("pull-ollama-model", async (event, modelName: string) => {
     const handleProgress = (progress: ProgressResponse) => {
-      event.sender.send("ollamaDownloadProgress", progress);
+      event.sender.send("ollamaDownloadProgress", modelName, progress);
     };
     await ollamaService.pullModel(modelName, handleProgress);
   });
