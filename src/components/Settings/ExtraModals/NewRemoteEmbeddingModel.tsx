@@ -59,16 +59,15 @@ const NewRemoteEmbeddingModelModal: React.FC<
           placeholder="Embedding Model Repo"
         />
         <p className="text-white text-xs mb-2 mt-2 italic">
-          <ExternalLink
-            url="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=downloads&search=xenova"
-            label="This page on Hugging Face"
-          />{" "}
+          <ExternalLink href="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=downloads&search=xenova">
+            {" "}
+            This page on Hugging Face
+          </ExternalLink>
           has most available models. It must be a &quot;Xenova&quot; ONNX
           embedding model. Check out{" "}
-          <ExternalLink
-            url="https://www.reorproject.org/docs/documentation/embedding"
-            label="this guide"
-          />{" "}
+          <ExternalLink href="https://www.reorproject.org/docs/documentation/embedding">
+            this guide
+          </ExternalLink>{" "}
           for more info.{" "}
         </p>
 

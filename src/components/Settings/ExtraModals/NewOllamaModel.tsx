@@ -76,12 +76,12 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
       <div className="w-[400px] ml-2 mr-2 mb-2 pl-3">
         <h2 className="text-white  font-semibold mb-0">New Local LLM</h2>
         <p className="text-white text-sm mb-2 mt-1">
-          Reor will automaticaly download an LLM. Please choose an LLM from the{" "}
-          <ExternalLink
-            url="https://ollama.com/library"
-            label="Ollama Library"
-          />{" "}
-          and paste the name of the LLM below:
+          To use paste the name of the model you want to use below. It will be
+          downloaded automatically. You can find models on the{" "}
+          <ExternalLink href="https://ollama.com/library">
+            Ollama Hub
+          </ExternalLink>
+          .
         </p>
 
         <input
