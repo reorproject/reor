@@ -59,7 +59,10 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
         <p className="text-white text-sm mb-2 mt-1">
           To use paste the name of the model you want to use below. It will be
           downloaded automatically. You can find models on the{" "}
-          <ExternalLink href="https://ollama.com/library" label="Ollama Hub" />.
+          <ExternalLink href="https://ollama.com/library">
+            Ollama Hub
+          </ExternalLink>
+          .
         </p>
 
         <input
