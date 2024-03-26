@@ -64,12 +64,12 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
         <p className="text-gray-100 mb-2 mt-2 text-sm">
           Connect with a custom OpenAI-like API endpoint like{" "}
           <ExternalLink
-            url="https://github.com/oobabooga/text-generation-webui/wiki/12-%E2%80%90-OpenAI-API"
+            href="https://github.com/oobabooga/text-generation-webui/wiki/12-%E2%80%90-OpenAI-API"
             label="Oobabooga"
           />
           . A guide to doing this is on the{" "}
           <ExternalLink
-            url="https://www.reorproject.org/docs/documentation/openai-like-api"
+            href="https://www.reorproject.org/docs/documentation/openai-like-api"
             label="docs"
           />
           .

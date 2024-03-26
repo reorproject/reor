@@ -84,7 +84,8 @@ const HardwareSettings: React.FC<HardwareSettingsProps> = () => {
     <div className="w-full bg-neutral-800 rounded text-gray-100">
       <h2 className="text-2xl font-semibold mb-0">Hardware</h2>
       <p className="mt-2 text-sm text-gray-100 mb-1">
-        This is the hardware that the will be used to run local LLMs:
+        Reor is now powered by{" "}
+        <ExternalLink href="https://ollama.com">Ollama</ExternalLink>.
       </p>
       <FormGroup className="mb-4">
         <FormControlLabel
@@ -126,12 +127,7 @@ const HardwareSettings: React.FC<HardwareSettingsProps> = () => {
       </FormGroup>
       <p className="text-xs text-gray-100">
         You don&apos;t need to worry about this unless you have a dedicated GPU.
-        Enable CUDA for NVIDIA GPUs and Vulkan for AMD. See{" "}
-        <ExternalLink
-          url="https://reorproject.org/docs/documentation/gpus"
-          label="docs"
-        />{" "}
-        for more info.
+        Enable CUDA for NVIDIA GPUs and Vulkan for AMD. See for more info.
       </p>
       {changesPending && (
         <div className="flex">

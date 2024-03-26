@@ -58,13 +58,13 @@ const NewLocalEmbeddingModelModal: React.FC<
         </Button>
         <p className="text-white text-xs mb-2 mt-2 italic">
           <ExternalLink
-            url="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=downloads&search=xenova"
+            href="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=downloads&search=xenova"
             label="This page on Hugging Face"
           />{" "}
           has most available models. It must be a &quot;Xenova&quot; ONNX
           embedding model. Check out{" "}
           <ExternalLink
-            url="https://www.reorproject.org/docs/documentation/embedding"
+            href="https://www.reorproject.org/docs/documentation/embedding"
             label="this guide"
           />{" "}
           for more info.{" "}
