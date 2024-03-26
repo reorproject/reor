@@ -63,8 +63,8 @@ const NewLocalEmbeddingModelModal: React.FC<
           has most available models. It must be a &quot;Xenova&quot; ONNX
           embedding model. Check out{" "}
           <ExternalLink href="https://www.reorproject.org/docs/documentation/embedding">
-            his guide
-          </ExternalLink>
+            this guide
+          </ExternalLink>{" "}
           for more info.{" "}
         </p>
         {newModelPath && (

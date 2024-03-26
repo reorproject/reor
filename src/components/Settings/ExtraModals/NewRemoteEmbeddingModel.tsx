@@ -67,7 +67,7 @@ const NewRemoteEmbeddingModelModal: React.FC<
           embedding model. Check out{" "}
           <ExternalLink href="https://www.reorproject.org/docs/documentation/embedding">
             this guide
-          </ExternalLink>
+          </ExternalLink>{" "}
           for more info.{" "}
         </p>
 
