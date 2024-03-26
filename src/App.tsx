@@ -33,7 +33,10 @@ const App: React.FC<AppProps> = () => {
       });
       setIndexingProgress(1);
     };
-    window.ipcRenderer.receive("indexing-error", handleIndexingError);
+    window.ipcRenderer.receive(
+      "error-to-display-in-window",
+      handleIndexingError
+    );
   }, []);
 
   useEffect(() => {
