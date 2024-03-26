@@ -11,9 +11,6 @@ const ExternalLink: React.FC<ExternalLinkProps> = ({ href: url, children }) => {
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
   ) => {
     e.preventDefault();
-    // Assuming `window.electron.openExternal` is the correct method
-    // to open the link in the external browser. Ensure this is implemented
-    // in your Electron app's preload script if `nodeIntegration` is set to false.
     window.electron.openExternal(url);
   };
 
