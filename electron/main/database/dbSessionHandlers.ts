@@ -134,11 +134,11 @@ ${DatabaseFields.FILE_MODIFIED} > timestamp '2024-03-16 13:00:00'
 
 Please generate ONLY the temporal filter using the same format as the example given. Please also make sure you only use the ${
               DatabaseFields.FILE_MODIFIED
-            } field in the filter. If you don't know or there is no temporal component in the query, please return an empty string.
-Query:
-${query}
-Filter:
-`,
+            } field in the filter. If you don't know or there is no temporal component in the query, please return an empty string.`,
+          },
+          {
+            role: "user",
+            content: query,
           },
         ],
         store.get(StoreKeys.LLMGenerationParameters)
@@ -147,10 +147,7 @@ Filter:
       try {
         let searchResults: DBEntry[] = [];
         const maxRAGExamples: number = store.get(StoreKeys.MaxRAGExamples);
-        const windowInfo = getWindowInfoForContents(
-          activeWindows,
-          event.sender
-        );
+        const windowInfo = windowManager.getWindowInfoForContents(event.sender);
         if (!windowInfo) {
           throw new Error("Window info not found.");
         }
