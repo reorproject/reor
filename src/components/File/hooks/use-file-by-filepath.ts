@@ -52,6 +52,7 @@ export const useFileByFilepath = () => {
   });
 
   const [debouncedEditor] = useDebounce(editor?.state.doc.content, 4000);
+  const [lastSavedContent, setLastSavedContent] = useState<string>("");
 
   useEffect(() => {
     if (debouncedEditor) {
@@ -68,24 +69,27 @@ export const useFileByFilepath = () => {
     filePath: string | null,
     indexFileInDatabase: boolean = false
   ) => {
-    if (editor?.getHTML() !== null && filePath !== null) {
-      const markdown = editor?.storage.markdown.getMarkdown();
-      await window.files.writeFile({
-        filePath: filePath,
-        content: markdown,
-      });
-      if (indexFileInDatabase) {
-        await window.files.indexFileInDatabase(filePath);
+    const markdownContent = editor?.storage.markdown.getMarkdown();
+    if (markdownContent !== null && filePath !== null) {
+      if (markdownContent !== lastSavedContent) {
+        await window.files.writeFile({
+          filePath: filePath,
+          content: markdownContent,
+        });
+
+        setLastSavedContent(markdownContent);
+
+        if (indexFileInDatabase) {
+          window.files.indexFileInDatabase(filePath);
+        }
       }
     }
   };
   // read file, load content into fileContent
   const openFileByPath = async (newFilePath: string) => {
-    //if the fileContent is null or if there is no file currently selected
-
     saveEditorContentToPath(editor, currentlyOpenedFilePath, true);
-
     const fileContent = (await window.files.readFile(newFilePath)) ?? "";
+    setLastSavedContent(fileContent);
     setCurrentlyOpenedFilePath(newFilePath);
 
     editor?.commands.setContent(fileContent);
