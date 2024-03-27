@@ -71,7 +71,7 @@ export class OllamaService implements LLMSessionService {
 
     try {
       // See if 'ollama serve' command is available on the system
-      await this.execServe("olladsfaddsfasma");
+      await this.execServe("ollama");
       console.log("Ollama is installed on the system");
       return OllamaServeType.SYSTEM;
     } catch (err) {
