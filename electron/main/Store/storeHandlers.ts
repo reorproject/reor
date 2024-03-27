@@ -7,17 +7,13 @@ import {
   StoreSchema,
 } from "../Store/storeConfig";
 import Store from "electron-store";
-import {
-  setupDirectoryFromPreviousSessionIfUnused,
-  getVaultDirectoryForContents,
-  setVaultDirectoryForContents,
-  activeWindows,
-} from "../windowManager";
 import path from "path";
 import { initializeAndMaybeMigrateStore } from "./storeMigrator";
+import WindowsManager from "../windowManager";
 
 export const registerStoreHandlers = (
-  store: Store<StoreSchema>
+  store: Store<StoreSchema>,
+  windowsManager: WindowsManager
   // fileWatcher: FSWatcher | null
 ) => {
   initializeAndMaybeMigrateStore(store);
@@ -25,8 +21,7 @@ export const registerStoreHandlers = (
     "set-user-directory",
     async (event, userDirectory: string): Promise<void> => {
       console.log("setting user directory", userDirectory);
-      setVaultDirectoryForContents(
-        activeWindows,
+      windowsManager.setVaultDirectoryForContents(
         event.sender,
         userDirectory,
         store
@@ -37,10 +32,9 @@ export const registerStoreHandlers = (
   );
 
   ipcMain.on("get-user-directory", (event) => {
-    let path = getVaultDirectoryForContents(activeWindows, event.sender);
+    let path = windowsManager.getVaultDirectoryForWinContents(event.sender);
     if (!path) {
-      path = setupDirectoryFromPreviousSessionIfUnused(
-        activeWindows,
+      path = windowsManager.getAndSetupDirectoryForWindowFromPreviousAppSession(
         event.sender,
         store
       );

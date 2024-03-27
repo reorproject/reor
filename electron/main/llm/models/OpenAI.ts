@@ -7,6 +7,7 @@ import {
 } from "electron/main/Store/storeConfig";
 
 import {
+  ChatCompletion,
   ChatCompletionChunk,
   ChatCompletionMessageParam,
 } from "openai/resources/chat/completions";
@@ -30,6 +31,26 @@ export class OpenAIModelSessionService implements LLMSessionService {
     throw new Error("Abort not yet implemented.");
   }
 
+  async response(
+    modelName: string,
+    modelConfig: OpenAILLMConfig,
+    messageHistory: ChatCompletionMessageParam[],
+    generationParams?: LLMGenerationParameters
+  ): Promise<ChatCompletion> {
+    const openai = new OpenAI({
+      apiKey: modelConfig.apiKey,
+      baseURL: modelConfig.apiURL,
+      fetch: customFetchUsingElectronNetStreaming,
+    });
+    const response = await openai.chat.completions.create({
+      model: modelName,
+      messages: messageHistory,
+      max_tokens: generationParams?.maxTokens,
+      temperature: generationParams?.temperature,
+    });
+    return response;
+  }
+
   async streamingResponse(
     modelName: string,
     modelConfig: OpenAILLMConfig,
@@ -43,7 +64,6 @@ export class OpenAIModelSessionService implements LLMSessionService {
       baseURL: modelConfig.apiURL,
       fetch: customFetchUsingElectronNetStreaming,
     });
-    // const tokenEncoding = this.getTokenizer(modelName);
 
     const stream = await openai.chat.completions.create({
       model: modelName,

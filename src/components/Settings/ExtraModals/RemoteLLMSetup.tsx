@@ -63,15 +63,13 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
         <h2 className="font-semibold mb-0 text-white">Remote LLM Setup</h2>
         <p className="text-gray-100 mb-2 mt-2 text-sm">
           Connect with a custom OpenAI-like API endpoint like{" "}
-          <ExternalLink
-            url="https://github.com/oobabooga/text-generation-webui/wiki/12-%E2%80%90-OpenAI-API"
-            label="Oobabooga"
-          />
+          <ExternalLink href="https://github.com/oobabooga/text-generation-webui/wiki/12-%E2%80%90-OpenAI-API">
+            Oobabooga
+          </ExternalLink>
           . A guide to doing this is on the{" "}
-          <ExternalLink
-            url="https://www.reorproject.org/docs/documentation/openai-like-api"
-            label="docs"
-          />
+          <ExternalLink href="https://www.reorproject.org/docs/documentation/openai-like-api">
+            docs
+          </ExternalLink>
           .
         </p>
 
@@ -122,7 +120,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
         />
 
         <Button
-          className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mt-3 w-[80px]"
+          className="bg-orange-700 border-none h-8 hover:bg-orange-900 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mt-3 w-[80px]"
           onClick={handleSave}
           placeholder=""
         >

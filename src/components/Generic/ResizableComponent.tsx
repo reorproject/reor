@@ -46,7 +46,7 @@ const ResizableComponent: React.FC<ResizableComponentProps> = ({
 
   const getResizeHandleStyle = (): CSSProperties => {
     return {
-      width: "10px",
+      width: "2.5px", //this needs to be smaller than the width of the scrollbar in css.
       cursor: "ew-resize",
       position: "absolute",
       top: 0,
