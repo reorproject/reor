@@ -4,11 +4,15 @@ import { DBEntry, DatabaseFields } from "./Schema";
 import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
 import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
-import { getWindowInfoForContents, activeWindows } from "../windowManager";
 import { getLLMConfig } from "../llm/llmConfig";
 import { errorToString } from "../Generic/error";
+import WindowsManager from "../windowManager";
 
-export const registerDBSessionHandlers = (store: Store<StoreSchema>) => {
+export const registerDBSessionHandlers = (
+  // dbTable: LanceDBTableWrapper,
+  store: Store<StoreSchema>,
+  windowManager: WindowsManager
+) => {
   ipcMain.handle(
     "search",
     async (
@@ -18,10 +22,7 @@ export const registerDBSessionHandlers = (store: Store<StoreSchema>) => {
       filter?: string
     ): Promise<DBEntry[]> => {
       try {
-        const windowInfo = getWindowInfoForContents(
-          activeWindows,
-          event.sender
-        );
+        const windowInfo = windowManager.getWindowInfoForContents(event.sender);
         if (!windowInfo) {
           throw new Error("Window info not found.");
         }
@@ -38,6 +39,28 @@ export const registerDBSessionHandlers = (store: Store<StoreSchema>) => {
     }
   );
 
+  // ipcMain.handle(
+  //   "delete-lance-db-entries-by-filepath",
+  //   async (
+  //     event,
+  //     filePath: string,
+  //   ): Promise<void> => {
+  //     try {
+  //       const windowInfo = getWindowInfoForContents(
+  //         activeWindows,
+  //         event.sender
+  //       );
+  //       if (!windowInfo) {
+  //         throw new Error("Window info not found.");
+  //       }
+  //       await windowInfo.dbTableClient.deleteDBItemsByFilePaths([filePath]);
+  //     } catch (error) {
+  //       console.error("Error deleting chunks from database:", error);
+  //       throw error;
+  //     }
+  //   }
+  // );
+
   ipcMain.handle(
     "augment-prompt-with-rag",
     async (
@@ -49,10 +72,7 @@ export const registerDBSessionHandlers = (store: Store<StoreSchema>) => {
       try {
         let searchResults: DBEntry[] = [];
         const maxRAGExamples: number = store.get(StoreKeys.MaxRAGExamples);
-        const windowInfo = getWindowInfoForContents(
-          activeWindows,
-          event.sender
-        );
+        const windowInfo = windowManager.getWindowInfoForContents(event.sender);
         if (!windowInfo) {
           throw new Error("Window info not found.");
         }

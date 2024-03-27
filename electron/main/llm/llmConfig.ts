@@ -89,7 +89,7 @@ export async function getAllLLMConfigs(
   ollamaSession: OllamaService
 ): Promise<LLMConfig[]> {
   const llmConfigsFromStore = store.get(StoreKeys.LLMs);
-  const ollamaLLMConfigs = await ollamaSession?.getAvailableModels();
+  const ollamaLLMConfigs = await ollamaSession.getAvailableModels();
 
   return [...llmConfigsFromStore, ...ollamaLLMConfigs];
 }

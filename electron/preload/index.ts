@@ -30,6 +30,7 @@ declare global {
       openExternal: (url: string) => void;
       getPlatform: () => string;
       openNewWindow: () => void;
+      destroyWindow: () => void;
     };
     contextMenu: {
       showFileItemContextMenu: (filePath: FileInfoNode) => void;
@@ -40,6 +41,7 @@ declare global {
         limit: number,
         filter?: string
       ) => Promise<DBQueryResult[]>;
+      deleteLanceDBEntriesByFilePath: (filePath: string) => Promise<void>;
       indexFilesInDirectory: () => void;
       augmentPromptWithRAG: (
         prompt: string,
@@ -59,6 +61,7 @@ declare global {
       writeFile: (writeFileProps: WriteFileProps) => Promise<void>;
       indexFileInDatabase: (filePath: string) => Promise<void>;
       readFile: (filePath: string) => Promise<string>;
+      deleteFile: (filePath: string) => Promise<void>;
       createFile: (filePath: string, content: string) => Promise<void>;
       createDirectory: (dirPath: string) => Promise<void>;
       joinPath: (...pathSegments: string[]) => Promise<string>;
@@ -118,6 +121,9 @@ contextBridge.exposeInMainWorld("database", {
   ): Promise<DBEntry[]> => {
     return ipcRenderer.invoke("search", query, limit, filter);
   },
+  deleteLanceDBEntriesByFilePath: async (filePath: string): Promise<void> => {
+    return ipcRenderer.invoke("delete-lance-db-entries-by-filepath", filePath);
+  },
   indexFilesInDirectory: async () => {
     return ipcRenderer.send("index-files-in-directory");
   },
@@ -152,6 +158,7 @@ contextBridge.exposeInMainWorld("electron", {
   openExternal: (url: string) => ipcRenderer.send("open-external", url),
   getPlatform: () => ipcRenderer.invoke("get-platform"),
   openNewWindow: () => ipcRenderer.send("open-new-window"),
+  destroyWindow: () => ipcRenderer.send("destroy-window"),
 });
 
 contextBridge.exposeInMainWorld("electronStore", {
@@ -248,6 +255,9 @@ contextBridge.exposeInMainWorld("files", {
 
   readFile: async (filePath: string) => {
     return ipcRenderer.invoke("read-file", filePath);
+  },
+  deleteFile: (filePath: string) => {
+    return ipcRenderer.invoke("delete-file", filePath);
   },
   joinPath: (...pathSegments: string[]) =>
     ipcRenderer.invoke("join-path", ...pathSegments),

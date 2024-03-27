@@ -29,7 +29,6 @@ export const RepopulateTableWithMissingItems = async (
   } catch (error) {
     throw new Error(`Error converting table to array: ${errorToString(error)}`);
   }
-
   let itemsToRemove;
   try {
     itemsToRemove = await computeDBItemsToRemoveFromTable(
@@ -84,26 +83,20 @@ export const RepopulateTableWithMissingItems = async (
 
 const getTableAsArray = async (
   table: LanceDBTableWrapper
-): Promise<DBEntry[]> => {
-  const totalRows = await table.countRows();
-  if (totalRows == 0) {
-    return [];
-  }
-  const nonEmptyResults = await table.filter(
-    `${DatabaseFields.CONTENT} != ''`,
-    totalRows
-  );
-  const emptyResults = await table.filter(
-    `${DatabaseFields.CONTENT} = ''`,
-    totalRows
-  );
-  const results = nonEmptyResults.concat(emptyResults);
-  return results;
+): Promise<{ notepath: string; filemodified: Date }[]> => {
+  const nonEmptyResults = await table.lanceTable
+    .filter(`${DatabaseFields.NOTE_PATH} != ''`)
+    .select([DatabaseFields.NOTE_PATH, DatabaseFields.FILE_MODIFIED])
+    .execute();
+
+  const mapped = nonEmptyResults.map(convertRecordToDBType<DBEntry>);
+
+  return mapped as { notepath: string; filemodified: Date }[];
 };
 
 const computeDbItemsToAddOrUpdate = async (
   filesInfoList: FileInfo[],
-  tableArray: DBEntry[]
+  tableArray: { notepath: string; filemodified: Date }[]
 ): Promise<DBEntry[][]> => {
   const filesAsChunks = await convertFileInfoListToDBItems(filesInfoList);
 
@@ -125,8 +118,8 @@ const convertFileInfoListToDBItems = async (
 
 const computeDBItemsToRemoveFromTable = async (
   filesInfoList: FileInfo[],
-  tableArray: DBEntry[]
-): Promise<DBEntry[]> => {
+  tableArray: { notepath: string; filemodified: Date }[]
+): Promise<{ notepath: string; filemodified: Date }[]> => {
   const itemsInTableAndNotInFilesInfoList = tableArray.filter(
     (item) => !filesInfoList.some((file) => file.path == item.notepath)
   );
@@ -135,7 +128,7 @@ const computeDBItemsToRemoveFromTable = async (
 
 const areChunksMissingFromTable = (
   chunksToCheck: DBEntry[],
-  tableArray: DBEntry[]
+  tableArray: { notepath: string; filemodified: Date }[]
 ): boolean => {
   // checking whether th
   if (chunksToCheck.length == 0) {
@@ -235,41 +228,12 @@ export const updateFileInTable = async (
   await dbTable.add(dbEntries);
 };
 
-export function convertLanceEntryToDBEntry(
+export function convertRecordToDBType<T extends DBEntry | DBQueryResult>(
   record: Record<string, unknown>
-): DBEntry | null {
-  if (
-    DatabaseFields.NOTE_PATH in record &&
-    DatabaseFields.VECTOR in record &&
-    DatabaseFields.CONTENT in record &&
-    DatabaseFields.SUB_NOTE_INDEX in record &&
-    DatabaseFields.TIME_ADDED in record
-  ) {
-    const recordAsDBQueryType = record as unknown as DBEntry;
-    recordAsDBQueryType.notepath = unsanitizePathForFileSystem(
-      recordAsDBQueryType.notepath
-    );
-    return recordAsDBQueryType;
-  }
-  return null;
-}
-
-export function convertLanceResultToDBResult(
-  record: Record<string, unknown>
-): DBQueryResult | null {
-  if (
-    DatabaseFields.NOTE_PATH in record &&
-    DatabaseFields.VECTOR in record &&
-    DatabaseFields.CONTENT in record &&
-    DatabaseFields.SUB_NOTE_INDEX in record &&
-    DatabaseFields.TIME_ADDED in record &&
-    DatabaseFields.DISTANCE in record
-  ) {
-    const recordAsDBQueryType = record as unknown as DBQueryResult;
-    recordAsDBQueryType.notepath = unsanitizePathForFileSystem(
-      recordAsDBQueryType.notepath
-    );
-    return recordAsDBQueryType;
-  }
-  return null;
+): T | null {
+  const recordWithType = record as T;
+  recordWithType.notepath = unsanitizePathForFileSystem(
+    recordWithType.notepath
+  );
+  return recordWithType;
 }

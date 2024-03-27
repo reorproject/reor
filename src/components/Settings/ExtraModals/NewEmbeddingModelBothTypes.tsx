@@ -74,14 +74,14 @@ const NewEmbeddingModelModalBothTypes: React.FC<
         </p>
         <div className="flex">
           <Button
-            className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1 mr-2"
+            className="bg-orange-700 border-none h-8 hover:bg-orange-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1 mr-2"
             onClick={handleModelDirectorySelection}
             placeholder=""
           >
             Attach Local Model
           </Button>
           <Button
-            className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1"
+            className="bg-orange-700 border-none h-8 hover:bg-orange-900 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1"
             onClick={() => {
               setIsRepoModalOpen(true);
             }}
@@ -91,16 +91,14 @@ const NewEmbeddingModelModalBothTypes: React.FC<
           </Button>
         </div>
         <p className="text-white text-xs mb-2 mt-2 italic">
-          <ExternalLink
-            url="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=downloads&search=xenova"
-            label="This page on Hugging Face"
-          />{" "}
+          <ExternalLink href="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=downloads&search=xenova">
+            This page on Hugging Face
+          </ExternalLink>{" "}
           has most available models. It must be a &quot;Xenova&quot; ONNX
           embedding model. Check out{" "}
-          <ExternalLink
-            url="https://www.reorproject.org/docs/documentation/embedding"
-            label="this guide"
-          />{" "}
+          <ExternalLink href="https://www.reorproject.org/docs/documentation/embedding">
+            this guide
+          </ExternalLink>
           for more info.{" "}
         </p>
 
@@ -134,7 +132,7 @@ const NewEmbeddingModelModalBothTypes: React.FC<
               embedding model.
             </p> */}
             <Button
-              className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
+              className="bg-orange-700 border-none h-8 hover:bg-orange-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
               onClick={() => {
                 if (huggingfaceRepo) handleSaveHuggingFaceRepo();
               }}
