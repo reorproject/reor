@@ -1,12 +1,19 @@
 import { ipcMain } from "electron";
 import { createPromptWithContextLimitFromContent } from "../Prompts/Prompts";
-import { DBEntry, DatabaseFields } from "./Schema";
+import { DBEntry, DBQueryResult, DatabaseFields } from "./Schema";
 import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
 import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 import { getLLMConfig } from "../llm/llmConfig";
 import { errorToString } from "../Generic/error";
 import WindowsManager from "../windowManager";
+
+export interface PromptWithRagResults {
+  ragPrompt: string;
+  uniqueFilesReferenced: string[];
+}
+
+const MAX_COSINE_DISTANCE = 0.4;
 
 export const registerDBSessionHandlers = (
   // dbTable: LanceDBTableWrapper,
@@ -39,28 +46,6 @@ export const registerDBSessionHandlers = (
     }
   );
 
-  // ipcMain.handle(
-  //   "delete-lance-db-entries-by-filepath",
-  //   async (
-  //     event,
-  //     filePath: string,
-  //   ): Promise<void> => {
-  //     try {
-  //       const windowInfo = getWindowInfoForContents(
-  //         activeWindows,
-  //         event.sender
-  //       );
-  //       if (!windowInfo) {
-  //         throw new Error("Window info not found.");
-  //       }
-  //       await windowInfo.dbTableClient.deleteDBItemsByFilePaths([filePath]);
-  //     } catch (error) {
-  //       console.error("Error deleting chunks from database:", error);
-  //       throw error;
-  //     }
-  //   }
-  // );
-
   ipcMain.handle(
     "augment-prompt-with-rag",
     async (
@@ -68,9 +53,9 @@ export const registerDBSessionHandlers = (
       query: string,
       llmName: string,
       filter?: string
-    ): Promise<string> => {
+    ): Promise<PromptWithRagResults> => {
       try {
-        let searchResults: DBEntry[] = [];
+        let searchResults: DBQueryResult[] = [];
         const maxRAGExamples: number = store.get(StoreKeys.MaxRAGExamples);
         const windowInfo = windowManager.getWindowInfoForContents(event.sender);
         if (!windowInfo) {
@@ -89,19 +74,28 @@ export const registerDBSessionHandlers = (
 
         const llmSession = openAISession;
         const llmConfig = await getLLMConfig(store, ollamaService, llmName);
-
         console.log("llmConfig", llmConfig);
         if (!llmConfig) {
           throw new Error(`LLM ${llmName} not configured.`);
         }
+
+        const filteredResults = searchResults.filter(
+          (entry) => entry._distance < MAX_COSINE_DISTANCE
+        );
         const { prompt: ragPrompt } = createPromptWithContextLimitFromContent(
-          searchResults,
+          filteredResults,
           query,
           llmSession.getTokenizer(llmName),
           llmConfig.contextLength
         );
+
+        // organize the search results by file path - which will include file path previews
+        const uniqueFilesReferenced = [
+          ...new Set(filteredResults.map((entry) => entry.notepath)),
+        ];
         console.log("ragPrompt", ragPrompt);
-        return ragPrompt;
+
+        return { ragPrompt, uniqueFilesReferenced };
       } catch (error) {
         console.error("Error searching database:", error);
         throw errorToString(error);

@@ -240,6 +240,7 @@ export class OllamaService implements LLMSessionService {
     modelConfig: OpenAILLMConfig,
     messageHistory: ChatCompletionMessageParam[],
     handleChunk: (chunk: ChatCompletionChunk) => void,
+    onComplete: () => void,
     generationParams?: LLMGenerationParameters
   ): Promise<void> {
     throw new Error("Method not implemented.");

@@ -1,5 +1,5 @@
 import { ipcMain, IpcMainInvokeEvent } from "electron";
-import { LLMSessionService } from "./Types";
+import { CompletedMessageType, LLMSessionService } from "./Types";
 import { OpenAIModelSessionService } from "./models/OpenAI";
 import { LLMConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
@@ -43,6 +43,11 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
         llmConfig,
         messageHistory,
         handleChunk,
+        () => {
+          event.sender.send("tokenStream", {
+            messageType: "COMPLETED",
+          } as CompletedMessageType);
+        },
         store.get(StoreKeys.LLMGenerationParameters)
       );
     }
