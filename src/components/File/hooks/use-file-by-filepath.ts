@@ -16,6 +16,8 @@ export const useFileByFilepath = () => {
     string | null
   >(null);
 
+  const [isFileContentModified, setIsFileContentModified] =
+    useState<boolean>(false);
   /**
 	 * with this editor, we want to take the HTML on the following scenarios:
 		1. when the file path changes, causing a re-render
@@ -34,6 +36,9 @@ export const useFileByFilepath = () => {
   });
 
   const editor = useEditor({
+    onUpdate() {
+      setIsFileContentModified(true);
+    },
     extensions: [
       StarterKit,
       Document,
@@ -52,7 +57,6 @@ export const useFileByFilepath = () => {
   });
 
   const [debouncedEditor] = useDebounce(editor?.state.doc.content, 4000);
-  const [lastSavedContent, setLastSavedContent] = useState<string>("");
 
   useEffect(() => {
     if (debouncedEditor) {
@@ -71,13 +75,13 @@ export const useFileByFilepath = () => {
   ) => {
     const markdownContent = editor?.storage.markdown.getMarkdown();
     if (markdownContent !== null && filePath !== null) {
-      if (markdownContent !== lastSavedContent) {
+      if (isFileContentModified) {
         await window.files.writeFile({
           filePath: filePath,
           content: markdownContent,
         });
 
-        setLastSavedContent(markdownContent);
+        setIsFileContentModified(false);
 
         if (indexFileInDatabase) {
           window.files.indexFileInDatabase(filePath);
@@ -85,11 +89,11 @@ export const useFileByFilepath = () => {
       }
     }
   };
-  // read file, load content into fileContent
+
   const openFileByPath = async (newFilePath: string) => {
     saveEditorContentToPath(editor, currentlyOpenedFilePath, true);
     const fileContent = (await window.files.readFile(newFilePath)) ?? "";
-    setLastSavedContent(fileContent);
+    setIsFileContentModified(false);
     setCurrentlyOpenedFilePath(newFilePath);
 
     editor?.commands.setContent(fileContent);
