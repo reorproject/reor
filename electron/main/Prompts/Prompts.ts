@@ -10,29 +10,32 @@ export function createPromptWithContextLimitFromContent(
   tokenize: (text: string) => number[],
   contextLimit: number
 ): PromptWithContextLimit {
-  const basePrompt = 'Answer the question below based on the following notes:\n ';
+  const basePrompt =
+    "Answer the question below based on the following notes:\n ";
   const queryPrompt = `Question: ${query}`;
-  let tokenCount = tokenize(queryPrompt + basePrompt).length;  
+  let tokenCount = tokenize(queryPrompt + basePrompt).length;
 
-  const contentArray: string[] = [] 
-  let cutOffLine: string = '';
-  const contents = ( typeof content === 'string') ? content.split("\n") : content.map(entry => entry.content);
+  const contentArray: string[] = [];
+  let cutOffLine: string = "";
+  const contents =
+    typeof content === "string"
+      ? content.split("\n")
+      : content.map((entry) => entry.content);
 
   for (const line of contents) {
     const lineWithNewLine = line + "\n";
-    if ((tokenize(lineWithNewLine).length + tokenCount) < contextLimit) {
+    if (tokenize(lineWithNewLine).length + tokenCount < contextLimit) {
       tokenCount += tokenize(lineWithNewLine).length;
       contentArray.push(lineWithNewLine);
     } else if (cutOffLine.length === 0) {
       cutOffLine = lineWithNewLine;
     }
-  }  
-  
+  }
+
   const outputPrompt = basePrompt + contentArray.join("") + queryPrompt;
 
   return {
-    prompt: outputPrompt, 
-    contextCutoffAt: cutOffLine || undefined
+    prompt: outputPrompt,
+    contextCutoffAt: cutOffLine || undefined,
   };
 }
-

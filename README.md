@@ -46,7 +46,7 @@ You can also [connect to an OpenAI-compatible API](https://www.reorproject.org/d
 
 ### Importing notes from other apps
 Reor works within a single directory in the filesystem. You choose the directory on first boot.
-To import notes/files from another app, you'll need to populate that directory manually with markdown files. Integrations with other apps are hopefully coming soon!
+To import notes/files from another app, you'll need to populate that directory manually with markdown files. Note that if you have frontmatter in your markdown files it may not parse correctly. Integrations with other apps are hopefully coming soon!
 
 
 ### Building from source

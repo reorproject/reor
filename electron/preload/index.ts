@@ -15,6 +15,7 @@ import {
 } from "electron/main/Files/Types";
 import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
+import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
@@ -46,7 +47,7 @@ declare global {
         prompt: string,
         llmName: string,
         filter?: string
-      ) => Promise<string>;
+      ) => Promise<PromptWithRagResults>;
       getDatabaseFields: () => Promise<Record<string, string>>;
     };
     files: {
@@ -126,7 +127,7 @@ contextBridge.exposeInMainWorld("database", {
     prompt: string,
     llmName: string,
     filter?: string
-  ): Promise<DBEntry[]> => {
+  ): Promise<PromptWithRagResults> => {
     return ipcRenderer.invoke(
       "augment-prompt-with-rag",
       prompt,

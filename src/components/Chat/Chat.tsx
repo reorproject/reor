@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import rehypeRaw from "rehype-raw";
 import {
   Menu,
   MenuHandler,
@@ -12,6 +13,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import ReactMarkdown from "react-markdown";
 import { FiRefreshCw } from "react-icons/fi"; // Importing refresh icon from React Icons
 import { ChatPrompt } from "./Chat-Prompts";
+import { CustomLinkMarkdown } from "./CustomLinkMarkdown";
 import { ChatCompletionChunk } from "openai/resources/chat/completions";
 
 // convert ask options to enum
@@ -34,14 +36,19 @@ type ChatUIMessage = {
 
 interface ChatWithLLMProps {
   currentFilePath: string | null;
+  openFileByPath: (path: string) => Promise<void>;
 }
 
-const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
+const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
+  currentFilePath,
+  openFileByPath,
+}) => {
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>("");
   const [messages, setMessages] = useState<ChatUIMessage[]>([]);
   const [defaultModel, setDefaultModel] = useState<string>("");
   const [askText, setAskText] = useState<string>("Ask");
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
+  const [filesReferenced, setFilesReferenced] = useState<string[]>([]);
   const [currentBotMessage, setCurrentBotMessage] =
     useState<ChatUIMessage | null>(null);
 
@@ -49,6 +56,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
     const defaultModelName = await window.llm.getDefaultLLMName();
     setDefaultModel(defaultModelName);
   };
+
   useEffect(() => {
     fetchDefaultModel();
   }, []);
@@ -118,10 +126,17 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
         }
         augmentedPrompt = prompt;
       } else if (askText === AskOptions.Ask) {
-        augmentedPrompt = await window.database.augmentPromptWithRAG(
-          userTextFieldInput,
-          llmName
-        );
+        const { ragPrompt, uniqueFilesReferenced } =
+          await window.database.augmentPromptWithRAG(
+            userTextFieldInput,
+            llmName
+          );
+
+        console.log("RAG Prompt:", ragPrompt);
+        console.log("Unique files referenced:", uniqueFilesReferenced);
+
+        setFilesReferenced(uniqueFilesReferenced);
+        augmentedPrompt = ragPrompt;
       }
     } catch (error) {
       console.error("Failed to augment prompt:", error);
@@ -143,15 +158,41 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
     setUserTextFieldInput("");
   };
 
+  const addCollapsibleDetailsInMarkdown = (content: string, title: string) => {
+    // <span/> is required to demarcate the start of collapsible details from the markdown line
+    return `\n -- -- -- \n <span/> <details> <summary> *${title.trim()}* </summary> \n ${content} </details>`;
+  };
+
   useEffect(() => {
     const updateStream = (chunk: ChatCompletionChunk) => {
-      const newMsgContent = chunk.choices[0].delta.content;
-      if (!newMsgContent) return;
+      let filesContext = "";
+      if (chunk.choices[0].finish_reason && filesReferenced.length > 0) {
+        const newBulletedFiles = filesReferenced.map((file, index) => {
+          const simplifiedFilePath = file.startsWith(
+            window.electronStore.getUserDirectory()
+          )
+            ? file.replace(window.electronStore.getUserDirectory() + "/", "")
+            : file;
+          return ` ${index + 1}. [${simplifiedFilePath}](#)`;
+        });
+        filesContext = addCollapsibleDetailsInMarkdown(
+          newBulletedFiles.join("  \n"),
+          "Files referenced:"
+        );
+        setFilesReferenced([]); // clear the files referenced after this message
+      }
+      const newMsgContent = chunk.choices[0].delta.content ?? "";
+
+      if (!newMsgContent && !filesContext) return;
       setCurrentBotMessage((prev) => {
+        const newContent = `${
+          prev?.content ? prev.content + newMsgContent : newMsgContent
+        }`.replace("\n", "<br/>"); // this is because react markdown wth rehype-raw can only HTML <br> instead of newline syntax
+
         return {
           role: "assistant",
           messageType: "success",
-          content: prev?.content ? prev.content + newMsgContent : newMsgContent,
+          content: newContent + `${filesContext}`,
         };
       });
     };
@@ -164,7 +205,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
     return () => {
       removeTokenStreamListener();
     };
-  }, []);
+  }, [filesReferenced]);
 
   const restartSession = async () => {
     fetchDefaultModel();
@@ -233,7 +274,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
         </div>
         <div className="pr-2 pt-1 cursor-pointer" onClick={restartSession}>
           <FiRefreshCw className="text-gray-300" title="Restart Session" />{" "}
-          {/* Icon */}
         </div>
       </div>
       <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
@@ -241,6 +281,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
           {messages.map((message, index) => (
             <ReactMarkdown
               key={index}
+              rehypePlugins={[rehypeRaw]}
               className={`p-1 pl-1 markdown-content rounded-lg break-words ${
                 message.messageType === "error"
                   ? "bg-red-100 text-red-800"
@@ -254,11 +295,21 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
           ))}
           {currentBotMessage && (
             <ReactMarkdown
+              rehypePlugins={[rehypeRaw]}
               className={`p-1 pl-1 markdown-content rounded-lg break-words ${
                 currentBotMessage.messageType === "error"
                   ? "bg-red-100 text-red-800"
                   : "bg-blue-100 text-blue-800"
               } `}
+              components={{
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                a: ({ node, ...props }) => (
+                  <CustomLinkMarkdown
+                    props={props}
+                    openFileByPath={openFileByPath}
+                  />
+                ),
+              }}
             >
               {currentBotMessage.content}
             </ReactMarkdown>
