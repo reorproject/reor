@@ -187,9 +187,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
       if (!newMsgContent && !filesContext) return;
       setCurrentBotMessage((prev) => {
-        console.log("prev: ", prev);
-        console.log("newMsgContent: ", newMsgContent);
-        console.log("filesContext: ", filesContext);
         const newContent = `${
           prev?.content ? prev.content + newMsgContent : newMsgContent
         }`.replace("\n", "<br/>"); // this is because react markdown wth rehype-raw can only HTML <br> instead of newline syntax
