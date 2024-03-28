@@ -4,6 +4,7 @@ import { FixedSizeList as List, ListChildComponentProps } from "react-window";
 import { isFileNodeDirectory } from "./fileOperations";
 import { FileItem } from "./FileItem";
 import { useFileInfoTree } from "./hooks/use-file-info-tree";
+import FileHistoryNavigator from "./FileHistoryBar";
 
 interface FileListProps {
   selectedFilePath: string | null;
@@ -122,14 +123,21 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   };
 
   return (
-    <List
-      height={listHeight}
-      itemCount={itemCount}
-      itemSize={30}
-      width={"100%"}
-      style={{ padding: 0, margin: 0 }}
-    >
-      {Rows}
-    </List>
+    <div>
+      <FileHistoryNavigator
+        currentPath={selectedFilePath || ""}
+        onFileSelect={onFileSelect}
+      />
+
+      <List
+        height={listHeight}
+        itemCount={itemCount}
+        itemSize={30}
+        width={"100%"}
+        style={{ padding: 0, margin: 0 }}
+      >
+        {Rows}
+      </List>
+    </div>
   );
 };
