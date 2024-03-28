@@ -15,7 +15,6 @@ import { FiRefreshCw } from "react-icons/fi"; // Importing refresh icon from Rea
 import { ChatPrompt } from "./Chat-Prompts";
 import { CustomLinkMarkdown } from "./CustomLinkMarkdown";
 import { ChatCompletionChunk } from "openai/resources/chat/completions";
-import { CompletedMessageType } from "electron/main/llm/Types";
 
 // convert ask options to enum
 enum AskOptions {
@@ -160,20 +159,16 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   };
 
   const addCollapsibleDetailsInMarkdown = (content: string, title: string) => {
-    return `<details> <summary> *${title.trim()}* </summary> \n ${content} </details>`;
+    // <span/> is required to demarcate the start of collapsible details from the markdown line
+    return `\n -- -- -- \n <span/> <details> <summary> *${title.trim()}* </summary> \n ${content} </details>`;
   };
 
   useEffect(() => {
     let active = true;
-    const updateStream = (
-      chunk: ChatCompletionChunk | CompletedMessageType
-    ) => {
+    const updateStream = (chunk: ChatCompletionChunk) => {
       if (!active) return;
       let filesContext = "";
-      if (
-        (chunk as CompletedMessageType).messageType === "COMPLETED" &&
-        filesReferenced.length > 0
-      ) {
+      if (chunk.choices[0].finish_reason && filesReferenced.length > 0) {
         const newBulletedFiles = filesReferenced.map((file, index) => {
           const simplifiedFilePath = file.startsWith(
             window.electronStore.getUserDirectory()
@@ -188,18 +183,21 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         );
         setFilesReferenced([]); // clear the files referenced after this message
       }
-      const newMsgContent = (chunk as ChatCompletionChunk).choices
-        ? (chunk as ChatCompletionChunk).choices[0].delta.content
-        : "";
+      const newMsgContent = chunk.choices[0].delta.content ?? "";
 
       if (!newMsgContent && !filesContext) return;
       setCurrentBotMessage((prev) => {
+        console.log("prev: ", prev);
+        console.log("newMsgContent: ", newMsgContent);
+        console.log("filesContext: ", filesContext);
+        const newContent = `${
+          prev?.content ? prev.content + newMsgContent : newMsgContent
+        }`.replace("\n", "<br/>"); // this is because react markdown wth rehype-raw can only HTML <br> instead of newline syntax
+
         return {
           role: "assistant",
           messageType: "success",
-          content:
-            `${prev?.content ? prev.content + newMsgContent : newMsgContent}` +
-            `${filesContext}`,
+          content: newContent + `${filesContext}`,
         };
       });
     };

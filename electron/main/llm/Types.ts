@@ -26,7 +26,6 @@ export interface LLMSessionService {
     modelConfig: LLMConfig,
     messageHistory: Array<ChatCompletionMessageParam>,
     chunkResponse: (chunk: ChatCompletionChunk) => void,
-    onComplete: () => void,
     generationParams?: LLMGenerationParameters
   ): Promise<void>;
 
