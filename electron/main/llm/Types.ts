@@ -41,7 +41,3 @@ export interface ISendFunctionImplementer {
    */
   send(channel: string, ...args: unknown[]): void;
 }
-
-export interface CompletedMessageType {
-  messageType: "COMPLETED";
-}
