@@ -74,18 +74,20 @@ export const useFileByFilepath = () => {
     indexFileInDatabase: boolean = false
   ) => {
     const markdownContent = editor?.storage.markdown.getMarkdown();
-    if (markdownContent !== null && filePath !== null) {
-      if (isFileContentModified) {
-        await window.files.writeFile({
-          filePath: filePath,
-          content: markdownContent,
-        });
+    if (
+      markdownContent !== null &&
+      filePath !== null &&
+      isFileContentModified
+    ) {
+      await window.files.writeFile({
+        filePath: filePath,
+        content: markdownContent,
+      });
 
-        setIsFileContentModified(false);
+      setIsFileContentModified(false);
 
-        if (indexFileInDatabase) {
-          window.files.indexFileInDatabase(filePath);
-        }
+      if (indexFileInDatabase) {
+        window.files.indexFileInDatabase(filePath);
       }
     }
   };
