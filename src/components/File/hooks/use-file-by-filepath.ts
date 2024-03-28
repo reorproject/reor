@@ -16,6 +16,8 @@ export const useFileByFilepath = () => {
     string | null
   >(null);
 
+  const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>("");
+
   /**
 	 * with this editor, we want to take the HTML on the following scenarios:
 		1. when the file path changes, causing a re-render
@@ -113,6 +115,18 @@ export const useFileByFilepath = () => {
     };
   }, [currentlyOpenedFilePath, editor]);
 
+  // open a new file rename dialog
+  useEffect(() => {
+    const renameFileListener = window.ipcRenderer.receive(
+      "rename-file-listener",
+      (noteName: string) => setNoteToBeRenamed(noteName)
+    );
+
+    return () => {
+      renameFileListener();
+    };
+  }, []);
+
   // cleanup effect ran once, so there was only 1 re-render
   // but for each query to the delete file-listener, you only want to run the listener once, not multiple times.
   // the listener function is ran multiple times, mostly before the cleanup is done, so apparently there are eihther multiple listeners being added, or the event is fired multiple times
@@ -125,9 +139,7 @@ export const useFileByFilepath = () => {
   // 2. on the FE, receives win.webContents.send("prepare-for-window-close", files);
   // 3. FE after saving, alerts backend that is ready for close
   useEffect(() => {
-    let active = true;
     const handleWindowClose = async () => {
-      if (!active) return;
       console.log("saving file", {
         filePath: currentlyOpenedFilePath,
         fileContent: editor?.getHTML() || "",
@@ -155,7 +167,6 @@ export const useFileByFilepath = () => {
     );
 
     return () => {
-      active = false;
       removeWindowCloseListener();
     };
   }, [currentlyOpenedFilePath, editor]);
@@ -165,5 +176,7 @@ export const useFileByFilepath = () => {
     saveCurrentlyOpenedFile,
     editor,
     openFileByPath,
+    noteToBeRenamed,
+    setNoteToBeRenamed,
   };
 };

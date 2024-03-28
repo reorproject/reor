@@ -4,6 +4,7 @@ import {
   FileInfoTree,
   AugmentPromptWithFileProps,
   WriteFileProps,
+  RenameFileProps,
 } from "./Types";
 import {
   GetFilesInfoTree,
@@ -106,6 +107,13 @@ export const registerFileHandlers = (
         writeFileProps.content,
         "utf-8"
       );
+    }
+  );
+
+  ipcMain.handle(
+    "rename-file",
+    async (event, renameFileProps: RenameFileProps) => {
+      fs.renameSync(renameFileProps.oldFilePath, renameFileProps.newFilePath);
     }
   );
 

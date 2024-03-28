@@ -1,4 +1,3 @@
-import NewNoteComponent from "./File/NewNote";
 import React, { useEffect, useState } from "react";
 import { PiSidebar, PiSidebarFill } from "react-icons/pi";
 
@@ -6,7 +5,6 @@ import { BsChatLeftDots, BsFillChatLeftDotsFill } from "react-icons/bs";
 
 export const titleBarHeight = "30px";
 interface TitleBarProps {
-  onFileSelect: (path: string) => void;
   chatbotOpen: boolean;
   similarFilesOpen: boolean;
   toggleChatbot: () => void;
@@ -14,13 +12,11 @@ interface TitleBarProps {
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
-  onFileSelect,
   chatbotOpen,
   similarFilesOpen,
   toggleChatbot,
   toggleSimilarFiles,
 }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [platform, setPlatform] = useState("");
 
   useEffect(() => {
@@ -31,9 +27,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
 
     fetchPlatform();
   }, []);
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
+
   return (
     <div
       id="customTitleBar"
@@ -41,19 +35,13 @@ const TitleBar: React.FC<TitleBarProps> = ({
       style={{ backgroundColor: "#303030" }}
     >
       <div
-        className=" flex"
+        className="flex"
         style={
           platform === "darwin"
             ? { marginLeft: "70px" }
             : { marginLeft: "10px" }
         }
-      >
-        <NewNoteComponent
-          isOpen={isModalOpen}
-          onClose={toggleModal}
-          onFileSelect={onFileSelect}
-        />
-      </div>
+      />
 
       <div
         className="flex justify-content-right align-items-right"
@@ -61,7 +49,6 @@ const TitleBar: React.FC<TitleBarProps> = ({
       >
         {similarFilesOpen ? (
           <PiSidebarFill
-
             className="text-gray-100 cursor-pointer mt-[0.04rem]"
             size={28}
             onClick={toggleSimilarFiles}
@@ -69,7 +56,6 @@ const TitleBar: React.FC<TitleBarProps> = ({
           />
         ) : (
           <PiSidebar
-
             className="text-gray-100 cursor-pointer mt-[0.04rem]"
             size={28}
             onClick={toggleSimilarFiles}

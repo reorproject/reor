@@ -173,6 +173,15 @@ ipcMain.on("show-context-menu-file-item", (event, file) => {
       },
     })
   );
+  menu.append(
+    new MenuItem({
+      label: "Rename file",
+      click: () => {
+        console.log(file.path);
+        event.sender.send("rename-file-listener", file.path);
+      },
+    })
+  );
 
   console.log("menu key: ", file);
 

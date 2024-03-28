@@ -7,6 +7,7 @@ import ResizableComponent from "./Generic/ResizableComponent";
 import SidebarManager from "./Sidebars/MainSidebar";
 import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
 import { EditorContent } from "@tiptap/react";
+import RenameNoteModal from "./File/RenameNote";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search";
@@ -17,8 +18,14 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const [sidebarShowing, setSidebarShowing] =
     useState<SidebarAbleToShow>("files");
 
-  const { filePath, editor, openFileByPath, saveCurrentlyOpenedFile } =
-    useFileByFilepath();
+  const {
+    filePath,
+    editor,
+    openFileByPath,
+    saveCurrentlyOpenedFile,
+    noteToBeRenamed,
+    setNoteToBeRenamed,
+  } = useFileByFilepath();
 
   const toggleChatbot = () => {
     setShowChatbot(!showChatbot);
@@ -30,13 +37,24 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   return (
     <div>
       <TitleBar
-        onFileSelect={openFileByPath}
         chatbotOpen={showChatbot}
         similarFilesOpen={showSimilarFiles}
         toggleChatbot={toggleChatbot}
         toggleSimilarFiles={toggleSimilarFiles}
       />
-
+      {noteToBeRenamed && (
+        <RenameNoteModal
+          isOpen={!!noteToBeRenamed}
+          onClose={() => setNoteToBeRenamed("")}
+          fullNoteName={noteToBeRenamed}
+          renameNote={({ path, newNoteName }) => {
+            window.files.renameFile({
+              oldFilePath: path,
+              newFilePath: newNoteName,
+            });
+          }}
+        />
+      )}
       <div className="flex h-below-titlebar">
         <div className="w-[40px] border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid">
           <LeftSidebar
