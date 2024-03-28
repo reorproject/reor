@@ -16,6 +16,7 @@ body {
 
 a {
   color: #0f82af;
+  cursor: pointer;
 }
 
 ::marker {

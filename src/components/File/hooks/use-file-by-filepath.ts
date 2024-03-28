@@ -6,10 +6,10 @@ import Paragraph from "@tiptap/extension-paragraph";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import Text from "@tiptap/extension-text";
-import Link from "@tiptap/extension-link";
 import "../tiptap.scss";
 import { useDebounce } from "use-debounce";
 import { Markdown } from "tiptap-markdown";
+import { RichTextLink } from "@/components/Editor/RichTextLink";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
@@ -34,6 +34,20 @@ export const useFileByFilepath = () => {
   });
 
   const editor = useEditor({
+    // editorProps: {
+    //   handleDOMEvents: {
+    //     click: (view, event) => {
+    //       // Assert event.target is of type Element to access the matches method
+    //       const target = event.target as Element;
+    //       if (target.matches("a[data-square-bracket-link]")) {
+    //         console.log("Square bracket link clicked");
+    //         // customOnClickHandler(event);
+    //         return true; // Stops the default handling
+    //       }
+    //       return false;
+    //     },
+    //   },
+    // },
     extensions: [
       StarterKit,
       Document,
@@ -41,15 +55,37 @@ export const useFileByFilepath = () => {
       Text,
       TaskList,
       Markdown,
+      // SquareBracketLink.configure({
+      //   // Additional configuration if necessary
+      // }),
       TaskItem.configure({
         nested: true,
       }),
-      Link.configure({
-        linkOnPaste: true,
-        openOnClick: true,
-      }),
+      RichTextLink,
+      // Link.configure({
+      //   linkOnPaste: true,
+      //   openOnClick: true,
+      // }),
     ],
   });
+
+  useEffect(() => {
+    const handleClick = (event) => {
+      const element = event.target;
+      if (element.tagName === "A" && element.href) {
+        event.preventDefault();
+        window.electron.openExternal(element.href);
+      }
+    };
+
+    // Add event listener to document to capture click events
+    document.addEventListener("click", handleClick);
+
+    // Cleanup
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
+  }, []);
 
   const [debouncedEditor] = useDebounce(editor?.state.doc.content, 4000);
 
