@@ -23,7 +23,6 @@ declare global {
   interface Window {
     ipcRenderer: {
       on: (channel: string, listener: (...args: unknown[]) => void) => void;
-      // removeListener: (channel: string, listener: ReceiveCallback) => void;
       receive: (channel: string, callback: ReceiveCallback) => () => void;
     };
     electron: {
