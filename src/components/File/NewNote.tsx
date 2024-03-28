@@ -39,12 +39,12 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
       if (!fileName || errorMessage) {
         return;
       }
-      const normalizedFileName = fileName.replace(/\\/g, "/");
+      const normalizedFileName = fileName.slice(0, 255).replace(/\\/g, "/");
       const fullPath = await window.files.joinPath(
         window.electronStore.getUserDirectory(),
         normalizedFileName + ".md"
       );
-      window.files.createFile(fullPath, "");
+      window.files.createFile(fullPath, `# ${fileName}\n`);
       onFileSelect(fullPath);
       onClose();
     } catch (e) {
