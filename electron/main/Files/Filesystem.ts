@@ -116,8 +116,13 @@ export function createFileRecursive(
   charset?: BufferEncoding
 ): void {
   const dirname = path.dirname(filePath);
+
   if (!fs.existsSync(dirname)) {
     fs.mkdirSync(dirname, { recursive: true });
+  }
+
+  if (fs.existsSync(filePath)) {
+    return;
   }
 
   fs.writeFileSync(filePath, content, charset);
