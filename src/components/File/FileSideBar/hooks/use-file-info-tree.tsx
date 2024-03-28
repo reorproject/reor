@@ -47,10 +47,13 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
       setExpandedDirectories(directoriesToBeExpanded);
     };
 
-    window.ipcRenderer.receive("files-list", handleFileUpdate);
+    const removeFilesListListener = window.ipcRenderer.receive(
+      "files-list",
+      handleFileUpdate
+    );
 
     return () => {
-      window.ipcRenderer.removeListener("files-list", handleFileUpdate);
+      removeFilesListListener();
     };
   }, [currentFilePath]);
 

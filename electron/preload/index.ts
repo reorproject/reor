@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from "electron";
+import { IpcRendererEvent, contextBridge, ipcRenderer } from "electron";
 import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
@@ -23,8 +23,8 @@ declare global {
   interface Window {
     ipcRenderer: {
       on: (channel: string, listener: (...args: unknown[]) => void) => void;
-      removeListener: (channel: string, listener: ReceiveCallback) => void;
-      receive: (channel: string, callback: ReceiveCallback) => void;
+      // removeListener: (channel: string, listener: ReceiveCallback) => void;
+      receive: (channel: string, callback: ReceiveCallback) => () => void;
     };
     electron: {
       openExternal: (url: string) => void;
@@ -203,9 +203,15 @@ contextBridge.exposeInMainWorld("electronStore", {
 
 contextBridge.exposeInMainWorld("ipcRenderer", {
   on: ipcRenderer.on,
-  removeListener: ipcRenderer.removeListener,
   receive: (channel: string, callback: (...args: unknown[]) => void) => {
-    ipcRenderer.on(channel, (event, ...args) => callback(...args));
+    // this creates a constant copy of the callback, thus ensuring that the removed listener is the same as the one added
+    const subscription = (event: IpcRendererEvent, ...args: unknown[]) =>
+      callback(...args);
+
+    ipcRenderer.on(channel, subscription);
+    return () => {
+      ipcRenderer.removeListener(channel, subscription);
+    };
   },
 });
 

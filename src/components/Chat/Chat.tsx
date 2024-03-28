@@ -144,9 +144,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
   };
 
   useEffect(() => {
-    let active = true;
     const updateStream = (chunk: ChatCompletionChunk) => {
-      if (!active) return;
       const newMsgContent = chunk.choices[0].delta.content;
       if (!newMsgContent) return;
       setCurrentBotMessage((prev) => {
@@ -158,11 +156,13 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({ currentFilePath }) => {
       });
     };
 
-    window.ipcRenderer.receive("tokenStream", updateStream);
+    const removeTokenStreamListener = window.ipcRenderer.receive(
+      "tokenStream",
+      updateStream
+    );
 
     return () => {
-      active = false;
-      window.ipcRenderer.removeListener("tokenStream", updateStream);
+      removeTokenStreamListener();
     };
   }, []);
 
