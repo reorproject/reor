@@ -52,7 +52,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
           onClose={() => setNoteToBeRenamed("")}
           fullNoteName={noteToBeRenamed}
           renameNote={async ({ path, newNoteName }) => {
-            console.log("Renaming note", path, newNoteName)
             await renameFile(path, newNoteName);
           }}
         />

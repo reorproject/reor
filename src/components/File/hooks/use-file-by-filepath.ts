@@ -19,7 +19,6 @@ export const useFileByFilepath = () => {
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>("");
   const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>("");
 
-
   const setFileNodeToBeRenamed = async (filePath: string) => {
     const isDirectory = await window.files.isDirectory(filePath);
     if (isDirectory) {
@@ -27,7 +26,7 @@ export const useFileByFilepath = () => {
     } else {
       setNoteToBeRenamed(filePath);
     }
-  }
+  };
   /**
 	 * with this editor, we want to take the HTML on the following scenarios:
 		1. when the file path changes, causing a re-render
@@ -124,7 +123,6 @@ export const useFileByFilepath = () => {
       removeDeleteFileListener();
     };
   }, [currentlyOpenedFilePath, editor]);
-
 
   const renameFileNode = async (oldFilePath: string, newFilePath: string) => {
     await window.files.renameFileRecursive({

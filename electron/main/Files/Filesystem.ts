@@ -154,7 +154,6 @@ export function startWatchingDirectory(
   } catch (error) {
     console.error("Error setting up file watcher:", error);
   }
-
 }
 
 function fileHasExtensionInList(

@@ -145,7 +145,10 @@ ipcMain.on("index-files-in-directory", async (event) => {
     const win = BrowserWindow.fromWebContents(event.sender);
 
     if (win) {
-      windowsManager.watcher = startWatchingDirectory(win, windowInfo.vaultDirectoryForWindow);
+      windowsManager.watcher = startWatchingDirectory(
+        win,
+        windowInfo.vaultDirectoryForWindow
+      );
       updateFileListForRenderer(win, windowInfo.vaultDirectoryForWindow);
     }
     event.sender.send("indexing-progress", 1);
