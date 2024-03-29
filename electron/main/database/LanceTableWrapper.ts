@@ -94,6 +94,23 @@ export class LanceDBTableWrapper {
     }
   }
 
+  async updateDBItemsWithNewFilePath(oldFilePath: string, newFilePath: string): Promise<void> {
+    const sanitizedFilePath = sanitizePathForDatabase(oldFilePath);
+    if (sanitizedFilePath === "") {
+      return;
+    }
+    const filterString = `${DatabaseFields.NOTE_PATH} = '${sanitizedFilePath}'`;
+    try {
+      await this.lanceTable.update({ where: filterString, values: {
+        [DatabaseFields.NOTE_PATH]: sanitizePathForDatabase(newFilePath)
+      }});
+    } catch (error) {
+      console.error(
+        `Error updating items from DB: ${error} using filter string: ${filterString}`
+      );
+    }
+  }
+
   async search(
     query: string,
     //   metricType: string,

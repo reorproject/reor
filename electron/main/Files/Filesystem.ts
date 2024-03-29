@@ -126,7 +126,7 @@ export function createFileRecursive(
 export function startWatchingDirectory(
   win: BrowserWindow,
   directoryToWatch: string
-): void {
+): chokidar.FSWatcher | undefined {
   try {
     const watcher = chokidar.watch(directoryToWatch, {
       ignoreInitial: true,
@@ -150,9 +150,11 @@ export function startWatchingDirectory(
       .on("unlinkDir", (path) => handleFileEvent("directory removed", path));
 
     // No 'ready' event handler is needed here, as we're ignoring initial scan
+    return watcher;
   } catch (error) {
     console.error("Error setting up file watcher:", error);
   }
+
 }
 
 function fileHasExtensionInList(

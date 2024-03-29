@@ -55,7 +55,8 @@ declare global {
       openFileDialog: (fileExtensions?: string[]) => Promise<string[]>;
       getFilesForWindow: () => Promise<FileInfoTree>;
       writeFile: (writeFileProps: WriteFileProps) => Promise<void>;
-      renameFile: (renameFileProps: RenameFileProps) => Promise<void>;
+      isDirectory: (filepath: string) => Promise<boolean>;
+      renameFileRecursive: (renameFileProps: RenameFileProps) => Promise<void>;
       indexFileInDatabase: (filePath: string) => Promise<void>;
       readFile: (filePath: string) => Promise<string>;
       deleteFile: (filePath: string) => Promise<void>;
@@ -233,9 +234,11 @@ contextBridge.exposeInMainWorld("files", {
   writeFile: async (writeFileProps: WriteFileProps) => {
     return ipcRenderer.invoke("write-file", writeFileProps);
   },
-
-  renameFile: async (renameFileProps: RenameFileProps) => {
-    return ipcRenderer.invoke("rename-file", renameFileProps);
+  isDirectory: async (filePath: string) => {
+    return ipcRenderer.invoke("is-directory", filePath);
+  },
+  renameFileRecursive: async (renameFileProps: RenameFileProps) => {
+    return ipcRenderer.invoke("rename-file-recursive", renameFileProps);
   },
 
   indexFileInDatabase: async (filePath: string) => {

@@ -1,4 +1,4 @@
-import { ipcMain } from "electron";
+import { BrowserWindow, ipcMain } from "electron";
 import * as path from "path";
 import {
   FileInfoTree,
@@ -111,9 +111,37 @@ export const registerFileHandlers = (
   );
 
   ipcMain.handle(
-    "rename-file",
+    "is-directory",
+    (event, filepath: string) => {
+      return fs.statSync(
+        filepath
+      ).isDirectory();
+    }
+  );
+
+  ipcMain.handle(
+    "rename-file-recursive",
     async (event, renameFileProps: RenameFileProps) => {
-      fs.renameSync(renameFileProps.oldFilePath, renameFileProps.newFilePath);
+      const windowInfo = windowsManager.getWindowInfoForContents(
+        event.sender
+      );
+
+      if (!windowInfo) {
+        throw new Error("Window info not found.");
+      }
+      windowsManager.watcher?.unwatch(windowInfo?.vaultDirectoryForWindow);
+
+      fs.rename(renameFileProps.oldFilePath, renameFileProps.newFilePath, (err) => {
+        if (err) {
+          throw err;
+        }
+        windowsManager.watcher?.add(windowInfo?.vaultDirectoryForWindow);
+
+      });
+
+
+      // then need to trigger reindexing of folder
+      windowInfo.dbTableClient.updateDBItemsWithNewFilePath(renameFileProps.oldFilePath, renameFileProps.newFilePath);
     }
   );
 

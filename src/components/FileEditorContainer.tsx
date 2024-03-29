@@ -8,6 +8,7 @@ import SidebarManager from "./Sidebars/MainSidebar";
 import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
 import { EditorContent } from "@tiptap/react";
 import RenameNoteModal from "./File/RenameNote";
+import RenameDirModal from "./File/RenameDirectory";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search";
@@ -25,6 +26,9 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     saveCurrentlyOpenedFile,
     noteToBeRenamed,
     setNoteToBeRenamed,
+    fileDirToBeRenamed,
+    setFileDirToBeRenamed,
+    renameFile,
   } = useFileByFilepath();
 
   const toggleChatbot = () => {
@@ -47,11 +51,19 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
           isOpen={!!noteToBeRenamed}
           onClose={() => setNoteToBeRenamed("")}
           fullNoteName={noteToBeRenamed}
-          renameNote={({ path, newNoteName }) => {
-            window.files.renameFile({
-              oldFilePath: path,
-              newFilePath: newNoteName,
-            });
+          renameNote={async ({ path, newNoteName }) => {
+            console.log("Renaming note", path, newNoteName)
+            await renameFile(path, newNoteName);
+          }}
+        />
+      )}
+      {fileDirToBeRenamed && (
+        <RenameDirModal
+          isOpen={!!fileDirToBeRenamed}
+          onClose={() => setFileDirToBeRenamed("")}
+          fullDirName={fileDirToBeRenamed}
+          renameDir={async ({ path, newNoteName }) => {
+            await renameFile(path, newNoteName);
           }}
         />
       )}

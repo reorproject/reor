@@ -17,7 +17,17 @@ export const useFileByFilepath = () => {
   >(null);
 
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>("");
+  const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>("");
 
+
+  const setFileNodeToBeRenamed = async (filePath: string) => {
+    const isDirectory = await window.files.isDirectory(filePath);
+    if (isDirectory) {
+      setFileDirToBeRenamed(filePath);
+    } else {
+      setNoteToBeRenamed(filePath);
+    }
+  }
   /**
 	 * with this editor, we want to take the HTML on the following scenarios:
 		1. when the file path changes, causing a re-render
@@ -115,11 +125,24 @@ export const useFileByFilepath = () => {
     };
   }, [currentlyOpenedFilePath, editor]);
 
+
+  const renameFileNode = async (oldFilePath: string, newFilePath: string) => {
+    await window.files.renameFileRecursive({
+      oldFilePath,
+      newFilePath,
+    });
+
+    //reset the editor to the new file path
+    if (currentlyOpenedFilePath === oldFilePath) {
+      setCurrentlyOpenedFilePath(newFilePath);
+    }
+  };
+
   // open a new file rename dialog
   useEffect(() => {
     const renameFileListener = window.ipcRenderer.receive(
       "rename-file-listener",
-      (noteName: string) => setNoteToBeRenamed(noteName)
+      (noteName: string) => setFileNodeToBeRenamed(noteName)
     );
 
     return () => {
@@ -178,5 +201,8 @@ export const useFileByFilepath = () => {
     openFileByPath,
     noteToBeRenamed,
     setNoteToBeRenamed,
+    fileDirToBeRenamed,
+    setFileDirToBeRenamed,
+    renameFile: renameFileNode,
   };
 };
