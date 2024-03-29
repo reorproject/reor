@@ -157,17 +157,21 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
           throw new Error("Window info not found.");
         }
 
-        const filter = llmFilter.choices[0].message.content ?? "";
+        const llmGeneratedFilterString =
+          llmFilter.choices[0].message.content ?? "";
 
-        if (maxRAGExamples && maxRAGExamples > 0) {
+        try {
           searchResults = await windowInfo.dbTableClient.search(
             query,
             maxRAGExamples,
-            filter
+            llmGeneratedFilterString
           );
-          // console.log("searchResults", searchResults);
-        } else {
-          throw new Error("Max RAG examples is not set or is invalid.");
+        } catch (error) {
+          searchResults = await windowInfo.dbTableClient.search(
+            query,
+            maxRAGExamples
+          );
+          searchResults = [];
         }
 
         const { prompt: ragPrompt } = createPromptWithContextLimitFromContent(
