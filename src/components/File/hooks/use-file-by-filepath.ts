@@ -95,7 +95,6 @@ export const useFileByFilepath = () => {
   const openFileByPath = async (newFilePath: string) => {
     saveEditorContentToPath(editor, currentlyOpenedFilePath, true);
     const fileContent = (await window.files.readFile(newFilePath)) ?? "";
-    setIsFileContentModified(false);
     setCurrentlyOpenedFilePath(newFilePath);
 
     editor?.commands.setContent(fileContent);
