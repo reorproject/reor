@@ -146,10 +146,13 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         setFilesReferenced(uniqueFilesReferenced);
         augmentedPrompt = ragPrompt;
       } else if (askText === AskOptions.TemporalAsk) {
-        augmentedPrompt = await window.database.augmentPromptWithTemporalAgent(
-          userTextFieldInput,
-          llmName
-        );
+        const { ragPrompt, uniqueFilesReferenced } =
+          await window.database.augmentPromptWithTemporalAgent(
+            userTextFieldInput,
+            llmName
+          );
+        augmentedPrompt = ragPrompt;
+        setFilesReferenced(uniqueFilesReferenced);
       }
     } catch (error) {
       console.error("Failed to augment prompt:", error);

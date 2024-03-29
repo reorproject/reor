@@ -105,7 +105,11 @@ export const registerDBSessionHandlers = (
 
   ipcMain.handle(
     "augment-prompt-with-temporal-agent",
-    async (event, query: string, llmName: string): Promise<string> => {
+    async (
+      event,
+      query: string,
+      llmName: string
+    ): Promise<PromptWithRagResults> => {
       const llmSession = openAISession;
       const llmConfig = await getLLMConfig(store, ollamaService, llmName);
       console.log("llmConfig", llmConfig);
@@ -181,7 +185,14 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
           llmConfig.contextLength
         );
         console.log("ragPrompt", ragPrompt);
-        return ragPrompt;
+        const uniqueFilesReferenced = [
+          ...new Set(searchResults.map((entry) => entry.notepath)),
+        ];
+
+        return {
+          ragPrompt,
+          uniqueFilesReferenced,
+        };
       } catch (error) {
         console.error("Error searching database:", error);
         throw errorToString(error);

@@ -52,7 +52,7 @@ declare global {
       augmentPromptWithTemporalAgent: (
         prompt: string,
         llmName: string
-      ) => Promise<string>;
+      ) => Promise<PromptWithRagResults>;
       getDatabaseFields: () => Promise<Record<string, string>>;
     };
     files: {
@@ -143,7 +143,7 @@ contextBridge.exposeInMainWorld("database", {
   augmentPromptWithTemporalAgent: async (
     prompt: string,
     llmName: string
-  ): Promise<DBEntry[]> => {
+  ): Promise<PromptWithRagResults> => {
     return ipcRenderer.invoke(
       "augment-prompt-with-temporal-agent",
       prompt,
