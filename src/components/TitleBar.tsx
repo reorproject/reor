@@ -3,10 +3,12 @@ import React, { useEffect, useState } from "react";
 import { PiSidebar, PiSidebarFill } from "react-icons/pi";
 
 import { BsChatLeftDots, BsFillChatLeftDotsFill } from "react-icons/bs";
+import FileHistoryNavigator from "./File/FileSideBar/FileHistoryBar";
 
 export const titleBarHeight = "30px";
 interface TitleBarProps {
   onFileSelect: (path: string) => void;
+  currentFilePath: string | null;
   chatbotOpen: boolean;
   similarFilesOpen: boolean;
   toggleChatbot: () => void;
@@ -15,6 +17,7 @@ interface TitleBarProps {
 
 const TitleBar: React.FC<TitleBarProps> = ({
   onFileSelect,
+  currentFilePath,
   chatbotOpen,
   similarFilesOpen,
   toggleChatbot,
@@ -40,6 +43,12 @@ const TitleBar: React.FC<TitleBarProps> = ({
       className={`h-titlebar  flex justify-between`}
       style={{ backgroundColor: "#303030" }}
     >
+      <div className="flex">
+        <FileHistoryNavigator
+          onFileSelect={onFileSelect}
+          currentPath={currentFilePath || ""}
+        />
+      </div>
       <div
         className=" flex"
         style={
@@ -61,7 +70,6 @@ const TitleBar: React.FC<TitleBarProps> = ({
       >
         {similarFilesOpen ? (
           <PiSidebarFill
-
             className="text-gray-100 cursor-pointer mt-[0.04rem]"
             size={28}
             onClick={toggleSimilarFiles}
@@ -69,7 +77,6 @@ const TitleBar: React.FC<TitleBarProps> = ({
           />
         ) : (
           <PiSidebar
-
             className="text-gray-100 cursor-pointer mt-[0.04rem]"
             size={28}
             onClick={toggleSimilarFiles}

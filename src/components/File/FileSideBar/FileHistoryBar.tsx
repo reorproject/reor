@@ -147,8 +147,12 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
   return (
     <div
       style={{
-        paddingTop: "2px",
-        paddingLeft: "8px",
+        padding: "1px",
+        backgroundColor: "#272626",
+        margin: "2px 0px",
+        overflow: "hidden",
+        border: "1px solid #212020",
+        borderRadius: "3px",
       }}
     >
       <button
@@ -162,9 +166,8 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
         style={{
           background: "none",
           color: !canGoBack ? "#727272" : "#dedede",
-          fontSize: "22px",
+          fontSize: "20px",
           border: "none",
-          padding: "4px 4px 0px",
           cursor: !canGoBack ? "default" : "pointer",
         }}
         title="Back"
@@ -182,9 +185,9 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
         style={{
           background: "none",
           color: !canGoForward ? "#727272" : "#dedede",
-          fontSize: "22px",
+          fontSize: "20px",
           border: "none",
-          padding: "4px 4px 0px",
+          paddingLeft: "4px",
           cursor: !canGoForward ? "default" : "pointer",
         }}
         title="Forward"
