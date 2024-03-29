@@ -16,6 +16,8 @@ export const useFileByFilepath = () => {
     string | null
   >(null);
 
+  const [isFileContentModified, setIsFileContentModified] =
+    useState<boolean>(false);
   /**
 	 * with this editor, we want to take the HTML on the following scenarios:
 		1. when the file path changes, causing a re-render
@@ -34,6 +36,9 @@ export const useFileByFilepath = () => {
   });
 
   const editor = useEditor({
+    onUpdate() {
+      setIsFileContentModified(true);
+    },
     extensions: [
       StarterKit,
       Document,
@@ -68,23 +73,27 @@ export const useFileByFilepath = () => {
     filePath: string | null,
     indexFileInDatabase: boolean = false
   ) => {
-    if (editor?.getHTML() !== null && filePath !== null) {
-      const markdown = editor?.storage.markdown.getMarkdown();
+    const markdownContent = editor?.storage.markdown.getMarkdown();
+    if (
+      markdownContent !== null &&
+      filePath !== null &&
+      isFileContentModified
+    ) {
       await window.files.writeFile({
         filePath: filePath,
-        content: markdown,
+        content: markdownContent,
       });
+
+      setIsFileContentModified(false);
+
       if (indexFileInDatabase) {
-        await window.files.indexFileInDatabase(filePath);
+        window.files.indexFileInDatabase(filePath);
       }
     }
   };
-  // read file, load content into fileContent
+
   const openFileByPath = async (newFilePath: string) => {
-    //if the fileContent is null or if there is no file currently selected
-
     saveEditorContentToPath(editor, currentlyOpenedFilePath, true);
-
     const fileContent = (await window.files.readFile(newFilePath)) ?? "";
     setCurrentlyOpenedFilePath(newFilePath);
 
