@@ -119,14 +119,25 @@ export const registerDBSessionHandlers = (
         [
           {
             role: "system",
-            content: `You are an experienced SQL engineer. Given an input user query, you will generate a temporal filter for the query. 
-If there is no temporal component in the query, you must return an empty string. For your reference, the timestamp right now is ${formatTimestampForLanceDB(
-              new Date()
-            )}.
-An example of a temporal filter is:
+            content: `You are an experienced SQL engineer. You are translating natural language queries into temporal filters for a database query. 
+            
+Below are 2 examples:
+
+Query: 
+Summarize all notes modified after March 16, 2024, 1:00 PM.
+
+Filter:
 ${DatabaseFields.FILE_MODIFIED} > timestamp '2024-03-16 13:00:00'
 
-Please generate ONLY the temporal filter using the same format as the example given. Please also make sure you only use the ${
+Query:
+Find all files modified after today.
+
+Filter:
+${DatabaseFields.FILE_MODIFIED} > ${formatTimestampForLanceDB(new Date())}
+
+For your reference, the timestamp right now is ${formatTimestampForLanceDB(
+              new Date()
+            )}.Please generate ONLY the temporal filter using the same format as the example given. Please also make sure you only use the ${
               DatabaseFields.FILE_MODIFIED
             } field in the filter. If you don't know or there is no temporal component in the query, please return an empty string.`,
           },
@@ -145,11 +156,9 @@ Please generate ONLY the temporal filter using the same format as the example gi
         if (!windowInfo) {
           throw new Error("Window info not found.");
         }
-        // const filter = `${DatabaseFields.FILE_MODIFIED} > timestamp '2024-03-16 13:00:00'`;
-        // const filter = "sadjfaosdifjasdf";
-        // console.log("filter", filter);
+
         const filter = llmFilter.choices[0].message.content ?? "";
-        console.log("filter", filter);
+
         if (maxRAGExamples && maxRAGExamples > 0) {
           searchResults = await windowInfo.dbTableClient.search(
             query,
