@@ -58,6 +58,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
       setCurrentIndex(newIndex);
       onFileSelect(history[newIndex]);
     }
+    setShowMenu('');
   };
 
   const handleLongPressStart = (direction: "back" | "forward") => {
