@@ -1,6 +1,7 @@
 import { removeFileExtension } from "@/functions/strings";
 import React, { useState, useRef, useEffect } from "react";
 import { FaCircleChevronLeft, FaCircleChevronRight } from "react-icons/fa6";
+import "./../../../styles/history.scss";
 
 interface FileHistoryNavigatorProps {
   onFileSelect: (path: string) => void;
@@ -29,7 +30,10 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
   }, [currentIndex]);
 
   const handleFileSelect = (path: string) => {
-    const updatedHistory = [...history.slice(0, currentIndex + 1), path];
+    const updatedHistory = [
+      ...history.filter((val) => val !== path).slice(0, currentIndex + 1),
+      path,
+    ];
     setHistory(updatedHistory);
     setCurrentIndex(updatedHistory.length - 1);
   };
@@ -53,12 +57,13 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
     }
   };
 
-  const goIndex = (newIndex: number): void => {
-    if (newIndex > -1) {
+  const goSelected = (path: string): void => {
+    if (path) {
+      const newIndex = history.indexOf(path);
       setCurrentIndex(newIndex);
-      onFileSelect(history[newIndex]);
+      onFileSelect(path);
     }
-    setShowMenu('');
+    setShowMenu("");
   };
 
   const handleLongPressStart = (direction: "back" | "forward") => {
@@ -103,35 +108,22 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
         ? history.slice(0, currentIndex)
         : history.slice(currentIndex + 1);
 
-    const startInd = currentRef.current?.id === "back" ? 0 : currentIndex + 1;
-
     return (
-      showMenu !== "" && menuChild.length > 0 && (
+      showMenu !== "" &&
+      menuChild.length > 0 && (
         <div
           ref={ref}
+          className="history-menu"
           tabIndex={0}
           style={{
-            position: "absolute",
             left: `${offsetLeft}px`,
             top: `${offsetTop + offsetHeight}px`,
-            backgroundColor: "#f9f9f9",
-            boxShadow: "0px 8px 16px rgba(0,0,0,0.2)",
-            padding: "6px 8px",
-            borderRadius: "4px",
-            zIndex: 1000,
           }}
         >
-          <ul style={{ listStyleType: "none", padding: "0", margin: "0" }}>
+          <ul>
             {menuChild.map((path, ind) => (
-              <li
-                key={ind + startInd}
-                style={{ padding: "4px 2px", cursor: "pointer" }}
-              >
-                <div
-                  key={ind + startInd}
-                  onClick={() => goIndex(ind + startInd)}
-                  style={{ color: "#666666", fontSize: "11px" }}
-                >
+              <li key={ind}>
+                <div key={ind} onClick={() => goSelected(path)}>
                   {removeFileExtension(
                     path.replace(/\\/g, "/").split("/").pop() || ""
                   )}
@@ -145,16 +137,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
   };
 
   return (
-    <div
-      style={{
-        padding: "1px",
-        backgroundColor: "#272626",
-        margin: "2px 0px",
-        overflow: "hidden",
-        border: "1px solid #212020",
-        borderRadius: "3px",
-      }}
-    >
+    <div className="history-container">
       <button
         id="back"
         ref={buttonRefBack}
@@ -164,10 +147,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
         onClick={goBack}
         disabled={!canGoBack}
         style={{
-          background: "none",
           color: !canGoBack ? "#727272" : "#dedede",
-          fontSize: "20px",
-          border: "none",
           cursor: !canGoBack ? "default" : "pointer",
         }}
         title="Back"
@@ -183,11 +163,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
         onClick={goForward}
         disabled={!canGoForward}
         style={{
-          background: "none",
           color: !canGoForward ? "#727272" : "#dedede",
-          fontSize: "20px",
-          border: "none",
-          paddingLeft: "4px",
           cursor: !canGoForward ? "default" : "pointer",
         }}
         title="Forward"
