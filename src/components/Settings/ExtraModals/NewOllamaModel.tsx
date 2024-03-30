@@ -50,10 +50,7 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
   };
 
   useEffect(() => {
-    let active = true;
-
     const updateStream = (modelName: string, progress: ProgressResponse) => {
-      if (!active) return;
       setDownloadProgress((prevProgress) => ({
         ...prevProgress,
         [modelName]: {
@@ -63,11 +60,13 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
       }));
     };
 
-    window.ipcRenderer.receive("ollamaDownloadProgress", updateStream);
+    const removeOllamaDownloadProgressListener = window.ipcRenderer.receive(
+      "ollamaDownloadProgress",
+      updateStream
+    );
 
     return () => {
-      active = false;
-      window.ipcRenderer.removeListener("ollamaDownloadProgress", updateStream);
+      removeOllamaDownloadProgressListener();
     };
   }, []);
 

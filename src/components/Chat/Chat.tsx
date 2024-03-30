@@ -164,9 +164,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   };
 
   useEffect(() => {
-    let active = true;
     const updateStream = (chunk: ChatCompletionChunk) => {
-      if (!active) return;
       let filesContext = "";
       if (chunk.choices[0].finish_reason && filesReferenced.length > 0) {
         const newBulletedFiles = filesReferenced.map((file, index) => {
@@ -199,10 +197,13 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       });
     };
 
-    window.ipcRenderer.receive("tokenStream", updateStream);
+    const removeTokenStreamListener = window.ipcRenderer.receive(
+      "tokenStream",
+      updateStream
+    );
+
     return () => {
-      active = false;
-      window.ipcRenderer.removeListener("tokenStream", updateStream);
+      removeTokenStreamListener();
     };
   }, [filesReferenced]);
 

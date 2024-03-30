@@ -71,23 +71,17 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   }, [filePath]);
 
   useEffect(() => {
-    let active = true;
     const vectorDBUpdateListener = async () => {
-      if (!active) return;
       console.log("Vector DB update listener path: ", filePath);
       updateSimilarEntries(filePath);
     };
 
-    window.ipcRenderer.receive(
+    const removeVectorDBListener = window.ipcRenderer.receive(
       "vector-database-update",
       vectorDBUpdateListener
     );
     return () => {
-      active = false;
-      window.ipcRenderer.removeListener(
-        "vector-database-update",
-        vectorDBUpdateListener
-      );
+      removeVectorDBListener();
     };
   }, [filePath]);
 

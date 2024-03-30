@@ -93,13 +93,7 @@ export const useFileByFilepath = () => {
 
   // delete file depending on file path returned by the listener
   useEffect(() => {
-    let active = true;
-    console.log("now active");
     const deleteFile = async (path: string) => {
-      console.log("listener got file path: ", path);
-      if (!active) return;
-      console.log("listener is active");
-
       await window.files.deleteFile(path);
 
       // if it is the current file, clear the content and set filepath to null so that it won't save anything else
@@ -109,12 +103,13 @@ export const useFileByFilepath = () => {
       }
     };
 
-    window.ipcRenderer.receive("delete-file-listener", deleteFile);
+    const removeDeleteFileListener = window.ipcRenderer.receive(
+      "delete-file-listener",
+      deleteFile
+    );
 
     return () => {
-      active = false;
-      console.log("cleanup effect ran");
-      window.ipcRenderer.removeListener("delete-file-listener", deleteFile);
+      removeDeleteFileListener();
     };
   }, [currentlyOpenedFilePath, editor]);
 
@@ -154,14 +149,14 @@ export const useFileByFilepath = () => {
       window.electron.destroyWindow();
     };
 
-    window.ipcRenderer.receive("prepare-for-window-close", handleWindowClose);
+    const removeWindowCloseListener = window.ipcRenderer.receive(
+      "prepare-for-window-close",
+      handleWindowClose
+    );
 
     return () => {
       active = false;
-      window.ipcRenderer.removeListener(
-        "prepare-for-window-close",
-        handleWindowClose
-      );
+      removeWindowCloseListener();
     };
   }, [currentlyOpenedFilePath, editor]);
 
