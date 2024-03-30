@@ -209,3 +209,8 @@ ipcMain.on("open-new-window", () => {
 ipcMain.handle("path-basename", (event, pathString: string) => {
   return path.basename(pathString);
 });
+
+ipcMain.handle("path-dirname", (event, pathString: string) => {
+  return path.dirname(pathString) + path.sep;
+});
+

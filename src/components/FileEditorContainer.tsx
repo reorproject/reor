@@ -61,7 +61,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
           isOpen={!!fileDirToBeRenamed}
           onClose={() => setFileDirToBeRenamed("")}
           fullDirName={fileDirToBeRenamed}
-          renameDir={async ({ path, newNoteName }) => {
+          renameDir={async ({ path, newDirName: newNoteName }) => {
             await renameFile(path, newNoteName);
           }}
         />

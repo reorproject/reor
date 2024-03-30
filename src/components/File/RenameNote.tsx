@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import * as path from "path";
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
 import { errorToString } from "@/functions/error";
 import { toast } from "react-toastify";
-import { getInvalidCharacterInFileName } from "@/functions/strings";
+import { getInvalidCharacterInFileName, removeFileExtension } from "@/functions/strings";
 
 export interface RenameNoteFuncProps {
   path: string;
@@ -23,11 +24,22 @@ const RenameNoteModal: React.FC<RenameNoteModalProps> = ({
   onClose,
   renameNote,
 }) => {
-  const initialNotePathPrefix = fullNoteName.split("/").slice(0, -1).join("/");
-  const trimmedInitialNoteName =
-    fullNoteName.split("/").pop()?.split(".").slice(0, -1).join(".") || "";
+
+  useEffect(() => {
+    const setDirectoryUponNoteChange = async () => {
+      const initialNotePathPrefix = await window.path.dirname(fullNoteName);
+      setDirPrefix(initialNotePathPrefix);
+      const initialNoteName = await window.path.basename(fullNoteName);
+      const trimmedInitialNoteName = removeFileExtension(initialNoteName) || ''
+      setNoteName(trimmedInitialNoteName);
+    }
+
+    setDirectoryUponNoteChange();
+  }, [fullNoteName]);
+
   const fileExtension = fullNoteName.split(".").pop() || "md";
-  const [noteName, setNoteName] = useState<string>(trimmedInitialNoteName);
+  const [dirPrefix, setDirPrefix] = useState<string>('');
+  const [noteName, setNoteName] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,8 +73,8 @@ const RenameNoteModal: React.FC<RenameNoteModalProps> = ({
 
       // get full path of note
       await renameNote({
-        path: `${initialNotePathPrefix}/${trimmedInitialNoteName}.${fileExtension}`,
-        newNoteName: `${initialNotePathPrefix}/${noteName}.${fileExtension}`,
+        path: `${fullNoteName}`,
+        newNoteName: `${dirPrefix}${noteName}.${fileExtension}`,
       });
       onClose();
     } catch (e) {
@@ -80,7 +92,7 @@ const RenameNoteModal: React.FC<RenameNoteModalProps> = ({
       sendNoteRename();
     }
   };
-  console.log(noteName);
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="ml-3 mr-6 mt-2 mb-2 h-full min-w-[400px]">

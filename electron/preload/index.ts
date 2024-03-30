@@ -72,7 +72,8 @@ declare global {
       ) => Promise<PromptWithContextLimit>;
     };
     path: {
-      basename: (pathString: string) => string;
+      basename: (pathString: string) => Promise<string>;
+      dirname: (pathString: string) => Promise<string>;
     };
     llm: {
       streamingLLMResponse: (
@@ -276,8 +277,13 @@ contextBridge.exposeInMainWorld("files", {
 });
 
 contextBridge.exposeInMainWorld("path", {
-  basename: (pathString: string) =>
-    ipcRenderer.invoke("path-basename", pathString),
+  basename: (pathString: string) => {
+    return ipcRenderer.invoke("path-basename", pathString);
+  },
+
+  dirname: (pathString: string) => {
+    return ipcRenderer.invoke("path-dirname", pathString);
+  },
 });
 
 contextBridge.exposeInMainWorld("llm", {

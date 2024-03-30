@@ -1,13 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
 import { errorToString } from "@/functions/error";
 import { toast } from "react-toastify";
 import { getInvalidCharacterInFileName } from "@/functions/strings";
-
 export interface RenameDirFuncProps {
   path: string;
-  newNoteName: string;
+  newDirName: string;
 }
 
 interface RenameDirModalProps {
@@ -23,12 +22,21 @@ const RenameDirModal: React.FC<RenameDirModalProps> = ({
   onClose,
   renameDir,
 }) => {
-  const initialDirPathPrefix = fullDirName.split("/").slice(0, -1).join("/");
-  const trimmedInitialDirName = fullDirName.split("/").pop() || "";
+  useEffect(() => {
+    const setDirectoryUponNoteChange = async () => {
+      const initialDirPathPrefix = await window.path.dirname(fullDirName);
+      setDirPrefix(initialDirPathPrefix);
+      const trimmedInitialDirName = await window.path.basename(fullDirName);
+      setDirName(trimmedInitialDirName);
+    }
+
+    setDirectoryUponNoteChange();
+  }, [fullDirName])
 
   const [isUpdatingDirName, setIsUpdatingDirName] = useState<boolean>(false);
 
-  const [dirName, setDirName] = useState<string>(trimmedInitialDirName);
+  const [dirPrefix, setDirPrefix] = useState<string>('');
+  const [dirName, setDirName] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -60,10 +68,11 @@ const RenameDirModal: React.FC<RenameDirModalProps> = ({
         return;
       }
       setIsUpdatingDirName(true);
-      // get full path of new directory
+      //get full path of new directory
+      console.log(dirName)
       await renameDir({
-        path: `${initialDirPathPrefix}/${trimmedInitialDirName}`,
-        newNoteName: `${initialDirPathPrefix}/${dirName}`,
+        path: `${fullDirName}`,
+        newDirName: `${dirPrefix}${dirName}`,
       });
       onClose();
       setIsUpdatingDirName(false);
