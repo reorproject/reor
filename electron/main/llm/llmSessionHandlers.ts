@@ -31,10 +31,6 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       llmConfig: LLMConfig,
       messageHistory: ChatCompletionMessageParam[]
     ): Promise<void> => {
-      if (llmConfig.type === "local") {
-        throw new Error("Local LLMs not yet implemented.");
-      }
-
       const handleChunk = (chunk: ChatCompletionChunk) => {
         event.sender.send("tokenStream", chunk);
       };

@@ -14,15 +14,8 @@ export function validateAIModelConfig(config: LLMConfig): string | null {
   }
 
   // Validate engine: ensure it's either "openai" or "llamacpp"
-  if (config.engine !== "openai" && config.engine !== "llamacpp") {
+  if (config.engine !== "openai") {
     return "Engine must be either 'openai' or 'llamacpp'.";
-  }
-  if (
-    config.type == "local" &&
-    !config.localPath &&
-    !config.localPath?.trim()
-  ) {
-    return "Local path is required.";
   }
 
   // Optional field validation for errorMsg: ensure it's not empty if provided
