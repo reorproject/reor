@@ -28,15 +28,15 @@ const RenameDirModal: React.FC<RenameDirModalProps> = ({
       setDirPrefix(initialDirPathPrefix);
       const trimmedInitialDirName = await window.path.basename(fullDirName);
       setDirName(trimmedInitialDirName);
-    }
+    };
 
     setDirectoryUponNoteChange();
-  }, [fullDirName])
+  }, [fullDirName]);
 
   const [isUpdatingDirName, setIsUpdatingDirName] = useState<boolean>(false);
 
-  const [dirPrefix, setDirPrefix] = useState<string>('');
-  const [dirName, setDirName] = useState<string>('');
+  const [dirPrefix, setDirPrefix] = useState<string>("");
+  const [dirName, setDirName] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,7 +69,7 @@ const RenameDirModal: React.FC<RenameDirModalProps> = ({
       }
       setIsUpdatingDirName(true);
       //get full path of new directory
-      console.log(dirName)
+      console.log(dirName);
       await renameDir({
         path: `${fullDirName}`,
         newDirName: `${dirPrefix}${dirName}`,

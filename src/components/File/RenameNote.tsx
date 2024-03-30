@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import * as path from "path";
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
 import { errorToString } from "@/functions/error";
 import { toast } from "react-toastify";
-import { getInvalidCharacterInFileName, removeFileExtension } from "@/functions/strings";
+import {
+  getInvalidCharacterInFileName,
+  removeFileExtension,
+} from "@/functions/strings";
 
 export interface RenameNoteFuncProps {
   path: string;
@@ -24,22 +26,21 @@ const RenameNoteModal: React.FC<RenameNoteModalProps> = ({
   onClose,
   renameNote,
 }) => {
-
   useEffect(() => {
     const setDirectoryUponNoteChange = async () => {
       const initialNotePathPrefix = await window.path.dirname(fullNoteName);
       setDirPrefix(initialNotePathPrefix);
       const initialNoteName = await window.path.basename(fullNoteName);
-      const trimmedInitialNoteName = removeFileExtension(initialNoteName) || ''
+      const trimmedInitialNoteName = removeFileExtension(initialNoteName) || "";
       setNoteName(trimmedInitialNoteName);
-    }
+    };
 
     setDirectoryUponNoteChange();
   }, [fullNoteName]);
 
   const fileExtension = fullNoteName.split(".").pop() || "md";
-  const [dirPrefix, setDirPrefix] = useState<string>('');
-  const [noteName, setNoteName] = useState<string>('');
+  const [dirPrefix, setDirPrefix] = useState<string>("");
+  const [noteName, setNoteName] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
