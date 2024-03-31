@@ -127,7 +127,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         augmentedPrompt = prompt;
       } else if (askText === AskOptions.Ask) {
         const { ragPrompt, uniqueFilesReferenced } =
-          await window.database.augmentPromptWithRAG(
+          await window.database.getFlashcardPromptWithRAG(
             userTextFieldInput,
             llmName
           );
@@ -187,7 +187,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       setCurrentBotMessage((prev) => {
         const newContent = `${
           prev?.content ? prev.content + newMsgContent : newMsgContent
-        }`.replace("\n", "<br/>"); // this is because react markdown wth rehype-raw can only HTML <br> instead of newline syntax
+        }`; //.replace("\n", "<br/>"); // this is because react markdown wth rehype-raw can only HTML <br> instead of newline syntax
 
         return {
           role: "assistant",

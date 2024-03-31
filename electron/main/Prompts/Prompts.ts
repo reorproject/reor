@@ -8,9 +8,11 @@ export function createPromptWithContextLimitFromContent(
   content: string | DBEntry[],
   query: string,
   tokenize: (text: string) => number[],
-  contextLimit: number
+  contextLimit: number,
+  modifiedBasePrompt = ""
 ): PromptWithContextLimit {
   const basePrompt =
+    modifiedBasePrompt ??
     "Answer the question below based on the following notes:\n ";
   const queryPrompt = `Question: ${query}`;
   let tokenCount = tokenize(queryPrompt + basePrompt).length;

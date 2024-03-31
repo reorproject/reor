@@ -48,6 +48,11 @@ declare global {
         llmName: string,
         filter?: string
       ) => Promise<PromptWithRagResults>;
+      getFlashcardPromptWithRAG: (
+        prompt: string,
+        llmName: string,
+        filter?: string
+      ) => Promise<PromptWithRagResults>;
       getDatabaseFields: () => Promise<Record<string, string>>;
     };
     files: {
@@ -130,6 +135,18 @@ contextBridge.exposeInMainWorld("database", {
   ): Promise<PromptWithRagResults> => {
     return ipcRenderer.invoke(
       "augment-prompt-with-rag",
+      prompt,
+      llmName,
+      filter
+    );
+  },
+  getFlashcardPromptWithRAG: async (
+    prompt: string,
+    llmName: string,
+    filter?: string
+  ): Promise<PromptWithRagResults> => {
+    return ipcRenderer.invoke(
+      "augment-prompt-to-flashcards-with-rag",
       prompt,
       llmName,
       filter
