@@ -30,6 +30,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   return (
     <div>
       <TitleBar
+        currentFilePath={filePath}
         onFileSelect={openFileByPath}
         chatbotOpen={showChatbot}
         similarFilesOpen={showSimilarFiles}
