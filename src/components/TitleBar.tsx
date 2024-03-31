@@ -48,8 +48,8 @@ const TitleBar: React.FC<TitleBarProps> = ({
         className="flex"
         style={
           platform === "darwin"
-            ? { marginLeft: "70px" }
-            : { marginLeft: "10px" }
+            ? { marginLeft: "60px" }
+            : { marginLeft: "2px" }
         }
       >
         <FileHistoryNavigator
