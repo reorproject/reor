@@ -84,7 +84,7 @@ export class OllamaService implements LLMSessionService {
     let exeDir = "";
     switch (process.platform) {
       case "win32":
-        exeName = "ollama.exe";
+        exeName = "ollama-windows-amd64.exe";
         exeDir = app.isPackaged
           ? path.join(process.resourcesPath, "binaries")
           : path.join(app.getAppPath(), "binaries", "win32");
@@ -97,7 +97,7 @@ export class OllamaService implements LLMSessionService {
           : path.join(app.getAppPath(), "binaries", "darwin");
         break;
       case "linux":
-        exeName = "ollama-linux";
+        exeName = "ollama-linux-amd64";
         exeDir = app.isPackaged
           ? path.join(process.resourcesPath, "binaries")
           : path.join(app.getAppPath(), "binaries", "linux");
@@ -111,6 +111,7 @@ export class OllamaService implements LLMSessionService {
       await this.execServe(exePath);
       return OllamaServeType.PACKAGED;
     } catch (err) {
+      console.log("Failed to start Ollama: ", err);
       throw new Error(`Failed to start Ollama: ${err}`);
     }
   }
