@@ -1,6 +1,6 @@
 import { Extension } from "@tiptap/core";
-import { Plugin, PluginKey } from "prosemirror-state";
-import { Decoration, DecorationSet } from "prosemirror-view";
+import { Plugin, PluginKey } from "@tiptap/pm/state";
+import { Decoration, DecorationSet } from "@tiptap/pm/view";
 
 const backlinkPlugin = new Plugin({
   key: new PluginKey("backlinks"),
