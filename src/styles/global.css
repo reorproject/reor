@@ -18,25 +18,17 @@ a {
   color: #0f82af;
   cursor: pointer;
 }
-
-.backlink {
-  color: #0f82af;
-  cursor: pointer;
-
+.backlink-text {
+  color: blue;
+  text-decoration: underline;
 }
 
-.backlink-invisible::before, .backlink-invisible::after {
-  visibility: hidden;
+.backlink-brackets {
+  color: inherit;
 }
 
-.backlink-visible::before {
-  content: '[[';
-  visibility: visible;
-}
-
-.backlink-visible::after {
-  content: ']]';
-  visibility: visible;
+.backlink-brackets-hidden {
+  display: none;
 }
 
 

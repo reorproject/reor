@@ -16,7 +16,7 @@ const backlinkPlugin = new Plugin({
   props: {
     decorations(state) {
       const decorations: Decoration[] = [];
-      const regex = /\[\[(.*?)\]\]/g;
+      const regex = /(\[\[)(.*?)(\]\])/g;
       const { doc, selection } = state;
       const selectionStart = selection.from;
       const selectionEnd = selection.to;
@@ -27,21 +27,37 @@ const backlinkPlugin = new Plugin({
           while (node.text && (match = regex.exec(node.text)) !== null) {
             const start = pos + match.index;
             const end = start + match[0].length;
-            // Check if the cursor or selection is within the backlink
+            const backlinkStart = start + match[1].length;
+            const backlinkEnd = end - match[3].length;
             const withinSelectedRange =
               start <= selectionEnd && end >= selectionStart;
 
-            // If within range, apply the backlink class, else apply a class that hides the brackets
-            const className = withinSelectedRange
-              ? "backlink"
-              : "backlink-hidden";
-            // const className = "backlink";
+            // Apply decorations to square brackets
             decorations.push(
-              Decoration.inline(start, end, { class: className })
+              Decoration.inline(start, backlinkStart, {
+                class: withinSelectedRange
+                  ? "backlink-brackets"
+                  : "backlink-brackets-hidden",
+              })
+            );
+            decorations.push(
+              Decoration.inline(backlinkEnd, end, {
+                class: withinSelectedRange
+                  ? "backlink-brackets"
+                  : "backlink-brackets-hidden",
+              })
+            );
+
+            // Apply decoration to backlink text
+            decorations.push(
+              Decoration.inline(backlinkStart, backlinkEnd, {
+                class: "backlink-text",
+              })
             );
           }
         }
       });
+
       return DecorationSet.create(doc, decorations);
     },
   },
