@@ -19,6 +19,27 @@ a {
   cursor: pointer;
 }
 
+.backlink {
+  color: #0f82af;
+  cursor: pointer;
+
+}
+
+.backlink-invisible::before, .backlink-invisible::after {
+  visibility: hidden;
+}
+
+.backlink-visible::before {
+  content: '[[';
+  visibility: visible;
+}
+
+.backlink-visible::after {
+  content: ']]';
+  visibility: visible;
+}
+
+
 ::marker {
   color: rgb(163 163 163);
 

@@ -16,7 +16,14 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const [showSimilarFiles, setShowSimilarFiles] = useState<boolean>(true);
   const [sidebarShowing, setSidebarShowing] =
     useState<SidebarAbleToShow>("files");
-
+  document.addEventListener("click", (e) => {
+    const target = e.target as HTMLElement;
+    if (target.classList.contains("backlink")) {
+      const backlinkText = target.innerText;
+      console.log("Backlink clicked", backlinkText);
+      // Here you can define your custom click handler logic
+    }
+  });
   const { filePath, editor, openFileByPath, saveCurrentlyOpenedFile } =
     useFileByFilepath();
 

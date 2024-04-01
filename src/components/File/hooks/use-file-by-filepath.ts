@@ -10,6 +10,7 @@ import "../tiptap.scss";
 import { useDebounce } from "use-debounce";
 import { Markdown } from "tiptap-markdown";
 import { RichTextLink } from "@/components/Editor/RichTextLink";
+import { BacklinkExtension } from "@/components/Editor/Backlink";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
@@ -48,6 +49,8 @@ export const useFileByFilepath = () => {
     //     },
     //   },
     // },
+    autofocus: true,
+
     extensions: [
       StarterKit,
       Document,
@@ -61,7 +64,13 @@ export const useFileByFilepath = () => {
       TaskItem.configure({
         nested: true,
       }),
+      // Link.configure({
+      //   protocols: ["ftp", "mailto"],
+      // }),
+      BacklinkExtension,
       RichTextLink,
+      // BacklinkExtension,
+      // ObsidianBacklink,
       // Link.configure({
       //   linkOnPaste: true,
       //   openOnClick: true,
@@ -106,6 +115,8 @@ export const useFileByFilepath = () => {
   ) => {
     if (editor?.getHTML() !== null && filePath !== null) {
       const markdown = editor?.storage.markdown.getMarkdown();
+      // const text = editor?.getText();
+      console.log("markdown IS: ", markdown);
       await window.files.writeFile({
         filePath: filePath,
         content: markdown,
