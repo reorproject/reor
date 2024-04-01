@@ -39,13 +39,10 @@ const TitleBar: React.FC<TitleBarProps> = ({
       className={`h-titlebar  flex justify-between`}
       style={{ backgroundColor: "#303030" }}
     >
-
       <div
         className="flex"
         style={
-          platform === "darwin"
-            ? { marginLeft: "60px" }
-            : { marginLeft: "2px" }
+          platform === "darwin" ? { marginLeft: "60px" } : { marginLeft: "2px" }
         }
       >
         <FileHistoryNavigator
@@ -53,15 +50,6 @@ const TitleBar: React.FC<TitleBarProps> = ({
           currentPath={currentFilePath || ""}
         />
       </div>
-
-      <div className="flex">
-        <NewNoteComponent
-          isOpen={isModalOpen}
-          onClose={toggleModal}
-          onFileSelect={onFileSelect}
-        />
-      </div>
-
       <div
         className="flex justify-content-right align-items-right"
         style={platform === "win32" ? { marginRight: "8.5rem" } : {}}
