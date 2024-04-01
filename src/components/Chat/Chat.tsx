@@ -19,14 +19,22 @@ import { ChatCompletionChunk } from "openai/resources/chat/completions";
 // convert ask options to enum
 enum AskOptions {
   Ask = "Ask",
-  AskFile = "Ask file",
+  AskFile = "Ask File",
+  TemporalAsk = "Temporal Ask",
 }
 const ASK_OPTIONS = Object.values(AskOptions);
 
-const PROMPT_OPTIONS = [
-  "Generate weekly 1-1 talking points from this file",
-  "Separate concepts from todos",
-]; // more options to come
+const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
+  [AskOptions.Ask]: [],
+  [AskOptions.AskFile]: [
+    "Summarize this file",
+    "What are the key points in this file?",
+  ],
+  [AskOptions.TemporalAsk]: [
+    "Summarize what I have worked on today",
+    "Which tasks have I completed this past week?",
+  ],
+};
 
 type ChatUIMessage = {
   role: "user" | "assistant";
@@ -137,6 +145,14 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
         setFilesReferenced(uniqueFilesReferenced);
         augmentedPrompt = ragPrompt;
+      } else if (askText === AskOptions.TemporalAsk) {
+        const { ragPrompt, uniqueFilesReferenced } =
+          await window.database.augmentPromptWithTemporalAgent(
+            userTextFieldInput,
+            llmName
+          );
+        augmentedPrompt = ragPrompt;
+        setFilesReferenced(uniqueFilesReferenced);
       }
     } catch (error) {
       console.error("Failed to augment prompt:", error);
@@ -315,11 +331,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             </ReactMarkdown>
           )}
         </div>
-        {userTextFieldInput === "" &&
-        askText === AskOptions.AskFile &&
-        messages.length == 0 ? (
+        {userTextFieldInput === "" && messages.length == 0 ? (
           <>
-            {PROMPT_OPTIONS.map((option, index) => {
+            {EXAMPLE_PROMPTS[askText].map((option, index) => {
               return (
                 <ChatPrompt
                   key={index}
@@ -331,7 +345,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                 />
               );
             })}
-            {/** if user has written something already, dont bother prompting with template */}
           </>
         ) : undefined}
       </div>

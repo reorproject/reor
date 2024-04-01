@@ -38,10 +38,7 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
   //upon indexing, update the file info tree and expand relevant directories
   useEffect(() => {
     const handleFileUpdate = (updatedFiles: FileInfoTree) => {
-      const sortedFiles = sortFilesAndDirectories(
-        updatedFiles,
-        currentFilePath
-      );
+      const sortedFiles = sortFilesAndDirectories(updatedFiles, null);
       setFileInfoTree(sortedFiles);
       const directoriesToBeExpanded = findRelevantDirectoriesToBeOpened();
       setExpandedDirectories(directoriesToBeExpanded);
@@ -60,10 +57,7 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
   //initial load of files
   useEffect(() => {
     window.files.getFilesForWindow().then((fetchedFiles) => {
-      const sortedFiles = sortFilesAndDirectories(
-        fetchedFiles,
-        currentFilePath
-      );
+      const sortedFiles = sortFilesAndDirectories(fetchedFiles, null);
       setFileInfoTree(sortedFiles);
     });
   }, []);
