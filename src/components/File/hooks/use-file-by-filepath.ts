@@ -20,6 +20,7 @@ export const useFileByFilepath = () => {
     useState<boolean>(false);
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>("");
   const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>("");
+  const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
 
   const setFileNodeToBeRenamed = async (filePath: string) => {
     const isDirectory = await window.files.isDirectory(filePath);
@@ -139,6 +140,12 @@ export const useFileByFilepath = () => {
       oldFilePath,
       newFilePath,
     });
+    //set the file history array to use the new absolute file path if there is anything matching
+    const navigationHistoryUpdated = [...navigationHistory].map((path) => {
+      return path.replace(oldFilePath, newFilePath);
+    });
+
+    setNavigationHistory(navigationHistoryUpdated);
 
     //reset the editor to the new file path
     if (currentlyOpenedFilePath === oldFilePath) {
@@ -206,6 +213,8 @@ export const useFileByFilepath = () => {
     filePath: currentlyOpenedFilePath,
     saveCurrentlyOpenedFile,
     editor,
+    navigationHistory,
+    setNavigationHistory,
     openFileByPath,
     noteToBeRenamed,
     setNoteToBeRenamed,

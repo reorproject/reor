@@ -12,6 +12,8 @@ interface TitleBarProps {
   similarFilesOpen: boolean;
   toggleChatbot: () => void;
   toggleSimilarFiles: () => void;
+  history: string[];
+  setHistory: (string: string[]) => void;
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
@@ -21,6 +23,8 @@ const TitleBar: React.FC<TitleBarProps> = ({
   similarFilesOpen,
   toggleChatbot,
   toggleSimilarFiles,
+  history,
+  setHistory,
 }) => {
   const [platform, setPlatform] = useState("");
 
@@ -46,6 +50,8 @@ const TitleBar: React.FC<TitleBarProps> = ({
         }
       >
         <FileHistoryNavigator
+          history={history}
+          setHistory={setHistory}
           onFileSelect={onFileSelect}
           currentPath={currentFilePath || ""}
         />

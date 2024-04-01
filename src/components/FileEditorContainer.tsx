@@ -29,6 +29,8 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     fileDirToBeRenamed,
     setFileDirToBeRenamed,
     renameFile,
+    navigationHistory,
+    setNavigationHistory,
   } = useFileByFilepath();
 
   const toggleChatbot = () => {
@@ -41,6 +43,8 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   return (
     <div>
       <TitleBar
+        history={navigationHistory}
+        setHistory={setNavigationHistory}
         currentFilePath={filePath}
         onFileSelect={openFileByPath}
         chatbotOpen={showChatbot}
