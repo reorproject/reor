@@ -130,7 +130,7 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
           )}
           {Object.entries(downloadProgress).length > 0 && (
             <p className="text-white text-xs">
-              (Feel free to close this modal while the download completes.)
+              (Feel free to close this modal while the download completes)
             </p>
           )}
         </div>
