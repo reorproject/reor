@@ -2,9 +2,12 @@ import React, { useEffect, useState } from "react";
 import { PiSidebar, PiSidebarFill } from "react-icons/pi";
 
 import { BsChatLeftDots, BsFillChatLeftDotsFill } from "react-icons/bs";
+import FileHistoryNavigator from "./File/FileSideBar/FileHistoryBar";
 
 export const titleBarHeight = "30px";
 interface TitleBarProps {
+  onFileSelect: (path: string) => void;
+  currentFilePath: string | null;
   chatbotOpen: boolean;
   similarFilesOpen: boolean;
   toggleChatbot: () => void;
@@ -12,6 +15,8 @@ interface TitleBarProps {
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
+  onFileSelect,
+  currentFilePath,
   chatbotOpen,
   similarFilesOpen,
   toggleChatbot,
@@ -34,14 +39,28 @@ const TitleBar: React.FC<TitleBarProps> = ({
       className={`h-titlebar  flex justify-between`}
       style={{ backgroundColor: "#303030" }}
     >
+
       <div
         className="flex"
         style={
           platform === "darwin"
-            ? { marginLeft: "70px" }
-            : { marginLeft: "10px" }
+            ? { marginLeft: "60px" }
+            : { marginLeft: "2px" }
         }
-      />
+      >
+        <FileHistoryNavigator
+          onFileSelect={onFileSelect}
+          currentPath={currentFilePath || ""}
+        />
+      </div>
+
+      <div className="flex">
+        <NewNoteComponent
+          isOpen={isModalOpen}
+          onClose={toggleModal}
+          onFileSelect={onFileSelect}
+        />
+      </div>
 
       <div
         className="flex justify-content-right align-items-right"

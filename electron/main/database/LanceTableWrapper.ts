@@ -126,8 +126,8 @@ export class LanceDBTableWrapper {
     const lanceQuery = await this.lanceTable
       .search(query)
       .metricType(MetricType.Cosine)
-      // .metricType(metricType)
       .limit(limit);
+
     if (filter) {
       lanceQuery.prefilter(true);
       lanceQuery.filter(filter);
