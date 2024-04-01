@@ -1,4 +1,3 @@
-import NewNoteComponent from "./File/NewNote";
 import React, { useEffect, useState } from "react";
 import { PiSidebar, PiSidebarFill } from "react-icons/pi";
 
@@ -13,6 +12,8 @@ interface TitleBarProps {
   similarFilesOpen: boolean;
   toggleChatbot: () => void;
   toggleSimilarFiles: () => void;
+  history: string[];
+  setHistory: (string: string[]) => void;
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
@@ -22,8 +23,9 @@ const TitleBar: React.FC<TitleBarProps> = ({
   similarFilesOpen,
   toggleChatbot,
   toggleSimilarFiles,
+  history,
+  setHistory,
 }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [platform, setPlatform] = useState("");
 
   useEffect(() => {
@@ -34,38 +36,26 @@ const TitleBar: React.FC<TitleBarProps> = ({
 
     fetchPlatform();
   }, []);
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
+
   return (
     <div
       id="customTitleBar"
       className={`h-titlebar  flex justify-between`}
       style={{ backgroundColor: "#303030" }}
     >
-
       <div
         className="flex"
         style={
-          platform === "darwin"
-            ? { marginLeft: "60px" }
-            : { marginLeft: "2px" }
+          platform === "darwin" ? { marginLeft: "60px" } : { marginLeft: "2px" }
         }
       >
         <FileHistoryNavigator
+          history={history}
+          setHistory={setHistory}
           onFileSelect={onFileSelect}
           currentPath={currentFilePath || ""}
         />
       </div>
-
-      <div className="flex">
-        <NewNoteComponent
-          isOpen={isModalOpen}
-          onClose={toggleModal}
-          onFileSelect={onFileSelect}
-        />
-      </div>
-
       <div
         className="flex justify-content-right align-items-right"
         style={platform === "win32" ? { marginRight: "8.5rem" } : {}}

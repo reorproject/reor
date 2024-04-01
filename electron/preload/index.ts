@@ -11,6 +11,7 @@ import {
   AugmentPromptWithFileProps,
   FileInfoNode,
   FileInfoTree,
+  RenameFileProps,
   WriteFileProps,
 } from "electron/main/Files/Types";
 import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
@@ -59,6 +60,8 @@ declare global {
       openFileDialog: (fileExtensions?: string[]) => Promise<string[]>;
       getFilesForWindow: () => Promise<FileInfoTree>;
       writeFile: (writeFileProps: WriteFileProps) => Promise<void>;
+      isDirectory: (filepath: string) => Promise<boolean>;
+      renameFileRecursive: (renameFileProps: RenameFileProps) => Promise<void>;
       indexFileInDatabase: (filePath: string) => Promise<void>;
       readFile: (filePath: string) => Promise<string>;
       deleteFile: (filePath: string) => Promise<void>;
@@ -74,7 +77,8 @@ declare global {
       ) => Promise<PromptWithContextLimit>;
     };
     path: {
-      basename: (pathString: string) => string;
+      basename: (pathString: string) => Promise<string>;
+      dirname: (pathString: string) => Promise<string>;
     };
     llm: {
       streamingLLMResponse: (
@@ -246,6 +250,12 @@ contextBridge.exposeInMainWorld("files", {
   writeFile: async (writeFileProps: WriteFileProps) => {
     return ipcRenderer.invoke("write-file", writeFileProps);
   },
+  isDirectory: async (filePath: string) => {
+    return ipcRenderer.invoke("is-directory", filePath);
+  },
+  renameFileRecursive: async (renameFileProps: RenameFileProps) => {
+    return ipcRenderer.invoke("rename-file-recursive", renameFileProps);
+  },
 
   indexFileInDatabase: async (filePath: string) => {
     return ipcRenderer.invoke("index-file-in-database", filePath);
@@ -282,8 +292,13 @@ contextBridge.exposeInMainWorld("files", {
 });
 
 contextBridge.exposeInMainWorld("path", {
-  basename: (pathString: string) =>
-    ipcRenderer.invoke("path-basename", pathString),
+  basename: (pathString: string) => {
+    return ipcRenderer.invoke("path-basename", pathString);
+  },
+
+  dirname: (pathString: string) => {
+    return ipcRenderer.invoke("path-dirname", pathString);
+  },
 });
 
 contextBridge.exposeInMainWorld("llm", {

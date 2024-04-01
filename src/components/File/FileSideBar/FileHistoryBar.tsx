@@ -4,15 +4,18 @@ import { FaCircleChevronLeft, FaCircleChevronRight } from "react-icons/fa6";
 import "./../../../styles/history.scss";
 
 interface FileHistoryNavigatorProps {
+  history: string[];
+  setHistory: (string: string[]) => void;
   onFileSelect: (path: string) => void;
   currentPath: string;
 }
 
 const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
+  history,
+  setHistory,
   onFileSelect,
   currentPath,
 }) => {
-  const [history, setHistory] = useState<string[]>([]);
   const [showMenu, setShowMenu] = useState<string>("");
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);

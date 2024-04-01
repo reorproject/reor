@@ -26,3 +26,8 @@ export type WriteFileProps = {
   filePath: string;
   content: string;
 };
+
+export type RenameFileProps = {
+  oldFilePath: string;
+  newFilePath: string;
+};

@@ -18,6 +18,19 @@ export const useFileByFilepath = () => {
 
   const [isFileContentModified, setIsFileContentModified] =
     useState<boolean>(false);
+  const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>("");
+  const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>("");
+  const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
+
+  const setFileNodeToBeRenamed = async (filePath: string) => {
+    const isDirectory = await window.files.isDirectory(filePath);
+    if (isDirectory) {
+      setFileDirToBeRenamed(filePath);
+    } else {
+      setNoteToBeRenamed(filePath);
+    }
+  };
+
   /**
 	 * with this editor, we want to take the HTML on the following scenarios:
 		1. when the file path changes, causing a re-render
@@ -122,6 +135,36 @@ export const useFileByFilepath = () => {
     };
   }, [currentlyOpenedFilePath, editor]);
 
+  const renameFileNode = async (oldFilePath: string, newFilePath: string) => {
+    await window.files.renameFileRecursive({
+      oldFilePath,
+      newFilePath,
+    });
+    //set the file history array to use the new absolute file path if there is anything matching
+    const navigationHistoryUpdated = [...navigationHistory].map((path) => {
+      return path.replace(oldFilePath, newFilePath);
+    });
+
+    setNavigationHistory(navigationHistoryUpdated);
+
+    //reset the editor to the new file path
+    if (currentlyOpenedFilePath === oldFilePath) {
+      setCurrentlyOpenedFilePath(newFilePath);
+    }
+  };
+
+  // open a new file rename dialog
+  useEffect(() => {
+    const renameFileListener = window.ipcRenderer.receive(
+      "rename-file-listener",
+      (noteName: string) => setFileNodeToBeRenamed(noteName)
+    );
+
+    return () => {
+      renameFileListener();
+    };
+  }, []);
+
   // cleanup effect ran once, so there was only 1 re-render
   // but for each query to the delete file-listener, you only want to run the listener once, not multiple times.
   // the listener function is ran multiple times, mostly before the cleanup is done, so apparently there are eihther multiple listeners being added, or the event is fired multiple times
@@ -134,9 +177,7 @@ export const useFileByFilepath = () => {
   // 2. on the FE, receives win.webContents.send("prepare-for-window-close", files);
   // 3. FE after saving, alerts backend that is ready for close
   useEffect(() => {
-    let active = true;
     const handleWindowClose = async () => {
-      if (!active) return;
       console.log("saving file", {
         filePath: currentlyOpenedFilePath,
         fileContent: editor?.getHTML() || "",
@@ -164,7 +205,6 @@ export const useFileByFilepath = () => {
     );
 
     return () => {
-      active = false;
       removeWindowCloseListener();
     };
   }, [currentlyOpenedFilePath, editor]);
@@ -173,6 +213,13 @@ export const useFileByFilepath = () => {
     filePath: currentlyOpenedFilePath,
     saveCurrentlyOpenedFile,
     editor,
+    navigationHistory,
+    setNavigationHistory,
     openFileByPath,
+    noteToBeRenamed,
+    setNoteToBeRenamed,
+    fileDirToBeRenamed,
+    setFileDirToBeRenamed,
+    renameFile: renameFileNode,
   };
 };
