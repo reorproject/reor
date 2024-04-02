@@ -43,14 +43,14 @@ function downloadIfMissing(platformKey) {
 
   fs.access(filePath, fs.constants.F_OK, (err) => {
     if (err) {
-      console.log(`Downloading ${platformKey} binary...`);
+      console.log(`Downloading ${platformKey} Ollama binary...`);
       const request = https.get(info.url, (response) => {
         if (response.statusCode === 200) {
           const file = fs.createWriteStream(filePath);
           response.pipe(file);
           file.on("finish", () => {
             file.close(() => {
-              console.log(`Downloaded ${platformKey} binary.`);
+              console.log(`Downloaded ${platformKey} Ollama binary.`);
               // Set as executable if not on Windows
               if (platformKey !== "win32") {
                 setExecutable(filePath);
@@ -74,7 +74,7 @@ function downloadIfMissing(platformKey) {
         );
       });
     } else {
-      console.log(`${platformKey} binary already exists.`);
+      console.log(`${platformKey} Ollama binary already exists.`);
       // Ensure it's executable if it already exists and not on Windows
       if (platformKey !== "win32") {
         setExecutable(filePath);

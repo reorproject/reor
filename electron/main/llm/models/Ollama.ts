@@ -149,7 +149,7 @@ export class OllamaService implements LLMSessionService {
     });
   }
 
-  async waitForPing(delay = 1000, retries = 5) {
+  async waitForPing(delay = 1000, retries = 20) {
     for (let i = 0; i < retries; i++) {
       try {
         await this.ping();
