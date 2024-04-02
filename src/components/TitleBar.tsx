@@ -44,7 +44,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
       style={{ backgroundColor: "#303030" }}
     >
       <div
-        className="flex"
+        className="flex mt-[1px]"
         style={
           platform === "darwin" ? { marginLeft: "60px" } : { marginLeft: "2px" }
         }
