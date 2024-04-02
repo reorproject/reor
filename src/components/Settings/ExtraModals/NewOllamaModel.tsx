@@ -91,7 +91,7 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
         />
         <p className="text-white text-xs mb-2 mt-2 italic">
           {" "}
-          We recommended either mistral, llama2, or gemma.
+          We recommended either mistral, llama2, or command-r.
         </p>
 
         <Button

@@ -13,7 +13,9 @@
     }
   },
   "scripts": {
+    "predev": "node scripts/downloadOllama.js",
     "dev": "vite",
+    "prebuild": "node scripts/downloadOllama.js",
     "build": "tsc && vite build && electron-builder",
     "preview": "vite preview",
     "pree2e": "vite build --mode=test",
