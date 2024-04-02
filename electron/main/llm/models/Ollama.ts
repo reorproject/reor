@@ -118,26 +118,22 @@ export class OllamaService implements LLMSessionService {
 
   async execServe(path: string) {
     return new Promise((resolve, reject) => {
-      const env = {
-        ...process.env,
-      };
-      this.childProcess = exec(
-        path + " serve",
-        { env },
-        (err, stdout, stderr) => {
-          if (err) {
-            reject(`exec error: ${err}`);
-            return;
-          }
+      const env = { ...process.env };
+      const command = `"${path}" serve`;
 
-          if (stderr) {
-            reject(`ollama stderr: ${stderr}`);
-            return;
-          }
-
-          reject(`ollama stdout: ${stdout}`);
+      this.childProcess = exec(command, { env }, (err, stdout, stderr) => {
+        if (err) {
+          reject(`exec error: ${err}`);
+          return;
         }
-      );
+
+        if (stderr) {
+          reject(`ollama stderr: ${stderr}`);
+          return;
+        }
+
+        reject(`ollama stdout: ${stdout}`);
+      });
 
       // Once the process is started, try to ping Ollama server.
       this.waitForPing()
