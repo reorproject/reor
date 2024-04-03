@@ -21,6 +21,8 @@ export const useFileByFilepath = () => {
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>("");
   const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>("");
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
+  const [currentlyChangingFilePath, setCurrentlyChangingFilePath] =
+    useState(false);
 
   const setFileNodeToBeRenamed = async (filePath: string) => {
     const isDirectory = await window.files.isDirectory(filePath);
@@ -72,13 +74,18 @@ export const useFileByFilepath = () => {
   const [debouncedEditor] = useDebounce(editor?.state.doc.content, 4000);
 
   useEffect(() => {
-    if (debouncedEditor) {
-      saveEditorContentToPath(editor, currentlyOpenedFilePath, false);
+    if (debouncedEditor && !currentlyChangingFilePath) {
+      saveEditorContentToPath(editor, currentlyOpenedFilePath);
     }
-  }, [debouncedEditor, currentlyOpenedFilePath, editor]);
+  }, [
+    debouncedEditor,
+    currentlyOpenedFilePath,
+    editor,
+    currentlyChangingFilePath,
+  ]);
 
   const saveCurrentlyOpenedFile = async () => {
-    saveEditorContentToPath(editor, currentlyOpenedFilePath);
+    await saveEditorContentToPath(editor, currentlyOpenedFilePath);
   };
 
   const saveEditorContentToPath = async (
@@ -106,11 +113,13 @@ export const useFileByFilepath = () => {
   };
 
   const openFileByPath = async (newFilePath: string) => {
-    saveEditorContentToPath(editor, currentlyOpenedFilePath, true);
+    setCurrentlyChangingFilePath(true);
+    await saveEditorContentToPath(editor, currentlyOpenedFilePath, true);
     const fileContent = (await window.files.readFile(newFilePath)) ?? "";
     setCurrentlyOpenedFilePath(newFilePath);
 
     editor?.commands.setContent(fileContent);
+    setCurrentlyChangingFilePath(false);
   };
 
   // delete file depending on file path returned by the listener
