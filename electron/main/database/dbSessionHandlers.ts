@@ -7,6 +7,7 @@ import Store from "electron-store";
 import { getLLMConfig } from "../llm/llmConfig";
 import { errorToString } from "../Generic/error";
 import WindowsManager from "../windowManager";
+import { BasePromptRequirements } from "./dbSessionHandlerTypes";
 
 export interface PromptWithRagResults {
   ragPrompt: string;
@@ -107,8 +108,7 @@ export const registerDBSessionHandlers = (
     "augment-prompt-with-temporal-agent",
     async (
       event,
-      query: string,
-      llmName: string
+      { query, llmName }: BasePromptRequirements
     ): Promise<PromptWithRagResults> => {
       const llmSession = openAISession;
       const llmConfig = await getLLMConfig(store, ollamaService, llmName);
@@ -197,6 +197,80 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
         console.error("Error searching database:", error);
         throw errorToString(error);
       }
+    }
+  );
+
+  ipcMain.handle(
+    "augment-prompt-with-flashcard-agent",
+    async (
+      event,
+      { query, llmName }: BasePromptRequirements
+    ): Promise<PromptWithRagResults> => {
+      const llmSession = openAISession;
+      console.log("llmName:   ", llmName);
+      const llmConfig = await getLLMConfig(store, ollamaService, llmName);
+      console.log("llmConfig", llmConfig);
+      if (!llmConfig) {
+        throw new Error(`LLM ${llmName} not configured.`);
+      }
+
+      let searchResults: DBEntry[] = [];
+      const maxRAGExamples: number = store.get(StoreKeys.MaxRAGExamples);
+      const windowInfo = windowManager.getWindowInfoForContents(event.sender);
+      if (!windowInfo) {
+        throw new Error("Window info not found.");
+      }
+
+      try {
+        searchResults = await windowInfo.dbTableClient.search(
+          query,
+          maxRAGExamples
+        );
+      } catch (error) {
+        searchResults = await windowInfo.dbTableClient.search(
+          query,
+          maxRAGExamples
+        );
+        console.error("Error searching database:", error);
+        throw errorToString(error);
+      }
+
+      const llmGeneratedFacts = await llmSession.response(
+        llmName,
+        llmConfig,
+        [
+          {
+            role: "system",
+            content: `You are an experienced teacher. Help your student search and curate their notes!`,
+          },
+          {
+            role: "user",
+            content: `Extract atomic facts that can be used for students to study, based on this query: ${query}`,
+          },
+        ],
+        store.get(StoreKeys.LLMGenerationParameters)
+      );
+
+      console.log(llmGeneratedFacts);
+      const { prompt: promptToCreateFlashcardsWithAtomicFacts } =
+        createPromptWithContextLimitFromContent(
+          llmGeneratedFacts.choices[0].message.content || "",
+          `Create useful FLASHCARDS that can be used for students to study using ONLY the context. Format is Q: <insert question> A: <insert answer>`,
+          llmSession.getTokenizer(llmName),
+          llmConfig.contextLength
+        );
+      console.log(
+        "promptToCreateFlashcardsWithAtomicFacts: ",
+        promptToCreateFlashcardsWithAtomicFacts
+      );
+      const uniqueFilesReferenced = [
+        ...new Set(searchResults.map((entry) => entry.notepath)),
+      ];
+
+      return {
+        ragPrompt: promptToCreateFlashcardsWithAtomicFacts,
+        uniqueFilesReferenced,
+      };
     }
   );
 

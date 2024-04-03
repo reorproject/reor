@@ -18,6 +18,7 @@ import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
 import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
+import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
 
@@ -53,6 +54,10 @@ declare global {
         prompt: string,
         llmName: string
       ) => Promise<PromptWithRagResults>;
+      augmentPromptWithFlashcardAgent: ({
+        query,
+        llmName,
+      }: BasePromptRequirements) => Promise<PromptWithRagResults>;
       getDatabaseFields: () => Promise<Record<string, string>>;
     };
     files: {
@@ -152,6 +157,16 @@ contextBridge.exposeInMainWorld("database", {
       prompt,
       llmName
     );
+  },
+  augmentPromptWithFlashcardAgent: async ({
+    query,
+    llmName,
+  }: BasePromptRequirements): Promise<PromptWithRagResults> => {
+    console.log(llmName, query);
+    return ipcRenderer.invoke("augment-prompt-with-flashcard-agent", {
+      query,
+      llmName,
+    });
   },
   getDatabaseFields: async (): Promise<Record<string, string>> => {
     return ipcRenderer.invoke("get-database-fields");

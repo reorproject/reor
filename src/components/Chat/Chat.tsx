@@ -21,6 +21,7 @@ enum AskOptions {
   Ask = "Ask",
   AskFile = "Ask File",
   TemporalAsk = "Temporal Ask",
+  FlashcardAsk = "Flashcard Ask",
 }
 const ASK_OPTIONS = Object.values(AskOptions);
 
@@ -153,6 +154,19 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           );
         augmentedPrompt = ragPrompt;
         setFilesReferenced(uniqueFilesReferenced);
+      } else if (askText === AskOptions.FlashcardAsk) {
+        console.log(llmName);
+        const { ragPrompt, uniqueFilesReferenced } =
+          await window.database.augmentPromptWithFlashcardAgent({
+            query: userTextFieldInput,
+            llmName,
+          });
+
+        console.log("RAG Prompt:", ragPrompt);
+        console.log("Unique files referenced:", uniqueFilesReferenced);
+
+        setFilesReferenced(uniqueFilesReferenced);
+        augmentedPrompt = ragPrompt;
       }
     } catch (error) {
       console.error("Failed to augment prompt:", error);
