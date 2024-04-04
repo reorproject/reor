@@ -32,26 +32,21 @@ const backlinkPlugin = new Plugin({
             const withinSelectedRange =
               start <= selectionEnd && end >= selectionStart;
 
-            // Apply decorations to square brackets
+            // Apply styles directly instead of using classes
+            const bracketsStyle = withinSelectedRange
+              ? "color: inherit;"
+              : "display: none;";
             decorations.push(
-              Decoration.inline(start, backlinkStart, {
-                class: withinSelectedRange
-                  ? "backlink-brackets"
-                  : "backlink-brackets-hidden",
-              })
+              Decoration.inline(start, backlinkStart, { style: bracketsStyle })
             );
             decorations.push(
-              Decoration.inline(backlinkEnd, end, {
-                class: withinSelectedRange
-                  ? "backlink-brackets"
-                  : "backlink-brackets-hidden",
-              })
+              Decoration.inline(backlinkEnd, end, { style: bracketsStyle })
             );
 
-            // Apply decoration to backlink text
+            // Apply decoration to backlink text with direct style
             decorations.push(
               Decoration.inline(backlinkStart, backlinkEnd, {
-                class: "backlink-text",
+                style: "color: blue; text-decoration: underline;",
               })
             );
           }
