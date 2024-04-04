@@ -113,8 +113,8 @@ export const useFileByFilepath = () => {
     filePath: string | null,
     indexFileInDatabase: boolean = false
   ) => {
-    if (editor?.getHTML() !== null && filePath !== null) {
-      const markdown = editor?.storage.markdown.getMarkdown();
+    if (editor && editor?.getHTML() !== null && filePath !== null) {
+      const markdown = getMarkdown(editor);
       // const text = editor?.getText();
       console.log("markdown IS: ", markdown);
       await window.files.writeFile({
@@ -190,7 +190,7 @@ export const useFileByFilepath = () => {
         editor &&
         editor.getHTML() !== null
       ) {
-        const markdown = editor?.storage.markdown.getMarkdown();
+        const markdown = getMarkdown(editor);
         await window.files.writeFile({
           filePath: currentlyOpenedFilePath,
           content: markdown,
@@ -219,3 +219,15 @@ export const useFileByFilepath = () => {
     openFileByPath,
   };
 };
+
+function getMarkdown(editor: Editor) {
+  // Fetch the current markdown content from the editor
+  const originalMarkdown = editor.storage.markdown.getMarkdown();
+  console.log("original markdown: ", originalMarkdown);
+  // Replace the escaped square brackets with unescaped ones
+  const modifiedMarkdown = originalMarkdown
+    .replace(/\\\[/g, "[") // Replaces \[ with [
+    .replace(/\\\]/g, "]"); // Replaces \] with ]
+
+  return modifiedMarkdown;
+}
