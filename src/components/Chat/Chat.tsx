@@ -35,6 +35,7 @@ const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
     "Summarize what I have worked on today",
     "Which tasks have I completed this past week?",
   ],
+  [AskOptions.FlashcardAsk]: [],
 };
 
 type ChatUIMessage = {
@@ -55,7 +56,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>("");
   const [messages, setMessages] = useState<ChatUIMessage[]>([]);
   const [defaultModel, setDefaultModel] = useState<string>("");
-  const [askText, setAskText] = useState<string>("Ask");
+  const [askText, setAskText] = useState<AskOptions>(AskOptions.Ask);
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
   const [filesReferenced, setFilesReferenced] = useState<string[]>([]);
   const [currentBotMessage, setCurrentBotMessage] =
