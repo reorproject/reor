@@ -67,6 +67,9 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
         padding: "10px",
         zIndex: 1000,
         maxWidth: "300px",
+        wordWrap: "break-word", // Ensures that long words do not overflow
+        overflowWrap: "break-word", // A more modern, preferable alternative to wordWrap
+        whiteSpace: "normal", // Ensures that the whitespace is handled in a standard way, allowing for wrapping
       }}
     >
       <ul style={{ margin: 0, padding: 0, listStyleType: "none" }}>
