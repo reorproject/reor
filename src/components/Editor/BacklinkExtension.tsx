@@ -16,8 +16,10 @@ export interface SuggestionsState {
 const backlinkPlugin = (
   openFileFunction: (newFilePath: string) => Promise<void>,
   updateSuggestionsState: (state: SuggestionsState) => void
-) =>
-  new Plugin({
+) => {
+  let hideTimeout: NodeJS.Timeout | null = null;
+
+  return new Plugin({
     key: new PluginKey("backlinks"),
     state: {
       init(_, { doc }) {
@@ -27,6 +29,75 @@ const backlinkPlugin = (
         // Logic to update decorations based on document changes
         return set.map(tr.mapping, tr.doc);
       },
+    },
+    view() {
+      return {
+        update: (view) => {
+          const { state } = view;
+          const { doc, selection } = state;
+          const { from } = selection;
+
+          // Clear the previous timeout if it exists
+          if (hideTimeout) {
+            clearTimeout(hideTimeout);
+          }
+
+          // Check if the editor does not have focus
+          if (!view.hasFocus()) {
+            // Set a timeout to hide the suggestions after a short delay
+            hideTimeout = setTimeout(() => {
+              updateSuggestionsState({
+                suggestions: [],
+              });
+            }, 1000); // Adjust the delay as needed (in milliseconds)
+            return;
+          }
+
+          const textBeforeCursor = doc.textBetween(0, from, "\n");
+          const lastOpeningBracketIndex = textBeforeCursor.lastIndexOf("[[");
+
+          if (
+            lastOpeningBracketIndex === -1 ||
+            textBeforeCursor.includes("]]", lastOpeningBracketIndex)
+          ) {
+            updateSuggestionsState({
+              suggestions: [],
+            });
+            return;
+          }
+
+          const textToLeft = textBeforeCursor.slice(
+            lastOpeningBracketIndex + 2,
+            from
+          );
+
+          console.log("Text to the left:", textToLeft);
+
+          const coords = view.coordsAtPos(from);
+
+          updateSuggestionsState({
+            text: textToLeft,
+            position: coords,
+            suggestions: ["Backlink 1", "Backlink 2", "Backlink 3"],
+            onSelect: (selectedSuggestion) => {
+              const tr = view.state.tr;
+              tr.replaceWith(
+                from - textToLeft.length,
+                from,
+                view.state.schema.text(selectedSuggestion)
+              );
+              view.dispatch(tr);
+              updateSuggestionsState({ suggestions: [] });
+            },
+          });
+        },
+        destroy: () => {
+          // Clear the timeout when the view is destroyed
+          if (hideTimeout) {
+            clearTimeout(hideTimeout);
+          }
+        },
+      };
     },
     props: {
       decorations(state) {
@@ -74,6 +145,17 @@ const backlinkPlugin = (
         return DecorationSet.create(doc, decorations);
       },
       handleDOMEvents: {
+        blur: () => {
+          console.log("Blur event triggered"); // Add this line for debugging
+          // Set a timeout to hide the suggestions after a short delay
+          hideTimeout = setTimeout(() => {
+            console.log("Hiding suggestions"); // Add this line for debugging
+            updateSuggestionsState({
+              suggestions: [],
+            });
+          }, 500); // Adjust the delay as needed (in milliseconds)
+          return true;
+        },
         click: (view, event) => {
           const { target } = event;
           if (target instanceof HTMLElement) {
@@ -90,65 +172,10 @@ const backlinkPlugin = (
           }
           return false; // Not handled
         },
-        keyup: (view) => {
-          const { from } = view.state.selection;
-          const coords = view.coordsAtPos(from);
-
-          // Get the entire text from the beginning of the document to the current cursor position
-          const textToCursor = view.state.doc.textBetween(0, from, "\n");
-
-          // Find the last occurrence of the opening square bracket before the cursor
-          const lastOpeningBracketIndex = textToCursor.lastIndexOf("[[");
-
-          // Check for a newline since the last set of opening square brackets
-          const hasNewlineSinceLastBracket = textToCursor
-            .slice(lastOpeningBracketIndex)
-            .includes("\n");
-
-          // If no opening bracket is found, or the bracket is followed by a closing bracket,
-          // or there is a newline character between the last opening bracket and the cursor,
-          // do not show suggestions
-          if (
-            lastOpeningBracketIndex === -1 ||
-            textToCursor.includes("]]", lastOpeningBracketIndex) ||
-            hasNewlineSinceLastBracket // Added check for newline
-          ) {
-            updateSuggestionsState({
-              suggestions: [],
-            });
-            return false;
-          }
-
-          // Extract the text inside the square brackets (up to the cursor position)
-          const textToLeft = textToCursor.slice(
-            lastOpeningBracketIndex + 2,
-            from
-          );
-
-          console.log("Text to the left:", textToLeft);
-
-          // Update shared state with the captured text and coordinates
-          updateSuggestionsState({
-            text: textToLeft,
-            position: coords,
-            suggestions: ["Backlink 1", "Backlink 2", "Backlink 3"],
-            onSelect: (selectedSuggestion) => {
-              const tr = view.state.tr;
-              tr.replaceWith(
-                from - textToLeft.length,
-                from,
-                view.state.schema.text(selectedSuggestion)
-              );
-              view.dispatch(tr);
-              updateSuggestionsState({ suggestions: [] });
-            },
-          });
-
-          return false;
-        },
       },
     },
   });
+};
 
 export const BacklinkExtension = (
   openFileFunction: (newFilePath: string) => Promise<void>,

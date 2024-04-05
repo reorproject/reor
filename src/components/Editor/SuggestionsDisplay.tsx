@@ -1,6 +1,11 @@
-import React, { useRef, useEffect, useState } from "react";
-import { SuggestionsState } from "./BacklinkExtension";
 import { removeFileExtension } from "@/functions/strings";
+import React, { useRef, useEffect, useState, useMemo } from "react";
+
+interface SuggestionsState {
+  text: string;
+  position: { top: number; left: number };
+  onSelect?: (suggestion: string) => void;
+}
 
 interface SuggestionsDisplayProps {
   suggestionsState: SuggestionsState;
@@ -11,71 +16,59 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
   suggestionsState,
   suggestions,
 }) => {
-  const [positionStyle, setPositionStyle] = useState({
+  const suggestionsRef = useRef<HTMLDivElement | null>(null);
+  const [layout, setLayout] = useState({
     top: -9999,
     left: -9999,
+    display: "none",
   });
-  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
-  const suggestionsRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    if (!suggestionsState.text) {
-      setFilteredSuggestions([]);
-      return;
-    }
+  const filteredSuggestions = useMemo(() => {
+    if (!suggestionsState.text) return [];
     const lowerCaseText = suggestionsState.text.toLowerCase();
-    const matchedSuggestions = suggestions.filter((suggestion) =>
-      suggestion.toLowerCase().includes(lowerCaseText)
-    );
-    setFilteredSuggestions(
-      matchedSuggestions.map(removeFileExtension).slice(0, 5)
-    );
-  }, [suggestionsState.text, suggestions]);
+    return suggestions
+      .filter((suggestion) => suggestion.toLowerCase().includes(lowerCaseText))
+      .map(removeFileExtension)
+      .slice(0, 5);
+  }, [suggestions, suggestionsState.text]);
 
   useEffect(() => {
     if (
-      suggestionsState.position &&
-      suggestionsRef.current &&
-      filteredSuggestions.length > 0
+      !suggestionsState.position ||
+      filteredSuggestions.length === 0 ||
+      !suggestionsRef.current
     ) {
-      const suggestionBox = suggestionsRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight;
-      let topPosition = suggestionsState.position.top;
-      if (topPosition + suggestionBox.height > viewportHeight) {
-        topPosition -= suggestionBox.height;
-      }
-
-      setPositionStyle({
-        top: topPosition,
-        left: suggestionsState.position.left,
-      });
+      return;
     }
-  }, [suggestionsState.position, filteredSuggestions.length]);
+    const { top, left } = suggestionsState.position;
+    const { height, width } = suggestionsRef.current.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const shouldDisplayAbove = top + height > viewportHeight && top > height;
 
-  if (filteredSuggestions.length === 0) {
-    return null;
-  }
+    setLayout({
+      top: shouldDisplayAbove ? top - height : top,
+      left: left,
+      display: "block",
+    });
+  }, [suggestionsState.position, filteredSuggestions]);
 
-  const handleClick = (suggestion: string) => {
-    suggestionsState.onSelect?.(suggestion);
-  };
+  if (filteredSuggestions.length === 0) return null;
 
   return (
     <div
       ref={suggestionsRef}
       style={{
         position: "absolute",
-        left: positionStyle.left,
-        top: positionStyle.top,
+        left: `${layout.left}px`,
+        top: `${layout.top}px`,
+        display: layout.display,
         backgroundColor: "white",
         border: "1px solid black",
         padding: "10px",
         zIndex: 1000,
         maxWidth: "300px",
-        display: positionStyle.top === -9999 ? "none" : "block", // Hide until ready
-        wordWrap: "break-word", // Ensures that long words do not overflow
-        overflowWrap: "break-word", // A more modern, preferable alternative to wordWrap
-        whiteSpace: "normal", // Ensures that the whitespace is handled in a standard way, allowing for wrapping
+        overflowWrap: "break-word",
+        whiteSpace: "normal",
       }}
     >
       <ul style={{ margin: 0, padding: 0, listStyleType: "none" }}>
@@ -83,7 +76,9 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
           <li
             key={index}
             style={{ padding: "5px", cursor: "pointer" }}
-            onClick={() => handleClick(suggestion)}
+            onClick={() => {
+              suggestionsState.onSelect?.(suggestion);
+            }}
           >
             {suggestion}
           </li>
