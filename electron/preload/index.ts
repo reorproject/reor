@@ -53,7 +53,7 @@ declare global {
     files: {
       openDirectoryDialog: () => Promise<string[]>;
       openFileDialog: (fileExtensions?: string[]) => Promise<string[]>;
-      getFilesForWindow: () => Promise<FileInfoTree>;
+      getFilesTreeForWindow: () => Promise<FileInfoTree>;
       writeFile: (writeFileProps: WriteFileProps) => Promise<void>;
       indexFileInDatabase: (filePath: string) => Promise<void>;
       readFile: (filePath: string) => Promise<string>;
@@ -219,8 +219,8 @@ contextBridge.exposeInMainWorld("files", {
   openDirectoryDialog: () => ipcRenderer.invoke("open-directory-dialog"),
   openFileDialog: (fileExtensions?: string[]) =>
     ipcRenderer.invoke("open-file-dialog", fileExtensions),
-  getFilesForWindow: async (): Promise<FileInfoTree> => {
-    return ipcRenderer.invoke("get-files-for-window");
+  getFilesTreeForWindow: async (): Promise<FileInfoTree> => {
+    return ipcRenderer.invoke("get-files-tree-for-window");
   },
 
   writeFile: async (writeFileProps: WriteFileProps) => {

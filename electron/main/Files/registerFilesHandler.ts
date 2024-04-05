@@ -31,7 +31,7 @@ export const registerFileHandlers = (
   });
 
   ipcMain.handle(
-    "get-files-for-window",
+    "get-files-tree-for-window",
     async (event): Promise<FileInfoTree> => {
       const directoryPath = windowsManager.getVaultDirectoryForWinContents(
         event.sender

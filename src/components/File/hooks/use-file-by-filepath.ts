@@ -42,7 +42,7 @@ export const useFileByFilepath = () => {
   });
 
   const testOpenFile = async (filePath: string) => {
-    console.log("opening file: ", filePath);
+    console.log(filePath);
   };
 
   const editor = useEditor({
@@ -69,7 +69,7 @@ export const useFileByFilepath = () => {
       //   }
       // })
 
-      RichTextLink,
+      // RichTextLink,
     ],
   });
 

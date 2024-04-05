@@ -1,42 +1,58 @@
 import React, { useRef, useEffect, useState } from "react";
 import { SuggestionsState } from "./TrReplaceSuggestions";
+import { removeFileExtension } from "@/functions/strings";
 
 interface SuggestionsDisplayProps {
   suggestionsState: SuggestionsState;
+  suggestions: string[];
 }
 
-const SuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
+const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
   suggestionsState,
+  suggestions,
 }) => {
   const [positionStyle, setPositionStyle] = useState({ top: 0, left: 0 });
+  const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (suggestionsState.suggestions.length > 0 && suggestionsRef.current) {
+    if (suggestionsState.position && suggestionsRef.current) {
       const suggestionBox = suggestionsRef.current.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
-      let topPosition = suggestionsState.position?.top ?? 0;
+      let topPosition = suggestionsState.position.top;
 
-      // Check if the suggestion box is going off the bottom of the viewport
       if (topPosition + suggestionBox.height > viewportHeight) {
-        // If it is, position it upwards instead
         topPosition = topPosition - suggestionBox.height;
       }
 
       setPositionStyle({
         top: topPosition,
-        left: suggestionsState.position?.left ?? 0,
+        left: suggestionsState.position.left,
       });
     }
-  }, [suggestionsState.position, suggestionsState.suggestions.length]);
+  }, [suggestionsState.position]);
 
-  if (suggestionsState.suggestions.length === 0) {
+  // Compute the filtered suggestions whenever the suggestions or the input text changes
+  useEffect(() => {
+    if (suggestionsState.text) {
+      const lowerCaseText = suggestionsState.text.toLowerCase();
+      const matchedSuggestions = suggestions.filter((suggestion) =>
+        suggestion.toLowerCase().includes(lowerCaseText)
+      );
+      setFilteredSuggestions(
+        matchedSuggestions.map(removeFileExtension).slice(0, 5)
+      );
+    } else {
+      setFilteredSuggestions([]);
+    }
+  }, [suggestionsState.text, suggestions]);
+
+  if (filteredSuggestions.length === 0) {
     return null;
   }
 
   const handleClick = (suggestion: string) => {
-    if (!suggestionsState.onSelect) return;
-    suggestionsState.onSelect(suggestion);
+    suggestionsState.onSelect?.(suggestion);
   };
 
   return (
@@ -54,7 +70,7 @@ const SuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
       }}
     >
       <ul style={{ margin: 0, padding: 0, listStyleType: "none" }}>
-        {suggestionsState.suggestions.map((suggestion, index) => (
+        {filteredSuggestions.map((suggestion, index) => (
           <li
             key={index}
             style={{ padding: "5px", cursor: "pointer" }}
@@ -68,4 +84,4 @@ const SuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
   );
 };
 
-export default SuggestionsDisplay;
+export default InEditorBacklinkSuggestionsDisplay;
