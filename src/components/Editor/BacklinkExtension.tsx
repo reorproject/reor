@@ -46,9 +46,7 @@ const backlinkPlugin = (
           if (!view.hasFocus()) {
             // Set a timeout to hide the suggestions after a short delay
             hideTimeout = setTimeout(() => {
-              updateSuggestionsState({
-                suggestions: [],
-              });
+              updateSuggestionsState({ suggestions: [] });
             }, 1000); // Adjust the delay as needed (in milliseconds)
             return;
           }
@@ -58,11 +56,9 @@ const backlinkPlugin = (
 
           if (
             lastOpeningBracketIndex === -1 ||
-            textBeforeCursor.includes("]]", lastOpeningBracketIndex)
+            textBeforeCursor.lastIndexOf("]]") > lastOpeningBracketIndex
           ) {
-            updateSuggestionsState({
-              suggestions: [],
-            });
+            updateSuggestionsState({ suggestions: [] });
             return;
           }
 
@@ -70,24 +66,31 @@ const backlinkPlugin = (
             lastOpeningBracketIndex + 2,
             from
           );
-
           console.log("Text to the left:", textToLeft);
 
           const coords = view.coordsAtPos(from);
-
           updateSuggestionsState({
             text: textToLeft,
             position: coords,
             suggestions: ["Backlink 1", "Backlink 2", "Backlink 3"],
             onSelect: (selectedSuggestion) => {
               const tr = view.state.tr;
-              tr.replaceWith(
-                from - textToLeft.length,
+              const textAfterCursor = doc.textBetween(
                 from,
-                view.state.schema.text(selectedSuggestion)
+                doc.content.size,
+                "\n"
               );
-              view.dispatch(tr);
-              updateSuggestionsState({ suggestions: [] });
+              const closingBracketIndex = textAfterCursor.indexOf("]]");
+
+              if (closingBracketIndex !== -1) {
+                tr.replaceWith(
+                  from - textToLeft.length,
+                  from + closingBracketIndex + 2,
+                  view.state.schema.text(selectedSuggestion + "]]")
+                );
+                view.dispatch(tr);
+                updateSuggestionsState({ suggestions: [] });
+              }
             },
           });
         },
@@ -99,6 +102,7 @@ const backlinkPlugin = (
         },
       };
     },
+
     props: {
       decorations(state) {
         const decorations: Decoration[] = [];
