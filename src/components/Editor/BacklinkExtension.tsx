@@ -1,5 +1,5 @@
 import { Extension } from "@tiptap/core";
-import { Plugin, PluginKey } from "@tiptap/pm/state";
+import { Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
 
 export interface SuggestionsState {
@@ -145,6 +145,36 @@ const backlinkPlugin = (
         return DecorationSet.create(doc, decorations);
       },
       handleDOMEvents: {
+        keydown: (view, event) => {
+          if (event.key === "[") {
+            const { state, dispatch } = view;
+            const { selection } = state;
+            const { from } = selection;
+
+            // Insert the closing bracket at the cursor position.
+            const transaction = state.tr.insertText("]", from);
+
+            // Create a new selection that places the cursor back by one position, before the inserted closing bracket.
+            // Since we are inserting at `from`, the cursor should ideally end up at `from` again (before the inserted text).
+            const newSelection = TextSelection.create(
+              transaction.doc,
+              from,
+              from
+            );
+
+            // Apply the new selection to the transaction.
+            transaction.setSelection(newSelection);
+
+            // Dispatch the transaction with the updated document and selection.
+            dispatch(transaction);
+
+            // Prevent the default handling to ensure no additional brackets are inserted.
+            return true;
+          }
+
+          // Allow default handling for other keys.
+          return false;
+        },
         blur: () => {
           console.log("Blur event triggered"); // Add this line for debugging
           // Set a timeout to hide the suggestions after a short delay
