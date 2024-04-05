@@ -7,6 +7,7 @@ import ResizableComponent from "./Generic/ResizableComponent";
 import SidebarManager from "./Sidebars/MainSidebar";
 import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
 import { EditorContent } from "@tiptap/react";
+import SuggestionsDisplay from "./Editor/SuggestionsDisplay";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search";
@@ -24,8 +25,13 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
       // Here you can define your custom click handler logic
     }
   });
-  const { filePath, editor, openFileByPath, saveCurrentlyOpenedFile } =
-    useFileByFilepath();
+  const {
+    filePath,
+    editor,
+    openFileByPath,
+    saveCurrentlyOpenedFile,
+    suggestionsState,
+  } = useFileByFilepath();
 
   const toggleChatbot = () => {
     setShowChatbot(!showChatbot);
@@ -77,6 +83,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                   style={{ wordBreak: "break-word" }}
                   editor={editor}
                 />
+                <SuggestionsDisplay suggestionsState={suggestionsState} />
               </div>
               {showSimilarFiles && (
                 <ResizableComponent resizeSide="left" initialWidth={400}>

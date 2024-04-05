@@ -10,13 +10,20 @@ import "../tiptap.scss";
 import { useDebounce } from "use-debounce";
 import { Markdown } from "tiptap-markdown";
 import { RichTextLink } from "@/components/Editor/RichTextLink";
-import { BacklinkExtension } from "@/components/Editor/Backlink";
+
+import {
+  BacklinkExtension,
+  SuggestionsState,
+} from "@/components/Editor/TrReplaceSuggestions";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
     string | null
   >(null);
-
+  const [suggestionsState, setSuggestionsState] = useState<SuggestionsState>({
+    suggestions: [],
+    position: { left: 0, top: 0 },
+  });
   /**
 	 * with this editor, we want to take the HTML on the following scenarios:
 		1. when the file path changes, causing a re-render
@@ -34,21 +41,11 @@ export const useFileByFilepath = () => {
     transformCopiedText: false, // Copied text is transformed to markdown
   });
 
+  const testOpenFile = async (filePath: string) => {
+    console.log("opening file: ", filePath);
+  };
+
   const editor = useEditor({
-    // editorProps: {
-    //   handleDOMEvents: {
-    //     click: (view, event) => {
-    //       // Assert event.target is of type Element to access the matches method
-    //       const target = event.target as Element;
-    //       if (target.matches("a[data-square-bracket-link]")) {
-    //         console.log("Square bracket link clicked");
-    //         // customOnClickHandler(event);
-    //         return true; // Stops the default handling
-    //       }
-    //       return false;
-    //     },
-    //   },
-    // },
     autofocus: true,
 
     extensions: [
@@ -58,23 +55,21 @@ export const useFileByFilepath = () => {
       Text,
       TaskList,
       Markdown,
-      // SquareBracketLink.configure({
-      //   // Additional configuration if necessary
-      // }),
+
       TaskItem.configure({
         nested: true,
       }),
-      // Link.configure({
-      //   protocols: ["ftp", "mailto"],
-      // }),
-      BacklinkExtension,
+      // Commands,
+      // slashCommand,
+      BacklinkExtension(testOpenFile, setSuggestionsState),
+      // .configure({
+      //   suggestion: {
+      //     // items: getSuggestionItems,
+      //     // render: renderItems
+      //   }
+      // })
+
       RichTextLink,
-      // BacklinkExtension,
-      // ObsidianBacklink,
-      // Link.configure({
-      //   linkOnPaste: true,
-      //   openOnClick: true,
-      // }),
     ],
   });
 
@@ -217,6 +212,7 @@ export const useFileByFilepath = () => {
     saveCurrentlyOpenedFile,
     editor,
     openFileByPath,
+    suggestionsState,
   };
 };
 
