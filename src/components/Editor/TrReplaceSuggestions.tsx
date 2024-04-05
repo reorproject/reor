@@ -100,10 +100,18 @@ const backlinkPlugin = (
           // Find the last occurrence of the opening square bracket before the cursor
           const lastOpeningBracketIndex = textToCursor.lastIndexOf("[[");
 
-          // If no opening bracket is found, or the bracket is not followed by the cursor directly or indirectly (i.e., without a closing bracket in between), do not show suggestions
+          // Check for a newline since the last set of opening square brackets
+          const hasNewlineSinceLastBracket = textToCursor
+            .slice(lastOpeningBracketIndex)
+            .includes("\n");
+
+          // If no opening bracket is found, or the bracket is followed by a closing bracket,
+          // or there is a newline character between the last opening bracket and the cursor,
+          // do not show suggestions
           if (
             lastOpeningBracketIndex === -1 ||
-            textToCursor.includes("]]", lastOpeningBracketIndex)
+            textToCursor.includes("]]", lastOpeningBracketIndex) ||
+            hasNewlineSinceLastBracket // Added check for newline
           ) {
             updateSuggestionsState({
               suggestions: [],
