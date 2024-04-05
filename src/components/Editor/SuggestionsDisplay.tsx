@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
-import { SuggestionsState } from "./TrReplaceSuggestions";
+import { SuggestionsState } from "./BacklinkExtension";
 import { removeFileExtension } from "@/functions/strings";
 
 interface SuggestionsDisplayProps {

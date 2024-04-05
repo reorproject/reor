@@ -14,7 +14,7 @@ import { RichTextLink } from "@/components/Editor/RichTextLink";
 import {
   BacklinkExtension,
   SuggestionsState,
-} from "@/components/Editor/TrReplaceSuggestions";
+} from "@/components/Editor/BacklinkExtension";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
