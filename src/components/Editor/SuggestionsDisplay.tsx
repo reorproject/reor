@@ -11,18 +11,38 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
   suggestionsState,
   suggestions,
 }) => {
-  const [positionStyle, setPositionStyle] = useState({ top: 0, left: 0 });
+  const [positionStyle, setPositionStyle] = useState({
+    top: -9999,
+    left: -9999,
+  });
   const [filteredSuggestions, setFilteredSuggestions] = useState<string[]>([]);
-  const suggestionsRef = useRef<HTMLDivElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    if (suggestionsState.position && suggestionsRef.current) {
+    if (!suggestionsState.text) {
+      setFilteredSuggestions([]);
+      return;
+    }
+    const lowerCaseText = suggestionsState.text.toLowerCase();
+    const matchedSuggestions = suggestions.filter((suggestion) =>
+      suggestion.toLowerCase().includes(lowerCaseText)
+    );
+    setFilteredSuggestions(
+      matchedSuggestions.map(removeFileExtension).slice(0, 5)
+    );
+  }, [suggestionsState.text, suggestions]);
+
+  useEffect(() => {
+    if (
+      suggestionsState.position &&
+      suggestionsRef.current &&
+      filteredSuggestions.length > 0
+    ) {
       const suggestionBox = suggestionsRef.current.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
       let topPosition = suggestionsState.position.top;
-
       if (topPosition + suggestionBox.height > viewportHeight) {
-        topPosition = topPosition - suggestionBox.height;
+        topPosition -= suggestionBox.height;
       }
 
       setPositionStyle({
@@ -30,22 +50,7 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
         left: suggestionsState.position.left,
       });
     }
-  }, [suggestionsState.position]);
-
-  // Compute the filtered suggestions whenever the suggestions or the input text changes
-  useEffect(() => {
-    if (suggestionsState.text) {
-      const lowerCaseText = suggestionsState.text.toLowerCase();
-      const matchedSuggestions = suggestions.filter((suggestion) =>
-        suggestion.toLowerCase().includes(lowerCaseText)
-      );
-      setFilteredSuggestions(
-        matchedSuggestions.map(removeFileExtension).slice(0, 5)
-      );
-    } else {
-      setFilteredSuggestions([]);
-    }
-  }, [suggestionsState.text, suggestions]);
+  }, [suggestionsState.position, filteredSuggestions.length]);
 
   if (filteredSuggestions.length === 0) {
     return null;
@@ -67,6 +72,7 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
         padding: "10px",
         zIndex: 1000,
         maxWidth: "300px",
+        display: positionStyle.top === -9999 ? "none" : "block", // Hide until ready
         wordWrap: "break-word", // Ensures that long words do not overflow
         overflowWrap: "break-word", // A more modern, preferable alternative to wordWrap
         whiteSpace: "normal", // Ensures that the whitespace is handled in a standard way, allowing for wrapping
