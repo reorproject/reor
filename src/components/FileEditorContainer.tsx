@@ -9,6 +9,8 @@ import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
 import { EditorContent } from "@tiptap/react";
 import InEditorBacklinkSuggestionsDisplay from "./Editor/SuggestionsDisplay";
 import { useFileInfoTree } from "./File/FileSideBar/hooks/use-file-info-tree";
+import RenameNoteModal from "./File/RenameNote";
+import RenameDirModal from "./File/RenameDirectory";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search";
@@ -26,16 +28,23 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
       // Here you can define your custom click handler logic
     }
   });
+
+  const { files, flattenedFiles, expandedDirectories, handleDirectoryToggle } =
+    useFileInfoTree(filePath);
   const {
     filePath,
     editor,
     openFileByPath,
     saveCurrentlyOpenedFile,
     suggestionsState,
+    noteToBeRenamed,
+    setNoteToBeRenamed,
+    fileDirToBeRenamed,
+    setFileDirToBeRenamed,
+    renameFile,
+    navigationHistory,
+    setNavigationHistory,
   } = useFileByFilepath();
-
-  const { files, flattenedFiles, expandedDirectories, handleDirectoryToggle } =
-    useFileInfoTree(filePath);
 
   const toggleChatbot = () => {
     setShowChatbot(!showChatbot);
@@ -47,13 +56,35 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   return (
     <div>
       <TitleBar
+        history={navigationHistory}
+        setHistory={setNavigationHistory}
+        currentFilePath={filePath}
         onFileSelect={openFileByPath}
         chatbotOpen={showChatbot}
         similarFilesOpen={showSimilarFiles}
         toggleChatbot={toggleChatbot}
         toggleSimilarFiles={toggleSimilarFiles}
       />
-
+      {noteToBeRenamed && (
+        <RenameNoteModal
+          isOpen={!!noteToBeRenamed}
+          onClose={() => setNoteToBeRenamed("")}
+          fullNoteName={noteToBeRenamed}
+          renameNote={async ({ path, newNoteName }) => {
+            await renameFile(path, newNoteName);
+          }}
+        />
+      )}
+      {fileDirToBeRenamed && (
+        <RenameDirModal
+          isOpen={!!fileDirToBeRenamed}
+          onClose={() => setFileDirToBeRenamed("")}
+          fullDirName={fileDirToBeRenamed}
+          renameDir={async ({ path, newDirName: newNoteName }) => {
+            await renameFile(path, newNoteName);
+          }}
+        />
+      )}
       <div className="flex h-below-titlebar">
         <div className="w-[40px] border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid">
           <LeftSidebar
@@ -114,7 +145,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
             className={`h-below-titlebar ${filePath ? "" : "absolute right-0"}`}
           >
             <ResizableComponent resizeSide="left" initialWidth={300}>
-              <ChatWithLLM currentFilePath={filePath} />
+              <ChatWithLLM
+                currentFilePath={filePath}
+                openFileByPath={openFileByPath}
+              />
             </ResizableComponent>
           </div>
         )}

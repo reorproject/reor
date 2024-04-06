@@ -24,6 +24,23 @@ export const useFileByFilepath = () => {
     suggestions: [],
     position: { left: 0, top: 0 },
   });
+  const [isFileContentModified, setIsFileContentModified] =
+    useState<boolean>(false);
+  const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>("");
+  const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>("");
+  const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
+  const [currentlyChangingFilePath, setCurrentlyChangingFilePath] =
+    useState(false);
+
+  const setFileNodeToBeRenamed = async (filePath: string) => {
+    const isDirectory = await window.files.isDirectory(filePath);
+    if (isDirectory) {
+      setFileDirToBeRenamed(filePath);
+    } else {
+      setNoteToBeRenamed(filePath);
+    }
+  };
+
   /**
 	 * with this editor, we want to take the HTML on the following scenarios:
 		1. when the file path changes, causing a re-render
@@ -48,6 +65,9 @@ export const useFileByFilepath = () => {
   const editor = useEditor({
     autofocus: true,
 
+    onUpdate() {
+      setIsFileContentModified(true);
+    },
     extensions: [
       StarterKit,
       Document,
@@ -94,13 +114,18 @@ export const useFileByFilepath = () => {
   const [debouncedEditor] = useDebounce(editor?.state.doc.content, 4000);
 
   useEffect(() => {
-    if (debouncedEditor) {
-      saveEditorContentToPath(editor, currentlyOpenedFilePath, false);
+    if (debouncedEditor && !currentlyChangingFilePath) {
+      saveEditorContentToPath(editor, currentlyOpenedFilePath);
     }
-  }, [debouncedEditor, currentlyOpenedFilePath, editor]);
+  }, [
+    debouncedEditor,
+    currentlyOpenedFilePath,
+    editor,
+    currentlyChangingFilePath,
+  ]);
 
   const saveCurrentlyOpenedFile = async () => {
-    saveEditorContentToPath(editor, currentlyOpenedFilePath);
+    await saveEditorContentToPath(editor, currentlyOpenedFilePath);
   };
 
   const saveEditorContentToPath = async (
@@ -108,40 +133,39 @@ export const useFileByFilepath = () => {
     filePath: string | null,
     indexFileInDatabase: boolean = false
   ) => {
-    if (editor && editor?.getHTML() !== null && filePath !== null) {
-      const markdown = getMarkdown(editor);
-      // const text = editor?.getText();
-      console.log("markdown IS: ", markdown);
+    if (
+      filePath !== null &&
+      isFileContentModified
+    ) {
+    const markdownContent = getMarkdown(editor);
+    if (markdownContent !== null) {
       await window.files.writeFile({
         filePath: filePath,
-        content: markdown,
+        content: markdownContent,
       });
+
+      setIsFileContentModified(false);
+
       if (indexFileInDatabase) {
-        await window.files.indexFileInDatabase(filePath);
+        window.files.indexFileInDatabase(filePath);
       }
     }
+    }
   };
-  // read file, load content into fileContent
+
   const openFileByPath = async (newFilePath: string) => {
-    //if the fileContent is null or if there is no file currently selected
-
-    saveEditorContentToPath(editor, currentlyOpenedFilePath, true);
-
+    setCurrentlyChangingFilePath(true);
+    await saveEditorContentToPath(editor, currentlyOpenedFilePath, true);
     const fileContent = (await window.files.readFile(newFilePath)) ?? "";
     setCurrentlyOpenedFilePath(newFilePath);
 
     editor?.commands.setContent(fileContent);
+    setCurrentlyChangingFilePath(false);
   };
 
   // delete file depending on file path returned by the listener
   useEffect(() => {
-    let active = true;
-    console.log("now active");
     const deleteFile = async (path: string) => {
-      console.log("listener got file path: ", path);
-      if (!active) return;
-      console.log("listener is active");
-
       await window.files.deleteFile(path);
 
       // if it is the current file, clear the content and set filepath to null so that it won't save anything else
@@ -151,14 +175,45 @@ export const useFileByFilepath = () => {
       }
     };
 
-    window.ipcRenderer.receive("delete-file-listener", deleteFile);
+    const removeDeleteFileListener = window.ipcRenderer.receive(
+      "delete-file-listener",
+      deleteFile
+    );
 
     return () => {
-      active = false;
-      console.log("cleanup effect ran");
-      window.ipcRenderer.removeListener("delete-file-listener", deleteFile);
+      removeDeleteFileListener();
     };
   }, [currentlyOpenedFilePath, editor]);
+
+  const renameFileNode = async (oldFilePath: string, newFilePath: string) => {
+    await window.files.renameFileRecursive({
+      oldFilePath,
+      newFilePath,
+    });
+    //set the file history array to use the new absolute file path if there is anything matching
+    const navigationHistoryUpdated = [...navigationHistory].map((path) => {
+      return path.replace(oldFilePath, newFilePath);
+    });
+
+    setNavigationHistory(navigationHistoryUpdated);
+
+    //reset the editor to the new file path
+    if (currentlyOpenedFilePath === oldFilePath) {
+      setCurrentlyOpenedFilePath(newFilePath);
+    }
+  };
+
+  // open a new file rename dialog
+  useEffect(() => {
+    const renameFileListener = window.ipcRenderer.receive(
+      "rename-file-listener",
+      (noteName: string) => setFileNodeToBeRenamed(noteName)
+    );
+
+    return () => {
+      renameFileListener();
+    };
+  }, []);
 
   // cleanup effect ran once, so there was only 1 re-render
   // but for each query to the delete file-listener, you only want to run the listener once, not multiple times.
@@ -172,9 +227,7 @@ export const useFileByFilepath = () => {
   // 2. on the FE, receives win.webContents.send("prepare-for-window-close", files);
   // 3. FE after saving, alerts backend that is ready for close
   useEffect(() => {
-    let active = true;
     const handleWindowClose = async () => {
-      if (!active) return;
       console.log("saving file", {
         filePath: currentlyOpenedFilePath,
         fileContent: editor?.getHTML() || "",
@@ -196,14 +249,13 @@ export const useFileByFilepath = () => {
       window.electron.destroyWindow();
     };
 
-    window.ipcRenderer.receive("prepare-for-window-close", handleWindowClose);
+    const removeWindowCloseListener = window.ipcRenderer.receive(
+      "prepare-for-window-close",
+      handleWindowClose
+    );
 
     return () => {
-      active = false;
-      window.ipcRenderer.removeListener(
-        "prepare-for-window-close",
-        handleWindowClose
-      );
+      removeWindowCloseListener();
     };
   }, [currentlyOpenedFilePath, editor]);
 
@@ -211,8 +263,15 @@ export const useFileByFilepath = () => {
     filePath: currentlyOpenedFilePath,
     saveCurrentlyOpenedFile,
     editor,
+    navigationHistory,
+    setNavigationHistory,
     openFileByPath,
     suggestionsState,
+    noteToBeRenamed,
+    setNoteToBeRenamed,
+    fileDirToBeRenamed,
+    setFileDirToBeRenamed,
+    renameFile: renameFileNode,
   };
 };
 

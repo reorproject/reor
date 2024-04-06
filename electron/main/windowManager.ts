@@ -2,6 +2,7 @@ import { BrowserWindow, WebContents, screen, shell } from "electron";
 import { LanceDBTableWrapper } from "./database/LanceTableWrapper";
 import Store from "electron-store";
 import { StoreKeys, StoreSchema } from "./Store/storeConfig";
+import chokidar from "chokidar";
 
 type WindowInfo = {
   windowID: number;
@@ -12,6 +13,8 @@ type WindowInfo = {
 class WindowsManager {
   activeWindows: WindowInfo[] = [];
   private errorStringsToSendWindow: string[] = [];
+
+  watcher: chokidar.FSWatcher | undefined;
 
   async createWindow(
     store: Store<StoreSchema>,

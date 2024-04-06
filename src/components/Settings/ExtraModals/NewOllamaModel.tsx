@@ -50,10 +50,7 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
   };
 
   useEffect(() => {
-    let active = true;
-
     const updateStream = (modelName: string, progress: ProgressResponse) => {
-      if (!active) return;
       setDownloadProgress((prevProgress) => ({
         ...prevProgress,
         [modelName]: {
@@ -63,11 +60,13 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
       }));
     };
 
-    window.ipcRenderer.receive("ollamaDownloadProgress", updateStream);
+    const removeOllamaDownloadProgressListener = window.ipcRenderer.receive(
+      "ollamaDownloadProgress",
+      updateStream
+    );
 
     return () => {
-      active = false;
-      window.ipcRenderer.removeListener("ollamaDownloadProgress", updateStream);
+      removeOllamaDownloadProgressListener();
     };
   }, []);
 
@@ -92,7 +91,7 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
         />
         <p className="text-white text-xs mb-2 mt-2 italic">
           {" "}
-          We recommended either mistral, llama2, or gemma.
+          We recommended either mistral, llama2, or command-r.
         </p>
 
         <Button
@@ -131,7 +130,7 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
           )}
           {Object.entries(downloadProgress).length > 0 && (
             <p className="text-white text-xs">
-              (Feel free to close this modal while the download completes.)
+              (Feel free to close this modal while the download completes)
             </p>
           )}
         </div>

@@ -1,26 +1,31 @@
-import NewNoteComponent from "./File/NewNote";
 import React, { useEffect, useState } from "react";
 import { PiSidebar, PiSidebarFill } from "react-icons/pi";
 
 import { BsChatLeftDots, BsFillChatLeftDotsFill } from "react-icons/bs";
+import FileHistoryNavigator from "./File/FileSideBar/FileHistoryBar";
 
 export const titleBarHeight = "30px";
 interface TitleBarProps {
   onFileSelect: (path: string) => void;
+  currentFilePath: string | null;
   chatbotOpen: boolean;
   similarFilesOpen: boolean;
   toggleChatbot: () => void;
   toggleSimilarFiles: () => void;
+  history: string[];
+  setHistory: (string: string[]) => void;
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
   onFileSelect,
+  currentFilePath,
   chatbotOpen,
   similarFilesOpen,
   toggleChatbot,
   toggleSimilarFiles,
+  history,
+  setHistory,
 }) => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [platform, setPlatform] = useState("");
 
   useEffect(() => {
@@ -31,9 +36,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
 
     fetchPlatform();
   }, []);
-  const toggleModal = () => {
-    setIsModalOpen(!isModalOpen);
-  };
+
   return (
     <div
       id="customTitleBar"
@@ -41,27 +44,24 @@ const TitleBar: React.FC<TitleBarProps> = ({
       style={{ backgroundColor: "#303030" }}
     >
       <div
-        className=" flex"
+        className="flex mt-[1px]"
         style={
-          platform === "darwin"
-            ? { marginLeft: "70px" }
-            : { marginLeft: "10px" }
+          platform === "darwin" ? { marginLeft: "60px" } : { marginLeft: "2px" }
         }
       >
-        <NewNoteComponent
-          isOpen={isModalOpen}
-          onClose={toggleModal}
+        <FileHistoryNavigator
+          history={history}
+          setHistory={setHistory}
           onFileSelect={onFileSelect}
+          currentPath={currentFilePath || ""}
         />
       </div>
-
       <div
         className="flex justify-content-right align-items-right"
         style={platform === "win32" ? { marginRight: "8.5rem" } : {}}
       >
         {similarFilesOpen ? (
           <PiSidebarFill
-
             className="text-gray-100 cursor-pointer mt-[0.04rem]"
             size={28}
             onClick={toggleSimilarFiles}
@@ -69,7 +69,6 @@ const TitleBar: React.FC<TitleBarProps> = ({
           />
         ) : (
           <PiSidebar
-
             className="text-gray-100 cursor-pointer mt-[0.04rem]"
             size={28}
             onClick={toggleSimilarFiles}

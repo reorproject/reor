@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from "electron";
+import { IpcRendererEvent, contextBridge, ipcRenderer } from "electron";
 import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
@@ -11,10 +11,12 @@ import {
   AugmentPromptWithFileProps,
   FileInfoNode,
   FileInfoTree,
+  RenameFileProps,
   WriteFileProps,
 } from "electron/main/Files/Types";
 import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
+import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
@@ -23,8 +25,7 @@ declare global {
   interface Window {
     ipcRenderer: {
       on: (channel: string, listener: (...args: unknown[]) => void) => void;
-      removeListener: (channel: string, listener: ReceiveCallback) => void;
-      receive: (channel: string, callback: ReceiveCallback) => void;
+      receive: (channel: string, callback: ReceiveCallback) => () => void;
     };
     electron: {
       openExternal: (url: string) => void;
@@ -47,7 +48,11 @@ declare global {
         prompt: string,
         llmName: string,
         filter?: string
-      ) => Promise<string>;
+      ) => Promise<PromptWithRagResults>;
+      augmentPromptWithTemporalAgent: (
+        prompt: string,
+        llmName: string
+      ) => Promise<PromptWithRagResults>;
       getDatabaseFields: () => Promise<Record<string, string>>;
     };
     files: {
@@ -55,6 +60,8 @@ declare global {
       openFileDialog: (fileExtensions?: string[]) => Promise<string[]>;
       getFilesTreeForWindow: () => Promise<FileInfoTree>;
       writeFile: (writeFileProps: WriteFileProps) => Promise<void>;
+      isDirectory: (filepath: string) => Promise<boolean>;
+      renameFileRecursive: (renameFileProps: RenameFileProps) => Promise<void>;
       indexFileInDatabase: (filePath: string) => Promise<void>;
       readFile: (filePath: string) => Promise<string>;
       deleteFile: (filePath: string) => Promise<void>;
@@ -70,7 +77,8 @@ declare global {
       ) => Promise<PromptWithContextLimit>;
     };
     path: {
-      basename: (pathString: string) => string;
+      basename: (pathString: string) => Promise<string>;
+      dirname: (pathString: string) => Promise<string>;
     };
     llm: {
       streamingLLMResponse: (
@@ -127,12 +135,22 @@ contextBridge.exposeInMainWorld("database", {
     prompt: string,
     llmName: string,
     filter?: string
-  ): Promise<DBEntry[]> => {
+  ): Promise<PromptWithRagResults> => {
     return ipcRenderer.invoke(
       "augment-prompt-with-rag",
       prompt,
       llmName,
       filter
+    );
+  },
+  augmentPromptWithTemporalAgent: async (
+    prompt: string,
+    llmName: string
+  ): Promise<PromptWithRagResults> => {
+    return ipcRenderer.invoke(
+      "augment-prompt-with-temporal-agent",
+      prompt,
+      llmName
     );
   },
   getDatabaseFields: async (): Promise<Record<string, string>> => {
@@ -203,9 +221,15 @@ contextBridge.exposeInMainWorld("electronStore", {
 
 contextBridge.exposeInMainWorld("ipcRenderer", {
   on: ipcRenderer.on,
-  removeListener: ipcRenderer.removeListener,
   receive: (channel: string, callback: (...args: unknown[]) => void) => {
-    ipcRenderer.on(channel, (event, ...args) => callback(...args));
+    // this creates a constant copy of the callback, thus ensuring that the removed listener is the same as the one added
+    const subscription = (event: IpcRendererEvent, ...args: unknown[]) =>
+      callback(...args);
+
+    ipcRenderer.on(channel, subscription);
+    return () => {
+      ipcRenderer.removeListener(channel, subscription);
+    };
   },
 });
 
@@ -225,6 +249,12 @@ contextBridge.exposeInMainWorld("files", {
 
   writeFile: async (writeFileProps: WriteFileProps) => {
     return ipcRenderer.invoke("write-file", writeFileProps);
+  },
+  isDirectory: async (filePath: string) => {
+    return ipcRenderer.invoke("is-directory", filePath);
+  },
+  renameFileRecursive: async (renameFileProps: RenameFileProps) => {
+    return ipcRenderer.invoke("rename-file-recursive", renameFileProps);
   },
 
   indexFileInDatabase: async (filePath: string) => {
@@ -262,8 +292,13 @@ contextBridge.exposeInMainWorld("files", {
 });
 
 contextBridge.exposeInMainWorld("path", {
-  basename: (pathString: string) =>
-    ipcRenderer.invoke("path-basename", pathString),
+  basename: (pathString: string) => {
+    return ipcRenderer.invoke("path-basename", pathString);
+  },
+
+  dirname: (pathString: string) => {
+    return ipcRenderer.invoke("path-dirname", pathString);
+  },
 });
 
 contextBridge.exposeInMainWorld("llm", {

@@ -145,7 +145,10 @@ ipcMain.on("index-files-in-directory", async (event) => {
     const win = BrowserWindow.fromWebContents(event.sender);
 
     if (win) {
-      startWatchingDirectory(win, windowInfo.vaultDirectoryForWindow);
+      windowsManager.watcher = startWatchingDirectory(
+        win,
+        windowInfo.vaultDirectoryForWindow
+      );
       updateFileListForRenderer(win, windowInfo.vaultDirectoryForWindow);
     }
     event.sender.send("indexing-progress", 1);
@@ -173,6 +176,15 @@ ipcMain.on("show-context-menu-file-item", (event, file) => {
       },
     })
   );
+  menu.append(
+    new MenuItem({
+      label: "Rename",
+      click: () => {
+        console.log(file.path);
+        event.sender.send("rename-file-listener", file.path);
+      },
+    })
+  );
 
   console.log("menu key: ", file);
 
@@ -197,3 +209,8 @@ ipcMain.on("open-new-window", () => {
 ipcMain.handle("path-basename", (event, pathString: string) => {
   return path.basename(pathString);
 });
+
+ipcMain.handle("path-dirname", (event, pathString: string) => {
+  return path.dirname(pathString) + path.sep;
+});
+

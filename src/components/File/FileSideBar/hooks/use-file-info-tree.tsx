@@ -43,10 +43,7 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
   //upon indexing, update the file info tree and expand relevant directories
   useEffect(() => {
     const handleFileUpdate = (updatedFiles: FileInfoTree) => {
-      const sortedFiles = sortFilesAndDirectories(
-        updatedFiles,
-        currentFilePath
-      );
+      const sortedFiles = sortFilesAndDirectories(updatedFiles, null);
       setFileInfoTree(sortedFiles);
       const flattenedFiles = flattenFileInfoTree(sortedFiles);
       setFlattenedFiles(flattenedFiles);
@@ -54,20 +51,20 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
       setExpandedDirectories(directoriesToBeExpanded);
     };
 
-    window.ipcRenderer.receive("files-list", handleFileUpdate);
+    const removeFilesListListener = window.ipcRenderer.receive(
+      "files-list",
+      handleFileUpdate
+    );
 
     return () => {
-      window.ipcRenderer.removeListener("files-list", handleFileUpdate);
+      removeFilesListListener();
     };
   }, [currentFilePath]);
 
   //initial load of files
   useEffect(() => {
-    window.files.getFilesTreeForWindow().then((fetchedFiles) => {
-      const sortedFiles = sortFilesAndDirectories(
-        fetchedFiles,
-        currentFilePath
-      );
+    window.files.getFilesForWindow().then((fetchedFiles) => {
+      const sortedFiles = sortFilesAndDirectories(fetchedFiles, null);
       setFileInfoTree(sortedFiles);
     });
   }, []);
