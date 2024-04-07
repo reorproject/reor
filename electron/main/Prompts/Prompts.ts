@@ -11,8 +11,7 @@ export function createPromptWithContextLimitFromContent(
   tokenize: (text: string) => number[],
   contextLimit: number
 ): PromptWithContextLimit {
-  const queryPrompt = `Given the above: ${query}`;
-  let tokenCount = tokenize(queryPrompt + basePrompt).length;
+  let tokenCount = tokenize(query + basePrompt).length;
 
   const contentArray: string[] = [];
   let cutOffLine: string = "";
@@ -31,7 +30,7 @@ export function createPromptWithContextLimitFromContent(
     }
   }
 
-  const outputPrompt = basePrompt + contentArray.join("") + queryPrompt;
+  const outputPrompt = basePrompt + contentArray.join("") + query;
 
   return {
     prompt: outputPrompt,

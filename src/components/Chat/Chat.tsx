@@ -176,7 +176,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           await window.database.augmentPromptWithFlashcardAgent({
             query: userTextFieldInput,
             llmName,
-            currentFilePath,
+            filePathToBeUsedAsContext: currentFilePath,
           });
 
         console.log("RAG Prompt:", ragPrompt);

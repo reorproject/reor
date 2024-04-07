@@ -211,7 +211,7 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
     "augment-prompt-with-flashcard-agent",
     async (
       event,
-      { query, llmName, currentFilePath }: BasePromptRequirements
+      { query, llmName, filePathToBeUsedAsContext }: BasePromptRequirements
     ): Promise<PromptWithRagResults> => {
       const llmSession = openAISession;
       console.log("llmName:   ", llmName);
@@ -220,12 +220,12 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
       if (!llmConfig) {
         throw new Error(`LLM ${llmName} not configured.`);
       }
-      if (!currentFilePath) {
+      if (!filePathToBeUsedAsContext) {
         throw new Error(
           "Current file path is not provided for flashcard agent."
         );
       }
-      const fileResults = fs.readFileSync(currentFilePath, "utf-8");
+      const fileResults = fs.readFileSync(filePathToBeUsedAsContext, "utf-8");
       const { prompt: promptToCreateAtomicFacts } =
         createPromptWithContextLimitFromContent(
           fileResults,
@@ -267,7 +267,7 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
         "promptToCreateFlashcardsWithAtomicFacts: ",
         promptToCreateFlashcardsWithAtomicFacts
       );
-      const uniqueFilesReferenced = [currentFilePath];
+      const uniqueFilesReferenced = [filePathToBeUsedAsContext];
 
       return {
         ragPrompt: promptToCreateFlashcardsWithAtomicFacts,
