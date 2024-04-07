@@ -6,13 +6,12 @@ export interface PromptWithContextLimit {
 
 export function createPromptWithContextLimitFromContent(
   content: string | DBEntry[],
+  basePrompt: string,
   query: string,
   tokenize: (text: string) => number[],
   contextLimit: number
 ): PromptWithContextLimit {
-  const basePrompt =
-    "Answer the question below based on the following notes:\n ";
-  const queryPrompt = `Question: ${query}`;
+  const queryPrompt = `Given the above: ${query}`;
   let tokenCount = tokenize(queryPrompt + basePrompt).length;
 
   const contentArray: string[] = [];
@@ -24,7 +23,7 @@ export function createPromptWithContextLimitFromContent(
 
   for (const line of contents) {
     const lineWithNewLine = line + "\n";
-    if (tokenize(lineWithNewLine).length + tokenCount < contextLimit) {
+    if (tokenize(lineWithNewLine).length + tokenCount < contextLimit * 0.9) {
       tokenCount += tokenize(lineWithNewLine).length;
       contentArray.push(lineWithNewLine);
     } else if (cutOffLine.length === 0) {

@@ -1,4 +1,6 @@
 import { ipcMain } from "electron";
+import * as fs from "fs";
+
 import { createPromptWithContextLimitFromContent } from "../Prompts/Prompts";
 import { DBEntry, DBQueryResult, DatabaseFields } from "./Schema";
 import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
@@ -83,8 +85,11 @@ export const registerDBSessionHandlers = (
         const filteredResults = searchResults.filter(
           (entry) => entry._distance < MAX_COSINE_DISTANCE
         );
+        const basePrompt =
+          "Answer the question below based on the following notes:\n";
         const { prompt: ragPrompt } = createPromptWithContextLimitFromContent(
           filteredResults,
+          basePrompt,
           query,
           llmSession.getTokenizer(llmName),
           llmConfig.contextLength
@@ -177,9 +182,11 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
           );
           searchResults = [];
         }
-
+        const basePrompt =
+          "Answer the question below based on the following notes:\n";
         const { prompt: ragPrompt } = createPromptWithContextLimitFromContent(
           searchResults,
+          basePrompt,
           query,
           llmSession.getTokenizer(llmName),
           llmConfig.contextLength
@@ -204,7 +211,7 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
     "augment-prompt-with-flashcard-agent",
     async (
       event,
-      { query, llmName }: BasePromptRequirements
+      { query, llmName, currentFilePath }: BasePromptRequirements
     ): Promise<PromptWithRagResults> => {
       const llmSession = openAISession;
       console.log("llmName:   ", llmName);
@@ -213,49 +220,46 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
       if (!llmConfig) {
         throw new Error(`LLM ${llmName} not configured.`);
       }
-
-      let searchResults: DBEntry[] = [];
-      const maxRAGExamples: number = store.get(StoreKeys.MaxRAGExamples);
-      const windowInfo = windowManager.getWindowInfoForContents(event.sender);
-      if (!windowInfo) {
-        throw new Error("Window info not found.");
-      }
-
-      try {
-        searchResults = await windowInfo.dbTableClient.search(
-          query,
-          maxRAGExamples
+      if (!currentFilePath) {
+        throw new Error(
+          "Current file path is not provided for flashcard agent."
         );
-      } catch (error) {
-        searchResults = await windowInfo.dbTableClient.search(
-          query,
-          maxRAGExamples
-        );
-        console.error("Error searching database:", error);
-        throw errorToString(error);
       }
-
+      const fileResults = fs.readFileSync(currentFilePath, "utf-8");
+      const { prompt: promptToCreateAtomicFacts } =
+        createPromptWithContextLimitFromContent(
+          fileResults,
+          "",
+          `Extract atomic facts that can be used for students to study, based on this query: ${query}`,
+          llmSession.getTokenizer(llmName),
+          llmConfig.contextLength
+        );
       const llmGeneratedFacts = await llmSession.response(
         llmName,
         llmConfig,
         [
           {
             role: "system",
-            content: `You are an experienced teacher. Help your student search and curate their notes!`,
+            content: `You are an experienced teacher reading through some notes a student has made and extracting atomic facts. You never come up with your own facts. You generate atomic facts directly from what you read.
+            An atomic fact is a fact that relates to a single piece of knowledge and makes it easy to create a question for which the atomic fact is the answer"`,
           },
           {
             role: "user",
-            content: `Extract atomic facts that can be used for students to study, based on this query: ${query}`,
+            content: promptToCreateAtomicFacts,
           },
         ],
         store.get(StoreKeys.LLMGenerationParameters)
       );
 
       console.log(llmGeneratedFacts);
+      const basePrompt = "Given the following atomic facts:\n";
+      const flashcardQuery =
+        "Create useful FLASHCARDS that can be used for students to study using ONLY the context. Format is Q: <insert question> A: <insert answer>";
       const { prompt: promptToCreateFlashcardsWithAtomicFacts } =
         createPromptWithContextLimitFromContent(
           llmGeneratedFacts.choices[0].message.content || "",
-          `Create useful FLASHCARDS that can be used for students to study using ONLY the context. Format is Q: <insert question> A: <insert answer>`,
+          basePrompt,
+          flashcardQuery,
           llmSession.getTokenizer(llmName),
           llmConfig.contextLength
         );
@@ -263,9 +267,7 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
         "promptToCreateFlashcardsWithAtomicFacts: ",
         promptToCreateFlashcardsWithAtomicFacts
       );
-      const uniqueFilesReferenced = [
-        ...new Set(searchResults.map((entry) => entry.notepath)),
-      ];
+      const uniqueFilesReferenced = [currentFilePath];
 
       return {
         ragPrompt: promptToCreateFlashcardsWithAtomicFacts,

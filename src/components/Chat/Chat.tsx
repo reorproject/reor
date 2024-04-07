@@ -35,7 +35,9 @@ const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
     "Summarize what I have worked on today",
     "Which tasks have I completed this past week?",
   ],
-  [AskOptions.FlashcardAsk]: [],
+  [AskOptions.FlashcardAsk]: [
+    "Create some flashcards based on the current note",
+  ],
 };
 
 type ChatUIMessage = {
@@ -75,7 +77,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   useEffect(() => {
     if (!currentFilePath && askText === AskOptions.AskFile) {
       fileNotSelectedToastId.current = toast.error(
-        "Please open a file before asking questions in ask file mode",
+        `Please open a file before asking questions in ${askText} mode`,
         {}
       ) as string;
     } else if (
@@ -111,18 +113,32 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     const llmName = await window.llm.getDefaultLLMName();
 
     let augmentedPrompt: string = "";
-    try {
-      if (askText === AskOptions.AskFile) {
-        if (!currentFilePath) {
-          console.error(
-            "No current file selected. The lack of a file means that there is no context being loaded into the prompt. Please open a file before trying again"
-          );
 
-          toast.error(
-            "No current file selected. Please open a file before trying again."
-          );
-          return;
-        }
+    if (askText === AskOptions.AskFile || askText === AskOptions.FlashcardAsk) {
+      if (!currentFilePath) {
+        console.error(
+          "No current file selected. The lack of a file means that there is no context being loaded into the prompt. Please open a file before trying again"
+        );
+
+        toast.error(
+          "No current file selected. Please open a file before trying again."
+        );
+        return;
+      }
+    }
+    setMessages([
+      ...newMessages,
+      { role: "user", messageType: "success", content: userTextFieldInput },
+    ]);
+    setCurrentBotMessage({
+      role: "assistant",
+      messageType: "success",
+      content: "thinking deeply.....",
+    });
+    setUserTextFieldInput("");
+
+    try {
+      if (askText === AskOptions.AskFile && currentFilePath) {
         const { prompt, contextCutoffAt } =
           await window.files.augmentPromptWithFile({
             prompt: userTextFieldInput,
@@ -155,12 +171,12 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           );
         augmentedPrompt = ragPrompt;
         setFilesReferenced(uniqueFilesReferenced);
-      } else if (askText === AskOptions.FlashcardAsk) {
-        console.log(llmName);
+      } else if (askText === AskOptions.FlashcardAsk && currentFilePath) {
         const { ragPrompt, uniqueFilesReferenced } =
           await window.database.augmentPromptWithFlashcardAgent({
             query: userTextFieldInput,
             llmName,
+            currentFilePath,
           });
 
         console.log("RAG Prompt:", ragPrompt);
@@ -181,12 +197,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     }
 
     startStreamingResponse(llmName, augmentedPrompt);
-
-    setMessages([
-      ...newMessages,
-      { role: "user", messageType: "success", content: userTextFieldInput },
-    ]);
-    setUserTextFieldInput("");
+    setCurrentBotMessage(null);
   };
 
   const addCollapsibleDetailsInMarkdown = (content: string, title: string) => {

@@ -57,6 +57,7 @@ declare global {
       augmentPromptWithFlashcardAgent: ({
         query,
         llmName,
+        currentFilePath,
       }: BasePromptRequirements) => Promise<PromptWithRagResults>;
       getDatabaseFields: () => Promise<Record<string, string>>;
     };
@@ -161,11 +162,13 @@ contextBridge.exposeInMainWorld("database", {
   augmentPromptWithFlashcardAgent: async ({
     query,
     llmName,
+    currentFilePath,
   }: BasePromptRequirements): Promise<PromptWithRagResults> => {
     console.log(llmName, query);
     return ipcRenderer.invoke("augment-prompt-with-flashcard-agent", {
       query,
       llmName,
+      currentFilePath,
     });
   },
   getDatabaseFields: async (): Promise<Record<string, string>> => {
