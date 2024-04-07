@@ -75,14 +75,17 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
   const fileNotSelectedToastId = useRef<string | null>(null);
   useEffect(() => {
-    if (!currentFilePath && askText === AskOptions.AskFile) {
+    if (
+      !currentFilePath &&
+      (askText === AskOptions.AskFile || askText === AskOptions.FlashcardAsk)
+    ) {
       fileNotSelectedToastId.current = toast.error(
         `Please open a file before asking questions in ${askText} mode`,
         {}
       ) as string;
     } else if (
       currentFilePath &&
-      askText === AskOptions.AskFile &&
+      (askText === AskOptions.AskFile || askText === AskOptions.FlashcardAsk) &&
       fileNotSelectedToastId.current
     ) {
       toast.dismiss(fileNotSelectedToastId.current);
@@ -91,6 +94,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
   const handleSubmitNewMessage = async () => {
     if (loadingResponse) return;
+    if (!userTextFieldInput.trim()) return;
+
     let newMessages = messages;
     if (currentBotMessage) {
       newMessages = [
@@ -109,7 +114,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         role: "assistant",
       });
     }
-    if (!userTextFieldInput.trim()) return;
+
     const llmName = await window.llm.getDefaultLLMName();
 
     let augmentedPrompt: string = "";
@@ -165,10 +170,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         augmentedPrompt = ragPrompt;
       } else if (askText === AskOptions.TemporalAsk) {
         const { ragPrompt, uniqueFilesReferenced } =
-          await window.database.augmentPromptWithTemporalAgent(
-            userTextFieldInput,
-            llmName
-          );
+          await window.database.augmentPromptWithTemporalAgent({
+            query: userTextFieldInput,
+            llmName,
+          });
         augmentedPrompt = ragPrompt;
         setFilesReferenced(uniqueFilesReferenced);
       } else if (askText === AskOptions.FlashcardAsk && currentFilePath) {

@@ -50,10 +50,10 @@ declare global {
         llmName: string,
         filter?: string
       ) => Promise<PromptWithRagResults>;
-      augmentPromptWithTemporalAgent: (
-        prompt: string,
-        llmName: string
-      ) => Promise<PromptWithRagResults>;
+      augmentPromptWithTemporalAgent: ({
+        query,
+        llmName,
+      }: BasePromptRequirements) => Promise<PromptWithRagResults>;
       augmentPromptWithFlashcardAgent: ({
         query,
         llmName,
@@ -149,15 +149,14 @@ contextBridge.exposeInMainWorld("database", {
       filter
     );
   },
-  augmentPromptWithTemporalAgent: async (
-    prompt: string,
-    llmName: string
-  ): Promise<PromptWithRagResults> => {
-    return ipcRenderer.invoke(
-      "augment-prompt-with-temporal-agent",
-      prompt,
-      llmName
-    );
+  augmentPromptWithTemporalAgent: async ({
+    query,
+    llmName,
+  }: BasePromptRequirements): Promise<PromptWithRagResults> => {
+    return ipcRenderer.invoke("augment-prompt-with-temporal-agent", {
+      query,
+      llmName,
+    });
   },
   augmentPromptWithFlashcardAgent: async ({
     query,
