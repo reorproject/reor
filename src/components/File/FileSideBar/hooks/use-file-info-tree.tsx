@@ -63,7 +63,7 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
 
   //initial load of files
   useEffect(() => {
-    window.files.getFilesForWindow().then((fetchedFiles) => {
+    window.files.getFilesTreeForWindow().then((fetchedFiles) => {
       const sortedFiles = sortFilesAndDirectories(fetchedFiles, null);
       setFileInfoTree(sortedFiles);
     });

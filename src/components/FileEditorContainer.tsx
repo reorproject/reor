@@ -29,8 +29,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     }
   });
 
-  const { files, flattenedFiles, expandedDirectories, handleDirectoryToggle } =
-    useFileInfoTree(filePath);
   const {
     filePath,
     editor,
@@ -45,6 +43,9 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     navigationHistory,
     setNavigationHistory,
   } = useFileByFilepath();
+
+  const { files, flattenedFiles, expandedDirectories, handleDirectoryToggle } =
+    useFileInfoTree(filePath);
 
   const toggleChatbot = () => {
     setShowChatbot(!showChatbot);
