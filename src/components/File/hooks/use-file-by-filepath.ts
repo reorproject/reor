@@ -58,8 +58,33 @@ export const useFileByFilepath = () => {
     transformCopiedText: false, // Copied text is transformed to markdown
   });
 
-  const testOpenFile = async (filePath: string) => {
-    console.log(filePath);
+  const openFileByPath = async (newFilePath: string) => {
+    setCurrentlyChangingFilePath(true);
+    await saveEditorContentToPath(editor, currentlyOpenedFilePath, true);
+    const newFileContent = (await window.files.readFile(newFilePath)) ?? "";
+    editor?.commands.setContent(newFileContent);
+    setCurrentlyOpenedFilePath(newFilePath);
+    setCurrentlyChangingFilePath(false);
+  };
+
+  const resolveRelativePath = (relativePath: string): string => {
+    const relativePathWithExtension =
+      window.path.addExtensionIfNoExtensionPresent(relativePath);
+    const absolutePath = window.path.join(
+      window.electronStore.getVaultDirectory(),
+      relativePathWithExtension
+    );
+    return absolutePath;
+  };
+
+  const openResolvedPath = async (relativePath: string) => {
+    const absolutePath = resolveRelativePath(relativePath);
+    // here we could check if the file exists and if not, create it:
+    const fileExists = await window.files.checkFileExists(absolutePath);
+    if (!fileExists) {
+      await window.files.createFile(absolutePath, "");
+    }
+    openFileByPath(absolutePath);
   };
 
   const editor = useEditor({
@@ -81,7 +106,7 @@ export const useFileByFilepath = () => {
       }),
       // Commands,
       // slashCommand,
-      BacklinkExtension(testOpenFile, setSuggestionsState),
+      BacklinkExtension(setSuggestionsState),
       // .configure({
       //   suggestion: {
       //     // items: getSuggestionItems,
@@ -92,24 +117,6 @@ export const useFileByFilepath = () => {
       // RichTextLink,
     ],
   });
-
-  useEffect(() => {
-    const handleClick = (event) => {
-      const element = event.target;
-      if (element.tagName === "A" && element.href) {
-        event.preventDefault();
-        window.electron.openExternal(element.href);
-      }
-    };
-
-    // Add event listener to document to capture click events
-    document.addEventListener("click", handleClick);
-
-    // Cleanup
-    return () => {
-      document.removeEventListener("click", handleClick);
-    };
-  }, []);
 
   const [debouncedEditor] = useDebounce(editor?.state.doc.content, 4000);
 
@@ -133,34 +140,21 @@ export const useFileByFilepath = () => {
     filePath: string | null,
     indexFileInDatabase: boolean = false
   ) => {
-    if (
-      filePath !== null &&
-      isFileContentModified
-    ) {
-    const markdownContent = getMarkdown(editor);
-    if (markdownContent !== null) {
-      await window.files.writeFile({
-        filePath: filePath,
-        content: markdownContent,
-      });
+    if (filePath !== null && isFileContentModified && editor) {
+      const markdownContent = getMarkdown(editor);
+      if (markdownContent !== null) {
+        await window.files.writeFile({
+          filePath: filePath,
+          content: markdownContent,
+        });
 
-      setIsFileContentModified(false);
+        setIsFileContentModified(false);
 
-      if (indexFileInDatabase) {
-        window.files.indexFileInDatabase(filePath);
+        if (indexFileInDatabase) {
+          window.files.indexFileInDatabase(filePath);
+        }
       }
     }
-    }
-  };
-
-  const openFileByPath = async (newFilePath: string) => {
-    setCurrentlyChangingFilePath(true);
-    await saveEditorContentToPath(editor, currentlyOpenedFilePath, true);
-    const fileContent = (await window.files.readFile(newFilePath)) ?? "";
-    setCurrentlyOpenedFilePath(newFilePath);
-
-    editor?.commands.setContent(fileContent);
-    setCurrentlyChangingFilePath(false);
   };
 
   // delete file depending on file path returned by the listener
@@ -266,6 +260,7 @@ export const useFileByFilepath = () => {
     navigationHistory,
     setNavigationHistory,
     openFileByPath,
+    openResolvedPath,
     suggestionsState,
     noteToBeRenamed,
     setNoteToBeRenamed,

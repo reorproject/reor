@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 import ChatWithLLM from "./Chat/Chat";
@@ -20,19 +20,11 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const [showSimilarFiles, setShowSimilarFiles] = useState<boolean>(true);
   const [sidebarShowing, setSidebarShowing] =
     useState<SidebarAbleToShow>("files");
-  document.addEventListener("click", (e) => {
-    const target = e.target as HTMLElement;
-    if (target.classList.contains("backlink")) {
-      const backlinkText = target.innerText;
-      console.log("Backlink clicked", backlinkText);
-      // Here you can define your custom click handler logic
-    }
-  });
-
   const {
     filePath,
     editor,
     openFileByPath,
+    openResolvedPath,
     saveCurrentlyOpenedFile,
     suggestionsState,
     noteToBeRenamed,
@@ -53,6 +45,23 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const toggleSimilarFiles = () => {
     setShowSimilarFiles(!showSimilarFiles);
   };
+
+  useEffect(() => {
+    const handleClick = (event) => {
+      const target = event.target;
+      if (target.getAttribute("data-backlink") === "true") {
+        event.preventDefault();
+        const backlinkPath = target.textContent;
+        openResolvedPath(backlinkPath);
+      }
+    };
+
+    document.addEventListener("click", handleClick);
+
+    return () => {
+      document.removeEventListener("click", handleClick);
+    };
+  }, [openResolvedPath]);
 
   return (
     <div>
@@ -87,7 +96,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         />
       )}
       <div className="flex h-below-titlebar">
-        <div className="w-[40px] border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid">
+        <div className="w-[35px] border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid">
           <LeftSidebar
             onFileSelect={openFileByPath}
             sidebarShowing={sidebarShowing}

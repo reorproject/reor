@@ -40,7 +40,7 @@ const App: React.FC<AppProps> = () => {
   }, []);
 
   useEffect(() => {
-    const initialDirectory = window.electronStore.getUserDirectory();
+    const initialDirectory = window.electronStore.getVaultDirectory();
     const defaultEmbedFunc = window.electronStore.getDefaultEmbeddingModel();
     if (initialDirectory && defaultEmbedFunc) {
       setUserHasConfiguredSettingsForIndexing(true);

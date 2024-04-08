@@ -14,7 +14,6 @@ export interface SuggestionsState {
 }
 
 const backlinkPlugin = (
-  openFileFunction: (newFilePath: string) => Promise<void>,
   updateSuggestionsState: (state: SuggestionsState) => void
 ) => {
   let hideTimeout: NodeJS.Timeout | null = null;
@@ -66,7 +65,6 @@ const backlinkPlugin = (
             lastOpeningBracketIndex + 2,
             from
           );
-          console.log("Text to the left:", textToLeft);
 
           const coords = view.coordsAtPos(from);
           updateSuggestionsState({
@@ -140,6 +138,7 @@ const backlinkPlugin = (
                 Decoration.inline(backlinkStart, backlinkEnd, {
                   style:
                     "color: blue; text-decoration: underline; cursor: pointer;",
+                  "data-backlink": "true",
                 })
               );
             }
@@ -180,31 +179,13 @@ const backlinkPlugin = (
           return false;
         },
         blur: () => {
-          console.log("Blur event triggered"); // Add this line for debugging
           // Set a timeout to hide the suggestions after a short delay
           hideTimeout = setTimeout(() => {
-            console.log("Hiding suggestions"); // Add this line for debugging
             updateSuggestionsState({
               suggestions: [],
             });
           }, 500); // Adjust the delay as needed (in milliseconds)
           return true;
-        },
-        click: (view, event) => {
-          const { target } = event;
-          if (target instanceof HTMLElement) {
-            // Check if the clicked element or its parent is a backlink-text
-            // This might need adjustment depending on how you identify backlink-text elements
-            const isBacklinkText =
-              target.style.color === "blue" &&
-              target.style.textDecoration === "underline";
-            if (isBacklinkText) {
-              const textContent = target.textContent || "";
-              openFileFunction(textContent);
-              return true; // Indicate that this event is handled
-            }
-          }
-          return false; // Not handled
         },
       },
     },
@@ -212,13 +193,13 @@ const backlinkPlugin = (
 };
 
 export const BacklinkExtension = (
-  openFileFunction: (newFilePath: string) => Promise<void>,
+  // openFileFunction: (newFilePath: string) => Promise<void>,
   updateSuggestionsState: (state: SuggestionsState) => void
 ) =>
   Extension.create({
     name: "backlink",
 
     addProseMirrorPlugins() {
-      return [backlinkPlugin(openFileFunction, updateSuggestionsState)];
+      return [backlinkPlugin(updateSuggestionsState)];
     },
   });

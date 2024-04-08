@@ -185,9 +185,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       if (chunk.choices[0].finish_reason && filesReferenced.length > 0) {
         const newBulletedFiles = filesReferenced.map((file, index) => {
           const simplifiedFilePath = file.startsWith(
-            window.electronStore.getUserDirectory()
+            window.electronStore.getVaultDirectory()
           )
-            ? file.replace(window.electronStore.getUserDirectory() + "/", "")
+            ? file.replace(window.electronStore.getVaultDirectory() + "/", "")
             : file;
           return ` ${index + 1}. [${simplifiedFilePath}](#)`;
         });
