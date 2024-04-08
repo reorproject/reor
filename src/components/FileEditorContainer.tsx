@@ -47,12 +47,12 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   };
 
   useEffect(() => {
-    const handleClick = (event) => {
-      const target = event.target;
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
       if (target.getAttribute("data-backlink") === "true") {
         event.preventDefault();
         const backlinkPath = target.textContent;
-        openResolvedPath(backlinkPath);
+        if (backlinkPath) openResolvedPath(backlinkPath);
       }
     };
 
