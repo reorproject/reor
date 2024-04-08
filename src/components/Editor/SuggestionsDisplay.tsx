@@ -41,7 +41,7 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
       return;
     }
     const { top, left } = suggestionsState.position;
-    const { height, width } = suggestionsRef.current.getBoundingClientRect();
+    const { height } = suggestionsRef.current.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
     const shouldDisplayAbove = top + height > viewportHeight && top > height;
 
@@ -55,27 +55,21 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
   if (filteredSuggestions.length === 0) return null;
 
   return (
+    // Assuming `suggestion` has a unique identifier `id` we can use as a key.
     <div
       ref={suggestionsRef}
+      className="absolute rounded bg-white border border-black  z-50 max-w-sm break-words whitespace-normal"
       style={{
-        position: "absolute",
         left: `${layout.left}px`,
         top: `${layout.top}px`,
         display: layout.display,
-        backgroundColor: "white",
-        border: "1px solid black",
-        padding: "10px",
-        zIndex: 1000,
-        maxWidth: "300px",
-        overflowWrap: "break-word",
-        whiteSpace: "normal",
       }}
     >
-      <ul style={{ margin: 0, padding: 0, listStyleType: "none" }}>
-        {filteredSuggestions.map((suggestion, index) => (
+      <ul className="m-0 p-0 list-none">
+        {filteredSuggestions.map((suggestion) => (
           <li
-            key={index}
-            style={{ padding: "5px", cursor: "pointer" }}
+            key={suggestion} // Use a unique id property from the suggestion
+            className="p-1.25 cursor-pointer hover:bg-gray-100 p-1 text-sm rounded"
             onClick={() => {
               suggestionsState.onSelect?.(suggestion);
             }}

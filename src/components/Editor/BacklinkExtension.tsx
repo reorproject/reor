@@ -137,7 +137,7 @@ const backlinkPlugin = (
               decorations.push(
                 Decoration.inline(backlinkStart, backlinkEnd, {
                   style:
-                    "color: blue; text-decoration: underline; cursor: pointer;",
+                    "color: #92c8fc; text-decoration: underline; cursor: pointer;",
                   "data-backlink": "true",
                 })
               );
