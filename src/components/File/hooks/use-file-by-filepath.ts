@@ -15,6 +15,7 @@ import {
   BacklinkExtension,
   SuggestionsState,
 } from "@/components/Editor/BacklinkExtension";
+import { removeFileExtension } from "@/functions/strings";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
@@ -79,10 +80,15 @@ export const useFileByFilepath = () => {
 
   const openResolvedPath = async (relativePath: string) => {
     const absolutePath = resolveRelativePath(relativePath);
+
     // here we could check if the file exists and if not, create it:
     const fileExists = await window.files.checkFileExists(absolutePath);
     if (!fileExists) {
-      await window.files.createFile(absolutePath, "");
+      const basename = await window.path.basename(absolutePath);
+      await window.files.createFile(
+        absolutePath,
+        "## " + removeFileExtension(basename) + "\n"
+      );
     }
     openFileByPath(absolutePath);
   };
