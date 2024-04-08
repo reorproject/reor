@@ -56,7 +56,6 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
   if (filteredSuggestions.length === 0) return null;
 
   return (
-    // Assuming `suggestion` has a unique identifier `id` we can use as a key.
     <div
       ref={suggestionsRef}
       className="absolute rounded bg-white border border-black  z-50 max-w-sm break-words whitespace-normal"
