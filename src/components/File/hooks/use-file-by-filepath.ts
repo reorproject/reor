@@ -63,20 +63,13 @@ export const useFileByFilepath = () => {
     setCurrentlyChangingFilePath(false);
   };
 
-  const resolveRelativePath = (relativePath: string): string => {
+  const openRelativePath = async (relativePath: string): Promise<string> => {
     const relativePathWithExtension =
       window.path.addExtensionIfNoExtensionPresent(relativePath);
     const absolutePath = window.path.join(
       window.electronStore.getVaultDirectory(),
       relativePathWithExtension
     );
-    return absolutePath;
-  };
-
-  const openResolvedPath = async (relativePath: string) => {
-    const absolutePath = resolveRelativePath(relativePath);
-
-    // here we could check if the file exists and if not, create it:
     const fileExists = await window.files.checkFileExists(absolutePath);
     if (!fileExists) {
       const basename = await window.path.basename(absolutePath);
@@ -86,7 +79,15 @@ export const useFileByFilepath = () => {
       );
     }
     openFileByPath(absolutePath);
+    return absolutePath;
   };
+
+  // const openResolvedPath = async (relativePath: string) => {
+  //   const absolutePath = resolveRelativePath(relativePath);
+
+  //   // here we could check if the file exists and if not, create it:
+
+  // };
 
   const editor = useEditor({
     autofocus: true,
@@ -251,7 +252,7 @@ export const useFileByFilepath = () => {
     navigationHistory,
     setNavigationHistory,
     openFileByPath,
-    openResolvedPath,
+    openRelativePath,
     suggestionsState,
     noteToBeRenamed,
     setNoteToBeRenamed,

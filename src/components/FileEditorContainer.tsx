@@ -24,7 +24,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     filePath,
     editor,
     openFileByPath,
-    openResolvedPath,
+    openRelativePath,
     saveCurrentlyOpenedFile,
     suggestionsState,
     noteToBeRenamed,
@@ -47,12 +47,12 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   };
 
   useEffect(() => {
-    const handleClick = (event: MouseEvent) => {
+    const handleClick = async (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       if (target.getAttribute("data-backlink") === "true") {
         event.preventDefault();
         const backlinkPath = target.textContent;
-        if (backlinkPath) openResolvedPath(backlinkPath);
+        if (backlinkPath) await openRelativePath(backlinkPath);
       }
     };
 
@@ -61,7 +61,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     return () => {
       document.removeEventListener("click", handleClick);
     };
-  }, [openResolvedPath]);
+  }, [openRelativePath]);
 
   return (
     <div>
