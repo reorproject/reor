@@ -131,10 +131,14 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                   style={{ wordBreak: "break-word" }}
                   editor={editor}
                 />
-                <InEditorBacklinkSuggestionsDisplay
-                  suggestionsState={suggestionsState}
-                  suggestions={flattenedFiles.map((file) => file.relativePath)}
-                />
+                {suggestionsState && (
+                  <InEditorBacklinkSuggestionsDisplay
+                    suggestionsState={suggestionsState}
+                    suggestions={flattenedFiles.map(
+                      (file) => file.relativePath
+                    )}
+                  />
+                )}
               </div>
               {showSimilarFiles && (
                 <ResizableComponent resizeSide="left" initialWidth={400}>

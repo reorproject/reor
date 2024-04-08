@@ -9,22 +9,17 @@ import Text from "@tiptap/extension-text";
 import "../tiptap.scss";
 import { useDebounce } from "use-debounce";
 import { Markdown } from "tiptap-markdown";
-import { RichTextLink } from "@/components/Editor/RichTextLink";
 
-import {
-  BacklinkExtension,
-  SuggestionsState,
-} from "@/components/Editor/BacklinkExtension";
+import { BacklinkExtension } from "@/components/Editor/BacklinkExtension";
 import { removeFileExtension } from "@/functions/strings";
+import { SuggestionsState } from "@/components/Editor/SuggestionsDisplay";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
     string | null
   >(null);
-  const [suggestionsState, setSuggestionsState] = useState<SuggestionsState>({
-    suggestions: [],
-    position: { left: 0, top: 0 },
-  });
+  const [suggestionsState, setSuggestionsState] =
+    useState<SuggestionsState | null>();
   const [isFileContentModified, setIsFileContentModified] =
     useState<boolean>(false);
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>("");
@@ -110,17 +105,7 @@ export const useFileByFilepath = () => {
       TaskItem.configure({
         nested: true,
       }),
-      // Commands,
-      // slashCommand,
       BacklinkExtension(setSuggestionsState),
-      // .configure({
-      //   suggestion: {
-      //     // items: getSuggestionItems,
-      //     // render: renderItems
-      //   }
-      // })
-
-      // RichTextLink,
     ],
   });
 

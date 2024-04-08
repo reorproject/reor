@@ -1,10 +1,10 @@
 import { removeFileExtension } from "@/functions/strings";
 import React, { useRef, useEffect, useState, useMemo } from "react";
 
-interface SuggestionsState {
-  text: string;
+export interface SuggestionsState {
+  textWithinBrackets: string;
   position: { top: number; left: number };
-  onSelect?: (suggestion: string) => void;
+  onSelect: (suggestion: string) => void;
 }
 
 interface SuggestionsDisplayProps {
@@ -24,13 +24,14 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
   });
 
   const filteredSuggestions = useMemo(() => {
-    if (!suggestionsState.text) return [];
-    const lowerCaseText = suggestionsState.text.toLowerCase();
+    if (!suggestionsState.textWithinBrackets) return [];
+    console.log("suggestionsState.text", suggestionsState.textWithinBrackets);
+    const lowerCaseText = suggestionsState.textWithinBrackets.toLowerCase();
     return suggestions
       .filter((suggestion) => suggestion.toLowerCase().includes(lowerCaseText))
       .map(removeFileExtension)
       .slice(0, 5);
-  }, [suggestions, suggestionsState.text]);
+  }, [suggestions, suggestionsState.textWithinBrackets]);
 
   useEffect(() => {
     if (
