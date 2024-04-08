@@ -18,6 +18,7 @@ import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
 import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
+import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
 
@@ -49,10 +50,15 @@ declare global {
         llmName: string,
         filter?: string
       ) => Promise<PromptWithRagResults>;
-      augmentPromptWithTemporalAgent: (
-        prompt: string,
-        llmName: string
-      ) => Promise<PromptWithRagResults>;
+      augmentPromptWithTemporalAgent: ({
+        query,
+        llmName,
+      }: BasePromptRequirements) => Promise<PromptWithRagResults>;
+      augmentPromptWithFlashcardAgent: ({
+        query,
+        llmName,
+        filePathToBeUsedAsContext,
+      }: BasePromptRequirements) => Promise<PromptWithRagResults>;
       getDatabaseFields: () => Promise<Record<string, string>>;
     };
     files: {
@@ -145,15 +151,26 @@ contextBridge.exposeInMainWorld("database", {
       filter
     );
   },
-  augmentPromptWithTemporalAgent: async (
-    prompt: string,
-    llmName: string
-  ): Promise<PromptWithRagResults> => {
-    return ipcRenderer.invoke(
-      "augment-prompt-with-temporal-agent",
-      prompt,
-      llmName
-    );
+  augmentPromptWithTemporalAgent: async ({
+    query,
+    llmName,
+  }: BasePromptRequirements): Promise<PromptWithRagResults> => {
+    return ipcRenderer.invoke("augment-prompt-with-temporal-agent", {
+      query,
+      llmName,
+    });
+  },
+  augmentPromptWithFlashcardAgent: async ({
+    query,
+    llmName,
+    filePathToBeUsedAsContext,
+  }: BasePromptRequirements): Promise<PromptWithRagResults> => {
+    console.log(llmName, query);
+    return ipcRenderer.invoke("augment-prompt-with-flashcard-agent", {
+      query,
+      llmName,
+      filePathToBeUsedAsContext,
+    });
   },
   getDatabaseFields: async (): Promise<Record<string, string>> => {
     return ipcRenderer.invoke("get-database-fields");

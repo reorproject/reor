@@ -219,9 +219,11 @@ export const registerFileHandlers = (
         if (!llmConfig) {
           throw new Error(`LLM ${llmName} not configured.`);
         }
+        const systemPrompt = "Based on the following information:\n";
         const { prompt: filePrompt, contextCutoffAt } =
           createPromptWithContextLimitFromContent(
             content,
+            systemPrompt,
             prompt,
             llmSession.getTokenizer(llmName),
             llmConfig.contextLength

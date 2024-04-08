@@ -21,6 +21,7 @@ enum AskOptions {
   Ask = "Ask",
   AskFile = "Ask File",
   TemporalAsk = "Temporal Ask",
+  FlashcardAsk = "Flashcard Ask",
 }
 const ASK_OPTIONS = Object.values(AskOptions);
 
@@ -33,6 +34,9 @@ const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
   [AskOptions.TemporalAsk]: [
     "Summarize what I have worked on today",
     "Which tasks have I completed this past week?",
+  ],
+  [AskOptions.FlashcardAsk]: [
+    "Create some flashcards based on the current note",
   ],
 };
 
@@ -54,7 +58,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>("");
   const [messages, setMessages] = useState<ChatUIMessage[]>([]);
   const [defaultModel, setDefaultModel] = useState<string>("");
-  const [askText, setAskText] = useState<string>("Ask");
+  const [askText, setAskText] = useState<AskOptions>(AskOptions.Ask);
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
   const [filesReferenced, setFilesReferenced] = useState<string[]>([]);
   const [currentBotMessage, setCurrentBotMessage] =
@@ -71,14 +75,17 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
   const fileNotSelectedToastId = useRef<string | null>(null);
   useEffect(() => {
-    if (!currentFilePath && askText === AskOptions.AskFile) {
+    if (
+      !currentFilePath &&
+      (askText === AskOptions.AskFile || askText === AskOptions.FlashcardAsk)
+    ) {
       fileNotSelectedToastId.current = toast.error(
-        "Please open a file before asking questions in ask file mode",
+        `Please open a file before asking questions in ${askText} mode`,
         {}
       ) as string;
     } else if (
       currentFilePath &&
-      askText === AskOptions.AskFile &&
+      (askText === AskOptions.AskFile || askText === AskOptions.FlashcardAsk) &&
       fileNotSelectedToastId.current
     ) {
       toast.dismiss(fileNotSelectedToastId.current);
@@ -87,6 +94,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
   const handleSubmitNewMessage = async () => {
     if (loadingResponse) return;
+    if (!userTextFieldInput.trim()) return;
+
     let newMessages = messages;
     if (currentBotMessage) {
       newMessages = [
@@ -105,22 +114,36 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         role: "assistant",
       });
     }
-    if (!userTextFieldInput.trim()) return;
+
     const llmName = await window.llm.getDefaultLLMName();
 
     let augmentedPrompt: string = "";
-    try {
-      if (askText === AskOptions.AskFile) {
-        if (!currentFilePath) {
-          console.error(
-            "No current file selected. The lack of a file means that there is no context being loaded into the prompt. Please open a file before trying again"
-          );
 
-          toast.error(
-            "No current file selected. Please open a file before trying again."
-          );
-          return;
-        }
+    if (askText === AskOptions.AskFile || askText === AskOptions.FlashcardAsk) {
+      if (!currentFilePath) {
+        console.error(
+          "No current file selected. The lack of a file means that there is no context being loaded into the prompt. Please open a file before trying again"
+        );
+
+        toast.error(
+          "No current file selected. Please open a file before trying again."
+        );
+        return;
+      }
+    }
+    setMessages([
+      ...newMessages,
+      { role: "user", messageType: "success", content: userTextFieldInput },
+    ]);
+    setCurrentBotMessage({
+      role: "assistant",
+      messageType: "success",
+      content: "thinking deeply.....",
+    });
+    setUserTextFieldInput("");
+
+    try {
+      if (askText === AskOptions.AskFile && currentFilePath) {
         const { prompt, contextCutoffAt } =
           await window.files.augmentPromptWithFile({
             prompt: userTextFieldInput,
@@ -147,12 +170,25 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         augmentedPrompt = ragPrompt;
       } else if (askText === AskOptions.TemporalAsk) {
         const { ragPrompt, uniqueFilesReferenced } =
-          await window.database.augmentPromptWithTemporalAgent(
-            userTextFieldInput,
-            llmName
-          );
+          await window.database.augmentPromptWithTemporalAgent({
+            query: userTextFieldInput,
+            llmName,
+          });
         augmentedPrompt = ragPrompt;
         setFilesReferenced(uniqueFilesReferenced);
+      } else if (askText === AskOptions.FlashcardAsk && currentFilePath) {
+        const { ragPrompt, uniqueFilesReferenced } =
+          await window.database.augmentPromptWithFlashcardAgent({
+            query: userTextFieldInput,
+            llmName,
+            filePathToBeUsedAsContext: currentFilePath,
+          });
+
+        console.log("RAG Prompt:", ragPrompt);
+        console.log("Unique files referenced:", uniqueFilesReferenced);
+
+        setFilesReferenced(uniqueFilesReferenced);
+        augmentedPrompt = ragPrompt;
       }
     } catch (error) {
       console.error("Failed to augment prompt:", error);
@@ -166,12 +202,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     }
 
     startStreamingResponse(llmName, augmentedPrompt);
-
-    setMessages([
-      ...newMessages,
-      { role: "user", messageType: "success", content: userTextFieldInput },
-    ]);
-    setUserTextFieldInput("");
+    setCurrentBotMessage(null);
   };
 
   const addCollapsibleDetailsInMarkdown = (content: string, title: string) => {
