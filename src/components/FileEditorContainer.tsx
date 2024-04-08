@@ -7,7 +7,7 @@ import ResizableComponent from "./Generic/ResizableComponent";
 import SidebarManager from "./Sidebars/MainSidebar";
 import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
 import { EditorContent } from "@tiptap/react";
-import InEditorBacklinkSuggestionsDisplay from "./Editor/SuggestionsDisplay";
+import InEditorBacklinkSuggestionsDisplay from "./Editor/BacklinkSuggestionsDisplay";
 import { useFileInfoTree } from "./File/FileSideBar/hooks/use-file-info-tree";
 import RenameNoteModal from "./File/RenameNote";
 import RenameDirModal from "./File/RenameDirectory";

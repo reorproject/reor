@@ -12,7 +12,7 @@ import { Markdown } from "tiptap-markdown";
 
 import { BacklinkExtension } from "@/components/Editor/BacklinkExtension";
 import { removeFileExtension } from "@/functions/strings";
-import { SuggestionsState } from "@/components/Editor/SuggestionsDisplay";
+import { SuggestionsState } from "@/components/Editor/BacklinkSuggestionsDisplay";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<

@@ -1,11 +1,12 @@
 import { Extension } from "@tiptap/core";
 import { Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
-import { SuggestionsState } from "./SuggestionsDisplay";
+import { SuggestionsState } from "./BacklinkSuggestionsDisplay";
 
 const backlinkPlugin = (
   updateSuggestionsState: (state: SuggestionsState | null) => void
 ) => {
+  // Timeout to hide the suggestions after a certain amount of time. This is needed so that blur or focusout events don't hide the suggestions immediately.
   let hideTimeout: NodeJS.Timeout | null = null;
 
   return new Plugin({
@@ -15,7 +16,6 @@ const backlinkPlugin = (
         return DecorationSet.create(doc, []);
       },
       apply(tr, set) {
-        // Logic to update decorations based on document changes
         return set.map(tr.mapping, tr.doc);
       },
     },
@@ -26,17 +26,14 @@ const backlinkPlugin = (
           const { doc, selection } = state;
           const { from } = selection;
 
-          // Clear the previous timeout if it exists
           if (hideTimeout) {
             clearTimeout(hideTimeout);
           }
 
-          // Check if the editor does not have focus
           if (!view.hasFocus()) {
-            // Set a timeout to hide the suggestions after a short delay
             hideTimeout = setTimeout(() => {
               updateSuggestionsState(null);
-            }, 1000); // Adjust the delay as needed (in milliseconds)
+            }, 1000);
             return;
           }
 
@@ -82,7 +79,6 @@ const backlinkPlugin = (
           });
         },
         destroy: () => {
-          // Clear the timeout when the view is destroyed
           if (hideTimeout) {
             clearTimeout(hideTimeout);
           }
