@@ -111,14 +111,35 @@ export const useFileByFilepath = () => {
       }
     }
   };
+  const findTextPosition = (
+    editor: Editor | null,
+    searchString: string
+  ): number | undefined => {
+    const position = editor?.state.doc.textContent.indexOf(searchString);
 
-  const openFileByPath = async (newFilePath: string) => {
+    return position;
+  };
+  const openFileByPath = async (newFilePath: string, content?: string) => {
     setCurrentlyChangingFilePath(true);
     await saveEditorContentToPath(editor, currentlyOpenedFilePath, true);
     const fileContent = (await window.files.readFile(newFilePath)) ?? "";
     setCurrentlyOpenedFilePath(newFilePath);
 
     editor?.commands.setContent(fileContent);
+    console.log(content);
+    if (content) {
+      const textPos = findTextPosition(editor, content);
+      console.log("textpos", textPos);
+      textPos
+        ? editor?.commands.setTextSelection({
+            from: textPos,
+            to: textPos + removeMd(content).length,
+          })
+        : undefined;
+
+      editor?.commands.focus();
+      editor?.commands.scrollIntoView();
+    }
     setCurrentlyChangingFilePath(false);
   };
 
