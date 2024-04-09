@@ -43,6 +43,8 @@ const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
 };
 
 const FILE_REFERENCE_DELIMITER = "\n -- -- -- \n";
+const QUESTION_FORMAT = "Q:";
+const ANSWER_FORMAT = "A:";
 
 type ChatUIMessage = {
   role: "user" | "assistant";
@@ -273,10 +275,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       FILE_REFERENCE_DELIMITER
     );
     return actualOutput.split("<br/><br/>").map((line) => {
-      const [question, answer] = line.split("<br/>");
+      const [question, answer] = line.split("<br/>"); // it is always in the order of Q: and A:
       return {
-        question: question.split(":").pop()?.trim() || "",
-        answer: answer.split(":").pop()?.trim() || "",
+        question: question.replace(QUESTION_FORMAT, "").trim(),
+        answer: answer.replace(ANSWER_FORMAT, "").trim(),
       };
     });
   };
@@ -386,8 +388,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           )}
         </div>
         {canGenerateFlashcard &&
-          currentBotMessage?.content.includes("Q:") &&
-          currentBotMessage?.content.includes("A:") && (
+          currentBotMessage?.content.includes(QUESTION_FORMAT) &&
+          currentBotMessage?.content.includes(ANSWER_FORMAT) && (
             <ChatAction
               actionText="Convert to flashcard"
               onClick={async () => {
