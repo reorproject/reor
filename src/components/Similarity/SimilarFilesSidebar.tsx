@@ -113,21 +113,6 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     setUserHitRefresh(false);
   }, [filePath]);
 
-  useEffect(() => {
-    const vectorDBUpdateListener = async () => {
-      console.log("Vector DB update listener path: ", filePath);
-      updateSimilarEntries(filePath);
-    };
-
-    const removeVectorDBListener = window.ipcRenderer.receive(
-      "vector-database-update",
-      vectorDBUpdateListener
-    );
-    return () => {
-      removeVectorDBListener();
-    };
-  }, [filePath]);
-
   const updateSimilarEntries = async (currentFilePath: string) => {
     const searchResults = await performSearch(currentFilePath);
     setSimilarEntries(searchResults);
