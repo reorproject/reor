@@ -8,13 +8,11 @@ body {
   margin: 0;
   min-height: 100%;
   min-width: 100%;
-  max-height: 100vh;
   overflow-y: hidden;
 }
 
 * {
   box-sizing: border-box;
-  max-height: 100vh;
 
 }
 
