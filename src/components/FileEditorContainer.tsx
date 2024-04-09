@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 import ChatWithLLM from "./Chat/Chat";
 import LeftSidebar from "./Sidebars/IconsSidebar";
@@ -11,6 +10,7 @@ import InEditorBacklinkSuggestionsDisplay from "./Editor/BacklinkSuggestionsDisp
 import { useFileInfoTree } from "./File/FileSideBar/hooks/use-file-info-tree";
 import RenameNoteModal from "./File/RenameNote";
 import RenameDirModal from "./File/RenameDirectory";
+import SidebarComponent from "./Similarity/SimilarFilesSidebar";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search";
@@ -27,6 +27,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     openRelativePath,
     saveCurrentlyOpenedFile,
     suggestionsState,
+    highlightData,
     noteToBeRenamed,
     setNoteToBeRenamed,
     fileDirToBeRenamed,
@@ -141,15 +142,14 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                 )}
               </div>
               {showSimilarFiles && (
-                <ResizableComponent resizeSide="left" initialWidth={400}>
-                  <SimilarEntriesComponent
-                    filePath={filePath}
-                    onFileSelect={openFileByPath}
-                    saveCurrentFile={async () => {
-                      await saveCurrentlyOpenedFile();
-                    }}
-                  />
-                </ResizableComponent>
+                <SidebarComponent
+                  filePath={filePath}
+                  highlightData={highlightData}
+                  openFileByPath={openFileByPath}
+                  saveCurrentlyOpenedFile={async () => {
+                    await saveCurrentlyOpenedFile();
+                  }}
+                />
               )}
             </div>
           </div>

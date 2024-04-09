@@ -5,15 +5,58 @@ import { PiGraph } from "react-icons/pi";
 import { toast } from "react-toastify";
 import { errorToString } from "@/functions/error";
 import { FiRefreshCw } from "react-icons/fi";
+import { HighlightData } from "../Editor/HighlightExtension";
+import ResizableComponent from "../Generic/ResizableComponent";
+
+interface SidebarComponentProps {
+  filePath: string;
+  highlightData: HighlightData;
+  openFileByPath: (filePath: string) => void;
+  saveCurrentlyOpenedFile: () => Promise<void>;
+}
+
+const SidebarComponent: React.FC<SidebarComponentProps> = ({
+  filePath,
+  highlightData,
+  openFileByPath,
+  saveCurrentlyOpenedFile,
+}) => {
+  return (
+    <>
+      <HighlightButton
+        highlightData={highlightData}
+        onClick={() => console.log("clicked this ting")}
+      />{" "}
+      <ResizableComponent resizeSide="left" initialWidth={400}>
+        <SimilarEntriesComponent
+          filePath={filePath}
+          highlightData={highlightData}
+          onFileSelect={openFileByPath}
+          saveCurrentFile={async () => {
+            await saveCurrentlyOpenedFile();
+          }}
+        />
+      </ResizableComponent>
+    </>
+  );
+};
+
+export default SidebarComponent;
 
 interface SimilarEntriesComponentProps {
   filePath: string;
+  // similarEntries: DBQueryResult[];
+  // setSimilarEntries: (entries: DBQueryResult[]) => void;
+  highlightData: HighlightData;
   onFileSelect: (path: string) => void;
   saveCurrentFile: () => Promise<void>;
 }
 
 const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   filePath,
+  // similarEntries,
+  // setSimilarEntries,
+  highlightData,
   onFileSelect,
   saveCurrentFile,
 }) => {
@@ -91,63 +134,101 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   };
 
   return (
-    <div
-      className={`h-below-titlebar ${
-        similarEntries.length > 0 ? "overflow-y-auto" : "overflow-y-hidden"
-      } overflow-x-hidden mt-0 border-l-[0.1px] border-t-0 border-b-0 border-r-0 border-gray-600 border-solid`}
-    >
-      {" "}
-      {/* {similarEntries.length > 0 && ( */}
-      <div className="flex items-center bg-neutral-800 p-0">
-        {/* Invisible Spacer */}
-        <div className="flex-1"></div>
+    <div>
+      {/* <HighlightButton
+        highlightData={highlightData}
+        onClick={() => console.log("clicked this ting")}
+      />{" "} */}
+      <div
+        className={`h-below-titlebar ${
+          similarEntries.length > 0 ? "overflow-y-auto" : "overflow-y-hidden"
+        } overflow-x-hidden mt-0 border-l-[0.1px] border-t-0 border-b-0 border-r-0 border-gray-600 border-solid`}
+      >
+        {/* {similarEntries.length > 0 && ( */}
+        <div className="flex items-center bg-neutral-800 p-0">
+          {/* Invisible Spacer */}
+          <div className="flex-1"></div>
 
-        {/* Centered content: PiGraph icon and Related Notes text */}
-        <div className="flex items-center justify-center px-4">
-          <PiGraph className="text-gray-300 mt-1" />
-          <p className="text-gray-300 text-sm pl-1 mb-0 mt-1">Related Notes</p>
-        </div>
-
-        <div
-          className="flex-1 flex justify-end pr-3 pt-1 cursor-pointer"
-          onClick={async () => {
-            setUserHitRefresh(true);
-            setSimilarEntries([]); // simulate refresh
-            await saveCurrentFile();
-            updateSimilarEntries(filePath);
-          }}
-        >
-          <FiRefreshCw
-            className="text-gray-300"
-            title="Refresh Related Notes"
-          />{" "}
-          {/* Icon */}
-        </div>
-      </div>
-      <div className="h-full w-full">
-        {similarEntries.map((dbResult, index) => (
-          <div className="pb-2 pr-2 pl-2 pt-1" key={index}>
-            <DBResultPreview
-              key={index}
-              dbResult={dbResult}
-              onSelect={onFileSelect}
-            />
+          {/* Centered content: PiGraph icon and Related Notes text */}
+          <div className="flex items-center justify-center px-4">
+            <PiGraph className="text-gray-300 mt-1" />
+            <p className="text-gray-300 text-sm pl-1 mb-0 mt-1">
+              Related Notes
+            </p>
           </div>
-        ))}
-      </div>
-      {similarEntries.length === 0 && (
-        <div className="flex flex-col items-center justify-center h-full w-full">
-          <p className="flex justify-center items-center text-gray-500 text-lg mx-auto text-center">
-            {!userHitRefresh ? (
-              <>Hit refresh to show related notes...</>
-            ) : (
-              <>Make sure your note is not empty...</>
-            )}
-          </p>
+
+          <div
+            className="flex-1 flex justify-end pr-3 pt-1 cursor-pointer"
+            onClick={async () => {
+              setUserHitRefresh(true);
+              setSimilarEntries([]); // simulate refresh
+              await saveCurrentFile();
+              updateSimilarEntries(filePath);
+            }}
+          >
+            <FiRefreshCw
+              className="text-gray-300"
+              title="Refresh Related Notes"
+            />{" "}
+            {/* Icon */}
+          </div>
         </div>
-      )}
+        <div className="h-full w-full">
+          {similarEntries.map((dbResult, index) => (
+            <div className="pb-2 pr-2 pl-2 pt-1" key={index}>
+              <DBResultPreview
+                key={index}
+                dbResult={dbResult}
+                onSelect={onFileSelect}
+              />
+            </div>
+          ))}
+        </div>
+        {similarEntries.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-full w-full">
+            <p className="flex justify-center items-center text-gray-500 text-lg mx-auto text-center">
+              {!userHitRefresh ? (
+                <>Hit refresh to show related notes...</>
+              ) : (
+                <>Make sure your note is not empty...</>
+              )}
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-export default SimilarEntriesComponent;
+// export default SimilarEntriesComponent;
+
+interface HighlightButtonProps {
+  highlightData: HighlightData;
+  onClick: () => void;
+}
+
+const HighlightButton: React.FC<HighlightButtonProps> = ({
+  highlightData,
+  onClick,
+}) => {
+  if (!highlightData.position) {
+    return null;
+  }
+
+  const { top, left } = highlightData.position;
+
+  const buttonStyle: React.CSSProperties = {
+    position: "absolute",
+    top: `${top}px`,
+    left: `${left}px`,
+    width: "20px",
+    height: "20px",
+    borderRadius: "50%",
+    backgroundColor: "blue",
+    border: "none",
+    cursor: "pointer",
+    zIndex: "10",
+  };
+
+  return <button style={buttonStyle} onClick={onClick} />;
+};

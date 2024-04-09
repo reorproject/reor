@@ -13,6 +13,9 @@ import { Markdown } from "tiptap-markdown";
 import { BacklinkExtension } from "@/components/Editor/BacklinkExtension";
 import { removeFileExtension } from "@/functions/strings";
 import { SuggestionsState } from "@/components/Editor/BacklinkSuggestionsDisplay";
+import HighlightExtension, {
+  HighlightData,
+} from "@/components/Editor/HighlightExtension";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
@@ -27,6 +30,10 @@ export const useFileByFilepath = () => {
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
   const [currentlyChangingFilePath, setCurrentlyChangingFilePath] =
     useState(false);
+  const [highlightData, setHighlightData] = useState<HighlightData>({
+    text: "",
+    position: null,
+  });
 
   const setFileNodeToBeRenamed = async (filePath: string) => {
     const isDirectory = await window.files.isDirectory(filePath);
@@ -107,6 +114,7 @@ export const useFileByFilepath = () => {
         nested: true,
       }),
       BacklinkExtension(setSuggestionsState),
+      HighlightExtension(setHighlightData),
     ],
   });
 
@@ -254,6 +262,7 @@ export const useFileByFilepath = () => {
     openFileByPath,
     openRelativePath,
     suggestionsState,
+    highlightData,
     noteToBeRenamed,
     setNoteToBeRenamed,
     fileDirToBeRenamed,
