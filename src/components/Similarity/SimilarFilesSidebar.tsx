@@ -21,16 +21,29 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
   openFileByPath,
   saveCurrentlyOpenedFile,
 }) => {
+  const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([]);
+
   return (
     <>
       <HighlightButton
         highlightData={highlightData}
-        onClick={() => console.log("clicked this ting")}
+        onClick={async () => {
+          const databaseFields = await window.database.getDatabaseFields();
+          const filterString = `${databaseFields.NOTE_PATH} != '${filePath}'`;
+          console.log("highlightData", highlightData.text);
+          const searchResults: DBQueryResult[] = await window.database.search(
+            highlightData.text,
+            20,
+            filterString
+          );
+          setSimilarEntries(searchResults);
+        }}
       />{" "}
       <ResizableComponent resizeSide="left" initialWidth={400}>
         <SimilarEntriesComponent
           filePath={filePath}
-          highlightData={highlightData}
+          similarEntries={similarEntries}
+          setSimilarEntries={setSimilarEntries}
           onFileSelect={openFileByPath}
           saveCurrentFile={async () => {
             await saveCurrentlyOpenedFile();
@@ -45,27 +58,24 @@ export default SidebarComponent;
 
 interface SimilarEntriesComponentProps {
   filePath: string;
-  // similarEntries: DBQueryResult[];
-  // setSimilarEntries: (entries: DBQueryResult[]) => void;
-  highlightData: HighlightData;
+  similarEntries: DBQueryResult[];
+  setSimilarEntries: (entries: DBQueryResult[]) => void;
   onFileSelect: (path: string) => void;
   saveCurrentFile: () => Promise<void>;
 }
 
 const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   filePath,
-  // similarEntries,
-  // setSimilarEntries,
-  highlightData,
+  similarEntries,
+  setSimilarEntries,
   onFileSelect,
   saveCurrentFile,
 }) => {
-  const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([]);
   const [userHitRefresh, setUserHitRefresh] = useState<boolean>(false);
 
   const handleNewFileOpen = async (path: string) => {
     try {
-      const searchResults = await performSearch(path);
+      const searchResults = await performSearchOnFile(path);
       if (searchResults.length > 0) {
         setSimilarEntries(searchResults);
       } else {
@@ -76,7 +86,9 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     }
   };
 
-  const performSearch = async (filePath: string): Promise<DBQueryResult[]> => {
+  const performSearchOnFile = async (
+    filePath: string
+  ): Promise<DBQueryResult[]> => {
     try {
       const fileContent: string = await window.files.readFile(filePath);
       // TODO: proper chunking here...
@@ -114,7 +126,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   }, [filePath]);
 
   const updateSimilarEntries = async (currentFilePath: string) => {
-    const searchResults = await performSearch(currentFilePath);
+    const searchResults = await performSearchOnFile(currentFilePath);
     setSimilarEntries(searchResults);
   };
 
