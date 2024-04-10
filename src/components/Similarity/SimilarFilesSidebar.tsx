@@ -8,7 +8,7 @@ import { FiRefreshCw } from "react-icons/fi";
 
 interface SimilarEntriesComponentProps {
   filePath: string;
-  onFileSelect: (path: string) => void;
+  onFileSelect: (path: string, content: string) => void;
   saveCurrentFile: () => Promise<void>;
 }
 
