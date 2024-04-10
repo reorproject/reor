@@ -90,6 +90,7 @@ declare global {
       streamingLLMResponse: (
         llmName: string,
         llmConfig: LLMConfig,
+        isJSONMode: boolean,
         messageHistory: ChatCompletionMessageParam[]
       ) => Promise<string>;
       getLLMConfigs: () => Promise<LLMConfig[]>;
@@ -322,12 +323,14 @@ contextBridge.exposeInMainWorld("llm", {
   streamingLLMResponse: async (
     llmName: string,
     llmConfig: LLMConfig,
+    isJSONMode: boolean,
     messageHistory: ChatCompletionMessageParam[]
   ) => {
     return await ipcRenderer.invoke(
       "streaming-llm-response",
       llmName,
       llmConfig,
+      isJSONMode,
       messageHistory
     );
   },

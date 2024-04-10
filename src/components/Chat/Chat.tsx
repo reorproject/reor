@@ -210,7 +210,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       return;
     }
 
-    startStreamingResponse(llmName, augmentedPrompt);
+    startStreamingResponse(llmName, augmentedPrompt, false);
     setCurrentBotMessage(null);
   };
 
@@ -286,7 +286,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const startStreamingResponse = async (
     // sessionId: string,
     llmName: string,
-    prompt: string
+    prompt: string,
+    isJSONMode: boolean
   ) => {
     try {
       console.log("Initializing streaming response...");
@@ -299,9 +300,12 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       if (!currentModelConfig) {
         throw new Error(`No model config found for model: ${llmName}`);
       }
-      await window.llm.streamingLLMResponse(llmName, currentModelConfig, [
-        { role: "user", content: prompt },
-      ]);
+      await window.llm.streamingLLMResponse(
+        llmName,
+        currentModelConfig,
+        isJSONMode,
+        [{ role: "user", content: prompt }]
+      );
       console.log("Initialized streaming response");
       setLoadingResponse(false);
     } catch (error) {

@@ -235,6 +235,7 @@ export class OllamaService implements LLMSessionService {
   async streamingResponse(
     modelName: string,
     modelConfig: OpenAILLMConfig,
+    isJSONMode: boolean,
     messageHistory: ChatCompletionMessageParam[],
     handleChunk: (chunk: ChatCompletionChunk) => void,
     generationParams?: LLMGenerationParameters
