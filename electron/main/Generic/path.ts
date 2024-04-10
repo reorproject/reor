@@ -6,8 +6,10 @@ export function addExtensionToFilenameIfNoExtensionPresent(
 ): string {
   const trimmedFilename = filename.trim();
   const trimmedExtension = extension.trim();
-
-  if (!trimmedFilename || !trimmedExtension) {
+  if (!trimmedFilename) {
+    throw new Error("Filename is required");
+  }
+  if (!trimmedExtension) {
     return trimmedFilename;
   }
 
