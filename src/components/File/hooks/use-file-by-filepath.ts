@@ -133,7 +133,7 @@ export const useFileByFilepath = () => {
       textPos
         ? editor?.commands.setTextSelection({
             from: textPos,
-            to: textPos + removeMd(content).length,
+            to: textPos + content.length,
           })
         : undefined;
 
