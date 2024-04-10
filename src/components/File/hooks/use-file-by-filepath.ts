@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEditor, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Document from "@tiptap/extension-document";
@@ -63,7 +63,7 @@ export const useFileByFilepath = () => {
     setCurrentlyChangingFilePath(false);
   };
 
-  const openRelativePath = async (relativePath: string): Promise<string> => {
+  const openRelativePath = async (relativePath: string): Promise<void> => {
     const relativePathWithExtension =
       window.path.addExtensionIfNoExtensionPresent(relativePath);
     const absolutePath = window.path.join(
@@ -79,15 +79,11 @@ export const useFileByFilepath = () => {
       );
     }
     openFileByPath(absolutePath);
-    return absolutePath;
+    // return absolutePath;
   };
 
-  // const openResolvedPath = async (relativePath: string) => {
-  //   const absolutePath = resolveRelativePath(relativePath);
-
-  //   // here we could check if the file exists and if not, create it:
-
-  // };
+  const openRelativePathRef = useRef<(newFilePath: string) => Promise<void>>();
+  openRelativePathRef.current = openRelativePath;
 
   const editor = useEditor({
     autofocus: true,
@@ -106,7 +102,7 @@ export const useFileByFilepath = () => {
       TaskItem.configure({
         nested: true,
       }),
-      BacklinkExtension(setSuggestionsState),
+      BacklinkExtension(openRelativePathRef, setSuggestionsState),
     ],
   });
 
@@ -252,7 +248,6 @@ export const useFileByFilepath = () => {
     navigationHistory,
     setNavigationHistory,
     openFileByPath,
-    openRelativePath,
     suggestionsState,
     noteToBeRenamed,
     setNoteToBeRenamed,

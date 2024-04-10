@@ -25,7 +25,6 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
 
   const filteredSuggestions = useMemo(() => {
     if (!suggestionsState.textWithinBrackets) return [];
-    console.log("suggestionsState.text", suggestionsState.textWithinBrackets);
     const lowerCaseText = suggestionsState.textWithinBrackets.toLowerCase();
     return suggestions
       .filter((suggestion) => suggestion.toLowerCase().includes(lowerCaseText))
