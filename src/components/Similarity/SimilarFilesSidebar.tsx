@@ -197,7 +197,12 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   );
 };
 
-// export default SimilarEntriesComponent;
+interface HighlightData {
+  position?: {
+    top: number;
+    left: number;
+  };
+}
 
 interface HighlightButtonProps {
   highlightData: HighlightData;
@@ -214,18 +219,14 @@ const HighlightButton: React.FC<HighlightButtonProps> = ({
 
   const { top, left } = highlightData.position;
 
-  const buttonStyle: React.CSSProperties = {
-    position: "absolute",
-    top: `${top}px`,
-    left: `${left}px`,
-    width: "20px",
-    height: "20px",
-    borderRadius: "50%",
-    backgroundColor: "blue",
-    border: "none",
-    cursor: "pointer",
-    zIndex: "10",
-  };
-
-  return <button style={buttonStyle} onClick={onClick} />;
+  return (
+    <button
+      onClick={onClick}
+      style={{ top: `${top}px`, left: `${left}px` }}
+      className="absolute w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer text-white border-none shadow-md hover:bg-gray-300"
+      aria-label="Highlight button"
+    >
+      <PiGraph className="text-gray-800 " />
+    </button>
+  );
 };
