@@ -260,7 +260,6 @@ export const useFileByFilepath = () => {
 function getMarkdown(editor: Editor) {
   // Fetch the current markdown content from the editor
   const originalMarkdown = editor.storage.markdown.getMarkdown();
-  console.log("original markdown: ", originalMarkdown);
   // Replace the escaped square brackets with unescaped ones
   const modifiedMarkdown = originalMarkdown
     .replace(/\\\[/g, "[") // Replaces \[ with [

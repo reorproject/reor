@@ -57,6 +57,7 @@ const backlinkPlugin = (
           );
 
           const coords = view.coordsAtPos(from);
+          coords.left += 5;
           updateSuggestionsState({
             textWithinBrackets: textToLeft,
             position: coords,
