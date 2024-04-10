@@ -254,7 +254,7 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
       console.log(llmGeneratedFacts);
       const basePrompt = "Given the following atomic facts:\n";
       const flashcardQuery =
-        "Create useful FLASHCARDS that can be used for students to study using ONLY the context. Format is Q: <insert question> A: <insert answer>. Return in JSON";
+        "Create useful FLASHCARDS that can be used for students to study using ONLY the context. Format is Q: <insert question> A: <insert answer>.";
       const { prompt: promptToCreateFlashcardsWithAtomicFacts } =
         createPromptWithContextLimitFromContent(
           llmGeneratedFacts.choices[0].message.content || "",
