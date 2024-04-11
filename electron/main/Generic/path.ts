@@ -2,26 +2,14 @@ import path from "path";
 
 export function addExtensionToFilenameIfNoExtensionPresent(
   filename: string,
-  extension: string
+  acceptableExtensions: string[],
+  defaultExtension: string
 ): string {
-  const trimmedFilename = filename.trim();
-  const trimmedExtension = extension.trim();
-  if (!trimmedFilename) {
-    throw new Error("Filename is required");
-  }
-  if (!trimmedExtension) {
-    return trimmedFilename;
-  }
+  const extension = path.extname(filename).slice(1).toLowerCase();
 
-  const currentExtension = path.extname(trimmedFilename);
-
-  if (!currentExtension) {
-    return `${trimmedFilename}.${
-      trimmedExtension.startsWith(".")
-        ? trimmedExtension.slice(1)
-        : trimmedExtension
-    }`;
+  if (acceptableExtensions.includes(extension)) {
+    return filename;
   }
-
-  return trimmedFilename;
+  console.log("filename: ", filename, "defaultExtension: ", defaultExtension);
+  return `${filename}${defaultExtension}`;
 }
