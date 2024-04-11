@@ -11,8 +11,12 @@ import { useDebounce } from "use-debounce";
 import { Markdown } from "tiptap-markdown";
 
 import { BacklinkExtension } from "@/components/Editor/BacklinkExtension";
-import { removeFileExtension } from "@/functions/strings";
+import {
+  getInvalidCharacterInFileName,
+  removeFileExtension,
+} from "@/functions/strings";
 import { SuggestionsState } from "@/components/Editor/BacklinkSuggestionsDisplay";
+import { toast } from "react-toastify";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
@@ -64,6 +68,13 @@ export const useFileByFilepath = () => {
   };
 
   const openRelativePath = async (relativePath: string): Promise<void> => {
+    const invalidChars = await getInvalidCharacterInFileName(relativePath);
+    if (invalidChars) {
+      toast.error(
+        `Could not create file ${relativePath}. Character ${invalidChars} cannot be included in note name.`
+      );
+      return;
+    }
     const relativePathWithExtension =
       window.path.addExtensionIfNoExtensionPresent(relativePath);
     const absolutePath = window.path.join(
