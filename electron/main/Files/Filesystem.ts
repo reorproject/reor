@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as fs from "fs";
 import { FileInfo, FileInfoTree, isFileNodeDirectory } from "./Types";
-import chokidar from "chokidar";
+import { FSWatcher, watch } from "chokidar";
 import { BrowserWindow } from "electron";
 import * as fsPromises from "fs/promises";
 import {
@@ -9,14 +9,6 @@ import {
   removeFileTreeFromDBTable,
 } from "../database/TableHelperFunctions";
 import { LanceDBTableWrapper } from "../database/LanceTableWrapper";
-
-export const markdownExtensions = [
-  ".md",
-  ".markdown",
-  ".mdown",
-  ".mkdn",
-  ".mkd",
-];
 
 export function GetFilesInfoList(directory: string): FileInfo[] {
   const fileInfoTree = GetFilesInfoTree(directory);
@@ -38,10 +30,7 @@ export function GetFilesInfoTree(
   try {
     const stats = fs.statSync(pathInput);
     if (stats.isFile()) {
-      if (
-        fileHasExtensionInList(pathInput, markdownExtensions) &&
-        !isHidden(path.basename(pathInput))
-      ) {
+      if (!isHidden(path.basename(pathInput))) {
         fileInfoTree.push({
           name: path.basename(pathInput),
           path: pathInput,
@@ -129,48 +118,26 @@ export function createFileRecursive(
 }
 
 export function startWatchingDirectory(
-  win: BrowserWindow,
+  win: Electron.BrowserWindow,
   directoryToWatch: string
-): chokidar.FSWatcher | undefined {
+): FSWatcher | undefined {
   try {
-    const watcher = chokidar.watch(directoryToWatch, {
+    const watcher = watch(directoryToWatch, {
       ignoreInitial: true,
     });
 
-    const handleFileEvent = (eventType: string, filePath: string) => {
-      if (
-        fileHasExtensionInList(filePath, markdownExtensions) ||
-        eventType.includes("directory")
-      ) {
-        // TODO: add logic to update vector db
-        updateFileListForRenderer(win, directoryToWatch);
-      }
-    };
+    // Define all events that trigger the update in an array
+    const events = ["add", "change", "unlink", "addDir", "unlinkDir"];
 
-    watcher
-      .on("add", (path) => handleFileEvent("added", path))
-      .on("change", (path) => handleFileEvent("changed", path))
-      .on("unlink", (path) => handleFileEvent("removed", path))
-      .on("addDir", (path) => handleFileEvent("directory added", path))
-      .on("unlinkDir", (path) => handleFileEvent("directory removed", path));
+    // Use forEach to attach the same handler for all events
+    events.forEach((event) =>
+      watcher.on(event, () => updateFileListForRenderer(win, directoryToWatch))
+    );
 
-    // No 'ready' event handler is needed here, as we're ignoring initial scan
     return watcher;
   } catch (error) {
     console.error("Error setting up file watcher:", error);
-  }
-}
-
-function fileHasExtensionInList(
-  filePath: string,
-  extensions: string[]
-): boolean {
-  try {
-    const fileExtension = path.extname(filePath).toLowerCase();
-    return extensions.includes(fileExtension);
-  } catch (error) {
-    console.error("Error checking file extension for extensions:", extensions);
-    return false;
+    return undefined;
   }
 }
 

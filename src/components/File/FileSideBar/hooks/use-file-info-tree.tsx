@@ -66,6 +66,7 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
     window.files.getFilesTreeForWindow().then((fetchedFiles) => {
       const sortedFiles = sortFilesAndDirectories(fetchedFiles, null);
       setFileInfoTree(sortedFiles);
+      setFlattenedFiles(flattenFileInfoTree(sortedFiles));
     });
   }, []);
 
