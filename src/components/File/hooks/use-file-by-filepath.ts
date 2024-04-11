@@ -71,7 +71,7 @@ export const useFileByFilepath = () => {
     const invalidChars = await getInvalidCharacterInFileName(relativePath);
     if (invalidChars) {
       toast.error(
-        `Could not create file ${relativePath}. Character ${invalidChars} cannot be included in note name.`
+        `Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`
       );
       return;
     }
