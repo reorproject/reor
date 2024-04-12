@@ -40,8 +40,8 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
         return;
       }
       const normalizedDirectoryName = directoryName.replace(/\\/g, "/");
-      const fullPath = window.path.join(
-        window.electronStore.getVaultDirectory(),
+      const fullPath = await window.path.join(
+        await window.electronStore.getVaultDirectoryForWindow(),
         normalizedDirectoryName
       );
       window.files.createDirectory(fullPath);

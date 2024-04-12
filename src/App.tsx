@@ -40,12 +40,18 @@ const App: React.FC<AppProps> = () => {
   }, []);
 
   useEffect(() => {
-    const initialDirectory = window.electronStore.getVaultDirectory();
-    const defaultEmbedFunc = window.electronStore.getDefaultEmbeddingModel();
-    if (initialDirectory && defaultEmbedFunc) {
-      setUserHasConfiguredSettingsForIndexing(true);
-      window.database.indexFilesInDirectory();
-    }
+    const fetchSettings = async () => {
+      const [initialDirectory, defaultEmbedFunc] = await Promise.all([
+        window.electronStore.getVaultDirectoryForWindow(),
+        window.electronStore.getDefaultEmbeddingModel(),
+      ]);
+      if (initialDirectory && defaultEmbedFunc) {
+        setUserHasConfiguredSettingsForIndexing(true);
+        window.database.indexFilesInDirectory();
+      }
+    };
+
+    fetchSettings();
   }, []);
 
   const handleAllInitialSettingsAreReady = () => {

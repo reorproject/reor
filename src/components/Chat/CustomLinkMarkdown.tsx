@@ -7,10 +7,12 @@ export const CustomLinkMarkdown = ({
   openFileByPath,
   props,
 }: CustomLinkMarkdownProps) => {
-  const handleCustomLinkClick = (event: React.MouseEvent) => {
+  const handleCustomLinkClick = async (event: React.MouseEvent) => {
     event.preventDefault(); // Prevent default link behavior
     const link = (event.target as HTMLAnchorElement).innerText;
-    openFileByPath(window.electronStore.getVaultDirectory() + "/" + link);
+    openFileByPath(
+      (await window.electronStore.getVaultDirectoryForWindow()) + "/" + link
+    );
   };
   return <a {...props} onClick={handleCustomLinkClick} />;
 };
