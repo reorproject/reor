@@ -64,16 +64,16 @@ declare global {
     files: {
       openDirectoryDialog: () => Promise<string[]>;
       openFileDialog: (fileExtensions?: string[]) => Promise<string[]>;
-      getFilesForWindow: () => Promise<FileInfoTree>;
+      getFilesTreeForWindow: () => Promise<FileInfoTree>;
       writeFile: (writeFileProps: WriteFileProps) => Promise<void>;
       isDirectory: (filepath: string) => Promise<boolean>;
       renameFileRecursive: (renameFileProps: RenameFileProps) => Promise<void>;
       indexFileInDatabase: (filePath: string) => Promise<void>;
       readFile: (filePath: string) => Promise<string>;
+      checkFileExists(filePath: string): Promise<boolean>;
       deleteFile: (filePath: string) => Promise<void>;
       createFile: (filePath: string, content: string) => Promise<void>;
       createDirectory: (dirPath: string) => Promise<void>;
-      joinPath: (...pathSegments: string[]) => Promise<string>;
       moveFileOrDir: (
         sourcePath: string,
         destinationPath: string
@@ -84,7 +84,9 @@ declare global {
     };
     path: {
       basename: (pathString: string) => Promise<string>;
+      join: (...pathSegments: string[]) => string;
       dirname: (pathString: string) => Promise<string>;
+      addExtensionIfNoExtensionPresent: (pathString: string) => string;
     };
     llm: {
       streamingLLMResponse: (
@@ -102,7 +104,7 @@ declare global {
     };
     electronStore: {
       setUserDirectory: (path: string) => Promise<void>;
-      getUserDirectory: () => string;
+      getVaultDirectory: () => string;
       getDefaultEmbeddingModel: () => string;
       setDefaultEmbeddingModel: (repoName: string) => void;
       addNewLocalEmbeddingModel: (model: EmbeddingModelWithLocalPath) => void;
@@ -186,8 +188,8 @@ contextBridge.exposeInMainWorld("electronStore", {
   setUserDirectory: (path: string) => {
     return ipcRenderer.sendSync("set-user-directory", path);
   },
-  getUserDirectory: () => {
-    return ipcRenderer.sendSync("get-user-directory");
+  getVaultDirectory: () => {
+    return ipcRenderer.sendSync("get-vault-directory");
   },
 
   getDefaultEmbeddingModel: () => {
@@ -260,8 +262,8 @@ contextBridge.exposeInMainWorld("files", {
   openDirectoryDialog: () => ipcRenderer.invoke("open-directory-dialog"),
   openFileDialog: (fileExtensions?: string[]) =>
     ipcRenderer.invoke("open-file-dialog", fileExtensions),
-  getFilesForWindow: async (): Promise<FileInfoTree> => {
-    return ipcRenderer.invoke("get-files-for-window");
+  getFilesTreeForWindow: async (): Promise<FileInfoTree> => {
+    return ipcRenderer.invoke("get-files-tree-for-window");
   },
 
   writeFile: async (writeFileProps: WriteFileProps) => {
@@ -289,11 +291,12 @@ contextBridge.exposeInMainWorld("files", {
   readFile: async (filePath: string) => {
     return ipcRenderer.invoke("read-file", filePath);
   },
+  checkFileExists: async (filePath: string) => {
+    return ipcRenderer.invoke("check-file-exists", filePath);
+  },
   deleteFile: (filePath: string) => {
     return ipcRenderer.invoke("delete-file", filePath);
   },
-  joinPath: (...pathSegments: string[]) =>
-    ipcRenderer.invoke("join-path", ...pathSegments),
 
   moveFileOrDir: async (sourcePath: string, destinationPath: string) => {
     return ipcRenderer.invoke("move-file-or-dir", sourcePath, destinationPath);
@@ -312,9 +315,16 @@ contextBridge.exposeInMainWorld("path", {
   basename: (pathString: string) => {
     return ipcRenderer.invoke("path-basename", pathString);
   },
-
+  join: (...pathSegments: string[]) =>
+    ipcRenderer.sendSync("join-path", ...pathSegments),
   dirname: (pathString: string) => {
     return ipcRenderer.invoke("path-dirname", pathString);
+  },
+  addExtensionIfNoExtensionPresent: (pathString: string) => {
+    return ipcRenderer.sendSync(
+      "add-extension-if-no-extension-present",
+      pathString
+    );
   },
 });
 

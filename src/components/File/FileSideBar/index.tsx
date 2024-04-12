@@ -3,20 +3,22 @@ import React, { useEffect, useState } from "react";
 import { FixedSizeList as List, ListChildComponentProps } from "react-window";
 import { isFileNodeDirectory } from "./fileOperations";
 import { FileItem } from "./FileItem";
-import { useFileInfoTree } from "./hooks/use-file-info-tree";
 
 interface FileListProps {
+  files: FileInfoTree;
+  expandedDirectories: Map<string, boolean>;
+  handleDirectoryToggle: (path: string) => void;
   selectedFilePath: string | null;
   onFileSelect: (path: string) => void;
 }
 
 export const FileSidebar: React.FC<FileListProps> = ({
+  files,
+  expandedDirectories,
+  handleDirectoryToggle,
   selectedFilePath,
   onFileSelect,
 }) => {
-  const { files, expandedDirectories, handleDirectoryToggle } =
-    useFileInfoTree(selectedFilePath);
-
   return (
     <div className="flex flex-col h-below-titlebar text-white overflow-y-auto overflow-x-hidden">
       <FileExplorer

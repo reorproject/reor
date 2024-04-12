@@ -15,6 +15,7 @@ import { StoreSchema } from "./Store/storeConfig";
 // import contextMenus from "./contextMenus";
 import * as lancedb from "vectordb";
 import {
+  markdownExtensions,
   startWatchingDirectory,
   updateFileListForRenderer,
 } from "./Files/Filesystem";
@@ -32,6 +33,7 @@ import { registerFileHandlers } from "./Files/registerFilesHandler";
 import { RepopulateTableWithMissingItems } from "./database/TableHelperFunctions";
 import WindowsManager from "./windowManager";
 import { errorToString } from "./Generic/error";
+import { addExtensionToFilenameIfNoExtensionPresent } from "./Generic/path";
 
 const store = new Store<StoreSchema>();
 // store.clear(); // clear store for testing
@@ -210,7 +212,21 @@ ipcMain.handle("path-basename", (event, pathString: string) => {
   return path.basename(pathString);
 });
 
+ipcMain.on("join-path", (event, ...args) => {
+  event.returnValue = path.join(...args);
+});
+
 ipcMain.handle("path-dirname", (event, pathString: string) => {
   return path.dirname(pathString) + path.sep;
 });
 
+ipcMain.on(
+  "add-extension-if-no-extension-present",
+  (event, pathString: string) => {
+    event.returnValue = addExtensionToFilenameIfNoExtensionPresent(
+      pathString,
+      markdownExtensions,
+      ".md"
+    );
+  }
+);

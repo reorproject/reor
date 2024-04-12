@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEditor, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Document from "@tiptap/extension-document";
@@ -6,16 +6,24 @@ import Paragraph from "@tiptap/extension-paragraph";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import Text from "@tiptap/extension-text";
-import Link from "@tiptap/extension-link";
 import "../tiptap.scss";
 import { useDebounce } from "use-debounce";
 import { Markdown } from "tiptap-markdown";
+
+import { BacklinkExtension } from "@/components/Editor/BacklinkExtension";
+import {
+  getInvalidCharacterInFileName,
+  removeFileExtension,
+} from "@/functions/strings";
+import { SuggestionsState } from "@/components/Editor/BacklinkSuggestionsDisplay";
+import { toast } from "react-toastify";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
     string | null
   >(null);
-
+  const [suggestionsState, setSuggestionsState] =
+    useState<SuggestionsState | null>();
   const [isFileContentModified, setIsFileContentModified] =
     useState<boolean>(false);
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>("");
@@ -50,7 +58,47 @@ export const useFileByFilepath = () => {
     transformCopiedText: false, // Copied text is transformed to markdown
   });
 
+  const openFileByPath = async (newFilePath: string) => {
+    setCurrentlyChangingFilePath(true);
+    await saveEditorContentToPath(editor, currentlyOpenedFilePath, true);
+    const newFileContent = (await window.files.readFile(newFilePath)) ?? "";
+    editor?.commands.setContent(newFileContent);
+    setCurrentlyOpenedFilePath(newFilePath);
+    setCurrentlyChangingFilePath(false);
+  };
+
+  const openRelativePath = async (relativePath: string): Promise<void> => {
+    const invalidChars = await getInvalidCharacterInFileName(relativePath);
+    if (invalidChars) {
+      toast.error(
+        `Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`
+      );
+      return;
+    }
+    const relativePathWithExtension =
+      window.path.addExtensionIfNoExtensionPresent(relativePath);
+    const absolutePath = window.path.join(
+      window.electronStore.getVaultDirectory(),
+      relativePathWithExtension
+    );
+    const fileExists = await window.files.checkFileExists(absolutePath);
+    if (!fileExists) {
+      const basename = await window.path.basename(absolutePath);
+      await window.files.createFile(
+        absolutePath,
+        "## " + removeFileExtension(basename) + "\n"
+      );
+    }
+    openFileByPath(absolutePath);
+    // return absolutePath;
+  };
+
+  const openRelativePathRef = useRef<(newFilePath: string) => Promise<void>>();
+  openRelativePathRef.current = openRelativePath;
+
   const editor = useEditor({
+    autofocus: true,
+
     onUpdate() {
       setIsFileContentModified(true);
     },
@@ -61,13 +109,11 @@ export const useFileByFilepath = () => {
       Text,
       TaskList,
       Markdown,
+
       TaskItem.configure({
         nested: true,
       }),
-      Link.configure({
-        linkOnPaste: true,
-        openOnClick: true,
-      }),
+      BacklinkExtension(openRelativePathRef, setSuggestionsState),
     ],
   });
 
@@ -93,33 +139,21 @@ export const useFileByFilepath = () => {
     filePath: string | null,
     indexFileInDatabase: boolean = false
   ) => {
-    const markdownContent = editor?.storage.markdown.getMarkdown();
-    if (
-      markdownContent !== null &&
-      filePath !== null &&
-      isFileContentModified
-    ) {
-      await window.files.writeFile({
-        filePath: filePath,
-        content: markdownContent,
-      });
+    if (filePath !== null && isFileContentModified && editor) {
+      const markdownContent = getMarkdown(editor);
+      if (markdownContent !== null) {
+        await window.files.writeFile({
+          filePath: filePath,
+          content: markdownContent,
+        });
 
-      setIsFileContentModified(false);
+        setIsFileContentModified(false);
 
-      if (indexFileInDatabase) {
-        window.files.indexFileInDatabase(filePath);
+        if (indexFileInDatabase) {
+          window.files.indexFileInDatabase(filePath);
+        }
       }
     }
-  };
-
-  const openFileByPath = async (newFilePath: string) => {
-    setCurrentlyChangingFilePath(true);
-    await saveEditorContentToPath(editor, currentlyOpenedFilePath, true);
-    const fileContent = (await window.files.readFile(newFilePath)) ?? "";
-    setCurrentlyOpenedFilePath(newFilePath);
-
-    editor?.commands.setContent(fileContent);
-    setCurrentlyChangingFilePath(false);
   };
 
   // delete file depending on file path returned by the listener
@@ -197,7 +231,7 @@ export const useFileByFilepath = () => {
         editor &&
         editor.getHTML() !== null
       ) {
-        const markdown = editor?.storage.markdown.getMarkdown();
+        const markdown = getMarkdown(editor);
         await window.files.writeFile({
           filePath: currentlyOpenedFilePath,
           content: markdown,
@@ -225,6 +259,7 @@ export const useFileByFilepath = () => {
     navigationHistory,
     setNavigationHistory,
     openFileByPath,
+    suggestionsState,
     noteToBeRenamed,
     setNoteToBeRenamed,
     fileDirToBeRenamed,
@@ -232,3 +267,14 @@ export const useFileByFilepath = () => {
     renameFile: renameFileNode,
   };
 };
+
+function getMarkdown(editor: Editor) {
+  // Fetch the current markdown content from the editor
+  const originalMarkdown = editor.storage.markdown.getMarkdown();
+  // Replace the escaped square brackets with unescaped ones
+  const modifiedMarkdown = originalMarkdown
+    .replace(/\\\[/g, "[") // Replaces \[ with [
+    .replace(/\\\]/g, "]"); // Replaces \] with ]
+
+  return modifiedMarkdown;
+}

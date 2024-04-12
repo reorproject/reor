@@ -18,7 +18,7 @@ const DirectorySelector: React.FC<DirectorySelectorProps> = ({
   };
 
   useEffect(() => {
-    const directory = window.electronStore.getUserDirectory();
+    const directory = window.electronStore.getVaultDirectory();
     if (directory) {
       setUserDirectory(directory);
     }

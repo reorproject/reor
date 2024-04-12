@@ -27,12 +27,8 @@ export const registerFileHandlers = (
   store: Store<StoreSchema>,
   windowsManager: WindowsManager
 ) => {
-  ipcMain.handle("join-path", (event, ...args) => {
-    return path.join(...args);
-  });
-
   ipcMain.handle(
-    "get-files-for-window",
+    "get-files-tree-for-window",
     async (event): Promise<FileInfoTree> => {
       const directoryPath = windowsManager.getVaultDirectoryForWinContents(
         event.sender
@@ -50,6 +46,18 @@ export const registerFileHandlers = (
       return fs.readFileSync(filePath, "utf-8");
     }
   );
+
+  ipcMain.handle("check-file-exists", async (event, filePath) => {
+    try {
+      // Attempt to access the file to check existence
+      await fs.promises.access(filePath, fs.constants.F_OK);
+      // If access is successful, return true
+      return true;
+    } catch (error) {
+      // If an error occurs (e.g., file doesn't exist), return false
+      return false;
+    }
+  });
 
   ipcMain.handle(
     "delete-file",
