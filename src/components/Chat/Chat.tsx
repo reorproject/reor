@@ -401,8 +401,13 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                   currentFilePath || ""
                 );
                 const trimmedFileName = removeFileExtension(fileName);
+                const filePath = await window.files.joinPath(
+                  window.electronStore.getUserDirectory(),
+                  ".flashcards",
+                  `${trimmedFileName}.json`
+                );
                 await window.files.writeFile({
-                  filePath: `${window.electronStore.getUserDirectory()}/.flashcards/${trimmedFileName}.json`,
+                  filePath: filePath,
                   content: JSON.stringify(
                     {
                       fileGeneratedFrom: currentFilePath,
