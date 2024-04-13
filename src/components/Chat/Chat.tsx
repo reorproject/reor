@@ -16,7 +16,13 @@ import { ChatPrompt } from "./Chat-Prompts";
 import { CustomLinkMarkdown } from "./CustomLinkMarkdown";
 import { ChatCompletionChunk } from "openai/resources/chat/completions";
 import { ChatAction } from "./ChatAction";
-import { removeFileExtension } from "@/functions/strings";
+import {
+  storeFlashcardPairsAsJSON,
+  parseFlashcardQAPair,
+  canBeParsedAsFlashcardQAPair,
+  CONVERT_TO_FLASHCARDS_FROM_CHAT,
+  FlashcardQAPair,
+} from "../Flashcard";
 
 // convert ask options to enum
 enum AskOptions {
@@ -43,8 +49,6 @@ const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
 };
 
 const FILE_REFERENCE_DELIMITER = "\n -- -- -- \n";
-const QUESTION_FORMAT = "Q:";
-const ANSWER_FORMAT = "A:";
 
 type ChatUIMessage = {
   role: "user" | "assistant";
@@ -267,19 +271,15 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     fetchDefaultModel();
   };
 
-  const parseFlashcardAnswer = (
+  const parseChatMessageIntoFlashcardPairs = (
     messageToBeParsed: string
-  ): { question: string; answer: string }[] => {
+  ): FlashcardQAPair[] => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [actualOutput, _fileReferences] = messageToBeParsed.split(
       FILE_REFERENCE_DELIMITER
     );
     return actualOutput.split("<br/><br/>").map((line) => {
-      const [question, answer] = line.split("<br/>"); // it is always in the order of Q: and A:
-      return {
-        question: question.replace(QUESTION_FORMAT, "").trim(),
-        answer: answer.replace(ANSWER_FORMAT, "").trim(),
-      };
+      return parseFlashcardQAPair(line);
     });
   };
 
@@ -392,36 +392,18 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           )}
         </div>
         {canGenerateFlashcard &&
-          currentBotMessage?.content.includes(QUESTION_FORMAT) &&
-          currentBotMessage?.content.includes(ANSWER_FORMAT) && (
+          currentBotMessage &&
+          canBeParsedAsFlashcardQAPair(currentBotMessage.content) && (
             <ChatAction
-              actionText="Convert to flashcard"
+              actionText={CONVERT_TO_FLASHCARDS_FROM_CHAT}
               onClick={async () => {
-                if (!currentFilePath) {
-                  toast.error(
-                    "No file currently selected. Please open a file."
-                  );
-                  return;
-                }
-                const fileName = await window.path.basename(currentFilePath);
-                const trimmedFileName = removeFileExtension(fileName);
-                const filePath = await window.files.joinPath(
-                  window.electronStore.getUserDirectory(),
-                  ".flashcards",
-                  `${trimmedFileName}.json`
+                const flashcardQAPairs = parseChatMessageIntoFlashcardPairs(
+                  currentBotMessage.content
                 );
-                await window.files.writeFile({
-                  filePath: filePath,
-                  content: JSON.stringify(
-                    {
-                      fileGeneratedFrom: currentFilePath,
-                      qnaPairs: parseFlashcardAnswer(currentBotMessage.content),
-                    },
-                    null,
-                    4
-                  ),
-                });
-                toast.success("Flashcard file generated!");
+                await storeFlashcardPairsAsJSON(
+                  flashcardQAPairs,
+                  currentFilePath
+                );
                 setCanGenerateFlashcard(false);
               }}
             />
