@@ -110,6 +110,11 @@ export const registerFileHandlers = (
   ipcMain.handle(
     "write-file",
     async (event, writeFileProps: WriteFileProps) => {
+      if (!fs.existsSync(path.dirname(writeFileProps.filePath))) {
+        fs.mkdirSync(path.dirname(writeFileProps.filePath), {
+          recursive: true,
+        });
+      }
       fs.writeFileSync(
         writeFileProps.filePath,
         writeFileProps.content,

@@ -24,6 +24,7 @@ export interface LLMSessionService {
   streamingResponse(
     modelName: string,
     modelConfig: LLMConfig,
+    isJSONMode: boolean,
     messageHistory: Array<ChatCompletionMessageParam>,
     chunkResponse: (chunk: ChatCompletionChunk) => void,
     generationParams?: LLMGenerationParameters

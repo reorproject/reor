@@ -15,6 +15,8 @@ import { FiRefreshCw } from "react-icons/fi"; // Importing refresh icon from Rea
 import { ChatPrompt } from "./Chat-Prompts";
 import { CustomLinkMarkdown } from "./CustomLinkMarkdown";
 import { ChatCompletionChunk } from "openai/resources/chat/completions";
+import { ChatAction } from "./ChatAction";
+import { removeFileExtension } from "@/functions/strings";
 
 // convert ask options to enum
 enum AskOptions {
@@ -40,6 +42,10 @@ const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
   ],
 };
 
+const FILE_REFERENCE_DELIMITER = "\n -- -- -- \n";
+const QUESTION_FORMAT = "Q:";
+const ANSWER_FORMAT = "A:";
+
 type ChatUIMessage = {
   role: "user" | "assistant";
   content: string;
@@ -60,6 +66,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const [defaultModel, setDefaultModel] = useState<string>("");
   const [askText, setAskText] = useState<AskOptions>(AskOptions.Ask);
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
+  const [canGenerateFlashcard, setCanGenerateFlashcard] =
+    useState<boolean>(false);
   const [filesReferenced, setFilesReferenced] = useState<string[]>([]);
   const [currentBotMessage, setCurrentBotMessage] =
     useState<ChatUIMessage | null>(null);
@@ -189,6 +197,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
         setFilesReferenced(uniqueFilesReferenced);
         augmentedPrompt = ragPrompt;
+        setCanGenerateFlashcard(true);
       }
     } catch (error) {
       console.error("Failed to augment prompt:", error);
@@ -201,13 +210,13 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       return;
     }
 
-    startStreamingResponse(llmName, augmentedPrompt);
+    startStreamingResponse(llmName, augmentedPrompt, false);
     setCurrentBotMessage(null);
   };
 
   const addCollapsibleDetailsInMarkdown = (content: string, title: string) => {
     // <span/> is required to demarcate the start of collapsible details from the markdown line
-    return `\n -- -- -- \n <span/> <details> <summary> *${title.trim()}* </summary> \n ${content} </details>`;
+    return `${FILE_REFERENCE_DELIMITER} <span/> <details> <summary> *${title.trim()}* </summary> \n ${content} </details>`;
   };
 
   useEffect(() => {
@@ -258,10 +267,27 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     fetchDefaultModel();
   };
 
+  const parseFlashcardAnswer = (
+    messageToBeParsed: string
+  ): { question: string; answer: string }[] => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [actualOutput, _fileReferences] = messageToBeParsed.split(
+      FILE_REFERENCE_DELIMITER
+    );
+    return actualOutput.split("<br/><br/>").map((line) => {
+      const [question, answer] = line.split("<br/>"); // it is always in the order of Q: and A:
+      return {
+        question: question.replace(QUESTION_FORMAT, "").trim(),
+        answer: answer.replace(ANSWER_FORMAT, "").trim(),
+      };
+    });
+  };
+
   const startStreamingResponse = async (
     // sessionId: string,
     llmName: string,
-    prompt: string
+    prompt: string,
+    isJSONMode: boolean
   ) => {
     try {
       console.log("Initializing streaming response...");
@@ -274,9 +300,12 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       if (!currentModelConfig) {
         throw new Error(`No model config found for model: ${llmName}`);
       }
-      await window.llm.streamingLLMResponse(llmName, currentModelConfig, [
-        { role: "user", content: prompt },
-      ]);
+      await window.llm.streamingLLMResponse(
+        llmName,
+        currentModelConfig,
+        isJSONMode,
+        [{ role: "user", content: prompt }]
+      );
       console.log("Initialized streaming response");
       setLoadingResponse(false);
     } catch (error) {
@@ -362,6 +391,41 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             </ReactMarkdown>
           )}
         </div>
+        {canGenerateFlashcard &&
+          currentBotMessage?.content.includes(QUESTION_FORMAT) &&
+          currentBotMessage?.content.includes(ANSWER_FORMAT) && (
+            <ChatAction
+              actionText="Convert to flashcard"
+              onClick={async () => {
+                if (!currentFilePath) {
+                  toast.error(
+                    "No file currently selected. Please open a file."
+                  );
+                  return;
+                }
+                const fileName = await window.path.basename(currentFilePath);
+                const trimmedFileName = removeFileExtension(fileName);
+                const filePath = await window.files.joinPath(
+                  window.electronStore.getUserDirectory(),
+                  ".flashcards",
+                  `${trimmedFileName}.json`
+                );
+                await window.files.writeFile({
+                  filePath: filePath,
+                  content: JSON.stringify(
+                    {
+                      fileGeneratedFrom: currentFilePath,
+                      qnaPairs: parseFlashcardAnswer(currentBotMessage.content),
+                    },
+                    null,
+                    4
+                  ),
+                });
+                toast.success("Flashcard file generated!");
+                setCanGenerateFlashcard(false);
+              }}
+            />
+          )}
         {userTextFieldInput === "" && messages.length == 0 ? (
           <>
             {EXAMPLE_PROMPTS[askText].map((option, index) => {

@@ -54,6 +54,7 @@ export class OpenAIModelSessionService implements LLMSessionService {
   async streamingResponse(
     modelName: string,
     modelConfig: OpenAILLMConfig,
+    isJSONMode: boolean,
     messageHistory: ChatCompletionMessageParam[],
     handleChunk: (chunk: ChatCompletionChunk) => void,
     generationParams?: LLMGenerationParameters
@@ -64,13 +65,16 @@ export class OpenAIModelSessionService implements LLMSessionService {
       baseURL: modelConfig.apiURL,
       fetch: customFetchUsingElectronNetStreaming,
     });
-
+    console.log("messageHistory: ");
     const stream = await openai.chat.completions.create({
       model: modelName,
       messages: messageHistory,
       stream: true,
       max_tokens: generationParams?.maxTokens,
       temperature: generationParams?.temperature,
+      response_format: {
+        type: isJSONMode ? "json_object" : "text",
+      },
     });
 
     for await (const chunk of stream) {
