@@ -397,8 +397,12 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             <ChatAction
               actionText="Convert to flashcard"
               onClick={async () => {
-                if (!currentFilePath)
-                  throw new Error("Current file path is null");
+                if (!currentFilePath) {
+                  toast.error(
+                    "No file currently selected. Please open a file."
+                  );
+                  return;
+                }
                 const fileName = await window.path.basename(currentFilePath);
                 const trimmedFileName = removeFileExtension(fileName);
                 const filePath = await window.files.joinPath(
