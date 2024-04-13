@@ -397,9 +397,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             <ChatAction
               actionText="Convert to flashcard"
               onClick={async () => {
-                const fileName = await window.path.basename(
-                  currentFilePath || ""
-                );
+                if (!currentFilePath)
+                  throw new Error("Current file path is null");
+                const fileName = await window.path.basename(currentFilePath);
                 const trimmedFileName = removeFileExtension(fileName);
                 const filePath = await window.files.joinPath(
                   window.electronStore.getUserDirectory(),
