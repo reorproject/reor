@@ -3,7 +3,8 @@ import { toast } from "react-toastify";
 
 export const QUESTION_FORMAT = "Q:";
 export const ANSWER_FORMAT = "A:";
-export const CONVERT_TO_FLASHCARDS_FROM_CHAT = "Convert to flashcards";
+export const CONVERT_TO_FLASHCARDS_FROM_CHAT =
+  "Convert the above message to flashcards";
 
 export interface FlashcardQAPair {
   question: string;
