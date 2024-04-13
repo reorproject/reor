@@ -211,6 +211,10 @@ ipcMain.handle("path-basename", (event, pathString: string) => {
   return path.basename(pathString);
 });
 
+ipcMain.handle("path-sep", () => {
+  return path.sep;
+});
+
 ipcMain.handle("join-path", (event, ...args) => {
   return path.join(...args);
 });

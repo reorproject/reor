@@ -86,6 +86,7 @@ declare global {
       join: (...pathSegments: string[]) => Promise<string>;
       dirname: (pathString: string) => Promise<string>;
       addExtensionIfNoExtensionPresent: (pathString: string) => Promise<string>;
+      pathSep: () => Promise<string>;
     };
     llm: {
       streamingLLMResponse: (
@@ -322,6 +323,9 @@ contextBridge.exposeInMainWorld("path", {
       "add-extension-if-no-extension-present",
       pathString
     );
+  },
+  pathSep: () => {
+    return ipcRenderer.invoke("path-sep");
   },
 });
 

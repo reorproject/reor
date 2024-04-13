@@ -11,7 +11,9 @@ export const CustomLinkMarkdown = ({
     event.preventDefault(); // Prevent default link behavior
     const link = (event.target as HTMLAnchorElement).innerText;
     openFileByPath(
-      (await window.electronStore.getVaultDirectoryForWindow()) + "/" + link
+      (await window.electronStore.getVaultDirectoryForWindow()) +
+        (await window.path.pathSep()) +
+        link
     );
   };
   return <a {...props} onClick={handleCustomLinkClick} />;
