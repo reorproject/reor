@@ -87,6 +87,7 @@ declare global {
       join: (...pathSegments: string[]) => string;
       dirname: (pathString: string) => Promise<string>;
       addExtensionIfNoExtensionPresent: (pathString: string) => string;
+      getAllFilenamesInDirectory: (dirName: string) => Promise<string[]>;
     };
     llm: {
       streamingLLMResponse: (
@@ -105,6 +106,7 @@ declare global {
     };
     electronStore: {
       setUserDirectory: (path: string) => Promise<void>;
+      getUserDirectory: (path: string) => Promise<void>;
       getVaultDirectory: () => string;
       getDefaultEmbeddingModel: () => string;
       setDefaultEmbeddingModel: (repoName: string) => void;
@@ -326,6 +328,9 @@ contextBridge.exposeInMainWorld("path", {
       "add-extension-if-no-extension-present",
       pathString
     );
+  },
+  getAllFilenamesInDirectory: (dirName: string) => {
+    return ipcRenderer.invoke("get-files-in-directory", dirName);
   },
 });
 

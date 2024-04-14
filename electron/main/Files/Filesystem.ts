@@ -85,7 +85,7 @@ export function GetFilesInfoTree(
 
   return fileInfoTree;
 }
-function isHidden(fileName: string): boolean {
+export function isHidden(fileName: string): boolean {
   return fileName.startsWith(".");
 }
 export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {

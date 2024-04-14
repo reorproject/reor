@@ -15,6 +15,7 @@ import { StoreSchema } from "./Store/storeConfig";
 // import contextMenus from "./contextMenus";
 import * as lancedb from "vectordb";
 import {
+  isHidden,
   markdownExtensions,
   startWatchingDirectory,
   updateFileListForRenderer,
@@ -34,6 +35,8 @@ import { RepopulateTableWithMissingItems } from "./database/TableHelperFunctions
 import WindowsManager from "./windowManager";
 import { errorToString } from "./Generic/error";
 import { addExtensionToFilenameIfNoExtensionPresent } from "./Generic/path";
+
+import * as fs from "fs";
 
 const store = new Store<StoreSchema>();
 // store.clear(); // clear store for testing
@@ -218,6 +221,12 @@ ipcMain.on("join-path", (event, ...args) => {
 
 ipcMain.handle("path-dirname", (event, pathString: string) => {
   return path.dirname(pathString) + path.sep;
+});
+
+//get-files-in-directory
+ipcMain.handle("get-files-in-directory", (event, dirName: string) => {
+  const itemsInDir = fs.readdirSync(dirName).filter((item) => !isHidden(item));
+  return itemsInDir;
 });
 
 ipcMain.on(

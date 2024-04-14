@@ -6,6 +6,11 @@ export const ANSWER_FORMAT = "A:";
 export const CONVERT_TO_FLASHCARDS_FROM_CHAT =
   "Convert the above message to flashcards";
 
+export interface FlashcardQAPairUI {
+  question: string;
+  answer: string;
+  isFlipped: boolean;
+}
 export interface FlashcardQAPair {
   question: string;
   answer: string;
@@ -38,8 +43,8 @@ export const storeFlashcardPairsAsJSON = async (
   }
   const fileName = await window.path.basename(currentFilePath);
   const trimmedFileName = removeFileExtension(fileName);
-  const filePath = await window.files.joinPath(
-    window.electronStore.getUserDirectory(),
+  const filePath = await window.path.join(
+    window.electronStore.getVaultDirectory(),
     ".flashcards",
     `${trimmedFileName}.json`
   );
