@@ -2,8 +2,12 @@ import React, { useEffect, useState } from "react";
 
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
-import { FlashcardQAPair, FlashcardQAPairUI } from ".";
+import {
+  getFlashcardQnaPairsFromJsonFile,
+  getFlashcardVaultDirectory,
+} from ".";
 import ReactCardFlip from "react-card-flip";
+import { FlashcardQAPairUI } from "./types";
 
 interface FlashcardReviewModalProps {
   isOpen: boolean;
@@ -34,14 +38,6 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
     setFlashcardQAPairs(updatedPairs);
   };
 
-  const getFlashcardVaultDirectory = async (): Promise<string> => {
-    const vaultDirectoryWithFlashcards = await window.path.join(
-      await window.electronStore.getVaultDirectory(),
-      ".flashcards"
-    );
-    return vaultDirectoryWithFlashcards;
-  };
-
   useEffect(() => {
     const getFlashcardsFromDirectory = async () => {
       const vaultDirectoryWithFlashcards = await getFlashcardVaultDirectory();
@@ -57,33 +53,15 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
   //get flashcards to be reviewed when the file changes
   useEffect(() => {
     const readFlashcardJSONForQnAPairs = async () => {
-      if (!selectedFlashcardFile) {
-        return;
-      }
-      const flashcardFullFilePath = await window.path.join(
-        await getFlashcardVaultDirectory(),
+      const qnaPairs = await getFlashcardQnaPairsFromJsonFile(
         selectedFlashcardFile
       );
-
-      const fileData = await window.files.readFile(flashcardFullFilePath);
-      const qnaPairs: FlashcardQAPairUI[] = (
-        JSON.parse(fileData).qnaPairs as FlashcardQAPair[]
-      ).map((pair) => {
-        return {
-          ...pair,
-          isFlipped: false,
-        };
-      });
       setFlashcardQAPairs(qnaPairs);
       setSelectedFlashcard(0);
     };
     readFlashcardJSONForQnAPairs();
   }, [selectedFlashcardFile]);
 
-  console.log("state of flashcard review mode", {
-    flashcardQAPairs,
-    currentSelectedFlashcard,
-  });
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="ml-6 mt-2 mb-2 h-full min-w-[400px]">
@@ -102,7 +80,7 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
             setSelectedFlashcardFile(event.target.value);
           }}
         >
-          <option disabled selected value="">
+          <option disabled value="">
             {" "}
             -- select an option --{" "}
           </option>
