@@ -7,6 +7,8 @@ export const ANSWER_FORMAT = "A:";
 export const CONVERT_TO_FLASHCARDS_FROM_CHAT =
   "Convert the above message to flashcards";
 
+const FLASHCARD_DIR = ".flashcards";
+
 export const canBeParsedAsFlashcardQAPair = (line: string): boolean => {
   return line.includes(QUESTION_FORMAT) && line.includes(ANSWER_FORMAT);
 };
@@ -36,7 +38,7 @@ export const storeFlashcardPairsAsJSON = async (
   const trimmedFileName = removeFileExtension(fileName);
   const filePath = await window.path.join(
     window.electronStore.getVaultDirectory(),
-    ".flashcards",
+    FLASHCARD_DIR,
     `${trimmedFileName}.json`
   );
   await window.files.writeFile({
@@ -56,7 +58,7 @@ export const storeFlashcardPairsAsJSON = async (
 export const getFlashcardVaultDirectory = async (): Promise<string> => {
   const vaultDirectoryWithFlashcards = await window.path.join(
     await window.electronStore.getVaultDirectory(),
-    ".flashcards"
+    FLASHCARD_DIR
   );
   return vaultDirectoryWithFlashcards;
 };
