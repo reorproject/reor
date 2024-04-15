@@ -8,6 +8,7 @@ import {
 } from ".";
 import ReactCardFlip from "react-card-flip";
 import { FlashcardQAPairUI } from "./types";
+import ProgressBar from "./ProgressBar";
 
 interface FlashcardReviewModalProps {
   isOpen: boolean;
@@ -63,10 +64,14 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
   }, [selectedFlashcardFile]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="ml-6 mt-2 mb-2 h-full min-w-[400px]">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      tailwindStylesOnBackground="bg-gradient-to-r from-orange-900 to-yellow-900"
+    >
+      <div className="ml-6 mt-2 mb-6 w-full h-full min-w-[800px]">
         <h2 className="text-xl font-semibold mb-3 text-white">
-          Select your flashcards
+          Start reviewing your flashcards
         </h2>
 
         <select
@@ -82,7 +87,7 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
         >
           <option disabled value="">
             {" "}
-            -- select an option --{" "}
+            -- select one of the flashcard sets --{" "}
           </option>
 
           {flashcardFiles.map((flashcardFile, index) => {
@@ -94,32 +99,24 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
           })}
         </select>
 
+        {flashcardQAPairs.length === 0 && (
+          <p className="text-red-500 text-xs">Choose a set of flashcards</p>
+        )}
         {flashcardQAPairs.length > 0 && (
-          <ReactCardFlip
-            isFlipped={flashcardQAPairs[currentSelectedFlashcard].isFlipped}
-            flipDirection="vertical"
-          >
-            <button
-              className="bg-orange-700 mt-3 mb-2 border-none rounded-md h-10 
-              hover:bg-orange-900 cursor-pointer w-full h-full 
-              text-center text-lg"
-              onClick={() =>
-                updateFlashcardUnderReview(currentSelectedFlashcard, {
-                  ...flashcardQAPairs[currentSelectedFlashcard],
-                  isFlipped:
-                    !flashcardQAPairs[currentSelectedFlashcard].isFlipped,
-                })
-              }
+          <>
+            <ProgressBar
+              completed={currentSelectedFlashcard + 1}
+              total={flashcardQAPairs.length}
+              height="15px"
+            />
+            <ReactCardFlip
+              isFlipped={flashcardQAPairs[currentSelectedFlashcard].isFlipped}
+              flipDirection="vertical"
             >
-              <div className="text-white resize-y w-full h-64 flex items-center justify-center">
-                <p>{flashcardQAPairs[currentSelectedFlashcard].question}</p>
-              </div>
-            </button>
-            {flashcardQAPairs[currentSelectedFlashcard].isFlipped && ( // this boolean is required to ensure that we check the flipped boolean to prevent the answer from leaking
-              <button
-                className="bg-slate-700 mt-3 mb-2 border-none rounded-md h-10 
-                hover:bg-orange-900 cursor-pointer w-full h-full 
-                text-center text-lg"
+              <Button
+                className="bg-orange-900  mt-3 mb-2 border-none rounded-md h-10 
+              cursor-pointer w-[800px] h-full 
+              text-center text-lg normal-case"
                 onClick={() =>
                   updateFlashcardUnderReview(currentSelectedFlashcard, {
                     ...flashcardQAPairs[currentSelectedFlashcard],
@@ -127,15 +124,37 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
                       !flashcardQAPairs[currentSelectedFlashcard].isFlipped,
                   })
                 }
+                placeholder=""
               >
-                <div className="text-white resize-y w-full h-64 flex items-center justify-center">
-                  <p>{flashcardQAPairs[currentSelectedFlashcard].answer}</p>
+                <div className="text-white opacity-75 resize-y w-full h-64 flex items-center justify-center break-words">
+                  <p>{flashcardQAPairs[currentSelectedFlashcard].question}</p>
                 </div>
-              </button>
-            )}
-          </ReactCardFlip>
+              </Button>
+              {flashcardQAPairs[currentSelectedFlashcard].isFlipped && ( // this boolean is required to ensure that we check the flipped boolean to prevent the answer from leaking
+                <Button
+                  className="bg-slate-700 mt-3 mb-2 border-none rounded-md h-10 
+                hover:bg-slate-900 cursor-pointer w-[800px] h-full 
+                text-center text-lg normal-case"
+                  onClick={() =>
+                    updateFlashcardUnderReview(currentSelectedFlashcard, {
+                      ...flashcardQAPairs[currentSelectedFlashcard],
+                      isFlipped:
+                        !flashcardQAPairs[currentSelectedFlashcard].isFlipped,
+                    })
+                  }
+                  placeholder=""
+                >
+                  <div className="text-white resize-y w-full h-64 flex items-center justify-center break-words">
+                    <text>
+                      {flashcardQAPairs[currentSelectedFlashcard].answer}
+                    </text>
+                  </div>
+                </Button>
+              )}
+            </ReactCardFlip>
+          </>
         )}
-        <div className="flex items-center justify-around w-50">
+        <div className="flex items-center justify-around w-50 mt-6">
           <Button
             className="bg-slate-700 border-none h-10 w-20 text-center
             hover:bg-orange-900 cursor-pointer
@@ -166,15 +185,6 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
             {">"}
           </Button>
         </div>
-        <Button
-          className="bg-neutral-300 mt-3 mb-2 border-none h-10 bg-opacity-50
-          hover:bg-orange-900 hover:text-white cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 text-orange-900"
-          onClick={() => console.log("done reviewing")} // write the reviewed files into the progress log
-          placeholder={""}
-        >
-          Save progress
-        </Button>
-        {/* {errorMessage && <p className="text-red-500 text-xs">{errorMessage}</p>} */}
       </div>
     </Modal>
   );
