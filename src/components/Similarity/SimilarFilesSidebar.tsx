@@ -5,8 +5,8 @@ import { PiGraph } from "react-icons/pi";
 import { toast } from "react-toastify";
 import { errorToString } from "@/functions/error";
 import { FiRefreshCw } from "react-icons/fi";
-import { HighlightData } from "../Editor/HighlightExtension";
 import ResizableComponent from "../Generic/ResizableComponent";
+import { HighlightData } from "../Editor/HighlightExtension";
 
 interface SidebarComponentProps {
   filePath: string;
@@ -196,13 +196,6 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     </div>
   );
 };
-
-interface HighlightData {
-  position?: {
-    top: number;
-    left: number;
-  };
-}
 
 interface HighlightButtonProps {
   highlightData: HighlightData;
