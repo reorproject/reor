@@ -105,7 +105,7 @@ export const FileItem: React.FC<FileInfoProps> = ({
             isDirectory ? "font-semibold" : ""
           }`}
         >
-          {isDirectory? file.name : removeFileExtension(file.name)}
+          {isDirectory ? file.name : removeFileExtension(file.name)}
         </span>
       </div>
     </div>

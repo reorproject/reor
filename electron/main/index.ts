@@ -120,7 +120,7 @@ ipcMain.handle("open-file-dialog", async (event, extensions) => {
   }
 });
 
-ipcMain.on("index-files-in-directory", async (event) => {
+ipcMain.handle("index-files-in-directory", async (event) => {
   try {
     console.log("Indexing files in directory");
     const windowInfo = windowsManager.getWindowInfoForContents(event.sender);
@@ -166,7 +166,7 @@ ipcMain.on("index-files-in-directory", async (event) => {
   }
 });
 
-ipcMain.on("show-context-menu-file-item", (event, file) => {
+ipcMain.handle("show-context-menu-file-item", (event, file) => {
   const menu = new Menu();
   menu.append(
     new MenuItem({
@@ -195,7 +195,7 @@ ipcMain.on("show-context-menu-file-item", (event, file) => {
   }
 });
 
-ipcMain.on("open-external", (event, url) => {
+ipcMain.handle("open-external", (event, url) => {
   shell.openExternal(url);
 });
 
@@ -203,7 +203,7 @@ ipcMain.handle("get-platform", async () => {
   return process.platform;
 });
 
-ipcMain.on("open-new-window", () => {
+ipcMain.handle("open-new-window", () => {
   windowsManager.createWindow(store, preload, url, indexHtml);
 });
 
@@ -211,20 +211,21 @@ ipcMain.handle("path-basename", (event, pathString: string) => {
   return path.basename(pathString);
 });
 
-ipcMain.on("join-path", (event, ...args) => {
-  event.returnValue = path.join(...args);
+ipcMain.handle("path-sep", () => {
+  return path.sep;
+});
+
+ipcMain.handle("join-path", (event, ...args) => {
+  return path.join(...args);
 });
 
 ipcMain.handle("path-dirname", (event, pathString: string) => {
   return path.dirname(pathString) + path.sep;
 });
 
-ipcMain.on(
+ipcMain.handle(
   "add-extension-if-no-extension-present",
   (event, pathString: string) => {
-    event.returnValue = addExtensionToFilenameIfNoExtensionPresent(
-      pathString,
-      ".md"
-    );
+    return addExtensionToFilenameIfNoExtensionPresent(pathString, ".md");
   }
 );

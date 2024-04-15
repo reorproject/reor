@@ -116,10 +116,11 @@ class WindowsManager {
 
   getWindowInfoForContents(webContents: WebContents): WindowInfo | null {
     const windowID = this.getBrowserWindowId(webContents);
+    console.log("window id is: ", windowID);
     if (windowID === null) {
       return null;
     }
-
+    console.log("active windows: ", this.activeWindows);
     const windowInfo = this.activeWindows.find((w) => w.windowID === windowID);
     return windowInfo || null;
   }

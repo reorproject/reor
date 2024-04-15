@@ -18,17 +18,21 @@ const DirectorySelector: React.FC<DirectorySelectorProps> = ({
   };
 
   useEffect(() => {
-    const directory = window.electronStore.getVaultDirectory();
-    if (directory) {
-      setUserDirectory(directory);
-    }
+    const fetchDirectory = async () => {
+      const directory = await window.electronStore.getVaultDirectoryForWindow();
+      if (directory) {
+        setUserDirectory(directory);
+      }
+    };
+
+    fetchDirectory();
   }, []);
 
   useEffect(() => {
     if (!userDirectory) {
       setErrorMsg("Please select a directory");
     } else {
-      window.electronStore.setUserDirectory(userDirectory);
+      window.electronStore.setVaultDirectoryForWindow(userDirectory);
       setErrorMsg("");
     }
   }, [userDirectory]);

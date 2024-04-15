@@ -40,9 +40,9 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
         return;
       }
       const normalizedFileName = fileName.slice(0, 255).replace(/\\/g, "/");
-      const fullPath = window.path.join(
-        window.electronStore.getVaultDirectory(),
-        window.path.addExtensionIfNoExtensionPresent(normalizedFileName)
+      const fullPath = await window.path.join(
+        await window.electronStore.getVaultDirectoryForWindow(),
+        await window.path.addExtensionIfNoExtensionPresent(normalizedFileName)
       );
       window.files.createFile(fullPath, `# ${fileName}\n`);
       onFileSelect(fullPath);

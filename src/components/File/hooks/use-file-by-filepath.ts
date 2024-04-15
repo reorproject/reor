@@ -72,9 +72,9 @@ export const useFileByFilepath = () => {
 
   const openRelativePath = async (relativePath: string): Promise<string> => {
     const relativePathWithExtension =
-      window.path.addExtensionIfNoExtensionPresent(relativePath);
-    const absolutePath = window.path.join(
-      window.electronStore.getVaultDirectory(),
+      await window.path.addExtensionIfNoExtensionPresent(relativePath);
+    const absolutePath = await window.path.join(
+      await window.electronStore.getVaultDirectoryForWindow(),
       relativePathWithExtension
     );
     const fileExists = await window.files.checkFileExists(absolutePath);
@@ -239,8 +239,6 @@ export const useFileByFilepath = () => {
         });
         await window.files.indexFileInDatabase(currentlyOpenedFilePath);
       }
-
-      window.electron.destroyWindow();
     };
 
     const removeWindowCloseListener = window.ipcRenderer.receive(
