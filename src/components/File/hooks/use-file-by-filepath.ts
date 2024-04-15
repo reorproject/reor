@@ -102,6 +102,11 @@ export const useFileByFilepath = () => {
     onUpdate() {
       setIsFileContentModified(true);
     },
+    editorProps: {
+      attributes: {
+        spellcheck: "false", // Disable spellcheck
+      },
+    },
     extensions: [
       StarterKit,
       Document,
