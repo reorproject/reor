@@ -223,7 +223,6 @@ ipcMain.handle("path-dirname", (event, pathString: string) => {
   return path.dirname(pathString) + path.sep;
 });
 
-//get-files-in-directory
 ipcMain.handle("get-files-in-directory", (event, dirName: string) => {
   const itemsInDir = fs.readdirSync(dirName).filter((item) => !isHidden(item));
   return itemsInDir;

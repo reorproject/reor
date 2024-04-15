@@ -69,9 +69,9 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
       onClose={onClose}
       tailwindStylesOnBackground="bg-gradient-to-r from-orange-900 to-yellow-900"
     >
-      <div className="ml-6 mt-2 mb-6 w-full h-full min-w-[800px]">
+      <div className="ml-6 mt-2 mb-6 w-full h-full min-w-[900px]">
         <h2 className="text-xl font-semibold mb-3 text-white">
-          Start reviewing your flashcards
+          Flashcard Review Mode
         </h2>
 
         <select
@@ -115,7 +115,7 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
             >
               <Button
                 className="bg-orange-900  mt-3 mb-2 border-none rounded-md h-10 
-              cursor-pointer w-[800px] h-full 
+              cursor-pointer w-[900px] h-full 
               text-center text-lg normal-case"
                 onClick={() =>
                   updateFlashcardUnderReview(currentSelectedFlashcard, {
@@ -133,7 +133,7 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
               {flashcardQAPairs[currentSelectedFlashcard].isFlipped && ( // this boolean is required to ensure that we check the flipped boolean to prevent the answer from leaking
                 <Button
                   className="bg-slate-700 mt-3 mb-2 border-none rounded-md h-10 
-                hover:bg-slate-900 cursor-pointer w-[800px] h-full 
+                hover:bg-slate-900 cursor-pointer w-[900px] h-full 
                 text-center text-lg normal-case"
                   onClick={() =>
                     updateFlashcardUnderReview(currentSelectedFlashcard, {
