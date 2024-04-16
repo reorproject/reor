@@ -7,6 +7,7 @@ import { errorToString } from "@/functions/error";
 import { FiRefreshCw } from "react-icons/fi";
 import ResizableComponent from "../Generic/ResizableComponent";
 import { HighlightData } from "../Editor/HighlightExtension";
+import { FaArrowRight } from "react-icons/fa";
 
 interface SidebarComponentProps {
   filePath: string;
@@ -28,6 +29,7 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
       <HighlightButton
         highlightData={highlightData}
         onClick={async () => {
+          setSimilarEntries([]);
           const databaseFields = await window.database.getDatabaseFields();
           const filterString = `${databaseFields.NOTE_PATH} != '${filePath}'`;
           console.log("highlightData", highlightData.text);
@@ -201,25 +203,42 @@ interface HighlightButtonProps {
   highlightData: HighlightData;
   onClick: () => void;
 }
-
 const HighlightButton: React.FC<HighlightButtonProps> = ({
   highlightData,
   onClick,
 }) => {
+  const [showArrow, setShowArrow] = useState<boolean>(false);
+
+  useEffect(() => {
+    // Reset to PiGraph icon when the position becomes undefined (unmounted)
+    if (!highlightData.position) {
+      setShowArrow(false);
+    }
+  }, [highlightData.position]);
+
   if (!highlightData.position) {
     return null;
   }
 
   const { top, left } = highlightData.position;
 
+  const handleClick = () => {
+    onClick(); // This calls the provided onClick handler
+    setShowArrow(true); // Show the arrow icon
+  };
+
   return (
     <button
-      onClick={onClick}
+      onClick={handleClick}
       style={{ top: `${top}px`, left: `${left}px` }}
       className="absolute w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer text-white border-none shadow-md hover:bg-gray-300"
       aria-label="Highlight button"
     >
-      <PiGraph className="text-gray-800 " />
+      {showArrow ? (
+        <FaArrowRight className="text-gray-800" />
+      ) : (
+        <PiGraph className="text-gray-800" />
+      )}
     </button>
   );
 };
