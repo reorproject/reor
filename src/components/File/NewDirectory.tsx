@@ -3,7 +3,7 @@ import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
 import { errorToString } from "@/functions/error";
 import { toast } from "react-toastify";
-import { getInvalidCharacterInFileName } from "@/functions/strings";
+import { getInvalidCharacterInFilePath } from "@/functions/strings";
 
 interface NewDirectoryComponentProps {
   isOpen: boolean;
@@ -23,7 +23,7 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
     const newName = e.target.value;
     setDirectoryName(newName);
 
-    getInvalidCharacterInFileName(newName).then((invalidCharacter) => {
+    getInvalidCharacterInFilePath(newName).then((invalidCharacter) => {
       if (invalidCharacter) {
         setErrorMessage(
           `The character [${invalidCharacter}] cannot be included in directory name.`

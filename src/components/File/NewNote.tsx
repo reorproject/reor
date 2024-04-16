@@ -3,7 +3,7 @@ import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
 import { toast } from "react-toastify";
 import { errorToString } from "@/functions/error";
-import { getInvalidCharacterInFileName } from "@/functions/strings";
+import { getInvalidCharacterInFilePath } from "@/functions/strings";
 
 interface NewNoteComponentProps {
   isOpen: boolean;
@@ -23,7 +23,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
     const newName = e.target.value;
     setFileName(newName);
 
-    getInvalidCharacterInFileName(newName).then((invalidCharacter) => {
+    getInvalidCharacterInFilePath(newName).then((invalidCharacter) => {
       if (invalidCharacter) {
         setErrorMessage(
           `The character [${invalidCharacter}] cannot be included in note name.`

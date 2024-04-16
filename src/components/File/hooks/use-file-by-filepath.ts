@@ -12,7 +12,7 @@ import { Markdown } from "tiptap-markdown";
 
 import { BacklinkExtension } from "@/components/Editor/BacklinkExtension";
 import {
-  getInvalidCharacterInFileName,
+  getInvalidCharacterInFilePath,
   removeFileExtension,
 } from "@/functions/strings";
 import { SuggestionsState } from "@/components/Editor/BacklinkSuggestionsDisplay";
@@ -68,7 +68,7 @@ export const useFileByFilepath = () => {
   };
 
   const openRelativePath = async (relativePath: string): Promise<void> => {
-    const invalidChars = await getInvalidCharacterInFileName(relativePath);
+    const invalidChars = await getInvalidCharacterInFilePath(relativePath);
     if (invalidChars) {
       toast.error(
         `Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`
