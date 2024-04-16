@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useEditor, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Document from "@tiptap/extension-document";
@@ -11,11 +11,15 @@ import { useDebounce } from "use-debounce";
 import { Markdown } from "tiptap-markdown";
 
 import { BacklinkExtension } from "@/components/Editor/BacklinkExtension";
-import { removeFileExtension } from "@/functions/strings";
+import {
+  getInvalidCharacterInFileName,
+  removeFileExtension,
+} from "@/functions/strings";
 import { SuggestionsState } from "@/components/Editor/BacklinkSuggestionsDisplay";
 import HighlightExtension, {
   HighlightData,
 } from "@/components/Editor/HighlightExtension";
+import { toast } from "react-toastify";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
@@ -70,7 +74,14 @@ export const useFileByFilepath = () => {
     setCurrentlyChangingFilePath(false);
   };
 
-  const openRelativePath = async (relativePath: string): Promise<string> => {
+  const openRelativePath = async (relativePath: string): Promise<void> => {
+    const invalidChars = await getInvalidCharacterInFileName(relativePath);
+    if (invalidChars) {
+      toast.error(
+        `Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`
+      );
+      return;
+    }
     const relativePathWithExtension =
       await window.path.addExtensionIfNoExtensionPresent(relativePath);
     const absolutePath = await window.path.join(
@@ -86,15 +97,11 @@ export const useFileByFilepath = () => {
       );
     }
     openFileByPath(absolutePath);
-    return absolutePath;
+    // return absolutePath;
   };
 
-  // const openResolvedPath = async (relativePath: string) => {
-  //   const absolutePath = resolveRelativePath(relativePath);
-
-  //   // here we could check if the file exists and if not, create it:
-
-  // };
+  const openRelativePathRef = useRef<(newFilePath: string) => Promise<void>>();
+  openRelativePathRef.current = openRelativePath;
 
   const editor = useEditor({
     autofocus: true,
@@ -113,8 +120,8 @@ export const useFileByFilepath = () => {
       TaskItem.configure({
         nested: true,
       }),
-      BacklinkExtension(setSuggestionsState),
       HighlightExtension(setHighlightData),
+      BacklinkExtension(openRelativePathRef, setSuggestionsState),
     ],
   });
 
@@ -258,7 +265,6 @@ export const useFileByFilepath = () => {
     navigationHistory,
     setNavigationHistory,
     openFileByPath,
-    openRelativePath,
     suggestionsState,
     highlightData,
     noteToBeRenamed,
@@ -272,7 +278,6 @@ export const useFileByFilepath = () => {
 function getMarkdown(editor: Editor) {
   // Fetch the current markdown content from the editor
   const originalMarkdown = editor.storage.markdown.getMarkdown();
-  console.log("original markdown: ", originalMarkdown);
   // Replace the escaped square brackets with unescaped ones
   const modifiedMarkdown = originalMarkdown
     .replace(/\\\[/g, "[") // Replaces \[ with [

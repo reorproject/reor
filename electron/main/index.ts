@@ -15,6 +15,7 @@ import { StoreSchema } from "./Store/storeConfig";
 // import contextMenus from "./contextMenus";
 import * as lancedb from "vectordb";
 import {
+  markdownExtensions,
   startWatchingDirectory,
   updateFileListForRenderer,
 } from "./Files/Filesystem";
@@ -226,6 +227,10 @@ ipcMain.handle("path-dirname", (event, pathString: string) => {
 ipcMain.handle(
   "add-extension-if-no-extension-present",
   (event, pathString: string) => {
-    return addExtensionToFilenameIfNoExtensionPresent(pathString, ".md");
+    return addExtensionToFilenameIfNoExtensionPresent(
+      pathString,
+      markdownExtensions,
+      ".md"
+    );
   }
 );

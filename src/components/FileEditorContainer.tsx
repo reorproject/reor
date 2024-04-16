@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 import ChatWithLLM from "./Chat/Chat";
 import LeftSidebar from "./Sidebars/IconsSidebar";
@@ -24,7 +25,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     filePath,
     editor,
     openFileByPath,
-    openRelativePath,
     saveCurrentlyOpenedFile,
     suggestionsState,
     highlightData,
@@ -46,23 +46,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const toggleSimilarFiles = () => {
     setShowSimilarFiles(!showSimilarFiles);
   };
-
-  useEffect(() => {
-    const handleClick = async (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-      if (target.getAttribute("data-backlink") === "true") {
-        event.preventDefault();
-        const backlinkPath = target.textContent;
-        if (backlinkPath) await openRelativePath(backlinkPath);
-      }
-    };
-
-    document.addEventListener("click", handleClick);
-
-    return () => {
-      document.removeEventListener("click", handleClick);
-    };
-  }, [openRelativePath]);
 
   return (
     <div>
