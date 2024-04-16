@@ -67,7 +67,10 @@ export const useFileByFilepath = () => {
     setCurrentlyChangingFilePath(false);
   };
 
-  const openRelativePath = async (relativePath: string): Promise<void> => {
+  const openRelativePath = async (
+    relativePath: string,
+    optionalContentToWriteOnCreate?: string
+  ): Promise<void> => {
     const invalidChars = await getInvalidCharacterInFileName(relativePath);
     if (invalidChars) {
       toast.error(
@@ -84,10 +87,10 @@ export const useFileByFilepath = () => {
     const fileExists = await window.files.checkFileExists(absolutePath);
     if (!fileExists) {
       const basename = await window.path.basename(absolutePath);
-      await window.files.createFile(
-        absolutePath,
-        "## " + removeFileExtension(basename) + "\n"
-      );
+      const content = optionalContentToWriteOnCreate
+        ? optionalContentToWriteOnCreate
+        : "## " + removeFileExtension(basename) + "\n";
+      await window.files.createFile(absolutePath, content);
     }
     openFileByPath(absolutePath);
   };
@@ -184,16 +187,18 @@ export const useFileByFilepath = () => {
 
   useEffect(() => {
     async function checkAppUsage() {
+      if (!editor || currentlyOpenedFilePath) return;
       const hasOpened = await window.electronStore.getHasUserOpenedAppBefore();
+      console.log("has opened", hasOpened);
       if (!hasOpened) {
         console.log("opening welcome note");
         await window.electronStore.setHasUserOpenedAppBefore();
-        openRelativePath("Welcome to Reor");
+        openRelativePath("Welcome to Reor", welcomeNote);
       }
     }
 
     checkAppUsage();
-  }, []);
+  }, [editor, currentlyOpenedFilePath]);
 
   const renameFileNode = async (oldFilePath: string, newFilePath: string) => {
     await window.files.renameFileRecursive({
@@ -295,3 +300,27 @@ function getMarkdown(editor: Editor) {
 
   return modifiedMarkdown;
 }
+
+const welcomeNote = `## Welcome to Reor!
+
+Reor is a private personal AI knowledge management tool. Our philosophy is that AI should be a thought enhancer but should not do the thinking for you: Reor helps you find & connect notes, discover new insights in your notes and reason through your thoughts with the assistance of an LLM. Here are the three things you need to know to work your way around:
+
+- **Linking:**
+
+  - Reor automatically links your notes to other notes in the Related Notes sidebar. 
+
+  - You can narrow down those results by highlighting some text and hitting the button that appears. 
+
+  - You can also create Obsidian-like backlinks by surrounding text with pairs of square brackets. [[Like this]]
+
+- **Chat:**
+
+  - Ask your entire set of notes anything you want to know! Reor will automatically give the LLM relevant context. 
+
+  - Ask things like “What are my thoughts on philosophy?” or “ In settings, you can download a local LLM or attach your OpenAI key to use OpenAI models.
+
+- **Search:**
+
+  - Search in natural language. Reor uses semantic search so you don’t need to remember the exact phrasing you used to make your search.
+
+You can import notes from other apps by populating the vault directory with markdown files, Reor will only read markdown files. Most apps like Notion have an export to markdown option.`;
