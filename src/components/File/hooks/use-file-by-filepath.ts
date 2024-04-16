@@ -90,7 +90,6 @@ export const useFileByFilepath = () => {
       );
     }
     openFileByPath(absolutePath);
-    // return absolutePath;
   };
 
   const openRelativePathRef = useRef<(newFilePath: string) => Promise<void>>();
@@ -182,6 +181,19 @@ export const useFileByFilepath = () => {
       removeDeleteFileListener();
     };
   }, [currentlyOpenedFilePath, editor]);
+
+  useEffect(() => {
+    async function checkAppUsage() {
+      const hasOpened = await window.electronStore.getHasUserOpenedAppBefore();
+      if (!hasOpened) {
+        console.log("opening welcome note");
+        await window.electronStore.setHasUserOpenedAppBefore();
+        openRelativePath("Welcome to Reor");
+      }
+    }
+
+    checkAppUsage();
+  }, []);
 
   const renameFileNode = async (oldFilePath: string, newFilePath: string) => {
     await window.files.renameFileRecursive({

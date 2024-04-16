@@ -129,6 +129,18 @@ export const registerStoreHandlers = (
     );
     event.returnValue = store.get(StoreKeys.LLMGenerationParameters);
   });
+
+  ipcMain.handle("has-user-opened-app-before", () => {
+    console.log(
+      "has user opened app before",
+      store.get(StoreKeys.hasUserOpenedAppBefore)
+    );
+    return store.get(StoreKeys.hasUserOpenedAppBefore);
+  });
+
+  ipcMain.handle("set-user-has-opened-app-before", () => {
+    store.set(StoreKeys.hasUserOpenedAppBefore, true);
+  });
 };
 
 export function getDefaultEmbeddingModelConfig(

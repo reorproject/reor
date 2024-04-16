@@ -10,6 +10,5 @@ export function addExtensionToFilenameIfNoExtensionPresent(
   if (acceptableExtensions.includes(extension)) {
     return filename;
   }
-  console.log("filename: ", filename, "defaultExtension: ", defaultExtension);
   return `${filename}${defaultExtension}`;
 }

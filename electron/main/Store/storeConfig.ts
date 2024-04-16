@@ -41,6 +41,7 @@ export type HardwareConfig = {
 };
 
 export interface StoreSchema {
+  hasUserOpenedAppBefore: boolean;
   schemaVersion: number;
   user: {
     vaultDirectories: string[];
@@ -58,6 +59,7 @@ export interface StoreSchema {
 }
 
 export enum StoreKeys {
+  hasUserOpenedAppBefore = "hasUserOpenedAppBefore",
   SchemaVersion = "schemaVersion",
   DirectoryFromPreviousSession = "user.directoryFromPreviousSession",
   LLMs = "LLMs",
