@@ -5,6 +5,7 @@ interface ModalProps {
   onClose: () => void;
   children: React.ReactNode;
   hideCloseButton?: boolean;
+  tailwindStylesOnBackground?: string;
 }
 
 const Modal: React.FC<ModalProps> = ({
@@ -12,6 +13,7 @@ const Modal: React.FC<ModalProps> = ({
   onClose,
   children,
   hideCloseButton,
+  tailwindStylesOnBackground,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -33,10 +35,12 @@ const Modal: React.FC<ModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 ${tailwindStylesOnBackground}`}
+    >
       <div
         ref={modalRef}
-        className="flex bg-neutral-800 rounded-lg shadow-xl  max-w-lg"
+        className="flex bg-neutral-800 rounded-lg shadow-xl max-w-6xl"
       >
         {children}
         {!hideCloseButton && (

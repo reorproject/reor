@@ -10,6 +10,7 @@ import {
   GetFilesInfoTree,
   orchestrateEntryMove,
   createFileRecursive,
+  isHidden,
 } from "./Filesystem";
 import * as fs from "fs";
 import { updateFileInTable } from "../database/TableHelperFunctions";
@@ -240,4 +241,11 @@ export const registerFileHandlers = (
       }
     }
   );
+
+  ipcMain.handle("get-files-in-directory", (event, dirName: string) => {
+    const itemsInDir = fs
+      .readdirSync(dirName)
+      .filter((item) => !isHidden(item));
+    return itemsInDir;
+  });
 };
