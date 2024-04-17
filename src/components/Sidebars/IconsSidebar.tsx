@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import SettingsModal from "../Settings/Settings";
-import { MdSettings } from "react-icons/md";
+import { MdOutlineQuiz, MdSettings } from "react-icons/md";
 import { SidebarAbleToShow } from "../FileEditorContainer";
 import { IoFolderOutline } from "react-icons/io5";
 import { FaSearch } from "react-icons/fa";
@@ -9,6 +9,7 @@ import NewNoteComponent from "../File/NewNote";
 import NewDirectoryComponent from "../File/NewDirectory";
 import { GrNewWindow } from "react-icons/gr";
 import { LuFolderPlus } from "react-icons/lu";
+import FlashcardReviewModal from "../Flashcard/FlashcardReviewModal";
 
 interface LeftSidebarProps {
   onFileSelect: (path: string) => void;
@@ -24,6 +25,8 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isNewNoteModalOpen, setIsNewNoteModalOpen] = useState(false);
   const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false);
+  const [isFlashcardReviewModeOpen, setIsFlashcardReviewModeOpen] =
+    useState(false);
 
   return (
     <div className="w-full h-full bg-neutral-800 flex flex-col items-center justify-between">
@@ -87,6 +90,19 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
           {/* < /> */}
         </div>
       </div>
+      <div
+        className="bg-transparent border-none cursor-pointer flex items-center justify-center w-full h-8 "
+        onClick={() => setIsFlashcardReviewModeOpen(true)}
+      >
+        <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
+          <MdOutlineQuiz
+            className="text-gray-200"
+            size={23}
+            title="Flashcard quiz"
+          />
+          {/* < /> */}
+        </div>
+      </div>
       <NewNoteComponent
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
@@ -97,6 +113,12 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
         onClose={() => setIsNewDirectoryModalOpen(false)}
         onDirectoryCreate={() => console.log("Directory created")}
       />
+      {isFlashcardReviewModeOpen && (
+        <FlashcardReviewModal
+          isOpen={isFlashcardReviewModeOpen}
+          onClose={() => setIsFlashcardReviewModeOpen(false)}
+        />
+      )}
       <div className="flex-grow border-1 border-yellow-300"></div>
       <SettingsModal
         isOpen={isSettingsModalOpen}

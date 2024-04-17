@@ -10,6 +10,7 @@ import {
   GetFilesInfoTree,
   orchestrateEntryMove,
   createFileRecursive,
+  isHidden,
 } from "./Filesystem";
 import * as fs from "fs";
 import { updateFileInTable } from "../database/TableHelperFunctions";
@@ -110,6 +111,11 @@ export const registerFileHandlers = (
   ipcMain.handle(
     "write-file",
     async (event, writeFileProps: WriteFileProps) => {
+      if (!fs.existsSync(path.dirname(writeFileProps.filePath))) {
+        fs.mkdirSync(path.dirname(writeFileProps.filePath), {
+          recursive: true,
+        });
+      }
       fs.writeFileSync(
         writeFileProps.filePath,
         writeFileProps.content,
@@ -234,4 +240,11 @@ export const registerFileHandlers = (
       }
     }
   );
+
+  ipcMain.handle("get-files-in-directory", (event, dirName: string) => {
+    const itemsInDir = fs
+      .readdirSync(dirName)
+      .filter((item) => !isHidden(item));
+    return itemsInDir;
+  });
 };

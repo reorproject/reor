@@ -56,6 +56,7 @@
     "npm": "^10.3.0",
     "ollama": "^0.4.9",
     "openai": "^4.20.0",
+    "react-card-flip": "^1.2.2",
     "react-icons": "^4.12.0",
     "react-markdown": "^9.0.1",
     "react-quill": "^2.0.0",

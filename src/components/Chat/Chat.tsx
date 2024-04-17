@@ -15,6 +15,14 @@ import { FiRefreshCw } from "react-icons/fi"; // Importing refresh icon from Rea
 import { ChatPrompt } from "./Chat-Prompts";
 import { CustomLinkMarkdown } from "./CustomLinkMarkdown";
 import { ChatCompletionChunk } from "openai/resources/chat/completions";
+import { ChatAction } from "./ChatAction";
+import {
+  storeFlashcardPairsAsJSON,
+  parseFlashcardQAPair,
+  canBeParsedAsFlashcardQAPair,
+  CONVERT_TO_FLASHCARDS_FROM_CHAT,
+  FlashcardQAPair,
+} from "../Flashcard";
 
 // convert ask options to enum
 enum AskOptions {
@@ -40,6 +48,8 @@ const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
   ],
 };
 
+const FILE_REFERENCE_DELIMITER = "\n -- -- -- \n";
+
 type ChatUIMessage = {
   role: "user" | "assistant";
   content: string;
@@ -60,6 +70,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const [defaultModel, setDefaultModel] = useState<string>("");
   const [askText, setAskText] = useState<AskOptions>(AskOptions.Ask);
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
+  const [canGenerateFlashcard, setCanGenerateFlashcard] =
+    useState<boolean>(false);
   const [filesReferenced, setFilesReferenced] = useState<string[]>([]);
   const [currentBotMessage, setCurrentBotMessage] =
     useState<ChatUIMessage | null>(null);
@@ -189,6 +201,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
         setFilesReferenced(uniqueFilesReferenced);
         augmentedPrompt = ragPrompt;
+        setCanGenerateFlashcard(true);
       }
     } catch (error) {
       console.error("Failed to augment prompt:", error);
@@ -201,13 +214,13 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       return;
     }
 
-    startStreamingResponse(llmName, augmentedPrompt);
+    startStreamingResponse(llmName, augmentedPrompt, false);
     setCurrentBotMessage(null);
   };
 
   const addCollapsibleDetailsInMarkdown = (content: string, title: string) => {
     // <span/> is required to demarcate the start of collapsible details from the markdown line
-    return `\n -- -- -- \n <span/> <details> <summary> *${title.trim()}* </summary> \n ${content} </details>`;
+    return `${FILE_REFERENCE_DELIMITER} <span/> <details> <summary> *${title.trim()}* </summary> \n ${content} </details>`;
   };
 
   useEffect(() => {
@@ -259,10 +272,23 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     fetchDefaultModel();
   };
 
+  const parseChatMessageIntoFlashcardPairs = (
+    messageToBeParsed: string
+  ): FlashcardQAPair[] => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [actualOutput, _fileReferences] = messageToBeParsed.split(
+      FILE_REFERENCE_DELIMITER
+    );
+    return actualOutput.split("<br/><br/>").map((line) => {
+      return parseFlashcardQAPair(line);
+    });
+  };
+
   const startStreamingResponse = async (
     // sessionId: string,
     llmName: string,
-    prompt: string
+    prompt: string,
+    isJSONMode: boolean
   ) => {
     try {
       console.log("Initializing streaming response...");
@@ -275,9 +301,12 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       if (!currentModelConfig) {
         throw new Error(`No model config found for model: ${llmName}`);
       }
-      await window.llm.streamingLLMResponse(llmName, currentModelConfig, [
-        { role: "user", content: prompt },
-      ]);
+      await window.llm.streamingLLMResponse(
+        llmName,
+        currentModelConfig,
+        isJSONMode,
+        [{ role: "user", content: prompt }]
+      );
       console.log("Initialized streaming response");
       setLoadingResponse(false);
     } catch (error) {
@@ -363,6 +392,23 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             </ReactMarkdown>
           )}
         </div>
+        {canGenerateFlashcard &&
+          currentBotMessage &&
+          canBeParsedAsFlashcardQAPair(currentBotMessage.content) && (
+            <ChatAction
+              actionText={CONVERT_TO_FLASHCARDS_FROM_CHAT}
+              onClick={async () => {
+                const flashcardQAPairs = parseChatMessageIntoFlashcardPairs(
+                  currentBotMessage.content
+                );
+                await storeFlashcardPairsAsJSON(
+                  flashcardQAPairs,
+                  currentFilePath
+                );
+                setCanGenerateFlashcard(false);
+              }}
+            />
+          )}
         {userTextFieldInput === "" && messages.length == 0 ? (
           <>
             {EXAMPLE_PROMPTS[askText].map((option, index) => {

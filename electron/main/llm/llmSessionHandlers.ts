@@ -28,6 +28,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       event: IpcMainInvokeEvent,
       llmName: string,
       llmConfig: LLMConfig,
+      isJSONMode: boolean,
       messageHistory: ChatCompletionMessageParam[]
     ): Promise<void> => {
       const handleChunk = (chunk: ChatCompletionChunk) => {
@@ -36,6 +37,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       await openAISession.streamingResponse(
         llmName,
         llmConfig,
+        isJSONMode,
         messageHistory,
         handleChunk,
         store.get(StoreKeys.LLMGenerationParameters)

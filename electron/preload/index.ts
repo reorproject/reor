@@ -87,11 +87,13 @@ declare global {
       dirname: (pathString: string) => Promise<string>;
       addExtensionIfNoExtensionPresent: (pathString: string) => Promise<string>;
       pathSep: () => Promise<string>;
+      getAllFilenamesInDirectory: (dirName: string) => Promise<string[]>;
     };
     llm: {
       streamingLLMResponse: (
         llmName: string,
         llmConfig: LLMConfig,
+        isJSONMode: boolean,
         messageHistory: ChatCompletionMessageParam[]
       ) => Promise<string>;
       getLLMConfigs: () => Promise<LLMConfig[]>;
@@ -120,6 +122,8 @@ declare global {
       setHardwareConfig: (config: HardwareConfig) => void;
       getLLMGenerationParams: () => Promise<LLMGenerationParameters>;
       setLLMGenerationParams: (params: LLMGenerationParameters) => void;
+      getHasUserOpenedAppBefore: () => boolean;
+      setHasUserOpenedAppBefore: () => void;
     };
   }
 }
@@ -234,6 +238,12 @@ contextBridge.exposeInMainWorld("electronStore", {
   setLLMGenerationParams: (params: LLMGenerationParameters) => {
     ipcRenderer.invoke("set-llm-generation-params", params);
   },
+  getHasUserOpenedAppBefore: () => {
+    return ipcRenderer.invoke("has-user-opened-app-before");
+  },
+  setHasUserOpenedAppBefore: () => {
+    return ipcRenderer.invoke("set-user-has-opened-app-before");
+  },
 });
 
 contextBridge.exposeInMainWorld("ipcRenderer", {
@@ -326,6 +336,8 @@ contextBridge.exposeInMainWorld("path", {
   },
   pathSep: () => {
     return ipcRenderer.invoke("path-sep");
+  getAllFilenamesInDirectory: (dirName: string) => {
+    return ipcRenderer.invoke("get-files-in-directory", dirName);
   },
 });
 
@@ -333,12 +345,14 @@ contextBridge.exposeInMainWorld("llm", {
   streamingLLMResponse: async (
     llmName: string,
     llmConfig: LLMConfig,
+    isJSONMode: boolean,
     messageHistory: ChatCompletionMessageParam[]
   ) => {
     return await ipcRenderer.invoke(
       "streaming-llm-response",
       llmName,
       llmConfig,
+      isJSONMode,
       messageHistory
     );
   },
