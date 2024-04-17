@@ -131,10 +131,6 @@ export const registerStoreHandlers = (
   });
 
   ipcMain.handle("has-user-opened-app-before", () => {
-    console.log(
-      "has user opened app before",
-      store.get(StoreKeys.hasUserOpenedAppBefore)
-    );
     return store.get(StoreKeys.hasUserOpenedAppBefore);
   });
 
