@@ -124,6 +124,8 @@ declare global {
       setHardwareConfig: (config: HardwareConfig) => void;
       getLLMGenerationParams: () => LLMGenerationParameters;
       setLLMGenerationParams: (params: LLMGenerationParameters) => void;
+      getHasUserOpenedAppBefore: () => boolean;
+      setHasUserOpenedAppBefore: () => void;
     };
   }
 }
@@ -238,6 +240,12 @@ contextBridge.exposeInMainWorld("electronStore", {
   },
   setLLMGenerationParams: (params: LLMGenerationParameters) => {
     ipcRenderer.send("set-llm-generation-params", params);
+  },
+  getHasUserOpenedAppBefore: () => {
+    return ipcRenderer.invoke("has-user-opened-app-before");
+  },
+  setHasUserOpenedAppBefore: () => {
+    return ipcRenderer.invoke("set-user-has-opened-app-before");
   },
 });
 
