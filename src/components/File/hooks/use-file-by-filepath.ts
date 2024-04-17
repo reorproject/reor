@@ -17,6 +17,7 @@ import {
 } from "@/functions/strings";
 import { SuggestionsState } from "@/components/Editor/BacklinkSuggestionsDisplay";
 import { toast } from "react-toastify";
+import { RichTextLink } from "@/components/Editor/RichTextLink";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
@@ -47,16 +48,6 @@ export const useFileByFilepath = () => {
 		2. When the component unmounts
 		3. when the file is deleted
 	 */
-  Markdown.configure({
-    html: true, // Allow HTML input/output
-    tightLists: true, // No <p> inside <li> in markdown output
-    tightListClass: "tight", // Add class to <ul> allowing you to remove <p> margins when tight
-    bulletListMarker: "-", // <li> prefix in markdown output
-    linkify: false, // Create links from "https://..." text
-    breaks: true, // New lines (\n) in markdown input are converted to <br>
-    transformPastedText: false, // Allow to paste markdown text in the editor
-    transformCopiedText: false, // Copied text is transformed to markdown
-  });
 
   const openFileByPath = async (newFilePath: string) => {
     setCurrentlyChangingFilePath(true);
@@ -108,10 +99,22 @@ export const useFileByFilepath = () => {
       Paragraph,
       Text,
       TaskList,
-      Markdown,
-
+      Markdown.configure({
+        html: true, // Allow HTML input/output
+        tightLists: true, // No <p> inside <li> in markdown output
+        tightListClass: "tight", // Add class to <ul> allowing you to remove <p> margins when tight
+        bulletListMarker: "-", // <li> prefix in markdown output
+        linkify: true, // Create links from "https://..." text
+        breaks: true, // New lines (\n) in markdown input are converted to <br>
+        transformPastedText: true, // Allow to paste markdown text in the editor
+        transformCopiedText: true, // Copied text is transformed to markdown
+      }),
       TaskItem.configure({
         nested: true,
+      }),
+      RichTextLink.configure({
+        linkOnPaste: true,
+        openOnClick: true,
       }),
       BacklinkExtension(openRelativePathRef, setSuggestionsState),
     ],
