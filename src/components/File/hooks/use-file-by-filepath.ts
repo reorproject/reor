@@ -313,7 +313,7 @@ function getMarkdown(editor: Editor) {
 
 const welcomeNote = `## Welcome to Reor!
 
-Reor is a private personal AI knowledge management tool. Our philosophy is that AI should be a thought enhancer not a thought replacer: Reor helps you find & connect notes, discover new insights and enhance your reasoning.
+Reor is a private AI personal knowledge management tool. Our philosophy is that AI should be a thought enhancer not a thought replacer: Reor helps you find & connect notes, discover new insights and enhance your reasoning.
 
 Some features you should be aware of:
 
