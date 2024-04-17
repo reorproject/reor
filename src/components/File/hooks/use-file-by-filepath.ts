@@ -28,7 +28,9 @@ export const useFileByFilepath = () => {
   >(null);
   const [suggestionsState, setSuggestionsState] =
     useState<SuggestionsState | null>();
-  const [isFileContentModified, setIsFileContentModified] =
+  const [needToWriteEditorContentToDisk, setNeedToWriteEditorContentToDisk] =
+    useState<boolean>(false);
+  const [needToIndexEditorContent, setNeedToIndexEditorContent] =
     useState<boolean>(false);
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>("");
   const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>("");
@@ -58,7 +60,11 @@ export const useFileByFilepath = () => {
 
   const openFileByPath = async (newFilePath: string) => {
     setCurrentlyChangingFilePath(true);
-    await saveEditorContentToPath(editor, currentlyOpenedFilePath, true);
+    await writeEditorContentToDisk(editor, currentlyOpenedFilePath);
+    if (currentlyOpenedFilePath && needToIndexEditorContent) {
+      window.files.indexFileInDatabase(currentlyOpenedFilePath);
+      setNeedToIndexEditorContent(false);
+    }
     const newFileContent = (await window.files.readFile(newFilePath)) ?? "";
     editor?.commands.setContent(newFileContent);
     setCurrentlyOpenedFilePath(newFilePath);
@@ -74,7 +80,9 @@ export const useFileByFilepath = () => {
       toast.error(
         `Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`
       );
-      return;
+      throw new Error(
+        `Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`
+      );
     }
     const relativePathWithExtension =
       await window.path.addExtensionIfNoExtensionPresent(relativePath);
@@ -89,6 +97,7 @@ export const useFileByFilepath = () => {
         ? optionalContentToWriteOnCreate
         : "## " + removeFileExtension(basename) + "\n";
       await window.files.createFile(absolutePath, content);
+      setNeedToIndexEditorContent(true);
     }
     openFileByPath(absolutePath);
   };
@@ -100,7 +109,8 @@ export const useFileByFilepath = () => {
     autofocus: true,
 
     onUpdate() {
-      setIsFileContentModified(true);
+      setNeedToWriteEditorContentToDisk(true);
+      setNeedToIndexEditorContent(true);
     },
     editorProps: {
       attributes: {
@@ -139,7 +149,7 @@ export const useFileByFilepath = () => {
 
   useEffect(() => {
     if (debouncedEditor && !currentlyChangingFilePath) {
-      saveEditorContentToPath(editor, currentlyOpenedFilePath);
+      writeEditorContentToDisk(editor, currentlyOpenedFilePath);
     }
   }, [
     debouncedEditor,
@@ -149,15 +159,14 @@ export const useFileByFilepath = () => {
   ]);
 
   const saveCurrentlyOpenedFile = async () => {
-    await saveEditorContentToPath(editor, currentlyOpenedFilePath);
+    await writeEditorContentToDisk(editor, currentlyOpenedFilePath);
   };
 
-  const saveEditorContentToPath = async (
+  const writeEditorContentToDisk = async (
     editor: Editor | null,
-    filePath: string | null,
-    indexFileInDatabase: boolean = false
+    filePath: string | null
   ) => {
-    if (filePath !== null && isFileContentModified && editor) {
+    if (filePath !== null && needToWriteEditorContentToDisk && editor) {
       const markdownContent = getMarkdown(editor);
       if (markdownContent !== null) {
         await window.files.writeFile({
@@ -165,11 +174,10 @@ export const useFileByFilepath = () => {
           content: markdownContent,
         });
 
-        setIsFileContentModified(false);
-
-        if (indexFileInDatabase) {
-          window.files.indexFileInDatabase(filePath);
-        }
+        console.log(
+          "setting is file content modified to false in actual save function"
+        );
+        setNeedToWriteEditorContentToDisk(false);
       }
     }
   };
@@ -290,6 +298,7 @@ export const useFileByFilepath = () => {
     navigationHistory,
     setNavigationHistory,
     openFileByPath,
+    openRelativePath,
     suggestionsState,
     highlightData,
     noteToBeRenamed,

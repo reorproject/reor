@@ -24,6 +24,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     filePath,
     editor,
     openFileByPath,
+    openRelativePath,
     saveCurrentlyOpenedFile,
     suggestionsState,
     highlightData,
@@ -82,6 +83,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         <div className="w-[35px] border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid">
           <LeftSidebar
             onFileSelect={openFileByPath}
+            openRelativePath={openRelativePath}
             sidebarShowing={sidebarShowing}
             makeSidebarShow={setSidebarShowing}
           />

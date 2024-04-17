@@ -12,13 +12,13 @@ import { LuFolderPlus } from "react-icons/lu";
 import FlashcardReviewModal from "../Flashcard/FlashcardReviewModal";
 
 interface LeftSidebarProps {
-  onFileSelect: (path: string) => void;
+  openRelativePath: (path: string) => void;
   sidebarShowing: SidebarAbleToShow;
   makeSidebarShow: (show: SidebarAbleToShow) => void;
 }
 
 const LeftSidebar: React.FC<LeftSidebarProps> = ({
-  onFileSelect,
+  openRelativePath,
   sidebarShowing,
   makeSidebarShow,
 }) => {
@@ -106,7 +106,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
       <NewNoteComponent
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
-        onFileSelect={onFileSelect}
+        openRelativePath={openRelativePath}
       />
       <NewDirectoryComponent
         isOpen={isNewDirectoryModalOpen}
