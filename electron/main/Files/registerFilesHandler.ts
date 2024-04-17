@@ -157,7 +157,6 @@ export const registerFileHandlers = (
       throw new Error("Window info not found.");
     }
     await updateFileInTable(windowInfo.dbTableClient, filePath);
-    event.sender.send("vector-database-update");
   });
 
   ipcMain.handle(

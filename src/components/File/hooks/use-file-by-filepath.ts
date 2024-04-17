@@ -16,6 +16,9 @@ import {
   removeFileExtension,
 } from "@/functions/strings";
 import { SuggestionsState } from "@/components/Editor/BacklinkSuggestionsDisplay";
+import HighlightExtension, {
+  HighlightData,
+} from "@/components/Editor/HighlightExtension";
 import { toast } from "react-toastify";
 
 export const useFileByFilepath = () => {
@@ -31,6 +34,10 @@ export const useFileByFilepath = () => {
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
   const [currentlyChangingFilePath, setCurrentlyChangingFilePath] =
     useState(false);
+  const [highlightData, setHighlightData] = useState<HighlightData>({
+    text: "",
+    position: null,
+  });
 
   const setFileNodeToBeRenamed = async (filePath: string) => {
     const isDirectory = await window.files.isDirectory(filePath);
@@ -76,9 +83,9 @@ export const useFileByFilepath = () => {
       return;
     }
     const relativePathWithExtension =
-      window.path.addExtensionIfNoExtensionPresent(relativePath);
-    const absolutePath = window.path.join(
-      window.electronStore.getVaultDirectory(),
+      await window.path.addExtensionIfNoExtensionPresent(relativePath);
+    const absolutePath = await window.path.join(
+      await window.electronStore.getVaultDirectoryForWindow(),
       relativePathWithExtension
     );
     const fileExists = await window.files.checkFileExists(absolutePath);
@@ -113,6 +120,7 @@ export const useFileByFilepath = () => {
       TaskItem.configure({
         nested: true,
       }),
+      HighlightExtension(setHighlightData),
       BacklinkExtension(openRelativePathRef, setSuggestionsState),
     ],
   });
@@ -238,8 +246,6 @@ export const useFileByFilepath = () => {
         });
         await window.files.indexFileInDatabase(currentlyOpenedFilePath);
       }
-
-      window.electron.destroyWindow();
     };
 
     const removeWindowCloseListener = window.ipcRenderer.receive(
@@ -260,6 +266,7 @@ export const useFileByFilepath = () => {
     setNavigationHistory,
     openFileByPath,
     suggestionsState,
+    highlightData,
     noteToBeRenamed,
     setNoteToBeRenamed,
     fileDirToBeRenamed,
