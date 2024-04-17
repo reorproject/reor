@@ -336,6 +336,7 @@ contextBridge.exposeInMainWorld("path", {
   },
   pathSep: () => {
     return ipcRenderer.invoke("path-sep");
+  },
   getAllFilenamesInDirectory: (dirName: string) => {
     return ipcRenderer.invoke("get-files-in-directory", dirName);
   },

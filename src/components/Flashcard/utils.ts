@@ -37,7 +37,7 @@ export const storeFlashcardPairsAsJSON = async (
   const fileName = await window.path.basename(currentFilePath);
   const trimmedFileName = removeFileExtension(fileName);
   const filePath = await window.path.join(
-    window.electronStore.getVaultDirectory(),
+    await window.electronStore.getVaultDirectoryForWindow(),
     FLASHCARD_DIR,
     `${trimmedFileName}.json`
   );
@@ -57,7 +57,7 @@ export const storeFlashcardPairsAsJSON = async (
 
 export const getFlashcardVaultDirectory = async (): Promise<string> => {
   const vaultDirectoryWithFlashcards = await window.path.join(
-    await window.electronStore.getVaultDirectory(),
+    await window.electronStore.getVaultDirectoryForWindow(),
     FLASHCARD_DIR
   );
   return vaultDirectoryWithFlashcards;
