@@ -36,8 +36,9 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
             Welcome to the Reor Project.
           </h2>
           <p className="mt-2 text-gray-100 ">
-            Reor is a self-organising note-taking app. Each note will be saved
-            as a markdown file to a &quot;vault&quot; directory on your machine.
+            Reor is a private AI personal knowledge management tool. Each note
+            will be saved as a markdown file to a &quot;vault&quot; directory on
+            your machine.
           </p>
           <p className="mt-2 text-gray-100">
             Choose your vault directory here:

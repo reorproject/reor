@@ -313,24 +313,34 @@ function getMarkdown(editor: Editor) {
 
 const welcomeNote = `## Welcome to Reor!
 
-Reor is a private personal AI knowledge management tool. Our philosophy is that AI should be a thought enhancer but should not do the thinking for you: Reor helps you find & connect notes, discover new insights in your notes and reason through your thoughts with the assistance of an LLM. Here are the three things you need to know to work your way around:
+Reor is a private personal AI knowledge management tool. Our philosophy is that AI should be a thought enhancer not a thought replacer: Reor helps you find & connect notes, discover new insights and enhance your reasoning.
 
-- **Linking:**
+Some features you should be aware of:
+
+- **Links:**
 
   - Reor automatically links your notes to other notes in the Related Notes sidebar. 
 
-  - You can narrow down those results by highlighting some text and hitting the button that appears. 
+  - You can view the Related Notes to a particular chunk of text by highlighting it and hitting the button that appears. 
 
-  - You can also create Obsidian-like backlinks by surrounding text with pairs of square brackets. [[Like this]]
+  - You can also create inline links by surrounding text with two square brackets (like in Obsidian). [[Like this]]
 
 - **Chat:**
 
   - Ask your entire set of notes anything you want to know! Reor will automatically give the LLM relevant context. 
 
-  - Ask things like “What are my thoughts on philosophy?” or “ In settings, you can download a local LLM or attach your OpenAI key to use OpenAI models.
+  - Ask things like “What are my thoughts on philosophy?” or “Summarize my notes on black holes"
+  
+  - In settings, you can attach a local LLM or connect to OpenAI models with your API key.
 
-- **Search:**
+- **AI Flashcards:**
 
-  - Search in natural language. Reor uses semantic search so you don’t need to remember the exact phrasing you used to make your search.
+  - Generate flashcards from any note by going to the chat window and hitting the toggle in the bottom right to "Flashcard Ask" mode.
 
-You can import notes from other apps by populating the vault directory with markdown files, Reor will only read markdown files. Most apps like Notion have an export to markdown option.`;
+  - Then generate flashcards by running a prompt like "Generate flashcards for this note"
+
+  - Then hit the flashcard icon in the left sidebar to see your flashcards :)
+
+You can import notes from other apps by adding markdown files to your vault directory. Note that Reor will only read markdown files.
+
+Please join our [Discord community](https://discord.gg/QBhGUFJYuH) to ask questions, give feedback, and get help. We're excited to have you on board!`;
