@@ -17,8 +17,8 @@ export const registerStoreHandlers = (
   // fileWatcher: FSWatcher | null
 ) => {
   initializeAndMaybeMigrateStore(store);
-  ipcMain.handle(
-    "set-vault-directory-for-window",
+  ipcMain.on(
+    "set-user-directory",
     async (event, userDirectory: string): Promise<void> => {
       console.log("setting user directory", userDirectory);
       windowsManager.setVaultDirectoryForContents(
@@ -26,10 +26,12 @@ export const registerStoreHandlers = (
         userDirectory,
         store
       );
+
+      event.returnValue = "success";
     }
   );
 
-  ipcMain.handle("get-vault-directory-for-window", (event) => {
+  ipcMain.on("get-vault-directory", (event) => {
     let path = windowsManager.getVaultDirectoryForWinContents(event.sender);
     if (!path) {
       path = windowsManager.getAndSetupDirectoryForWindowFromPreviousAppSession(
@@ -37,13 +39,13 @@ export const registerStoreHandlers = (
         store
       );
     }
-    return path;
+    event.returnValue = path;
   });
-  ipcMain.handle("set-default-embedding-model", (event, repoName: string) => {
+  ipcMain.on("set-default-embedding-model", (event, repoName: string) => {
     store.set(StoreKeys.DefaultEmbeddingModelAlias, repoName);
   });
 
-  ipcMain.handle(
+  ipcMain.on(
     "add-new-local-embedding-model",
     (event, model: EmbeddingModelWithLocalPath) => {
       const currentModels = store.get(StoreKeys.EmbeddingModels) || {};
@@ -56,7 +58,7 @@ export const registerStoreHandlers = (
     }
   );
 
-  ipcMain.handle(
+  ipcMain.on(
     "add-new-repo-embedding-model",
     (event, model: EmbeddingModelWithRepo) => {
       const currentModels = store.get(StoreKeys.EmbeddingModels) || {};
@@ -68,11 +70,11 @@ export const registerStoreHandlers = (
     }
   );
 
-  ipcMain.handle("get-embedding-models", () => {
-    return store.get(StoreKeys.EmbeddingModels);
+  ipcMain.on("get-embedding-models", (event) => {
+    event.returnValue = store.get(StoreKeys.EmbeddingModels);
   });
 
-  ipcMain.handle(
+  ipcMain.on(
     "update-embedding-model",
     (
       event,
@@ -87,7 +89,7 @@ export const registerStoreHandlers = (
     }
   );
 
-  ipcMain.handle("remove-embedding-model", (event, modelName: string) => {
+  ipcMain.on("remove-embedding-model", (event, modelName: string) => {
     const currentModels = store.get(StoreKeys.EmbeddingModels) || {};
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { [modelName]: _, ...updatedModels } = currentModels;
@@ -95,37 +97,37 @@ export const registerStoreHandlers = (
     store.set(StoreKeys.EmbeddingModels, updatedModels);
   });
 
-  ipcMain.handle("set-no-of-rag-examples", (event, noOfExamples: number) => {
+  ipcMain.on("set-no-of-rag-examples", (event, noOfExamples: number) => {
     store.set(StoreKeys.MaxRAGExamples, noOfExamples);
   });
 
-  ipcMain.handle("get-no-of-rag-examples", () => {
-    return store.get(StoreKeys.MaxRAGExamples);
+  ipcMain.on("get-no-of-rag-examples", (event) => {
+    event.returnValue = store.get(StoreKeys.MaxRAGExamples);
   });
 
-  ipcMain.handle("get-default-embedding-model", () => {
-    return store.get(StoreKeys.DefaultEmbeddingModelAlias);
+  ipcMain.on("get-default-embedding-model", (event) => {
+    event.returnValue = store.get(StoreKeys.DefaultEmbeddingModelAlias);
   });
 
-  ipcMain.handle("get-hardware-config", () => {
-    return store.get(StoreKeys.Hardware);
+  ipcMain.on("get-hardware-config", (event) => {
+    event.returnValue = store.get(StoreKeys.Hardware);
   });
 
-  ipcMain.handle("set-hardware-config", (event, hardwareConfig) => {
+  ipcMain.on("set-hardware-config", (event, hardwareConfig) => {
     store.set(StoreKeys.Hardware, hardwareConfig);
   });
 
-  ipcMain.handle("set-llm-generation-params", (event, generationParams) => {
+  ipcMain.on("set-llm-generation-params", (event, generationParams) => {
     console.log("setting generation params", generationParams);
     store.set(StoreKeys.LLMGenerationParameters, generationParams);
   });
 
-  ipcMain.handle("get-llm-generation-params", () => {
+  ipcMain.on("get-llm-generation-params", (event) => {
     console.log(
       "getting generation params",
       store.get(StoreKeys.LLMGenerationParameters)
     );
-    return store.get(StoreKeys.LLMGenerationParameters);
+    event.returnValue = store.get(StoreKeys.LLMGenerationParameters);
   });
 };
 

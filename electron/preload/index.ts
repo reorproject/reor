@@ -32,6 +32,7 @@ declare global {
       openExternal: (url: string) => void;
       getPlatform: () => string;
       openNewWindow: () => void;
+      destroyWindow: () => void;
     };
     contextMenu: {
       showFileItemContextMenu: (filePath: FileInfoNode) => void;
@@ -43,7 +44,7 @@ declare global {
         filter?: string
       ) => Promise<DBQueryResult[]>;
       deleteLanceDBEntriesByFilePath: (filePath: string) => Promise<void>;
-      indexFilesInDirectory: () => Promise<void>;
+      indexFilesInDirectory: () => void;
       augmentPromptWithRAG: (
         prompt: string,
         llmName: string,
@@ -83,10 +84,9 @@ declare global {
     };
     path: {
       basename: (pathString: string) => Promise<string>;
-      join: (...pathSegments: string[]) => Promise<string>;
+      join: (...pathSegments: string[]) => string;
       dirname: (pathString: string) => Promise<string>;
-      addExtensionIfNoExtensionPresent: (pathString: string) => Promise<string>;
-      pathSep: () => Promise<string>;
+      addExtensionIfNoExtensionPresent: (pathString: string) => string;
     };
     llm: {
       streamingLLMResponse: (
@@ -95,30 +95,31 @@ declare global {
         messageHistory: ChatCompletionMessageParam[]
       ) => Promise<string>;
       getLLMConfigs: () => Promise<LLMConfig[]>;
+      getLLMConfigByName: (modelName: string) => LLMConfig;
       pullOllamaModel: (modelName: string) => Promise<void>;
       addOrUpdateLLM: (modelConfig: LLMConfig) => Promise<void>;
       removeLLM: (modelNameToDelete: string) => Promise<void>;
       setDefaultLLM: (modelName: string) => void;
-      getDefaultLLMName: () => Promise<string>;
+      getDefaultLLMName: () => string;
     };
     electronStore: {
-      setVaultDirectoryForWindow: (path: string) => Promise<void>;
-      getVaultDirectoryForWindow: () => Promise<string>;
-      getDefaultEmbeddingModel: () => Promise<string>;
+      setUserDirectory: (path: string) => Promise<void>;
+      getVaultDirectory: () => string;
+      getDefaultEmbeddingModel: () => string;
       setDefaultEmbeddingModel: (repoName: string) => void;
       addNewLocalEmbeddingModel: (model: EmbeddingModelWithLocalPath) => void;
       addNewRepoEmbeddingModel: (model: EmbeddingModelWithRepo) => void;
-      getEmbeddingModels: () => Promise<Record<string, EmbeddingModelConfig>>;
+      getEmbeddingModels: () => Record<string, EmbeddingModelConfig>;
       updateEmbeddingModel: (
         modelName: string,
         updatedModel: EmbeddingModelWithLocalPath | EmbeddingModelWithRepo
       ) => void;
       removeEmbeddingModel: (modelName: string) => void;
-      getNoOfRAGExamples: () => Promise<number>;
+      getNoOfRAGExamples: () => number;
       setNoOfRAGExamples: (noOfExamples: number) => void;
-      getHardwareConfig: () => Promise<HardwareConfig>;
+      getHardwareConfig: () => HardwareConfig;
       setHardwareConfig: (config: HardwareConfig) => void;
-      getLLMGenerationParams: () => Promise<LLMGenerationParameters>;
+      getLLMGenerationParams: () => LLMGenerationParameters;
       setLLMGenerationParams: (params: LLMGenerationParameters) => void;
     };
   }
@@ -136,7 +137,7 @@ contextBridge.exposeInMainWorld("database", {
     return ipcRenderer.invoke("delete-lance-db-entries-by-filepath", filePath);
   },
   indexFilesInDirectory: async () => {
-    return ipcRenderer.invoke("index-files-in-directory");
+    return ipcRenderer.send("index-files-in-directory");
   },
   augmentPromptWithRAG: async (
     prompt: string,
@@ -177,62 +178,63 @@ contextBridge.exposeInMainWorld("database", {
 });
 
 contextBridge.exposeInMainWorld("electron", {
-  openExternal: (url: string) => ipcRenderer.invoke("open-external", url),
+  openExternal: (url: string) => ipcRenderer.send("open-external", url),
   getPlatform: () => ipcRenderer.invoke("get-platform"),
-  openNewWindow: () => ipcRenderer.invoke("open-new-window"),
+  openNewWindow: () => ipcRenderer.send("open-new-window"),
+  destroyWindow: () => ipcRenderer.send("destroy-window"),
 });
 
 contextBridge.exposeInMainWorld("electronStore", {
-  setVaultDirectoryForWindow: (path: string) => {
-    return ipcRenderer.invoke("set-vault-directory-for-window", path);
+  setUserDirectory: (path: string) => {
+    return ipcRenderer.sendSync("set-user-directory", path);
   },
-  getVaultDirectoryForWindow: () => {
-    return ipcRenderer.invoke("get-vault-directory-for-window");
+  getVaultDirectory: () => {
+    return ipcRenderer.sendSync("get-vault-directory");
   },
 
   getDefaultEmbeddingModel: () => {
-    return ipcRenderer.invoke("get-default-embedding-model");
+    return ipcRenderer.sendSync("get-default-embedding-model");
   },
   setDefaultEmbeddingModel: (repoName: string) => {
-    ipcRenderer.invoke("set-default-embedding-model", repoName);
+    ipcRenderer.send("set-default-embedding-model", repoName);
   },
 
   addNewLocalEmbeddingModel: (model: EmbeddingModelWithLocalPath) => {
-    ipcRenderer.invoke("add-new-local-embedding-model", model);
+    ipcRenderer.send("add-new-local-embedding-model", model);
   },
   getEmbeddingModels: () => {
-    return ipcRenderer.invoke("get-embedding-models");
+    return ipcRenderer.sendSync("get-embedding-models");
   },
   addNewRepoEmbeddingModel: (model: EmbeddingModelWithRepo) => {
-    ipcRenderer.invoke("add-new-repo-embedding-model", model);
+    ipcRenderer.send("add-new-repo-embedding-model", model);
   },
   updateEmbeddingModel: (
     modelName: string,
     updatedModel: EmbeddingModelWithLocalPath | EmbeddingModelWithRepo
   ) => {
-    ipcRenderer.invoke("update-embedding-model", modelName, updatedModel);
+    ipcRenderer.send("update-embedding-model", modelName, updatedModel);
   },
   removeEmbeddingModel: (modelName: string) => {
-    ipcRenderer.invoke("remove-embedding-model", modelName);
+    ipcRenderer.send("remove-embedding-model", modelName);
   },
 
   getNoOfRAGExamples: () => {
-    return ipcRenderer.invoke("get-no-of-rag-examples");
+    return ipcRenderer.sendSync("get-no-of-rag-examples");
   },
   setNoOfRAGExamples: (noOfExamples: number) => {
-    ipcRenderer.invoke("set-no-of-rag-examples", noOfExamples);
+    ipcRenderer.send("set-no-of-rag-examples", noOfExamples);
   },
   getHardwareConfig: () => {
-    return ipcRenderer.invoke("get-hardware-config");
+    return ipcRenderer.sendSync("get-hardware-config");
   },
   setHardwareConfig: (config: HardwareConfig) => {
-    ipcRenderer.invoke("set-hardware-config", config);
+    ipcRenderer.send("set-hardware-config", config);
   },
   getLLMGenerationParams: () => {
-    return ipcRenderer.invoke("get-llm-generation-params");
+    return ipcRenderer.sendSync("get-llm-generation-params");
   },
   setLLMGenerationParams: (params: LLMGenerationParameters) => {
-    ipcRenderer.invoke("set-llm-generation-params", params);
+    ipcRenderer.send("set-llm-generation-params", params);
   },
 });
 
@@ -252,7 +254,7 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
 
 contextBridge.exposeInMainWorld("contextMenu", {
   showFileItemContextMenu: (file: FileInfoNode) => {
-    ipcRenderer.invoke("show-context-menu-file-item", file);
+    ipcRenderer.send("show-context-menu-file-item", file);
   },
 });
 
@@ -314,18 +316,15 @@ contextBridge.exposeInMainWorld("path", {
     return ipcRenderer.invoke("path-basename", pathString);
   },
   join: (...pathSegments: string[]) =>
-    ipcRenderer.invoke("join-path", ...pathSegments),
+    ipcRenderer.sendSync("join-path", ...pathSegments),
   dirname: (pathString: string) => {
     return ipcRenderer.invoke("path-dirname", pathString);
   },
   addExtensionIfNoExtensionPresent: (pathString: string) => {
-    return ipcRenderer.invoke(
+    return ipcRenderer.sendSync(
       "add-extension-if-no-extension-present",
       pathString
     );
-  },
-  pathSep: () => {
-    return ipcRenderer.invoke("path-sep");
   },
 });
 
@@ -346,6 +345,9 @@ contextBridge.exposeInMainWorld("llm", {
   getLLMConfigs: async (): Promise<LLMConfig[]> => {
     return ipcRenderer.invoke("get-llm-configs");
   },
+  getLLMConfigByName: (modelName: string) => {
+    return ipcRenderer.sendSync("get-llm-config-by-name", modelName);
+  },
 
   pullOllamaModel: async (modelName: string) => {
     return await ipcRenderer.invoke("pull-ollama-model", modelName);
@@ -357,10 +359,10 @@ contextBridge.exposeInMainWorld("llm", {
     return await ipcRenderer.invoke("remove-llm", modelNameToDelete);
   },
   setDefaultLLM: (modelName: string) => {
-    ipcRenderer.invoke("set-default-llm", modelName);
+    ipcRenderer.send("set-default-llm", modelName);
   },
 
   getDefaultLLMName: () => {
-    return ipcRenderer.invoke("get-default-llm-name");
+    return ipcRenderer.sendSync("get-default-llm-name");
   },
 });

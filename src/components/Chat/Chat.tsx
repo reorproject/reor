@@ -211,15 +211,14 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   };
 
   useEffect(() => {
-    const updateStream = async (chunk: ChatCompletionChunk) => {
+    const updateStream = (chunk: ChatCompletionChunk) => {
       let filesContext = "";
-      const vaultDir =
-        (await window.electronStore.getVaultDirectoryForWindow()) +
-        (await window.path.pathSep());
       if (chunk.choices[0].finish_reason && filesReferenced.length > 0) {
         const newBulletedFiles = filesReferenced.map((file, index) => {
-          const simplifiedFilePath = file.trim().startsWith(vaultDir)
-            ? file.replace(vaultDir, "")
+          const simplifiedFilePath = file.startsWith(
+            window.electronStore.getVaultDirectory()
+          )
+            ? file.replace(window.electronStore.getVaultDirectory() + "/", "")
             : file;
           return ` ${index + 1}. [${simplifiedFilePath}](#)`;
         });

@@ -18,7 +18,7 @@ export const DBResultPreview: React.FC<DBResultPreview> = ({
       className="pr-2 pb-1 mt-0 text-slate-300 pt-1 rounded border-solid border-gray-600 bg-neutral-800 border-[0.1px] pl-2 shadow-md cursor-pointer hover:scale-104 hover:shadow-lg hover:bg-neutral-700 transition-transform duration-300"
       onClick={() => onSelect(entry.notepath)}
     >
-      <ReactMarkdown className="text-gray-200 break-words text-sm">
+      <ReactMarkdown className="text-gray-200 break-words">
         {entry.content}
       </ReactMarkdown>
       <div className="text-xs text-gray-400 mt-0">

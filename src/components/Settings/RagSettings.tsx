@@ -8,18 +8,13 @@ const RagSettings: React.FC<RagSettingsProps> = ({ children }) => {
   const [noOfRAGExamples, setNoOfRAGExamples] = useState<number | null>();
 
   useEffect(() => {
-    const fetchData = async () => {
-      const defaultNoOfRAGExamples =
-        await window.electronStore.getNoOfRAGExamples();
-      if (defaultNoOfRAGExamples) {
-        setNoOfRAGExamples(defaultNoOfRAGExamples);
-      } else {
-        setNoOfRAGExamples(15);
-        window.electronStore.setNoOfRAGExamples(15);
-      }
-    };
-
-    fetchData();
+    const defaultNoOfRAGExamples = window.electronStore.getNoOfRAGExamples();
+    if (defaultNoOfRAGExamples) {
+      setNoOfRAGExamples(defaultNoOfRAGExamples);
+    } else {
+      setNoOfRAGExamples(15);
+      window.electronStore.setNoOfRAGExamples(15);
+    }
   }, []);
 
   const handleChangeOnModelSelect = (ragExamples: string) => {

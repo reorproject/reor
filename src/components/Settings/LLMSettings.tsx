@@ -38,7 +38,7 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
       if (fetchedLLMConfigs !== llmConfigs && llmConfigs.length > 0) {
         setUserMadeChanges(true);
       }
-      const defaultModelName = await window.llm.getDefaultLLMName();
+      const defaultModelName = window.llm.getDefaultLLMName();
 
       setDefaultModel(defaultModelName);
     } catch (error) {

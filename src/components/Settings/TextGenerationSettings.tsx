@@ -17,14 +17,10 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
   // const [maxTokens, setMaxTokens] = useState<number | null>();
 
   useEffect(() => {
-    const fetchParams = async () => {
-      const params = await window.electronStore.getLLMGenerationParams();
-      if (params) {
-        setTextGenerationParams(params);
-      }
-    };
-
-    fetchParams();
+    const params = window.electronStore.getLLMGenerationParams();
+    if (params) {
+      setTextGenerationParams(params);
+    }
   }, []);
 
   const handleSave = () => {
