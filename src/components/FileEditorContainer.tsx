@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import SimilarEntriesComponent from "./Similarity/SimilarFilesSidebar";
+import React, { useState } from "react";
 import TitleBar from "./TitleBar";
 import ChatWithLLM from "./Chat/Chat";
 import LeftSidebar from "./Sidebars/IconsSidebar";
