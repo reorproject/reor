@@ -30,7 +30,7 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
       onClose={() => console.log("Not allowing a close for now")}
       hideCloseButton={true}
     >
-      <div className="w-full mr-4 ml-2">
+      <div className="max-w-[550px] mr-4 ml-2">
         <div className="ml-2 mt-0 h-full  ">
           <h2 className="text-2xl font-semibold mb-0 text-white">
             Welcome to the Reor Project.
