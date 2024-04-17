@@ -145,9 +145,7 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
                   placeholder=""
                 >
                   <div className="text-white resize-y w-full h-64 flex items-center justify-center break-words">
-                    <text>
-                      {flashcardQAPairs[currentSelectedFlashcard].answer}
-                    </text>
+                    <p>{flashcardQAPairs[currentSelectedFlashcard].answer}</p>
                   </div>
                 </Button>
               )}
