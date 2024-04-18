@@ -14,7 +14,10 @@ import ReactMarkdown from "react-markdown";
 import { FiRefreshCw } from "react-icons/fi"; // Importing refresh icon from React Icons
 import { ChatPrompt } from "./Chat-Prompts";
 import { CustomLinkMarkdown } from "./CustomLinkMarkdown";
-import { ChatCompletionChunk } from "openai/resources/chat/completions";
+import {
+  ChatCompletionChunk,
+  ChatCompletionMessageParam,
+} from "openai/resources/chat/completions";
 import { ChatAction } from "./ChatAction";
 import {
   storeFlashcardPairsAsJSON,
@@ -50,7 +53,7 @@ const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
 
 const FILE_REFERENCE_DELIMITER = "\n -- -- -- \n";
 
-type ChatUIMessage = {
+type MessageToDisplay = {
   role: "user" | "assistant";
   content: string;
   messageType: "success" | "error";
@@ -66,15 +69,15 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   openFileByPath,
 }) => {
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>("");
-  const [messages, setMessages] = useState<ChatUIMessage[]>([]);
+  const [messagesHistoryToDisplay, setMessageHistoryToDisplay] = useState<
+    MessageToDisplay[]
+  >([]);
   const [defaultModel, setDefaultModel] = useState<string>("");
   const [askText, setAskText] = useState<AskOptions>(AskOptions.Ask);
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
   const [canGenerateFlashcard, setCanGenerateFlashcard] =
     useState<boolean>(false);
   const [filesReferenced, setFilesReferenced] = useState<string[]>([]);
-  const [currentBotMessage, setCurrentBotMessage] =
-    useState<ChatUIMessage | null>(null);
 
   const fetchDefaultModel = async () => {
     const defaultModelName = await window.llm.getDefaultLLMName();
@@ -107,25 +110,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     if (loadingResponse) return;
     if (!userTextFieldInput.trim()) return;
 
-    let newMessages = messages;
-    if (currentBotMessage) {
-      newMessages = [
-        ...newMessages,
-        {
-          role: "assistant",
-          messageType: currentBotMessage.messageType,
-          content: currentBotMessage.content,
-        },
-      ];
-      setMessages(newMessages);
-
-      setCurrentBotMessage({
-        messageType: "success",
-        content: "",
-        role: "assistant",
-      });
-    }
-
     const llmName = await window.llm.getDefaultLLMName();
 
     let augmentedPrompt: string = "";
@@ -142,15 +126,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         return;
       }
     }
-    setMessages([
-      ...newMessages,
+    setMessageHistoryToDisplay((prev) => [
+      ...prev,
       { role: "user", messageType: "success", content: userTextFieldInput },
     ]);
-    setCurrentBotMessage({
-      role: "assistant",
-      messageType: "success",
-      content: "thinking deeply.....",
-    });
     setUserTextFieldInput("");
 
     try {
@@ -208,50 +187,80 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     }
 
     startStreamingResponse(llmName, augmentedPrompt, false);
-    setCurrentBotMessage(null);
+    // setCurrentVisibleStreamingLLMMessage(null);
+  };
+
+  // let filesContext = "";
+
+  // if (chunk.choices[0].finish_reason) {
+  //   if (filesReferenced.length > 0) {
+  //     const vaultDir =
+  //       await window.electronStore.getVaultDirectoryForWindow();
+
+  //     const newBulletedFiles = await Promise.all(
+  //       filesReferenced.map(async (file, index) => {
+  //         const relativePath = await window.path.relative(vaultDir, file);
+  //         return ` ${index + 1}. [${relativePath}](#)`;
+  //       })
+  //     );
+
+  //     filesContext = addCollapsibleDetailsInMarkdown(
+  //       newBulletedFiles.join("  \n"),
+  //       "Files referenced:",
+  //       FILE_REFERENCE_DELIMITER
+  //     );
+  //     setFilesReferenced([]);
+  //   }
+  // }
+
+  const updateMessageHistory = (
+    newContent: string,
+    newMessageType: "success" | "error"
+  ) => {
+    setMessageHistoryToDisplay((prev) => {
+      const newHistory = [...prev];
+
+      if (newHistory.length > 0) {
+        const lastMessage = newHistory[newHistory.length - 1];
+
+        if (lastMessage.role === "assistant") {
+          // Append the new content to the last assistant message
+          lastMessage.content += newContent; // Append new content with a space
+          lastMessage.messageType = newMessageType;
+        } else {
+          // Add a new assistant message
+          newHistory.push({
+            role: "assistant",
+            content: newContent,
+            messageType: newMessageType,
+          });
+        }
+      } else {
+        // If the history is empty, just add the new message
+        newHistory.push({
+          role: "assistant",
+          content: newContent,
+          messageType: newMessageType,
+        });
+      }
+      if (newMessageType === "error") {
+        console.error("message history on error: ", newHistory);
+      }
+      return newHistory;
+    });
   };
 
   useEffect(() => {
-    const updateStream = async (chunk: ChatCompletionChunk) => {
-      let filesContext = "";
-
-      if (chunk.choices[0].finish_reason && filesReferenced.length > 0) {
-        const vaultDir =
-          await window.electronStore.getVaultDirectoryForWindow();
-
-        const newBulletedFiles = await Promise.all(
-          filesReferenced.map(async (file, index) => {
-            const relativePath = await window.path.relative(vaultDir, file);
-            return ` ${index + 1}. [${relativePath}](#)`;
-          })
-        );
-
-        filesContext = addCollapsibleDetailsInMarkdown(
-          newBulletedFiles.join("  \n"),
-          "Files referenced:",
-          FILE_REFERENCE_DELIMITER
-        );
-        setFilesReferenced([]);
+    const handleChunk = async (chunk: ChatCompletionChunk) => {
+      const newContent = chunk.choices[0].delta.content ?? "";
+      if (newContent) {
+        updateMessageHistory(newContent, "success");
       }
-      const newMsgContent = chunk.choices[0].delta.content ?? "";
-
-      if (!newMsgContent && !filesContext) return;
-      setCurrentBotMessage((prev) => {
-        const newContent = `${
-          prev?.content ? prev.content + newMsgContent : newMsgContent
-        }`.replace("\n", "<br/>"); // this is because react markdown wth rehype-raw can only HTML <br> instead of newline syntax
-
-        return {
-          role: "assistant",
-          messageType: "success",
-          content: newContent + `${filesContext}`,
-        };
-      });
     };
 
     const removeTokenStreamListener = window.ipcRenderer.receive(
       "tokenStream",
-      updateStream
+      handleChunk
     );
 
     return () => {
@@ -274,25 +283,19 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       if (!currentModelConfig) {
         throw new Error(`No model config found for model: ${llmName}`);
       }
+      const llmMessageHistory: ChatCompletionMessageParam[] = [
+        { role: "user", content: prompt },
+      ];
       await window.llm.streamingLLMResponse(
         llmName,
         currentModelConfig,
         isJSONMode,
-        [{ role: "user", content: prompt }]
+        llmMessageHistory
       );
-      setLoadingResponse(false);
     } catch (error) {
-      setLoadingResponse(false);
-      setCurrentBotMessage((prev) => {
-        return {
-          role: "assistant",
-          messageType: "error",
-          content: prev?.content
-            ? prev.content + "\n" + errorToString(error)
-            : errorToString(error),
-        };
-      });
+      updateMessageHistory(errorToString(error), "error");
     }
+    setLoadingResponse(false);
   };
 
   return (
@@ -311,7 +314,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       </div>
       <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
         <div className="space-y-2 mt-4 flex-grow">
-          {messages.map((message, index) => (
+          {messagesHistoryToDisplay.map((message, index) => (
             <ReactMarkdown
               key={index}
               rehypePlugins={[rehypeRaw]}
@@ -326,11 +329,11 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
               {message.content}
             </ReactMarkdown>
           ))}
-          {currentBotMessage && (
+          {/* {currentVisibleStreamingAssistantMessage && (
             <ReactMarkdown
               rehypePlugins={[rehypeRaw]}
               className={`p-1 pl-1 markdown-content rounded-lg break-words ${
-                currentBotMessage.messageType === "error"
+                currentVisibleStreamingAssistantMessage.messageType === "error"
                   ? "bg-red-100 text-red-800"
                   : "bg-blue-100 text-blue-800"
               } `}
@@ -344,18 +347,20 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                 ),
               }}
             >
-              {currentBotMessage.content}
+              {currentVisibleStreamingAssistantMessage.content}
             </ReactMarkdown>
-          )}
+          )} */}
         </div>
-        {canGenerateFlashcard &&
-          currentBotMessage &&
-          canBeParsedAsFlashcardQAPair(currentBotMessage.content) && (
+        {/* {canGenerateFlashcard &&
+          currentVisibleStreamingAssistantMessage &&
+          canBeParsedAsFlashcardQAPair(
+            currentVisibleStreamingAssistantMessage.content
+          ) && (
             <ChatAction
               actionText={CONVERT_TO_FLASHCARDS_FROM_CHAT}
               onClick={async () => {
                 const flashcardQAPairs = parseChatMessageIntoFlashcardPairs(
-                  currentBotMessage.content,
+                  currentVisibleStreamingAssistantMessage.content,
                   FILE_REFERENCE_DELIMITER
                 );
                 await storeFlashcardPairsAsJSON(
@@ -365,8 +370,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                 setCanGenerateFlashcard(false);
               }}
             />
-          )}
-        {userTextFieldInput === "" && messages.length == 0 ? (
+          )} */}
+        {userTextFieldInput === "" && messagesHistoryToDisplay.length == 0 ? (
           <>
             {EXAMPLE_PROMPTS[askText].map((option, index) => {
               return (
@@ -374,7 +379,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                   key={index}
                   promptText={option}
                   onClick={() => {
-                    console.log(option);
                     setUserTextFieldInput(option);
                   }}
                 />
