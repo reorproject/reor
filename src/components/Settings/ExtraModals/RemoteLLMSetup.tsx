@@ -113,7 +113,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
         <h4 className="text-gray-100 mb-1">Context Length</h4>
         <CustomSelect
           options={contextLengthOptions}
-          value={selectedContextLength}
+          selectedValue={selectedContextLength}
           onChange={(newValue) => {
             setSelectedContextLength(newValue);
           }}

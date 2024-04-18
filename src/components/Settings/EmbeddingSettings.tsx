@@ -80,7 +80,7 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
           options={Object.keys(embeddingModels).map((model) => {
             return { label: model, value: model };
           })}
-          value={selectedModel}
+          selectedValue={selectedModel}
           onChange={handleChangeOnModelSelect}
         />
       )}

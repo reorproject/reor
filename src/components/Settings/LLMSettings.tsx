@@ -122,7 +122,7 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
               <div className="w-full mb-1">
                 <CustomSelect
                   options={modelOptions}
-                  value={defaultModel}
+                  selectedValue={defaultModel}
                   onChange={handleDefaultModelChange}
                 />
               </div>
@@ -137,9 +137,8 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
               <h4 className="text-gray-100 mb-1">Default LLM:</h4>
               <div className="w-full mb-1">
                 <CustomSelect
-                  isLLMDropdown={true}
                   options={modelOptions}
-                  value={defaultModel}
+                  selectedValue={defaultModel}
                   onChange={handleDefaultModelChange}
                   onDelete={handleDeleteModel}
                 />
