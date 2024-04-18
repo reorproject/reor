@@ -26,6 +26,19 @@ export const parseFlashcardQAPair = (line: string): FlashcardQAPair => {
   };
 };
 
+export const parseChatMessageIntoFlashcardPairs = (
+  messageToBeParsed: string,
+  FILE_REFERENCE_DELIMITER: string
+): FlashcardQAPair[] => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [actualOutput, _fileReferences] = messageToBeParsed.split(
+    FILE_REFERENCE_DELIMITER
+  );
+  return actualOutput.split("<br/><br/>").map((line) => {
+    return parseFlashcardQAPair(line);
+  });
+};
+
 export const storeFlashcardPairsAsJSON = async (
   qnaPairs: FlashcardQAPair[],
   currentFilePath: string | null

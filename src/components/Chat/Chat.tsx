@@ -18,11 +18,11 @@ import { ChatCompletionChunk } from "openai/resources/chat/completions";
 import { ChatAction } from "./ChatAction";
 import {
   storeFlashcardPairsAsJSON,
-  parseFlashcardQAPair,
   canBeParsedAsFlashcardQAPair,
   CONVERT_TO_FLASHCARDS_FROM_CHAT,
-  FlashcardQAPair,
+  parseChatMessageIntoFlashcardPairs,
 } from "../Flashcard";
+import { addCollapsibleDetailsInMarkdown } from "./utils";
 
 // convert ask options to enum
 enum AskOptions {
@@ -80,7 +80,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     const defaultModelName = await window.llm.getDefaultLLMName();
     setDefaultModel(defaultModelName);
   };
-
   useEffect(() => {
     fetchDefaultModel();
   }, []);
@@ -175,9 +174,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             llmName
           );
 
-        console.log("RAG Prompt:", ragPrompt);
-        console.log("Unique files referenced:", uniqueFilesReferenced);
-
         setFilesReferenced(uniqueFilesReferenced);
         augmentedPrompt = ragPrompt;
       } else if (askText === AskOptions.TemporalAsk) {
@@ -195,9 +191,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             llmName,
             filePathToBeUsedAsContext: currentFilePath,
           });
-
-        console.log("RAG Prompt:", ragPrompt);
-        console.log("Unique files referenced:", uniqueFilesReferenced);
 
         setFilesReferenced(uniqueFilesReferenced);
         augmentedPrompt = ragPrompt;
@@ -218,29 +211,27 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     setCurrentBotMessage(null);
   };
 
-  const addCollapsibleDetailsInMarkdown = (content: string, title: string) => {
-    // <span/> is required to demarcate the start of collapsible details from the markdown line
-    return `${FILE_REFERENCE_DELIMITER} <span/> <details> <summary> *${title.trim()}* </summary> \n ${content} </details>`;
-  };
-
   useEffect(() => {
     const updateStream = async (chunk: ChatCompletionChunk) => {
       let filesContext = "";
-      const vaultDir =
-        (await window.electronStore.getVaultDirectoryForWindow()) +
-        (await window.path.pathSep());
+
       if (chunk.choices[0].finish_reason && filesReferenced.length > 0) {
-        const newBulletedFiles = filesReferenced.map((file, index) => {
-          const simplifiedFilePath = file.trim().startsWith(vaultDir)
-            ? file.replace(vaultDir, "")
-            : file;
-          return ` ${index + 1}. [${simplifiedFilePath}](#)`;
-        });
+        const vaultDir =
+          await window.electronStore.getVaultDirectoryForWindow();
+
+        const newBulletedFiles = await Promise.all(
+          filesReferenced.map(async (file, index) => {
+            const relativePath = await window.path.relative(vaultDir, file);
+            return ` ${index + 1}. [${relativePath}](#)`;
+          })
+        );
+
         filesContext = addCollapsibleDetailsInMarkdown(
           newBulletedFiles.join("  \n"),
-          "Files referenced:"
+          "Files referenced:",
+          FILE_REFERENCE_DELIMITER
         );
-        setFilesReferenced([]); // clear the files referenced after this message
+        setFilesReferenced([]);
       }
       const newMsgContent = chunk.choices[0].delta.content ?? "";
 
@@ -268,30 +259,12 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     };
   }, [filesReferenced]);
 
-  const restartSession = async () => {
-    fetchDefaultModel();
-  };
-
-  const parseChatMessageIntoFlashcardPairs = (
-    messageToBeParsed: string
-  ): FlashcardQAPair[] => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [actualOutput, _fileReferences] = messageToBeParsed.split(
-      FILE_REFERENCE_DELIMITER
-    );
-    return actualOutput.split("<br/><br/>").map((line) => {
-      return parseFlashcardQAPair(line);
-    });
-  };
-
   const startStreamingResponse = async (
-    // sessionId: string,
     llmName: string,
     prompt: string,
     isJSONMode: boolean
   ) => {
     try {
-      console.log("Initializing streaming response...");
       setLoadingResponse(true);
       const llmConfigs = await window.llm.getLLMConfigs();
       const defaultLLMName = await window.llm.getDefaultLLMName();
@@ -307,7 +280,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         isJSONMode,
         [{ role: "user", content: prompt }]
       );
-      console.log("Initialized streaming response");
       setLoadingResponse(false);
     } catch (error) {
       setLoadingResponse(false);
@@ -323,22 +295,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     }
   };
 
-  // TODO: also check that hitting this when loading is not allowed...
-  const handleKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement> = (
-    e
-  ) => {
-    if (!e.shiftKey && e.key == "Enter") {
-      e.preventDefault();
-      handleSubmitNewMessage();
-    }
-  };
-
-  const handleInputChange: React.ChangeEventHandler<HTMLTextAreaElement> = (
-    e
-  ) => {
-    setUserTextFieldInput(e.target.value);
-  };
-
   return (
     <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid">
       <div className="flex w-full items-center">
@@ -349,7 +305,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             <p className="m-0 p-0 text-gray-500">No default model selected</p>
           )}
         </div>
-        <div className="pr-2 pt-1 cursor-pointer" onClick={restartSession}>
+        <div className="pr-2 pt-1 cursor-pointer" onClick={fetchDefaultModel}>
           <FiRefreshCw className="text-gray-300" title="Restart Session" />{" "}
         </div>
       </div>
@@ -399,7 +355,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
               actionText={CONVERT_TO_FLASHCARDS_FROM_CHAT}
               onClick={async () => {
                 const flashcardQAPairs = parseChatMessageIntoFlashcardPairs(
-                  currentBotMessage.content
+                  currentBotMessage.content,
+                  FILE_REFERENCE_DELIMITER
                 );
                 await storeFlashcardPairsAsJSON(
                   flashcardQAPairs,
@@ -429,8 +386,13 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       <div className="p-3 bg-neutral-600">
         <div className="flex space-x-2 h-full">
           <Textarea
-            onKeyDown={handleKeyDown}
-            onChange={handleInputChange}
+            onKeyDown={(e) => {
+              if (!e.shiftKey && e.key === "Enter") {
+                e.preventDefault();
+                handleSubmitNewMessage();
+              }
+            }}
+            onChange={(e) => setUserTextFieldInput(e.target.value)}
             value={userTextFieldInput}
             className="w-full  bg-gray-300"
             name="Outlined"

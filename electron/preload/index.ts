@@ -85,6 +85,7 @@ declare global {
       basename: (pathString: string) => Promise<string>;
       join: (...pathSegments: string[]) => Promise<string>;
       dirname: (pathString: string) => Promise<string>;
+      relative: (from: string, to: string) => Promise<string>;
       addExtensionIfNoExtensionPresent: (pathString: string) => Promise<string>;
       pathSep: () => Promise<string>;
       getAllFilenamesInDirectory: (dirName: string) => Promise<string[]>;
@@ -327,6 +328,9 @@ contextBridge.exposeInMainWorld("path", {
     ipcRenderer.invoke("join-path", ...pathSegments),
   dirname: (pathString: string) => {
     return ipcRenderer.invoke("path-dirname", pathString);
+  },
+  relative: (from: string, to: string) => {
+    return ipcRenderer.invoke("path-relative", from, to);
   },
   addExtensionIfNoExtensionPresent: (pathString: string) => {
     return ipcRenderer.invoke(

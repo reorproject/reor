@@ -224,6 +224,10 @@ ipcMain.handle("path-dirname", (event, pathString: string) => {
   return path.dirname(pathString) + path.sep;
 });
 
+ipcMain.handle("path-relative", (event, from: string, to: string) => {
+  return path.relative(from, to);
+});
+
 ipcMain.handle(
   "add-extension-if-no-extension-present",
   (event, pathString: string) => {
