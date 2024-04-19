@@ -151,7 +151,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   //   }
   // }
 
-  const updateMessageHistory = (
+  const updateMessageHistoryToDisplay = (
     newContent: string,
     newMessageType: "success" | "error"
   ) => {
@@ -181,9 +181,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           messageType: newMessageType,
         });
       }
-      if (newMessageType === "error") {
-        console.error("message history on error: ", newHistory);
-      }
       return newHistory;
     });
   };
@@ -192,7 +189,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     const handleChunk = async (chunk: ChatCompletionChunk) => {
       const newContent = chunk.choices[0].delta.content ?? "";
       if (newContent) {
-        updateMessageHistory(newContent, "success");
+        updateMessageHistoryToDisplay(newContent, "success");
       }
     };
 
@@ -231,7 +228,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         llmMessageHistory
       );
     } catch (error) {
-      updateMessageHistory(errorToString(error), "error");
+      updateMessageHistoryToDisplay(errorToString(error), "error");
     }
     setLoadingResponse(false);
   };
@@ -325,6 +322,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           </>
         ) : undefined}
       </div>
+
       <div className="p-3 bg-neutral-600">
         <div className="flex space-x-2 h-full">
           <Textarea
