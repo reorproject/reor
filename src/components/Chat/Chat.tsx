@@ -12,7 +12,7 @@ import Textarea from "@mui/joy/Textarea";
 import CircularProgress from "@mui/material/CircularProgress";
 import ReactMarkdown from "react-markdown";
 import { FiRefreshCw } from "react-icons/fi"; // Importing refresh icon from React Icons
-import { ChatPrompt } from "./Chat-Prompts";
+import { PromptSuggestion } from "./Chat-Prompts";
 import { CustomLinkMarkdown } from "./CustomLinkMarkdown";
 import {
   ChatCompletionChunk,
@@ -30,25 +30,25 @@ import { addCollapsibleDetailsInMarkdown } from "./utils";
 // convert ask options to enum
 enum AskOptions {
   Ask = "Ask",
-  AskFile = "Ask File",
-  TemporalAsk = "Temporal Ask",
-  FlashcardAsk = "Flashcard Ask",
+  // AskFile = "Ask File",
+  // TemporalAsk = "Temporal Ask",
+  // FlashcardAsk = "Flashcard Ask",
 }
 const ASK_OPTIONS = Object.values(AskOptions);
 
 const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
   [AskOptions.Ask]: [],
-  [AskOptions.AskFile]: [
-    "Summarize this file",
-    "What are the key points in this file?",
-  ],
-  [AskOptions.TemporalAsk]: [
-    "Summarize what I have worked on today",
-    "Which tasks have I completed this past week?",
-  ],
-  [AskOptions.FlashcardAsk]: [
-    "Create some flashcards based on the current note",
-  ],
+  // [AskOptions.AskFile]: [
+  //   "Summarize this file",
+  //   "What are the key points in this file?",
+  // ],
+  // [AskOptions.TemporalAsk]: [
+  //   "Summarize what I have worked on today",
+  //   "Which tasks have I completed this past week?",
+  // ],
+  // [AskOptions.FlashcardAsk]: [
+  //   "Create some flashcards based on the current note",
+  // ],
 };
 
 const FILE_REFERENCE_DELIMITER = "\n -- -- -- \n";
@@ -87,24 +87,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     fetchDefaultModel();
   }, []);
 
-  const fileNotSelectedToastId = useRef<string | null>(null);
-  useEffect(() => {
-    if (
-      !currentFilePath &&
-      (askText === AskOptions.AskFile || askText === AskOptions.FlashcardAsk)
-    ) {
-      fileNotSelectedToastId.current = toast.error(
-        `Please open a file before asking questions in ${askText} mode`,
-        {}
-      ) as string;
-    } else if (
-      currentFilePath &&
-      (askText === AskOptions.AskFile || askText === AskOptions.FlashcardAsk) &&
-      fileNotSelectedToastId.current
-    ) {
-      toast.dismiss(fileNotSelectedToastId.current);
-    }
-  }, [currentFilePath, askText]);
+  // const fileNotSelectedToastId = useRef<string | null>(null);
 
   const handleSubmitNewMessage = async () => {
     if (loadingResponse) return;
@@ -114,18 +97,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
     let augmentedPrompt: string = "";
 
-    if (askText === AskOptions.AskFile || askText === AskOptions.FlashcardAsk) {
-      if (!currentFilePath) {
-        console.error(
-          "No current file selected. The lack of a file means that there is no context being loaded into the prompt. Please open a file before trying again"
-        );
-
-        toast.error(
-          "No current file selected. Please open a file before trying again."
-        );
-        return;
-      }
-    }
     setMessageHistoryToDisplay((prev) => [
       ...prev,
       { role: "user", messageType: "success", content: userTextFieldInput },
@@ -133,20 +104,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     setUserTextFieldInput("");
 
     try {
-      if (askText === AskOptions.AskFile && currentFilePath) {
-        const { prompt, contextCutoffAt } =
-          await window.files.augmentPromptWithFile({
-            prompt: userTextFieldInput,
-            llmName: llmName,
-            filePath: currentFilePath,
-          });
-        if (contextCutoffAt) {
-          toast.warning(
-            `The file is too large to be used as context. It got cut off at: ${contextCutoffAt}`
-          );
-        }
-        augmentedPrompt = prompt;
-      } else if (askText === AskOptions.Ask) {
+      if (askText === AskOptions.Ask) {
         const { ragPrompt, uniqueFilesReferenced } =
           await window.database.augmentPromptWithRAG(
             userTextFieldInput,
@@ -155,25 +113,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
         setFilesReferenced(uniqueFilesReferenced);
         augmentedPrompt = ragPrompt;
-      } else if (askText === AskOptions.TemporalAsk) {
-        const { ragPrompt, uniqueFilesReferenced } =
-          await window.database.augmentPromptWithTemporalAgent({
-            query: userTextFieldInput,
-            llmName,
-          });
-        augmentedPrompt = ragPrompt;
-        setFilesReferenced(uniqueFilesReferenced);
-      } else if (askText === AskOptions.FlashcardAsk && currentFilePath) {
-        const { ragPrompt, uniqueFilesReferenced } =
-          await window.database.augmentPromptWithFlashcardAgent({
-            query: userTextFieldInput,
-            llmName,
-            filePathToBeUsedAsContext: currentFilePath,
-          });
-
-        setFilesReferenced(uniqueFilesReferenced);
-        augmentedPrompt = ragPrompt;
-        setCanGenerateFlashcard(true);
       }
     } catch (error) {
       console.error("Failed to augment prompt:", error);
@@ -187,7 +126,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     }
 
     startStreamingResponse(llmName, augmentedPrompt, false);
-    // setCurrentVisibleStreamingLLMMessage(null);
   };
 
   // let filesContext = "";
@@ -375,7 +313,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           <>
             {EXAMPLE_PROMPTS[askText].map((option, index) => {
               return (
-                <ChatPrompt
+                <PromptSuggestion
                   key={index}
                   promptText={option}
                   onClick={() => {
