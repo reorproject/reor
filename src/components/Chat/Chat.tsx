@@ -72,6 +72,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const [messagesHistoryToDisplay, setMessageHistoryToDisplay] = useState<
     MessageToDisplay[]
   >([]);
+  const [openAIMessageHistory, setOpenAIMessageHistory] = useState<
+    ChatCompletionMessageParam[]
+  >([]);
   const [defaultModel, setDefaultModel] = useState<string>("");
   const [askText, setAskText] = useState<AskOptions>(AskOptions.Ask);
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
@@ -93,17 +96,36 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     try {
       if (loadingResponse) return;
       if (!userTextFieldInput.trim()) return;
+      const defaultLLMName = await window.llm.getDefaultLLMName();
 
-      const currentMessageHistory = messagesHistoryToDisplay;
-      currentMessageHistory.push({
+      const currentVisibleMessageHistory = messagesHistoryToDisplay;
+      currentVisibleMessageHistory.push({
         role: "user",
         content: userTextFieldInput,
         messageType: "success",
       });
-      setMessageHistoryToDisplay(currentMessageHistory);
+      setMessageHistoryToDisplay(currentVisibleMessageHistory);
       setUserTextFieldInput("");
+      const currentOpenAIMessageHistory = openAIMessageHistory;
 
-      const defaultLLMName = await window.llm.getDefaultLLMName();
+      let potentiallyAugmentedPrompt = userTextFieldInput;
+      // for now, we'll default to doing rag.
+
+      if (currentOpenAIMessageHistory.length === 0) {
+        console.log("augmenting prompt with rag");
+        const { ragPrompt } = await window.database.augmentPromptWithRAG(
+          userTextFieldInput,
+          defaultLLMName
+        );
+        potentiallyAugmentedPrompt = ragPrompt;
+      }
+
+      currentOpenAIMessageHistory.push({
+        role: "user",
+        content: potentiallyAugmentedPrompt,
+      });
+
+      setOpenAIMessageHistory(currentOpenAIMessageHistory);
 
       const llmConfigs = await window.llm.getLLMConfigs();
 
@@ -114,16 +136,13 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         throw new Error(`No model config found for model: ${defaultLLMName}`);
       }
 
-      console.log("currentMessageHistory", currentMessageHistory);
+      console.log("currentMessageHistory", currentVisibleMessageHistory);
 
       await window.llm.streamingLLMResponse(
         defaultLLMName,
         currentModelConfig,
         false,
-        currentMessageHistory.map((message) => ({
-          role: message.role,
-          content: message.content,
-        }))
+        openAIMessageHistory
       );
     } catch (error) {
       updateMessageHistoryToDisplay(errorToString(error), "error");
