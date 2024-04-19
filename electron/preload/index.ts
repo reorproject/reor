@@ -19,6 +19,7 @@ import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
 import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
+import { sliceListOfStringsToContextLength } from "electron/main/llm/contextLimit";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
 
@@ -103,6 +104,14 @@ declare global {
       removeLLM: (modelNameToDelete: string) => Promise<void>;
       setDefaultLLM: (modelName: string) => void;
       getDefaultLLMName: () => Promise<string>;
+      sliceListOfStringsToContextLength: (
+        strings: string[],
+        llmName: string
+      ) => Promise<string[]>;
+      sliceStringToContextLength: (
+        inputString: string,
+        llmName: string
+      ) => Promise<string>;
     };
     electronStore: {
       setVaultDirectoryForWindow: (path: string) => Promise<void>;
@@ -381,5 +390,27 @@ contextBridge.exposeInMainWorld("llm", {
 
   getDefaultLLMName: () => {
     return ipcRenderer.invoke("get-default-llm-name");
+  },
+
+  sliceListOfStringsToContextLength: (
+    strings: string[],
+    llmName: string
+  ): Promise<string[]> => {
+    return ipcRenderer.invoke(
+      "slice-list-of-strings-to-context-length",
+      strings,
+      llmName
+    );
+  },
+
+  sliceStringToContextLength: (
+    inputString: string,
+    llmName: string
+  ): Promise<string> => {
+    return ipcRenderer.invoke(
+      "slice-string-to-context-length",
+      inputString,
+      llmName
+    );
   },
 });

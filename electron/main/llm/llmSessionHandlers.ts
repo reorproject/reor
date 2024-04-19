@@ -12,8 +12,14 @@ import {
   addOrUpdateLLMSchemaInStore,
   removeLLM,
   getAllLLMConfigs,
+  getLLMConfig,
 } from "./llmConfig";
 import { ProgressResponse } from "ollama";
+import {
+  sliceListOfStringsToContextLength,
+  sliceStringToContextLength,
+} from "./contextLimit";
+import { errorToString } from "../Generic/error";
 
 export const LLMSessions: { [sessionId: string]: LLMSessionService } = {};
 
@@ -73,4 +79,40 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
     console.log("deleting local model", modelNameToDelete);
     await removeLLM(store, ollamaService, modelNameToDelete);
   });
+
+  ipcMain.handle(
+    "slice-list-of-strings-to-context-length",
+    async (event, strings: string[], llmName: string): Promise<string[]> => {
+      const llmSession = openAISession;
+      const llmConfig = await getLLMConfig(store, ollamaService, llmName);
+      console.log("llmConfig", llmConfig);
+      if (!llmConfig) {
+        throw new Error(`LLM ${llmName} not configured.`);
+      }
+
+      return sliceListOfStringsToContextLength(
+        strings,
+        llmSession.getTokenizer(llmName),
+        llmConfig.contextLength
+      );
+    }
+  );
+
+  ipcMain.handle(
+    "slice-string-to-context-length",
+    async (event, inputString: string, llmName: string): Promise<string> => {
+      const llmSession = openAISession;
+      const llmConfig = await getLLMConfig(store, ollamaService, llmName);
+      console.log("llmConfig", llmConfig);
+      if (!llmConfig) {
+        throw new Error(`LLM ${llmName} not configured.`);
+      }
+
+      return sliceStringToContextLength(
+        inputString,
+        llmSession.getTokenizer(llmName),
+        llmConfig.contextLength
+      );
+    }
+  );
 };

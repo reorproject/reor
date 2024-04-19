@@ -90,66 +90,46 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   // const fileNotSelectedToastId = useRef<string | null>(null);
 
   const handleSubmitNewMessage = async () => {
-    if (loadingResponse) return;
-    if (!userTextFieldInput.trim()) return;
-
-    const llmName = await window.llm.getDefaultLLMName();
-
-    let augmentedPrompt: string = "";
-
-    setMessageHistoryToDisplay((prev) => [
-      ...prev,
-      { role: "user", messageType: "success", content: userTextFieldInput },
-    ]);
-    setUserTextFieldInput("");
-
     try {
-      if (askText === AskOptions.Ask) {
-        const { ragPrompt, uniqueFilesReferenced } =
-          await window.database.augmentPromptWithRAG(
-            userTextFieldInput,
-            llmName
-          );
+      if (loadingResponse) return;
+      if (!userTextFieldInput.trim()) return;
 
-        setFilesReferenced(uniqueFilesReferenced);
-        augmentedPrompt = ragPrompt;
-      }
-    } catch (error) {
-      console.error("Failed to augment prompt:", error);
-      toast.error(errorToString(error), {
-        className: "mt-5",
-        autoClose: false,
-        closeOnClick: true,
-        draggable: false,
+      const currentMessageHistory = messagesHistoryToDisplay;
+      currentMessageHistory.push({
+        role: "user",
+        content: userTextFieldInput,
+        messageType: "success",
       });
-      return;
+      setMessageHistoryToDisplay(currentMessageHistory);
+      setUserTextFieldInput("");
+
+      const defaultLLMName = await window.llm.getDefaultLLMName();
+
+      const llmConfigs = await window.llm.getLLMConfigs();
+
+      const currentModelConfig = llmConfigs.find(
+        (config) => config.modelName === defaultLLMName
+      );
+      if (!currentModelConfig) {
+        throw new Error(`No model config found for model: ${defaultLLMName}`);
+      }
+
+      console.log("currentMessageHistory", currentMessageHistory);
+
+      await window.llm.streamingLLMResponse(
+        defaultLLMName,
+        currentModelConfig,
+        false,
+        currentMessageHistory.map((message) => ({
+          role: message.role,
+          content: message.content,
+        }))
+      );
+    } catch (error) {
+      updateMessageHistoryToDisplay(errorToString(error), "error");
     }
-
-    startStreamingResponse(llmName, augmentedPrompt, false);
+    setLoadingResponse(false);
   };
-
-  // let filesContext = "";
-
-  // if (chunk.choices[0].finish_reason) {
-  //   if (filesReferenced.length > 0) {
-  //     const vaultDir =
-  //       await window.electronStore.getVaultDirectoryForWindow();
-
-  //     const newBulletedFiles = await Promise.all(
-  //       filesReferenced.map(async (file, index) => {
-  //         const relativePath = await window.path.relative(vaultDir, file);
-  //         return ` ${index + 1}. [${relativePath}](#)`;
-  //       })
-  //     );
-
-  //     filesContext = addCollapsibleDetailsInMarkdown(
-  //       newBulletedFiles.join("  \n"),
-  //       "Files referenced:",
-  //       FILE_REFERENCE_DELIMITER
-  //     );
-  //     setFilesReferenced([]);
-  //   }
-  // }
 
   const updateMessageHistoryToDisplay = (
     newContent: string,
@@ -202,36 +182,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       removeTokenStreamListener();
     };
   }, [filesReferenced]);
-
-  const startStreamingResponse = async (
-    llmName: string,
-    prompt: string,
-    isJSONMode: boolean
-  ) => {
-    try {
-      setLoadingResponse(true);
-      const llmConfigs = await window.llm.getLLMConfigs();
-      const defaultLLMName = await window.llm.getDefaultLLMName();
-      const currentModelConfig = llmConfigs.find(
-        (config) => config.modelName === defaultLLMName
-      );
-      if (!currentModelConfig) {
-        throw new Error(`No model config found for model: ${llmName}`);
-      }
-      const llmMessageHistory: ChatCompletionMessageParam[] = [
-        { role: "user", content: prompt },
-      ];
-      await window.llm.streamingLLMResponse(
-        llmName,
-        currentModelConfig,
-        isJSONMode,
-        llmMessageHistory
-      );
-    } catch (error) {
-      updateMessageHistoryToDisplay(errorToString(error), "error");
-    }
-    setLoadingResponse(false);
-  };
 
   return (
     <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid">
