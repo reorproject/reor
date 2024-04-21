@@ -6,6 +6,7 @@ import {
   HardwareConfig,
   LLMGenerationParameters,
   LLMConfig,
+  ChatHistory,
 } from "electron/main/Store/storeConfig";
 import {
   AugmentPromptWithFileProps,
@@ -19,7 +20,6 @@ import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
 import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
-import { sliceListOfStringsToContextLength } from "electron/main/llm/contextLimit";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
 
@@ -134,6 +134,8 @@ declare global {
       setLLMGenerationParams: (params: LLMGenerationParameters) => void;
       getHasUserOpenedAppBefore: () => boolean;
       setHasUserOpenedAppBefore: () => void;
+      getAllChatHistories: () => Promise<ChatHistory[]>;
+      updateChatHistory: (chatHistory: ChatHistory) => void;
     };
   }
 }
@@ -253,6 +255,12 @@ contextBridge.exposeInMainWorld("electronStore", {
   },
   setHasUserOpenedAppBefore: () => {
     return ipcRenderer.invoke("set-user-has-opened-app-before");
+  },
+  getAllChatHistories: () => {
+    return ipcRenderer.invoke("get-all-chat-histories");
+  },
+  updateChatHistory: (chatHistory: ChatHistory) => {
+    ipcRenderer.invoke("update-chat-history", chatHistory);
   },
 });
 

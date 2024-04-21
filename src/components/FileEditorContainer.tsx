@@ -140,7 +140,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
           <div
             className={`h-below-titlebar ${filePath ? "" : "absolute right-0"}`}
           >
-            <ResizableComponent resizeSide="left" initialWidth={300}>
+            <ResizableComponent resizeSide="left" initialWidth={450}>
               <ChatWithLLM
                 currentFilePath={filePath}
                 openFileByPath={openFileByPath}

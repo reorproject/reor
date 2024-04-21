@@ -1,5 +1,6 @@
 import { ipcMain } from "electron";
 import {
+  ChatHistory,
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
@@ -134,6 +135,26 @@ export const registerStoreHandlers = (
 
   ipcMain.handle("set-user-has-opened-app-before", () => {
     store.set(StoreKeys.hasUserOpenedAppBefore, true);
+  });
+
+  ipcMain.handle("get-all-chat-histories", () => {
+    return store.get(StoreKeys.ChatHistories);
+  });
+
+  ipcMain.handle("update-chat-history", (event, newChat: ChatHistory) => {
+    const allChatHistories = store.get(StoreKeys.ChatHistories);
+    if (!allChatHistories) {
+      store.set(StoreKeys.ChatHistories, [newChat]);
+    } else {
+      const newChatHistories = allChatHistories.map((chat) => {
+        if (chat.id === newChat.id) {
+          return newChat;
+        } else {
+          return chat;
+        }
+      });
+      store.set(StoreKeys.ChatHistories, newChatHistories);
+    }
   });
 };
 
