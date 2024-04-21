@@ -79,6 +79,6 @@ The main components of the project are located in the following directories:
 - `/src`: Contains the frontend of the application, which is a React app.
 
 ## License
-GPL-3.0 license. See `LICENSE` for details.
+AGPL-3.0 license. See `LICENSE` for details.
 
 *Reor means "to think" in Latin.*
