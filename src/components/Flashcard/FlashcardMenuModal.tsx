@@ -8,13 +8,11 @@ import FlashcardCreateModal from "./FlashcardCreateModal";
 interface FlashcardMenuModalProps {
   isOpen: boolean;
   onClose: () => void;
-  filePath: string | null
 }
 
 const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
   isOpen,
   onClose,
-  filePath,
 }) => {
   const [isCreateFlashcardMode, setIsCreateFlashcardMode] = useState<boolean>(false);
   const [isReviewFlashcardMode, setIsReviewFlashcardMode] = useState<boolean>(false);
