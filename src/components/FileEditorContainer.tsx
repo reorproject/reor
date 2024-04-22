@@ -99,6 +99,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
               setNoteToBeRenamed={setNoteToBeRenamed}
               fileDirToBeRenamed={fileDirToBeRenamed}
               setFileDirToBeRenamed={setFileDirToBeRenamed}
+              currentChatHistory={currentChatHistory}
               allChatHistories={allChatHistories}
               setCurrentChatHistory={openChatOverwrite}
             />
@@ -146,7 +147,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
           <div className={`w-full h-below-titlebar`}>
             {/* <ResizableComponent resizeSide="left" initialWidth={450}> */}
             <ChatWithLLM
-              allChatHistories={allChatHistories}
               setAllChatHistories={setAllChatHistories}
               currentChatHistory={currentChatHistory}
               setCurrentChatHistory={setCurrentChatHistory}

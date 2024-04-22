@@ -1,18 +1,34 @@
+import { ChatHistory } from "electron/main/Store/storeConfig";
 import React from "react";
 
 interface ChatListProps {
   chatIDs: string[];
+  currentChatHistory: ChatHistory | undefined;
   onSelect: (chatID: string) => void;
+  newChat: () => void;
 }
 
-export const ChatList: React.FC<ChatListProps> = ({ chatIDs, onSelect }) => {
+export const ChatsSidebar: React.FC<ChatListProps> = ({
+  chatIDs,
+  currentChatHistory,
+  onSelect,
+  newChat,
+}) => {
   return (
     <div className="h-full overflow-y-auto bg-neutral-800">
+      <div
+        className="flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-neutral-700 h-full mt-0 mb-0"
+        onClick={newChat}
+      >
+        <span className="text-[13px] flex-1 truncate mt-0 text-slate-300">
+          New Chat
+        </span>
+      </div>
       {chatIDs.map((chatID) => (
         <ChatItem
           key={chatID}
           chatID={chatID}
-          selectedChatID={null} // Pass null or manage this state internally if needed
+          selectedChatID={currentChatHistory?.id || ""}
           onChatSelect={onSelect}
         />
       ))}
