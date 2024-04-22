@@ -48,32 +48,40 @@ export type ChatMessageToDisplay = {
 };
 
 interface ChatWithLLMProps {
-  currentFilePath: string | null;
-  openFileByPath: (path: string) => Promise<void>;
+  // currentFilePath: string | null;
+  // openFileByPath: (path: string) => Promise<void>;
+  allChatHistories: ChatHistory[];
+  setAllChatHistories: React.Dispatch<React.SetStateAction<ChatHistory[]>>;
+  currentChatHistory: ChatHistory | undefined;
+  setCurrentChatHistory: React.Dispatch<
+    React.SetStateAction<ChatHistory | undefined>
+  >;
 }
 
 const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
-  currentFilePath,
-  openFileByPath,
+  allChatHistories,
+  setAllChatHistories,
+  currentChatHistory,
+  setCurrentChatHistory,
 }) => {
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>("");
-  const [currentChatHistory, setCurrentChatHistory] = useState<ChatHistory>();
-  const [allChatHistories, setAllChatHistories] = useState<ChatHistory[]>();
+  // const [currentChatHistory, setCurrentChatHistory] = useState<ChatHistory>();
+  // const [allChatHistories, setAllChatHistories] = useState<ChatHistory[]>();
   const [defaultModel, setDefaultModel] = useState<string>("");
   const [askText, setAskText] = useState<AskOptions>(AskOptions.Ask);
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
 
-  const fetchDefaultModel = async () => {
-    const defaultModelName = await window.llm.getDefaultLLMName();
-    setDefaultModel(defaultModelName);
-    const allChatHistories = await window.electronStore.getAllChatHistories();
-    setAllChatHistories(allChatHistories);
-    setCurrentChatHistory(undefined);
-  };
+  // const fetchDefaultModel = async () => {
+  //   const defaultModelName = await window.llm.getDefaultLLMName();
+  //   setDefaultModel(defaultModelName);
+  //   const allChatHistories = await window.electronStore.getAllChatHistories();
+  //   setAllChatHistories(allChatHistories);
+  //   setCurrentChatHistory(undefined);
+  // };
 
-  useEffect(() => {
-    fetchDefaultModel();
-  }, []);
+  // useEffect(() => {
+  //   fetchDefaultModel();
+  // }, []);
 
   const handleSubmitNewMessage = async () => {
     try {
@@ -219,24 +227,24 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     };
   }, []);
 
-  useEffect(() => {
-    console.log(
-      "chat ids are: ",
-      allChatHistories?.map((chat) => chat.id)
-    );
-  }, [allChatHistories]);
+  // useEffect(() => {
+  //   console.log(
+  //     "chat ids are: ",
+  //     allChatHistories?.map((chat) => chat.id)
+  //   );
+  // }, [allChatHistories]);
 
   return (
     <div className="flex items-center justify-center w-full h-full">
       <div>
-        <Button
+        {/* <Button
           placeholder=""
           className="bg-orange-700 mt-3 mb-2 border-none h-10 hover:bg-orange-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
           onClick={fetchDefaultModel}
         >
           New Chat
-        </Button>
-        <ChatList
+        </Button> */}
+        {/* <ChatList
           chatIDs={allChatHistories?.map((chat) => chat.id) || []}
           onSelect={(chatID) => {
             const selectedChat = allChatHistories?.find(
@@ -244,7 +252,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             );
             setCurrentChatHistory(selectedChat);
           }}
-        />
+        /> */}
       </div>
       <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid">
         <div className="flex w-full items-center">
@@ -255,9 +263,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
               <p className="m-0 p-0 text-gray-500">No default model selected</p>
             )}
           </div>
-          <div className="pr-2 pt-1 cursor-pointer" onClick={fetchDefaultModel}>
+          {/* <div className="pr-2 pt-1 cursor-pointer" onClick={fetchDefaultModel}>
             <FiRefreshCw className="text-gray-300" title="Restart Session" />{" "}
-          </div>
+          </div> */}
         </div>
         <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
           <div className="space-y-2 mt-4 flex-grow">
