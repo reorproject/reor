@@ -3,16 +3,9 @@ import { TypeAnimation } from 'react-type-animation';
 
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
-import {
-  getFlashcardQnaPairsFromJsonFile,
-  getFlashcardVaultDirectory,
-  storeFlashcardPairsAsJSON,
-} from "./utils";
-import ReactCardFlip from "react-card-flip";
-import { FlashcardQAPair, FlashcardQAPairUI } from "./types";
-import ProgressBar from "./ProgressBar";
+import { storeFlashcardPairsAsJSON } from "./utils";
+import { FlashcardQAPairUI } from "./types";
 import { FlashcardCore } from "./FlashcardsCore";
-import { toast } from "react-toastify";
 import { CircularProgress } from "@mui/material";
 
 interface FlashcardCreateModalProps {

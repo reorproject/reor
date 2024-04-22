@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from "react";
 
 import Modal from "../Generic/Modal";
-import { Button } from "@material-tailwind/react";
 import {
   getFlashcardQnaPairsFromJsonFile,
   getFlashcardVaultDirectory,
 } from "./utils";
-import ReactCardFlip from "react-card-flip";
 import { FlashcardQAPairUI } from "./types";
-import ProgressBar from "./ProgressBar";
 import { FlashcardCore } from "./FlashcardsCore";
 
 interface FlashcardReviewModalProps {
