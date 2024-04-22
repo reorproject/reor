@@ -72,12 +72,6 @@ npm run build
 ### Contributions
 Contributions are welcome in all areas: features, ideas, bug fixes, design, etc. This is very much a community driven project. There are some open issues to choose from. For new features, please open an issue to discuss it before beginning work on a PR :)
 
-### Folder Structure
-The main components of the project are located in the following directories:
-
-- `/electron`: Contains the main process functions that manage all the filesystem interactions, LLMs, Embedding Models and the vector database.
-- `/src`: Contains the frontend of the application, which is a React app.
-
 ## License
 AGPL-3.0 license. See `LICENSE` for details.
 
