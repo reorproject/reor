@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import rehypeRaw from "rehype-raw";
 import {
+  Button,
   Menu,
   MenuHandler,
   MenuItem,
@@ -40,8 +41,6 @@ const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
   // ],
 };
 
-const FILE_REFERENCE_DELIMITER = "\n -- -- -- \n";
-
 export type ChatMessageToDisplay = {
   role: "user" | "assistant";
   content: string;
@@ -69,7 +68,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     setDefaultModel(defaultModelName);
     const allChatHistories = await window.electronStore.getAllChatHistories();
     setAllChatHistories(allChatHistories);
+    setCurrentChatHistory(undefined);
   };
+
   useEffect(() => {
     fetchDefaultModel();
   }, []);
@@ -90,7 +91,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           openAIChatHistory: [],
         };
       }
-      console.log("currentChatHistory", chatHistory);
       chatHistory?.displayableChatHistory.push({
         role: "user",
         content: userTextFieldInput,
@@ -98,10 +98,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       });
       setUserTextFieldInput("");
 
-      console.log("currentChatHistory", chatHistory);
       let potentiallyAugmentedPrompt = userTextFieldInput;
       if (chatHistory?.openAIChatHistory.length === 0) {
-        console.log("augmenting prompt with rag");
         const { ragPrompt } = await window.database.augmentPromptWithRAG(
           userTextFieldInput,
           defaultLLMName
@@ -109,13 +107,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         potentiallyAugmentedPrompt = ragPrompt;
       }
 
-      console.log("currentChatHistory", chatHistory);
       chatHistory?.openAIChatHistory.push({
         role: "user",
         content: potentiallyAugmentedPrompt,
       });
-      // so here we need to generate an id:
-      console.log("currentChatHistory", chatHistory);
 
       setCurrentChatHistory(chatHistory);
       setAllChatHistories((prev) => {
@@ -129,13 +124,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       // so we could call save here
       // and then
 
-      console.log("currentChatHistory", chatHistory);
       if (!chatHistory) return;
 
-      console.log("currentChatHistory", chatHistory);
       await window.electronStore.updateChatHistory(chatHistory);
 
-      console.log("currentChatHistory", chatHistory);
       const llmConfigs = await window.llm.getLLMConfigs();
 
       const currentModelConfig = llmConfigs.find(
@@ -145,9 +137,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         throw new Error(`No model config found for model: ${defaultLLMName}`);
       }
 
-      // console.log("currentMessageHistory", currentVisibleMessageHistory);
-
-      console.log("currentChatHistory STARTING STREAMING", chatHistory);
       await window.llm.streamingLLMResponse(
         defaultLLMName,
         currentModelConfig,
@@ -239,15 +228,24 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
   return (
     <div className="flex items-center justify-center w-full h-full">
-      <ChatList
-        chatIDs={allChatHistories?.map((chat) => chat.id) || []}
-        onSelect={(chatID) => {
-          const selectedChat = allChatHistories?.find(
-            (chat) => chat.id === chatID
-          );
-          setCurrentChatHistory(selectedChat);
-        }}
-      />
+      <div>
+        <Button
+          placeholder=""
+          className="bg-orange-700 mt-3 mb-2 border-none h-10 hover:bg-orange-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
+          onClick={fetchDefaultModel}
+        >
+          New Chat
+        </Button>
+        <ChatList
+          chatIDs={allChatHistories?.map((chat) => chat.id) || []}
+          onSelect={(chatID) => {
+            const selectedChat = allChatHistories?.find(
+              (chat) => chat.id === chatID
+            );
+            setCurrentChatHistory(selectedChat);
+          }}
+        />
+      </div>
       <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid">
         <div className="flex w-full items-center">
           <div className="flex-grow flex justify-center items-center m-0 mt-1 ml-2 mb-1 p-0">
