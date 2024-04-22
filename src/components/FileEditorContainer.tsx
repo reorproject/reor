@@ -85,6 +85,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
             openRelativePath={openRelativePath}
             sidebarShowing={sidebarShowing}
             makeSidebarShow={setSidebarShowing}
+            filePath={filePath}
           />
         </div>
 

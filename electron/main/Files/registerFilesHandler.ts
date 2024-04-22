@@ -20,7 +20,7 @@ import {
   createPromptWithContextLimitFromContent,
 } from "../Prompts/Prompts";
 import Store from "electron-store";
-import { StoreSchema } from "../Store/storeConfig";
+import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import { getLLMConfig } from "../llm/llmConfig";
 import WindowsManager from "../windowManager";
 
@@ -240,6 +240,93 @@ export const registerFileHandlers = (
       }
     }
   );
+
+  ipcMain.handle(
+    "generate-flashcards-from-file",
+    async (
+      event,
+      { prompt, llmName, filePath } : AugmentPromptWithFileProps
+    ): Promise<string> => { // actual response required { question: string, answer: string} []
+      const llmSession = openAISession;
+      console.log("llmName:   ", llmName);
+      const llmConfig = await getLLMConfig(store, ollamaService, llmName);
+      console.log("llmConfig", llmConfig);
+      if (!llmConfig) {
+        throw new Error(`LLM ${llmName} not configured.`);
+      }
+      if (!filePath) {
+        throw new Error(
+          "Current file path is not provided for flashcard agent."
+        );
+      }
+      const fileResults = fs.readFileSync(filePath, "utf-8");
+      const { prompt: promptToCreateAtomicFacts } =
+        createPromptWithContextLimitFromContent(
+          fileResults,
+          "",
+          `Extract atomic facts that can be used for students to study, based on this query: ${prompt}`,
+          llmSession.getTokenizer(llmName),
+          llmConfig.contextLength
+        );
+      const llmGeneratedFacts = await llmSession.response(
+        llmName,
+        llmConfig,
+        [
+          {
+            role: "system",
+            content: `You are an experienced teacher reading through some notes a student has made and extracting atomic facts. You never come up with your own facts. You generate atomic facts directly from what you read.
+            An atomic fact is a fact that relates to a single piece of knowledge and makes it easy to create a question for which the atomic fact is the answer"`,
+          },
+          {
+            role: "user",
+            content: promptToCreateAtomicFacts,
+          },
+        ],
+        false,
+        store.get(StoreKeys.LLMGenerationParameters)
+      );
+
+
+      const basePrompt = "Given the following atomic facts:\n";
+      const flashcardQuery =
+        "Create useful FLASHCARDS that can be used for students to study using ONLY the context. Format is Q: <insert question> A: <insert answer>.";
+      const { prompt: promptToCreateFlashcardsWithAtomicFacts } =
+        createPromptWithContextLimitFromContent(
+          llmGeneratedFacts.choices[0].message.content || "",
+          basePrompt,
+          flashcardQuery,
+          llmSession.getTokenizer(llmName),
+          llmConfig.contextLength
+        );
+      console.log(
+        "promptToCreateFlashcardsWithAtomicFacts: ",
+        promptToCreateFlashcardsWithAtomicFacts
+      );
+
+      // call the query to respond
+      const llmGeneratedFlashcards = await llmSession.response(
+        llmName,
+        llmConfig,
+        [
+          {
+            role: "system",
+            content: `You are an experienced teacher that is reading some facts given to you so that you can generate flashcards as JSON for your student for review.
+            You never come up with your own facts. You will generate flashcards using the atomic facts given.
+            An atomic fact is a fact that relates to a single piece of knowledge and makes it easy to create a question for which the atomic fact is the answer"`,
+          },
+          {
+            role: "user",
+            content: promptToCreateFlashcardsWithAtomicFacts,
+          },
+        ],
+        true,
+        store.get(StoreKeys.LLMGenerationParameters)
+      )
+      const content = llmGeneratedFlashcards.choices[0].message.content || ''
+      return content;
+    }
+  );
+
 
   ipcMain.handle("get-files-in-directory", (event, dirName: string) => {
     const itemsInDir = fs

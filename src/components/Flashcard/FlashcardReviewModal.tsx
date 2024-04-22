@@ -5,7 +5,7 @@ import { Button } from "@material-tailwind/react";
 import {
   getFlashcardQnaPairsFromJsonFile,
   getFlashcardVaultDirectory,
-} from ".";
+} from "./utils";
 import ReactCardFlip from "react-card-flip";
 import { FlashcardQAPairUI } from "./types";
 import ProgressBar from "./ProgressBar";
@@ -29,7 +29,7 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
   //unit flashcard
   const [currentSelectedFlashcard, setSelectedFlashcard] = useState<number>(0);
 
-  // store the state of review TODO
+  // store the state of review
   const updateFlashcardUnderReview = (
     flashcardSelected: number,
     updatedFlashcard: FlashcardQAPairUI
@@ -76,9 +76,9 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
 
         <select
           className="
-            block w-full px-3 py-2 mb-2  
-            border border-gray-300 rounded-md 
-            focus:outline-none focus:shadow-outline-blue focus:border-blue-300 
+            block w-full px-3 py-2 mb-2
+            border border-gray-300 rounded-md
+            focus:outline-none focus:shadow-outline-blue focus:border-blue-300
             transition duration-150 ease-in-out"
           defaultValue=""
           onChange={(event) => {
@@ -114,8 +114,8 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
               flipDirection="vertical"
             >
               <Button
-                className="bg-orange-900  mt-3 mb-2 border-none rounded-md h-10 
-              cursor-pointer w-[900px] h-full 
+                className="bg-orange-900  mt-3 mb-2 border-none rounded-md h-10
+              cursor-pointer w-[900px] h-full
               text-center text-lg normal-case"
                 onClick={() =>
                   updateFlashcardUnderReview(currentSelectedFlashcard, {
@@ -132,8 +132,8 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
               </Button>
               {flashcardQAPairs[currentSelectedFlashcard].isFlipped && ( // this boolean is required to ensure that we check the flipped boolean to prevent the answer from leaking
                 <Button
-                  className="bg-slate-700 mt-3 mb-2 border-none rounded-md h-10 
-                hover:bg-slate-900 cursor-pointer w-[900px] h-full 
+                  className="bg-slate-700 mt-3 mb-2 border-none rounded-md h-10
+                hover:bg-slate-900 cursor-pointer w-[900px] h-full
                 text-center text-lg normal-case"
                   onClick={() =>
                     updateFlashcardUnderReview(currentSelectedFlashcard, {
@@ -170,7 +170,7 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
 
           <Button
             className="bg-slate-700 border-none h-10 w-20 text-center
-            hover:bg-orange-900 cursor-pointer 
+            hover:bg-orange-900 cursor-pointer
 
             disabled:pointer-events-none
             disabled:opacity-25"

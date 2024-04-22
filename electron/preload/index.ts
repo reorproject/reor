@@ -80,6 +80,9 @@ declare global {
       augmentPromptWithFile: (
         augmentPromptWithFileProps: AugmentPromptWithFileProps
       ) => Promise<PromptWithContextLimit>;
+      generateFlashcardsWithFile: (
+        flashcardWithFileProps: AugmentPromptWithFileProps
+      ) => Promise<string>;
     };
     path: {
       basename: (pathString: string) => Promise<string>;
@@ -317,6 +320,14 @@ contextBridge.exposeInMainWorld("files", {
       augmentPromptWithFileProps
     );
   },
+  generateFlashcardsWithFile: async (
+    flashcardWithFileProps: AugmentPromptWithFileProps
+  ): Promise<string> => {
+    return ipcRenderer.invoke(
+      "generate-flashcards-from-file",
+      flashcardWithFileProps
+    )
+  }
 });
 
 contextBridge.exposeInMainWorld("path", {

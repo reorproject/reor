@@ -35,7 +35,8 @@ export class OpenAIModelSessionService implements LLMSessionService {
     modelName: string,
     modelConfig: OpenAILLMConfig,
     messageHistory: ChatCompletionMessageParam[],
-    generationParams?: LLMGenerationParameters
+    isJSONMode: boolean,
+    generationParams?: LLMGenerationParameters,
   ): Promise<ChatCompletion> {
     const openai = new OpenAI({
       apiKey: modelConfig.apiKey,
@@ -47,6 +48,9 @@ export class OpenAIModelSessionService implements LLMSessionService {
       messages: messageHistory,
       max_tokens: generationParams?.maxTokens,
       temperature: generationParams?.temperature,
+      response_format: {
+        type: isJSONMode ? "json_object" : "text",
+      },
     });
     return response;
   }

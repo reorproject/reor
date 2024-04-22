@@ -52,7 +52,7 @@ export const storeFlashcardPairsAsJSON = async (
       4
     ),
   });
-  toast.success("Flashcard file generated!");
+  toast.success("Flashcards stored as file!");
 };
 
 export const getFlashcardVaultDirectory = async (): Promise<string> => {
