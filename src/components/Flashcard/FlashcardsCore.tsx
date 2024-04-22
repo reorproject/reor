@@ -7,11 +7,13 @@ import react, { useState } from "react";
 interface FlashcardCoreProps {
     flashcardQAPairs: FlashcardQAPairUI[]
     setFlashcardQAPairs: (pairs: FlashcardQAPairUI[]) => void;
+    currentSelectedFlashcard: number;
+    setCurrentSelectedFlashcard: (current: number) => void;
+
 }
 
-export const FlashcardCore = ({ flashcardQAPairs, setFlashcardQAPairs}: FlashcardCoreProps) => {
+export const FlashcardCore = ({ flashcardQAPairs, setFlashcardQAPairs, currentSelectedFlashcard, setCurrentSelectedFlashcard}: FlashcardCoreProps) => {
 
-    const [currentSelectedFlashcard, setCurrentSelectedFlashcard] = useState<number>(0);
 
     const updateFlashcardUnderReview = (
         flashcardSelected: number,
@@ -20,7 +22,7 @@ export const FlashcardCore = ({ flashcardQAPairs, setFlashcardQAPairs}: Flashcar
         const updatedPairs = [...flashcardQAPairs];
         updatedPairs[flashcardSelected] = updatedFlashcard;
         setFlashcardQAPairs(updatedPairs);
-      };
+    };
 
    return (
     <>

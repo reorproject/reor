@@ -16,27 +16,19 @@ import { toast } from "react-toastify";
 import { CircularProgress } from "@mui/material";
 
 interface FlashcardCreateModalProps {
-  fileToGenerateFlashcardsFor: string | null;
   isOpen: boolean;
   onClose: () => void;
 }
 
 const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
-  fileToGenerateFlashcardsFor,
   isOpen,
   onClose,
 }) => {
   const [flashcardQAPairs, setFlashcardQAPairs] = useState<FlashcardQAPairUI[]>([]);
   const [isLoadingFlashcards, setIsLoadingFlashcards] = useState<boolean>(false)
-  if (!fileToGenerateFlashcardsFor) {
-    toast.error('Select a file that you want to generate flashcards from')
-    return
-  }
-
-  // processing the flashcard
-  // loading the thing
-
-  // writing out Flashcard question and answers -> get the values in order
+  const [currentSelectedFlashcard, setCurrentSelectedFlashcard] = useState<number>(0);
+  const [selectedFile, setSelectedFile] = useState<string>("");
+  const [availableFiles, setAvailableFiles] = useState<string[]>([]);
 
 
   // handle the creation process
@@ -47,7 +39,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
     const result = await window.files.generateFlashcardsWithFile({
         prompt: "Generate flashcards as json from this file",
         llmName,
-        filePath: fileToGenerateFlashcardsFor
+        filePath: selectedFile
       })
 
     // receive the output as JSON from the backend
@@ -63,6 +55,16 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
     setFlashcardQAPairs(flashcardUIPairs);
   }
 
+  // find all available files
+  useEffect(() => {
+    const getAllFiles = async() => {
+      const vaultDirectoryWithFlashcards = await window.electronStore.getVaultDirectoryForWindow();
+      const files = await window.path.getAllFilenamesInDirectoryRecursively(vaultDirectoryWithFlashcards);
+      setAvailableFiles(files)
+    }
+    getAllFiles();
+  }, [])
+
   return (
     <Modal
       isOpen={isOpen}
@@ -71,9 +73,35 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
     >
       <div className="ml-6 mt-2 mb-6 w-full h-full min-w-[900px]">
         <h2 className="text-xl font-semibold mb-3 text-white">
-          Creating flashcards for: {fileToGenerateFlashcardsFor}
+          Creating flashcards for: {selectedFile}
         </h2>
+        <select
+          className="
+            block w-full px-3 py-2 mb-2
+            border border-gray-300 rounded-md
+            focus:outline-none focus:shadow-outline-blue focus:border-blue-300
+            transition duration-150 ease-in-out"
+          defaultValue=""
+          onChange={(event) => {
+            setSelectedFile(event.target.value);
+          }}
+        >
+          <option disabled value="">
+            {" "}
+            -- select one of the files for flashcard generation --{" "}
+          </option>
 
+          {availableFiles.map((flashcardFile, index) => {
+            return (
+              <option value={flashcardFile} key={index}>
+                {flashcardFile}
+              </option>
+            );
+          })}
+        </select>
+        {flashcardQAPairs.length === 0 && (
+          <p className="text-red-500 text-xs">Choose a file</p>
+        )}
         {isLoadingFlashcards && flashcardQAPairs.length == 0 &&
         <div>
         <TypeAnimation
@@ -92,42 +120,44 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
           wrapper="span"
           speed={50}
           />
-          </div>}
+        </div>}
         <FlashcardCore
             flashcardQAPairs={flashcardQAPairs}
             setFlashcardQAPairs={setFlashcardQAPairs}
+            currentSelectedFlashcard={currentSelectedFlashcard}
+            setCurrentSelectedFlashcard={setCurrentSelectedFlashcard}
         />
-          <div
-            className="flex justify-end">
-            {flashcardQAPairs.length == 0 && <Button
-              className="bg-slate-900/75 border-none h-20 w-96 text-center
-              mt-4 mr-16
-              cursor-pointer
-              disabled:pointer-events-none
-              disabled:opacity-25"
-              onClick={() => createFlashcardsFromFile()}
-              // Write to the flashcards directory if the flashcards generated are valid
-              // onClick={async () => await storeFlashcardPairsAsJSON(flashcardQAPairs, fileToGenerateFlashcardsFor)}
-              placeholder={""}
-              disabled={isLoadingFlashcards}
-            >
-              {"Generate cards"} {isLoadingFlashcards && <CircularProgress />}
+        <div
+          className="flex justify-end">
+          {flashcardQAPairs.length == 0 && <Button
+            className="bg-slate-900/75 border-none h-20 w-96 text-center
+            mt-4 mr-16
+            cursor-pointer
+            disabled:pointer-events-none
+            disabled:opacity-25"
+            onClick={() => createFlashcardsFromFile()}
+            // Write to the flashcards directory if the flashcards generated are valid
+            // onClick={async () => await storeFlashcardPairsAsJSON(flashcardQAPairs, fileToGenerateFlashcardsFor)}
+            placeholder={""}
+            disabled={isLoadingFlashcards}
+          >
+            {"Generate cards"} {isLoadingFlashcards && <CircularProgress />}
 
-            </Button>}
+          </Button>}
 
-            {flashcardQAPairs.length > 0 && <Button
-              className="bg-orange-900/75 border-none h-20 w-96 text-center
-              mt-4 ml-16
-              cursor-pointer
-              disabled:pointer-events-none
-              disabled:opacity-25"
-              // Write to the flashcards directory if the flashcards generated are valid
-              onClick={async () => await storeFlashcardPairsAsJSON(flashcardQAPairs, fileToGenerateFlashcardsFor)}
-              placeholder={""}
-            >
-              {"Save cards"}
-            </Button>}
-          </div>
+          {flashcardQAPairs.length > 0 && <Button
+            className="bg-orange-900/75 border-none h-20 w-96 text-center
+            mt-4 ml-16
+            cursor-pointer
+            disabled:pointer-events-none
+            disabled:opacity-25"
+            // Write to the flashcards directory if the flashcards generated are valid
+            onClick={async () => await storeFlashcardPairsAsJSON(flashcardQAPairs, selectedFile)}
+            placeholder={""}
+          >
+            {"Save cards"}
+          </Button>}
+        </div>
       </div>
     </Modal>
   );

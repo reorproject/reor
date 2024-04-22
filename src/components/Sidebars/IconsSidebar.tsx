@@ -9,8 +9,7 @@ import NewNoteComponent from "../File/NewNote";
 import NewDirectoryComponent from "../File/NewDirectory";
 import { GrNewWindow } from "react-icons/gr";
 import { LuFolderPlus } from "react-icons/lu";
-import FlashcardReviewModal from "../Flashcard/FlashcardReviewModal";
-import FlashcardCreateModal from "../Flashcard/FlashcardCreateModal";
+import FlashcardMenuModal from "../Flashcard/FlashcardMenuModal";
 
 interface LeftSidebarProps {
   openRelativePath: (path: string) => void;
@@ -28,13 +27,8 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isNewNoteModalOpen, setIsNewNoteModalOpen] = useState(false);
   const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false);
-  const [isFlashcardReviewModeOpen, setIsFlashcardReviewModeOpen] =
+  const [isFlashcardModeOpen, setIsFlashcardModeOpen] =
     useState(false);
-
-  const [isFlashcardCreateModeOpen, setIsFlashcardCreateModeOpen] =
-    useState(false);
-
-
 
   return (
     <div className="w-full h-full bg-neutral-800 flex flex-col items-center justify-between">
@@ -100,26 +94,13 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
       </div>
       <div
         className="bg-transparent border-none cursor-pointer flex items-center justify-center w-full h-8 "
-        onClick={() => setIsFlashcardReviewModeOpen(true)}
+        onClick={() => setIsFlashcardModeOpen(true)}
       >
         <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
           <MdOutlineQuiz
             className="text-gray-200"
             size={23}
             title="Flashcard quiz"
-          />
-          {/* < /> */}
-        </div>
-      </div>
-      <div
-        className="bg-transparent border-none cursor-pointer flex items-center justify-center w-full h-8 "
-        onClick={() => setIsFlashcardCreateModeOpen(true)}
-      >
-        <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
-          <MdMovieEdit
-            className="text-gray-200"
-            size={23}
-            title="Create flashcard"
           />
           {/* < /> */}
         </div>
@@ -135,17 +116,11 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
         onClose={() => setIsNewDirectoryModalOpen(false)}
         onDirectoryCreate={() => console.log("Directory created")}
       />
-      {isFlashcardReviewModeOpen && (
-        <FlashcardReviewModal
-          isOpen={isFlashcardReviewModeOpen}
-          onClose={() => setIsFlashcardReviewModeOpen(false)}
-        />
-      )}
-      {isFlashcardCreateModeOpen && (
-        <FlashcardCreateModal
-          isOpen={isFlashcardCreateModeOpen}
-          onClose={() => setIsFlashcardCreateModeOpen(false)}
-          fileToGenerateFlashcardsFor={filePath}
+      {isFlashcardModeOpen && (
+        <FlashcardMenuModal
+          isOpen={isFlashcardModeOpen}
+          onClose={() => setIsFlashcardModeOpen(false)}
+          filePath={filePath}
         />
       )}
       <div className="flex-grow border-1 border-yellow-300"></div>

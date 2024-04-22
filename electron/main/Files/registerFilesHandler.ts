@@ -334,4 +334,24 @@ export const registerFileHandlers = (
       .filter((item) => !isHidden(item));
     return itemsInDir;
   });
+
+  ipcMain.handle("get-files-in-directory-recursive", (event, dirName: string) => {
+    const fileNameSet = new Set<string>();
+
+    const getAllFiles = (dir: string) =>  {
+      const files = fs.readdirSync(dir).filter((item) => !isHidden(item));
+      files.forEach((file) => {
+        const fullPath = path.join(dir, file).trim();
+        console.log(fullPath)
+        if (fs.statSync(fullPath).isDirectory()) {
+            getAllFiles(fullPath);
+        } else {
+            fileNameSet.add(fullPath);
+        }
+      });
+    }
+    getAllFiles(dirName);
+
+    return Array.from(fileNameSet);
+  });
 };
