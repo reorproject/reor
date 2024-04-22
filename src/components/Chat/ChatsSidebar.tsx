@@ -5,15 +5,6 @@ interface ChatListProps {
   onSelect: (chatID: string) => void;
 }
 
-// Mock data for demonstration
-// const mockChats = [
-//   "chat_001",
-//   "chat_002",
-//   "chat_003",
-//   "folder_004", // Assume this is a directory
-//   "chat_005",
-// ];
-
 export const ChatList: React.FC<ChatListProps> = ({ chatIDs, onSelect }) => {
   return (
     <div className="h-full overflow-y-auto bg-neutral-800">

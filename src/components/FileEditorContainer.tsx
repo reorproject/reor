@@ -8,8 +8,6 @@ import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
 import { EditorContent } from "@tiptap/react";
 import InEditorBacklinkSuggestionsDisplay from "./Editor/BacklinkSuggestionsDisplay";
 import { useFileInfoTree } from "./File/FileSideBar/hooks/use-file-info-tree";
-import RenameNoteModal from "./File/RenameNote";
-import RenameDirModal from "./File/RenameDirectory";
 import SidebarComponent from "./Similarity/SimilarFilesSidebar";
 
 interface FileEditorContainerProps {}
@@ -58,26 +56,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         toggleChatbot={toggleChatbot}
         toggleSimilarFiles={toggleSimilarFiles}
       />
-      {noteToBeRenamed && (
-        <RenameNoteModal
-          isOpen={!!noteToBeRenamed}
-          onClose={() => setNoteToBeRenamed("")}
-          fullNoteName={noteToBeRenamed}
-          renameNote={async ({ path, newNoteName }) => {
-            await renameFile(path, newNoteName);
-          }}
-        />
-      )}
-      {fileDirToBeRenamed && (
-        <RenameDirModal
-          isOpen={!!fileDirToBeRenamed}
-          onClose={() => setFileDirToBeRenamed("")}
-          fullDirName={fileDirToBeRenamed}
-          renameDir={async ({ path, newDirName: newNoteName }) => {
-            await renameFile(path, newNoteName);
-          }}
-        />
-      )}
+
       <div className="flex h-below-titlebar">
         <div className="w-[35px] border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid">
           <LeftSidebar
@@ -96,6 +75,11 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
               selectedFilePath={filePath}
               onFileSelect={openFileByPath}
               sidebarShowing={sidebarShowing}
+              renameFile={renameFile}
+              noteToBeRenamed={noteToBeRenamed}
+              setNoteToBeRenamed={setNoteToBeRenamed}
+              fileDirToBeRenamed={fileDirToBeRenamed}
+              setFileDirToBeRenamed={setFileDirToBeRenamed}
             />
           </div>
         </ResizableComponent>

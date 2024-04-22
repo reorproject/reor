@@ -11,6 +11,10 @@ interface SidebarManagerProps {
   selectedFilePath: string | null;
   onFileSelect: (path: string) => void;
   sidebarShowing: "files" | "search";
+  noteToBeRenamed: string;
+  setNoteToBeRenamed: (note: string) => void;
+  fileDirToBeRenamed: string;
+  setFileDirToBeRenamed: (dir: string) => void;
 }
 
 const SidebarManager: React.FC<SidebarManagerProps> = ({
@@ -20,6 +24,10 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
   selectedFilePath,
   onFileSelect,
   sidebarShowing,
+  noteToBeRenamed,
+  setNoteToBeRenamed,
+  fileDirToBeRenamed,
+  setFileDirToBeRenamed,
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<DBQueryResult[]>([]);
@@ -33,6 +41,10 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
           handleDirectoryToggle={handleDirectoryToggle}
           selectedFilePath={selectedFilePath}
           onFileSelect={onFileSelect}
+          noteToBeRenamed={noteToBeRenamed}
+          setNoteToBeRenamed={setNoteToBeRenamed}
+          fileDirToBeRenamed={fileDirToBeRenamed}
+          setFileDirToBeRenamed={setFileDirToBeRenamed}
         />
       )}
       {sidebarShowing === "search" && (
