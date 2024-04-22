@@ -142,19 +142,18 @@ export const registerStoreHandlers = (
   });
 
   ipcMain.handle("update-chat-history", (event, newChat: ChatHistory) => {
+    console.log("updating chat history", newChat);
     const allChatHistories = store.get(StoreKeys.ChatHistories);
-    if (!allChatHistories) {
-      store.set(StoreKeys.ChatHistories, [newChat]);
+    // check if chat history already exists. if it does, update it. if it doesn't append it
+    const existingChatIndex = allChatHistories.findIndex(
+      (chat) => chat.id === newChat.id
+    );
+    if (existingChatIndex !== -1) {
+      allChatHistories[existingChatIndex] = newChat;
     } else {
-      const newChatHistories = allChatHistories.map((chat) => {
-        if (chat.id === newChat.id) {
-          return newChat;
-        } else {
-          return chat;
-        }
-      });
-      store.set(StoreKeys.ChatHistories, newChatHistories);
+      allChatHistories.push(newChat);
     }
+    store.set(StoreKeys.ChatHistories, allChatHistories);
   });
 };
 
