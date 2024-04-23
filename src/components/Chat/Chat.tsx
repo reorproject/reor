@@ -55,6 +55,10 @@ export type ChatMessageToDisplay = ChatCompletionMessageParam & {
   visibleContent?: string;
 };
 
+export interface ChatFilters {
+  files: string[];
+}
+
 function formatMessageContent(
   content: string | ChatCompletionContentPart[] | null | undefined
 ): string | undefined {
@@ -154,7 +158,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>("");
   const [askText, setAskText] = useState<AskOptions>(AskOptions.Ask);
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
-
+  const [chatFilters, setChatFilters] = useState<ChatFilters>({
+    files: [],
+  });
   const handleSubmitNewMessage = async (
     chatHistory: ChatHistory | undefined
   ) => {
@@ -370,6 +376,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           }
           loadingResponse={loadingResponse}
           askText={askText}
+          chatFilters={chatFilters}
+          setChatFilters={setChatFilters}
         />
       </div>
     </div>
