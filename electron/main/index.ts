@@ -188,6 +188,16 @@ ipcMain.handle("show-context-menu-file-item", (event, file) => {
     })
   );
 
+  menu.append(
+    new MenuItem({
+      label: "Create a flashcard set",
+      click: () => {
+        console.log("creating: ", file.path);
+        event.sender.send("create-flashcard-file-listener", file.path);
+      },
+    })
+  );
+
   console.log("menu key: ", file);
 
   const browserWindow = BrowserWindow.fromWebContents(event.sender);

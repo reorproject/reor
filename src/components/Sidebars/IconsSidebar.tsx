@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SettingsModal from "../Settings/Settings";
 import { MdMovieEdit, MdOutlineQuiz, MdSettings } from "react-icons/md";
 import { SidebarAbleToShow } from "../FileEditorContainer";
@@ -10,6 +10,7 @@ import NewDirectoryComponent from "../File/NewDirectory";
 import { GrNewWindow } from "react-icons/gr";
 import { LuFolderPlus } from "react-icons/lu";
 import FlashcardMenuModal from "../Flashcard/FlashcardMenuModal";
+import { removeFileExtension } from "@/functions/strings";
 
 interface LeftSidebarProps {
   openRelativePath: (path: string) => void;
@@ -29,6 +30,27 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false);
   const [isFlashcardModeOpen, setIsFlashcardModeOpen] =
     useState(false);
+
+  const [initialFileToCreateFlashcard, setInitialFileToCreateFlashcard] =
+    useState("");
+  const [initialFileToReviewFlashcard, setInitialFileToReviewFlashcard] =
+    useState("");
+
+
+  // open a new flashcard create mode
+  useEffect(() => {
+    const createFlashcardFileListener = window.ipcRenderer.receive(
+      "create-flashcard-file-listener",
+      (noteName: string) => {
+        setIsFlashcardModeOpen(!!noteName)
+        setInitialFileToCreateFlashcard(noteName)
+      }
+    );
+
+    return () => {
+      createFlashcardFileListener();
+    };
+  }, []);
 
   return (
     <div className="w-full h-full bg-neutral-800 flex flex-col items-center justify-between">
@@ -119,8 +141,13 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
       {isFlashcardModeOpen && (
         <FlashcardMenuModal
           isOpen={isFlashcardModeOpen}
-          onClose={() => setIsFlashcardModeOpen(false)}
-          filePath={filePath}
+          onClose={() => {
+              setIsFlashcardModeOpen(false)
+              setInitialFileToCreateFlashcard('');
+              setInitialFileToReviewFlashcard('');
+          }}
+          initialFileToCreateFlashcard={initialFileToCreateFlashcard}
+          initialFileToReviewFlashcard={initialFileToReviewFlashcard}
         />
       )}
       <div className="flex-grow border-1 border-yellow-300"></div>

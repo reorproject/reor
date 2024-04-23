@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { TypeAnimation } from 'react-type-animation';
 
 import Modal from "../Generic/Modal";
@@ -7,22 +7,54 @@ import { storeFlashcardPairsAsJSON } from "./utils";
 import { FlashcardQAPairUI } from "./types";
 import { FlashcardCore } from "./FlashcardsCore";
 import { CircularProgress } from "@mui/material";
+import { FileSidebar } from "../File/FileSideBar";
+import { useFileInfoTree } from "../File/FileSideBar/hooks/use-file-info-tree";
+import { useFileByFilepath } from "../File/hooks/use-file-by-filepath";
+import InEditorBacklinkSuggestionsDisplay from "../Editor/BacklinkSuggestionsDisplay";
 
 interface FlashcardCreateModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialFlashcardFile?: string
 }
 
 const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
   isOpen,
   onClose,
+  initialFlashcardFile = ""
 }) => {
   const [flashcardQAPairs, setFlashcardQAPairs] = useState<FlashcardQAPairUI[]>([]);
   const [isLoadingFlashcards, setIsLoadingFlashcards] = useState<boolean>(false)
   const [currentSelectedFlashcard, setCurrentSelectedFlashcard] = useState<number>(0);
-  const [selectedFile, setSelectedFile] = useState<string>("");
-  const [availableFiles, setAvailableFiles] = useState<string[]>([]);
+  const [selectedFile, setSelectedFile] = useState<string>(initialFlashcardFile);
+  // const [availableFiles, setAvailableFiles] = useState<string[]>([]);
+  const [vaultDirectory, setVaultDirectory] = useState<string>("");
 
+  const { flattenedFiles } = useFileInfoTree(vaultDirectory);
+  const { suggestionsState, setSuggestionsState } = useFileByFilepath();
+
+  const [searchText, setSearchText] = useState<string>(initialFlashcardFile)
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const initializeSuggestionsStateOnFocus = () => {
+    const inputCoords = inputRef.current?.getBoundingClientRect();
+    if (!inputCoords) {
+      return;
+    }
+    setSuggestionsState({
+      position: {
+        top: inputCoords.bottom,
+        left: inputCoords.x
+      },
+      textWithinBrackets: searchText,
+      onSelect: async (suggestion: string) => {
+        const suggestionWithExtension = await window.path.addExtensionIfNoExtensionPresent(suggestion)
+        setSearchText(suggestionWithExtension);
+        setSelectedFile(suggestionWithExtension);
+        setSuggestionsState(null)
+      },
+    })
+  }
 
   // handle the creation process
   const createFlashcardsFromFile = async(): Promise<void> => {
@@ -38,24 +70,21 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
     // receive the output as JSON from the backend
     // store the flashcards in memory so that we can render it in flashcardQA pairs
     // and set UI as flipped = false
-    const flashcardUIPairs:FlashcardQAPairUI[]  = (JSON.parse(result).flashcards as any[]).map((card) => {return {
+    const flashcardUIPairs: FlashcardQAPairUI[]  = (JSON.parse(result).flashcards as any[]).map((card) => {return {
       question: card.Q,
       answer: card.A,
       isFlipped: false
     }});
-    console.log(result)
-    console.log(flashcardUIPairs)
     setFlashcardQAPairs(flashcardUIPairs);
   }
 
   // find all available files
   useEffect(() => {
-    const getAllFiles = async() => {
-      const vaultDirectoryWithFlashcards = await window.electronStore.getVaultDirectoryForWindow();
-      const files = await window.path.getAllFilenamesInDirectoryRecursively(vaultDirectoryWithFlashcards);
-      setAvailableFiles(files)
+    const setFileDirectory = async() => {
+      const windowDirectory = await window.electronStore.getVaultDirectoryForWindow();
+      setVaultDirectory(windowDirectory);
     }
-    getAllFiles();
+    setFileDirectory();
   }, [])
 
   return (
@@ -64,35 +93,45 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
       onClose={onClose}
       tailwindStylesOnBackground="bg-gradient-to-r from-orange-900 to-yellow-900"
     >
-      <div className="ml-6 mt-2 mb-6 w-full h-full min-w-[900px]">
+      <div className="ml-6 mt-2 mb-6 w-[900px] h-full">
         <h2 className="text-xl font-semibold mb-3 text-white">
-          Creating flashcards for: {selectedFile}
-        </h2>
-        <select
-          className="
-            block w-full px-3 py-2 mb-2
-            border border-gray-300 rounded-md
+          {/** Search box - and replace when the file is selected */}
+          Select a file to generate flashcards for:
+          <input
+            ref={inputRef}
+            type="text"
+            className="block w-full px-3 py-2 mt-6 h-[40px] border border-gray-300 box-border rounded-md
             focus:outline-none focus:shadow-outline-blue focus:border-blue-300
             transition duration-150 ease-in-out"
-          defaultValue=""
-          onChange={(event) => {
-            setSelectedFile(event.target.value);
-          }}
-        >
-          <option disabled value="">
-            {" "}
-            -- select one of the files for flashcard generation --{" "}
-          </option>
-
-          {availableFiles.map((flashcardFile, index) => {
-            return (
-              <option value={flashcardFile} key={index}>
-                {flashcardFile}
-              </option>
-            );
-          })}
-        </select>
-        {flashcardQAPairs.length === 0 && (
+            value={searchText}
+            onSelect={() => initializeSuggestionsStateOnFocus()}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="Search for the files by name"
+          />
+          {suggestionsState && (
+              <InEditorBacklinkSuggestionsDisplay
+                suggestionsState={suggestionsState}
+                suggestions={flattenedFiles.map(
+                  (file) => file.path
+                )}
+                maxWidth={'w-[900px]'}
+              />
+            )}
+        </h2>
+        {/* {!isLoadingFlashcards  && flashcardQAPairs.length == 0 && <div className="max-h-[300px]">
+          <FileSidebar
+            files={files}
+            expandedDirectories={expandedDirectories}
+            handleDirectoryToggle={handleDirectoryToggle}
+            selectedFilePath={filePath}
+            onFileSelect={(filePath: string) => {
+              setSelectedFile(filePath);
+              setSearchText(filePath)
+            }}
+            listHeight={300}
+            />
+        </div>} */}
+        {!selectedFile && (
           <p className="text-red-500 text-xs">Choose a file</p>
         )}
         {isLoadingFlashcards && flashcardQAPairs.length == 0 &&
@@ -105,7 +144,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
             500, // wait 0.5 before replacing "question" with "answers"
             'We are working hard to generate answers',
             500,
-            'We are working hard to pair questions and answers togetehr',
+            'We are working hard to pair questions and answers together',
             500,
             'We should be ready any time now......',
             500,
@@ -123,7 +162,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
         <div
           className="flex justify-end">
           {flashcardQAPairs.length == 0 && <Button
-            className="bg-slate-900/75 border-none h-20 w-96 text-center
+            className="bg-slate-900/75 border-none h-20 w-96 text-center vertical-align
             mt-4 mr-16
             cursor-pointer
             disabled:pointer-events-none
@@ -134,8 +173,9 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
             placeholder={""}
             disabled={isLoadingFlashcards}
           >
-            {"Generate cards"} {isLoadingFlashcards && <CircularProgress />}
-
+            <div className="flex items-center justify-around h-full space-x-2">
+              {"Generate cards"} {isLoadingFlashcards && <CircularProgress />}
+            </div>
           </Button>}
 
           {flashcardQAPairs.length > 0 && <Button

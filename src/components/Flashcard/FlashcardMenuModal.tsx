@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
@@ -8,14 +8,18 @@ import FlashcardCreateModal from "./FlashcardCreateModal";
 interface FlashcardMenuModalProps {
   isOpen: boolean;
   onClose: () => void;
+  initialFileToCreateFlashcard ?: string;
+  initialFileToReviewFlashcard ?: string;
 }
 
 const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
   isOpen,
   onClose,
+  initialFileToCreateFlashcard,
+  initialFileToReviewFlashcard,
 }) => {
-  const [isCreateFlashcardMode, setIsCreateFlashcardMode] = useState<boolean>(false);
-  const [isReviewFlashcardMode, setIsReviewFlashcardMode] = useState<boolean>(false);
+  const [isCreateFlashcardMode, setIsCreateFlashcardMode] = useState<boolean>(!!initialFileToCreateFlashcard);
+  const [isReviewFlashcardMode, setIsReviewFlashcardMode] = useState<boolean>(!!initialFileToReviewFlashcard);
 
   return (
     <Modal
@@ -37,6 +41,7 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
           <FlashcardCreateModal
             isOpen={isCreateFlashcardMode}
             onClose={() => setIsCreateFlashcardMode(false)}
+            initialFlashcardFile={initialFileToCreateFlashcard}
           />
         )}
 
