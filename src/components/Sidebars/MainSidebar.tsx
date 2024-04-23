@@ -4,8 +4,8 @@ import SearchComponent from "./FileSidebarSearch";
 import { DBQueryResult } from "electron/main/database/Schema";
 import { FileInfoTree } from "electron/main/Files/Types";
 import { ChatsSidebar } from "../Chat/ChatsSidebar";
-import { ChatHistory } from "electron/main/Store/storeConfig";
 import { SidebarAbleToShow } from "../FileEditorContainer";
+import { ChatHistory } from "../Chat/Chat";
 
 interface SidebarManagerProps {
   files: FileInfoTree;

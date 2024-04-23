@@ -1,5 +1,5 @@
-import { ChatHistory } from "electron/main/Store/storeConfig";
 import React from "react";
+import { ChatHistory } from "./Chat";
 
 interface ChatListProps {
   chatIDs: string[];

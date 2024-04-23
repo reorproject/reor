@@ -20,12 +20,15 @@ import {
   sliceStringToContextLength,
 } from "./contextLimit";
 import { errorToString } from "../Generic/error";
+import { ChatHistory } from "@/components/Chat/Chat";
 
 export const LLMSessions: { [sessionId: string]: LLMSessionService } = {};
 
 export const openAISession = new OpenAIModelSessionService();
 
 export const ollamaService = new OllamaService();
+
+// This function takes a ChatMessageToDisplay object and returns a ChatCompletionMessageParam
 
 export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
   ipcMain.handle(
@@ -35,11 +38,12 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       llmName: string,
       llmConfig: LLMConfig,
       isJSONMode: boolean,
-      messageHistory: ChatCompletionMessageParam[]
+      messageHistory: ChatHistory[]
     ): Promise<void> => {
       const handleChunk = (chunk: ChatCompletionChunk) => {
         event.sender.send("tokenStream", chunk);
       };
+
       await openAISession.streamingResponse(
         llmName,
         llmConfig,

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import TitleBar from "./TitleBar";
-import ChatWithLLM from "./Chat/Chat";
+import ChatWithLLM, { ChatHistory } from "./Chat/Chat";
 import IconsSidebar from "./Sidebars/IconsSidebar";
 import ResizableComponent from "./Generic/ResizableComponent";
 import SidebarManager from "./Sidebars/MainSidebar";
@@ -10,13 +10,12 @@ import InEditorBacklinkSuggestionsDisplay from "./Editor/BacklinkSuggestionsDisp
 import { useFileInfoTree } from "./File/FileSideBar/hooks/use-file-info-tree";
 import SidebarComponent from "./Similarity/SimilarFilesSidebar";
 import { useChatHistory } from "./Chat/hooks/use-chat-history";
-import { ChatHistory } from "electron/main/Store/storeConfig";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search" | "chats";
 
 const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
-  const [showChatbot, setShowChatbot] = useState<boolean>(true);
+  const [showChatbot, setShowChatbot] = useState<boolean>(false);
   const [showSimilarFiles, setShowSimilarFiles] = useState<boolean>(true);
   const [sidebarShowing, setSidebarShowing] =
     useState<SidebarAbleToShow>("files");

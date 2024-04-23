@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState, useEffect } from "react";
 import rehypeRaw from "rehype-raw";
 import {
@@ -11,8 +12,12 @@ import Textarea from "@mui/joy/Textarea";
 import CircularProgress from "@mui/material/CircularProgress";
 import ReactMarkdown from "react-markdown";
 import { PromptSuggestion } from "./Chat-Prompts";
-import { ChatCompletionChunk } from "openai/resources/chat/completions";
-import { ChatHistory } from "electron/main/Store/storeConfig";
+import {
+  ChatCompletionChunk,
+  ChatCompletionContentPart,
+  ChatCompletionMessageParam,
+} from "openai/resources/chat/completions";
+import { DBQueryResult } from "electron/main/database/Schema";
 
 // convert ask options to enum
 enum AskOptions {
@@ -38,10 +43,94 @@ const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
   // ],
 };
 
-export type ChatMessageToDisplay = {
-  role: "user" | "assistant";
-  content: string;
+export type ChatHistory = {
+  id: string;
+  // openAIChatHistory: ChatCompletionMessageParam[];
+  displayableChatHistory: ChatMessageToDisplay[];
+};
+export type ChatMessageToDisplay = ChatCompletionMessageParam & {
   messageType: "success" | "error";
+  context: DBQueryResult[];
+};
+
+function formatMessageContent(
+  content: string | ChatCompletionContentPart[] | null | undefined
+): string | undefined {
+  if (Array.isArray(content)) {
+    return content.reduce((acc, part) => {
+      if (part.type === "text") {
+        return acc + part.text; // Concatenate text parts
+      }
+      return acc; // Skip image parts
+    }, "");
+  }
+  return content || undefined;
+}
+
+interface ChatProperties {
+  [key: string]: string; // Values must be strings
+}
+
+export type ChatTemplate = {
+  messageHistory: ChatCompletionMessageParam[];
+  properties: ChatProperties;
+};
+
+function replaceContentInMessages(
+  messages: ChatMessageToDisplay[],
+  context: ChatProperties
+): ChatMessageToDisplay[] {
+  return messages.map((message) => {
+    if ("content" in message) {
+      if (typeof message.content === "string") {
+        message.content = message.content.replace(
+          /\{(\w+)\}/g,
+          (match, key) => {
+            return key in context ? context[key] : match;
+          }
+        );
+      }
+    }
+    return message;
+  });
+}
+
+const ragPromptTemplate: ChatCompletionMessageParam[] = [
+  {
+    content:
+      "You are an advanced question answer agent answering questions based on provided context.",
+    role: "system",
+  },
+  {
+    content: `
+Context:
+{context}
+
+Query:
+{query}`,
+    role: "user",
+  },
+];
+
+export const resolveRAGContext = async (
+  query: string,
+  limit: number
+): Promise<ChatMessageToDisplay> => {
+  // I mean like the only real places to get context from are like particular files or semantic search or full text search.
+  // and like it could be like that if a file is here
+  const results = await window.database.search(query, limit);
+
+  // maybe for now, we don't need to do any kinds of serious slicing...We can just let users deal with errors themselves based on the limits
+  // return results, results.map(dbItem => dbItem.content)
+  //  return both results and results.content concatenated:
+  return {
+    messageType: "success",
+    role: "user",
+    context: results,
+    content: `Based on the following context answer the question down below. \n\n\nContext: \n${results
+      .map((dbItem) => dbItem.content)
+      .join("\n\n")}\n\n\nQuery:\n${query}`,
+  };
 };
 
 interface ChatWithLLMProps {
@@ -60,72 +149,51 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   setCurrentChatHistory,
 }) => {
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>("");
-  // const [currentChatHistory, setCurrentChatHistory] = useState<ChatHistory>();
-  // const [allChatHistories, setAllChatHistories] = useState<ChatHistory[]>();
-  const [defaultModel, setDefaultModel] = useState<string>("");
   const [askText, setAskText] = useState<AskOptions>(AskOptions.Ask);
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
 
-  // const fetchDefaultModel = async () => {
-  //   const defaultModelName = await window.llm.getDefaultLLMName();
-  //   setDefaultModel(defaultModelName);
-  //   const allChatHistories = await window.electronStore.getAllChatHistories();
-  //   setAllChatHistories(allChatHistories);
-  //   setCurrentChatHistory(undefined);
-  // };
-
-  // useEffect(() => {
-  //   fetchDefaultModel();
-  // }, []);
-
-  const handleSubmitNewMessage = async () => {
+  const handleSubmitNewMessage = async (
+    chatHistory: ChatHistory | undefined
+  ) => {
     try {
       if (loadingResponse) return;
       if (!userTextFieldInput.trim()) return;
       const defaultLLMName = await window.llm.getDefaultLLMName();
-      let chatHistory = currentChatHistory;
-      // so now we have the problem that
-      if (!chatHistory) {
-        // generate an id
+
+      if (!chatHistory || !chatHistory.id) {
         const chatID = Date.now().toString();
         chatHistory = {
           id: chatID,
           displayableChatHistory: [],
-          openAIChatHistory: [],
         };
       }
-      chatHistory?.displayableChatHistory.push({
-        role: "user",
-        content: userTextFieldInput,
-        messageType: "success",
-      });
-      setUserTextFieldInput("");
 
-      let potentiallyAugmentedPrompt = userTextFieldInput;
-      if (chatHistory?.openAIChatHistory.length === 0) {
-        const { ragPrompt } = await window.database.augmentPromptWithRAG(
-          userTextFieldInput,
-          defaultLLMName
+      if (chatHistory.displayableChatHistory.length === 0) {
+        chatHistory.displayableChatHistory.push(
+          await resolveRAGContext(userTextFieldInput, 10)
         );
-        potentiallyAugmentedPrompt = ragPrompt;
+      } else {
+        chatHistory.displayableChatHistory.push({
+          role: "user",
+          content: userTextFieldInput,
+          messageType: "success",
+          context: [],
+        });
       }
 
-      chatHistory?.openAIChatHistory.push({
-        role: "user",
-        content: potentiallyAugmentedPrompt,
-      });
+      setUserTextFieldInput("");
 
+      // oh this is literally just for making the chat history appear in the sidebar
       setCurrentChatHistory(chatHistory);
+
       setAllChatHistories((prev) => {
+        if (!chatHistory) return prev;
         if (prev?.find((chat) => chat.id === chatHistory?.id)) {
           return prev;
         }
         const newChatHistories = prev ? [...prev, chatHistory] : [chatHistory];
         return newChatHistories;
       });
-      // setAllChatHistories((prev) => {});
-      // so we could call save here
-      // and then
 
       if (!chatHistory) return;
 
@@ -144,51 +212,45 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         defaultLLMName,
         currentModelConfig,
         false,
-        chatHistory?.openAIChatHistory
+        chatHistory?.displayableChatHistory
       );
       // once finish streaming, save the message?
-      console.log("finished streaming");
     } catch (error) {
-      updateMessageHistoryToDisplay(errorToString(error), "error");
+      appendNewContentToMessageHistory(errorToString(error), "error");
     }
     // so here we could save the chat history
     setLoadingResponse(false);
   };
 
-  const updateMessageHistoryToDisplay = (
+  const appendNewContentToMessageHistory = (
     newContent: string,
     newMessageType: "success" | "error"
   ) => {
     setCurrentChatHistory((prev) => {
-      console.log("prev", prev);
       const newDisplayableHistory = prev?.displayableChatHistory || [];
       if (newDisplayableHistory.length > 0) {
         const lastMessage =
           newDisplayableHistory[newDisplayableHistory.length - 1];
 
         if (lastMessage.role === "assistant") {
-          // Append the new content to the last assistant message
           lastMessage.content += newContent; // Append new content with a space
           lastMessage.messageType = newMessageType;
         } else {
-          // Add a new assistant message
           newDisplayableHistory.push({
             role: "assistant",
             content: newContent,
             messageType: newMessageType,
+            context: [],
           });
         }
       } else {
-        // If the history is empty, just add the new message
         newDisplayableHistory.push({
           role: "assistant",
           content: newContent,
           messageType: newMessageType,
+          context: [],
         });
       }
-      // so now we have these types, where should generate an id
-      // and where should we save the current chat history
-      // well I think we know where we should save it
 
       return {
         id: prev!.id,
@@ -205,10 +267,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
   useEffect(() => {
     const handleChunk = async (chunk: ChatCompletionChunk) => {
-      console.log("handling chunk", chunk);
       const newContent = chunk.choices[0].delta.content ?? "";
       if (newContent) {
-        updateMessageHistoryToDisplay(newContent, "success");
+        appendNewContentToMessageHistory(newContent, "success");
       }
     };
 
@@ -222,24 +283,17 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     };
   }, []);
 
-  // useEffect(() => {
-  //   console.log(
-  //     "chat ids are: ",
-  //     allChatHistories?.map((chat) => chat.id)
-  //   );
-  // }, [allChatHistories]);
-
   return (
     <div className="flex items-center justify-center w-full h-full">
       <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid">
         <div className="flex w-full items-center">
-          <div className="flex-grow flex justify-center items-center m-0 mt-1 ml-2 mb-1 p-0">
+          {/* <div className="flex-grow flex justify-center items-center m-0 mt-1 ml-2 mb-1 p-0">
             {defaultModel ? (
               <p className="m-0 p-0 text-gray-500">{defaultModel}</p>
             ) : (
               <p className="m-0 p-0 text-gray-500">No default model selected</p>
             )}
-          </div>
+          </div> */}
           {/* <div className="pr-2 pt-1 cursor-pointer" onClick={fetchDefaultModel}>
             <FiRefreshCw className="text-gray-300" title="Restart Session" />{" "}
           </div> */}
@@ -259,7 +313,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                       : "bg-green-100 text-green-800"
                   } `}
                 >
-                  {message.content}
+                  {formatMessageContent(message.content)}
                 </ReactMarkdown>
               )
             )}
@@ -309,7 +363,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
               onKeyDown={(e) => {
                 if (!e.shiftKey && e.key === "Enter") {
                   e.preventDefault();
-                  handleSubmitNewMessage();
+                  handleSubmitNewMessage(currentChatHistory);
                 }
               }}
               onChange={(e) => setUserTextFieldInput(e.target.value)}
@@ -342,7 +396,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                   active:shadow-none bg-neutral-700 border-none h-full hover:bg-neutral-900 cursor-pointer text-center 
                   pt-0 pb-0 pr-2 pl-2`}
                     type="button"
-                    onClick={handleSubmitNewMessage}
+                    onClick={() => handleSubmitNewMessage(currentChatHistory)}
                   >
                     {askText}
                   </button>

@@ -6,7 +6,6 @@ import {
   HardwareConfig,
   LLMGenerationParameters,
   LLMConfig,
-  ChatHistory,
 } from "electron/main/Store/storeConfig";
 import {
   AugmentPromptWithFileProps,
@@ -20,6 +19,7 @@ import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
 import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
+import { ChatHistory } from "@/components/Chat/Chat";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
 

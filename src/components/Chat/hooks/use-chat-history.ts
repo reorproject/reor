@@ -1,5 +1,5 @@
-import { ChatHistory } from "electron/main/Store/storeConfig";
 import { useEffect, useState } from "react";
+import { ChatHistory } from "../Chat";
 
 export const useChatHistory = () => {
   const [currentChatHistory, setCurrentChatHistory] = useState<ChatHistory>();
