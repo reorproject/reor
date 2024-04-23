@@ -68,7 +68,6 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
       setFileInfoTree(sortedFiles);
       const flattenedFiles = flattenFileInfoTree(sortedFiles);
       setFlattenedFiles(flattenedFiles);
-
     });
   }, []);
 

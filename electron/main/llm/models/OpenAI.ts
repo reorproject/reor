@@ -36,7 +36,7 @@ export class OpenAIModelSessionService implements LLMSessionService {
     modelConfig: OpenAILLMConfig,
     messageHistory: ChatCompletionMessageParam[],
     isJSONMode: boolean,
-    generationParams?: LLMGenerationParameters,
+    generationParams?: LLMGenerationParameters
   ): Promise<ChatCompletion> {
     const openai = new OpenAI({
       apiKey: modelConfig.apiKey,

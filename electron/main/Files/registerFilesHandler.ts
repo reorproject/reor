@@ -245,8 +245,9 @@ export const registerFileHandlers = (
     "generate-flashcards-from-file",
     async (
       event,
-      { prompt, llmName, filePath } : AugmentPromptWithFileProps
-    ): Promise<string> => { // actual response required { question: string, answer: string} []
+      { prompt, llmName, filePath }: AugmentPromptWithFileProps
+    ): Promise<string> => {
+      // actual response required { question: string, answer: string} []
       const llmSession = openAISession;
       console.log("llmName:   ", llmName);
       const llmConfig = await getLLMConfig(store, ollamaService, llmName);
@@ -286,7 +287,6 @@ export const registerFileHandlers = (
         store.get(StoreKeys.LLMGenerationParameters)
       );
 
-
       const basePrompt = "Given the following atomic facts:\n";
       const flashcardQuery =
         "Create useful FLASHCARDS that can be used for students to study using ONLY the context. Format is Q: <insert question> A: <insert answer>.";
@@ -321,12 +321,11 @@ export const registerFileHandlers = (
         ],
         true,
         store.get(StoreKeys.LLMGenerationParameters)
-      )
-      const content = llmGeneratedFlashcards.choices[0].message.content || ''
+      );
+      const content = llmGeneratedFlashcards.choices[0].message.content || "";
       return content;
     }
   );
-
 
   ipcMain.handle("get-files-in-directory", (event, dirName: string) => {
     const itemsInDir = fs
@@ -335,23 +334,26 @@ export const registerFileHandlers = (
     return itemsInDir;
   });
 
-  ipcMain.handle("get-files-in-directory-recursive", (event, dirName: string) => {
-    const fileNameSet = new Set<string>();
+  ipcMain.handle(
+    "get-files-in-directory-recursive",
+    (event, dirName: string) => {
+      const fileNameSet = new Set<string>();
 
-    const getAllFiles = (dir: string) =>  {
-      const files = fs.readdirSync(dir).filter((item) => !isHidden(item));
-      files.forEach((file) => {
-        const fullPath = path.join(dir, file).trim();
-        console.log(fullPath)
-        if (fs.statSync(fullPath).isDirectory()) {
+      const getAllFiles = (dir: string) => {
+        const files = fs.readdirSync(dir).filter((item) => !isHidden(item));
+        files.forEach((file) => {
+          const fullPath = path.join(dir, file).trim();
+          console.log(fullPath);
+          if (fs.statSync(fullPath).isDirectory()) {
             getAllFiles(fullPath);
-        } else {
+          } else {
             fileNameSet.add(fullPath);
-        }
-      });
-    }
-    getAllFiles(dirName);
+          }
+        });
+      };
+      getAllFiles(dirName);
 
-    return Array.from(fileNameSet);
-  });
+      return Array.from(fileNameSet);
+    }
+  );
 };

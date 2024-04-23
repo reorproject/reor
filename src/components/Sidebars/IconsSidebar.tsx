@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import SettingsModal from "../Settings/Settings";
-import { MdMovieEdit, MdOutlineQuiz, MdSettings } from "react-icons/md";
+import { MdOutlineQuiz, MdSettings } from "react-icons/md";
 import { SidebarAbleToShow } from "../FileEditorContainer";
 import { IoFolderOutline } from "react-icons/io5";
 import { FaSearch } from "react-icons/fa";
@@ -10,7 +10,6 @@ import NewDirectoryComponent from "../File/NewDirectory";
 import { GrNewWindow } from "react-icons/gr";
 import { LuFolderPlus } from "react-icons/lu";
 import FlashcardMenuModal from "../Flashcard/FlashcardMenuModal";
-import { removeFileExtension } from "@/functions/strings";
 
 interface LeftSidebarProps {
   openRelativePath: (path: string) => void;
@@ -23,27 +22,24 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
   openRelativePath,
   sidebarShowing,
   makeSidebarShow,
-  filePath,
 }) => {
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isNewNoteModalOpen, setIsNewNoteModalOpen] = useState(false);
   const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false);
-  const [isFlashcardModeOpen, setIsFlashcardModeOpen] =
-    useState(false);
+  const [isFlashcardModeOpen, setIsFlashcardModeOpen] = useState(false);
 
   const [initialFileToCreateFlashcard, setInitialFileToCreateFlashcard] =
     useState("");
   const [initialFileToReviewFlashcard, setInitialFileToReviewFlashcard] =
     useState("");
 
-
   // open a new flashcard create mode
   useEffect(() => {
     const createFlashcardFileListener = window.ipcRenderer.receive(
       "create-flashcard-file-listener",
       (noteName: string) => {
-        setIsFlashcardModeOpen(!!noteName)
-        setInitialFileToCreateFlashcard(noteName)
+        setIsFlashcardModeOpen(!!noteName);
+        setInitialFileToCreateFlashcard(noteName);
       }
     );
 
@@ -142,9 +138,9 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
         <FlashcardMenuModal
           isOpen={isFlashcardModeOpen}
           onClose={() => {
-              setIsFlashcardModeOpen(false)
-              setInitialFileToCreateFlashcard('');
-              setInitialFileToReviewFlashcard('');
+            setIsFlashcardModeOpen(false);
+            setInitialFileToCreateFlashcard("");
+            setInitialFileToReviewFlashcard("");
           }}
           initialFileToCreateFlashcard={initialFileToCreateFlashcard}
           initialFileToReviewFlashcard={initialFileToReviewFlashcard}

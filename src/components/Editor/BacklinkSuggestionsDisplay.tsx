@@ -10,13 +10,13 @@ export interface SuggestionsState {
 interface SuggestionsDisplayProps {
   suggestionsState: SuggestionsState;
   suggestions: string[];
-  maxWidth?: string
+  maxWidth?: string;
 }
 
 const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
   suggestionsState,
   suggestions,
-  maxWidth = 'max-w-sm'
+  maxWidth = "max-w-sm",
 }) => {
   const suggestionsRef = useRef<HTMLDivElement | null>(null);
   const [layout, setLayout] = useState({

@@ -22,7 +22,9 @@ export const FileSidebar: React.FC<FileListProps> = ({
   listHeight,
 }) => {
   return (
-    <div className={`flex flex-col h-below-titlebar text-white overflow-x-hidden`}>
+    <div
+      className={`flex flex-col h-below-titlebar text-white overflow-x-hidden`}
+    >
       <FileExplorer
         files={files}
         selectedFilePath={selectedFilePath}
@@ -58,7 +60,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   handleDragStart,
   expandedDirectories,
   handleDirectoryToggle,
-  lheight
+  lheight,
 }) => {
   const [listHeight, setListHeight] = useState(lheight ?? window.innerHeight);
 
@@ -134,7 +136,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
       itemCount={itemCount}
       itemSize={30}
       width={"100%"}
-      style={{ padding: 0, margin: 0, overflowY: undefined }}
+      style={{ padding: 0, margin: 0 }}
     >
       {Rows}
     </List>

@@ -91,7 +91,9 @@ declare global {
       addExtensionIfNoExtensionPresent: (pathString: string) => Promise<string>;
       pathSep: () => Promise<string>;
       getAllFilenamesInDirectory: (dirName: string) => Promise<string[]>;
-      getAllFilenamesInDirectoryRecursively: (dirName: string) => Promise<string[]>;
+      getAllFilenamesInDirectoryRecursively: (
+        dirName: string
+      ) => Promise<string[]>;
     };
     llm: {
       streamingLLMResponse: (
@@ -327,8 +329,8 @@ contextBridge.exposeInMainWorld("files", {
     return ipcRenderer.invoke(
       "generate-flashcards-from-file",
       flashcardWithFileProps
-    )
-  }
+    );
+  },
 });
 
 contextBridge.exposeInMainWorld("path", {
