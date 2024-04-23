@@ -51,6 +51,7 @@ export type ChatHistory = {
 export type ChatMessageToDisplay = ChatCompletionMessageParam & {
   messageType: "success" | "error";
   context: DBQueryResult[];
+  visibleContent?: string;
 };
 
 function formatMessageContent(
@@ -130,6 +131,7 @@ export const resolveRAGContext = async (
     content: `Based on the following context answer the question down below. \n\n\nContext: \n${results
       .map((dbItem) => dbItem.content)
       .join("\n\n")}\n\n\nQuery:\n${query}`,
+    visibleContent: query,
   };
 };
 
@@ -313,7 +315,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                       : "bg-green-100 text-green-800"
                   } `}
                 >
-                  {formatMessageContent(message.content)}
+                  {message.visibleContent
+                    ? message.visibleContent
+                    : formatMessageContent(message.content)}
                 </ReactMarkdown>
               )
             )}

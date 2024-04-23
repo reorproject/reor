@@ -12,7 +12,7 @@ import {
   ChatCompletionMessageParam,
 } from "openai/resources/chat/completions";
 import { customFetchUsingElectronNetStreaming } from "../../Generic/network";
-import { ChatHistory } from "@/components/Chat/Chat";
+import { ChatMessageToDisplay } from "@/components/Chat/Chat";
 
 export class OpenAIModelSessionService implements LLMSessionService {
   public getTokenizer = (llmName: string): ((text: string) => number[]) => {
@@ -56,7 +56,7 @@ export class OpenAIModelSessionService implements LLMSessionService {
     modelName: string,
     modelConfig: OpenAILLMConfig,
     isJSONMode: boolean,
-    messageHistory: ChatHistory[],
+    messageHistory: ChatMessageToDisplay[],
     handleChunk: (chunk: ChatCompletionChunk) => void,
     generationParams?: LLMGenerationParameters
   ): Promise<void> {
@@ -85,8 +85,10 @@ export class OpenAIModelSessionService implements LLMSessionService {
   }
 }
 
-function cleanMessage(message: ChatHistory): ChatCompletionMessageParam {
+function cleanMessage(
+  message: ChatMessageToDisplay
+): ChatCompletionMessageParam {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { messageType, context, ...cleanMessage } = message;
+  const { messageType, context, visibleContent, ...cleanMessage } = message;
   return cleanMessage;
 }

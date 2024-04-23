@@ -3,10 +3,7 @@ import { LLMSessionService } from "./Types";
 import { OpenAIModelSessionService } from "./models/OpenAI";
 import { LLMConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
-import {
-  ChatCompletionChunk,
-  ChatCompletionMessageParam,
-} from "openai/resources/chat/completions";
+import { ChatCompletionChunk } from "openai/resources/chat/completions";
 import { OllamaService } from "./models/Ollama";
 import {
   addOrUpdateLLMSchemaInStore,
@@ -19,8 +16,7 @@ import {
   sliceListOfStringsToContextLength,
   sliceStringToContextLength,
 } from "./contextLimit";
-import { errorToString } from "../Generic/error";
-import { ChatHistory } from "@/components/Chat/Chat";
+import { ChatMessageToDisplay } from "@/components/Chat/Chat";
 
 export const LLMSessions: { [sessionId: string]: LLMSessionService } = {};
 
@@ -38,7 +34,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       llmName: string,
       llmConfig: LLMConfig,
       isJSONMode: boolean,
-      messageHistory: ChatHistory[]
+      messageHistory: ChatMessageToDisplay[]
     ): Promise<void> => {
       const handleChunk = (chunk: ChatCompletionChunk) => {
         event.sender.send("tokenStream", chunk);
