@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
@@ -8,8 +8,8 @@ import FlashcardCreateModal from "./FlashcardCreateModal";
 interface FlashcardMenuModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialFileToCreateFlashcard ?: string;
-  initialFileToReviewFlashcard ?: string;
+  initialFileToCreateFlashcard?: string;
+  initialFileToReviewFlashcard?: string;
 }
 
 const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
@@ -18,8 +18,12 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
   initialFileToCreateFlashcard,
   initialFileToReviewFlashcard,
 }) => {
-  const [isCreateFlashcardMode, setIsCreateFlashcardMode] = useState<boolean>(!!initialFileToCreateFlashcard);
-  const [isReviewFlashcardMode, setIsReviewFlashcardMode] = useState<boolean>(!!initialFileToReviewFlashcard);
+  const [isCreateFlashcardMode, setIsCreateFlashcardMode] = useState<boolean>(
+    !!initialFileToCreateFlashcard
+  );
+  const [isReviewFlashcardMode, setIsReviewFlashcardMode] = useState<boolean>(
+    !!initialFileToReviewFlashcard
+  );
 
   return (
     <Modal
@@ -32,10 +36,10 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
           Flashcard Mode
         </h2>
         {isReviewFlashcardMode && (
-        <FlashcardReviewModal
-          isOpen={isReviewFlashcardMode}
-          onClose={() => setIsReviewFlashcardMode(false)}
-        />
+          <FlashcardReviewModal
+            isOpen={isReviewFlashcardMode}
+            onClose={() => setIsReviewFlashcardMode(false)}
+          />
         )}
         {isCreateFlashcardMode && (
           <FlashcardCreateModal
@@ -46,33 +50,31 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
         )}
 
         <Button
-            className="bg-slate-900/75 border-none h-20 w-96 text-center
+          className="bg-slate-900/75 border-none h-20 w-96 text-center
             mt-4 mr-16
             cursor-pointer
             disabled:pointer-events-none
             disabled:opacity-25"
-            onClick={() => setIsCreateFlashcardMode(true)}
-            // Write to the flashcards directory if the flashcards generated are valid
-            // onClick={async () => await storeFlashcardPairsAsJSON(flashcardQAPairs, fileToGenerateFlashcardsFor)}
-            placeholder={""}
-          >
-            {"Create new flashcards"}
+          onClick={() => setIsCreateFlashcardMode(true)}
+          // Write to the flashcards directory if the flashcards generated are valid
+          // onClick={async () => await storeFlashcardPairsAsJSON(flashcardQAPairs, fileToGenerateFlashcardsFor)}
+          placeholder={""}
+        >
+          {"Create new flashcards"}
+        </Button>
 
-          </Button>
-
-          <Button
-            className="bg-orange-900/75 border-none h-20 w-96 text-center
+        <Button
+          className="bg-orange-900/75 border-none h-20 w-96 text-center
             mt-4 ml-16
             cursor-pointer
             disabled:pointer-events-none
             disabled:opacity-25"
-            // Write to the flashcards directory if the flashcards generated are valid
-            onClick={async () => setIsReviewFlashcardMode(true)}
-            placeholder={""}
-          >
-            {"Review my existing cards"}
-          </Button>
-
+          // Write to the flashcards directory if the flashcards generated are valid
+          onClick={async () => setIsReviewFlashcardMode(true)}
+          placeholder={""}
+        >
+          {"Review my existing cards"}
+        </Button>
       </div>
     </Modal>
   );

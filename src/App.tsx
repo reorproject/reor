@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
+import { Portal } from "@headlessui/react";
 import "react-toastify/dist/ReactToastify.css";
 import FileEditorContainer from "./components/FileEditorContainer";
 import IndexingProgress from "./components/IndexingProgress";
@@ -61,7 +62,9 @@ const App: React.FC<AppProps> = () => {
 
   return (
     <div className="max-h-screen font-sans bg-neutral-800">
-      <ToastContainer className="mt-4" />
+      <Portal>
+        <ToastContainer className="mt-4" />
+      </Portal>
       {userHasConfiguredSettingsForIndexing ? (
         indexingProgress < 1 ? (
           <IndexingProgress indexingProgress={indexingProgress} />

@@ -56,6 +56,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
           await window.path.addExtensionIfNoExtensionPresent(suggestion);
         setSearchText(suggestionWithExtension);
         setSelectedFile(suggestionWithExtension);
+        setFlashcardQAPairs([]);
         setSuggestionsState(null);
       },
     });
@@ -85,6 +86,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
       };
     });
     setFlashcardQAPairs(flashcardUIPairs);
+    setIsLoadingFlashcards(false);
 
     storeFlashcardPairsAsJSON(flashcardUIPairs, selectedFile);
   };

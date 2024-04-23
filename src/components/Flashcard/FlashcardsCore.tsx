@@ -1,30 +1,32 @@
+import React from "react";
 import ReactCardFlip from "react-card-flip";
 import ProgressBar from "./ProgressBar";
 import { Button } from "@material-tailwind/react";
 import { FlashcardQAPairUI } from "./types";
-import react, { useState } from "react";
 
 interface FlashcardCoreProps {
-    flashcardQAPairs: FlashcardQAPairUI[]
-    setFlashcardQAPairs: (pairs: FlashcardQAPairUI[]) => void;
-    currentSelectedFlashcard: number;
-    setCurrentSelectedFlashcard: (current: number) => void;
-
+  flashcardQAPairs: FlashcardQAPairUI[];
+  setFlashcardQAPairs: (pairs: FlashcardQAPairUI[]) => void;
+  currentSelectedFlashcard: number;
+  setCurrentSelectedFlashcard: (current: number) => void;
 }
 
-export const FlashcardCore = ({ flashcardQAPairs, setFlashcardQAPairs, currentSelectedFlashcard, setCurrentSelectedFlashcard}: FlashcardCoreProps) => {
+export const FlashcardCore = ({
+  flashcardQAPairs,
+  setFlashcardQAPairs,
+  currentSelectedFlashcard,
+  setCurrentSelectedFlashcard,
+}: FlashcardCoreProps) => {
+  const updateFlashcardUnderReview = (
+    flashcardSelected: number,
+    updatedFlashcard: FlashcardQAPairUI
+  ) => {
+    const updatedPairs = [...flashcardQAPairs];
+    updatedPairs[flashcardSelected] = updatedFlashcard;
+    setFlashcardQAPairs(updatedPairs);
+  };
 
-
-    const updateFlashcardUnderReview = (
-        flashcardSelected: number,
-        updatedFlashcard: FlashcardQAPairUI
-      ) => {
-        const updatedPairs = [...flashcardQAPairs];
-        updatedPairs[flashcardSelected] = updatedFlashcard;
-        setFlashcardQAPairs(updatedPairs);
-    };
-
-   return (
+  return (
     <>
       {flashcardQAPairs.length > 0 && (
         <>
@@ -75,40 +77,38 @@ export const FlashcardCore = ({ flashcardQAPairs, setFlashcardQAPairs, currentSe
             )}
           </ReactCardFlip>
           <div className="flex items-center justify-around w-50 mt-6">
-        <Button
-          className="bg-slate-700 border-none h-10 w-20 text-center
+            <Button
+              className="bg-slate-700 border-none h-10 w-20 text-center
           hover:bg-orange-900 cursor-pointer
 
           disabled:pointer-events-none
           disabled:opacity-25"
-          onClick={() => {
-            setCurrentSelectedFlashcard(currentSelectedFlashcard - 1);
-          }}
-          placeholder={""}
-          disabled={currentSelectedFlashcard <= 0}
-        >
-          {"<"}
-        </Button>
+              onClick={() => {
+                setCurrentSelectedFlashcard(currentSelectedFlashcard - 1);
+              }}
+              placeholder={""}
+              disabled={currentSelectedFlashcard <= 0}
+            >
+              {"<"}
+            </Button>
 
-        <Button
-          className="bg-slate-700 border-none h-10 w-20 text-center
+            <Button
+              className="bg-slate-700 border-none h-10 w-20 text-center
           hover:bg-orange-900 cursor-pointer
 
           disabled:pointer-events-none
           disabled:opacity-25"
-          onClick={() => {
-            setCurrentSelectedFlashcard(currentSelectedFlashcard + 1);
-          }}
-          placeholder={""}
-          disabled={currentSelectedFlashcard >= flashcardQAPairs.length - 1}
-        >
-          {">"}
-        </Button>
-        </div>
-
+              onClick={() => {
+                setCurrentSelectedFlashcard(currentSelectedFlashcard + 1);
+              }}
+              placeholder={""}
+              disabled={currentSelectedFlashcard >= flashcardQAPairs.length - 1}
+            >
+              {">"}
+            </Button>
+          </div>
         </>
-
       )}
-      </>
-   );
-}
+    </>
+  );
+};
