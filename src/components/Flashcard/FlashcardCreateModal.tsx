@@ -91,7 +91,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      tailwindStylesOnBackground="bg-gradient-to-r from-orange-900 to-yellow-900"
+      // tailwindStylesOnBackground="bg-gradient-to-r from-orange-900 to-yellow-900"
     >
       <div className="ml-6 mt-2 mb-6 w-[900px] h-full">
         <h2 className="text-xl font-semibold mb-3 text-white">
