@@ -14,7 +14,7 @@ A self-organizing AI note-taking app that runs models locally.</h4>
 </p>
 
 > ### 📢 Announcement
-> We are now on [Discord](https://discord.gg/UaHN2Dyyzv)! We are shipping very quickly right now so sharing ❤️feedback❤️ with us will really help shape the product 🚀
+> We are now on [Discord](https://discord.gg/UaHN2Dyyzv)! Our team is shipping very quickly right now so sharing ❤️feedback❤️ with us will really help shape the product 🚀
 
 
 
