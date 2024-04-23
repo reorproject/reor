@@ -8,13 +8,13 @@ A self-organizing AI note-taking app that runs models locally.</h4>
 
 <p align="center">
     <a href="https://tooomm.github.io/github-release-stats/?username=reorproject&repository=reor">    <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/reorproject/reor/total"></a>
-<a href="https://discord.gg/UaHN2Dyyzv" target="_blank"><img src="https://dcbadge.vercel.app/api/server/QBhGUFJYuH?style=flat&compact=true" alt="Discord"></a>
+<a href="https://discord.gg/b7zanGCTUY" target="_blank"><img src="https://dcbadge.vercel.app/api/server/QBhGUFJYuH?style=flat&compact=true" alt="Discord"></a>
     <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/reorproject/reor">
 
 </p>
 
 > ### 📢 Announcement
-> We are now on [Discord](https://discord.gg/UaHN2Dyyzv)! Our team is shipping very quickly right now so sharing ❤️feedback❤️ with us will really help shape the product 🚀
+> We are now on [Discord](https://discord.gg/b7zanGCTUY)! Our team is shipping very quickly right now so sharing ❤️feedback❤️ with us will really help shape the product 🚀
 
 
 
