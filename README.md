@@ -8,14 +8,15 @@ A self-organizing AI note-taking app that runs models locally.</h4>
 
 <p align="center">
     <a href="https://tooomm.github.io/github-release-stats/?username=reorproject&repository=reor">    <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/reorproject/reor/total"></a>
-<a href="https://discord.gg/QBhGUFJYuH" target="_blank"><img src="https://dcbadge.vercel.app/api/server/QBhGUFJYuH?style=flat&compact=true" alt="Discord"></a>
+<a href="https://discord.gg/UaHN2Dyyzv" target="_blank"><img src="https://dcbadge.vercel.app/api/server/QBhGUFJYuH?style=flat&compact=true" alt="Discord"></a>
     <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/reorproject/reor">
 
 </p>
 
-<h2 align="center">
-    New: We are now accessible via <a href="https://discord.gg/QBhGUFJYuH" target="_blank">discord</a>, hop by to give ❤️feedback❤️ or discuss our upcoming features!
-</h2>
+> ### 📢 Announcement
+> We are now on [Discord](https://discord.gg/UaHN2Dyyzv)! We are shipping very quickly right now so sharing ❤️feedback❤️ with us will really help shape the product 🚀
+
+
 
 ## About
 **Reor** is an AI-powered desktop note-taking app: it automatically links related notes, answers questions on your notes and provides semantic search. Everything is stored locally and you can edit your notes with an Obsidian-like markdown editor. The hypothesis of the project is that AI tools for thought should **run models locally** by default. Reor stands on the shoulders of the giants [Ollama](https://github.com/ollama/ollama), [Transformers.js](https://github.com/xenova/transformers.js) & [LanceDB](https://github.com/lancedb/lancedb) to enable both LLMs and embedding models to run locally. Connecting to OpenAI or OpenAI-compatible APIs like Oobabooga is also supported.
