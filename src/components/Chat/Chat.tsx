@@ -241,21 +241,29 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         defaultLLMName,
         currentModelConfig,
         false,
-        chatHistory?.displayableChatHistory
+        chatHistory
       );
       setReadyToSave(true);
     } catch (error) {
-      appendNewContentToMessageHistory(errorToString(error), "error");
+      if (chatHistory) {
+        appendNewContentToMessageHistory(
+          chatHistory.id,
+          errorToString(error),
+          "error"
+        );
+      }
     }
     // so here we could save the chat history
     setLoadingResponse(false);
   };
 
   const appendNewContentToMessageHistory = (
+    chatID: string,
     newContent: string,
     newMessageType: "success" | "error"
   ) => {
     setCurrentChatHistory((prev) => {
+      if (chatID !== prev?.id) return prev;
       const newDisplayableHistory = prev?.displayableChatHistory || [];
       if (newDisplayableHistory.length > 0) {
         const lastMessage =
@@ -295,10 +303,13 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   };
 
   useEffect(() => {
-    const handleChunk = async (chunk: ChatCompletionChunk) => {
+    const handleChunk = async (
+      recievedChatID: string,
+      chunk: ChatCompletionChunk
+    ) => {
       const newContent = chunk.choices[0].delta.content ?? "";
       if (newContent) {
-        appendNewContentToMessageHistory(newContent, "success");
+        appendNewContentToMessageHistory(recievedChatID, newContent, "success");
       }
     };
 

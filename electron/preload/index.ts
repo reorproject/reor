@@ -17,9 +17,8 @@ import {
 import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
 import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
-import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
-import { ChatHistory, ChatMessageToDisplay } from "@/components/Chat/Chat";
+import { ChatHistory } from "@/components/Chat/Chat";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
 
@@ -97,7 +96,7 @@ declare global {
         llmName: string,
         llmConfig: LLMConfig,
         isJSONMode: boolean,
-        messageHistory: ChatCompletionMessageParam[]
+        chatHistory: ChatHistory
       ) => Promise<string>;
       getLLMConfigs: () => Promise<LLMConfig[]>;
       pullOllamaModel: (modelName: string) => Promise<void>;
@@ -376,14 +375,14 @@ contextBridge.exposeInMainWorld("llm", {
     llmName: string,
     llmConfig: LLMConfig,
     isJSONMode: boolean,
-    messageHistory: ChatMessageToDisplay[]
+    chatHistory: ChatHistory
   ) => {
     return await ipcRenderer.invoke(
       "streaming-llm-response",
       llmName,
       llmConfig,
       isJSONMode,
-      messageHistory
+      chatHistory
     );
   },
 
