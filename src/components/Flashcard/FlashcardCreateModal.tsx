@@ -125,7 +125,11 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
             />
           )}
         </h2>
-        {!selectedFile && <p className="text-red-500 text-xs">Choose a file</p>}
+        {!selectedFile && (
+          <p className="text-red-500 text-xs">
+            Choose a file by searching or by right clicking a file in directory
+          </p>
+        )}
         {isLoadingFlashcards && flashcardQAPairs.length == 0 && (
           <div>
             <TypeAnimation
