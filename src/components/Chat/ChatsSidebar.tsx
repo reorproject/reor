@@ -1,15 +1,15 @@
 import React from "react";
-import { ChatHistory } from "./Chat";
+import { ChatHistory, formatOpenAIMessageContentIntoString } from "./Chat";
 
 interface ChatListProps {
-  chatIDs: string[];
+  chatHistories: ChatHistory[];
   currentChatHistory: ChatHistory | undefined;
   onSelect: (chatID: string) => void;
   newChat: () => void;
 }
 
 export const ChatsSidebar: React.FC<ChatListProps> = ({
-  chatIDs,
+  chatHistories,
   currentChatHistory,
   onSelect,
   newChat,
@@ -24,10 +24,10 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
           New Chat
         </span>
       </div>
-      {chatIDs.map((chatID) => (
+      {chatHistories.map((chat) => (
         <ChatItem
-          key={chatID}
-          chatID={chatID}
+          key={chat.id}
+          chat={chat}
           selectedChatID={currentChatHistory?.id || ""}
           onChatSelect={onSelect}
         />
@@ -37,17 +37,17 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
 };
 
 interface ChatItemProps {
-  chatID: string;
+  chat: ChatHistory;
   selectedChatID: string | null;
   onChatSelect: (path: string) => void;
 }
 
 export const ChatItem: React.FC<ChatItemProps> = ({
-  chatID,
+  chat,
   selectedChatID,
   onChatSelect,
 }) => {
-  const isSelected = chatID === selectedChatID;
+  const isSelected = chat.id === selectedChatID;
 
   const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-neutral-700 h-full mt-0 mb-0 ${
     isSelected ? "bg-neutral-700 text-white font-semibold" : "text-gray-200"
@@ -55,9 +55,34 @@ export const ChatItem: React.FC<ChatItemProps> = ({
 
   return (
     <div>
-      <div onClick={() => onChatSelect(chatID)} className={itemClasses}>
-        <span className={`text-[13px] flex-1 truncate mt-0`}>{chatID}</span>
+      <div onClick={() => onChatSelect(chat.id)} className={itemClasses}>
+        <span className={`text-[13px] flex-1 truncate mt-0`}>
+          {getChatName(chat)}
+        </span>
       </div>
     </div>
   );
+};
+
+const getChatName = (chat: ChatHistory): string => {
+  const actualHistory = chat.displayableChatHistory;
+
+  if (
+    actualHistory.length === 0 ||
+    !actualHistory[actualHistory.length - 1].content
+  ) {
+    return "Empty Chat";
+  }
+
+  const lastMsg = actualHistory[actualHistory.length - 1];
+
+  if (lastMsg.visibleContent) {
+    return lastMsg.visibleContent.slice(0, 30);
+  }
+
+  const lastMessage = formatOpenAIMessageContentIntoString(lastMsg.content);
+  if (!lastMessage || lastMessage === "") {
+    return "Empty Chat";
+  }
+  return lastMessage.slice(0, 30);
 };

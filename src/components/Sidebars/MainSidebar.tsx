@@ -71,7 +71,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
 
       {sidebarShowing === "chats" && (
         <ChatsSidebar
-          chatIDs={allChatHistories?.map((chat) => chat.id) || []}
+          chatHistories={allChatHistories}
           currentChatHistory={currentChatHistory}
           onSelect={(chatID) => {
             const selectedChat = allChatHistories?.find(

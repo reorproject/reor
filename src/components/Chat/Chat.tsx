@@ -60,7 +60,7 @@ export interface ChatFilters {
   files: string[];
 }
 
-function formatMessageContentIntoString(
+export function formatOpenAIMessageContentIntoString(
   content: string | ChatCompletionContentPart[] | null | undefined
 ): string | undefined {
   if (Array.isArray(content)) {
@@ -83,41 +83,41 @@ export type ChatTemplate = {
   properties: ChatProperties;
 };
 
-function replaceContentInMessages(
-  messages: ChatMessageToDisplay[],
-  context: ChatProperties
-): ChatMessageToDisplay[] {
-  return messages.map((message) => {
-    if ("content" in message) {
-      if (typeof message.content === "string") {
-        message.content = message.content.replace(
-          /\{(\w+)\}/g,
-          (match, key) => {
-            return key in context ? context[key] : match;
-          }
-        );
-      }
-    }
-    return message;
-  });
-}
+// function replaceContentInMessages(
+//   messages: ChatMessageToDisplay[],
+//   context: ChatProperties
+// ): ChatMessageToDisplay[] {
+//   return messages.map((message) => {
+//     if ("content" in message) {
+//       if (typeof message.content === "string") {
+//         message.content = message.content.replace(
+//           /\{(\w+)\}/g,
+//           (match, key) => {
+//             return key in context ? context[key] : match;
+//           }
+//         );
+//       }
+//     }
+//     return message;
+//   });
+// }
 
-const ragPromptTemplate: ChatCompletionMessageParam[] = [
-  {
-    content:
-      "You are an advanced question answer agent answering questions based on provided context.",
-    role: "system",
-  },
-  {
-    content: `
-Context:
-{context}
+// const ragPromptTemplate: ChatCompletionMessageParam[] = [
+//   {
+//     content:
+//       "You are an advanced question answer agent answering questions based on provided context.",
+//     role: "system",
+//   },
+//   {
+//     content: `
+// Context:
+// {context}
 
-Query:
-{query}`,
-    role: "user",
-  },
-];
+// Query:
+// {query}`,
+//     role: "user",
+//   },
+// ];
 
 export const resolveRAGContext = async (
   query: string,
@@ -335,7 +335,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                 >
                   {message.visibleContent
                     ? message.visibleContent
-                    : formatMessageContentIntoString(message.content)}
+                    : formatOpenAIMessageContentIntoString(message.content)}
                 </ReactMarkdown>
               )
             )}
