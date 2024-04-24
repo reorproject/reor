@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { CircularProgress } from "@mui/material";
 import Textarea from "@mui/joy/Textarea";
 import { ChatFilters } from "./Chat";
@@ -8,7 +8,7 @@ interface ChatInputProps {
   handleSubmitNewMessage: () => void;
   loadingResponse: boolean;
   askText: string;
-  chatFilters: ChatFilters;
+  chatFilters: ChatFilters | undefined;
   setChatFilters: (chatFilters: ChatFilters) => void;
 }
 
@@ -78,7 +78,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
 export default ChatInput;
 
 interface FilterComponentProps {
-  chatFilters: ChatFilters;
+  chatFilters: ChatFilters | undefined;
   setChatFilters: (chatFilters: ChatFilters) => void;
 }
 
@@ -86,5 +86,13 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
   chatFilters,
   setChatFilters,
 }) => {
+  // useEffect()
+  useEffect(() => {
+    setChatFilters({
+      files: [""],
+      numberOfChunksToFetch: 15,
+    });
+  }, []);
+
   return <div className="flex space-x-2">filters</div>;
 };

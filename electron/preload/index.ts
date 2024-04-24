@@ -81,6 +81,7 @@ declare global {
       augmentPromptWithFile: (
         augmentPromptWithFileProps: AugmentPromptWithFileProps
       ) => Promise<PromptWithContextLimit>;
+      getFilesystemPathsAsDBItems: (paths: string[]) => Promise<DBEntry[]>;
     };
     path: {
       basename: (pathString: string) => Promise<string>;
@@ -334,6 +335,9 @@ contextBridge.exposeInMainWorld("files", {
       "augment-prompt-with-file",
       augmentPromptWithFileProps
     );
+  },
+  getFilesystemPathsAsDBItems: async (paths: string[]): Promise<DBEntry[]> => {
+    return ipcRenderer.invoke("get-filesystem-paths-as-db-items", paths);
   },
 });
 

@@ -17,7 +17,7 @@ import {
   ChatCompletionContentPart,
   ChatCompletionMessageParam,
 } from "openai/resources/chat/completions";
-import { DBQueryResult } from "electron/main/database/Schema";
+import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import ChatInput from "./ChatInput";
 
 // convert ask options to enum
@@ -51,15 +51,16 @@ export type ChatHistory = {
 };
 export type ChatMessageToDisplay = ChatCompletionMessageParam & {
   messageType: "success" | "error";
-  context: DBQueryResult[];
+  context: DBEntry[];
   visibleContent?: string;
 };
 
 export interface ChatFilters {
+  numberOfChunksToFetch: number;
   files: string[];
 }
 
-function formatMessageContent(
+function formatMessageContentIntoString(
   content: string | ChatCompletionContentPart[] | null | undefined
 ): string | undefined {
   if (Array.isArray(content)) {
@@ -120,12 +121,22 @@ Query:
 
 export const resolveRAGContext = async (
   query: string,
-  limit: number
+  chatFilters: ChatFilters
 ): Promise<ChatMessageToDisplay> => {
   // I mean like the only real places to get context from are like particular files or semantic search or full text search.
   // and like it could be like that if a file is here
-  const results = await window.database.search(query, limit);
 
+  let results: DBEntry[] = [];
+  if (chatFilters.files.length > 0) {
+    console.log("chatFilters.files", chatFilters.files);
+    results = await window.files.getFilesystemPathsAsDBItems(chatFilters.files);
+  } else {
+    results = await window.database.search(
+      query,
+      chatFilters.numberOfChunksToFetch
+    );
+  }
+  console.log("results", results);
   // maybe for now, we don't need to do any kinds of serious slicing...We can just let users deal with errors themselves based on the limits
   // return results, results.map(dbItem => dbItem.content)
   //  return both results and results.content concatenated:
@@ -158,9 +169,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>("");
   const [askText, setAskText] = useState<AskOptions>(AskOptions.Ask);
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
-  const [chatFilters, setChatFilters] = useState<ChatFilters>({
-    files: [],
-  });
+  const [chatFilters, setChatFilters] = useState<ChatFilters>();
   const handleSubmitNewMessage = async (
     chatHistory: ChatHistory | undefined
   ) => {
@@ -178,9 +187,11 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       }
 
       if (chatHistory.displayableChatHistory.length === 0) {
-        chatHistory.displayableChatHistory.push(
-          await resolveRAGContext(userTextFieldInput, 10)
-        );
+        if (chatFilters) {
+          chatHistory.displayableChatHistory.push(
+            await resolveRAGContext(userTextFieldInput, chatFilters)
+          );
+        }
       } else {
         chatHistory.displayableChatHistory.push({
           role: "user",
@@ -324,7 +335,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                 >
                   {message.visibleContent
                     ? message.visibleContent
-                    : formatMessageContent(message.content)}
+                    : formatMessageContentIntoString(message.content)}
                 </ReactMarkdown>
               )
             )}
