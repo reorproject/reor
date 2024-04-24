@@ -20,6 +20,7 @@ import {
 import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import ChatInput from "./ChatInput";
 import { ChatHistoryMetadata } from "./hooks/use-chat-history";
+import { useDebounce } from "use-debounce";
 
 // convert ask options to enum
 enum AskOptions {
@@ -137,10 +138,6 @@ export const resolveRAGContext = async (
       chatFilters.numberOfChunksToFetch
     );
   }
-  console.log("results", results);
-  // maybe for now, we don't need to do any kinds of serious slicing...We can just let users deal with errors themselves based on the limits
-  // return results, results.map(dbItem => dbItem.content)
-  //  return both results and results.content concatenated:
   return {
     messageType: "success",
     role: "user",
@@ -172,6 +169,16 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const [askText, setAskText] = useState<AskOptions>(AskOptions.Ask);
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
   const [chatFilters, setChatFilters] = useState<ChatFilters>();
+  const [debouncedChatHistory] = useDebounce(currentChatHistory, 1000);
+  const [readyToSave, setReadyToSave] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (readyToSave && currentChatHistory) {
+      window.electronStore.updateChatHistory(currentChatHistory);
+      setReadyToSave(false);
+    }
+  }, [readyToSave, currentChatHistory]);
+
   const handleSubmitNewMessage = async (
     chatHistory: ChatHistory | undefined
   ) => {
@@ -205,17 +212,15 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
       setUserTextFieldInput("");
 
-      // oh this is literally just for making the chat history appear in the sidebar
       setCurrentChatHistory(chatHistory);
-
       setChatHistoriesMetadata((prev) => {
         if (!chatHistory) return prev;
         if (prev?.find((chat) => chat.id === chatHistory?.id)) {
           return prev;
         }
         const newChatHistories = prev
-          ? [...prev, { id: chatHistory.id }]
-          : [{ id: chatHistory.id }];
+          ? [...prev, { id: chatHistory.id, displayName: "New Chat" }]
+          : [{ id: chatHistory.id, displayName: "New Chat" }];
         return newChatHistories;
       });
 
@@ -238,7 +243,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         false,
         chatHistory?.displayableChatHistory
       );
-      // once finish streaming, save the message?
+      setReadyToSave(true);
     } catch (error) {
       appendNewContentToMessageHistory(errorToString(error), "error");
     }
