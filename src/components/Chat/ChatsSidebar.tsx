@@ -1,19 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ChatHistory, formatOpenAIMessageContentIntoString } from "./Chat";
+import { ChatHistoryMetadata } from "./hooks/use-chat-history";
 
 interface ChatListProps {
-  chatHistories: ChatHistory[];
+  // chatHistories: ChatHistory[];
+  chatHistoriesMetadata: ChatHistoryMetadata[];
   currentChatHistory: ChatHistory | undefined;
   onSelect: (chatID: string) => void;
   newChat: () => void;
 }
 
 export const ChatsSidebar: React.FC<ChatListProps> = ({
-  chatHistories,
+  chatHistoriesMetadata,
   currentChatHistory,
   onSelect,
   newChat,
 }) => {
+  const [localChatHistoriesMetadata, setLocalChatHistoriesMetadata] = useState<
+    ChatHistoryMetadata[]
+  >([]);
+  useEffect(() => {
+    setLocalChatHistoriesMetadata(chatHistoriesMetadata.reverse());
+  }, [chatHistoriesMetadata]);
   return (
     <div className="h-full overflow-y-auto bg-neutral-800">
       <div
@@ -24,10 +32,11 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
           New Chat
         </span>
       </div>
-      {chatHistories.map((chat) => (
+      {localChatHistoriesMetadata.map((chat) => (
         <ChatItem
           key={chat.id}
-          chat={chat}
+          // chat={chat}
+          id={chat.id}
           selectedChatID={currentChatHistory?.id || ""}
           onChatSelect={onSelect}
         />
@@ -37,17 +46,17 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
 };
 
 interface ChatItemProps {
-  chat: ChatHistory;
+  id: string;
   selectedChatID: string | null;
   onChatSelect: (path: string) => void;
 }
 
 export const ChatItem: React.FC<ChatItemProps> = ({
-  chat,
+  id,
   selectedChatID,
   onChatSelect,
 }) => {
-  const isSelected = chat.id === selectedChatID;
+  const isSelected = id === selectedChatID;
 
   const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-neutral-700 h-full mt-0 mb-0 ${
     isSelected ? "bg-neutral-700 text-white font-semibold" : "text-gray-200"
@@ -55,10 +64,8 @@ export const ChatItem: React.FC<ChatItemProps> = ({
 
   return (
     <div>
-      <div onClick={() => onChatSelect(chat.id)} className={itemClasses}>
-        <span className={`text-[13px] flex-1 truncate mt-0`}>
-          {getChatName(chat)}
-        </span>
+      <div onClick={() => onChatSelect(id)} className={itemClasses}>
+        <span className={`text-[13px] flex-1 truncate mt-0`}>{id}</span>
       </div>
     </div>
   );
@@ -74,7 +81,7 @@ const getChatName = (chat: ChatHistory): string => {
     return "Empty Chat";
   }
 
-  const lastMsg = actualHistory[actualHistory.length - 1];
+  const lastMsg = actualHistory[0];
 
   if (lastMsg.visibleContent) {
     return lastMsg.visibleContent.slice(0, 30);

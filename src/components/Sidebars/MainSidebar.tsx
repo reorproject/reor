@@ -6,6 +6,7 @@ import { FileInfoTree } from "electron/main/Files/Types";
 import { ChatsSidebar } from "../Chat/ChatsSidebar";
 import { SidebarAbleToShow } from "../FileEditorContainer";
 import { ChatHistory } from "../Chat/Chat";
+import { ChatHistoryMetadata } from "../Chat/hooks/use-chat-history";
 
 interface SidebarManagerProps {
   files: FileInfoTree;
@@ -20,7 +21,7 @@ interface SidebarManagerProps {
   fileDirToBeRenamed: string;
   setFileDirToBeRenamed: (dir: string) => void;
   currentChatHistory: ChatHistory | undefined;
-  allChatHistories: ChatHistory[];
+  chatHistoriesMetadata: ChatHistoryMetadata[];
   setCurrentChatHistory: (chat: ChatHistory | undefined) => void;
 }
 
@@ -37,7 +38,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
   fileDirToBeRenamed,
   setFileDirToBeRenamed,
   currentChatHistory,
-  allChatHistories,
+  chatHistoriesMetadata,
   setCurrentChatHistory,
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -71,13 +72,12 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
 
       {sidebarShowing === "chats" && (
         <ChatsSidebar
-          chatHistories={allChatHistories}
+          chatHistoriesMetadata={chatHistoriesMetadata}
           currentChatHistory={currentChatHistory}
           onSelect={(chatID) => {
-            const selectedChat = allChatHistories?.find(
-              (chat) => chat.id === chatID
-            );
-            setCurrentChatHistory(selectedChat);
+            window.electronStore.getChatHistory(chatID).then((chat) => {
+              setCurrentChatHistory(chat);
+            });
           }}
           newChat={() => {
             setCurrentChatHistory(undefined);

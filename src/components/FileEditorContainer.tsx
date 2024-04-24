@@ -36,10 +36,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   } = useFileByFilepath();
 
   const {
-    allChatHistories,
-    setAllChatHistories,
     currentChatHistory,
     setCurrentChatHistory,
+    chatHistoriesMetadata,
+    setChatHistoriesMetadata,
   } = useChatHistory();
 
   const { files, flattenedFiles, expandedDirectories, handleDirectoryToggle } =
@@ -99,7 +99,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
               fileDirToBeRenamed={fileDirToBeRenamed}
               setFileDirToBeRenamed={setFileDirToBeRenamed}
               currentChatHistory={currentChatHistory}
-              allChatHistories={allChatHistories}
+              chatHistoriesMetadata={chatHistoriesMetadata}
               setCurrentChatHistory={openChatOverwrite}
             />
           </div>
@@ -146,7 +146,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
           <div className={`w-full h-below-titlebar`}>
             {/* <ResizableComponent resizeSide="left" initialWidth={450}> */}
             <ChatWithLLM
-              setAllChatHistories={setAllChatHistories}
+              setChatHistoriesMetadata={setChatHistoriesMetadata}
               currentChatHistory={currentChatHistory}
               setCurrentChatHistory={setCurrentChatHistory}
             />

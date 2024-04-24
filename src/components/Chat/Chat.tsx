@@ -19,6 +19,7 @@ import {
 } from "openai/resources/chat/completions";
 import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import ChatInput from "./ChatInput";
+import { ChatHistoryMetadata } from "./hooks/use-chat-history";
 
 // convert ask options to enum
 enum AskOptions {
@@ -152,9 +153,10 @@ export const resolveRAGContext = async (
 };
 
 interface ChatWithLLMProps {
-  // currentFilePath: string | null;
-  // openFileByPath: (path: string) => Promise<void>;
-  setAllChatHistories: React.Dispatch<React.SetStateAction<ChatHistory[]>>;
+  setChatHistoriesMetadata: React.Dispatch<
+    React.SetStateAction<ChatHistoryMetadata[]>
+  >;
+  // setAllChatHistories: React.Dispatch<React.SetStateAction<ChatHistory[]>>;
   currentChatHistory: ChatHistory | undefined;
   setCurrentChatHistory: React.Dispatch<
     React.SetStateAction<ChatHistory | undefined>
@@ -162,7 +164,7 @@ interface ChatWithLLMProps {
 }
 
 const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
-  setAllChatHistories,
+  setChatHistoriesMetadata,
   currentChatHistory,
   setCurrentChatHistory,
 }) => {
@@ -206,12 +208,14 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       // oh this is literally just for making the chat history appear in the sidebar
       setCurrentChatHistory(chatHistory);
 
-      setAllChatHistories((prev) => {
+      setChatHistoriesMetadata((prev) => {
         if (!chatHistory) return prev;
         if (prev?.find((chat) => chat.id === chatHistory?.id)) {
           return prev;
         }
-        const newChatHistories = prev ? [...prev, chatHistory] : [chatHistory];
+        const newChatHistories = prev
+          ? [...prev, { id: chatHistory.id }]
+          : [{ id: chatHistory.id }];
         return newChatHistories;
       });
 

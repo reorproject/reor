@@ -137,6 +137,7 @@ declare global {
       setHasUserOpenedAppBefore: () => void;
       getAllChatHistories: () => Promise<ChatHistory[]>;
       updateChatHistory: (chatHistory: ChatHistory) => void;
+      getChatHistory: (chatID: string) => Promise<ChatHistory>;
     };
   }
 }
@@ -262,6 +263,9 @@ contextBridge.exposeInMainWorld("electronStore", {
   },
   updateChatHistory: (chatHistory: ChatHistory) => {
     ipcRenderer.invoke("update-chat-history", chatHistory);
+  },
+  getChatHistory: (chatID: string) => {
+    return ipcRenderer.invoke("get-chat-history", chatID);
   },
 });
 

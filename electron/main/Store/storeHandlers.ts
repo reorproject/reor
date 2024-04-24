@@ -174,6 +174,18 @@ export const registerStoreHandlers = (
       [vaultDir]: vaultChatHistories,
     });
   });
+
+  ipcMain.handle("get-chat-history", (event, chatId: string) => {
+    const vaultDir = windowsManager.getVaultDirectoryForWinContents(
+      event.sender
+    );
+    if (!vaultDir) {
+      return;
+    }
+    const allChatHistories = store.get(StoreKeys.ChatHistories);
+    const vaultChatHistories = allChatHistories[vaultDir] || [];
+    return vaultChatHistories.find((chat) => chat.id === chatId);
+  });
 };
 
 export function getDefaultEmbeddingModelConfig(
