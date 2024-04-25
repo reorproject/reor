@@ -135,7 +135,7 @@ export const SimilarEntriesComponent: React.FC<
 }) => {
   return (
     <div>
-      <ResizableComponent resizeSide="left" initialWidth={400}>
+      <ResizableComponent resizeSide="left" initialWidth={300}>
         <div
           className={`h-below-titlebar ${
             similarEntries.length > 0 ? "overflow-y-auto" : "overflow-y-hidden"
@@ -173,15 +173,17 @@ export const SimilarEntriesComponent: React.FC<
           </div>
           {similarEntries.length > 0 && (
             <div className="h-full w-full">
-              {similarEntries.map((dbResult, index) => (
-                <div className="pb-2 pr-2 pl-2 pt-1" key={index}>
-                  <DBResultPreview
-                    key={index}
-                    dbResult={dbResult}
-                    onSelect={onFileSelect}
-                  />
-                </div>
-              ))}
+              {similarEntries
+                .filter((dbResult) => dbResult)
+                .map((dbResult, index) => (
+                  <div className="pb-2 pr-2 pl-2 pt-1" key={index}>
+                    <DBResultPreview
+                      key={index}
+                      dbResult={dbResult}
+                      onSelect={onFileSelect}
+                    />
+                  </div>
+                ))}
             </div>
           )}
           {similarEntries.length === 0 && (
