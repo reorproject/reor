@@ -24,57 +24,11 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
 }) => {
   const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([]);
 
-  return (
-    <>
-      <HighlightButton
-        highlightData={highlightData}
-        onClick={async () => {
-          setSimilarEntries([]);
-          const databaseFields = await window.database.getDatabaseFields();
-          const filterString = `${databaseFields.NOTE_PATH} != '${filePath}'`;
-          console.log("highlightData", highlightData.text);
-          const searchResults: DBQueryResult[] = await window.database.search(
-            highlightData.text,
-            20,
-            filterString
-          );
-          setSimilarEntries(searchResults);
-        }}
-      />{" "}
-      <ResizableComponent resizeSide="left" initialWidth={400}>
-        <SimilarEntriesComponent
-          filePath={filePath}
-          similarEntries={similarEntries}
-          setSimilarEntries={setSimilarEntries}
-          onFileSelect={openFileByPath}
-          saveCurrentFile={async () => {
-            await saveCurrentlyOpenedFile();
-          }}
-        />
-      </ResizableComponent>
-    </>
-  );
-};
-
-export default SidebarComponent;
-
-interface SimilarEntriesComponentProps {
-  filePath: string;
-  similarEntries: DBQueryResult[];
-  setSimilarEntries: (entries: DBQueryResult[]) => void;
-  onFileSelect: (path: string) => void;
-  saveCurrentFile: () => Promise<void>;
-}
-
-const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
-  filePath,
-  similarEntries,
-  setSimilarEntries,
-  onFileSelect,
-  saveCurrentFile,
-}) => {
-  const [userHitRefresh, setUserHitRefresh] = useState<boolean>(false);
-
+  useEffect(() => {
+    if (filePath) {
+      handleNewFileOpen(filePath);
+    }
+  }, [filePath]);
   const handleNewFileOpen = async (path: string) => {
     try {
       const searchResults = await performSearchOnFile(path);
@@ -119,82 +73,126 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     }
   };
 
-  useEffect(() => {
-    if (filePath) {
-      handleNewFileOpen(filePath);
-    }
-
-    setUserHitRefresh(false);
-  }, [filePath]);
-
-  const updateSimilarEntries = async (currentFilePath: string) => {
-    const searchResults = await performSearchOnFile(currentFilePath);
+  const updateSimilarEntries = async () => {
+    const searchResults = await performSearchOnFile(filePath);
     setSimilarEntries(searchResults);
   };
 
   return (
-    <div>
-      {/* <HighlightButton
+    <>
+      <HighlightButton
         highlightData={highlightData}
-        onClick={() => console.log("clicked this ting")}
-      />{" "} */}
-      <div
-        className={`h-below-titlebar ${
-          similarEntries.length > 0 ? "overflow-y-auto" : "overflow-y-hidden"
-        } overflow-x-hidden mt-0 border-l-[0.1px] border-t-0 border-b-0 border-r-0 border-gray-600 border-solid`}
-      >
-        {/* {similarEntries.length > 0 && ( */}
-        <div className="flex items-center bg-neutral-800 p-0">
-          {/* Invisible Spacer */}
-          <div className="flex-1"></div>
+        onClick={async () => {
+          setSimilarEntries([]);
+          const databaseFields = await window.database.getDatabaseFields();
+          const filterString = `${databaseFields.NOTE_PATH} != '${filePath}'`;
+          const searchResults: DBQueryResult[] = await window.database.search(
+            highlightData.text,
+            20,
+            filterString
+          );
+          setSimilarEntries(searchResults);
+        }}
+      />{" "}
+      <SimilarEntriesComponent
+        // filePath={filePath}
+        similarEntries={similarEntries}
+        setSimilarEntries={setSimilarEntries}
+        onFileSelect={openFileByPath}
+        saveCurrentFile={async () => {
+          await saveCurrentlyOpenedFile();
+        }}
+        updateSimilarEntries={updateSimilarEntries}
+        titleText="Related Notes"
+      />
+      {/* </ResizableComponent> */}
+    </>
+  );
+};
 
-          {/* Centered content: PiGraph icon and Related Notes text */}
-          <div className="flex items-center justify-center px-4">
-            <PiGraph className="text-gray-300 mt-1" />
-            <p className="text-gray-300 text-sm pl-1 mb-0 mt-1">
-              Related Notes
-            </p>
-          </div>
+export default SidebarComponent;
 
-          <div
-            className="flex-1 flex justify-end pr-3 pt-1 cursor-pointer"
-            onClick={async () => {
-              setUserHitRefresh(true);
-              setSimilarEntries([]); // simulate refresh
-              await saveCurrentFile();
-              updateSimilarEntries(filePath);
-            }}
-          >
-            <FiRefreshCw
-              className="text-gray-300"
-              title="Refresh Related Notes"
-            />{" "}
-            {/* Icon */}
-          </div>
-        </div>
-        <div className="h-full w-full">
-          {similarEntries.map((dbResult, index) => (
-            <div className="pb-2 pr-2 pl-2 pt-1" key={index}>
-              <DBResultPreview
-                key={index}
-                dbResult={dbResult}
-                onSelect={onFileSelect}
-              />
+interface SimilarEntriesComponentProps {
+  // filePath: string;
+  similarEntries: DBQueryResult[];
+  setSimilarEntries?: (entries: DBQueryResult[]) => void;
+  onFileSelect: (path: string) => void;
+  saveCurrentFile: () => Promise<void>;
+  updateSimilarEntries?: () => Promise<void>;
+  titleText: string;
+}
+
+export const SimilarEntriesComponent: React.FC<
+  SimilarEntriesComponentProps
+> = ({
+  // filePath,
+  similarEntries,
+  setSimilarEntries,
+  onFileSelect,
+  saveCurrentFile,
+  updateSimilarEntries,
+  titleText,
+}) => {
+  return (
+    <div>
+      <ResizableComponent resizeSide="left" initialWidth={400}>
+        <div
+          className={`h-below-titlebar ${
+            similarEntries.length > 0 ? "overflow-y-auto" : "overflow-y-hidden"
+          } overflow-x-hidden mt-0 border-l-[0.1px] border-t-0 border-b-0 border-r-0 border-neutral-700  border-solid`}
+        >
+          {/* {similarEntries.length > 0 && ( */}
+          <div className="flex items-center bg-neutral-800 p-0">
+            {/* Invisible Spacer */}
+            <div className="flex-1"></div>
+
+            <div className="flex items-center justify-center px-4">
+              <PiGraph className="text-gray-300 mt-1" />
+              <p className="text-gray-300 text-sm pl-1 mb-0 mt-1">
+                {titleText}
+              </p>
             </div>
-          ))}
-        </div>
-        {similarEntries.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full w-full">
-            <p className="flex justify-center items-center text-gray-500 text-lg mx-auto text-center">
-              {!userHitRefresh ? (
-                <>Hit refresh to show related notes...</>
-              ) : (
-                <>Make sure your note is not empty...</>
+
+            <div className="flex-1 flex justify-end pr-3 pt-1 cursor-pointer">
+              {updateSimilarEntries && setSimilarEntries && (
+                <div
+                  onClick={async () => {
+                    setSimilarEntries([]); // simulate refresh
+                    await saveCurrentFile();
+                    updateSimilarEntries();
+                  }}
+                >
+                  <FiRefreshCw
+                    className="text-gray-300"
+                    title="Refresh Related Notes"
+                  />{" "}
+                  {/* Icon */}
+                </div>
               )}
-            </p>
+            </div>
           </div>
-        )}
-      </div>
+          {similarEntries.length > 0 && (
+            <div className="h-full w-full">
+              {similarEntries.map((dbResult, index) => (
+                <div className="pb-2 pr-2 pl-2 pt-1" key={index}>
+                  <DBResultPreview
+                    key={index}
+                    dbResult={dbResult}
+                    onSelect={onFileSelect}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+          {similarEntries.length === 0 && (
+            <div className="flex flex-col items-center justify-center h-full w-full">
+              <p className="flex justify-center items-center text-gray-500 text-lg mx-auto text-center">
+                <>No items found</>
+              </p>
+            </div>
+          )}
+        </div>
+      </ResizableComponent>
     </div>
   );
 };

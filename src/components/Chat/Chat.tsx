@@ -21,6 +21,8 @@ import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import ChatInput from "./ChatInput";
 import { ChatHistoryMetadata } from "./hooks/use-chat-history";
 import { useDebounce } from "use-debounce";
+import { SimilarEntriesComponent } from "../Similarity/SimilarFilesSidebar";
+import ResizableComponent from "../Generic/ResizableComponent";
 
 // convert ask options to enum
 enum AskOptions {
@@ -150,6 +152,8 @@ export const resolveRAGContext = async (
 };
 
 interface ChatWithLLMProps {
+  openFileByPath: (path: string) => Promise<void>;
+
   setChatHistoriesMetadata: React.Dispatch<
     React.SetStateAction<ChatHistoryMetadata[]>
   >;
@@ -158,18 +162,21 @@ interface ChatWithLLMProps {
   setCurrentChatHistory: React.Dispatch<
     React.SetStateAction<ChatHistory | undefined>
   >;
+  showSimilarFiles: boolean;
 }
 
 const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
+  openFileByPath,
+
   setChatHistoriesMetadata,
   currentChatHistory,
   setCurrentChatHistory,
+  showSimilarFiles,
 }) => {
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>("");
   const [askText, setAskText] = useState<AskOptions>(AskOptions.Ask);
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
   const [chatFilters, setChatFilters] = useState<ChatFilters>();
-  const [debouncedChatHistory] = useDebounce(currentChatHistory, 1000);
   const [readyToSave, setReadyToSave] = useState<boolean>(false);
 
   useEffect(() => {
@@ -326,18 +333,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   return (
     <div className="flex items-center justify-center w-full h-full">
       <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid">
-        <div className="flex w-full items-center">
-          {/* <div className="flex-grow flex justify-center items-center m-0 mt-1 ml-2 mb-1 p-0">
-            {defaultModel ? (
-              <p className="m-0 p-0 text-gray-500">{defaultModel}</p>
-            ) : (
-              <p className="m-0 p-0 text-gray-500">No default model selected</p>
-            )}
-          </div> */}
-          {/* <div className="pr-2 pt-1 cursor-pointer" onClick={fetchDefaultModel}>
-            <FiRefreshCw className="text-gray-300" title="Restart Session" />{" "}
-          </div> */}
-        </div>
         <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
           <div className="space-y-2 mt-4 flex-grow">
             {currentChatHistory?.displayableChatHistory.map(
@@ -377,7 +372,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             </>
           ) : undefined}
         </div>
-
         <ChatInput
           userTextFieldInput={userTextFieldInput}
           setUserTextFieldInput={setUserTextFieldInput}
@@ -390,8 +384,32 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           setChatFilters={setChatFilters}
         />
       </div>
+      {showSimilarFiles && (
+        <SimilarEntriesComponent
+          similarEntries={getChatHistoryContext(currentChatHistory)}
+          titleText="Context Used in Chat"
+          onFileSelect={openFileByPath}
+          saveCurrentFile={() => {
+            return Promise.resolve();
+          }}
+        />
+      )}
     </div>
   );
+};
+
+const getChatHistoryContext = (
+  chatHistory: ChatHistory | undefined
+): DBQueryResult[] => {
+  if (!chatHistory) return [];
+  console.log("chatHistory", chatHistory.displayableChatHistory);
+
+  const contextForChat = chatHistory.displayableChatHistory
+    .map((message) => {
+      return message.context;
+    })
+    .flat();
+  return contextForChat as DBQueryResult[];
 };
 
 export default ChatWithLLM;
