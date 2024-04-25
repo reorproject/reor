@@ -45,9 +45,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const { files, flattenedFiles, expandedDirectories, handleDirectoryToggle } =
     useFileInfoTree(filePath);
 
-  const toggleChatbot = () => {
-    setShowChatbot(!showChatbot);
-  };
   const toggleSimilarFiles = () => {
     setShowSimilarFiles(!showSimilarFiles);
   };
@@ -69,9 +66,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         setHistory={setNavigationHistory}
         currentFilePath={filePath}
         onFileSelect={openFileOverwrite}
-        chatbotOpen={showChatbot}
         similarFilesOpen={showSimilarFiles}
-        toggleChatbot={toggleChatbot}
         toggleSimilarFiles={toggleSimilarFiles}
       />
 

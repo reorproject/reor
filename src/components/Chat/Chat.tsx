@@ -359,27 +359,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                 </ReactMarkdown>
               )
             )}
-            {/* {currentVisibleStreamingAssistantMessage && (
-            <ReactMarkdown
-              rehypePlugins={[rehypeRaw]}
-              className={`p-1 pl-1 markdown-content rounded-lg break-words ${
-                currentVisibleStreamingAssistantMessage.messageType === "error"
-                  ? "bg-red-100 text-red-800"
-                  : "bg-blue-100 text-blue-800"
-              } `}
-              components={{
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                a: ({ node, ...props }) => (
-                  <CustomLinkMarkdown
-                    props={props}
-                    openFileByPath={openFileByPath}
-                  />
-                ),
-              }}
-            >
-              {currentVisibleStreamingAssistantMessage.content}
-            </ReactMarkdown>
-          )} */}
           </div>
           {userTextFieldInput === "" &&
           currentChatHistory?.displayableChatHistory.length == 0 ? (
