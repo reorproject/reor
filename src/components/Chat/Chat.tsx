@@ -178,6 +178,12 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
   const [chatFilters, setChatFilters] = useState<ChatFilters>();
   const [readyToSave, setReadyToSave] = useState<boolean>(false);
+  const [currentContext, setCurrentContext] = useState<DBQueryResult[]>([]);
+
+  useEffect(() => {
+    const context = getChatHistoryContext(currentChatHistory);
+    setCurrentContext(context);
+  }, [currentChatHistory]);
 
   useEffect(() => {
     if (readyToSave && currentChatHistory) {
@@ -386,7 +392,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       </div>
       {showSimilarFiles && (
         <SimilarEntriesComponent
-          similarEntries={getChatHistoryContext(currentChatHistory)}
+          similarEntries={currentContext}
           titleText="Context Used in Chat"
           onFileSelect={openFileByPath}
           saveCurrentFile={() => {
