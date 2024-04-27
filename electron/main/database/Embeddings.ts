@@ -10,6 +10,7 @@ import {
 } from "../Store/storeConfig";
 import { splitDirectoryPathIntoBaseAndRepo } from "../Files/Filesystem";
 import { DownloadModelFilesFromHFRepo } from "../download/download";
+import removeMd from "remove-markdown";
 
 export interface EnhancedEmbeddingFunction<T>
   extends lancedb.EmbeddingFunction<T> {
@@ -113,6 +114,8 @@ export async function createEmbeddingFunctionForRepo(
   const tokenize = setupTokenizeFunction(pipe.tokenizer);
   const embed = await setupEmbedFunction(pipe);
 
+  // sanitize the embedding text to remove markdown content
+
   return {
     name: functionName,
     contextLength: pipe.model.config.hidden_size,
@@ -162,7 +165,7 @@ async function setupEmbedFunction(
     const result: number[][] = await Promise.all(
       batch.map(async (text) => {
         try {
-          const res = await pipe(text, {
+          const res = await pipe(removeMd(text as string), {
             pooling: "mean",
             normalize: true,
           });

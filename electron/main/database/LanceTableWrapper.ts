@@ -57,15 +57,21 @@ export class LanceDBTableWrapper {
       string,
       unknown
     >[];
-    const chunkSize = 50;
+    const numberOfChunksToIndexAtOnce = 50;
     const chunks = [];
-    for (let i = 0; i < recordEntry.length; i += chunkSize) {
-      chunks.push(recordEntry.slice(i, i + chunkSize));
+    for (let i = 0; i < recordEntry.length; i += numberOfChunksToIndexAtOnce) {
+      chunks.push(recordEntry.slice(i, i + numberOfChunksToIndexAtOnce));
     }
+
+    if (chunks.length == 0) return
+
+    //clean up previously indexed entries and reindex the whole file
+    await this.deleteDBItemsByFilePaths(data.map((x) => x.notepath));
     let index = 0;
     const totalChunks = chunks.length;
     for (const chunk of chunks) {
       const arrowTableOfChunk = makeArrowTable(chunk);
+      console.log(arrowTableOfChunk);
       await this.lanceTable.add(arrowTableOfChunk);
 
       index++;
