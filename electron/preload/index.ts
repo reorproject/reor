@@ -86,6 +86,9 @@ declare global {
         augmentPromptWithFileProps: AugmentPromptWithFileProps
       ) => Promise<PromptWithContextLimit>;
       getFilesystemPathsAsDBItems: (paths: string[]) => Promise<DBEntry[]>;
+      generateFlashcardsWithFile: (
+        flashcardWithFileProps: AugmentPromptWithFileProps
+      ) => Promise<string>;
     };
     path: {
       basename: (pathString: string) => Promise<string>;
@@ -95,6 +98,9 @@ declare global {
       addExtensionIfNoExtensionPresent: (pathString: string) => Promise<string>;
       pathSep: () => Promise<string>;
       getAllFilenamesInDirectory: (dirName: string) => Promise<string[]>;
+      getAllFilenamesInDirectoryRecursively: (
+        dirName: string
+      ) => Promise<string[]>;
     };
     llm: {
       streamingLLMResponse: (
@@ -354,6 +360,14 @@ contextBridge.exposeInMainWorld("files", {
   getFilesystemPathsAsDBItems: async (paths: string[]): Promise<DBEntry[]> => {
     return ipcRenderer.invoke("get-filesystem-paths-as-db-items", paths);
   },
+  generateFlashcardsWithFile: async (
+    flashcardWithFileProps: AugmentPromptWithFileProps
+  ): Promise<string> => {
+    return ipcRenderer.invoke(
+      "generate-flashcards-from-file",
+      flashcardWithFileProps
+    );
+  },
 });
 
 contextBridge.exposeInMainWorld("path", {
@@ -379,6 +393,9 @@ contextBridge.exposeInMainWorld("path", {
   },
   getAllFilenamesInDirectory: (dirName: string) => {
     return ipcRenderer.invoke("get-files-in-directory", dirName);
+  },
+  getAllFilenamesInDirectoryRecursively: (dirName: string) => {
+    return ipcRenderer.invoke("get-files-in-directory-recursive", dirName);
   },
 });
 

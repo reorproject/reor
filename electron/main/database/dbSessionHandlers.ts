@@ -184,6 +184,7 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
             content: query,
           },
         ],
+        false,
         store.get(StoreKeys.LLMGenerationParameters)
       );
 
@@ -277,6 +278,7 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
             content: promptToCreateAtomicFacts,
           },
         ],
+        false,
         store.get(StoreKeys.LLMGenerationParameters)
       );
 

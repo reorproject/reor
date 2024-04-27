@@ -17,6 +17,7 @@ interface FileListProps {
   setNoteToBeRenamed: (note: string) => void;
   fileDirToBeRenamed: string;
   setFileDirToBeRenamed: (dir: string) => void;
+  listHeight?: number;
 }
 
 export const FileSidebar: React.FC<FileListProps> = ({
@@ -30,6 +31,7 @@ export const FileSidebar: React.FC<FileListProps> = ({
   setNoteToBeRenamed,
   fileDirToBeRenamed,
   setFileDirToBeRenamed,
+  listHeight,
 }) => {
   return (
     <div className="flex flex-col h-below-titlebar text-white overflow-y-auto overflow-x-hidden">
@@ -60,6 +62,7 @@ export const FileSidebar: React.FC<FileListProps> = ({
         handleDragStart={handleDragStartImpl}
         expandedDirectories={expandedDirectories}
         handleDirectoryToggle={handleDirectoryToggle}
+        lheight={listHeight}
       />
     </div>
   );
@@ -77,6 +80,7 @@ interface FileExplorerProps {
   handleDragStart: (e: React.DragEvent, file: FileInfoNode) => void;
   expandedDirectories: Map<string, boolean>;
   handleDirectoryToggle: (path: string) => void;
+  lheight?: number;
 }
 
 const FileExplorer: React.FC<FileExplorerProps> = ({
@@ -86,12 +90,13 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   handleDragStart,
   expandedDirectories,
   handleDirectoryToggle,
+  lheight,
 }) => {
-  const [listHeight, setListHeight] = useState(window.innerHeight);
+  const [listHeight, setListHeight] = useState(lheight ?? window.innerHeight);
 
   useEffect(() => {
     const updateHeight = () => {
-      setListHeight(window.innerHeight);
+      setListHeight(lheight ?? window.innerHeight);
     };
 
     window.addEventListener("resize", updateHeight);
