@@ -22,6 +22,8 @@ export interface DBQueryResult extends DBEntry {
   _distance: number;
 }
 
+export const chunksize = 500;
+
 export enum DatabaseFields {
   NOTE_PATH = "notepath",
   VECTOR = "vector",
