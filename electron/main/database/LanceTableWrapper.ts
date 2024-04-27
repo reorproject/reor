@@ -53,6 +53,9 @@ export class LanceDBTableWrapper {
         return x;
       });
 
+    //clean up previously indexed entries and reindex the whole file
+    await this.deleteDBItemsByFilePaths(data.map((x) => x.notepath));
+
     const recordEntry: Record<string, unknown>[] = data as unknown as Record<
       string,
       unknown
@@ -65,8 +68,7 @@ export class LanceDBTableWrapper {
 
     if (chunks.length == 0) return
 
-    //clean up previously indexed entries and reindex the whole file
-    await this.deleteDBItemsByFilePaths(data.map((x) => x.notepath));
+
     let index = 0;
     const totalChunks = chunks.length;
     for (const chunk of chunks) {
