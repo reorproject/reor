@@ -8,6 +8,8 @@ import { FiRefreshCw } from "react-icons/fi";
 import ResizableComponent from "../Generic/ResizableComponent";
 import { HighlightData } from "../Editor/HighlightExtension";
 import { FaArrowRight } from "react-icons/fa";
+import removeMd from "remove-markdown";
+import { CircularProgress } from "@mui/material";
 
 interface SidebarComponentProps {
   filePath: string;
@@ -23,6 +25,7 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
   saveCurrentlyOpenedFile,
 }) => {
   const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([]);
+  const [isLoadingSimilarEntries, setIsLoadingSimilarEntries] = useState(false);
 
   useEffect(() => {
     if (filePath) {
@@ -47,19 +50,22 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
   ): Promise<DBQueryResult[]> => {
     try {
       const fileContent: string = await window.files.readFile(filePath);
-      // TODO: proper chunking here...
+      // TODO: proper semantic chunking here... current quick win is just to take top 500 characters
       if (!fileContent) {
         return [];
       }
+      const sanitizedText = removeMd(fileContent.slice(0, 500));
+
       const databaseFields = await window.database.getDatabaseFields();
       const filterString = `${databaseFields.NOTE_PATH} != '${filePath}'`;
 
-      const searchResults: DBQueryResult[] = await window.database.search(
-        fileContent,
+      setIsLoadingSimilarEntries(true);
+      const searchResults: DBQueryResult[] = await window.database.searchWithReranking(
+        sanitizedText,
         20,
         filterString
       );
-
+      setIsLoadingSimilarEntries(false);
       return searchResults;
     } catch (error) {
       console.error("Error:", error);
@@ -103,6 +109,7 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
           await saveCurrentlyOpenedFile();
         }}
         updateSimilarEntries={updateSimilarEntries}
+        isLoadingSimilarEntries={isLoadingSimilarEntries}
         titleText="Related Notes"
       />
       {/* </ResizableComponent> */}
@@ -120,6 +127,7 @@ interface SimilarEntriesComponentProps {
   saveCurrentFile: () => Promise<void>;
   updateSimilarEntries?: () => Promise<void>;
   titleText: string;
+  isLoadingSimilarEntries: boolean;
 }
 
 export const SimilarEntriesComponent: React.FC<
@@ -132,7 +140,9 @@ export const SimilarEntriesComponent: React.FC<
   saveCurrentFile,
   updateSimilarEntries,
   titleText,
+  isLoadingSimilarEntries,
 }) => {
+
   return (
     <div>
       <ResizableComponent resizeSide="left" initialWidth={300}>
@@ -162,11 +172,13 @@ export const SimilarEntriesComponent: React.FC<
                     updateSimilarEntries();
                   }}
                 >
-                  <FiRefreshCw
+                  {!isLoadingSimilarEntries && <FiRefreshCw
                     className="text-gray-300"
                     title="Refresh Related Notes"
-                  />{" "}
-                  {/* Icon */}
+                  />}
+                  {isLoadingSimilarEntries && (
+                      <CircularProgress size={24} />
+                  )}
                 </div>
               )}
             </div>
@@ -186,7 +198,7 @@ export const SimilarEntriesComponent: React.FC<
                 ))}
             </div>
           )}
-          {similarEntries.length === 0 && (
+          {similarEntries.length === 0 && !isLoadingSimilarEntries && (
             <div className="flex flex-col items-center justify-center h-full w-full">
               <p className="flex justify-center items-center text-gray-500 text-lg mx-auto text-center">
                 <>No items found</>
