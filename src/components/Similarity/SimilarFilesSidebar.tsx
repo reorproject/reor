@@ -92,7 +92,7 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
           setSimilarEntries([]);
           const databaseFields = await window.database.getDatabaseFields();
           const filterString = `${databaseFields.NOTE_PATH} != '${filePath}'`;
-          const searchResults: DBQueryResult[] = await window.database.search(
+          const searchResults: DBQueryResult[] = await window.database.searchWithReranking(
             highlightData.text,
             20,
             filterString

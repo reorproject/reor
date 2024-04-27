@@ -59,9 +59,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
               aria-expanded="false"
               aria-haspopup="menu"
               className={`align-middle select-none font-sans font-bold transition-all w-[85px]
-                  text-xs py-3 px-6 rounded text-white shadow-md shadow-gray-900/10 
-                  hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] 
-                  active:shadow-none bg-neutral-700 border-none h-full hover:bg-neutral-900 cursor-pointer text-center 
+                  text-xs py-3 px-6 rounded text-white shadow-md shadow-gray-900/10
+                  hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85]
+                  active:shadow-none bg-neutral-700 border-none h-full hover:bg-neutral-900 cursor-pointer text-center
                   pt-0 pb-0 pr-2 pl-2`}
               type="button"
               onClick={() => handleSubmitNewMessage()}
@@ -83,10 +83,9 @@ interface FilterComponentProps {
 }
 
 const FilterComponent: React.FC<FilterComponentProps> = ({
-  chatFilters,
+  // chatFilters,
   setChatFilters,
 }) => {
-  // useEffect()
   useEffect(() => {
     setChatFilters({
       files: [],

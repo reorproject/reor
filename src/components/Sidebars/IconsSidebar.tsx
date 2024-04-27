@@ -9,7 +9,6 @@ import NewNoteComponent from "../File/NewNote";
 import NewDirectoryComponent from "../File/NewDirectory";
 import { GrNewWindow } from "react-icons/gr";
 import { LuFolderPlus } from "react-icons/lu";
-import FlashcardReviewModal from "../Flashcard/FlashcardReviewModal";
 import { BsChatLeftDots, BsFillChatLeftDotsFill } from "react-icons/bs";
 import FlashcardMenuModal from "../Flashcard/FlashcardMenuModal";
 
