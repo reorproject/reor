@@ -17,9 +17,8 @@ import {
 import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
 import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
-import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
-import { ChatHistory, ChatMessageToDisplay } from "@/components/Chat/Chat";
+import { ChatHistory } from "@/components/Chat/Chat";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
 
@@ -39,6 +38,11 @@ declare global {
     };
     database: {
       search: (
+        query: string,
+        limit: number,
+        filter?: string
+      ) => Promise<DBQueryResult[]>;
+      searchWithReranking: (
         query: string,
         limit: number,
         filter?: string
@@ -81,6 +85,7 @@ declare global {
       augmentPromptWithFile: (
         augmentPromptWithFileProps: AugmentPromptWithFileProps
       ) => Promise<PromptWithContextLimit>;
+      getFilesystemPathsAsDBItems: (paths: string[]) => Promise<DBEntry[]>;
     };
     path: {
       basename: (pathString: string) => Promise<string>;
@@ -96,7 +101,7 @@ declare global {
         llmName: string,
         llmConfig: LLMConfig,
         isJSONMode: boolean,
-        messageHistory: ChatCompletionMessageParam[]
+        chatHistory: ChatHistory
       ) => Promise<string>;
       getLLMConfigs: () => Promise<LLMConfig[]>;
       pullOllamaModel: (modelName: string) => Promise<void>;
@@ -136,6 +141,7 @@ declare global {
       setHasUserOpenedAppBefore: () => void;
       getAllChatHistories: () => Promise<ChatHistory[]>;
       updateChatHistory: (chatHistory: ChatHistory) => void;
+      getChatHistory: (chatID: string) => Promise<ChatHistory>;
     };
   }
 }
@@ -147,6 +153,13 @@ contextBridge.exposeInMainWorld("database", {
     filter?: string
   ): Promise<DBEntry[]> => {
     return ipcRenderer.invoke("search", query, limit, filter);
+  },
+  searchWithReranking: async (
+    query: string,
+    limit: number,
+    filter?: string
+  ): Promise<DBEntry[]> => {
+    return ipcRenderer.invoke("search-with-reranking", query, limit, filter);
   },
   deleteLanceDBEntriesByFilePath: async (filePath: string): Promise<void> => {
     return ipcRenderer.invoke("delete-lance-db-entries-by-filepath", filePath);
@@ -262,6 +275,9 @@ contextBridge.exposeInMainWorld("electronStore", {
   updateChatHistory: (chatHistory: ChatHistory) => {
     ipcRenderer.invoke("update-chat-history", chatHistory);
   },
+  getChatHistory: (chatID: string) => {
+    return ipcRenderer.invoke("get-chat-history", chatID);
+  },
 });
 
 contextBridge.exposeInMainWorld("ipcRenderer", {
@@ -335,6 +351,9 @@ contextBridge.exposeInMainWorld("files", {
       augmentPromptWithFileProps
     );
   },
+  getFilesystemPathsAsDBItems: async (paths: string[]): Promise<DBEntry[]> => {
+    return ipcRenderer.invoke("get-filesystem-paths-as-db-items", paths);
+  },
 });
 
 contextBridge.exposeInMainWorld("path", {
@@ -368,14 +387,14 @@ contextBridge.exposeInMainWorld("llm", {
     llmName: string,
     llmConfig: LLMConfig,
     isJSONMode: boolean,
-    messageHistory: ChatMessageToDisplay[]
+    chatHistory: ChatHistory
   ) => {
     return await ipcRenderer.invoke(
       "streaming-llm-response",
       llmName,
       llmConfig,
       isJSONMode,
-      messageHistory
+      chatHistory
     );
   },
 

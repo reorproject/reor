@@ -53,15 +53,22 @@ export class LanceDBTableWrapper {
         return x;
       });
 
+    //clean up previously indexed entries and reindex the whole file
+    await this.deleteDBItemsByFilePaths(data.map((x) => x.notepath));
+
     const recordEntry: Record<string, unknown>[] = data as unknown as Record<
       string,
       unknown
     >[];
-    const chunkSize = 50;
+    const numberOfChunksToIndexAtOnce = 50;
     const chunks = [];
-    for (let i = 0; i < recordEntry.length; i += chunkSize) {
-      chunks.push(recordEntry.slice(i, i + chunkSize));
+    for (let i = 0; i < recordEntry.length; i += numberOfChunksToIndexAtOnce) {
+      chunks.push(recordEntry.slice(i, i + numberOfChunksToIndexAtOnce));
     }
+
+    if (chunks.length == 0) return
+
+
     let index = 0;
     const totalChunks = chunks.length;
     for (const chunk of chunks) {

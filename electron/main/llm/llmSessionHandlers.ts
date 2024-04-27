@@ -16,7 +16,7 @@ import {
   sliceListOfStringsToContextLength,
   sliceStringToContextLength,
 } from "./contextLimit";
-import { ChatMessageToDisplay } from "@/components/Chat/Chat";
+import { ChatHistory } from "@/components/Chat/Chat";
 
 export const LLMSessions: { [sessionId: string]: LLMSessionService } = {};
 
@@ -34,17 +34,17 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       llmName: string,
       llmConfig: LLMConfig,
       isJSONMode: boolean,
-      messageHistory: ChatMessageToDisplay[]
+      chatHistory: ChatHistory
     ): Promise<void> => {
       const handleChunk = (chunk: ChatCompletionChunk) => {
-        event.sender.send("tokenStream", chunk);
+        event.sender.send("tokenStream", chatHistory.id, chunk);
       };
 
       await openAISession.streamingResponse(
         llmName,
         llmConfig,
         isJSONMode,
-        messageHistory,
+        chatHistory.displayableChatHistory,
         handleChunk,
         store.get(StoreKeys.LLMGenerationParameters)
       );

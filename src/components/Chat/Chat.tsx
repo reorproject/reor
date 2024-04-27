@@ -17,7 +17,15 @@ import {
   ChatCompletionContentPart,
   ChatCompletionMessageParam,
 } from "openai/resources/chat/completions";
-import { DBQueryResult } from "electron/main/database/Schema";
+import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
+import ChatInput from "./ChatInput";
+import {
+  ChatHistoryMetadata,
+  getDisplayableChatName,
+} from "./hooks/use-chat-history";
+import { useDebounce } from "use-debounce";
+import { SimilarEntriesComponent } from "../Similarity/SimilarFilesSidebar";
+import ResizableComponent from "../Generic/ResizableComponent";
 
 // convert ask options to enum
 enum AskOptions {
@@ -50,11 +58,16 @@ export type ChatHistory = {
 };
 export type ChatMessageToDisplay = ChatCompletionMessageParam & {
   messageType: "success" | "error";
-  context: DBQueryResult[];
+  context: DBEntry[];
   visibleContent?: string;
 };
 
-function formatMessageContent(
+export interface ChatFilters {
+  numberOfChunksToFetch: number;
+  files: string[];
+}
+
+export function formatOpenAIMessageContentIntoString(
   content: string | ChatCompletionContentPart[] | null | undefined
 ): string | undefined {
   if (Array.isArray(content)) {
@@ -77,53 +90,59 @@ export type ChatTemplate = {
   properties: ChatProperties;
 };
 
-function replaceContentInMessages(
-  messages: ChatMessageToDisplay[],
-  context: ChatProperties
-): ChatMessageToDisplay[] {
-  return messages.map((message) => {
-    if ("content" in message) {
-      if (typeof message.content === "string") {
-        message.content = message.content.replace(
-          /\{(\w+)\}/g,
-          (match, key) => {
-            return key in context ? context[key] : match;
-          }
-        );
-      }
-    }
-    return message;
-  });
-}
+// function replaceContentInMessages(
+//   messages: ChatMessageToDisplay[],
+//   context: ChatProperties
+// ): ChatMessageToDisplay[] {
+//   return messages.map((message) => {
+//     if ("content" in message) {
+//       if (typeof message.content === "string") {
+//         message.content = message.content.replace(
+//           /\{(\w+)\}/g,
+//           (match, key) => {
+//             return key in context ? context[key] : match;
+//           }
+//         );
+//       }
+//     }
+//     return message;
+//   });
+// }
 
-const ragPromptTemplate: ChatCompletionMessageParam[] = [
-  {
-    content:
-      "You are an advanced question answer agent answering questions based on provided context.",
-    role: "system",
-  },
-  {
-    content: `
-Context:
-{context}
+// const ragPromptTemplate: ChatCompletionMessageParam[] = [
+//   {
+//     content:
+//       "You are an advanced question answer agent answering questions based on provided context.",
+//     role: "system",
+//   },
+//   {
+//     content: `
+// Context:
+// {context}
 
-Query:
-{query}`,
-    role: "user",
-  },
-];
+// Query:
+// {query}`,
+//     role: "user",
+//   },
+// ];
 
 export const resolveRAGContext = async (
   query: string,
-  limit: number
+  chatFilters: ChatFilters
 ): Promise<ChatMessageToDisplay> => {
   // I mean like the only real places to get context from are like particular files or semantic search or full text search.
   // and like it could be like that if a file is here
-  const results = await window.database.search(query, limit);
 
-  // maybe for now, we don't need to do any kinds of serious slicing...We can just let users deal with errors themselves based on the limits
-  // return results, results.map(dbItem => dbItem.content)
-  //  return both results and results.content concatenated:
+  let results: DBEntry[] = [];
+  if (chatFilters.files.length > 0) {
+    console.log("chatFilters.files", chatFilters.files);
+    results = await window.files.getFilesystemPathsAsDBItems(chatFilters.files);
+  } else {
+    results = await window.database.search(
+      query,
+      chatFilters.numberOfChunksToFetch
+    );
+  }
   return {
     messageType: "success",
     role: "user",
@@ -136,23 +155,45 @@ export const resolveRAGContext = async (
 };
 
 interface ChatWithLLMProps {
-  // currentFilePath: string | null;
-  // openFileByPath: (path: string) => Promise<void>;
-  setAllChatHistories: React.Dispatch<React.SetStateAction<ChatHistory[]>>;
+  openFileByPath: (path: string) => Promise<void>;
+
+  setChatHistoriesMetadata: React.Dispatch<
+    React.SetStateAction<ChatHistoryMetadata[]>
+  >;
+  // setAllChatHistories: React.Dispatch<React.SetStateAction<ChatHistory[]>>;
   currentChatHistory: ChatHistory | undefined;
   setCurrentChatHistory: React.Dispatch<
     React.SetStateAction<ChatHistory | undefined>
   >;
+  showSimilarFiles: boolean;
 }
 
 const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
-  setAllChatHistories,
+  openFileByPath,
+
+  setChatHistoriesMetadata,
   currentChatHistory,
   setCurrentChatHistory,
+  showSimilarFiles,
 }) => {
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>("");
   const [askText, setAskText] = useState<AskOptions>(AskOptions.Ask);
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
+  const [chatFilters, setChatFilters] = useState<ChatFilters>();
+  const [readyToSave, setReadyToSave] = useState<boolean>(false);
+  const [currentContext, setCurrentContext] = useState<DBQueryResult[]>([]);
+
+  useEffect(() => {
+    const context = getChatHistoryContext(currentChatHistory);
+    setCurrentContext(context);
+  }, [currentChatHistory]);
+
+  useEffect(() => {
+    if (readyToSave && currentChatHistory) {
+      window.electronStore.updateChatHistory(currentChatHistory);
+      setReadyToSave(false);
+    }
+  }, [readyToSave, currentChatHistory]);
 
   const handleSubmitNewMessage = async (
     chatHistory: ChatHistory | undefined
@@ -171,9 +212,11 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       }
 
       if (chatHistory.displayableChatHistory.length === 0) {
-        chatHistory.displayableChatHistory.push(
-          await resolveRAGContext(userTextFieldInput, 10)
-        );
+        if (chatFilters) {
+          chatHistory.displayableChatHistory.push(
+            await resolveRAGContext(userTextFieldInput, chatFilters)
+          );
+        }
       } else {
         chatHistory.displayableChatHistory.push({
           role: "user",
@@ -185,15 +228,26 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
       setUserTextFieldInput("");
 
-      // oh this is literally just for making the chat history appear in the sidebar
       setCurrentChatHistory(chatHistory);
-
-      setAllChatHistories((prev) => {
+      setChatHistoriesMetadata((prev) => {
         if (!chatHistory) return prev;
         if (prev?.find((chat) => chat.id === chatHistory?.id)) {
           return prev;
         }
-        const newChatHistories = prev ? [...prev, chatHistory] : [chatHistory];
+        const newChatHistories = prev
+          ? [
+              ...prev,
+              {
+                id: chatHistory.id,
+                displayName: getDisplayableChatName(chatHistory),
+              },
+            ]
+          : [
+              {
+                id: chatHistory.id,
+                displayName: getDisplayableChatName(chatHistory),
+              },
+            ];
         return newChatHistories;
       });
 
@@ -214,21 +268,29 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         defaultLLMName,
         currentModelConfig,
         false,
-        chatHistory?.displayableChatHistory
+        chatHistory
       );
-      // once finish streaming, save the message?
+      setReadyToSave(true);
     } catch (error) {
-      appendNewContentToMessageHistory(errorToString(error), "error");
+      if (chatHistory) {
+        appendNewContentToMessageHistory(
+          chatHistory.id,
+          errorToString(error),
+          "error"
+        );
+      }
     }
     // so here we could save the chat history
     setLoadingResponse(false);
   };
 
   const appendNewContentToMessageHistory = (
+    chatID: string,
     newContent: string,
     newMessageType: "success" | "error"
   ) => {
     setCurrentChatHistory((prev) => {
+      if (chatID !== prev?.id) return prev;
       const newDisplayableHistory = prev?.displayableChatHistory || [];
       if (newDisplayableHistory.length > 0) {
         const lastMessage =
@@ -268,10 +330,13 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   };
 
   useEffect(() => {
-    const handleChunk = async (chunk: ChatCompletionChunk) => {
+    const handleChunk = async (
+      recievedChatID: string,
+      chunk: ChatCompletionChunk
+    ) => {
       const newContent = chunk.choices[0].delta.content ?? "";
       if (newContent) {
-        appendNewContentToMessageHistory(newContent, "success");
+        appendNewContentToMessageHistory(recievedChatID, newContent, "success");
       }
     };
 
@@ -288,18 +353,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   return (
     <div className="flex items-center justify-center w-full h-full">
       <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid">
-        <div className="flex w-full items-center">
-          {/* <div className="flex-grow flex justify-center items-center m-0 mt-1 ml-2 mb-1 p-0">
-            {defaultModel ? (
-              <p className="m-0 p-0 text-gray-500">{defaultModel}</p>
-            ) : (
-              <p className="m-0 p-0 text-gray-500">No default model selected</p>
-            )}
-          </div> */}
-          {/* <div className="pr-2 pt-1 cursor-pointer" onClick={fetchDefaultModel}>
-            <FiRefreshCw className="text-gray-300" title="Restart Session" />{" "}
-          </div> */}
-        </div>
         <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
           <div className="space-y-2 mt-4 flex-grow">
             {currentChatHistory?.displayableChatHistory.map(
@@ -317,31 +370,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                 >
                   {message.visibleContent
                     ? message.visibleContent
-                    : formatMessageContent(message.content)}
+                    : formatOpenAIMessageContentIntoString(message.content)}
                 </ReactMarkdown>
               )
             )}
-            {/* {currentVisibleStreamingAssistantMessage && (
-            <ReactMarkdown
-              rehypePlugins={[rehypeRaw]}
-              className={`p-1 pl-1 markdown-content rounded-lg break-words ${
-                currentVisibleStreamingAssistantMessage.messageType === "error"
-                  ? "bg-red-100 text-red-800"
-                  : "bg-blue-100 text-blue-800"
-              } `}
-              components={{
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                a: ({ node, ...props }) => (
-                  <CustomLinkMarkdown
-                    props={props}
-                    openFileByPath={openFileByPath}
-                  />
-                ),
-              }}
-            >
-              {currentVisibleStreamingAssistantMessage.content}
-            </ReactMarkdown>
-          )} */}
           </div>
           {userTextFieldInput === "" &&
           currentChatHistory?.displayableChatHistory.length == 0 ? (
@@ -360,88 +392,44 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             </>
           ) : undefined}
         </div>
-
-        <div className="p-3 bg-neutral-600">
-          <div className="flex space-x-2 h-full">
-            <Textarea
-              onKeyDown={(e) => {
-                if (!e.shiftKey && e.key === "Enter") {
-                  e.preventDefault();
-                  handleSubmitNewMessage(currentChatHistory);
-                }
-              }}
-              onChange={(e) => setUserTextFieldInput(e.target.value)}
-              value={userTextFieldInput}
-              className="w-full  bg-gray-300"
-              name="Outlined"
-              placeholder="Ask your knowledge..."
-              variant="outlined"
-              style={{
-                backgroundColor: "rgb(64 64 64)",
-                color: "rgb(212 212 212)",
-              }}
-            />
-            <div className="flex justify-center items-center h-full ">
-              {loadingResponse ? (
-                <CircularProgress
-                  size={32}
-                  thickness={20}
-                  style={{ color: "rgb(209 213 219 / var(--tw-bg-opacity))" }}
-                  className="h-full w-full m-x-auto color-gray-500 "
-                />
-              ) : (
-                <>
-                  <button
-                    aria-expanded="false"
-                    aria-haspopup="menu"
-                    className={`align-middle select-none font-sans font-bold transition-all 
-                  text-xs py-3 px-6 rounded-tl rounded-bl text-white shadow-md shadow-gray-900/10 
-                  hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] 
-                  active:shadow-none bg-neutral-700 border-none h-full hover:bg-neutral-900 cursor-pointer text-center 
-                  pt-0 pb-0 pr-2 pl-2`}
-                    type="button"
-                    onClick={() => handleSubmitNewMessage(currentChatHistory)}
-                  >
-                    {askText}
-                  </button>
-                  <Menu placement="top-end">
-                    <MenuHandler>
-                      <button
-                        aria-expanded="false"
-                        aria-haspopup="menu"
-                        className={`align-middle select-none font-sans font-bold uppercase transition-all 
-                  text-xs py-3 px-6 rounded-tr rounded-br text-white shadow-md shadow-gray-900/10 
-                  hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] 
-                  active:shadow-none bg-neutral-700 border-none h-full hover:bg-neutral-900 cursor-pointer text-center 
-                  pt-0 pb-0 pr-2 pl-2`}
-                        type="button"
-                      >
-                        <div className="mb-1">⌄</div>
-                      </button>
-                    </MenuHandler>
-                    <MenuList placeholder="" className="bg-neutral-600">
-                      {ASK_OPTIONS.map((option, index) => {
-                        return (
-                          <MenuItem
-                            key={index}
-                            placeholder=""
-                            className="bg-neutral-600 border-none h-full w-full hover:bg-neutral-700 cursor-pointer text-white text-left p-2"
-                            onClick={() => setAskText(option)}
-                          >
-                            {option}
-                          </MenuItem>
-                        );
-                      })}
-                    </MenuList>
-                  </Menu>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
+        <ChatInput
+          userTextFieldInput={userTextFieldInput}
+          setUserTextFieldInput={setUserTextFieldInput}
+          handleSubmitNewMessage={() =>
+            handleSubmitNewMessage(currentChatHistory)
+          }
+          loadingResponse={loadingResponse}
+          askText={askText}
+          chatFilters={chatFilters}
+          setChatFilters={setChatFilters}
+        />
       </div>
+      {showSimilarFiles && (
+        <SimilarEntriesComponent
+          similarEntries={currentContext}
+          titleText="Context Used in Chat"
+          onFileSelect={openFileByPath}
+          saveCurrentFile={() => {
+            return Promise.resolve();
+          }}
+        />
+      )}
     </div>
   );
+};
+
+const getChatHistoryContext = (
+  chatHistory: ChatHistory | undefined
+): DBQueryResult[] => {
+  if (!chatHistory) return [];
+  console.log("chatHistory", chatHistory.displayableChatHistory);
+
+  const contextForChat = chatHistory.displayableChatHistory
+    .map((message) => {
+      return message.context;
+    })
+    .flat();
+  return contextForChat as DBQueryResult[];
 };
 
 export default ChatWithLLM;

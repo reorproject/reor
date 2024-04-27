@@ -11,9 +11,13 @@ import {
   orchestrateEntryMove,
   createFileRecursive,
   isHidden,
+  GetFilesInfoListForListOfPaths,
 } from "./Filesystem";
 import * as fs from "fs";
-import { updateFileInTable } from "../database/TableHelperFunctions";
+import {
+  convertFileInfoListToDBItems,
+  updateFileInTable,
+} from "../database/TableHelperFunctions";
 import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
 import {
   PromptWithContextLimit,
@@ -23,6 +27,7 @@ import Store from "electron-store";
 import { StoreSchema } from "../Store/storeConfig";
 import { getLLMConfig } from "../llm/llmConfig";
 import WindowsManager from "../windowManager";
+import { DBEntry } from "../database/Schema";
 
 export const registerFileHandlers = (
   store: Store<StoreSchema>,
@@ -234,6 +239,22 @@ export const registerFileHandlers = (
             llmConfig.contextLength
           );
         return { prompt: filePrompt, contextCutoffAt };
+      } catch (error) {
+        console.error("Error searching database:", error);
+        throw error;
+      }
+    }
+  );
+
+  ipcMain.handle(
+    "get-filesystem-paths-as-db-items",
+    async (_event, filePaths: string[]): Promise<DBEntry[]> => {
+      try {
+        const fileItems = GetFilesInfoListForListOfPaths(filePaths);
+        console.log("fileItems", fileItems);
+        const dbItems = await convertFileInfoListToDBItems(fileItems);
+        console.log("dbItems", dbItems);
+        return dbItems.flat();
       } catch (error) {
         console.error("Error searching database:", error);
         throw error;
