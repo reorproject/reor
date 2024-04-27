@@ -11,6 +11,8 @@ import {
   orchestrateEntryMove,
   createFileRecursive,
   isHidden,
+  GetFilesInfoList,
+  markdownExtensions,
 } from "./Filesystem";
 import * as fs from "fs";
 import { updateFileInTable } from "../database/TableHelperFunctions";
@@ -23,6 +25,7 @@ import Store from "electron-store";
 import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import { getLLMConfig } from "../llm/llmConfig";
 import WindowsManager from "../windowManager";
+import { addExtensionToFilenameIfNoExtensionPresent } from "../Generic/path";
 
 export const registerFileHandlers = (
   store: Store<StoreSchema>,
@@ -339,20 +342,11 @@ export const registerFileHandlers = (
     (event, dirName: string) => {
       const fileNameSet = new Set<string>();
 
-      const getAllFiles = (dir: string) => {
-        const files = fs.readdirSync(dir).filter((item) => !isHidden(item));
-        files.forEach((file) => {
-          const fullPath = path.join(dir, file).trim();
-          console.log(fullPath);
-          if (fs.statSync(fullPath).isDirectory()) {
-            getAllFiles(fullPath);
-          } else {
-            fileNameSet.add(fullPath);
-          }
-        });
-      };
-      getAllFiles(dirName);
-
+      const fileList = GetFilesInfoList(dirName);
+      fileList.forEach((file) => {
+        fileNameSet.add(addExtensionToFilenameIfNoExtensionPresent(file.path, markdownExtensions,
+          ".md"));
+      })
       return Array.from(fileNameSet);
     }
   );
