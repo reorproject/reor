@@ -147,8 +147,8 @@ export const registerStoreHandlers = (
     }
 
     const allHistories = store.get(StoreKeys.ChatHistories);
-    const output = allHistories ? allHistories[vaultDir] : [];
-    return output;
+    const chatHistoriesCorrespondingToVault = allHistories?.[vaultDir] ?? [];
+    return chatHistoriesCorrespondingToVault;
   });
 
   ipcMain.handle("update-chat-history", (event, newChat: ChatHistory) => {
@@ -159,22 +159,21 @@ export const registerStoreHandlers = (
     if (!vaultDir) {
       return;
     }
-    const vaultChatHistories = allChatHistories
-      ? allChatHistories[vaultDir]
-      : [];
+    const chatHistoriesCorrespondingToVault =
+      allChatHistories?.[vaultDir] ?? [];
     // check if chat history already exists. if it does, update it. if it doesn't append it
-    const existingChatIndex = vaultChatHistories.findIndex(
+    const existingChatIndex = chatHistoriesCorrespondingToVault.findIndex(
       (chat) => chat.id === newChat.id
     );
     if (existingChatIndex !== -1) {
-      vaultChatHistories[existingChatIndex] = newChat;
+      chatHistoriesCorrespondingToVault[existingChatIndex] = newChat;
     } else {
-      vaultChatHistories.push(newChat);
+      chatHistoriesCorrespondingToVault.push(newChat);
     }
     // store.set(StoreKeys.ChatHistories, allChatHistories);
     store.set(StoreKeys.ChatHistories, {
       ...allChatHistories,
-      [vaultDir]: vaultChatHistories,
+      [vaultDir]: chatHistoriesCorrespondingToVault,
     });
   });
 

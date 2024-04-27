@@ -16,11 +16,10 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
   onSelect,
   newChat,
 }) => {
-  const [localChatHistoriesMetadata, setLocalChatHistoriesMetadata] = useState<
-    ChatHistoryMetadata[]
-  >([]);
+  const [reversedChatHistoriesMetadata, setReversedChatHistoriesMetadata] =
+    useState<ChatHistoryMetadata[]>([]);
   useEffect(() => {
-    setLocalChatHistoriesMetadata(chatHistoriesMetadata.reverse());
+    setReversedChatHistoriesMetadata(chatHistoriesMetadata.reverse());
   }, [chatHistoriesMetadata]);
   return (
     <div className="h-full overflow-y-auto bg-neutral-800">
@@ -31,7 +30,7 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
         <span className="text-sm">New Chat</span>
       </div>
 
-      {localChatHistoriesMetadata.map((chatMetadata) => (
+      {reversedChatHistoriesMetadata.map((chatMetadata) => (
         <ChatItem
           key={chatMetadata.id}
           // chat={chat}

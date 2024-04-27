@@ -19,7 +19,10 @@ import {
 } from "openai/resources/chat/completions";
 import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import ChatInput from "./ChatInput";
-import { ChatHistoryMetadata } from "./hooks/use-chat-history";
+import {
+  ChatHistoryMetadata,
+  getDisplayableChatName,
+} from "./hooks/use-chat-history";
 import { useDebounce } from "use-debounce";
 import { SimilarEntriesComponent } from "../Similarity/SimilarFilesSidebar";
 import ResizableComponent from "../Generic/ResizableComponent";
@@ -232,8 +235,19 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           return prev;
         }
         const newChatHistories = prev
-          ? [...prev, { id: chatHistory.id, displayName: "New Chat" }]
-          : [{ id: chatHistory.id, displayName: "New Chat" }];
+          ? [
+              ...prev,
+              {
+                id: chatHistory.id,
+                displayName: getDisplayableChatName(chatHistory),
+              },
+            ]
+          : [
+              {
+                id: chatHistory.id,
+                displayName: getDisplayableChatName(chatHistory),
+              },
+            ];
         return newChatHistories;
       });
 
