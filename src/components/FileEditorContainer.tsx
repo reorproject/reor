@@ -49,12 +49,12 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     setShowSimilarFiles(!showSimilarFiles);
   };
 
-  const openFileOverwrite = async (path: string) => {
+  const openFileAndOpenEditor = async (path: string) => {
     setShowChatbot(false);
     openFileByPath(path);
   };
 
-  const openChatOverwrite = (chatHistory: ChatHistory | undefined) => {
+  const openChatAndOpenChat = (chatHistory: ChatHistory | undefined) => {
     setShowChatbot(true);
     setCurrentChatHistory(chatHistory);
   };
@@ -65,7 +65,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         history={navigationHistory}
         setHistory={setNavigationHistory}
         currentFilePath={filePath}
-        onFileSelect={openFileOverwrite}
+        onFileSelect={openFileAndOpenEditor}
         similarFilesOpen={showSimilarFiles}
         toggleSimilarFiles={toggleSimilarFiles}
       />
@@ -73,7 +73,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
       <div className="flex h-below-titlebar">
         <div className="w-[35px] border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid">
           <IconsSidebar
-            onFileSelect={openFileOverwrite}
+            onFileSelect={openFileAndOpenEditor}
             sidebarShowing={sidebarShowing}
             makeSidebarShow={setSidebarShowing}
           />
@@ -86,7 +86,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
               expandedDirectories={expandedDirectories}
               handleDirectoryToggle={handleDirectoryToggle}
               selectedFilePath={filePath}
-              onFileSelect={openFileOverwrite}
+              onFileSelect={openFileAndOpenEditor}
               sidebarShowing={sidebarShowing}
               renameFile={renameFile}
               noteToBeRenamed={noteToBeRenamed}
@@ -95,7 +95,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
               setFileDirToBeRenamed={setFileDirToBeRenamed}
               currentChatHistory={currentChatHistory}
               chatHistoriesMetadata={chatHistoriesMetadata}
-              setCurrentChatHistory={openChatOverwrite}
+              setCurrentChatHistory={openChatAndOpenChat}
             />
           </div>
         </ResizableComponent>
@@ -114,6 +114,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                   style={{ wordBreak: "break-word" }}
                   editor={editor}
                 />
+
                 {suggestionsState && (
                   <InEditorBacklinkSuggestionsDisplay
                     suggestionsState={suggestionsState}
@@ -127,7 +128,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                 <SidebarComponent
                   filePath={filePath}
                   highlightData={highlightData}
-                  openFileByPath={openFileOverwrite}
+                  openFileByPath={openFileAndOpenEditor}
                   saveCurrentlyOpenedFile={async () => {
                     await saveCurrentlyOpenedFile();
                   }}
@@ -141,9 +142,11 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
           <div className={`w-full h-below-titlebar`}>
             {/* <ResizableComponent resizeSide="left" initialWidth={450}> */}
             <ChatWithLLM
+              openFileByPath={openFileAndOpenEditor}
               setChatHistoriesMetadata={setChatHistoriesMetadata}
               currentChatHistory={currentChatHistory}
               setCurrentChatHistory={setCurrentChatHistory}
+              showSimilarFiles={showSimilarFiles}
             />
             {/* </ResizableComponent> */}
           </div>

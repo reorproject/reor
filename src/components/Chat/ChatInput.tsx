@@ -23,7 +23,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
 }) => {
   return (
     <div className="p-3 bg-neutral-600">
-      <div className="flex space-x-2 h-full">
+      <div className="flex h-full">
         <FilterComponent
           chatFilters={chatFilters}
           setChatFilters={setChatFilters}
@@ -37,7 +37,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           }}
           onChange={(e) => setUserTextFieldInput(e.target.value)}
           value={userTextFieldInput}
-          className="w-full  bg-gray-300"
+          className="w-full mr-2 bg-gray-300"
           name="Outlined"
           placeholder="Ask your knowledge..."
           variant="outlined"
@@ -58,8 +58,8 @@ const ChatInput: React.FC<ChatInputProps> = ({
             <button
               aria-expanded="false"
               aria-haspopup="menu"
-              className={`align-middle select-none font-sans font-bold transition-all 
-                  text-xs py-3 px-6 rounded-tl rounded-bl text-white shadow-md shadow-gray-900/10 
+              className={`align-middle select-none font-sans font-bold transition-all w-[85px]
+                  text-xs py-3 px-6 rounded text-white shadow-md shadow-gray-900/10 
                   hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-[0.85] focus:shadow-none active:opacity-[0.85] 
                   active:shadow-none bg-neutral-700 border-none h-full hover:bg-neutral-900 cursor-pointer text-center 
                   pt-0 pb-0 pr-2 pl-2`}
@@ -89,10 +89,10 @@ const FilterComponent: React.FC<FilterComponentProps> = ({
   // useEffect()
   useEffect(() => {
     setChatFilters({
-      files: [""],
+      files: [],
       numberOfChunksToFetch: 15,
     });
   }, []);
 
-  return <div className="flex space-x-2">filters</div>;
+  return <div className="flex space-x-2"></div>;
 };

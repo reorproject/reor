@@ -14,13 +14,15 @@ export const useChatHistory = () => {
   const [allChatHistories, setAllChatHistories] = useState<ChatHistory[]>([]);
 
   const fetchChatHistories = async () => {
-    const allChatHistories = await window.electronStore.getAllChatHistories();
-    console.log("allChatHistories", allChatHistories);
+    let allChatHistories = await window.electronStore.getAllChatHistories();
+    if (!allChatHistories) {
+      allChatHistories = [];
+    }
     setAllChatHistories(allChatHistories);
     setChatHistoriesMetadata(
       allChatHistories.map((chat) => ({
         id: chat.id,
-        displayName: getChatName(chat),
+        displayName: getDisplayableChatName(chat),
       }))
     );
 
@@ -41,7 +43,7 @@ export const useChatHistory = () => {
   };
 };
 
-const getChatName = (chat: ChatHistory): string => {
+export const getDisplayableChatName = (chat: ChatHistory): string => {
   const actualHistory = chat.displayableChatHistory;
 
   if (

@@ -42,6 +42,11 @@ declare global {
         limit: number,
         filter?: string
       ) => Promise<DBQueryResult[]>;
+      searchWithReranking: (
+        query: string,
+        limit: number,
+        filter?: string
+      ) => Promise<DBQueryResult[]>;
       deleteLanceDBEntriesByFilePath: (filePath: string) => Promise<void>;
       indexFilesInDirectory: () => Promise<void>;
       augmentPromptWithRAG: (
@@ -148,6 +153,13 @@ contextBridge.exposeInMainWorld("database", {
     filter?: string
   ): Promise<DBEntry[]> => {
     return ipcRenderer.invoke("search", query, limit, filter);
+  },
+  searchWithReranking: async (
+    query: string,
+    limit: number,
+    filter?: string
+  ): Promise<DBEntry[]> => {
+    return ipcRenderer.invoke("search-with-reranking", query, limit, filter);
   },
   deleteLanceDBEntriesByFilePath: async (filePath: string): Promise<void> => {
     return ipcRenderer.invoke("delete-lance-db-entries-by-filepath", filePath);
