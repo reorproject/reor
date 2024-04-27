@@ -71,7 +71,6 @@ export class LanceDBTableWrapper {
     const totalChunks = chunks.length;
     for (const chunk of chunks) {
       const arrowTableOfChunk = makeArrowTable(chunk);
-      console.log(arrowTableOfChunk);
       await this.lanceTable.add(arrowTableOfChunk);
 
       index++;
