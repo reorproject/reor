@@ -10,11 +10,13 @@ export interface SuggestionsState {
 interface SuggestionsDisplayProps {
   suggestionsState: SuggestionsState;
   suggestions: string[];
+  maxWidth?: string;
 }
 
 const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
   suggestionsState,
   suggestions,
+  maxWidth = "max-w-sm",
 }) => {
   const suggestionsRef = useRef<HTMLDivElement | null>(null);
   const [layout, setLayout] = useState({
@@ -57,7 +59,7 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
   return (
     <div
       ref={suggestionsRef}
-      className="absolute rounded bg-white border border-black  z-50 max-w-sm break-words whitespace-normal"
+      className={`absolute rounded bg-white text-black ${maxWidth} border border-black  z-50 break-words whitespace-normal`}
       style={{
         left: `${layout.left}px`,
         top: `${layout.top}px`,

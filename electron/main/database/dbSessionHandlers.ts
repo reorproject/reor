@@ -128,11 +128,11 @@ export const registerDBSessionHandlers = (
         [
           {
             role: "system",
-            content: `You are an experienced SQL engineer. You are translating natural language queries into temporal filters for a database query. 
-            
+            content: `You are an experienced SQL engineer. You are translating natural language queries into temporal filters for a database query.
+
 Below are 2 examples:
 
-Query: 
+Query:
 Summarize all notes modified after March 16, 2024, 1:00 PM.
 
 Filter:
@@ -155,6 +155,7 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
             content: query,
           },
         ],
+        false,
         store.get(StoreKeys.LLMGenerationParameters)
       );
 
@@ -248,6 +249,7 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
             content: promptToCreateAtomicFacts,
           },
         ],
+        false,
         store.get(StoreKeys.LLMGenerationParameters)
       );
 

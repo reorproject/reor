@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SettingsModal from "../Settings/Settings";
 import { MdOutlineQuiz, MdSettings } from "react-icons/md";
 import { SidebarAbleToShow } from "../FileEditorContainer";
@@ -9,12 +9,13 @@ import NewNoteComponent from "../File/NewNote";
 import NewDirectoryComponent from "../File/NewDirectory";
 import { GrNewWindow } from "react-icons/gr";
 import { LuFolderPlus } from "react-icons/lu";
-import FlashcardReviewModal from "../Flashcard/FlashcardReviewModal";
+import FlashcardMenuModal from "../Flashcard/FlashcardMenuModal";
 
 interface LeftSidebarProps {
   openRelativePath: (path: string) => void;
   sidebarShowing: SidebarAbleToShow;
   makeSidebarShow: (show: SidebarAbleToShow) => void;
+  filePath: string | null;
 }
 
 const LeftSidebar: React.FC<LeftSidebarProps> = ({
@@ -25,8 +26,27 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isNewNoteModalOpen, setIsNewNoteModalOpen] = useState(false);
   const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false);
-  const [isFlashcardReviewModeOpen, setIsFlashcardReviewModeOpen] =
-    useState(false);
+  const [isFlashcardModeOpen, setIsFlashcardModeOpen] = useState(false);
+
+  const [initialFileToCreateFlashcard, setInitialFileToCreateFlashcard] =
+    useState("");
+  const [initialFileToReviewFlashcard, setInitialFileToReviewFlashcard] =
+    useState("");
+
+  // open a new flashcard create mode
+  useEffect(() => {
+    const createFlashcardFileListener = window.ipcRenderer.receive(
+      "create-flashcard-file-listener",
+      (noteName: string) => {
+        setIsFlashcardModeOpen(!!noteName);
+        setInitialFileToCreateFlashcard(noteName);
+      }
+    );
+
+    return () => {
+      createFlashcardFileListener();
+    };
+  }, []);
 
   return (
     <div className="w-full h-full bg-neutral-800 flex flex-col items-center justify-between">
@@ -92,7 +112,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
       </div>
       <div
         className="bg-transparent border-none cursor-pointer flex items-center justify-center w-full h-8 "
-        onClick={() => setIsFlashcardReviewModeOpen(true)}
+        onClick={() => setIsFlashcardModeOpen(true)}
       >
         <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
           <MdOutlineQuiz
@@ -103,6 +123,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
           {/* < /> */}
         </div>
       </div>
+
       <NewNoteComponent
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
@@ -113,10 +134,16 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
         onClose={() => setIsNewDirectoryModalOpen(false)}
         onDirectoryCreate={() => console.log("Directory created")}
       />
-      {isFlashcardReviewModeOpen && (
-        <FlashcardReviewModal
-          isOpen={isFlashcardReviewModeOpen}
-          onClose={() => setIsFlashcardReviewModeOpen(false)}
+      {isFlashcardModeOpen && (
+        <FlashcardMenuModal
+          isOpen={isFlashcardModeOpen}
+          onClose={() => {
+            setIsFlashcardModeOpen(false);
+            setInitialFileToCreateFlashcard("");
+            setInitialFileToReviewFlashcard("");
+          }}
+          initialFileToCreateFlashcard={initialFileToCreateFlashcard}
+          initialFileToReviewFlashcard={initialFileToReviewFlashcard}
         />
       )}
       <div className="flex-grow border-1 border-yellow-300"></div>
