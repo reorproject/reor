@@ -319,18 +319,18 @@ Some features you should be aware of:
 
 - **Links:**
 
-  - Reor automatically links your notes to other notes in the Related Notes sidebar. 
+  - Reor automatically links your notes to other notes in the Related Notes sidebar.
 
-  - You can view the Related Notes to a particular chunk of text by highlighting it and hitting the button that appears. 
+  - You can view the Related Notes to a particular chunk of text by highlighting it and hitting the button that appears.
 
   - You can also create inline links by surrounding text with two square brackets (like in Obsidian). [[Like this]]
 
 - **Chat:**
 
-  - Ask your entire set of notes anything you want to know! Reor will automatically give the LLM relevant context. 
+  - Ask your entire set of notes anything you want to know! Reor will automatically give the LLM relevant context.
 
   - Ask things like “What are my thoughts on philosophy?” or “Summarize my notes on black holes"
-  
+
   - In settings, you can attach a local LLM or connect to OpenAI models with your API key.
 
 - **AI Flashcards:**

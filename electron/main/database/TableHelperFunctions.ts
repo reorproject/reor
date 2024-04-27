@@ -108,7 +108,7 @@ const computeDbItemsToAddOrUpdate = async (
   return fileChunksMissingFromTable;
 };
 
-const convertFileInfoListToDBItems = async (
+export const convertFileInfoListToDBItems = async (
   filesInfoList: FileInfo[]
 ): Promise<DBEntry[][]> => {
   const promises = filesInfoList.map(convertFileTypeToDBType);

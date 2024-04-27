@@ -1,6 +1,5 @@
 import { ipcMain } from "electron";
 import {
-  ChatHistory,
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
@@ -11,6 +10,7 @@ import Store from "electron-store";
 import path from "path";
 import { initializeAndMaybeMigrateStore } from "./storeMigrator";
 import WindowsManager from "../windowManager";
+import { ChatHistory } from "@/components/Chat/Chat";
 
 export const registerStoreHandlers = (
   store: Store<StoreSchema>,
@@ -137,23 +137,56 @@ export const registerStoreHandlers = (
     store.set(StoreKeys.hasUserOpenedAppBefore, true);
   });
 
-  ipcMain.handle("get-all-chat-histories", () => {
-    return store.get(StoreKeys.ChatHistories);
+  ipcMain.handle("get-all-chat-histories", (event) => {
+    const vaultDir = windowsManager.getVaultDirectoryForWinContents(
+      event.sender
+    );
+
+    if (!vaultDir) {
+      return [];
+    }
+
+    const allHistories = store.get(StoreKeys.ChatHistories);
+    const chatHistoriesCorrespondingToVault = allHistories?.[vaultDir] ?? [];
+    return chatHistoriesCorrespondingToVault;
   });
 
   ipcMain.handle("update-chat-history", (event, newChat: ChatHistory) => {
-    console.log("updating chat history", newChat);
+    const vaultDir = windowsManager.getVaultDirectoryForWinContents(
+      event.sender
+    );
     const allChatHistories = store.get(StoreKeys.ChatHistories);
+    if (!vaultDir) {
+      return;
+    }
+    const chatHistoriesCorrespondingToVault =
+      allChatHistories?.[vaultDir] ?? [];
     // check if chat history already exists. if it does, update it. if it doesn't append it
-    const existingChatIndex = allChatHistories.findIndex(
+    const existingChatIndex = chatHistoriesCorrespondingToVault.findIndex(
       (chat) => chat.id === newChat.id
     );
     if (existingChatIndex !== -1) {
-      allChatHistories[existingChatIndex] = newChat;
+      chatHistoriesCorrespondingToVault[existingChatIndex] = newChat;
     } else {
-      allChatHistories.push(newChat);
+      chatHistoriesCorrespondingToVault.push(newChat);
     }
-    store.set(StoreKeys.ChatHistories, allChatHistories);
+    // store.set(StoreKeys.ChatHistories, allChatHistories);
+    store.set(StoreKeys.ChatHistories, {
+      ...allChatHistories,
+      [vaultDir]: chatHistoriesCorrespondingToVault,
+    });
+  });
+
+  ipcMain.handle("get-chat-history", (event, chatId: string) => {
+    const vaultDir = windowsManager.getVaultDirectoryForWinContents(
+      event.sender
+    );
+    if (!vaultDir) {
+      return;
+    }
+    const allChatHistories = store.get(StoreKeys.ChatHistories);
+    const vaultChatHistories = allChatHistories[vaultDir] || [];
+    return vaultChatHistories.find((chat) => chat.id === chatId);
   });
 };
 

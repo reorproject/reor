@@ -10,14 +10,15 @@ import NewDirectoryComponent from "../File/NewDirectory";
 import { GrNewWindow } from "react-icons/gr";
 import { LuFolderPlus } from "react-icons/lu";
 import FlashcardReviewModal from "../Flashcard/FlashcardReviewModal";
+import { BsChatLeftDots, BsFillChatLeftDotsFill } from "react-icons/bs";
 
-interface LeftSidebarProps {
+interface IconsSidebarProps {
   onFileSelect: (path: string) => void;
   sidebarShowing: SidebarAbleToShow;
   makeSidebarShow: (show: SidebarAbleToShow) => void;
 }
 
-const LeftSidebar: React.FC<LeftSidebarProps> = ({
+const IconsSidebar: React.FC<IconsSidebarProps> = ({
   onFileSelect,
   sidebarShowing,
   makeSidebarShow,
@@ -47,7 +48,31 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
           />
         </div>
       </div>
-
+      <div
+        className=" flex items-center justify-center w-full h-8 cursor-pointer"
+        onClick={() => makeSidebarShow("chats")}
+      >
+        <div
+          className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700"
+          style={{
+            backgroundColor: sidebarShowing === "chats" ? "rgb(82 82 82)" : "",
+          }}
+        >
+          {sidebarShowing === "chats" ? (
+            <BsFillChatLeftDotsFill
+              size={22}
+              className="text-gray-100 cursor-pointer"
+              title="Open Chatbot"
+            />
+          ) : (
+            <BsChatLeftDots
+              className="text-gray-100 cursor-pointer "
+              size={22}
+              title="Close Chatbot"
+            />
+          )}
+        </div>
+      </div>
       <div
         className="flex items-center justify-center w-full h-8 cursor-pointer"
         onClick={() => makeSidebarShow("search")}
@@ -144,4 +169,4 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({
   );
 };
 
-export default LeftSidebar;
+export default IconsSidebar;

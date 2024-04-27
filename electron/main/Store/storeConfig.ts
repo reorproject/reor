@@ -1,5 +1,4 @@
-import { ChatMessageToDisplay } from "@/components/Chat/Chat";
-import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
+import { ChatHistory } from "@/components/Chat/Chat";
 
 export interface BaseLLMConfig {
   modelName: string;
@@ -43,12 +42,6 @@ export type HardwareConfig = {
   useVulkan: boolean;
 };
 
-export type ChatHistory = {
-  id: string;
-  openAIChatHistory: ChatCompletionMessageParam[];
-  displayableChatHistory: ChatMessageToDisplay[];
-};
-
 export interface StoreSchema {
   hasUserOpenedAppBefore: boolean;
   schemaVersion: number;
@@ -65,7 +58,9 @@ export interface StoreSchema {
   RAG?: RAGConfig;
   hardware: HardwareConfig;
   llmGenerationParameters: LLMGenerationParameters;
-  chatHistories: ChatHistory[];
+  chatHistories: {
+    [vaultDir: string]: ChatHistory[];
+  };
 }
 
 export enum StoreKeys {
