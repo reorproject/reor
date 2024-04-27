@@ -10,6 +10,7 @@ import { getLLMConfig } from "../llm/llmConfig";
 import { errorToString } from "../Generic/error";
 import WindowsManager from "../windowManager";
 import { BasePromptRequirements } from "./dbSessionHandlerTypes";
+import { rerankSearchedEmbeddings } from "./Embeddings";
 
 export interface PromptWithRagResults {
   ragPrompt: string;
@@ -42,6 +43,34 @@ export const registerDBSessionHandlers = (
           filter
         );
         return searchResults;
+      } catch (error) {
+        console.error("Error searching database:", error);
+        throw error;
+      }
+    }
+  );
+
+  ipcMain.handle(
+    "search-with-reranking",
+    async (
+      event,
+      query: string,
+      limit: number,
+      filter?: string
+    ): Promise<DBEntry[]> => {
+      try {
+        const windowInfo = windowManager.getWindowInfoForContents(event.sender);
+        if (!windowInfo) {
+          throw new Error("Window info not found.");
+        }
+        const searchResults = await windowInfo.dbTableClient.search(
+          query,
+          limit,
+          filter
+        );
+
+        const rankedResults = await rerankSearchedEmbeddings(query, searchResults);
+        return rankedResults;
       } catch (error) {
         console.error("Error searching database:", error);
         throw error;
@@ -128,11 +157,11 @@ export const registerDBSessionHandlers = (
         [
           {
             role: "system",
-            content: `You are an experienced SQL engineer. You are translating natural language queries into temporal filters for a database query. 
-            
+            content: `You are an experienced SQL engineer. You are translating natural language queries into temporal filters for a database query.
+
 Below are 2 examples:
 
-Query: 
+Query:
 Summarize all notes modified after March 16, 2024, 1:00 PM.
 
 Filter:

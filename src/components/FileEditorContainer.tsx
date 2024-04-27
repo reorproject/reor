@@ -1,22 +1,21 @@
 import React, { useState } from "react";
 import TitleBar from "./TitleBar";
-import ChatWithLLM from "./Chat/Chat";
-import LeftSidebar from "./Sidebars/IconsSidebar";
+import ChatWithLLM, { ChatHistory } from "./Chat/Chat";
+import IconsSidebar from "./Sidebars/IconsSidebar";
 import ResizableComponent from "./Generic/ResizableComponent";
 import SidebarManager from "./Sidebars/MainSidebar";
 import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
 import { EditorContent } from "@tiptap/react";
 import InEditorBacklinkSuggestionsDisplay from "./Editor/BacklinkSuggestionsDisplay";
 import { useFileInfoTree } from "./File/FileSideBar/hooks/use-file-info-tree";
-import RenameNoteModal from "./File/RenameNote";
-import RenameDirModal from "./File/RenameDirectory";
 import SidebarComponent from "./Similarity/SimilarFilesSidebar";
+import { useChatHistory } from "./Chat/hooks/use-chat-history";
 
 interface FileEditorContainerProps {}
-export type SidebarAbleToShow = "files" | "search";
+export type SidebarAbleToShow = "files" | "search" | "chats";
 
 const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
-  const [showChatbot, setShowChatbot] = useState<boolean>(true);
+  const [showChatbot, setShowChatbot] = useState<boolean>(false);
   const [showSimilarFiles, setShowSimilarFiles] = useState<boolean>(true);
   const [sidebarShowing, setSidebarShowing] =
     useState<SidebarAbleToShow>("files");
@@ -36,14 +35,28 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     setNavigationHistory,
   } = useFileByFilepath();
 
+  const {
+    currentChatHistory,
+    setCurrentChatHistory,
+    chatHistoriesMetadata,
+    setChatHistoriesMetadata,
+  } = useChatHistory();
+
   const { files, flattenedFiles, expandedDirectories, handleDirectoryToggle } =
     useFileInfoTree(filePath);
 
-  const toggleChatbot = () => {
-    setShowChatbot(!showChatbot);
-  };
   const toggleSimilarFiles = () => {
     setShowSimilarFiles(!showSimilarFiles);
+  };
+
+  const openFileAndOpenEditor = async (path: string) => {
+    setShowChatbot(false);
+    openFileByPath(path);
+  };
+
+  const openChatAndOpenChat = (chatHistory: ChatHistory | undefined) => {
+    setShowChatbot(true);
+    setCurrentChatHistory(chatHistory);
   };
 
   return (
@@ -52,36 +65,15 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         history={navigationHistory}
         setHistory={setNavigationHistory}
         currentFilePath={filePath}
-        onFileSelect={openFileByPath}
-        chatbotOpen={showChatbot}
+        onFileSelect={openFileAndOpenEditor}
         similarFilesOpen={showSimilarFiles}
-        toggleChatbot={toggleChatbot}
         toggleSimilarFiles={toggleSimilarFiles}
       />
-      {noteToBeRenamed && (
-        <RenameNoteModal
-          isOpen={!!noteToBeRenamed}
-          onClose={() => setNoteToBeRenamed("")}
-          fullNoteName={noteToBeRenamed}
-          renameNote={async ({ path, newNoteName }) => {
-            await renameFile(path, newNoteName);
-          }}
-        />
-      )}
-      {fileDirToBeRenamed && (
-        <RenameDirModal
-          isOpen={!!fileDirToBeRenamed}
-          onClose={() => setFileDirToBeRenamed("")}
-          fullDirName={fileDirToBeRenamed}
-          renameDir={async ({ path, newDirName: newNoteName }) => {
-            await renameFile(path, newNoteName);
-          }}
-        />
-      )}
+
       <div className="flex h-below-titlebar">
         <div className="w-[35px] border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid">
-          <LeftSidebar
-            onFileSelect={openFileByPath}
+          <IconsSidebar
+            onFileSelect={openFileAndOpenEditor}
             sidebarShowing={sidebarShowing}
             makeSidebarShow={setSidebarShowing}
           />
@@ -94,13 +86,21 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
               expandedDirectories={expandedDirectories}
               handleDirectoryToggle={handleDirectoryToggle}
               selectedFilePath={filePath}
-              onFileSelect={openFileByPath}
+              onFileSelect={openFileAndOpenEditor}
               sidebarShowing={sidebarShowing}
+              renameFile={renameFile}
+              noteToBeRenamed={noteToBeRenamed}
+              setNoteToBeRenamed={setNoteToBeRenamed}
+              fileDirToBeRenamed={fileDirToBeRenamed}
+              setFileDirToBeRenamed={setFileDirToBeRenamed}
+              currentChatHistory={currentChatHistory}
+              chatHistoriesMetadata={chatHistoriesMetadata}
+              setCurrentChatHistory={openChatAndOpenChat}
             />
           </div>
         </ResizableComponent>
 
-        {filePath && (
+        {!showChatbot && filePath && (
           <div className="w-full h-full flex overflow-x-hidden">
             <div className="w-full flex h-full">
               <div
@@ -114,6 +114,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                   style={{ wordBreak: "break-word" }}
                   editor={editor}
                 />
+
                 {suggestionsState && (
                   <InEditorBacklinkSuggestionsDisplay
                     suggestionsState={suggestionsState}
@@ -127,7 +128,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                 <SidebarComponent
                   filePath={filePath}
                   highlightData={highlightData}
-                  openFileByPath={openFileByPath}
+                  openFileByPath={openFileAndOpenEditor}
                   saveCurrentlyOpenedFile={async () => {
                     await saveCurrentlyOpenedFile();
                   }}
@@ -136,16 +137,18 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
             </div>
           </div>
         )}
+
         {showChatbot && (
-          <div
-            className={`h-below-titlebar ${filePath ? "" : "absolute right-0"}`}
-          >
-            <ResizableComponent resizeSide="left" initialWidth={300}>
-              <ChatWithLLM
-                currentFilePath={filePath}
-                openFileByPath={openFileByPath}
-              />
-            </ResizableComponent>
+          <div className={`w-full h-below-titlebar`}>
+            {/* <ResizableComponent resizeSide="left" initialWidth={450}> */}
+            <ChatWithLLM
+              openFileByPath={openFileAndOpenEditor}
+              setChatHistoriesMetadata={setChatHistoriesMetadata}
+              currentChatHistory={currentChatHistory}
+              setCurrentChatHistory={setCurrentChatHistory}
+              showSimilarFiles={showSimilarFiles}
+            />
+            {/* </ResizableComponent> */}
           </div>
         )}
       </div>
