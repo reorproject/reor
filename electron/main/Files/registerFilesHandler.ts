@@ -262,6 +262,9 @@ export const registerFileHandlers = (
         console.error("Error searching database:", error);
         throw error;
       }
+    });
+
+  ipcMain.handle(
     "generate-flashcards-from-file",
     async (
       event,
