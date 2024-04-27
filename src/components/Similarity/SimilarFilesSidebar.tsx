@@ -8,6 +8,7 @@ import { FiRefreshCw } from "react-icons/fi";
 import ResizableComponent from "../Generic/ResizableComponent";
 import { HighlightData } from "../Editor/HighlightExtension";
 import { FaArrowRight } from "react-icons/fa";
+import removeMd from "remove-markdown";
 
 interface SidebarComponentProps {
   filePath: string;
@@ -47,15 +48,16 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
   ): Promise<DBQueryResult[]> => {
     try {
       const fileContent: string = await window.files.readFile(filePath);
-      // TODO: proper chunking here...
+      // TODO: proper semantic chunking here... current quick win is just to take top 1000 characters
       if (!fileContent) {
         return [];
       }
       const databaseFields = await window.database.getDatabaseFields();
       const filterString = `${databaseFields.NOTE_PATH} != '${filePath}'`;
 
+      const sanitizedText = removeMd(fileContent.slice(0,1000));
       const searchResults: DBQueryResult[] = await window.database.search(
-        fileContent,
+        sanitizedText,
         20,
         filterString
       );
