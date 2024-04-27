@@ -141,24 +141,27 @@ export const registerStoreHandlers = (
     const vaultDir = windowsManager.getVaultDirectoryForWinContents(
       event.sender
     );
+
     if (!vaultDir) {
       return [];
     }
 
     const allHistories = store.get(StoreKeys.ChatHistories);
-    return allHistories[vaultDir] || [];
+    const output = allHistories ? allHistories[vaultDir] : [];
+    return output;
   });
 
   ipcMain.handle("update-chat-history", (event, newChat: ChatHistory) => {
     const vaultDir = windowsManager.getVaultDirectoryForWinContents(
       event.sender
     );
-    console.log("updating chat history", newChat);
     const allChatHistories = store.get(StoreKeys.ChatHistories);
     if (!vaultDir) {
       return;
     }
-    const vaultChatHistories = allChatHistories[vaultDir] || [];
+    const vaultChatHistories = allChatHistories
+      ? allChatHistories[vaultDir]
+      : [];
     // check if chat history already exists. if it does, update it. if it doesn't append it
     const existingChatIndex = vaultChatHistories.findIndex(
       (chat) => chat.id === newChat.id
