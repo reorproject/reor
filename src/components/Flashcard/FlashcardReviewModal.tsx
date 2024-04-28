@@ -63,7 +63,7 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
             options={flashcardFiles.map((file) => {
               return { label: file, value: file };
             })}
-            value={selectedFlashcardFile}
+            selectedValue={selectedFlashcardFile}
             onChange={(value) => {
               setCurrentSelectedFlashcard(0);
               setSelectedFlashcardFile(value);

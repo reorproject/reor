@@ -209,6 +209,6 @@ export const rerankSearchedEmbeddings = async (query: string, searchResults: DBE
     }
   });
 
-  // TODO: we should allow users to set threshold for recall too.
+  // TODO: we should allow users to set threshold for sensitivity too.
   return resultsWithIndex.sort((a, b) => b.score - a.score).filter(item => item.score > 0);
 }

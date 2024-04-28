@@ -26,6 +26,7 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
 }) => {
   const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([]);
   const [isLoadingSimilarEntries, setIsLoadingSimilarEntries] = useState(false);
+  const [isRefined, setIsRefined] = useState(false);
 
   useEffect(() => {
     if (filePath) {
@@ -34,7 +35,7 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
   }, [filePath]);
   const handleNewFileOpen = async (path: string) => {
     try {
-      const searchResults = await performSearchOnFile(path);
+      const searchResults = await performSearchOnFile(path, isRefined);
       if (searchResults.length > 0) {
         setSimilarEntries(searchResults);
       } else {
@@ -46,11 +47,12 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
   };
 
   const performSearchOnFile = async (
-    filePath: string
+    filePath: string,
+    withReranking = false
   ): Promise<DBQueryResult[]> => {
     try {
       const fileContent: string = await window.files.readFile(filePath);
-      // TODO: proper semantic chunking here... current quick win is just to take top 500 characters
+      // TODO: proper semantic chunking here...current quick win is just to take top 500 characters
       if (!fileContent) {
         return [];
       }
@@ -60,7 +62,11 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
       const filterString = `${databaseFields.NOTE_PATH} != '${filePath}'`;
 
       setIsLoadingSimilarEntries(true);
-      const searchResults: DBQueryResult[] = await window.database.searchWithReranking(
+      const searchResults: DBQueryResult[] = withReranking ? await window.database.searchWithReranking(
+        sanitizedText,
+        20,
+        filterString,
+      ) : await window.database.search(
         sanitizedText,
         20,
         filterString
@@ -79,8 +85,8 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
     }
   };
 
-  const updateSimilarEntries = async () => {
-    const searchResults = await performSearchOnFile(filePath);
+  const updateSimilarEntries = async (isRefined?: boolean) => {
+    const searchResults = await performSearchOnFile(filePath, isRefined);
     setSimilarEntries(searchResults);
   };
 
@@ -92,7 +98,7 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
           setSimilarEntries([]);
           const databaseFields = await window.database.getDatabaseFields();
           const filterString = `${databaseFields.NOTE_PATH} != '${filePath}'`;
-          const searchResults: DBQueryResult[] = await window.database.searchWithReranking(
+          const searchResults: DBQueryResult[] = await window.database.search(
             highlightData.text,
             20,
             filterString
@@ -102,6 +108,8 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
       />{" "}
       <SimilarEntriesComponent
         // filePath={filePath}
+        isRefined={isRefined}
+        setIsRefined={setIsRefined}
         similarEntries={similarEntries}
         setSimilarEntries={setSimilarEntries}
         onFileSelect={openFileByPath}
@@ -123,9 +131,11 @@ interface SimilarEntriesComponentProps {
   // filePath: string;
   similarEntries: DBQueryResult[];
   setSimilarEntries?: (entries: DBQueryResult[]) => void;
+  isRefined: boolean;
+  setIsRefined: (isRefined: boolean) => void;
   onFileSelect: (path: string) => void;
   saveCurrentFile: () => Promise<void>;
-  updateSimilarEntries?: () => Promise<void>;
+  updateSimilarEntries?: (isRefined?: boolean) => Promise<void>;
   titleText: string;
   isLoadingSimilarEntries: boolean;
 }
@@ -136,13 +146,14 @@ export const SimilarEntriesComponent: React.FC<
   // filePath,
   similarEntries,
   setSimilarEntries,
+  isRefined,
+  setIsRefined,
   onFileSelect,
   saveCurrentFile,
   updateSimilarEntries,
   titleText,
   isLoadingSimilarEntries,
 }) => {
-
   return (
     <div>
       <ResizableComponent resizeSide="left" initialWidth={300}>
@@ -172,16 +183,27 @@ export const SimilarEntriesComponent: React.FC<
                     updateSimilarEntries();
                   }}
                 >
-                  {!isLoadingSimilarEntries && <FiRefreshCw
-                    className="text-gray-300"
-                    title="Refresh Related Notes"
-                  />}
+                  {!isLoadingSimilarEntries &&
+                      <FiRefreshCw
+                      className="text-gray-300"
+                      title="Refresh Related Notes"
+                    />}
                   {isLoadingSimilarEntries && (
                       <CircularProgress size={24} />
                   )}
                 </div>
               )}
             </div>
+          </div>
+          <div className="text-sm flex items-center justify-center">
+            {updateSimilarEntries && <button
+                className='bg-slate-600 m-2 rounded-lg border-none h-6 w-40 text-center vertical-align text-white'
+                onClick={() => {
+                  setIsRefined(!isRefined);
+                  updateSimilarEntries(!isRefined);
+              }}>
+              {isRefined? "Unrefine" : "Refine results"}
+            </button>}
           </div>
           {similarEntries.length > 0 && (
             <div className="h-full w-full">

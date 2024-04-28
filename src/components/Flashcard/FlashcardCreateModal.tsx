@@ -114,7 +114,12 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
             transition duration-150 ease-in-out"
             value={searchText}
             onSelect={() => initializeSuggestionsStateOnFocus()}
-            onChange={(e) => setSearchText(e.target.value)}
+            onChange={(e) => {
+              setSearchText(e.target.value)
+              if (e.target.value.length == 0) {
+                setSelectedFile('')
+              }
+            }}
             placeholder="Search for the files by name"
           />
           {suggestionsState && (
@@ -157,7 +162,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
           setCurrentSelectedFlashcard={setCurrentSelectedFlashcard}
         />
         <div className="flex justify-end">
-          {flashcardQAPairs.length == 0 && (
+          {selectedFile && (
             <Button
               className="bg-slate-900/75 border-none h-20 w-96 text-center vertical-align
             mt-4 mr-16
