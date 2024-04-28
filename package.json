@@ -17,6 +17,7 @@
     "dev": "vite",
     "prebuild": "node scripts/downloadOllama.js",
     "build": "tsc && vite build && electron-builder",
+    "postbuild": "node scripts/notarize.js",
     "preview": "vite preview",
     "pree2e": "vite build --mode=test",
     "e2e": "playwright test",
@@ -72,6 +73,7 @@
     "vectordb": "0.4.10"
   },
   "devDependencies": {
+    "@electron/notarize": "^2.3.0",
     "@playwright/test": "^1.37.1",
     "@types/jest": "^29.5.11",
     "@types/react": "^18.2.20",
