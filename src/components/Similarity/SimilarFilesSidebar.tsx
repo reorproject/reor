@@ -33,13 +33,19 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
       handleNewFileOpen(filePath);
     }
   }, [filePath]);
+
   const handleNewFileOpen = async (path: string) => {
+    setIsRefined(false);
     try {
       const sanitizedText = await getChunkForInitialSearchFromFile(path);
       if (!sanitizedText) {
         return;
       }
-      const searchResults = await performSearchOnChunk(sanitizedText, path, isRefined);
+      const searchResults = await performSearchOnChunk(
+        sanitizedText,
+        path,
+        false
+      );
 
       if (searchResults.length > 0) {
         setSimilarEntries(searchResults);
@@ -51,7 +57,6 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
     }
   };
 
-
   const getChunkForInitialSearchFromFile = async (filePath: string) => {
     // TODO: proper semantic chunking - current quick win is just to take top 500 characters
     const fileContent: string = await window.files.readFile(filePath);
@@ -61,7 +66,6 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
     const sanitizedText = removeMd(fileContent.slice(0, 500));
     return sanitizedText;
   };
-
 
   const performSearchOnChunk = async (
     sanitizedText: string,
@@ -73,16 +77,13 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
       const filterString = `${databaseFields.NOTE_PATH} != '${fileToBeExcluded}'`;
 
       setIsLoadingSimilarEntries(true);
-      const searchResults: DBQueryResult[] = withReranking ?
-        await window.database.searchWithReranking(
-          sanitizedText,
-          20,
-          filterString,
-        ) : await window.database.search(
-          sanitizedText,
-          20,
-          filterString
-        );
+      const searchResults: DBQueryResult[] = withReranking
+        ? await window.database.searchWithReranking(
+            sanitizedText,
+            20,
+            filterString
+          )
+        : await window.database.search(sanitizedText, 20, filterString);
 
       setIsLoadingSimilarEntries(false);
       return searchResults;
@@ -103,10 +104,14 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
 
     if (!sanitizedText) {
       toast.error(`Error: Could not get chunk for search ${filePath}`);
-      return
+      return;
     }
 
-    const searchResults = await performSearchOnChunk(sanitizedText, filePath, isRefined);
+    const searchResults = await performSearchOnChunk(
+      sanitizedText,
+      filePath,
+      isRefined
+    );
     setSimilarEntries(searchResults);
   };
 
@@ -205,27 +210,28 @@ export const SimilarEntriesComponent: React.FC<
                     updateSimilarEntries();
                   }}
                 >
-                  {!isLoadingSimilarEntries &&
-                      <FiRefreshCw
+                  {!isLoadingSimilarEntries && (
+                    <FiRefreshCw
                       className="text-gray-300"
                       title="Refresh Related Notes"
-                    />}
-                  {isLoadingSimilarEntries && (
-                      <CircularProgress size={24} />
+                    />
                   )}
+                  {isLoadingSimilarEntries && <CircularProgress size={24} />}
                 </div>
               )}
             </div>
           </div>
           <div className="text-sm flex items-center justify-center">
-            {updateSimilarEntries && <button
-                className='bg-slate-600 m-2 rounded-lg border-none h-6 w-40 text-center vertical-align text-white'
+            {updateSimilarEntries && (
+              <button
+                className="bg-slate-600 m-2 rounded-lg border-none h-6 w-40 text-center vertical-align text-white cursor-pointer"
                 onClick={() => {
                   setIsRefined(!isRefined);
                   updateSimilarEntries(!isRefined);
-              }}>
-              {isRefined? "Widen" : "Refine results"}
-            </button>}
+                 }}
+                {isRefined ? "Un-rerank" : "Rerank results"}
+              </button>
+            )}
           </div>
           {similarEntries.length > 0 && (
             <div className="h-full w-full">

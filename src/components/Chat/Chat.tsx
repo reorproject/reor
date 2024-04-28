@@ -240,6 +240,14 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
       if (chatHistory.displayableChatHistory.length === 0) {
         if (chatFilters) {
+          // chatHistory.displayableChatHistory.push({
+          //   role: "system",
+          //   content:
+          //     "You are an advanced question answer agent answering questions based on provided context. You will respond to queries in second person: saying things like 'you'. The context provided was written by the same user who is asking the question.",
+          //   messageType: "success",
+
+          //   context: [],
+          // });
           chatHistory.displayableChatHistory.push(
             await resolveRAGContext(userTextFieldInput, chatFilters)
           );
@@ -384,8 +392,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid">
         <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
           <div className="space-y-2 ml-4 mr-4 mt-4 flex-grow">
-            {currentChatHistory?.displayableChatHistory.map(
-              (message, index) => (
+            {currentChatHistory?.displayableChatHistory
+              .filter((msg) => msg.role !== "system")
+              .map((message, index) => (
                 <ReactMarkdown
                   key={index}
                   rehypePlugins={[rehypeRaw]}
@@ -401,8 +410,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                     ? message.visibleContent
                     : formatOpenAIMessageContentIntoString(message.content)}
                 </ReactMarkdown>
-              )
-            )}
+              ))}
           </div>
           {
             (!currentChatHistory || currentChatHistory?.displayableChatHistory.length == 0) && (
