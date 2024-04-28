@@ -24,10 +24,10 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
   return (
     <div className="h-full overflow-y-auto bg-neutral-800">
       <div
-        className="mt-1 mb-[1px] mr-1 ml-1 flex items-center justify-center cursor-pointer px-4 py-[2px] bg-neutral-600 hover:bg-neutral-700 text-white border border-transparent hover:border-white rounded transition duration-150 ease-in-out"
+        className="mt-1 mb-1 mr-1 ml-1 flex items-center justify-center cursor-pointer px-4 py-[2px] bg-neutral-600 hover:bg-neutral-700 text-white border border-transparent hover:border-white rounded transition duration-150 ease-in-out"
         onClick={newChat}
       >
-        <span className="text-sm">New Chat</span>
+        <span className="text-sm"> + New Chat</span>
       </div>
 
       {reversedChatHistoriesMetadata.map((chatMetadata) => (

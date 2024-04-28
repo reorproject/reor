@@ -13,7 +13,6 @@ import { BsChatLeftDots, BsFillChatLeftDotsFill } from "react-icons/bs";
 import FlashcardMenuModal from "../Flashcard/FlashcardMenuModal";
 
 interface IconsSidebarProps {
-  onFileSelect: (path: string) => void;
   openRelativePath: (path: string) => void;
   sidebarShowing: SidebarAbleToShow;
   makeSidebarShow: (show: SidebarAbleToShow) => void;
@@ -21,7 +20,6 @@ interface IconsSidebarProps {
 }
 
 const IconsSidebar: React.FC<IconsSidebarProps> = ({
-  onFileSelect,
   openRelativePath,
   sidebarShowing,
   makeSidebarShow,

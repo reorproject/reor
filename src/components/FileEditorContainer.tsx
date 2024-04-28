@@ -74,7 +74,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
       <div className="flex h-below-titlebar">
         <div className="w-[35px] border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid">
           <IconsSidebar
-            onFileSelect={openFileAndOpenEditor}
             openRelativePath={openRelativePath}
             sidebarShowing={sidebarShowing}
             makeSidebarShow={setSidebarShowing}
