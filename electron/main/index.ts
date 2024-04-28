@@ -198,6 +198,16 @@ ipcMain.handle("show-context-menu-file-item", (event, file) => {
     })
   );
 
+  menu.append(
+    new MenuItem({
+      label: "Use file in chat context",
+      click: () => {
+        console.log("creating: ", file.path);
+        event.sender.send("create-chat-with-file-listener", file.path);
+      },
+    })
+  );
+
   console.log("menu key: ", file);
 
   const browserWindow = BrowserWindow.fromWebContents(event.sender);

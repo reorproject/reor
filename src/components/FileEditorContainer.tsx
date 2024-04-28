@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TitleBar from "./TitleBar";
 import ChatWithLLM, { ChatHistory } from "./Chat/Chat";
 import IconsSidebar from "./Sidebars/IconsSidebar";
@@ -6,19 +6,25 @@ import ResizableComponent from "./Generic/ResizableComponent";
 import SidebarManager from "./Sidebars/MainSidebar";
 import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
 import { EditorContent } from "@tiptap/react";
-import InEditorBacklinkSuggestionsDisplay from "./Editor/BacklinkSuggestionsDisplay";
+import FilesSuggestionsDisplay from "./Editor/FilesSuggestionsDisplay";
 import { useFileInfoTree } from "./File/FileSideBar/hooks/use-file-info-tree";
 import SidebarComponent from "./Similarity/SimilarFilesSidebar";
-import { useChatHistory } from "./Chat/hooks/use-chat-history";
+import { getChatHistoryContext, useChatHistory } from "./Chat/hooks/use-chat-history";
 
 interface FileEditorContainerProps {}
-export type SidebarAbleToShow = "files" | "search" | "chats";
+export enum SidebarAbleToShow {
+  FILES = "files",
+  SEARCH = "search",
+  CHATS = "chats",
+}
 
 const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const [showChatbot, setShowChatbot] = useState<boolean>(false);
   const [showSimilarFiles, setShowSimilarFiles] = useState<boolean>(true);
   const [sidebarShowing, setSidebarShowing] =
-    useState<SidebarAbleToShow>("files");
+    useState<SidebarAbleToShow>(SidebarAbleToShow.FILES);
+  const [vaultDirectory, setVaultDirectory] = useState<string>("");
+
   const {
     filePath,
     editor,
@@ -37,10 +43,16 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   } = useFileByFilepath();
 
   const {
+    chatFilePath,
     currentChatHistory,
     setCurrentChatHistory,
     chatHistoriesMetadata,
     setChatHistoriesMetadata,
+    currentChatContext,
+    setCurrentChatContext,
+    chatFilters,
+    setChatFilters,
+    handleSetChatFilePath,
   } = useChatHistory();
 
   const { files, flattenedFiles, expandedDirectories, handleDirectoryToggle } =
@@ -55,10 +67,41 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     openFileByPath(path);
   };
 
-  const openChatAndOpenChat = (chatHistory: ChatHistory | undefined) => {
+  const openChatAndSetHistory = (chatHistory: ChatHistory | undefined) => {
     setShowChatbot(true);
     setCurrentChatHistory(chatHistory);
+    setCurrentChatContext(getChatHistoryContext(chatHistory));
+    handleSetChatFilePath("")
   };
+
+  // open chat when context menu option is selected
+  useEffect(() => {
+    const removeOpenChatWithFileListener = window.ipcRenderer.receive(
+      "create-chat-with-file-listener",
+      (noteName: string) => {
+        setSidebarShowing(SidebarAbleToShow.CHATS);
+        handleSetChatFilePath(noteName);
+        setShowChatbot(true);
+        setCurrentChatHistory(undefined);
+      }
+    );
+
+    return () => {
+      removeOpenChatWithFileListener();
+    };
+  }, []);
+
+
+  // find all available files in the vault directory
+  useEffect(() => {
+    const setFileDirectory = async () => {
+      const windowDirectory =
+        await window.electronStore.getVaultDirectoryForWindow();
+      setVaultDirectory(windowDirectory);
+    };
+    setFileDirectory();
+  }, []);
+
 
   return (
     <div>
@@ -97,7 +140,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
               setFileDirToBeRenamed={setFileDirToBeRenamed}
               currentChatHistory={currentChatHistory}
               chatHistoriesMetadata={chatHistoriesMetadata}
-              setCurrentChatHistory={openChatAndOpenChat}
+              setCurrentChatHistory={openChatAndSetHistory}
             />
           </div>
         </ResizableComponent>
@@ -118,7 +161,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                 />
 
                 {suggestionsState && (
-                  <InEditorBacklinkSuggestionsDisplay
+                  <FilesSuggestionsDisplay
                     suggestionsState={suggestionsState}
                     suggestions={flattenedFiles.map(
                       (file) => file.relativePath
@@ -144,11 +187,18 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
           <div className={`w-full h-below-titlebar`}>
             {/* <ResizableComponent resizeSide="left" initialWidth={450}> */}
             <ChatWithLLM
+              vaultDirectory={vaultDirectory}
+              filePath={chatFilePath}
+              setFilePath={handleSetChatFilePath}
+              chatFilters={chatFilters}
+              setChatFilters={setChatFilters}
               openFileByPath={openFileAndOpenEditor}
               setChatHistoriesMetadata={setChatHistoriesMetadata}
               currentChatHistory={currentChatHistory}
               setCurrentChatHistory={setCurrentChatHistory}
               showSimilarFiles={showSimilarFiles}
+              currentChatContext={currentChatContext}
+              setCurrentChatContext={setCurrentChatContext}
             />
             {/* </ResizableComponent> */}
           </div>

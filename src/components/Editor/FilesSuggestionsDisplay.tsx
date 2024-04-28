@@ -13,7 +13,7 @@ interface SuggestionsDisplayProps {
   maxWidth?: string;
 }
 
-const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
+const FilesSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
   suggestionsState,
   suggestions,
   maxWidth = "max-w-sm",
@@ -45,14 +45,14 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
     const { top, left } = suggestionsState.position;
     const { height } = suggestionsRef.current.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
-    const shouldDisplayAbove = top + height > viewportHeight && top > height;
+    const shouldDisplayAbove = top + height > viewportHeight + 100 && top > height;
 
     setLayout({
       top: shouldDisplayAbove ? top - height : top,
       left: left,
       display: "block",
     });
-  }, [suggestionsState.position, filteredSuggestions]);
+  }, [suggestionsRef, suggestionsState.position, filteredSuggestions]);
 
   if (filteredSuggestions.length === 0) return null;
 
@@ -83,4 +83,4 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
   );
 };
 
-export default InEditorBacklinkSuggestionsDisplay;
+export default FilesSuggestionsDisplay;
