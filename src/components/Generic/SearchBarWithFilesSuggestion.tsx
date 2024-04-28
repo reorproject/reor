@@ -4,32 +4,29 @@ import { useFileByFilepath } from "../File/hooks/use-file-by-filepath";
 import FilesSuggestionsDisplay, { SuggestionsState } from "../Editor/FilesSuggestionsDisplay";
 
 interface Props {
+    vaultDirectory: string;
     titleText: string;
     searchText: string;
     setSearchText: (text: string) => void;
     setSelectedFile: (file: string) => void;
-    selectedFile: string | null;
     onSelectSuggestion: (suggestion: string) => void;
     suggestionsState: SuggestionsState | null;
     setSuggestionsState: (state: SuggestionsState) => void;
-    isInEditor?: boolean;
     maxSuggestionWidth?: string;
 }
 
 export const SearchBarWithFilesSuggestion = ({
+  vaultDirectory,
   titleText,
   searchText,
   setSearchText,
-  selectedFile,
   setSelectedFile,
   onSelectSuggestion,
   suggestionsState,
   setSuggestionsState,
-  isInEditor,
   maxSuggestionWidth,
   }: Props) => {
 
-  const [vaultDirectory, setVaultDirectory] = useState<string>("");
   const { flattenedFiles } = useFileInfoTree(vaultDirectory);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -38,8 +35,6 @@ export const SearchBarWithFilesSuggestion = ({
     if (!inputCoords) {
       return;
     }
-    console.log("coords: ", { top: inputCoords.top, left: inputCoords.x });
-    console.log({inputCoords})
 
     setSuggestionsState({
       position: {
@@ -50,16 +45,6 @@ export const SearchBarWithFilesSuggestion = ({
       onSelect: (suggestion) => onSelectSuggestion(suggestion),
     });
   };
-
-  // find all available files in the vault directory
-  useEffect(() => {
-    const setFileDirectory = async () => {
-      const windowDirectory =
-        await window.electronStore.getVaultDirectoryForWindow();
-      setVaultDirectory(windowDirectory);
-    };
-    setFileDirectory();
-  }, []);
 
     return (
         <>
@@ -86,11 +71,10 @@ export const SearchBarWithFilesSuggestion = ({
             suggestionsState={suggestionsState}
             suggestions={flattenedFiles.map((file) => file.path)}
             maxWidth={maxSuggestionWidth}
-            isInEditor={isInEditor}
           />
         )}
       </h2>
-        {!selectedFile && (
+        {!searchText && (
           <p className="text-red-500 text-xs">
           Choose a file by searching or by right clicking a file in directory
           </p>

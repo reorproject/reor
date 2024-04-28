@@ -11,14 +11,12 @@ interface SuggestionsDisplayProps {
   suggestionsState: SuggestionsState;
   suggestions: string[];
   maxWidth?: string;
-  isInEditor?: boolean;
 }
 
 const FilesSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
   suggestionsState,
   suggestions,
   maxWidth = "max-w-sm",
-  isInEditor = true,
 }) => {
   const suggestionsRef = useRef<HTMLDivElement | null>(null);
   const [layout, setLayout] = useState({
@@ -47,19 +45,14 @@ const FilesSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
     const { top, left } = suggestionsState.position;
     const { height } = suggestionsRef.current.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
-    const shouldDisplayAbove = top + height > viewportHeight && top > height;
+    const shouldDisplayAbove = top + height > viewportHeight + 100 && top > height;
 
-    console.log("layout: ", {
-      top: shouldDisplayAbove ? top - height : top,
-      left: left,
-      display: "block",
-    })
     setLayout({
       top: shouldDisplayAbove ? top - height : top,
       left: left,
       display: "block",
     });
-  }, [suggestionsState.position, filteredSuggestions]);
+  }, [suggestionsRef, suggestionsState.position, filteredSuggestions]);
 
   if (filteredSuggestions.length === 0) return null;
 
@@ -68,8 +61,7 @@ const FilesSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
       ref={suggestionsRef}
       className={`absolute rounded bg-white text-black ${maxWidth} border border-black  z-50 break-words whitespace-normal`}
       style={{
-        // should only use this when you need in editor
-        left: isInEditor ? `${layout.left}px` : 0,
+        left: `${layout.left}px`,
         top: `${layout.top}px`,
         display: layout.display,
       }}

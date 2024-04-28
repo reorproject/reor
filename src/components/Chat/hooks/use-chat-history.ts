@@ -58,7 +58,6 @@ export const useChatHistory = () => {
 
   return {
     chatFilePath,
-    setChatFilePath,
     allChatHistories,
     setAllChatHistories,
     currentChatHistory,

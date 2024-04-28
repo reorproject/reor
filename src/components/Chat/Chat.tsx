@@ -24,11 +24,9 @@ import {
   getChatHistoryContext,
   getDisplayableChatName,
 } from "./hooks/use-chat-history";
-import { useDebounce } from "use-debounce";
 import { SimilarEntriesComponent } from "../Similarity/SimilarFilesSidebar";
-import ResizableComponent from "../Generic/ResizableComponent";
-import { SearchBarWithFilesSuggestion } from "../Generic/SearchBarWithFilesSuggestion";
 import { useFileByFilepath } from "../File/hooks/use-file-by-filepath";
+import AddContextFiltersModal from "./AddContextFiltersModal";
 
 // convert ask options to enum
 enum AskOptions {
@@ -159,6 +157,7 @@ export const resolveRAGContext = async (
 };
 
 interface ChatWithLLMProps {
+  vaultDirectory: string;
   openFileByPath: (path: string) => Promise<void>;
   // filePath: string | null;
   setChatHistoriesMetadata: React.Dispatch<
@@ -175,10 +174,11 @@ interface ChatWithLLMProps {
   chatFilters: ChatFilters;
   setChatFilters: React.Dispatch<React.SetStateAction<ChatFilters>>;
   filePath: string | null;
-  setFilePath: React.Dispatch<React.SetStateAction<string | null>>;
+  setFilePath: (filePath: string) => Promise<void>;
 }
 
 const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
+  vaultDirectory,
   openFileByPath,
   filePath,
   setFilePath,
@@ -195,6 +195,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
   const [readyToSave, setReadyToSave] = useState<boolean>(false);
 
+  const [isAddContextFiltersModalOpen, setIsAddContextFiltersModalOpen] = useState<boolean>(false);
   const { suggestionsState, setSuggestionsState } = useFileByFilepath();
 
   const [searchText, setSearchText] = useState<string>("");
@@ -205,9 +206,11 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         await window.path.addExtensionIfNoExtensionPresent(suggestion);
       console.log(suggestionWithExtension);
       setSearchText(suggestionWithExtension);
-      setFilePath(suggestionWithExtension);
 
       //also should set the chat context using the file selected into the chat context and chat history
+      // this enables our chat context side bar to be able to see the context from the file
+      setFilePath(suggestionWithExtension);
+
       setSuggestionsState(null);
   }
 
@@ -376,20 +379,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     };
   }, []);
 
-  const FileSearchBar = <div className="text-sm ml-4 mr-4">
-      <SearchBarWithFilesSuggestion
-        titleText="You can optionally select a file to use as chat context"
-        searchText={searchText}
-        setSearchText={setSearchText}
-        selectedFile={filePath}
-        setSelectedFile={setFilePath}
-        onSelectSuggestion={handleSelectSuggestion}
-        suggestionsState={suggestionsState}
-        setSuggestionsState={setSuggestionsState}
-        isInEditor={false}
-        />
-    </div>
-
   return (
     <div className="flex items-center justify-center w-full h-full">
       <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid">
@@ -421,12 +410,34 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                 <div className="flex items-center justify-center text-gray-300 text-sm">
                   Start a conversation with your notes by typing a message below.
                 </div>
+                <div className="flex items-center justify-center text-gray-300 text-sm">
+                  <button className='bg-slate-600 m-2 rounded-lg border-none h-6 w-40 text-center vertical-align text-white '
+                      onClick={() => {
+                        setIsAddContextFiltersModalOpen(true)
+                    }}>
+                  {filePath ? "Update filters" : "Add filters"}
+                  </button>
+                </div>
               </>
-
             )
           }
-          {userTextFieldInput === "" &&
-          currentChatHistory?.displayableChatHistory.length == 0 ? (
+
+          {isAddContextFiltersModalOpen && <AddContextFiltersModal
+            vaultDirectory={vaultDirectory}
+            isOpen={isAddContextFiltersModalOpen} onClose={() => setIsAddContextFiltersModalOpen(false)}
+            titleText="You can optionally include a file into chat context"
+            searchText={searchText}
+            setSearchText={setSearchText}
+            selectedFile={filePath}
+            setSelectedFile={setFilePath}
+            onSelectSuggestion={handleSelectSuggestion}
+            setSuggestionState={setSuggestionsState}
+            suggestionsState={suggestionsState}
+            setSuggestionsState={setSuggestionsState}
+            maxSuggestionWidth="w-[900px]"
+            />}
+          {userTextFieldInput === "" && (!currentChatHistory ||
+          currentChatHistory?.displayableChatHistory.length == 0) ? (
             <>
               {EXAMPLE_PROMPTS[askText].map((option, index) => {
                 return (
@@ -465,7 +476,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           isLoadingSimilarEntries={false}
           setIsRefined={() => {}} // to allow future toggling
           isRefined={true} // always refined for now
-          EmptyStateComponent={FileSearchBar}
+          // EmptyStateComponent={FileSearchBar}
         />
       )}
     </div>

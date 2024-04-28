@@ -23,6 +23,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const [showSimilarFiles, setShowSimilarFiles] = useState<boolean>(true);
   const [sidebarShowing, setSidebarShowing] =
     useState<SidebarAbleToShow>(SidebarAbleToShow.FILES);
+  const [vaultDirectory, setVaultDirectory] = useState<string>("");
 
   const {
     filePath,
@@ -43,7 +44,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
 
   const {
     chatFilePath,
-    setChatFilePath,
     currentChatHistory,
     setCurrentChatHistory,
     chatHistoriesMetadata,
@@ -71,6 +71,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     setShowChatbot(true);
     setCurrentChatHistory(chatHistory);
     setCurrentChatContext(getChatHistoryContext(chatHistory));
+    handleSetChatFilePath("")
   };
 
   // open chat when context menu option is selected
@@ -89,6 +90,18 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
       removeOpenChatWithFileListener();
     };
   }, []);
+
+
+  // find all available files in the vault directory
+  useEffect(() => {
+    const setFileDirectory = async () => {
+      const windowDirectory =
+        await window.electronStore.getVaultDirectoryForWindow();
+      setVaultDirectory(windowDirectory);
+    };
+    setFileDirectory();
+  }, []);
+
 
   return (
     <div>
@@ -174,8 +187,9 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
           <div className={`w-full h-below-titlebar`}>
             {/* <ResizableComponent resizeSide="left" initialWidth={450}> */}
             <ChatWithLLM
+              vaultDirectory={vaultDirectory}
               filePath={chatFilePath}
-              setFilePath={setChatFilePath}
+              setFilePath={handleSetChatFilePath}
               chatFilters={chatFilters}
               setChatFilters={setChatFilters}
               openFileByPath={openFileAndOpenEditor}

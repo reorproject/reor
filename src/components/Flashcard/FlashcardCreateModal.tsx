@@ -35,7 +35,8 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
   const { suggestionsState, setSuggestionsState } = useFileByFilepath();
 
   const [searchText, setSearchText] = useState<string>(initialFlashcardFile);
-  // const inputRef = useRef<HTMLInputElement>(null);
+  const [vaultDirectory, setVaultDirectory] = useState<string>("");
+
 
   const handleSelectSuggestion = async (suggestion: string) => {
       const suggestionWithExtension =
@@ -76,14 +77,25 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
     storeFlashcardPairsAsJSON(flashcardUIPairs, selectedFile);
   };
 
+
+  // find all available files in the vault directory
+  useEffect(() => {
+    const setFileDirectory = async () => {
+      const windowDirectory =
+        await window.electronStore.getVaultDirectoryForWindow();
+      setVaultDirectory(windowDirectory);
+    };
+    setFileDirectory();
+  }, []);
+
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="ml-6 mt-2 mb-6 w-[900px] h-full">
         <SearchBarWithFilesSuggestion
+          vaultDirectory={vaultDirectory}
           titleText="Select a file to generate flashcards for"
           searchText={searchText}
           setSearchText={setSearchText}
-          selectedFile={selectedFile}
           setSelectedFile={setSelectedFile}
           onSelectSuggestion={handleSelectSuggestion}
           suggestionsState={suggestionsState}
@@ -119,7 +131,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
         <div className="flex justify-end">
           {selectedFile && (
             <Button
-              className="bg-slate-900/75 border-none h-20 w-96 text-center vertical-align
+              className="bg-slate-600 border-none h-20 w-96 text-center vertical-align
             mt-4 mr-16
             cursor-pointer
             disabled:pointer-events-none
