@@ -83,15 +83,9 @@ interface FilterComponentProps {
 }
 
 const FilterComponent: React.FC<FilterComponentProps> = ({
-  // chatFilters,
+  chatFilters,
   setChatFilters,
 }) => {
-  useEffect(() => {
-    setChatFilters({
-      files: [],
-      numberOfChunksToFetch: 15,
-    });
-  }, []);
 
   return <div className="flex space-x-2"></div>;
 };

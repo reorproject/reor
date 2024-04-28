@@ -7,9 +7,8 @@ import { storeFlashcardPairsAsJSON } from "./utils";
 import { FlashcardQAPairUI } from "./types";
 import { FlashcardCore } from "./FlashcardsCore";
 import { CircularProgress } from "@mui/material";
-import { useFileInfoTree } from "../File/FileSideBar/hooks/use-file-info-tree";
 import { useFileByFilepath } from "../File/hooks/use-file-by-filepath";
-import FilesSuggestionsDisplay from "../Editor/BacklinkSuggestionsDisplay";
+import { SearchBarWithFilesSuggestion } from "../Generic/SearchBarWithFilesSuggestion";
 
 interface FlashcardCreateModalProps {
   isOpen: boolean;
@@ -32,35 +31,21 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
   const [selectedFile, setSelectedFile] =
     useState<string>(initialFlashcardFile);
   // const [availableFiles, setAvailableFiles] = useState<string[]>([]);
-  const [vaultDirectory, setVaultDirectory] = useState<string>("");
 
-  const { flattenedFiles } = useFileInfoTree(vaultDirectory);
   const { suggestionsState, setSuggestionsState } = useFileByFilepath();
 
   const [searchText, setSearchText] = useState<string>(initialFlashcardFile);
-  const inputRef = useRef<HTMLInputElement>(null);
+  // const inputRef = useRef<HTMLInputElement>(null);
 
-  const initializeSuggestionsStateOnFocus = () => {
-    const inputCoords = inputRef.current?.getBoundingClientRect();
-    if (!inputCoords) {
-      return;
-    }
-    setSuggestionsState({
-      position: {
-        top: inputCoords.bottom,
-        left: inputCoords.x,
-      },
-      textWithinBrackets: searchText,
-      onSelect: async (suggestion: string) => {
-        const suggestionWithExtension =
-          await window.path.addExtensionIfNoExtensionPresent(suggestion);
-        setSearchText(suggestionWithExtension);
-        setSelectedFile(suggestionWithExtension);
-        setFlashcardQAPairs([]);
-        setSuggestionsState(null);
-      },
-    });
-  };
+  const handleSelectSuggestion = async (suggestion: string) => {
+      const suggestionWithExtension =
+        await window.path.addExtensionIfNoExtensionPresent(suggestion);
+      console.log(suggestionWithExtension);
+      setSearchText(suggestionWithExtension);
+      setSelectedFile(suggestionWithExtension);
+      setFlashcardQAPairs([]);
+      setSuggestionsState(null);
+  }
 
   // handle the creation process
   const createFlashcardsFromFile = async (): Promise<void> => {
@@ -91,50 +76,20 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
     storeFlashcardPairsAsJSON(flashcardUIPairs, selectedFile);
   };
 
-  // find all available files
-  useEffect(() => {
-    const setFileDirectory = async () => {
-      const windowDirectory =
-        await window.electronStore.getVaultDirectoryForWindow();
-      setVaultDirectory(windowDirectory);
-    };
-    setFileDirectory();
-  }, []);
-
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="ml-6 mt-2 mb-6 w-[900px] h-full">
-        <h2 className="text-xl font-semibold mb-3 text-white">
-          Select a file to generate flashcards for:
-          <input
-            ref={inputRef}
-            type="text"
-            className="block w-full px-3 py-2 mt-6 h-[40px] border border-gray-300 box-border rounded-md
-            focus:outline-none focus:shadow-outline-blue focus:border-blue-300
-            transition duration-150 ease-in-out"
-            value={searchText}
-            onSelect={() => initializeSuggestionsStateOnFocus()}
-            onChange={(e) => {
-              setSearchText(e.target.value)
-              if (e.target.value.length == 0) {
-                setSelectedFile('')
-              }
-            }}
-            placeholder="Search for the files by name"
+        <SearchBarWithFilesSuggestion
+          titleText="Select a file to generate flashcards for"
+          searchText={searchText}
+          setSearchText={setSearchText}
+          selectedFile={selectedFile}
+          setSelectedFile={setSelectedFile}
+          onSelectSuggestion={handleSelectSuggestion}
+          suggestionsState={suggestionsState}
+          setSuggestionsState={setSuggestionsState}
+          maxSuggestionWidth="w-[900px]"
           />
-          {suggestionsState && (
-            <FilesSuggestionsDisplay
-              suggestionsState={suggestionsState}
-              suggestions={flattenedFiles.map((file) => file.path)}
-              maxWidth={"w-[900px]"}
-            />
-          )}
-        </h2>
-        {!selectedFile && (
-          <p className="text-red-500 text-xs">
-            Choose a file by searching or by right clicking a file in directory
-          </p>
-        )}
         {isLoadingFlashcards && flashcardQAPairs.length == 0 && (
           <div>
             <TypeAnimation

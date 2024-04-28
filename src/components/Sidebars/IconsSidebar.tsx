@@ -53,7 +53,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
     <div className="w-full h-full bg-neutral-800 flex flex-col items-center justify-between">
       <div
         className=" flex items-center justify-center w-full h-8 cursor-pointer"
-        onClick={() => makeSidebarShow("files")}
+        onClick={() => makeSidebarShow(SidebarAbleToShow.FILES)}
       >
         <div
           className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700"
@@ -70,7 +70,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
       </div>
       <div
         className=" flex items-center justify-center w-full h-8 cursor-pointer"
-        onClick={() => makeSidebarShow("chats")}
+        onClick={() => makeSidebarShow(SidebarAbleToShow.CHATS)}
       >
         <div
           className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700"
@@ -95,7 +95,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
       </div>
       <div
         className="flex items-center justify-center w-full h-8 cursor-pointer"
-        onClick={() => makeSidebarShow("search")}
+        onClick={() => makeSidebarShow(SidebarAbleToShow.SEARCH)}
       >
         <div
           className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700"
