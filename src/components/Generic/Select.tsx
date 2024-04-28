@@ -8,23 +8,21 @@ type OptionType = {
 
 type CustomSelectProps = {
   options: OptionType[];
-  value: string;
+  selectedValue: string;
   onChange: (value: string) => void;
-  onDelete?: (value: string) => void;
-  isLLMDropdown?: boolean;
   addButton?: {
     label: string;
     onClick: () => void;
   };
+  onDelete?: (value: string) => void;
 };
 
 const CustomSelect: React.FC<CustomSelectProps> = ({
   options,
-  value,
+  selectedValue,
   onChange,
   addButton,
-  onDelete = () => {},
-  isLLMDropdown = false,
+  onDelete,
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -52,8 +50,10 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   };
 
   const handleDeleteModelInDropdown = async (selectedModel: string) => {
-    onDelete(selectedModel);
-    setIsOpen(false);
+    if (onDelete) {
+      onDelete(selectedModel);
+      setIsOpen(false);
+    }
   };
 
   return (
@@ -62,7 +62,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         className="flex justify-between items-center w-full py-2 border border-gray-300 rounded-md bg-neutral-200 cursor-pointer"
         onClick={toggleDropdown}
       >
-        <span className="ml-2 text-[13px] text-gray-600">{value}</span>
+        <span className="ml-2 text-[13px] text-gray-600">{selectedValue}</span>
         <span
           className="transform transition-transform mr-2"
           style={{ transform: isOpen ? "rotate(180deg)" : "none" }}
@@ -83,9 +83,9 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
               >
                 {option.label}
               </span>
-              {value === option.value ? (
-                <span className="text-blue-500">&#10003;</span> // Tick mark
-              ) : isLLMDropdown ? (
+              {selectedValue === option.value ? (
+                <span className="text-blue-500">&#10003;</span>
+              ) : onDelete ? (
                 <span
                   onClick={() => handleDeleteModelInDropdown(option.value)}
                   className="ml-2 text-[13px] text-red-700"

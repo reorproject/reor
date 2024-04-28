@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import { FixedSizeList as List, ListChildComponentProps } from "react-window";
 import { isFileNodeDirectory } from "./fileOperations";
 import { FileItem } from "./FileItem";
+import RenameNoteModal from "../RenameNote";
+import RenameDirModal from "../RenameDirectory";
 
 interface FileListProps {
   files: FileInfoTree;
@@ -10,6 +12,11 @@ interface FileListProps {
   handleDirectoryToggle: (path: string) => void;
   selectedFilePath: string | null;
   onFileSelect: (path: string) => void;
+  renameFile: (oldFilePath: string, newFilePath: string) => Promise<void>;
+  noteToBeRenamed: string;
+  setNoteToBeRenamed: (note: string) => void;
+  fileDirToBeRenamed: string;
+  setFileDirToBeRenamed: (dir: string) => void;
   listHeight?: number;
 }
 
@@ -19,12 +26,35 @@ export const FileSidebar: React.FC<FileListProps> = ({
   handleDirectoryToggle,
   selectedFilePath,
   onFileSelect,
+  renameFile,
+  noteToBeRenamed,
+  setNoteToBeRenamed,
+  fileDirToBeRenamed,
+  setFileDirToBeRenamed,
   listHeight,
 }) => {
   return (
-    <div
-      className={`flex flex-col h-below-titlebar text-white overflow-x-hidden`}
-    >
+    <div className="flex flex-col h-below-titlebar text-white overflow-y-auto overflow-x-hidden">
+      {noteToBeRenamed && (
+        <RenameNoteModal
+          isOpen={!!noteToBeRenamed}
+          onClose={() => setNoteToBeRenamed("")}
+          fullNoteName={noteToBeRenamed}
+          renameNote={async ({ path, newNoteName }) => {
+            await renameFile(path, newNoteName);
+          }}
+        />
+      )}
+      {fileDirToBeRenamed && (
+        <RenameDirModal
+          isOpen={!!fileDirToBeRenamed}
+          onClose={() => setFileDirToBeRenamed("")}
+          fullDirName={fileDirToBeRenamed}
+          renameDir={async ({ path, newDirName: newNoteName }) => {
+            await renameFile(path, newNoteName);
+          }}
+        />
+      )}
       <FileExplorer
         files={files}
         selectedFilePath={selectedFilePath}

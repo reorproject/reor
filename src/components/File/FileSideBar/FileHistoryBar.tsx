@@ -1,6 +1,7 @@
 import { removeFileExtension } from "@/functions/strings";
 import React, { useState, useRef, useEffect } from "react";
-import { FaCircleChevronLeft, FaCircleChevronRight } from "react-icons/fa6";
+import { IoMdArrowRoundBack, IoMdArrowRoundForward } from "react-icons/io";
+
 import "./../../../styles/history.scss";
 
 interface FileHistoryNavigatorProps {
@@ -73,7 +74,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
     longPressTimer.current = setTimeout(() => {
       console.log(`${direction} holded 1 seconds.`);
       setShowMenu(direction);
-    }, 1000); // 1 seconds
+    }, 400);
   };
 
   const handleLongPressEnd = () => {
@@ -155,7 +156,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
         }}
         title="Back"
       >
-        <FaCircleChevronLeft title="Back" />
+        <IoMdArrowRoundBack title="Back" />
       </button>
       <button
         id="forward"
@@ -171,7 +172,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
         }}
         title="Forward"
       >
-        <FaCircleChevronRight title="Forward" />
+        <IoMdArrowRoundForward title="Forward" />
       </button>
       {handleHistoryContext(
         showMenu === "back" ? buttonRefBack : buttonRefForward

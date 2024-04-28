@@ -1,5 +1,6 @@
 import * as lancedb from "vectordb";
 import { Pipeline, PreTrainedTokenizer } from "@xenova/transformers";
+
 import path from "path";
 import { app } from "electron";
 import { errorToString } from "../Generic/error";
@@ -10,6 +11,8 @@ import {
 } from "../Store/storeConfig";
 import { splitDirectoryPathIntoBaseAndRepo } from "../Files/Filesystem";
 import { DownloadModelFilesFromHFRepo } from "../download/download";
+import removeMd from "remove-markdown";
+import { DBEntry } from "./Schema";
 
 export interface EnhancedEmbeddingFunction<T>
   extends lancedb.EmbeddingFunction<T> {
@@ -64,6 +67,7 @@ export async function createEmbeddingFunctionForLocalModel(
         `Pipeline initialization failed for repo ${errorToString(error)}`
       );
     }
+
   } catch (error) {
     console.error(`Resource initialization failed: ${errorToString(error)}`);
     throw new Error(`Resource initialization failed: ${errorToString(error)}`);
@@ -95,6 +99,8 @@ export async function createEmbeddingFunctionForRepo(
     repoName = embeddingModelConfig.repoName;
     env.allowRemoteModels = true;
     functionName = embeddingModelConfig.repoName;
+
+    console.log(repoName, env.cacheDir)
     try {
       pipe = (await pipeline("feature-extraction", repoName)) as Pipeline;
     } catch (error) {
@@ -112,6 +118,8 @@ export async function createEmbeddingFunctionForRepo(
   }
   const tokenize = setupTokenizeFunction(pipe.tokenizer);
   const embed = await setupEmbedFunction(pipe);
+
+  // sanitize the embedding text to remove markdown content
 
   return {
     name: functionName,
@@ -162,7 +170,7 @@ async function setupEmbedFunction(
     const result: number[][] = await Promise.all(
       batch.map(async (text) => {
         try {
-          const res = await pipe(text, {
+          const res = await pipe(removeMd(text as string), {
             pooling: "mean",
             normalize: true,
           });
@@ -177,4 +185,30 @@ async function setupEmbedFunction(
 
     return result;
   };
+}
+
+
+export const rerankSearchedEmbeddings = async (query: string, searchResults: DBEntry[]) => {
+
+  const { env, AutoModelForSequenceClassification, AutoTokenizer } = await import("@xenova/transformers");
+  env.cacheDir = path.join(app.getPath("userData"), "models", "reranker"); // set for all. Just to deal with library and remote inconsistencies
+
+  const tokenizer = await AutoTokenizer.from_pretrained('Xenova/bge-reranker-base')
+  const model = await AutoModelForSequenceClassification.from_pretrained('Xenova/bge-reranker-base')
+
+  const queries = Array(searchResults.length).fill(query)
+
+  const inputs = tokenizer(queries, { text_pair: searchResults.map(item => item.content), padding: true, truncation: true })
+
+  const scores = await model(inputs)
+  // map logits to searchResults by index
+  const resultsWithIndex = searchResults.map((item, index) => {
+    return {
+      ...item,
+      score: scores.logits.data[index]
+    }
+  });
+
+  // TODO: we should allow users to set threshold for sensitivity too.
+  return resultsWithIndex.sort((a, b) => b.score - a.score).filter(item => item.score > 0);
 }

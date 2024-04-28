@@ -39,7 +39,7 @@ const RagSettings: React.FC<RagSettingsProps> = ({ children }) => {
             label: num.toString(),
             value: num.toString(),
           }))}
-          value={noOfRAGExamples?.toString()}
+          selectedValue={noOfRAGExamples?.toString()}
           onChange={handleChangeOnModelSelect}
         />
       )}

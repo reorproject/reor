@@ -3,23 +3,28 @@ import { LLMSessionService } from "./Types";
 import { OpenAIModelSessionService } from "./models/OpenAI";
 import { LLMConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
-import {
-  ChatCompletionChunk,
-  ChatCompletionMessageParam,
-} from "openai/resources/chat/completions";
+import { ChatCompletionChunk } from "openai/resources/chat/completions";
 import { OllamaService } from "./models/Ollama";
 import {
   addOrUpdateLLMSchemaInStore,
   removeLLM,
   getAllLLMConfigs,
+  getLLMConfig,
 } from "./llmConfig";
 import { ProgressResponse } from "ollama";
+import {
+  sliceListOfStringsToContextLength,
+  sliceStringToContextLength,
+} from "./contextLimit";
+import { ChatHistory } from "@/components/Chat/Chat";
 
 export const LLMSessions: { [sessionId: string]: LLMSessionService } = {};
 
 export const openAISession = new OpenAIModelSessionService();
 
 export const ollamaService = new OllamaService();
+
+// This function takes a ChatMessageToDisplay object and returns a ChatCompletionMessageParam
 
 export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
   ipcMain.handle(
@@ -29,16 +34,17 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       llmName: string,
       llmConfig: LLMConfig,
       isJSONMode: boolean,
-      messageHistory: ChatCompletionMessageParam[]
+      chatHistory: ChatHistory
     ): Promise<void> => {
       const handleChunk = (chunk: ChatCompletionChunk) => {
-        event.sender.send("tokenStream", chunk);
+        event.sender.send("tokenStream", chatHistory.id, chunk);
       };
+
       await openAISession.streamingResponse(
         llmName,
         llmConfig,
         isJSONMode,
-        messageHistory,
+        chatHistory.displayableChatHistory,
         handleChunk,
         store.get(StoreKeys.LLMGenerationParameters)
       );
@@ -73,4 +79,40 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
     console.log("deleting local model", modelNameToDelete);
     await removeLLM(store, ollamaService, modelNameToDelete);
   });
+
+  ipcMain.handle(
+    "slice-list-of-strings-to-context-length",
+    async (event, strings: string[], llmName: string): Promise<string[]> => {
+      const llmSession = openAISession;
+      const llmConfig = await getLLMConfig(store, ollamaService, llmName);
+      console.log("llmConfig", llmConfig);
+      if (!llmConfig) {
+        throw new Error(`LLM ${llmName} not configured.`);
+      }
+
+      return sliceListOfStringsToContextLength(
+        strings,
+        llmSession.getTokenizer(llmName),
+        llmConfig.contextLength
+      );
+    }
+  );
+
+  ipcMain.handle(
+    "slice-string-to-context-length",
+    async (event, inputString: string, llmName: string): Promise<string> => {
+      const llmSession = openAISession;
+      const llmConfig = await getLLMConfig(store, ollamaService, llmName);
+      console.log("llmConfig", llmConfig);
+      if (!llmConfig) {
+        throw new Error(`LLM ${llmName} not configured.`);
+      }
+
+      return sliceStringToContextLength(
+        inputString,
+        llmSession.getTokenizer(llmName),
+        llmConfig.contextLength
+      );
+    }
+  );
 };

@@ -11,11 +11,15 @@ import {
   orchestrateEntryMove,
   createFileRecursive,
   isHidden,
+  GetFilesInfoListForListOfPaths,
   GetFilesInfoList,
   markdownExtensions,
 } from "./Filesystem";
 import * as fs from "fs";
-import { updateFileInTable } from "../database/TableHelperFunctions";
+import {
+  convertFileInfoListToDBItems,
+  updateFileInTable,
+} from "../database/TableHelperFunctions";
 import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
 import {
   PromptWithContextLimit,
@@ -25,6 +29,7 @@ import Store from "electron-store";
 import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import { getLLMConfig } from "../llm/llmConfig";
 import WindowsManager from "../windowManager";
+import { DBEntry } from "../database/Schema";
 import { addExtensionToFilenameIfNoExtensionPresent } from "../Generic/path";
 
 export const registerFileHandlers = (
@@ -243,6 +248,21 @@ export const registerFileHandlers = (
       }
     }
   );
+
+  ipcMain.handle(
+    "get-filesystem-paths-as-db-items",
+    async (_event, filePaths: string[]): Promise<DBEntry[]> => {
+      try {
+        const fileItems = GetFilesInfoListForListOfPaths(filePaths);
+        console.log("fileItems", fileItems);
+        const dbItems = await convertFileInfoListToDBItems(fileItems);
+        console.log("dbItems", dbItems);
+        return dbItems.flat();
+      } catch (error) {
+        console.error("Error searching database:", error);
+        throw error;
+      }
+    });
 
   ipcMain.handle(
     "generate-flashcards-from-file",

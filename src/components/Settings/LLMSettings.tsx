@@ -5,6 +5,7 @@ import { Button } from "@material-tailwind/react";
 import OpenAISetupModal from "./ExtraModals/OpenAISetup";
 import RemoteLLMSetupModal from "./ExtraModals/RemoteLLMSetup";
 import NewOllamaModelModal from "./ExtraModals/NewOllamaModel";
+import DefaultLLMSelector from "./DefaultLLMSelector";
 
 interface LLMSettingsProps {
   userHasCompleted?: (completed: boolean) => void;
@@ -75,10 +76,10 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
     window.llm.setDefaultLLM(selectedModel);
   };
 
-  const handleDeleteModel = async (modelToDelete: string) => {
-    await window.llm.removeLLM(modelToDelete);
-    fetchAndUpdateModelConfigs();
-  };
+  // const handleDeleteModel = async (modelToDelete: string) => {
+  //   await window.llm.removeLLM(modelToDelete);
+  //   fetchAndUpdateModelConfigs();
+  // };
 
   const modelOptions = llmConfigs.map((config) => {
     return {
@@ -86,7 +87,17 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
       value: config.modelName,
     };
   });
-  console.log("modelOptions: ", modelOptions);
+
+  const handleModelChange = (model: string) => {
+    setUserMadeChanges(true);
+    userHasCompleted?.(!!model);
+  };
+
+  const handleModelError = (error: string) => {
+    setCurrentError(error);
+    userHasCompleted?.(false);
+  };
+
   return (
     <div className="w-full bg-neutral-800 rounded">
       {isInitialSetup ? (
@@ -122,7 +133,7 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
               <div className="w-full mb-1">
                 <CustomSelect
                   options={modelOptions}
-                  value={defaultModel}
+                  selectedValue={defaultModel}
                   onChange={handleDefaultModelChange}
                 />
               </div>
@@ -136,12 +147,9 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
             <div>
               <h4 className="text-gray-100 mb-1">Default LLM:</h4>
               <div className="w-full mb-1">
-                <CustomSelect
-                  isLLMDropdown={true}
-                  options={modelOptions}
-                  value={defaultModel}
-                  onChange={handleDefaultModelChange}
-                  onDelete={handleDeleteModel}
+                <DefaultLLMSelector
+                  onModelChange={handleModelChange}
+                  onModelError={handleModelError}
                 />
               </div>
             </div>
@@ -156,14 +164,6 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
             >
               Add New Local LLM
             </Button>
-            {/* <Button
-              className="bg-slate-700  border-none h-8 hover:bg-slate-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
-
-              onClick={() => setIsContextLengthModalOpen(true)}
-              placeholder={""}
-            >
-              Context Length Settings
-            </Button> */}
           </div>
           <h4 className="text-gray-100 mb-0">Setup remote LLMs:</h4>
           <div className="flex">
@@ -197,13 +197,6 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
           setIsRemoteLLMModalOpen(false);
         }}
       />
-      {/* <ContextLengthModal
-        isOpen={isConextLengthModalOpen}
-        onClose={() => {
-          setIsContextLengthModalOpen(false);
-        }}
-        modelConfigs={llmConfigs}
-      /> */}
       <OpenAISetupModal
         isOpen={isOpenAIModelModalOpen}
         onClose={() => {

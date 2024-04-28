@@ -6,7 +6,7 @@ interface Props {
   onClick?: () => void;
 }
 
-export const ChatPrompt: FC<Props> = ({ promptText, onClick }: Props) => {
+export const PromptSuggestion: FC<Props> = ({ promptText, onClick }: Props) => {
   return (
     <button
       className={`

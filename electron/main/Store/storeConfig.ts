@@ -1,3 +1,5 @@
+import { ChatHistory } from "@/components/Chat/Chat";
+
 export interface BaseLLMConfig {
   modelName: string;
   contextLength: number;
@@ -56,6 +58,9 @@ export interface StoreSchema {
   RAG?: RAGConfig;
   hardware: HardwareConfig;
   llmGenerationParameters: LLMGenerationParameters;
+  chatHistories: {
+    [vaultDir: string]: ChatHistory[];
+  };
 }
 
 export enum StoreKeys {
@@ -69,4 +74,5 @@ export enum StoreKeys {
   MaxRAGExamples = "RAG.maxRAGExamples",
   Hardware = "hardware",
   LLMGenerationParameters = "llmGenerationParameters",
+  ChatHistories = "chatHistories",
 }
