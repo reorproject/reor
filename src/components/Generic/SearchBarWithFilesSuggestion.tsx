@@ -1,6 +1,5 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useRef } from "react";
 import { useFileInfoTree } from "../File/FileSideBar/hooks/use-file-info-tree";
-import { useFileByFilepath } from "../File/hooks/use-file-by-filepath";
 import FilesSuggestionsDisplay, { SuggestionsState } from "../Editor/FilesSuggestionsDisplay";
 
 interface Props {
@@ -11,7 +10,7 @@ interface Props {
     setSelectedFile: (file: string) => void;
     onSelectSuggestion: (suggestion: string) => void;
     suggestionsState: SuggestionsState | null;
-    setSuggestionsState: (state: SuggestionsState) => void;
+    setSuggestionsState: (state: SuggestionsState | null) => void;
     maxSuggestionWidth?: string;
 }
 
@@ -62,6 +61,7 @@ export const SearchBarWithFilesSuggestion = ({
             setSearchText(e.target.value)
             if (e.target.value.length == 0) {
               setSelectedFile('')
+              onSelectSuggestion('')
             }
           }}
           placeholder="Search for the files by name"

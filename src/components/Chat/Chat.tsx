@@ -292,7 +292,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       if (!currentModelConfig) {
         throw new Error(`No model config found for model: ${defaultLLMName}`);
       }
-
+      setLoadingResponse(true);
       await window.llm.streamingLLMResponse(
         defaultLLMName,
         currentModelConfig,
@@ -383,7 +383,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     <div className="flex items-center justify-center w-full h-full">
       <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid">
         <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
-          <div className="space-y-2 mt-4 flex-grow">
+          <div className="space-y-2 ml-4 mr-4 mt-4 flex-grow">
             {currentChatHistory?.displayableChatHistory.map(
               (message, index) => (
                 <ReactMarkdown
@@ -393,8 +393,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                     message.messageType === "error"
                       ? "bg-red-100 text-red-800"
                       : message.role === "assistant"
-                      ? "bg-blue-100 text-blue-800"
-                      : "bg-green-100 text-green-800"
+                      ? "bg-neutral-600	text-gray-200"
+                      : "bg-blue-100	text-blue-800"
                   } `}
                 >
                   {message.visibleContent
