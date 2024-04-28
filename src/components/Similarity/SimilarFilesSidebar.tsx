@@ -35,7 +35,12 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
   }, [filePath]);
   const handleNewFileOpen = async (path: string) => {
     try {
-      const searchResults = await performSearchOnFile(path, isRefined);
+      const sanitizedText = await getChunkForInitialSearchFromFile(path);
+      if (!sanitizedText) {
+        return;
+      }
+      const searchResults = await performSearchOnChunk(sanitizedText, path, isRefined);
+
       if (searchResults.length > 0) {
         setSimilarEntries(searchResults);
       } else {
@@ -46,31 +51,39 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
     }
   };
 
-  const performSearchOnFile = async (
-    filePath: string,
+
+  const getChunkForInitialSearchFromFile = async (filePath: string) => {
+    // TODO: proper semantic chunking - current quick win is just to take top 500 characters
+    const fileContent: string = await window.files.readFile(filePath);
+    if (!fileContent) {
+      return undefined;
+    }
+    const sanitizedText = removeMd(fileContent.slice(0, 500));
+    return sanitizedText;
+  };
+
+
+  const performSearchOnChunk = async (
+    sanitizedText: string,
+    fileToBeExcluded: string,
     withReranking = false
   ): Promise<DBQueryResult[]> => {
     try {
-      const fileContent: string = await window.files.readFile(filePath);
-      // TODO: proper semantic chunking here...current quick win is just to take top 500 characters
-      if (!fileContent) {
-        return [];
-      }
-      const sanitizedText = removeMd(fileContent.slice(0, 500));
-
       const databaseFields = await window.database.getDatabaseFields();
-      const filterString = `${databaseFields.NOTE_PATH} != '${filePath}'`;
+      const filterString = `${databaseFields.NOTE_PATH} != '${fileToBeExcluded}'`;
 
       setIsLoadingSimilarEntries(true);
-      const searchResults: DBQueryResult[] = withReranking ? await window.database.searchWithReranking(
-        sanitizedText,
-        20,
-        filterString,
-      ) : await window.database.search(
-        sanitizedText,
-        20,
-        filterString
-      );
+      const searchResults: DBQueryResult[] = withReranking ?
+        await window.database.searchWithReranking(
+          sanitizedText,
+          20,
+          filterString,
+        ) : await window.database.search(
+          sanitizedText,
+          20,
+          filterString
+        );
+
       setIsLoadingSimilarEntries(false);
       return searchResults;
     } catch (error) {
@@ -86,7 +99,14 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
   };
 
   const updateSimilarEntries = async (isRefined?: boolean) => {
-    const searchResults = await performSearchOnFile(filePath, isRefined);
+    const sanitizedText = await getChunkForInitialSearchFromFile(filePath);
+
+    if (!sanitizedText) {
+      toast.error(`Error: Could not get chunk for search ${filePath}`);
+      return
+    }
+
+    const searchResults = await performSearchOnChunk(sanitizedText, filePath, isRefined);
     setSimilarEntries(searchResults);
   };
 
