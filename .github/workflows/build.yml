@@ -15,8 +15,8 @@ jobs:
         include:
           - os: macos-latest
             # arch: x64
-          - os: macos-latest-xlarge
-            arch: arm64
+          # - os: macos-latest-xlarge
+          #   arch: arm64
           - os: windows-latest
           - os: ubuntu-latest
             arch: x64
