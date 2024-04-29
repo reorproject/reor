@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useEditor, Editor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import TaskItem from "@tiptap/extension-task-item";
@@ -20,10 +21,6 @@ import HighlightExtension, {
 } from "@/components/Editor/HighlightExtension";
 import { toast } from "react-toastify";
 import { RichTextLink } from "@/components/Editor/RichTextLink";
-import HardBreak from "@tiptap/extension-hard-break";
-import BulletList from "@tiptap/extension-bullet-list";
-import ListItem from "@tiptap/extension-list-item";
-import OrderedList from "@tiptap/extension-ordered-list";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
@@ -121,16 +118,14 @@ export const useFileByFilepath = () => {
       },
     },
     extensions: [
+      StarterKit,
       Document,
       Paragraph,
       Text,
       TaskList,
-      OrderedList,
-      BulletList,
-      ListItem,
       Markdown.configure({
         html: true, // Allow HTML input/output
-        tightLists: false, // No <p> inside <li> in markdown output
+        tightLists: true, // No <p> inside <li> in markdown output
         tightListClass: "tight", // Add class to <ul> allowing you to remove <p> margins when tight
         bulletListMarker: "-", // <li> prefix in markdown output
         linkify: true, // Create links from "https://..." text
@@ -138,7 +133,6 @@ export const useFileByFilepath = () => {
         transformPastedText: true, // Allow to paste markdown text in the editor
         transformCopiedText: true, // Copied text is transformed to markdown
       }),
-      HardBreak,
       TaskItem.configure({
         nested: true,
       }),
