@@ -1,7 +1,7 @@
 import { Extension } from "@tiptap/core";
 import { Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
-import { SuggestionsState } from "./FilesSuggestionsDisplay";
+import { SuggestionsState } from "./BacklinkSuggestionsDisplay";
 
 const backlinkPlugin = (
   openRelativePathRef: React.MutableRefObject<

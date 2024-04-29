@@ -14,7 +14,7 @@ import {
   getInvalidCharacterInFilePath,
   removeFileExtension,
 } from "@/functions/strings";
-import { SuggestionsState } from "@/components/Editor/FilesSuggestionsDisplay";
+import { SuggestionsState } from "@/components/Editor/BacklinkSuggestionsDisplay";
 import HighlightExtension, {
   HighlightData,
 } from "@/components/Editor/HighlightExtension";
@@ -30,7 +30,7 @@ export const useFileByFilepath = () => {
     string | null
   >(null);
   const [suggestionsState, setSuggestionsState] =
-    useState<SuggestionsState | null>(null);
+    useState<SuggestionsState | null>();
   const [needToWriteEditorContentToDisk, setNeedToWriteEditorContentToDisk] =
     useState<boolean>(false);
   const [needToIndexEditorContent, setNeedToIndexEditorContent] =
@@ -296,7 +296,6 @@ export const useFileByFilepath = () => {
       removeWindowCloseListener();
     };
   }, [currentlyOpenedFilePath, editor]);
-
 
   return {
     filePath: currentlyOpenedFilePath,
