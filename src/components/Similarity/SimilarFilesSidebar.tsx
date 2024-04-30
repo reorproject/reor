@@ -163,7 +163,6 @@ interface SimilarEntriesComponentProps {
   updateSimilarEntries?: (isRefined?: boolean) => Promise<void>;
   titleText: string;
   isLoadingSimilarEntries: boolean;
-  EmptyStateComponent?: React.ReactNode;
 }
 
 export const SimilarEntriesComponent: React.FC<
@@ -179,7 +178,6 @@ export const SimilarEntriesComponent: React.FC<
   updateSimilarEntries,
   titleText,
   isLoadingSimilarEntries,
-  EmptyStateComponent,
 }) => {
   return (
     <div>
@@ -228,9 +226,9 @@ export const SimilarEntriesComponent: React.FC<
                 onClick={() => {
                   setIsRefined(!isRefined);
                   updateSimilarEntries(!isRefined);
-                 }}
-                 >
-                {isRefined ? "Un-rerank" : "Rerank results"}
+                }}
+              >
+                {isRefined ? "Unrefine" : "Refine results"}
               </button>
             )}
           </div>
@@ -250,9 +248,9 @@ export const SimilarEntriesComponent: React.FC<
             </div>
           )}
           {similarEntries.length === 0 && !isLoadingSimilarEntries && (
-            <div className="flex flex-col items-center h-full">
+            <div className="flex flex-col items-center justify-center h-full w-full">
               <p className="flex justify-center items-center text-gray-500 text-lg mx-auto text-center">
-                {EmptyStateComponent? EmptyStateComponent : <>No items found</>}
+                <>No items found</>
               </p>
             </div>
           )}

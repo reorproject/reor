@@ -21,12 +21,11 @@ import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import ChatInput from "./ChatInput";
 import {
   ChatHistoryMetadata,
-  getChatHistoryContext,
   getDisplayableChatName,
 } from "./hooks/use-chat-history";
+import { useDebounce } from "use-debounce";
 import { SimilarEntriesComponent } from "../Similarity/SimilarFilesSidebar";
-import { useFileByFilepath } from "../File/hooks/use-file-by-filepath";
-import AddContextFiltersModal from "./AddContextFiltersModal";
+import ResizableComponent from "../Generic/ResizableComponent";
 
 // convert ask options to enum
 enum AskOptions {
@@ -131,8 +130,7 @@ export const resolveRAGContext = async (
   query: string,
   chatFilters: ChatFilters
 ): Promise<ChatMessageToDisplay> => {
-  // I mean like the only real places to get context from are like
-  // particular files or semantic search or full text search.
+  // I mean like the only real places to get context from are like particular files or semantic search or full text search.
   // and like it could be like that if a file is here
 
   let results: DBEntry[] = [];
@@ -157,9 +155,8 @@ export const resolveRAGContext = async (
 };
 
 interface ChatWithLLMProps {
-  vaultDirectory: string;
   openFileByPath: (path: string) => Promise<void>;
-  // filePath: string | null;
+
   setChatHistoriesMetadata: React.Dispatch<
     React.SetStateAction<ChatHistoryMetadata[]>
   >;
@@ -168,52 +165,28 @@ interface ChatWithLLMProps {
   setCurrentChatHistory: React.Dispatch<
     React.SetStateAction<ChatHistory | undefined>
   >;
-  currentChatContext: DBQueryResult[];
-  setCurrentChatContext: React.Dispatch<React.SetStateAction<DBQueryResult[]>>;
   showSimilarFiles: boolean;
-  chatFilters: ChatFilters;
-  setChatFilters: React.Dispatch<React.SetStateAction<ChatFilters>>;
-  filePath: string | null;
-  setFilePath: (filePath: string) => Promise<void>;
 }
 
 const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
-  vaultDirectory,
   openFileByPath,
-  filePath,
-  setFilePath,
+
   setChatHistoriesMetadata,
   currentChatHistory,
   setCurrentChatHistory,
-  currentChatContext,
   showSimilarFiles,
-  chatFilters,
-  setChatFilters,
 }) => {
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>("");
   const [askText, setAskText] = useState<AskOptions>(AskOptions.Ask);
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
+  const [chatFilters, setChatFilters] = useState<ChatFilters>();
   const [readyToSave, setReadyToSave] = useState<boolean>(false);
+  const [currentContext, setCurrentContext] = useState<DBQueryResult[]>([]);
 
-  const [isAddContextFiltersModalOpen, setIsAddContextFiltersModalOpen] = useState<boolean>(false);
-  const { suggestionsState, setSuggestionsState } = useFileByFilepath();
-
-  const [searchText, setSearchText] = useState<string>("");
-  // const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleSelectSuggestion = async (suggestion: string) => {
-      const suggestionWithExtension =
-        await window.path.addExtensionIfNoExtensionPresent(suggestion);
-      console.log(suggestionWithExtension);
-      setSearchText(suggestionWithExtension);
-
-      //also should set the chat context using the file selected into the chat context and chat history
-      // this enables our chat context side bar to be able to see the context from the file
-      setFilePath(suggestionWithExtension);
-
-      setSuggestionsState(null);
-  }
-
+  useEffect(() => {
+    const context = getChatHistoryContext(currentChatHistory);
+    setCurrentContext(context);
+  }, [currentChatHistory]);
 
   useEffect(() => {
     if (readyToSave && currentChatHistory) {
@@ -251,8 +224,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           chatHistory.displayableChatHistory.push(
             await resolveRAGContext(userTextFieldInput, chatFilters)
           );
-          console.log("chatHistory.displayableChatHistory")
-          console.log(chatHistory.displayableChatHistory)
         }
       } else {
         chatHistory.displayableChatHistory.push({
@@ -300,7 +271,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       if (!currentModelConfig) {
         throw new Error(`No model config found for model: ${defaultLLMName}`);
       }
-      setLoadingResponse(true);
+
       await window.llm.streamingLLMResponse(
         defaultLLMName,
         currentModelConfig,
@@ -391,7 +362,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     <div className="flex items-center justify-center w-full h-full">
       <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid">
         <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
-          <div className="space-y-2 ml-4 mr-4 mt-4 flex-grow">
+          <div className="space-y-2 mt-4 flex-grow">
             {currentChatHistory?.displayableChatHistory
               .filter((msg) => msg.role !== "system")
               .map((message, index) => (
@@ -402,8 +373,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                     message.messageType === "error"
                       ? "bg-red-100 text-red-800"
                       : message.role === "assistant"
-                      ? "bg-neutral-600	text-gray-200"
-                      : "bg-blue-100	text-blue-800"
+                      ? "bg-blue-100 text-blue-800"
+                      : "bg-green-100 text-green-800"
                   } `}
                 >
                   {message.visibleContent
@@ -412,40 +383,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                 </ReactMarkdown>
               ))}
           </div>
-          {
-            (!currentChatHistory || currentChatHistory?.displayableChatHistory.length == 0) && (
-              <>
-                <div className="flex items-center justify-center text-gray-300 text-sm">
-                  Start a conversation with your notes by typing a message below.
-                </div>
-                <div className="flex items-center justify-center text-gray-300 text-sm">
-                  <button className='bg-slate-600 m-2 rounded-lg border-none h-6 w-40 text-center vertical-align text-white '
-                      onClick={() => {
-                        setIsAddContextFiltersModalOpen(true)
-                    }}>
-                  {filePath ? "Update filters" : "Add filters"}
-                  </button>
-                </div>
-              </>
-            )
-          }
-
-          {isAddContextFiltersModalOpen && <AddContextFiltersModal
-            vaultDirectory={vaultDirectory}
-            isOpen={isAddContextFiltersModalOpen} onClose={() => setIsAddContextFiltersModalOpen(false)}
-            titleText="You can optionally include a file into chat context"
-            searchText={searchText}
-            setSearchText={setSearchText}
-            selectedFile={filePath}
-            setSelectedFile={setFilePath}
-            onSelectSuggestion={handleSelectSuggestion}
-            setSuggestionState={setSuggestionsState}
-            suggestionsState={suggestionsState}
-            setSuggestionsState={setSuggestionsState}
-            maxSuggestionWidth="w-[900px]"
-            />}
-          {userTextFieldInput === "" && (!currentChatHistory ||
-          currentChatHistory?.displayableChatHistory.length == 0) ? (
+          {userTextFieldInput === "" &&
+          currentChatHistory?.displayableChatHistory.length == 0 ? (
             <>
               {EXAMPLE_PROMPTS[askText].map((option, index) => {
                 return (
@@ -475,7 +414,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       </div>
       {showSimilarFiles && (
         <SimilarEntriesComponent
-          similarEntries={currentChatContext}
+          similarEntries={currentContext}
           titleText="Context Used in Chat"
           onFileSelect={openFileByPath}
           saveCurrentFile={() => {
@@ -484,11 +423,24 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           isLoadingSimilarEntries={false}
           setIsRefined={() => {}} // to allow future toggling
           isRefined={true} // always refined for now
-          // EmptyStateComponent={FileSearchBar}
         />
       )}
     </div>
   );
+};
+
+const getChatHistoryContext = (
+  chatHistory: ChatHistory | undefined
+): DBQueryResult[] => {
+  if (!chatHistory) return [];
+  console.log("chatHistory", chatHistory.displayableChatHistory);
+
+  const contextForChat = chatHistory.displayableChatHistory
+    .map((message) => {
+      return message.context;
+    })
+    .flat();
+  return contextForChat as DBQueryResult[];
 };
 
 export default ChatWithLLM;

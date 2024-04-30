@@ -50,7 +50,7 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
         )}
 
         <Button
-          className="bg-slate-600 border-none h-20 w-96 text-center
+          className="bg-slate-900/75 border-none h-20 w-96 text-center
             mt-4 mr-16
             cursor-pointer
             disabled:pointer-events-none
