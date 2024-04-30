@@ -200,12 +200,12 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
   // update chat context when files are added
   useEffect(() => {
-
     const setContextOnFileAdded = async () => {
       if (chatFilters.files.length > 0) {
         const results = await window.files.getFilesystemPathsAsDBItems(chatFilters.files);
         setCurrentContext(results as DBQueryResult[]);
-      } else {
+      } else if (!currentChatHistory?.id) {
+        // if there is no prior history, set current context to empty
         setCurrentContext([]);
       }
     }

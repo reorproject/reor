@@ -179,6 +179,7 @@ export const SimilarEntriesComponent: React.FC<
   titleText,
   isLoadingSimilarEntries,
 }) => {
+
   return (
     <div>
       <ResizableComponent resizeSide="left" initialWidth={300}>

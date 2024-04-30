@@ -66,6 +66,15 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     numberOfChunksToFetch: 15,
   });
 
+  const handleAddFileToChatFilters = (file: string) => {
+    setSidebarShowing("chats");
+    setShowChatbot(true);
+    setCurrentChatHistory(undefined);
+    setChatFilters({
+      ...chatFilters,
+      files: [...chatFilters.files, file]});
+  }
+
   // find all available files
   useEffect(() => {
     const setFileDirectory = async () => {
@@ -80,12 +89,8 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     const removeAddChatToFileListener = window.ipcRenderer.receive(
       "add-file-to-chat-listener",
       (noteName: string) => {
-        setSidebarShowing("chats");
-        setCurrentChatHistory(undefined);
-        setChatFilters({
-        ...chatFilters,
-        files: [...chatFilters.files, noteName],
-      })}
+        handleAddFileToChatFilters(noteName);
+      }
     );
 
     return () => {
