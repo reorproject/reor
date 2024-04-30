@@ -390,7 +390,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     <div className="flex items-center justify-center w-full h-full">
       <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid">
         <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
-          <div className="space-y-2 ml-4 mr-4 flex-grow">
+          <div className="space-y-2 mt-2 ml-4 mr-4 flex-grow">
             {currentChatHistory?.displayableChatHistory
               .filter((msg) => msg.role !== "system")
               .map((message, index) => (
