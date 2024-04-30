@@ -129,7 +129,7 @@ export type ChatTemplate = {
 
 export const resolveRAGContext = async (
   query: string,
-  chatFilters: ChatFilters
+  chatFilters: ChatFilters,
 ): Promise<ChatMessageToDisplay> => {
   // I mean like the only real places to get context from are like particular files or semantic search or full text search.
   // and like it could be like that if a file is here
@@ -197,6 +197,20 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     const context = getChatHistoryContext(currentChatHistory);
     setCurrentContext(context);
   }, [currentChatHistory]);
+
+  // update chat context when files are added
+  useEffect(() => {
+
+    const setContextOnFileAdded = async () => {
+      if (chatFilters.files.length > 0) {
+        const results = await window.files.getFilesystemPathsAsDBItems(chatFilters.files);
+        setCurrentContext(results as DBQueryResult[]);
+      } else {
+        setCurrentContext([]);
+      }
+    }
+    setContextOnFileAdded();
+  }, [chatFilters.files]);
 
   useEffect(() => {
     if (readyToSave && currentChatHistory) {

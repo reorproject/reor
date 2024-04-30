@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 
 import Modal from "../Generic/Modal";
-import { Avatar, Button, List, ListItem } from "@material-tailwind/react";
+import { Button, List, ListItem } from "@material-tailwind/react";
 import { SearchBarWithFilesSuggestion } from "../Generic/SearchBarWithFilesSuggestion";
 import { SuggestionsState } from "../Editor/FilesSuggestionsDisplay";
 import { ChatFilters } from "./Chat";
-import { ListItemAvatar, ListItemIcon, ListItemText } from "@mui/material";
+import { ListItemIcon, ListItemText } from "@mui/material";
 import FolderIcon from '@mui/icons-material/Folder';
 
 interface Props {

@@ -228,7 +228,7 @@ export const SimilarEntriesComponent: React.FC<
                   updateSimilarEntries(!isRefined);
                 }}
               >
-                {isRefined ? "Unrefine" : "Refine results"}
+                {isRefined ? "Un-rerank" : "Rerank results"}
               </button>
             )}
           </div>

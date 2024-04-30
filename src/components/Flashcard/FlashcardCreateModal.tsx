@@ -164,7 +164,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
         <div className="flex justify-end">
           {selectedFile && (
             <Button
-              className="bg-slate-900/75 border-none h-20 w-96 text-center vertical-align
+              className="bg-slate-600 border-none h-20 w-96 text-center vertical-align text-white
             mt-4 mr-16
             cursor-pointer
             disabled:pointer-events-none

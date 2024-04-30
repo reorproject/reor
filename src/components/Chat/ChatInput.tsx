@@ -1,7 +1,6 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { CircularProgress } from "@mui/material";
 import Textarea from "@mui/joy/Textarea";
-import { ChatFilters } from "./Chat";
 interface ChatInputProps {
   userTextFieldInput: string;
   setUserTextFieldInput: (value: string) => void;
