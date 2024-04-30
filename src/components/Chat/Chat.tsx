@@ -129,7 +129,7 @@ export type ChatTemplate = {
 
 export const resolveRAGContext = async (
   query: string,
-  chatFilters: ChatFilters,
+  chatFilters: ChatFilters
 ): Promise<ChatMessageToDisplay> => {
   // I mean like the only real places to get context from are like particular files or semantic search or full text search.
   // and like it could be like that if a file is here
@@ -144,7 +144,7 @@ export const resolveRAGContext = async (
       chatFilters.numberOfChunksToFetch
     );
   }
-  console.log("results", results)
+  console.log("results", results);
   return {
     messageType: "success",
     role: "user",
@@ -188,7 +188,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
   const [readyToSave, setReadyToSave] = useState<boolean>(false);
   const [currentContext, setCurrentContext] = useState<DBQueryResult[]>([]);
-  const [isAddContextFiltersModalOpen, setIsAddContextFiltersModalOpen] = useState<boolean>(false);
+  const [isAddContextFiltersModalOpen, setIsAddContextFiltersModalOpen] =
+    useState<boolean>(false);
 
   // chat filters related state: this is the only thing that the Chat component cares about
   // chat component doesn't care about previous states and suggestions, and it can reset it
@@ -202,13 +203,15 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   useEffect(() => {
     const setContextOnFileAdded = async () => {
       if (chatFilters.files.length > 0) {
-        const results = await window.files.getFilesystemPathsAsDBItems(chatFilters.files);
+        const results = await window.files.getFilesystemPathsAsDBItems(
+          chatFilters.files
+        );
         setCurrentContext(results as DBQueryResult[]);
       } else if (!currentChatHistory?.id) {
         // if there is no prior history, set current context to empty
         setCurrentContext([]);
       }
-    }
+    };
     setContextOnFileAdded();
   }, [chatFilters.files]);
 
@@ -234,7 +237,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           displayableChatHistory: [],
         };
       }
-      console.log(chatFilters)
+      console.log(chatFilters);
       if (chatHistory.displayableChatHistory.length === 0) {
         if (chatFilters) {
           // chatHistory.displayableChatHistory.push({
@@ -257,7 +260,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           context: [],
         });
       }
-      console.log(chatHistory)
+      console.log(chatHistory);
 
       setUserTextFieldInput("");
 
@@ -408,31 +411,37 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                 </ReactMarkdown>
               ))}
           </div>
-          {
-            (!currentChatHistory || currentChatHistory?.displayableChatHistory.length == 0) && (
-              <>
-                <div className="flex items-center justify-center text-gray-300 text-sm">
-                  Start a conversation with your notes by typing a message below.
-                </div>
-                <div className="flex items-center justify-center text-gray-300 text-sm">
-                  <button className='bg-slate-600 m-2 rounded-lg border-none h-6 w-40 text-center vertical-align text-white '
-                      onClick={() => {
-                        setIsAddContextFiltersModalOpen(true)
-                    }}>
-                  {chatFilters.files.length > 0 ? "Update filters" : "Add filters"}
-                  </button>
-                </div>
-              </>
-            )
-          }
-          {isAddContextFiltersModalOpen && <AddContextFiltersModal
+          {(!currentChatHistory ||
+            currentChatHistory?.displayableChatHistory.length == 0) && (
+            <>
+              <div className="flex items-center justify-center text-gray-300 text-sm">
+                Start a conversation with your notes by typing a message below.
+              </div>
+              <div className="flex items-center justify-center text-gray-300 text-sm">
+                <button
+                  className="bg-slate-600 m-2 rounded-lg border-none h-6 w-40 text-center vertical-align text-white "
+                  onClick={() => {
+                    setIsAddContextFiltersModalOpen(true);
+                  }}
+                >
+                  {chatFilters.files.length > 0
+                    ? "Update filters"
+                    : "Add filters"}
+                </button>
+              </div>
+            </>
+          )}
+          {isAddContextFiltersModalOpen && (
+            <AddContextFiltersModal
               vaultDirectory={vaultDirectory}
-              isOpen={isAddContextFiltersModalOpen} onClose={() => setIsAddContextFiltersModalOpen(false)}
+              isOpen={isAddContextFiltersModalOpen}
+              onClose={() => setIsAddContextFiltersModalOpen(false)}
               titleText="You can optionally include a file into chat context"
               chatFilters={chatFilters}
               setChatFilters={setChatFilters}
               maxSuggestionWidth="w-[900px]"
-            />}
+            />
+          )}
           {userTextFieldInput === "" &&
           currentChatHistory?.displayableChatHistory.length == 0 ? (
             <>

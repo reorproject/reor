@@ -6,7 +6,7 @@ import { SearchBarWithFilesSuggestion } from "../Generic/SearchBarWithFilesSugge
 import { SuggestionsState } from "../Editor/FilesSuggestionsDisplay";
 import { ChatFilters } from "./Chat";
 import { ListItemIcon, ListItemText } from "@mui/material";
-import FolderIcon from '@mui/icons-material/Folder';
+import FolderIcon from "@mui/icons-material/Folder";
 
 interface Props {
   isOpen: boolean;
@@ -27,22 +27,24 @@ const AddContextFiltersModal: React.FC<Props> = ({
   setChatFilters,
   maxSuggestionWidth,
 }) => {
-  const [internalFilesSelected, setInternalFilesSelected] = useState<string []>(chatFilters?.files || []);
+  const [internalFilesSelected, setInternalFilesSelected] = useState<string[]>(
+    chatFilters?.files || []
+  );
   const [searchText, setSearchText] = useState<string>("");
-  const [suggestionsState, setSuggestionsState] = useState<SuggestionsState | null>(null);
-
+  const [suggestionsState, setSuggestionsState] =
+    useState<SuggestionsState | null>(null);
 
   const handleAddFilesToChatFilters = (files: string[]) => {
-      const currentChatFilters: ChatFilters = chatFilters ?
-      {
-        ...chatFilters,
-        files: [...chatFilters.files, ...files],
-      } :
-      {
-        numberOfChunksToFetch: 15,
-        files: [...files],
-      };
-      setChatFilters(currentChatFilters);
+    const currentChatFilters: ChatFilters = chatFilters
+      ? {
+          ...chatFilters,
+          files: [...chatFilters.files, ...files],
+        }
+      : {
+          numberOfChunksToFetch: 15,
+          files: [...files],
+        };
+    setChatFilters(currentChatFilters);
   };
 
   return (
@@ -56,29 +58,30 @@ const AddContextFiltersModal: React.FC<Props> = ({
           onSelectSuggestion={(file: string) => {
             if (!internalFilesSelected.includes(file)) {
               //TODO: add markdown extension properly
-              setInternalFilesSelected([...internalFilesSelected, file + ".md"]);
+              setInternalFilesSelected([
+                ...internalFilesSelected,
+                file + ".md",
+              ]);
             }
             setSuggestionsState(null);
           }}
           suggestionsState={suggestionsState}
           setSuggestionsState={setSuggestionsState}
           maxSuggestionWidth={maxSuggestionWidth}
-          />
+        />
         <div className="text-white">
-            <List placeholder=''>
-              {internalFilesSelected.map((fileItem, index) => {
-                return (
-                  <ListItem key={index} placeholder=''>
-                    <ListItemIcon>
-                      <FolderIcon color="primary" />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={fileItem}
-                    />
-                  </ListItem>
-                );
-              })}
-              </List>
+          <List placeholder="">
+            {internalFilesSelected.map((fileItem, index) => {
+              return (
+                <ListItem key={index} placeholder="">
+                  <ListItemIcon>
+                    <FolderIcon color="primary" />
+                  </ListItemIcon>
+                  <ListItemText primary={fileItem} />
+                </ListItem>
+              );
+            })}
+          </List>
         </div>
         <div className="flex justify-end">
           {internalFilesSelected && (
@@ -89,7 +92,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
                 disabled:pointer-events-none
                 disabled:opacity-25"
               onClick={() => {
-                handleAddFilesToChatFilters(internalFilesSelected)
+                handleAddFilesToChatFilters(internalFilesSelected);
                 onClose();
               }}
               placeholder={""}
@@ -99,9 +102,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
               </div>
             </Button>
           )}
-
         </div>
-
       </div>
     </Modal>
   );

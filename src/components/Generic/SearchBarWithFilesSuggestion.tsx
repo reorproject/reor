@@ -1,16 +1,18 @@
 import React, { useRef } from "react";
 import { useFileInfoTree } from "../File/FileSideBar/hooks/use-file-info-tree";
-import FilesSuggestionsDisplay, { SuggestionsState } from "../Editor/FilesSuggestionsDisplay";
+import FilesSuggestionsDisplay, {
+  SuggestionsState,
+} from "../Editor/FilesSuggestionsDisplay";
 
 interface Props {
-    vaultDirectory: string;
-    titleText: string;
-    searchText: string;
-    setSearchText: (text: string) => void;
-    onSelectSuggestion: (suggestion: string) => void;
-    suggestionsState: SuggestionsState | null;
-    setSuggestionsState: (state: SuggestionsState | null) => void;
-    maxSuggestionWidth?: string;
+  vaultDirectory: string;
+  titleText: string;
+  searchText: string;
+  setSearchText: (text: string) => void;
+  onSelectSuggestion: (suggestion: string) => void;
+  suggestionsState: SuggestionsState | null;
+  setSuggestionsState: (state: SuggestionsState | null) => void;
+  maxSuggestionWidth?: string;
 }
 
 export const SearchBarWithFilesSuggestion = ({
@@ -22,8 +24,7 @@ export const SearchBarWithFilesSuggestion = ({
   suggestionsState,
   setSuggestionsState,
   maxSuggestionWidth,
-  }: Props) => {
-
+}: Props) => {
   const { flattenedFiles } = useFileInfoTree(vaultDirectory);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -43,9 +44,9 @@ export const SearchBarWithFilesSuggestion = ({
     });
   };
 
-    return (
-        <>
-        <h2 className="text-xl font-semibold mb-3 text-white">
+  return (
+    <>
+      <h2 className="text-xl font-semibold mb-3 text-white">
         {titleText}
         <input
           ref={inputRef}
@@ -56,9 +57,9 @@ export const SearchBarWithFilesSuggestion = ({
           value={searchText}
           onSelect={() => initializeSuggestionsStateOnFocus()}
           onChange={(e) => {
-            setSearchText(e.target.value)
+            setSearchText(e.target.value);
             if (e.target.value.length == 0) {
-              onSelectSuggestion('')
+              onSelectSuggestion("");
             }
           }}
           placeholder="Search for the files by name"
@@ -71,11 +72,11 @@ export const SearchBarWithFilesSuggestion = ({
           />
         )}
       </h2>
-        {!searchText && (
-          <p className="text-red-500 text-xs">
+      {!searchText && (
+        <p className="text-red-500 text-xs">
           Choose a file by searching or by right clicking a file in directory
-          </p>
-        )}
-        </>
-    )
+        </p>
+      )}
+    </>
+  );
 };

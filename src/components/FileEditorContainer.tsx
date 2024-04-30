@@ -72,8 +72,9 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     setCurrentChatHistory(undefined);
     setChatFilters({
       ...chatFilters,
-      files: [...chatFilters.files, file]});
-  }
+      files: [...chatFilters.files, file],
+    });
+  };
 
   // find all available files
   useEffect(() => {

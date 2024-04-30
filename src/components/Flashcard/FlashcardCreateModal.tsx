@@ -115,9 +115,9 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
             value={searchText}
             onSelect={() => initializeSuggestionsStateOnFocus()}
             onChange={(e) => {
-              setSearchText(e.target.value)
+              setSearchText(e.target.value);
               if (e.target.value.length == 0) {
-                setSelectedFile('')
+                setSelectedFile("");
               }
             }}
             placeholder="Search for the files by name"
