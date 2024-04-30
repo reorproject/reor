@@ -5,7 +5,7 @@ import { DBQueryResult } from "electron/main/database/Schema";
 import { FileInfoTree } from "electron/main/Files/Types";
 import { ChatsSidebar } from "../Chat/ChatsSidebar";
 import { SidebarAbleToShow } from "../FileEditorContainer";
-import { ChatHistory } from "../Chat/Chat";
+import { ChatFilters, ChatHistory } from "../Chat/Chat";
 import { ChatHistoryMetadata } from "../Chat/hooks/use-chat-history";
 
 interface SidebarManagerProps {
@@ -23,6 +23,7 @@ interface SidebarManagerProps {
   currentChatHistory: ChatHistory | undefined;
   chatHistoriesMetadata: ChatHistoryMetadata[];
   setCurrentChatHistory: (chat: ChatHistory | undefined) => void;
+  setChatFilters: (chatFilters: ChatFilters) => void;
 }
 
 const SidebarManager: React.FC<SidebarManagerProps> = ({
@@ -40,6 +41,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
   currentChatHistory,
   chatHistoriesMetadata,
   setCurrentChatHistory,
+  setChatFilters,
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<DBQueryResult[]>([]);
@@ -81,6 +83,10 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
           }}
           newChat={() => {
             setCurrentChatHistory(undefined);
+            setChatFilters({
+              files: [],
+              numberOfChunksToFetch: 15,
+            });
           }}
         />
       )}
