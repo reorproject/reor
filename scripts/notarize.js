@@ -12,7 +12,7 @@ async function notarizeApp() {
   const arch = os.arch();
 
   // Check if the current platform is macOS and the architecture is Intel or ARM
-  if (platform === "darwin" && arch === "arm64") {
+  if (platform === "darwin" && (arch === "x64" || arch === "arm64")) {
     const platformDir = arch === "x64" ? "mac-x64" : "mac-arm64";
 
     const appPath = path.join(
