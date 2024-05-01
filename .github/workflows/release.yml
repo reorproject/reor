@@ -15,8 +15,9 @@ jobs:
           - os: windows-latest
           - os: ubuntu-latest
           - os: macos-latest # Intel-based macOS (default architecture)
+            arch: x64
           - os: macos-latest-xlarge # macOS with M1 chip (ARM architecture)
-            # arch: arm64
+            arch: arm64
       fail-fast: false
 
     steps:
