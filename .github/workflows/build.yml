@@ -13,10 +13,10 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-latest-large
-            arch: x64
           - os: macos-latest
-            arch: arm64
+            # arch: x64
+          # - os: macos-latest-xlarge
+          #   arch: arm64
           - os: windows-latest
           - os: ubuntu-latest
             arch: x64
@@ -58,7 +58,7 @@ jobs:
         run: npm run test
 
       - name: Set up environment for macOS build
-        if: matrix.os == 'macos-latest-large' || matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-latest' || matrix.os == 'macos-latest-xlarge'
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
@@ -69,7 +69,7 @@ jobs:
           npm run build
 
       - name: Build for non-macos
-        if: matrix.os != 'macos-latest-large' && matrix.os != 'macos-latest'
+        if: matrix.os != 'macos-latest' && matrix.os != 'macos-latest-xlarge'
         run: |
           npm run build
 
@@ -79,23 +79,13 @@ jobs:
       - name: Print APP_VERSION
         run: echo "APP_VERSION=${{ env.APP_VERSION }}"
 
-      - name: List output files
-        if: matrix.os == 'macos-latest-large'
-        run: |
-          ls ./release/${{ env.APP_VERSION }}/
-
-      - name: Check runner architecture
-        if: matrix.os == 'macos-latest-large'
-        run: uname -m
-        
-
       - name: Rename artifacts for ARM architecture
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-latest-xlarge'
         run: |
           mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/Reor_${{ env.APP_VERSION }}-arm64.dmg
 
       - name: Rename artifacts for Intel architecture
-        if: matrix.os == 'macos-latest-large'
+        if: matrix.os == 'macos-latest'
         run: |
           mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/Reor_${{ env.APP_VERSION }}-intel.dmg
 
