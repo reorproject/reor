@@ -79,6 +79,16 @@ jobs:
       - name: Print APP_VERSION
         run: echo "APP_VERSION=${{ env.APP_VERSION }}"
 
+      - name: List output files
+        if: matrix.os == 'macos-latest'
+        run: |
+          ls ./release/${{ env.APP_VERSION }}/
+
+      - name: Check runner architecture
+        if: matrix.os == 'macos-latest'
+        run: uname -m
+        
+
       - name: Rename artifacts for ARM architecture
         if: matrix.os == 'macos-latest-xlarge'
         run: |
