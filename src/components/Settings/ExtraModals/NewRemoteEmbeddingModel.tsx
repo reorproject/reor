@@ -62,7 +62,7 @@ const NewRemoteEmbeddingModelModal: React.FC<
           <ExternalLink href="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=downloads&search=xenova">
             {" "}
             This page on Hugging Face
-          </ExternalLink>
+          </ExternalLink>{" "}
           has most available models. It must be a &quot;Xenova&quot; ONNX
           embedding model. Check out{" "}
           <ExternalLink href="https://www.reorproject.org/docs/documentation/embedding">
