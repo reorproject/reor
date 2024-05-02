@@ -47,7 +47,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="ml-6 mt-2 mb-6 h-full">
+      <div className="ml-6 mt-2 mb-6 h-full w-[600px]">
         <SearchBarWithFilesSuggestion
           vaultDirectory={vaultDirectory}
           titleText={titleText}
