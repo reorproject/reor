@@ -12,12 +12,13 @@ jobs:
     strategy:
       matrix:
         include:
+          - os: macos-13
+            # arch: x64
+          - os: macos-latest
+            # arch: arm64
           - os: windows-latest
           - os: ubuntu-latest
-          - os: macos-latest # Intel-based macOS (default architecture)
             arch: x64
-          - os: macos-latest-xlarge # macOS with M1 chip (ARM architecture)
-            arch: arm64
       fail-fast: false
 
     steps:
@@ -74,12 +75,12 @@ jobs:
         run: echo "APP_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
       - name: Rename artifacts for ARM architecture
-        if: matrix.os == 'macos-latest-xlarge'
+        if: matrix.os == 'macos-latest'
         run: |
           mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/Reor_${{ env.APP_VERSION }}-arm64.dmg
 
       - name: Rename artifacts for Intel architecture
-        if: matrix.os == 'macos-latest'
+        if: matrix.os == 'macos-13'
         run: |
           mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/Reor_${{ env.APP_VERSION }}-intel.dmg
 
