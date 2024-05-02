@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TitleBar from "./TitleBar";
-import ChatWithLLM, { ChatHistory } from "./Chat/Chat";
+import ChatWithLLM, { ChatFilters, ChatHistory } from "./Chat/Chat";
 import IconsSidebar from "./Sidebars/IconsSidebar";
 import ResizableComponent from "./Generic/ResizableComponent";
 import SidebarManager from "./Sidebars/MainSidebar";
@@ -60,6 +60,45 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     setCurrentChatHistory(chatHistory);
   };
 
+  const [vaultDirectory, setVaultDirectory] = useState<string>("");
+  const [chatFilters, setChatFilters] = useState<ChatFilters>({
+    files: [],
+    numberOfChunksToFetch: 15,
+  });
+
+  const handleAddFileToChatFilters = (file: string) => {
+    setSidebarShowing("chats");
+    setShowChatbot(true);
+    setCurrentChatHistory(undefined);
+    setChatFilters({
+      ...chatFilters,
+      files: [...chatFilters.files, file],
+    });
+  };
+
+  // find all available files
+  useEffect(() => {
+    const setFileDirectory = async () => {
+      const windowDirectory =
+        await window.electronStore.getVaultDirectoryForWindow();
+      setVaultDirectory(windowDirectory);
+    };
+    setFileDirectory();
+  }, []);
+
+  useEffect(() => {
+    const removeAddChatToFileListener = window.ipcRenderer.receive(
+      "add-file-to-chat-listener",
+      (noteName: string) => {
+        handleAddFileToChatFilters(noteName);
+      }
+    );
+
+    return () => {
+      removeAddChatToFileListener();
+    };
+  }, []);
+
   return (
     <div>
       <TitleBar
@@ -98,6 +137,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
               currentChatHistory={currentChatHistory}
               chatHistoriesMetadata={chatHistoriesMetadata}
               setCurrentChatHistory={openChatAndOpenChat}
+              setChatFilters={setChatFilters}
             />
           </div>
         </ResizableComponent>
@@ -144,11 +184,14 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
           <div className={`w-full h-below-titlebar`}>
             {/* <ResizableComponent resizeSide="left" initialWidth={450}> */}
             <ChatWithLLM
+              vaultDirectory={vaultDirectory}
               openFileByPath={openFileAndOpenEditor}
               setChatHistoriesMetadata={setChatHistoriesMetadata}
               currentChatHistory={currentChatHistory}
               setCurrentChatHistory={setCurrentChatHistory}
               showSimilarFiles={showSimilarFiles}
+              chatFilters={chatFilters}
+              setChatFilters={setChatFilters}
             />
             {/* </ResizableComponent> */}
           </div>

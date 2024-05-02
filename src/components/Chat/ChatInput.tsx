@@ -1,15 +1,12 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { CircularProgress } from "@mui/material";
 import Textarea from "@mui/joy/Textarea";
-import { ChatFilters } from "./Chat";
 interface ChatInputProps {
   userTextFieldInput: string;
   setUserTextFieldInput: (value: string) => void;
   handleSubmitNewMessage: () => void;
   loadingResponse: boolean;
   askText: string;
-  chatFilters: ChatFilters | undefined;
-  setChatFilters: (chatFilters: ChatFilters) => void;
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({
@@ -18,16 +15,10 @@ const ChatInput: React.FC<ChatInputProps> = ({
   handleSubmitNewMessage,
   loadingResponse,
   askText,
-  chatFilters,
-  setChatFilters,
 }) => {
   return (
     <div className="p-3 bg-neutral-600">
       <div className="flex h-full">
-        <FilterComponent
-          chatFilters={chatFilters}
-          setChatFilters={setChatFilters}
-        />
         <Textarea
           onKeyDown={(e) => {
             if (!e.shiftKey && e.key === "Enter") {
@@ -76,22 +67,3 @@ const ChatInput: React.FC<ChatInputProps> = ({
 };
 
 export default ChatInput;
-
-interface FilterComponentProps {
-  chatFilters: ChatFilters | undefined;
-  setChatFilters: (chatFilters: ChatFilters) => void;
-}
-
-const FilterComponent: React.FC<FilterComponentProps> = ({
-  // chatFilters,
-  setChatFilters,
-}) => {
-  useEffect(() => {
-    setChatFilters({
-      files: [],
-      numberOfChunksToFetch: 15,
-    });
-  }, []);
-
-  return <div className="flex space-x-2"></div>;
-};

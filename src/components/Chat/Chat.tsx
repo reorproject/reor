@@ -26,6 +26,7 @@ import {
 import { useDebounce } from "use-debounce";
 import { SimilarEntriesComponent } from "../Similarity/SimilarFilesSidebar";
 import ResizableComponent from "../Generic/ResizableComponent";
+import AddContextFiltersModal from "./AddContextFiltersModal";
 
 // convert ask options to enum
 enum AskOptions {
@@ -143,6 +144,7 @@ export const resolveRAGContext = async (
       chatFilters.numberOfChunksToFetch
     );
   }
+  console.log("results", results);
   return {
     messageType: "success",
     role: "user",
@@ -155,6 +157,7 @@ export const resolveRAGContext = async (
 };
 
 interface ChatWithLLMProps {
+  vaultDirectory: string;
   openFileByPath: (path: string) => Promise<void>;
 
   setChatHistoriesMetadata: React.Dispatch<
@@ -166,27 +169,51 @@ interface ChatWithLLMProps {
     React.SetStateAction<ChatHistory | undefined>
   >;
   showSimilarFiles: boolean;
+  chatFilters: ChatFilters;
+  setChatFilters: React.Dispatch<ChatFilters>;
 }
 
 const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
+  vaultDirectory,
   openFileByPath,
-
   setChatHistoriesMetadata,
   currentChatHistory,
   setCurrentChatHistory,
   showSimilarFiles,
+  chatFilters,
+  setChatFilters,
 }) => {
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>("");
   const [askText, setAskText] = useState<AskOptions>(AskOptions.Ask);
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
-  const [chatFilters, setChatFilters] = useState<ChatFilters>();
   const [readyToSave, setReadyToSave] = useState<boolean>(false);
   const [currentContext, setCurrentContext] = useState<DBQueryResult[]>([]);
+  const [isAddContextFiltersModalOpen, setIsAddContextFiltersModalOpen] =
+    useState<boolean>(false);
 
+  // chat filters related state: this is the only thing that the Chat component cares about
+  // chat component doesn't care about previous states and suggestions, and it can reset it
+  // RESET when a new chat occurs
   useEffect(() => {
     const context = getChatHistoryContext(currentChatHistory);
     setCurrentContext(context);
   }, [currentChatHistory]);
+
+  // update chat context when files are added
+  useEffect(() => {
+    const setContextOnFileAdded = async () => {
+      if (chatFilters.files.length > 0) {
+        const results = await window.files.getFilesystemPathsAsDBItems(
+          chatFilters.files
+        );
+        setCurrentContext(results as DBQueryResult[]);
+      } else if (!currentChatHistory?.id) {
+        // if there is no prior history, set current context to empty
+        setCurrentContext([]);
+      }
+    };
+    setContextOnFileAdded();
+  }, [chatFilters.files]);
 
   useEffect(() => {
     if (readyToSave && currentChatHistory) {
@@ -210,7 +237,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           displayableChatHistory: [],
         };
       }
-
+      console.log(chatFilters);
       if (chatHistory.displayableChatHistory.length === 0) {
         if (chatFilters) {
           // chatHistory.displayableChatHistory.push({
@@ -233,6 +260,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           context: [],
         });
       }
+      console.log(chatHistory);
 
       setUserTextFieldInput("");
 
@@ -362,7 +390,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     <div className="flex items-center justify-center w-full h-full">
       <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid">
         <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
-          <div className="space-y-2 mt-4 flex-grow">
+          <div className="space-y-2 mt-2 ml-4 mr-4 flex-grow">
             {currentChatHistory?.displayableChatHistory
               .filter((msg) => msg.role !== "system")
               .map((message, index) => (
@@ -373,8 +401,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                     message.messageType === "error"
                       ? "bg-red-100 text-red-800"
                       : message.role === "assistant"
-                      ? "bg-blue-100 text-blue-800"
-                      : "bg-green-100 text-green-800"
+                      ? "bg-neutral-600	text-gray-200"
+                      : "bg-blue-100	text-blue-800"
                   } `}
                 >
                   {message.visibleContent
@@ -383,6 +411,37 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                 </ReactMarkdown>
               ))}
           </div>
+          {(!currentChatHistory ||
+            currentChatHistory?.displayableChatHistory.length == 0) && (
+            <>
+              <div className="flex items-center justify-center text-gray-300 text-sm">
+                Start a conversation with your notes by typing a message below.
+              </div>
+              <div className="flex items-center justify-center text-gray-300 text-sm">
+                <button
+                  className="bg-slate-600 m-2 rounded-lg border-none 
+                  h-6 w-40 text-center cursor-pointer vertical-align text-white"
+                  onClick={() => {
+                    setIsAddContextFiltersModalOpen(true);
+                  }}
+                >
+                  {chatFilters.files.length > 0
+                    ? "Update filters"
+                    : "Add filters"}
+                </button>
+              </div>
+            </>
+          )}
+          {isAddContextFiltersModalOpen && (
+            <AddContextFiltersModal
+              vaultDirectory={vaultDirectory}
+              isOpen={isAddContextFiltersModalOpen}
+              onClose={() => setIsAddContextFiltersModalOpen(false)}
+              titleText="Add file(s) into chat context"
+              chatFilters={chatFilters}
+              setChatFilters={setChatFilters}
+            />
+          )}
           {userTextFieldInput === "" &&
           currentChatHistory?.displayableChatHistory.length == 0 ? (
             <>
@@ -408,8 +467,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           }
           loadingResponse={loadingResponse}
           askText={askText}
-          chatFilters={chatFilters}
-          setChatFilters={setChatFilters}
         />
       </div>
       {showSimilarFiles && (
