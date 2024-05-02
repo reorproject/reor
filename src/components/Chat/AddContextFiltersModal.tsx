@@ -84,7 +84,6 @@ const AddContextFiltersModal: React.FC<Props> = ({
           {internalFilesSelected && (
             <Button
               className="bg-slate-600 border-none h-8 w-48 text-center vertical-align
-                mt-4 mr-16
                 cursor-pointer
                 disabled:pointer-events-none
                 disabled:opacity-25"
