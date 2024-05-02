@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useFileInfoTree } from "../File/FileSideBar/hooks/use-file-info-tree";
 import FilesSuggestionsDisplay, {
   SuggestionsState,
@@ -12,7 +12,6 @@ interface Props {
   onSelectSuggestion: (suggestion: string) => void;
   suggestionsState: SuggestionsState | null;
   setSuggestionsState: (state: SuggestionsState | null) => void;
-  maxSuggestionWidth?: string;
 }
 
 export const SearchBarWithFilesSuggestion = ({
@@ -23,7 +22,6 @@ export const SearchBarWithFilesSuggestion = ({
   onSelectSuggestion,
   suggestionsState,
   setSuggestionsState,
-  maxSuggestionWidth,
 }: Props) => {
   const { flattenedFiles } = useFileInfoTree(vaultDirectory);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -43,6 +41,27 @@ export const SearchBarWithFilesSuggestion = ({
       onSelect: (suggestion) => onSelectSuggestion(suggestion),
     });
   };
+
+  console.log(inputRef.current?.offsetWidth);
+
+  const [sidebarWidth, setSidebarWidth] = useState(0);
+
+  useEffect(() => {
+    // Calculate the width of the sidebar
+    const calculateWidth = () => {
+      if (inputRef.current) {
+        setSidebarWidth(inputRef.current.offsetWidth);
+      }
+      console.log("sidebar width : ", inputRef.current?.offsetWidth);
+    };
+
+    // Update width on mount and window resize
+    calculateWidth();
+    window.addEventListener("resize", calculateWidth);
+
+    // Cleanup event listener
+    return () => window.removeEventListener("resize", calculateWidth);
+  });
 
   return (
     <>
@@ -68,7 +87,7 @@ export const SearchBarWithFilesSuggestion = ({
           <FilesSuggestionsDisplay
             suggestionsState={suggestionsState}
             suggestions={flattenedFiles.map((file) => file.path)}
-            maxWidth={maxSuggestionWidth}
+            maxWidth={`${sidebarWidth}`}
           />
         )}
       </h2>

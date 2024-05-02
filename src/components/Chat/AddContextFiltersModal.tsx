@@ -15,7 +15,6 @@ interface Props {
   vaultDirectory: string;
   setChatFilters: (chatFilters: ChatFilters) => void;
   chatFilters: ChatFilters;
-  maxSuggestionWidth?: string;
 }
 
 const AddContextFiltersModal: React.FC<Props> = ({
@@ -25,7 +24,6 @@ const AddContextFiltersModal: React.FC<Props> = ({
   titleText,
   chatFilters,
   setChatFilters,
-  maxSuggestionWidth,
 }) => {
   const [internalFilesSelected, setInternalFilesSelected] = useState<string[]>(
     chatFilters?.files || []
@@ -49,7 +47,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="ml-6 mt-2 mb-6 w-[900px] h-full">
+      <div className="ml-6 mt-2 mb-6 h-full">
         <SearchBarWithFilesSuggestion
           vaultDirectory={vaultDirectory}
           titleText={titleText}
@@ -67,9 +65,8 @@ const AddContextFiltersModal: React.FC<Props> = ({
           }}
           suggestionsState={suggestionsState}
           setSuggestionsState={setSuggestionsState}
-          maxSuggestionWidth={maxSuggestionWidth}
         />
-        <div className="text-white">
+        <div className="text-white max-w-lg">
           <List placeholder="">
             {internalFilesSelected.map((fileItem, index) => {
               return (
@@ -86,7 +83,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
         <div className="flex justify-end">
           {internalFilesSelected && (
             <Button
-              className="bg-slate-600 border-none h-20 w-48 text-center vertical-align
+              className="bg-slate-600 border-none h-8 w-48 text-center vertical-align
                 mt-4 mr-16
                 cursor-pointer
                 disabled:pointer-events-none
@@ -98,7 +95,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
               placeholder={""}
             >
               <div className="flex items-center justify-around h-full space-x-2">
-                Add file
+                Add to context
               </div>
             </Button>
           )}

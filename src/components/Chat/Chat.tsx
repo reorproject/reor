@@ -419,7 +419,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
               </div>
               <div className="flex items-center justify-center text-gray-300 text-sm">
                 <button
-                  className="bg-slate-600 m-2 rounded-lg border-none h-6 w-40 text-center vertical-align text-white "
+                  className="bg-slate-600 m-2 rounded-lg border-none 
+                  h-6 w-40 text-center cursor-pointer vertical-align text-white"
                   onClick={() => {
                     setIsAddContextFiltersModalOpen(true);
                   }}
@@ -436,10 +437,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
               vaultDirectory={vaultDirectory}
               isOpen={isAddContextFiltersModalOpen}
               onClose={() => setIsAddContextFiltersModalOpen(false)}
-              titleText="You can optionally include a file into chat context"
+              titleText="Add file(s) into chat context"
               chatFilters={chatFilters}
               setChatFilters={setChatFilters}
-              maxSuggestionWidth="w-[900px]"
             />
           )}
           {userTextFieldInput === "" &&

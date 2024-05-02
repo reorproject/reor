@@ -16,7 +16,7 @@ interface SuggestionsDisplayProps {
 const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
   suggestionsState,
   suggestions,
-  maxWidth = "max-w-sm",
+  maxWidth,
 }) => {
   const suggestionsRef = useRef<HTMLDivElement | null>(null);
   const [layout, setLayout] = useState({
@@ -56,6 +56,7 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
 
   if (filteredSuggestions.length === 0) return null;
 
+  console.log(maxWidth);
   return (
     <div
       ref={suggestionsRef}
@@ -64,13 +65,14 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
         left: `${layout.left}px`,
         top: `${layout.top}px`,
         display: layout.display,
+        width: `${maxWidth}px`,
       }}
     >
-      <ul className="m-0 p-0 list-none">
+      <ul className={`m-0 p-0 list-none`}>
         {filteredSuggestions.map((suggestion) => (
           <li
             key={suggestion} // Use a unique id property from the suggestion
-            className="p-1.25 cursor-pointer hover:bg-gray-100 p-1 text-sm rounded"
+            className={`p-1.25 cursor-pointer hover:bg-gray-100 p-1 text-sm rounded break-words`}
             onClick={() => {
               suggestionsState.onSelect?.(suggestion);
             }}
