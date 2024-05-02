@@ -3,6 +3,23 @@ const { notarize } = require("@electron/notarize");
 const { version } = require("../package.json");
 const path = require("path");
 const os = require("os");
+const fs = require("fs"); // Import the filesystem module
+
+// Recursive function to print directory tree
+function printDirectoryTree(startPath, indent = "") {
+  const filesAndDirs = fs.readdirSync(startPath);
+
+  filesAndDirs.forEach((file, index) => {
+    const filePath = path.join(startPath, file);
+    const stats = fs.statSync(filePath);
+    const isLast = index === filesAndDirs.length - 1;
+
+    console.log(`${indent}${isLast ? "└──" : "├──"} ${file}`);
+    if (stats.isDirectory()) {
+      printDirectoryTree(filePath, indent + (isLast ? "    " : "│   "));
+    }
+  });
+}
 
 async function notarizeApp() {
   const productName = "Reor"; // Replace with your actual product name
@@ -24,17 +41,28 @@ async function notarizeApp() {
       `${productName}.app`
     );
 
-    console.log(`Notarizing ${productName}.app`);
-    await notarize({
-      tool: "notarytool",
-      appPath: appPath,
-      teamId: "ZHJMNQM65Q",
-      appleId: process.env.APPLE_ID,
-      appleIdPassword: process.env.APPLE_APP_SPECIFIC_PASSWORD,
-    });
+    // Check if the app file exists
+    if (fs.existsSync(appPath)) {
+      console.log(`Found ${productName}.app at ${appPath}`);
+      console.log(`Notarizing ${productName}.app`);
+      await notarize({
+        tool: "notarytool",
+        appPath: appPath,
+        teamId: "ZHJMNQM65Q",
+        appleId: process.env.APPLE_ID,
+        appleIdPassword: process.env.APPLE_APP_SPECIFIC_PASSWORD,
+      });
+      console.log(`Notarization complete for ${productName}.app`);
+    } else {
+      console.error(`Error: ${productName}.app does not exist at ${appPath}`);
+      // Print the tree of files starting from the release directory
+      const releasePath = path.join(__dirname, "..", "release");
+      console.log(`Directory tree of ${releasePath}:`);
+      printDirectoryTree(releasePath);
+    }
+  } else {
+    console.log("Notarization is only supported on macOS (Intel or ARM).");
   }
-
-  //   console.log(`Notarization complete for ${build.productName}.app`);
 }
 
 notarizeApp().catch((error) => {
