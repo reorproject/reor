@@ -4,7 +4,7 @@
 </p> -->
 
 <h4 align="center">
-A self-organizing AI note-taking app that runs models locally.</h4>
+Private & offline AI personal knowledge management app.</h4>
 
 <p align="center">
     <a href="https://tooomm.github.io/github-release-stats/?username=reorproject&repository=reor">    <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/reorproject/reor/total"></a>
