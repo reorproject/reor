@@ -4,6 +4,7 @@ import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
 import FlashcardReviewModal from "./FlashcardReviewModal";
 import FlashcardCreateModal from "./FlashcardCreateModal";
+import posthog from "posthog-js";
 
 interface FlashcardMenuModalProps {
   isOpen: boolean;
@@ -55,7 +56,10 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
             cursor-pointer
             disabled:pointer-events-none
             disabled:opacity-25"
-          onClick={() => setIsCreateFlashcardMode(true)}
+          onClick={() => {
+            posthog.capture("open_create_flashcard_mode");
+            setIsCreateFlashcardMode(true);
+          }}
           // Write to the flashcards directory if the flashcards generated are valid
           // onClick={async () => await storeFlashcardPairsAsJSON(flashcardQAPairs, fileToGenerateFlashcardsFor)}
           placeholder={""}
@@ -70,7 +74,11 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
             disabled:pointer-events-none
             disabled:opacity-25"
           // Write to the flashcards directory if the flashcards generated are valid
-          onClick={async () => setIsReviewFlashcardMode(true)}
+          onClick={async () => {
+            posthog.capture("open_review_flashcard_mode");
+
+            setIsReviewFlashcardMode(true);
+          }}
           placeholder={""}
         >
           {"Review my existing cards"}

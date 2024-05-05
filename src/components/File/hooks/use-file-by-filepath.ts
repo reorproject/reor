@@ -7,8 +7,9 @@ import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import Text from "@tiptap/extension-text";
 import "../tiptap.scss";
-import { useDebounce } from "use-debounce";
+import { useDebounce, useDebouncedCallback } from "use-debounce";
 import { Markdown } from "tiptap-markdown";
+import posthog from "posthog-js";
 
 import { BacklinkExtension } from "@/components/Editor/BacklinkExtension";
 import {
@@ -105,6 +106,17 @@ export const useFileByFilepath = () => {
   const openRelativePathRef = useRef<(newFilePath: string) => Promise<void>>();
   openRelativePathRef.current = openRelativePath;
 
+  const debouncedBacklinkCapture = useDebouncedCallback(
+    () => posthog.capture("initialize_backlinks_2"),
+    4000
+  );
+  const handleSuggestionsStateWithEventCapture = (
+    suggState: SuggestionsState | null
+  ): void => {
+    debouncedBacklinkCapture();
+    setSuggestionsState(suggState);
+  };
+
   const editor = useEditor({
     autofocus: true,
 
@@ -141,7 +153,10 @@ export const useFileByFilepath = () => {
         linkOnPaste: true,
         openOnClick: true,
       }),
-      BacklinkExtension(openRelativePathRef, setSuggestionsState),
+      BacklinkExtension(
+        openRelativePathRef,
+        handleSuggestionsStateWithEventCapture
+      ),
     ],
   });
 

@@ -10,6 +10,7 @@ import { CircularProgress } from "@mui/material";
 import { useFileInfoTree } from "../File/FileSideBar/hooks/use-file-info-tree";
 import { useFileByFilepath } from "../File/hooks/use-file-by-filepath";
 import FilesSuggestionsDisplay from "../Editor/BacklinkSuggestionsDisplay";
+import posthog from "posthog-js";
 
 interface FlashcardCreateModalProps {
   isOpen: boolean;
@@ -64,6 +65,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
 
   // handle the creation process
   const createFlashcardsFromFile = async (): Promise<void> => {
+    posthog.capture("create_flashcard_from_file");
     // send the file as context to the backend
     const llmName = await window.llm.getDefaultLLMName();
     setIsLoadingFlashcards(true);
