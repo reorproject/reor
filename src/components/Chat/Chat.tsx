@@ -367,12 +367,12 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
   useEffect(() => {
     const handleChunk = async (
-      recievedChatID: string,
+      receivedChatID: string,
       chunk: ChatCompletionChunk
     ) => {
       const newContent = chunk.choices[0].delta.content ?? "";
       if (newContent) {
-        appendNewContentToMessageHistory(recievedChatID, newContent, "success");
+        appendNewContentToMessageHistory(receivedChatID, newContent, "success");
       }
     };
 
