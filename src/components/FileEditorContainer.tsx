@@ -77,7 +77,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
       files: files,
     });
     posthog.capture("add_file_to_chat", {
-      chatFiles: files.length,
+      chatFilesLength: files.length,
     });
   };
 
@@ -196,7 +196,13 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
               setCurrentChatHistory={setCurrentChatHistory}
               showSimilarFiles={showSimilarFiles}
               chatFilters={chatFilters}
-              setChatFilters={setChatFilters}
+              setChatFilters={(chatFilters: ChatFilters) => {
+                posthog.capture("add_file_to_chat", {
+                  chatFilesLength: chatFilters.files.length,
+                });
+
+                setChatFilters(chatFilters);
+              }}
             />
             {/* </ResizableComponent> */}
           </div>
