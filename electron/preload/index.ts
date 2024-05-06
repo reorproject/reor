@@ -143,6 +143,8 @@ declare global {
       setHardwareConfig: (config: HardwareConfig) => void;
       getLLMGenerationParams: () => Promise<LLMGenerationParameters>;
       setLLMGenerationParams: (params: LLMGenerationParameters) => void;
+      getAnalyticsMode: () => Promise<boolean>;
+      setAnalyticsMode: (isAnalytics: boolean) => void;
       getHasUserOpenedAppBefore: () => boolean;
       setHasUserOpenedAppBefore: () => void;
       getAllChatHistories: () => Promise<ChatHistory[]>;
@@ -268,6 +270,12 @@ contextBridge.exposeInMainWorld("electronStore", {
   },
   setLLMGenerationParams: (params: LLMGenerationParameters) => {
     ipcRenderer.invoke("set-llm-generation-params", params);
+  },
+  getAnalyticsMode: () => {
+    return ipcRenderer.invoke("get-analytics-mode");
+  },
+  setAnalyticsMode: (isAnalytics: boolean) => {
+    ipcRenderer.invoke("set-analytics-mode", isAnalytics);
   },
   getHasUserOpenedAppBefore: () => {
     return ipcRenderer.invoke("has-user-opened-app-before");

@@ -7,9 +7,12 @@ import IndexingProgress from "./components/IndexingProgress";
 import InitialSetupSinglePage from "./components/Settings/InitialSettingsSinglePage";
 import posthog from "posthog-js";
 
-posthog.init("phc_xi4hFToX1cZU657yzge1VW0XImaaRzuvnFUdbAKI8fu", {
-  api_host: "https://us.i.posthog.com",
-});
+if (await window.electronStore.getAnalyticsMode()) {
+  posthog.init("phc_xi4hFToX1cZU657yzge1VW0XImaaRzuvnFUdbAKI8fu", {
+    api_host: "https://us.i.posthog.com",
+  });
+  console.log("initializing posthog");
+}
 
 interface AppProps {}
 

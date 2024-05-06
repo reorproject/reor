@@ -61,10 +61,12 @@ export interface StoreSchema {
   chatHistories: {
     [vaultDir: string]: ChatHistory[];
   };
+  analytics?: boolean;
 }
 
 export enum StoreKeys {
   hasUserOpenedAppBefore = "hasUserOpenedAppBefore",
+  Analytics = "analytics",
   SchemaVersion = "schemaVersion",
   DirectoryFromPreviousSession = "user.directoryFromPreviousSession",
   LLMs = "LLMs",

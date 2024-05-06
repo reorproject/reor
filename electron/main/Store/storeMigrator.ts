@@ -17,10 +17,18 @@ export function setupDefaultStoreValues(store: Store<StoreSchema>) {
   if (!store.get(StoreKeys.MaxRAGExamples)) {
     store.set(StoreKeys.MaxRAGExamples, 15);
   }
+  setupDefaultAnalyticsValue(store);
+
   setupDefaultEmbeddingModels(store);
 
   setupDefaultHardwareConfig(store);
 }
+
+const setupDefaultAnalyticsValue = (store: Store<StoreSchema>) => {
+  if (store.get(StoreKeys.Analytics) === undefined) {
+    store.set(StoreKeys.Analytics, true);
+  }
+};
 
 const setupDefaultHardwareConfig = (store: Store<StoreSchema>) => {
   const hardwareConfig = store.get(StoreKeys.Hardware);
