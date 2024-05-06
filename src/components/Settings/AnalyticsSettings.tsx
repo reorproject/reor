@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@material-tailwind/react";
 import Switch from "@mui/material/Switch";
+import posthog from "posthog-js";
 
 interface AnalyticsSettingsProps {}
 const AnalyticsSettings: React.FC<AnalyticsSettingsProps> = () => {
@@ -36,8 +37,11 @@ const AnalyticsSettings: React.FC<AnalyticsSettingsProps> = () => {
         onChange={() => {
           setUserHasMadeUpdate(true);
           setIsAnalyticsEnabled(!isAnalyticsEnabled);
+          if (isAnalyticsEnabled) {
+            posthog.capture("analytics_disabled");
+          }
         }}
-        // inputProps={{ "aria-label": "controlled" }}
+        inputProps={{ "aria-label": "controlled" }}
       />
       {userHasMadeUpdate && (
         <div className="flex">
