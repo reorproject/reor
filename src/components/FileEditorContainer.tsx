@@ -10,6 +10,7 @@ import InEditorBacklinkSuggestionsDisplay from "./Editor/BacklinkSuggestionsDisp
 import { useFileInfoTree } from "./File/FileSideBar/hooks/use-file-info-tree";
 import SidebarComponent from "./Similarity/SimilarFilesSidebar";
 import { useChatHistory } from "./Chat/hooks/use-chat-history";
+import posthog from "posthog-js";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search" | "chats";
@@ -67,12 +68,16 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   });
 
   const handleAddFileToChatFilters = (file: string) => {
+    const files = [...chatFilters.files, file];
     setSidebarShowing("chats");
     setShowChatbot(true);
     setCurrentChatHistory(undefined);
     setChatFilters({
       ...chatFilters,
-      files: [...chatFilters.files, file],
+      files: files,
+    });
+    posthog.capture("add_file_to_chat", {
+      chatFilesLength: files.length,
     });
   };
 
@@ -191,7 +196,13 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
               setCurrentChatHistory={setCurrentChatHistory}
               showSimilarFiles={showSimilarFiles}
               chatFilters={chatFilters}
-              setChatFilters={setChatFilters}
+              setChatFilters={(chatFilters: ChatFilters) => {
+                posthog.capture("add_file_to_chat", {
+                  chatFilesLength: chatFilters.files.length,
+                });
+
+                setChatFilters(chatFilters);
+              }}
             />
             {/* </ResizableComponent> */}
           </div>

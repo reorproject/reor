@@ -129,6 +129,16 @@ export const registerStoreHandlers = (
     return store.get(StoreKeys.LLMGenerationParameters);
   });
 
+  ipcMain.handle("set-analytics-mode", (event, isAnalytics) => {
+    console.log("setting analytics mode", isAnalytics);
+    store.set(StoreKeys.Analytics, isAnalytics);
+  });
+
+  ipcMain.handle("get-analytics-mode", () => {
+    console.log("getting analytics params", store.get(StoreKeys.Analytics));
+    return store.get(StoreKeys.Analytics);
+  });
+
   ipcMain.handle("has-user-opened-app-before", () => {
     return store.get(StoreKeys.hasUserOpenedAppBefore);
   });

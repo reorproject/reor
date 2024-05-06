@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import FileEditorContainer from "./components/FileEditorContainer";
 import IndexingProgress from "./components/IndexingProgress";
 import InitialSetupSinglePage from "./components/Settings/InitialSettingsSinglePage";
+import posthog from "posthog-js";
 
 interface AppProps {}
 
@@ -21,6 +22,17 @@ const App: React.FC<AppProps> = () => {
       setIndexingProgress(newProgress);
     };
     window.ipcRenderer.receive("indexing-progress", handleProgressUpdate);
+  }, []);
+
+  useEffect(() => {
+    const initialisePosthog = async () => {
+      if (await window.electronStore.getAnalyticsMode()) {
+        posthog.init("phc_xi4hFToX1cZU657yzge1VW0XImaaRzuvnFUdbAKI8fu", {
+          api_host: "https://us.i.posthog.com",
+        });
+      }
+    };
+    initialisePosthog();
   }, []);
 
   useEffect(() => {

@@ -7,7 +7,7 @@ import { ChatsSidebar } from "../Chat/ChatsSidebar";
 import { SidebarAbleToShow } from "../FileEditorContainer";
 import { ChatFilters, ChatHistory } from "../Chat/Chat";
 import { ChatHistoryMetadata } from "../Chat/hooks/use-chat-history";
-
+import posthog from "posthog-js";
 interface SidebarManagerProps {
   files: FileInfoTree;
   expandedDirectories: Map<string, boolean>;
@@ -82,6 +82,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
             });
           }}
           newChat={() => {
+            posthog.capture("create_new_chat");
             setCurrentChatHistory(undefined);
             setChatFilters({
               files: [],

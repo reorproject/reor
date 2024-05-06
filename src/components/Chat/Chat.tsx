@@ -27,6 +27,7 @@ import { useDebounce } from "use-debounce";
 import { SimilarEntriesComponent } from "../Similarity/SimilarFilesSidebar";
 import ResizableComponent from "../Generic/ResizableComponent";
 import AddContextFiltersModal from "./AddContextFiltersModal";
+import posthog from "posthog-js";
 
 // convert ask options to enum
 enum AskOptions {
@@ -225,6 +226,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const handleSubmitNewMessage = async (
     chatHistory: ChatHistory | undefined
   ) => {
+    posthog.capture("chat_message_submitted", {
+      chatId: chatHistory?.id,
+      chatLength: chatHistory?.displayableChatHistory.length,
+    });
     try {
       if (loadingResponse) return;
       if (!userTextFieldInput.trim()) return;

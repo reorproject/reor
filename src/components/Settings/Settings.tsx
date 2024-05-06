@@ -5,6 +5,7 @@ import EmbeddingModelSettings from "./EmbeddingSettings";
 import RagSettings from "./RagSettings";
 import HardwareSettings from "./HardwareSettings";
 import TextGenerationSettings from "./TextGenerationSettings";
+import AnalyticsSettings from "./AnalyticsSettings";
 
 interface ModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ enum SettingsTab {
   Hardware = "hardware",
   TextGeneration = "textGeneration",
   RAG = "RAG",
+  ANALYTICS = "analytics",
 }
 
 const SettingsModal: React.FC<ModalProps> = ({
@@ -97,6 +99,16 @@ const SettingsModal: React.FC<ModalProps> = ({
           >
             RAG{" "}
           </div>
+          <div
+            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
+              activeTab === SettingsTab.ANALYTICS
+                ? "bg-neutral-700 text-white font-semibold"
+                : "text-gray-200"
+            }`}
+            onClick={() => setActiveTab(SettingsTab.ANALYTICS)}
+          >
+            Analytics{" "}
+          </div>
         </div>
 
         {/* Right Content Area */}
@@ -131,6 +143,12 @@ const SettingsModal: React.FC<ModalProps> = ({
           {activeTab === SettingsTab.TextGeneration && (
             <div className="w-full">
               <TextGenerationSettings />
+            </div>
+          )}
+
+          {activeTab === SettingsTab.ANALYTICS && (
+            <div className="w-full">
+              <AnalyticsSettings />
             </div>
           )}
 
