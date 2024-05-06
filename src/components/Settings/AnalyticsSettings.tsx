@@ -32,6 +32,11 @@ const AnalyticsSettings: React.FC<AnalyticsSettingsProps> = () => {
   return (
     <div className="w-full bg-neutral-800 rounded pb-7 ">
       <h2 className="text-2xl font-semibold mb-0 text-white">Analytics mode</h2>{" "}
+      <p className="text-gray-300 text-sm mb-2 mt-1">
+        Reor tracks anonymous usage data to help improve the app. We never send
+        any personal data. This is solely to track which features are popular.
+        You can disable this at any time:
+      </p>
       <Switch
         checked={isAnalyticsEnabled}
         onChange={() => {
