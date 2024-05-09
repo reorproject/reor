@@ -1,4 +1,4 @@
-import { ipcMain } from "electron";
+import { ipcMain, BrowserWindow } from "electron";
 import * as path from "path";
 import {
   FileInfoTree,
@@ -14,6 +14,8 @@ import {
   GetFilesInfoListForListOfPaths,
   GetFilesInfoList,
   markdownExtensions,
+  startWatchingDirectory,
+  updateFileListForRenderer,
 } from "./Filesystem";
 import * as fs from "fs";
 import {
@@ -140,23 +142,64 @@ export const registerFileHandlers = (
     "rename-file-recursive",
     async (event, renameFileProps: RenameFileProps) => {
       const windowInfo = windowsManager.getWindowInfoForContents(event.sender);
-
+    
       if (!windowInfo) {
         throw new Error("Window info not found.");
       }
+
+
       windowsManager.watcher?.unwatch(windowInfo?.vaultDirectoryForWindow);
 
-      fs.rename(
-        renameFileProps.oldFilePath,
-        renameFileProps.newFilePath,
-        (err) => {
-          if (err) {
-            throw err;
-          }
-          windowsManager.watcher?.add(windowInfo?.vaultDirectoryForWindow);
+      if (process.platform == 'win32') {
+        console.log("Running on windows environment");
+        const pathsToReWatch: string[] = [];
+        
+        const watchedPaths = windowsManager.watcher?.getWatched();
+        for (let paths in watchedPaths) {
+          pathsToReWatch.push(paths);
         }
-      );
+        windowsManager.watcher?.unwatch(renameFileProps.oldFilePath);
+        
+        windowsManager.watcher?.close().then(() => {
+          // Get win so we can refresh after updating
+          const win = BrowserWindow.fromWebContents(event.sender);
 
+          fs.rename(
+            renameFileProps.oldFilePath,
+            renameFileProps.newFilePath,
+            (err) => {
+              if (err) {
+                throw err;
+              }
+              // Re-watch all paths after renaming the file
+              windowsManager.watcher?.add(windowInfo?.vaultDirectoryForWindow);
+              for (let path in pathsToReWatch) {
+                windowsManager.watcher?.add(path);
+              }
+              if (win) {
+                updateFileListForRenderer(win, windowInfo.vaultDirectoryForWindow);
+              }
+            }
+          );
+        });
+      } else {
+        console.log("Running on *nix environment");
+
+        fs.rename(
+          renameFileProps.oldFilePath,
+          renameFileProps.newFilePath,
+          (err) => {
+            if (err) {
+              throw err;
+            }
+            // Re-watch all paths after renaming the file
+            // windowsManager.watcher?.add(renameFileProps.newFilePath);
+            windowsManager.watcher?.add(windowInfo?.vaultDirectoryForWindow);
+          }
+        );
+      }
+
+      console.log("reindexing folder");
       // then need to trigger reindexing of folder
       windowInfo.dbTableClient.updateDBItemsWithNewFilePath(
         renameFileProps.oldFilePath,
