@@ -14,7 +14,6 @@ import {
   GetFilesInfoListForListOfPaths,
   GetFilesInfoList,
   markdownExtensions,
-  startWatchingDirectory,
   updateFileListForRenderer,
 } from "./Filesystem";
 import * as fs from "fs";
@@ -151,11 +150,10 @@ export const registerFileHandlers = (
       windowsManager.watcher?.unwatch(windowInfo?.vaultDirectoryForWindow);
 
       if (process.platform == 'win32') {
-        console.log("Running on windows environment");
         const pathsToReWatch: string[] = [];
         
         const watchedPaths = windowsManager.watcher?.getWatched();
-        for (let paths in watchedPaths) {
+        for (const paths in watchedPaths) {
           pathsToReWatch.push(paths);
         }
         windowsManager.watcher?.unwatch(renameFileProps.oldFilePath);
@@ -173,7 +171,7 @@ export const registerFileHandlers = (
               }
               // Re-watch all paths after renaming the file
               windowsManager.watcher?.add(windowInfo?.vaultDirectoryForWindow);
-              for (let path in pathsToReWatch) {
+              for (const path in pathsToReWatch) {
                 windowsManager.watcher?.add(path);
               }
               if (win) {
@@ -183,8 +181,6 @@ export const registerFileHandlers = (
           );
         });
       } else {
-        console.log("Running on *nix environment");
-
         fs.rename(
           renameFileProps.oldFilePath,
           renameFileProps.newFilePath,
