@@ -147,58 +147,37 @@ export const registerFileHandlers = (
         throw new Error("Window info not found.");
       }
 
-
       windowsManager.watcher?.unwatch(windowInfo?.vaultDirectoryForWindow);
 
       if (process.platform == 'win32') {
-        console.log("Running on windows environment");
-        const pathsToReWatch: string[] = [];
-        
-        const watchedPaths = windowsManager.watcher?.getWatched();
-        for (let paths in watchedPaths) {
-          pathsToReWatch.push(paths);
-        }
-        windowsManager.watcher?.unwatch(renameFileProps.oldFilePath);
-        
         windowsManager.watcher?.close().then(() => {
-          // Get win so we can refresh after updating
-          const win = BrowserWindow.fromWebContents(event.sender);
-
-          fs.rename(
-            renameFileProps.oldFilePath,
-            renameFileProps.newFilePath,
-            (err) => {
-              if (err) {
-                throw err;
-              }
-              // Re-watch all paths after renaming the file
-              windowsManager.watcher?.add(windowInfo?.vaultDirectoryForWindow);
-              for (let path in pathsToReWatch) {
-                windowsManager.watcher?.add(path);
-              }
-              if (win) {
-                updateFileListForRenderer(win, windowInfo.vaultDirectoryForWindow);
-              }
-            }
-          );
-        });
-      } else {
-        console.log("Running on *nix environment");
-
-        fs.rename(
-          renameFileProps.oldFilePath,
-          renameFileProps.newFilePath,
-          (err) => {
+          fs.rename(renameFileProps.oldFilePath, renameFileProps.newFilePath, (err) => {
             if (err) {
               throw err;
             }
-            // Re-watch all paths after renaming the file
-            // windowsManager.watcher?.add(renameFileProps.newFilePath);
-            windowsManager.watcher?.add(windowInfo?.vaultDirectoryForWindow);
+            
+            // Re-start watching all paths in array
+            const win = BrowserWindow.fromWebContents(event.sender);
+            if (win) {
+              windowsManager.watcher = startWatchingDirectory(
+                win,
+                windowInfo.vaultDirectoryForWindow,
+              );
+              updateFileListForRenderer(win, windowInfo.vaultDirectoryForWindow);
+            }
+          })
+        });
+      } else {
+        // On non-Windows platforms, directly perform the rename operation
+        fs.rename(renameFileProps.oldFilePath, renameFileProps.newFilePath, (err) => {
+          if (err) {
+            throw err;
           }
-        );
+          // Re-watch the vault directory after renaming
+          windowsManager.watcher?.add(windowInfo?.vaultDirectoryForWindow);
+        });
       }
-
+      
       console.log("reindexing folder");
       // then need to trigger reindexing of folder
       windowInfo.dbTableClient.updateDBItemsWithNewFilePath(
