@@ -73,6 +73,7 @@ export const FileItem: React.FC<FileInfoProps> = ({
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation(); // Prevent event from bubbling up to the parent.
     window.contextMenu.showFileItemContextMenu(file);
   };
 
