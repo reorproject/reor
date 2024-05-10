@@ -49,6 +49,36 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
     };
   }, []);
 
+  // open a new note window
+  useEffect(() => {
+    const createNewNoteListener = window.ipcRenderer.receive(
+      "add-new-note-listener",
+      () => {
+        console.log("Setting new note modal to true");
+        setIsNewNoteModalOpen(true);
+      }
+    );
+
+    return () => {
+      createNewNoteListener();
+    }
+  }, []);
+
+  // open a new directory window
+  useEffect(() => {
+    const createNewDirectoryListener = window.ipcRenderer.receive(
+      "add-new-directory-listener",
+      () => {
+        console.log("Adding new directory modal to true");
+        setIsNewDirectoryModalOpen(true);
+      }
+    );
+
+    return () => {
+      createNewDirectoryListener();
+    }
+  }, []);
+
   return (
     <div className="w-full h-full bg-neutral-800 flex flex-col items-center justify-between">
       <div
