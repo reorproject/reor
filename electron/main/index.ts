@@ -216,6 +216,32 @@ ipcMain.handle("show-context-menu-file-item", (event, file) => {
   }
 });
 
+ipcMain.handle("show-context-menu-item", (event) => {
+  const menu = new Menu();
+
+  menu.append(
+    new MenuItem({
+      label: "New Note",
+      click: () => {
+        event.sender.send("add-new-note-listener");
+      },
+    })  
+  );
+
+  menu.append(
+    new MenuItem({
+      label: "New Directory",
+      click: () => {
+        event.sender.send("add-new-directory-listener");
+      },
+    })  
+  );
+
+  const browserWindow = BrowserWindow.fromWebContents(event.sender);
+  if (browserWindow)
+      menu.popup({ window: browserWindow })
+});
+
 ipcMain.handle("open-external", (event, url) => {
   shell.openExternal(url);
 });
