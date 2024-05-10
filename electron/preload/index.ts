@@ -36,6 +36,9 @@ declare global {
     contextMenu: {
       showFileItemContextMenu: (filePath: FileInfoNode) => void;
     };
+    contextFileMenu: {
+      showMenuItemContext: () => void;
+    }
     database: {
       search: (
         query: string,
@@ -303,6 +306,12 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
 contextBridge.exposeInMainWorld("contextMenu", {
   showFileItemContextMenu: (file: FileInfoNode) => {
     ipcRenderer.invoke("show-context-menu-file-item", file);
+  },
+});
+
+contextBridge.exposeInMainWorld("contextFileMenu", {
+  showMenuItemContext: () => {
+    ipcRenderer.invoke("show-context-menu-item");
   },
 });
 
