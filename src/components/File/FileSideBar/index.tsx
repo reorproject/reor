@@ -33,8 +33,13 @@ export const FileSidebar: React.FC<FileListProps> = ({
   setFileDirToBeRenamed,
   listHeight,
 }) => {
+
+
+  
   return (
-    <div className="flex flex-col h-below-titlebar text-white overflow-y-auto overflow-x-hidden">
+    <div 
+      className="flex flex-col h-below-titlebar text-white overflow-y-auto overflow-x-hidden"
+      >
       {noteToBeRenamed && (
         <RenameNoteModal
           isOpen={!!noteToBeRenamed}
@@ -135,6 +140,22 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     return visibleItems;
   };
 
+  const handleMenuContext = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.contextFileMenu.showMenuItemContext();
+  }
+
+  const hideScrollbarStyle = {
+    overflowY: 'auto',
+    scrollbarWidth: 'none',
+  };
+
+  const webKitScrollBarStyles = `
+    div::-webkit-scrollbar {
+      display: none;
+    }
+  `;
+
   // Calculate visible items and item count
   const visibleItems = getVisibleFilesAndFlatten(files, expandedDirectories);
   const itemCount = visibleItems.length;
@@ -161,14 +182,23 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   };
 
   return (
-    <List
-      height={listHeight}
-      itemCount={itemCount}
-      itemSize={30}
-      width={"100%"}
-      style={{ padding: 0, margin: 0 }}
+    <div 
+      onContextMenu={handleMenuContext}
+      style={hideScrollbarStyle}
     >
-      {Rows}
-    </List>
+      <style>
+        {webKitScrollBarStyles}
+      </style>
+      <List
+        height={listHeight}
+        itemCount={itemCount}
+        itemSize={30}
+        width={"100%"}
+        style={{ padding: 0, margin: 0 }}
+      >
+        {Rows}
+      </List>
+    </div>
   );
+  
 };
