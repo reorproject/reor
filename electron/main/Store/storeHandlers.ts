@@ -198,6 +198,38 @@ export const registerStoreHandlers = (
     const vaultChatHistories = allChatHistories[vaultDir] || [];
     return vaultChatHistories.find((chat) => chat.id === chatId);
   });
+
+  ipcMain.handle("update-all-chat-history", (event, chatID: string) => {
+    const vaultDir = windowsManager.getVaultDirectoryForWinContents(
+      event.sender
+    );
+
+    if (!vaultDir) {
+      return;
+    }
+
+    const chatHistoriesMap = store.get(StoreKeys.ChatHistories);
+    const allChatHistories = chatHistoriesMap[vaultDir] || [];
+    // console.log(`Chat histories map: ${JSON.stringify(allChatHistories)}`);
+    const filteredChatHistories = allChatHistories.filter(item => item.id !== chatID);
+    store.set(StoreKeys.ChatHistories, filteredChatHistories);
+  });
+
+  ipcMain.handle("remove-chat-history-at-id", (event, chatID: string) => {
+    const vaultDir = windowsManager.getVaultDirectoryForWinContents(
+      event.sender
+    );
+
+    if (!vaultDir) {
+      return;
+    }
+
+    const chatHistoriesMap = store.get(StoreKeys.ChatHistories);
+    const allChatHistories = chatHistoriesMap[vaultDir] || [];
+    const filteredChatHistories = allChatHistories.filter(item => item.id !== chatID);
+    chatHistoriesMap[vaultDir] = filteredChatHistories;
+    store.set(StoreKeys.ChatHistories, chatHistoriesMap);
+  });
 };
 
 export function getDefaultEmbeddingModelConfig(
