@@ -19,6 +19,7 @@ import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
 import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
 import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
 import { ChatHistory } from "@/components/Chat/Chat";
+import { ChatHistoryMetadata } from "@/components/Chat/hooks/use-chat-history";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
 
@@ -35,6 +36,9 @@ declare global {
     };
     contextMenu: {
       showFileItemContextMenu: (filePath: FileInfoNode) => void;
+    };
+    contextChatMenu: {
+      showChatItemContext: (chatRow: ChatHistoryMetadata) => void;
     };
     database: {
       search: (
@@ -150,6 +154,7 @@ declare global {
       getAllChatHistories: () => Promise<ChatHistory[]>;
       updateChatHistory: (chatHistory: ChatHistory) => void;
       getChatHistory: (chatID: string) => Promise<ChatHistory>;
+      updateAllChatHistories: (chatID: string) => void;
     };
   }
 }
@@ -289,6 +294,9 @@ contextBridge.exposeInMainWorld("electronStore", {
   updateChatHistory: (chatHistory: ChatHistory) => {
     ipcRenderer.invoke("update-chat-history", chatHistory);
   },
+  updateAllChatHistories: (chatID: string) => {
+    ipcRenderer.invoke("remove-chat-history-at-id", chatID);
+  },
   getChatHistory: (chatID: string) => {
     return ipcRenderer.invoke("get-chat-history", chatID);
   },
@@ -311,6 +319,12 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
 contextBridge.exposeInMainWorld("contextMenu", {
   showFileItemContextMenu: (file: FileInfoNode) => {
     ipcRenderer.invoke("show-context-menu-file-item", file);
+  },
+});
+
+contextBridge.exposeInMainWorld("contextChatMenu", {
+  showChatItemContext: (chatRow: ChatHistoryMetadata) => {
+    ipcRenderer.invoke("show-chat-menu-item", chatRow.id);
   },
 });
 
