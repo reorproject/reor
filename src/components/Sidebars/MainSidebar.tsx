@@ -24,6 +24,7 @@ interface SidebarManagerProps {
   chatHistoriesMetadata: ChatHistoryMetadata[];
   setCurrentChatHistory: (chat: ChatHistory | undefined) => void;
   setChatFilters: (chatFilters: ChatFilters) => void;
+  setChatHistoriesMetadata: (chat: ChatHistoryMetadata[]) => void;
 }
 
 const SidebarManager: React.FC<SidebarManagerProps> = ({
@@ -40,6 +41,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
   setFileDirToBeRenamed,
   currentChatHistory,
   chatHistoriesMetadata,
+  setChatHistoriesMetadata,
   setCurrentChatHistory,
   setChatFilters,
 }) => {
@@ -89,6 +91,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
               numberOfChunksToFetch: 15,
             });
           }}
+          setChatHistoriesMetadata={setChatHistoriesMetadata}
         />
       )}
     </div>
