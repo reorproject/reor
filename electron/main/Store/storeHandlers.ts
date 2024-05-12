@@ -227,7 +227,7 @@ export const registerStoreHandlers = (
     const chatHistoriesMap = store.get(StoreKeys.ChatHistories);
     const allChatHistories = chatHistoriesMap[vaultDir] || [];
     const filteredChatHistories = allChatHistories.filter(item => item.id !== chatID);
-    chatHistoriesMap[vaultDir] = filteredChatHistories;
+    chatHistoriesMap[vaultDir] = filteredChatHistories.reverse();
     store.set(StoreKeys.ChatHistories, chatHistoriesMap);
   });
 };
