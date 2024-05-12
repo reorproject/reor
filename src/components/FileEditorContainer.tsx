@@ -140,6 +140,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
               setFileDirToBeRenamed={setFileDirToBeRenamed}
               currentChatHistory={currentChatHistory}
               chatHistoriesMetadata={chatHistoriesMetadata}
+              setChatHistoriesMetadata={setChatHistoriesMetadata}
               setCurrentChatHistory={openChatAndOpenChat}
               setChatFilters={setChatFilters}
             />
