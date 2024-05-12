@@ -216,6 +216,23 @@ ipcMain.handle("show-context-menu-file-item", (event, file) => {
   }
 });
 
+ipcMain.handle("show-chat-menu-item", (event, chatID) => {
+  const menu = new Menu();
+
+  menu.append(
+    new MenuItem({
+      label: "Delete Chat",
+      click: () => {
+        event.sender.send("remove-chat-at-id", chatID);
+      },
+    })
+  );
+
+  const browserWindow = BrowserWindow.fromWebContents(event.sender);
+  if (browserWindow)
+    menu.popup({ window: browserWindow })
+});
+
 ipcMain.handle("open-external", (event, url) => {
   shell.openExternal(url);
 });
