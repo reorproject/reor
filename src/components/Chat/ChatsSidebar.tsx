@@ -8,6 +8,7 @@ interface ChatListProps {
   currentChatHistory: ChatHistory | undefined;
   onSelect: (chatID: string) => void;
   newChat: () => void;
+  setChatHistoriesMetadata: (chat: ChatHistoryMetadata[]) => void;
 }
 
 export const ChatsSidebar: React.FC<ChatListProps> = ({
@@ -15,12 +16,28 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
   currentChatHistory,
   onSelect,
   newChat,
+  setChatHistoriesMetadata,
 }) => {
   const [reversedChatHistoriesMetadata, setReversedChatHistoriesMetadata] =
     useState<ChatHistoryMetadata[]>([]);
   useEffect(() => {
     setReversedChatHistoriesMetadata(chatHistoriesMetadata.reverse());
   }, [chatHistoriesMetadata]);
+
+  useEffect(() => {
+    const deleteChatRow = window.ipcRenderer.receive(
+      "remove-chat-at-id",
+      (chatID) => {
+        setChatHistoriesMetadata(chatHistoriesMetadata.filter(item => item.id !== chatID));        
+        window.electronStore.updateAllChatHistories(chatID);
+      }
+    );
+
+    return () => {
+      deleteChatRow();
+    }
+  }, [chatHistoriesMetadata]);
+
   return (
     <div className="h-full overflow-y-auto bg-neutral-800">
       <div
@@ -60,11 +77,17 @@ export const ChatItem: React.FC<ChatItemProps> = ({
     isSelected ? "bg-neutral-700 text-white font-semibold" : "text-gray-200"
   }`;
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    window.contextChatMenu.showChatItemContext(chatMetadata);
+  }
+
   return (
     <div>
       <div
         onClick={() => onChatSelect(chatMetadata.id)}
         className={itemClasses}
+        onContextMenu={handleContextMenu}
       >
         <span className={`text-[13px] flex-1 truncate mt-0`}>
           {chatMetadata.displayName}
