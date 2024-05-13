@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { ChatHistory } from "./Chat";
 import { ChatHistoryMetadata } from "./hooks/use-chat-history";
 
@@ -9,6 +9,7 @@ interface ChatListProps {
   onSelect: (chatID: string) => void;
   newChat: () => void;
   setChatHistoriesMetadata: (chat: ChatHistoryMetadata[]) => void;
+  setShowChatbot: (showChat: boolean) => void;
 }
 
 export const ChatsSidebar: React.FC<ChatListProps> = ({
@@ -17,18 +18,24 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
   onSelect,
   newChat,
   setChatHistoriesMetadata,
+  setShowChatbot,
 }) => {
   const [reversedChatHistoriesMetadata, setReversedChatHistoriesMetadata] =
     useState<ChatHistoryMetadata[]>([]);
   useEffect(() => {
     setReversedChatHistoriesMetadata(chatHistoriesMetadata.reverse());
   }, [chatHistoriesMetadata]);
+  const currentSelectedChatID = useRef<string | undefined>();
 
   useEffect(() => {
     const deleteChatRow = window.ipcRenderer.receive(
       "remove-chat-at-id",
       (chatID) => {
-        setChatHistoriesMetadata(chatHistoriesMetadata.filter(item => item.id !== chatID));        
+        const filteredData = chatHistoriesMetadata.filter(item => item.id !== chatID)
+        setChatHistoriesMetadata(filteredData.reverse());
+        if (chatID === currentSelectedChatID.current) {
+          setShowChatbot(false);  
+        }
         window.electronStore.updateAllChatHistories(chatID);
       }
     );
@@ -54,22 +61,25 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
           chatMetadata={chatMetadata}
           selectedChatID={currentChatHistory?.id || ""}
           onChatSelect={onSelect}
+          currentSelectedChatID={currentSelectedChatID}
         />
       ))}
     </div>
   );
 };
 
-interface ChatItemProps {
+export interface ChatItemProps {
   chatMetadata: ChatHistoryMetadata;
   selectedChatID: string | null;
   onChatSelect: (path: string) => void;
+  currentSelectedChatID: React.MutableRefObject<string | undefined>;
 }
 
 export const ChatItem: React.FC<ChatItemProps> = ({
   chatMetadata,
   selectedChatID,
   onChatSelect,
+  currentSelectedChatID,
 }) => {
   const isSelected = chatMetadata.id === selectedChatID;
 
@@ -80,12 +90,15 @@ export const ChatItem: React.FC<ChatItemProps> = ({
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     window.contextChatMenu.showChatItemContext(chatMetadata);
-  }
+  };
 
   return (
     <div>
       <div
-        onClick={() => onChatSelect(chatMetadata.id)}
+        onClick={() => {
+          onChatSelect(chatMetadata.id);
+          currentSelectedChatID.current = chatMetadata.id;
+        }}
         className={itemClasses}
         onContextMenu={handleContextMenu}
       >

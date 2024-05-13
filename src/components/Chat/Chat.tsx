@@ -242,7 +242,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           displayableChatHistory: [],
         };
       }
-      console.log(chatFilters);
       if (chatHistory.displayableChatHistory.length === 0) {
         if (chatFilters) {
           // chatHistory.displayableChatHistory.push({
@@ -265,7 +264,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           context: [],
         });
       }
-      console.log(chatHistory);
 
       setUserTextFieldInput("");
 
@@ -495,8 +493,6 @@ const getChatHistoryContext = (
   chatHistory: ChatHistory | undefined
 ): DBQueryResult[] => {
   if (!chatHistory) return [];
-  console.log("chatHistory", chatHistory.displayableChatHistory);
-
   const contextForChat = chatHistory.displayableChatHistory
     .map((message) => {
       return message.context;

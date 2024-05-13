@@ -7,7 +7,8 @@ import { ChatsSidebar } from "../Chat/ChatsSidebar";
 import { SidebarAbleToShow } from "../FileEditorContainer";
 import { ChatFilters, ChatHistory } from "../Chat/Chat";
 import { ChatHistoryMetadata } from "../Chat/hooks/use-chat-history";
-import posthog from "posthog-js";
+import posthog from "posthog-js"
+
 interface SidebarManagerProps {
   files: FileInfoTree;
   expandedDirectories: Map<string, boolean>;
@@ -23,8 +24,9 @@ interface SidebarManagerProps {
   currentChatHistory: ChatHistory | undefined;
   chatHistoriesMetadata: ChatHistoryMetadata[];
   setCurrentChatHistory: (chat: ChatHistory | undefined) => void;
-  setChatFilters: (chatFilters: ChatFilters) => void;
   setChatHistoriesMetadata: (chat: ChatHistoryMetadata[]) => void;
+  setChatFilters: (chatFilters: ChatFilters) => void;
+  setShowChatbot: (showChat: boolean) => void;
 }
 
 const SidebarManager: React.FC<SidebarManagerProps> = ({
@@ -44,6 +46,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
   setChatHistoriesMetadata,
   setCurrentChatHistory,
   setChatFilters,
+  setShowChatbot
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<DBQueryResult[]>([]);
@@ -92,6 +95,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
             });
           }}
           setChatHistoriesMetadata={setChatHistoriesMetadata}
+          setShowChatbot={setShowChatbot}
         />
       )}
     </div>
