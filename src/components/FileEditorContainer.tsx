@@ -143,6 +143,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
               setChatHistoriesMetadata={setChatHistoriesMetadata}
               setCurrentChatHistory={openChatAndOpenChat}
               setChatFilters={setChatFilters}
+              setShowChatbot={setShowChatbot}
             />
           </div>
         </ResizableComponent>
