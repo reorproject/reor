@@ -173,8 +173,19 @@ ipcMain.handle("show-context-menu-file-item", (event, file) => {
     new MenuItem({
       label: "Delete",
       click: () => {
-        console.log(file.path);
-        event.sender.send("delete-file-listener", file.path);
+        return dialog
+          .showMessageBox({
+            type: "question",
+            title: "Delete File",
+            message: `Are you sure you want to delete "${file.name}"?`,
+            buttons: ["Yes", "No"],
+          })
+          .then((confirm) => {
+            if (confirm.response === 0) {
+              console.log(file.path);
+              event.sender.send("delete-file-listener", file.path);
+            }
+          });
       },
     })
   );
