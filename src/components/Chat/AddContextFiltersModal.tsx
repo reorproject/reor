@@ -56,10 +56,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
           onSelectSuggestion={(file: string) => {
             if (file && !internalFilesSelected.includes(file)) {
               //TODO: add markdown extension properly
-              setInternalFilesSelected([
-                ...internalFilesSelected,
-                file + ".md",
-              ]);
+              setInternalFilesSelected([...internalFilesSelected, file]);
             }
             setSuggestionsState(null);
           }}

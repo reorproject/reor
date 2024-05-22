@@ -38,7 +38,7 @@ export const SearchBarWithFilesSuggestion = ({
         left: inputCoords.x,
       },
       textWithinBrackets: searchText,
-      onSelect: (suggestion) => onSelectSuggestion(suggestion),
+      onSelect: (suggestion) => onSelectSuggestion(suggestion + ".md"),
     });
   };
 
