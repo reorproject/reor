@@ -68,14 +68,13 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   });
 
   const handleAddFileToChatFilters = (file: string) => {
-    const files = [...chatFilters.files, file];
     setSidebarShowing("chats");
     setShowChatbot(true);
     setCurrentChatHistory(undefined);
-    setChatFilters({
-      ...chatFilters,
-      files: files,
-    });
+    setChatFilters((prevChatFilters) => ({
+      ...prevChatFilters,
+      files: [...prevChatFilters.files, file],
+    }));
     posthog.capture("add_file_to_chat", {
       chatFilesLength: files.length,
     });

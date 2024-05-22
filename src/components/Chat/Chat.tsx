@@ -232,6 +232,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     });
     try {
       if (loadingResponse) return;
+      setLoadingResponse(true);
       if (!userTextFieldInput.trim()) return;
       const defaultLLMName = await window.llm.getDefaultLLMName();
 

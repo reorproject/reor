@@ -36,7 +36,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
     const currentChatFilters: ChatFilters = chatFilters
       ? {
           ...chatFilters,
-          files: [...chatFilters.files, ...files],
+          files: [...new Set([...chatFilters.files, ...files])],
         }
       : {
           numberOfChunksToFetch: 15,
@@ -56,10 +56,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
           onSelectSuggestion={(file: string) => {
             if (file && !internalFilesSelected.includes(file)) {
               //TODO: add markdown extension properly
-              setInternalFilesSelected([
-                ...internalFilesSelected,
-                file + ".md",
-              ]);
+              setInternalFilesSelected([...internalFilesSelected, file]);
             }
             setSuggestionsState(null);
           }}
