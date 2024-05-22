@@ -36,7 +36,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
     const currentChatFilters: ChatFilters = chatFilters
       ? {
           ...chatFilters,
-          files: [...chatFilters.files, ...files],
+          files: [...new Set([...chatFilters.files, ...files])],
         }
       : {
           numberOfChunksToFetch: 15,
