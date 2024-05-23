@@ -71,23 +71,7 @@ const OpenAISetupModal: React.FC<OpenAISetupModalProps> = ({
 const openAIDefaultModels: OpenAILLMConfig[] = [
   {
     contextLength: 16385,
-    modelName: "gpt-3.5-turbo-0125",
-    engine: "openai",
-    type: "openai",
-    apiKey: "",
-    apiURL: "",
-  },
-  {
-    contextLength: 16385,
-    modelName: "gpt-3.5-turbo-1106",
-    engine: "openai",
-    type: "openai",
-    apiKey: "",
-    apiURL: "",
-  },
-  {
-    contextLength: 8192,
-    modelName: "gpt-4-0613",
+    modelName: "gpt-3.5-turbo",
     engine: "openai",
     type: "openai",
     apiKey: "",
@@ -95,7 +79,7 @@ const openAIDefaultModels: OpenAILLMConfig[] = [
   },
   {
     contextLength: 128000,
-    modelName: "gpt-4-0125-preview",
+    modelName: "gpt-4o",
     engine: "openai",
     type: "openai",
     apiKey: "",
@@ -103,7 +87,7 @@ const openAIDefaultModels: OpenAILLMConfig[] = [
   },
   {
     contextLength: 128000,
-    modelName: "gpt-4-1106-preview",
+    modelName: "gpt-4-turbo",
     engine: "openai",
     type: "openai",
     apiKey: "",
