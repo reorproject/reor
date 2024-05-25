@@ -154,7 +154,7 @@ declare global {
       getAllChatHistories: () => Promise<ChatHistory[]>;
       updateChatHistory: (chatHistory: ChatHistory) => void;
       getChatHistory: (chatID: string) => Promise<ChatHistory>;
-      updateAllChatHistories: (chatID: string) => void;
+      removeChatHistoryAtID: (chatID: string) => void;
     };
   }
 }
@@ -294,7 +294,7 @@ contextBridge.exposeInMainWorld("electronStore", {
   updateChatHistory: (chatHistory: ChatHistory) => {
     ipcRenderer.invoke("update-chat-history", chatHistory);
   },
-  updateAllChatHistories: (chatID: string) => {
+  removeChatHistoryAtID: (chatID: string) => {
     ipcRenderer.invoke("remove-chat-history-at-id", chatID);
   },
   getChatHistory: (chatID: string) => {
