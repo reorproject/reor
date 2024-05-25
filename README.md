@@ -19,7 +19,9 @@ Private & local AI personal knowledge management app.</h4>
 
 
 ## About
-**Reor** is an AI-powered desktop note-taking app: it automatically links related notes, answers questions on your notes, provides semantic search and can generate AI flashcards. Everything is stored locally and you can edit your notes with an Obsidian-like markdown editor. The hypothesis of the project is that AI tools for thought should **run models locally** by default. Reor stands on the shoulders of the giants [Ollama](https://github.com/ollama/ollama), [Transformers.js](https://github.com/xenova/transformers.js) & [LanceDB](https://github.com/lancedb/lancedb) to enable both LLMs and embedding models to run locally. Connecting to OpenAI or OpenAI-compatible APIs like Oobabooga is also supported.
+**Reor** is an AI-powered desktop note-taking app: it automatically links related notes, answers questions on your notes, provides semantic search and can generate AI flashcards. Everything is stored locally and you can edit your notes with an Obsidian-like markdown editor. 
+
+The hypothesis of the project is that AI tools for thought should **run models locally** by default. Reor stands on the shoulders of the giants [Ollama](https://github.com/ollama/ollama), [Transformers.js](https://github.com/xenova/transformers.js) & [LanceDB](https://github.com/lancedb/lancedb) to enable both LLMs and embedding models to run locally. Connecting to OpenAI or OpenAI-compatible APIs like Oobabooga is also supported.
 
 ### How can it possibly be "self-organizing"?
 
