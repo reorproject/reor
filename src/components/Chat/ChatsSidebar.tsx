@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { ChatHistory } from "./Chat";
 import { ChatHistoryMetadata } from "./hooks/use-chat-history";
 
@@ -8,7 +8,6 @@ interface ChatListProps {
   currentChatHistory: ChatHistory | undefined;
   onSelect: (chatID: string) => void;
   newChat: () => void;
-  setChatHistoriesMetadata: (chat: ChatHistoryMetadata[]) => void;
   setShowChatbot: (showChat: boolean) => void;
 }
 
@@ -17,32 +16,30 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
   currentChatHistory,
   onSelect,
   newChat,
-  setChatHistoriesMetadata,
   setShowChatbot,
 }) => {
-  const [reversedChatHistoriesMetadata, setReversedChatHistoriesMetadata] =
-    useState<ChatHistoryMetadata[]>([]);
-  useEffect(() => {
-    setReversedChatHistoriesMetadata(chatHistoriesMetadata.reverse());
-  }, [chatHistoriesMetadata]);
   const currentSelectedChatID = useRef<string | undefined>();
-
+  useEffect(() => {
+    console.log("chatHistoriesMetadata", chatHistoriesMetadata);
+  }, [chatHistoriesMetadata]);
   useEffect(() => {
     const deleteChatRow = window.ipcRenderer.receive(
       "remove-chat-at-id",
       (chatID) => {
-        const filteredData = chatHistoriesMetadata.filter(item => item.id !== chatID)
-        setChatHistoriesMetadata(filteredData.reverse());
+        // const filteredData = chatHistoriesMetadata.filter(
+        //   (item) => item.id !== chatID
+        // );
+        // setChatHistoriesMetadata(filteredData.reverse());
         if (chatID === currentSelectedChatID.current) {
-          setShowChatbot(false);  
+          setShowChatbot(false);
         }
-        window.electronStore.updateAllChatHistories(chatID);
+        window.electronStore.removeChatHistoryAtID(chatID);
       }
     );
 
     return () => {
       deleteChatRow();
-    }
+    };
   }, [chatHistoriesMetadata]);
 
   return (
@@ -54,16 +51,19 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
         <span className="text-sm"> + New Chat</span>
       </div>
 
-      {reversedChatHistoriesMetadata.map((chatMetadata) => (
-        <ChatItem
-          key={chatMetadata.id}
-          // chat={chat}
-          chatMetadata={chatMetadata}
-          selectedChatID={currentChatHistory?.id || ""}
-          onChatSelect={onSelect}
-          currentSelectedChatID={currentSelectedChatID}
-        />
-      ))}
+      {chatHistoriesMetadata
+        .slice()
+        .reverse()
+        .map((chatMetadata) => (
+          <ChatItem
+            key={chatMetadata.id}
+            // chat={chat}
+            chatMetadata={chatMetadata}
+            selectedChatID={currentChatHistory?.id || ""}
+            onChatSelect={onSelect}
+            currentSelectedChatID={currentSelectedChatID}
+          />
+        ))}
     </div>
   );
 };

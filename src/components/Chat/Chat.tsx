@@ -161,10 +161,6 @@ interface ChatWithLLMProps {
   vaultDirectory: string;
   openFileByPath: (path: string) => Promise<void>;
 
-  setChatHistoriesMetadata: React.Dispatch<
-    React.SetStateAction<ChatHistoryMetadata[]>
-  >;
-  // setAllChatHistories: React.Dispatch<React.SetStateAction<ChatHistory[]>>;
   currentChatHistory: ChatHistory | undefined;
   setCurrentChatHistory: React.Dispatch<
     React.SetStateAction<ChatHistory | undefined>
@@ -177,7 +173,6 @@ interface ChatWithLLMProps {
 const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   vaultDirectory,
   openFileByPath,
-  setChatHistoriesMetadata,
   currentChatHistory,
   setCurrentChatHistory,
   showSimilarFiles,
@@ -268,27 +263,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       setUserTextFieldInput("");
 
       setCurrentChatHistory(chatHistory);
-      setChatHistoriesMetadata((prev) => {
-        if (!chatHistory) return prev;
-        if (prev?.find((chat) => chat.id === chatHistory?.id)) {
-          return prev;
-        }
-        const newChatHistories = prev
-          ? [
-              ...prev,
-              {
-                id: chatHistory.id,
-                displayName: getDisplayableChatName(chatHistory),
-              },
-            ]
-          : [
-              {
-                id: chatHistory.id,
-                displayName: getDisplayableChatName(chatHistory),
-              },
-            ];
-        return newChatHistories;
-      });
 
       if (!chatHistory) return;
 

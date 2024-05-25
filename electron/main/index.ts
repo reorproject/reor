@@ -11,7 +11,7 @@ import { release } from "node:os";
 import { join } from "node:path";
 import Store from "electron-store";
 import * as path from "path";
-import { StoreSchema } from "./Store/storeConfig";
+import { StoreKeys, StoreSchema } from "./Store/storeConfig";
 // import contextMenus from "./contextMenus";
 import * as lancedb from "vectordb";
 import {
@@ -223,14 +223,31 @@ ipcMain.handle("show-chat-menu-item", (event, chatID) => {
     new MenuItem({
       label: "Delete Chat",
       click: () => {
-        event.sender.send("remove-chat-at-id", chatID);
+        const vaultDir = windowsManager.getVaultDirectoryForWinContents(
+          event.sender
+        );
+
+        if (!vaultDir) {
+          return;
+        }
+
+        const chatHistoriesMap = store.get(StoreKeys.ChatHistories);
+        const allChatHistories = chatHistoriesMap[vaultDir] || [];
+        const filteredChatHistories = allChatHistories.filter(
+          (item) => item.id !== chatID
+        );
+        chatHistoriesMap[vaultDir] = filteredChatHistories;
+        store.set(StoreKeys.ChatHistories, chatHistoriesMap);
+        event.sender.send(
+          "update-chat-histories",
+          chatHistoriesMap[vaultDir] || []
+        );
       },
     })
   );
 
   const browserWindow = BrowserWindow.fromWebContents(event.sender);
-  if (browserWindow)
-    menu.popup({ window: browserWindow })
+  if (browserWindow) menu.popup({ window: browserWindow });
 });
 
 ipcMain.handle("open-external", (event, url) => {
