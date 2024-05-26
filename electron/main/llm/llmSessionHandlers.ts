@@ -1,9 +1,11 @@
 import { ipcMain, IpcMainInvokeEvent } from "electron";
 import { LLMSessionService } from "./Types";
 import { OpenAIModelSessionService } from "./models/OpenAI";
+import { AnthropicModelSessionService } from "./models/Anthropic";
 import { LLMConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
 import Store from "electron-store";
 import { ChatCompletionChunk } from "openai/resources/chat/completions";
+import { MessageStreamEvent } from "@anthropic-ai/sdk/resources";
 import { OllamaService } from "./models/Ollama";
 import {
   addOrUpdateLLMSchemaInStore,
@@ -18,9 +20,15 @@ import {
 } from "./contextLimit";
 import { ChatHistory } from "@/components/Chat/Chat";
 
+enum LLMType {
+  OpenAI = "openai",
+  Anthropic = "anthropic",
+}
+
 export const LLMSessions: { [sessionId: string]: LLMSessionService } = {};
 
 export const openAISession = new OpenAIModelSessionService();
+export const anthropicSession = new AnthropicModelSessionService();
 
 export const ollamaService = new OllamaService();
 
@@ -36,18 +44,38 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       isJSONMode: boolean,
       chatHistory: ChatHistory
     ): Promise<void> => {
-      const handleChunk = (chunk: ChatCompletionChunk) => {
-        event.sender.send("tokenStream", chatHistory.id, chunk);
+      const handleOpenAIChunk = (chunk: ChatCompletionChunk) => {
+        event.sender.send("openAITokenStream", chatHistory.id, chunk);
       };
 
-      await openAISession.streamingResponse(
-        llmName,
-        llmConfig,
-        isJSONMode,
-        chatHistory.displayableChatHistory,
-        handleChunk,
-        store.get(StoreKeys.LLMGenerationParameters)
-      );
+      const handleAnthropicChunk = (chunk: MessageStreamEvent) => {
+        event.sender.send("anthropicTokenStream", chatHistory.id, chunk);
+      };
+
+      switch (llmConfig.type) {
+        case LLMType.OpenAI:
+          await openAISession.streamingResponse(
+            llmName,
+            llmConfig,
+            isJSONMode,
+            chatHistory.displayableChatHistory,
+            handleOpenAIChunk,
+            store.get(StoreKeys.LLMGenerationParameters)
+          );
+          break;
+        case LLMType.Anthropic:
+          await anthropicSession.streamingResponse(
+            llmName,
+            llmConfig,
+            isJSONMode,
+            chatHistory.displayableChatHistory,
+            handleAnthropicChunk,
+            store.get(StoreKeys.LLMGenerationParameters)
+          );
+          break;
+        default:
+          throw new Error(`LLM type ${llmConfig.type} not supported.`);
+      }
     }
   );
   ipcMain.handle("set-default-llm", (event, modelName: string) => {

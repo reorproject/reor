@@ -15,6 +15,7 @@ type CustomSelectProps = {
     onClick: () => void;
   };
   onDelete?: (value: string) => void;
+  centerText?: boolean;
 };
 
 const CustomSelect: React.FC<CustomSelectProps> = ({
@@ -23,6 +24,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   onChange,
   addButton,
   onDelete,
+  centerText = false,
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -62,6 +64,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         className="flex justify-between items-center w-full py-2 border border-gray-300 rounded-md bg-neutral-200 cursor-pointer"
         onClick={toggleDropdown}
       >
+        {centerText ? <span></span> : null}
         <span className="ml-2 text-[13px] text-gray-600">{selectedValue}</span>
         <span
           className="transform transition-transform mr-2"

@@ -1,28 +1,37 @@
 import React, { useState } from "react";
 import { Button } from "@material-tailwind/react";
 import Modal from "../../Generic/Modal";
-import { OpenAILLMConfig } from "electron/main/Store/storeConfig";
+import {
+  OpenAILLMConfig,
+  AnthropicLLMConfig,
+} from "electron/main/Store/storeConfig";
 
-interface OpenAISetupModalProps {
+interface CloudLLMSetupModalProps {
   isOpen: boolean;
   onClose: () => void;
+  LLMType: "openai" | "anthropic";
 }
 
-const OpenAISetupModal: React.FC<OpenAISetupModalProps> = ({
+const CloudLLMSetupModal: React.FC<CloudLLMSetupModalProps> = ({
   isOpen,
   onClose,
+  LLMType,
 }) => {
-  const [openAIKey, setOpenAIKey] = useState("");
+  const [openKey, setOpenKey] = useState("");
+
+  const defaultModels =
+    LLMType === "openai" ? openAIDefaultModels : AnthropicDefaultModels;
+  const LLMDisplayName = LLMType === "openai" ? "OpenAI" : "Anthropic";
 
   const handleSave = async () => {
-    if (openAIKey) {
-      for (const modelConfig of openAIDefaultModels) {
+    if (openKey) {
+      for (const modelConfig of defaultModels) {
         console.log("modelConfig:", modelConfig);
-        modelConfig.apiKey = openAIKey;
+        modelConfig.apiKey = openKey;
         await window.llm.addOrUpdateLLM(modelConfig);
       }
-      if (openAIDefaultModels.length > 0) {
-        window.llm.setDefaultLLM(openAIDefaultModels[0].modelName);
+      if (defaultModels.length > 0) {
+        window.llm.setDefaultLLM(defaultModels[0].modelName);
       }
     }
 
@@ -37,22 +46,24 @@ const OpenAISetupModal: React.FC<OpenAISetupModalProps> = ({
   return (
     <Modal isOpen={isOpen} onClose={handleSave}>
       <div className="w-[300px] ml-3 mr-2 mb-2">
-        <h3 className="font-semibold mb-0 text-white">OpenAI Setup</h3>
+        <h3 className="font-semibold mb-0 text-white">
+          {LLMDisplayName} Setup
+        </h3>
         <p className="text-gray-100 mb-2 mt-2 text-sm">
-          Enter your OpenAI API key below:
+          Enter your {LLMDisplayName} API key below:
         </p>
         <input
           type="text"
           className="block w-full px-3 py-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
-          value={openAIKey}
-          onChange={(e) => setOpenAIKey(e.target.value)}
+          value={openKey}
+          onChange={(e) => setOpenKey(e.target.value)}
           onKeyDown={handleKeyPress}
-          placeholder="OpenAI API Key"
+          placeholder={`${LLMDisplayName} API Key`}
         />
         <p className="mt-2 text-gray-100 text-xs">
           <i>
-            You&apos;ll then be able to choose an OpenAI model in the model
-            dropdown...
+            You&apos;ll then be able to choose an {LLMDisplayName} model in the
+            model dropdown...
           </i>
         </p>
 
@@ -95,4 +106,31 @@ const openAIDefaultModels: OpenAILLMConfig[] = [
   },
 ];
 
-export default OpenAISetupModal;
+const AnthropicDefaultModels: AnthropicLLMConfig[] = [
+  {
+    contextLength: 180000,
+    modelName: "claude-3-haiku-20240307",
+    engine: "anthropic",
+    type: "anthropic",
+    apiKey: "",
+    apiURL: "",
+  },
+  {
+    contextLength: 180000,
+    modelName: "claude-3-sonnet-20240229",
+    engine: "anthropic",
+    type: "anthropic",
+    apiKey: "",
+    apiURL: "",
+  },
+  {
+    contextLength: 180000,
+    modelName: "claude-3-opus-20240229",
+    engine: "anthropic",
+    type: "anthropic",
+    apiKey: "",
+    apiURL: "",
+  },
+];
+
+export default CloudLLMSetupModal;
