@@ -14,7 +14,7 @@ export function validateAIModelConfig(config: LLMConfig): string | null {
   }
 
   // Validate engine: ensure it's either "openai" or "llamacpp"
-  if (config.engine !== "openai") {
+  if (config.engine !== "openai" && config.engine !== "anthropic") {
     return "Engine must be either 'openai' or 'llamacpp'.";
   }
 

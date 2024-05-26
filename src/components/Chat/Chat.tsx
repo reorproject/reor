@@ -28,6 +28,7 @@ import { SimilarEntriesComponent } from "../Similarity/SimilarFilesSidebar";
 import ResizableComponent from "../Generic/ResizableComponent";
 import AddContextFiltersModal from "./AddContextFiltersModal";
 import posthog from "posthog-js";
+import { MessageStreamEvent } from "@anthropic-ai/sdk/resources";
 
 // convert ask options to enum
 enum AskOptions {
@@ -344,7 +345,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   };
 
   useEffect(() => {
-    const handleChunk = async (
+    const handleOpenAIChunk = async (
       receivedChatID: string,
       chunk: ChatCompletionChunk
     ) => {
@@ -354,13 +355,30 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       }
     };
 
-    const removeTokenStreamListener = window.ipcRenderer.receive(
-      "tokenStream",
-      handleChunk
+    const handleAnthropicChunk = async (
+      receivedChatID: string,
+      chunk: MessageStreamEvent
+    ) => {
+      const newContent =
+        chunk.type === "content_block_delta" ? chunk.delta.text ?? "" : "";
+      if (newContent) {
+        appendNewContentToMessageHistory(receivedChatID, newContent, "success");
+      }
+    };
+
+    const removeOpenAITokenStreamListener = window.ipcRenderer.receive(
+      "openAITokenStream",
+      handleOpenAIChunk
+    );
+
+    const removeAnthropicTokenStreamListener = window.ipcRenderer.receive(
+      "anthropicTokenStream",
+      handleAnthropicChunk
     );
 
     return () => {
-      removeTokenStreamListener();
+      removeOpenAITokenStreamListener();
+      removeAnthropicTokenStreamListener();
     };
   }, []);
 

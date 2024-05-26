@@ -2,6 +2,7 @@ import {
   ChatCompletionChunk,
   ChatCompletionMessageParam,
 } from "openai/resources/chat/completions";
+import { MessageStreamEvent } from "@anthropic-ai/sdk/resources";
 import { LLMGenerationParameters, LLMConfig } from "../Store/storeConfig";
 
 // Any LLM engine should implement this interface:
@@ -26,7 +27,7 @@ export interface LLMSessionService {
     modelConfig: LLMConfig,
     isJSONMode: boolean,
     messageHistory: Array<ChatCompletionMessageParam>,
-    chunkResponse: (chunk: ChatCompletionChunk) => void,
+    chunkResponse: (chunk: ChatCompletionChunk | MessageStreamEvent) => void,
     generationParams?: LLMGenerationParameters
   ): Promise<void>;
 
