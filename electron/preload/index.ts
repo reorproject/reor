@@ -143,6 +143,8 @@ declare global {
       removeEmbeddingModel: (modelName: string) => void;
       getNoOfRAGExamples: () => Promise<number>;
       setNoOfRAGExamples: (noOfExamples: number) => void;
+      getChunkSize: () => Promise<number>;
+      setChunkSize: (chunkSize: number) => void;
       getHardwareConfig: () => Promise<HardwareConfig>;
       setHardwareConfig: (config: HardwareConfig) => void;
       getLLMGenerationParams: () => Promise<LLMGenerationParameters>;
@@ -263,6 +265,12 @@ contextBridge.exposeInMainWorld("electronStore", {
   },
   setNoOfRAGExamples: (noOfExamples: number) => {
     ipcRenderer.invoke("set-no-of-rag-examples", noOfExamples);
+  },
+  getChunkSize: () => {
+    return ipcRenderer.invoke("get-chunk-size");
+  },
+  setChunkSize: (chunkSize: number) => {
+    ipcRenderer.invoke("set-chunk-size", chunkSize);
   },
   getHardwareConfig: () => {
     return ipcRenderer.invoke("get-hardware-config");
