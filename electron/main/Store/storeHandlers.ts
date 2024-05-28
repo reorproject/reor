@@ -104,6 +104,14 @@ export const registerStoreHandlers = (
     return store.get(StoreKeys.MaxRAGExamples);
   });
 
+  ipcMain.handle("set-chunk-size", (event, chunkSize: number) => {
+    store.set(StoreKeys.ChunkSize, chunkSize);
+  });
+
+  ipcMain.handle("get-chunk-size", () => {
+    return store.get(StoreKeys.ChunkSize);
+  });
+
   ipcMain.handle("get-default-embedding-model", () => {
     return store.get(StoreKeys.DefaultEmbeddingModelAlias);
   });

@@ -62,6 +62,7 @@ export interface StoreSchema {
     [vaultDir: string]: ChatHistory[];
   };
   analytics?: boolean;
+  chunkSize: number;
 }
 
 export enum StoreKeys {
@@ -77,4 +78,5 @@ export enum StoreKeys {
   Hardware = "hardware",
   LLMGenerationParameters = "llmGenerationParameters",
   ChatHistories = "chatHistories",
+  ChunkSize = "chunkSize",
 }

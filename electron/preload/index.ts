@@ -19,6 +19,7 @@ import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
 import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
 import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
 import { ChatHistory } from "@/components/Chat/Chat";
+import { set } from "date-fns";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
 
@@ -139,6 +140,8 @@ declare global {
       removeEmbeddingModel: (modelName: string) => void;
       getNoOfRAGExamples: () => Promise<number>;
       setNoOfRAGExamples: (noOfExamples: number) => void;
+      getChunkSize: () => Promise<number>;
+      setChunkSize: (chunkSize: number) => void;
       getHardwareConfig: () => Promise<HardwareConfig>;
       setHardwareConfig: (config: HardwareConfig) => void;
       getLLMGenerationParams: () => Promise<LLMGenerationParameters>;
@@ -258,6 +261,12 @@ contextBridge.exposeInMainWorld("electronStore", {
   },
   setNoOfRAGExamples: (noOfExamples: number) => {
     ipcRenderer.invoke("set-no-of-rag-examples", noOfExamples);
+  },
+  getChunkSize: () => {
+    return ipcRenderer.invoke("get-chunk-size");
+  },
+  setChunkSize: (chunkSize: number) => {
+    ipcRenderer.invoke("set-chunk-size", chunkSize);
   },
   getHardwareConfig: () => {
     return ipcRenderer.invoke("get-hardware-config");

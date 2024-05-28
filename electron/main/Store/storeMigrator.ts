@@ -17,6 +17,10 @@ export function setupDefaultStoreValues(store: Store<StoreSchema>) {
   if (!store.get(StoreKeys.MaxRAGExamples)) {
     store.set(StoreKeys.MaxRAGExamples, 15);
   }
+
+  if (!store.get(StoreKeys.ChunkSize)) {
+    store.set(StoreKeys.ChunkSize, 500);
+  }
   setupDefaultAnalyticsValue(store);
 
   setupDefaultEmbeddingModels(store);
