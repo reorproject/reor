@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { LLMConfig } from "electron/main/Store/storeConfig";
 import CustomSelect from "../Generic/Select";
 import { Button } from "@material-tailwind/react";
-import OpenAISetupModal from "./ExtraModals/OpenAISetup";
+import CloudLLMSetupModal from "./ExtraModals/CloudLLMSetup";
 import RemoteLLMSetupModal from "./ExtraModals/RemoteLLMSetup";
 import NewOllamaModelModal from "./ExtraModals/NewOllamaModel";
 import DefaultLLMSelector from "./DefaultLLMSelector";
@@ -26,8 +26,31 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
   const [isRemoteLLMModalOpen, setIsRemoteLLMModalOpen] =
     useState<boolean>(false);
 
-  const [isOpenAIModelModalOpen, setIsOpenAIModelModalOpen] =
+  const [isCloudLLMModalOpen, setIsCloudLLMModalOpen] =
     useState<boolean>(false);
+  const [selectedCloudLLMModal, setSelectedCloudLLMModal] =
+    useState<string>("");
+
+  const modalOptions = [
+    {
+      label: "OpenAI Setup",
+      value: "openai",
+    },
+    {
+      label: "Anthropic Setup",
+      value: "anthropic",
+    },
+  ];
+
+  const handleModalSelection = (selectedValue: string) => {
+    setSelectedCloudLLMModal(selectedValue);
+    setIsCloudLLMModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsCloudLLMModalOpen(false);
+    setSelectedCloudLLMModal("");
+  };
 
   const [defaultModel, setDefaultModel] = useState<string>("");
   const [currentError, setCurrentError] = useState<string>("");
@@ -49,7 +72,7 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
 
   useEffect(() => {
     fetchAndUpdateModelConfigs();
-  }, [isNewLocalModelModalOpen, isRemoteLLMModalOpen, isOpenAIModelModalOpen]);
+  }, [isNewLocalModelModalOpen, isRemoteLLMModalOpen, isCloudLLMModalOpen]);
 
   useEffect(() => {
     // this condition may in fact be less necessary: no need for the user to use chatbot...
@@ -119,13 +142,14 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
             >
               Attach remote LLM
             </Button>
-            <Button
-              className="bg-orange-700  border-none h-8 hover:bg-orange-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mb-3 mr-2"
-              onClick={() => setIsOpenAIModelModalOpen(true)}
-              placeholder=""
-            >
-              Connect to OpenAI
-            </Button>
+            <div className="border-none h-8 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-1 mb-3 mr-2">
+              <CustomSelect
+                options={modalOptions}
+                selectedValue={"Attach Cloud LLM"}
+                onChange={handleModalSelection}
+                centerText={true}
+              />
+            </div>
           </div>
           {llmConfigs.length > 0 && (
             <div>
@@ -174,13 +198,14 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
             >
               Remote LLM Setup
             </Button>
-            <Button
-              className="bg-orange-700  border-none h-8 hover:bg-orange-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
-              onClick={() => setIsOpenAIModelModalOpen(true)}
-              placeholder=""
-            >
-              OpenAI Setup
-            </Button>
+            <div className="border-none h-8 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4">
+              <CustomSelect
+                options={modalOptions}
+                selectedValue={"Cloud Based LLM Setup"}
+                onChange={handleModalSelection}
+                centerText={true}
+              />
+            </div>
           </div>
         </div>
       )}
@@ -197,12 +222,20 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
           setIsRemoteLLMModalOpen(false);
         }}
       />
-      <OpenAISetupModal
-        isOpen={isOpenAIModelModalOpen}
-        onClose={() => {
-          setIsOpenAIModelModalOpen(false);
-        }}
-      />
+      {isCloudLLMModalOpen && selectedCloudLLMModal === "openai" && (
+        <CloudLLMSetupModal
+          isOpen={isCloudLLMModalOpen}
+          onClose={handleModalClose}
+          LLMType="openai"
+        />
+      )}
+      {isCloudLLMModalOpen && selectedCloudLLMModal === "anthropic" && (
+        <CloudLLMSetupModal
+          isOpen={isCloudLLMModalOpen}
+          onClose={handleModalClose}
+          LLMType="anthropic"
+        />
+      )}
       {userMadeChanges && (
         <p className="text-xs text-slate-100 mt-1">
           You&apos;ll need to refresh the chat window to apply these changes.

@@ -193,6 +193,11 @@ export const registerStoreHandlers = (
       ...allChatHistories,
       [vaultDir]: chatHistoriesCorrespondingToVault,
     });
+
+    event.sender.send(
+      "update-chat-histories",
+      chatHistoriesCorrespondingToVault
+    );
   });
 
   ipcMain.handle("get-chat-history", (event, chatId: string) => {
@@ -205,6 +210,24 @@ export const registerStoreHandlers = (
     const allChatHistories = store.get(StoreKeys.ChatHistories);
     const vaultChatHistories = allChatHistories[vaultDir] || [];
     return vaultChatHistories.find((chat) => chat.id === chatId);
+  });
+
+  ipcMain.handle("remove-chat-history-at-id", (event, chatID: string) => {
+    const vaultDir = windowsManager.getVaultDirectoryForWinContents(
+      event.sender
+    );
+
+    if (!vaultDir) {
+      return;
+    }
+
+    const chatHistoriesMap = store.get(StoreKeys.ChatHistories);
+    const allChatHistories = chatHistoriesMap[vaultDir] || [];
+    const filteredChatHistories = allChatHistories.filter(
+      (item) => item.id !== chatID
+    );
+    chatHistoriesMap[vaultDir] = filteredChatHistories.reverse();
+    store.set(StoreKeys.ChatHistories, chatHistoriesMap);
   });
 };
 

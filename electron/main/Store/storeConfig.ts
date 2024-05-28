@@ -4,15 +4,23 @@ export interface BaseLLMConfig {
   modelName: string;
   contextLength: number;
   errorMsg?: string;
-  engine: "openai";
 }
 
 export interface OpenAILLMConfig extends BaseLLMConfig {
   type: "openai";
+  engine: "openai";
   apiURL: string;
   apiKey: string;
 }
-export type LLMConfig = OpenAILLMConfig;
+
+export interface AnthropicLLMConfig extends BaseLLMConfig {
+  type: "anthropic";
+  engine: "anthropic";
+  apiURL: string;
+  apiKey: string;
+}
+
+export type LLMConfig = OpenAILLMConfig | AnthropicLLMConfig;
 
 export type LLMGenerationParameters = {
   maxTokens?: number;

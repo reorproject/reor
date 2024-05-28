@@ -28,6 +28,7 @@ import { SimilarEntriesComponent } from "../Similarity/SimilarFilesSidebar";
 import ResizableComponent from "../Generic/ResizableComponent";
 import AddContextFiltersModal from "./AddContextFiltersModal";
 import posthog from "posthog-js";
+import { MessageStreamEvent } from "@anthropic-ai/sdk/resources";
 
 // convert ask options to enum
 enum AskOptions {
@@ -161,10 +162,6 @@ interface ChatWithLLMProps {
   vaultDirectory: string;
   openFileByPath: (path: string) => Promise<void>;
 
-  setChatHistoriesMetadata: React.Dispatch<
-    React.SetStateAction<ChatHistoryMetadata[]>
-  >;
-  // setAllChatHistories: React.Dispatch<React.SetStateAction<ChatHistory[]>>;
   currentChatHistory: ChatHistory | undefined;
   setCurrentChatHistory: React.Dispatch<
     React.SetStateAction<ChatHistory | undefined>
@@ -177,7 +174,6 @@ interface ChatWithLLMProps {
 const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   vaultDirectory,
   openFileByPath,
-  setChatHistoriesMetadata,
   currentChatHistory,
   setCurrentChatHistory,
   showSimilarFiles,
@@ -243,7 +239,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           displayableChatHistory: [],
         };
       }
-      console.log(chatFilters);
       if (chatHistory.displayableChatHistory.length === 0) {
         if (chatFilters) {
           // chatHistory.displayableChatHistory.push({
@@ -266,32 +261,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           context: [],
         });
       }
-      console.log(chatHistory);
 
       setUserTextFieldInput("");
 
       setCurrentChatHistory(chatHistory);
-      setChatHistoriesMetadata((prev) => {
-        if (!chatHistory) return prev;
-        if (prev?.find((chat) => chat.id === chatHistory?.id)) {
-          return prev;
-        }
-        const newChatHistories = prev
-          ? [
-              ...prev,
-              {
-                id: chatHistory.id,
-                displayName: getDisplayableChatName(chatHistory),
-              },
-            ]
-          : [
-              {
-                id: chatHistory.id,
-                displayName: getDisplayableChatName(chatHistory),
-              },
-            ];
-        return newChatHistories;
-      });
 
       if (!chatHistory) return;
 
@@ -372,7 +345,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   };
 
   useEffect(() => {
-    const handleChunk = async (
+    const handleOpenAIChunk = async (
       receivedChatID: string,
       chunk: ChatCompletionChunk
     ) => {
@@ -382,13 +355,30 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       }
     };
 
-    const removeTokenStreamListener = window.ipcRenderer.receive(
-      "tokenStream",
-      handleChunk
+    const handleAnthropicChunk = async (
+      receivedChatID: string,
+      chunk: MessageStreamEvent
+    ) => {
+      const newContent =
+        chunk.type === "content_block_delta" ? chunk.delta.text ?? "" : "";
+      if (newContent) {
+        appendNewContentToMessageHistory(receivedChatID, newContent, "success");
+      }
+    };
+
+    const removeOpenAITokenStreamListener = window.ipcRenderer.receive(
+      "openAITokenStream",
+      handleOpenAIChunk
+    );
+
+    const removeAnthropicTokenStreamListener = window.ipcRenderer.receive(
+      "anthropicTokenStream",
+      handleAnthropicChunk
     );
 
     return () => {
-      removeTokenStreamListener();
+      removeOpenAITokenStreamListener();
+      removeAnthropicTokenStreamListener();
     };
   }, []);
 
@@ -496,8 +486,6 @@ const getChatHistoryContext = (
   chatHistory: ChatHistory | undefined
 ): DBQueryResult[] => {
   if (!chatHistory) return [];
-  console.log("chatHistory", chatHistory.displayableChatHistory);
-
   const contextForChat = chatHistory.displayableChatHistory
     .map((message) => {
       return message.context;

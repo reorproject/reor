@@ -37,12 +37,8 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     setNavigationHistory,
   } = useFileByFilepath();
 
-  const {
-    currentChatHistory,
-    setCurrentChatHistory,
-    chatHistoriesMetadata,
-    setChatHistoriesMetadata,
-  } = useChatHistory();
+  const { currentChatHistory, setCurrentChatHistory, chatHistoriesMetadata } =
+    useChatHistory();
 
   const { files, flattenedFiles, expandedDirectories, handleDirectoryToggle } =
     useFileInfoTree(filePath);
@@ -142,6 +138,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
               chatHistoriesMetadata={chatHistoriesMetadata}
               setCurrentChatHistory={openChatAndOpenChat}
               setChatFilters={setChatFilters}
+              setShowChatbot={setShowChatbot}
             />
           </div>
         </ResizableComponent>
@@ -190,7 +187,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
             <ChatWithLLM
               vaultDirectory={vaultDirectory}
               openFileByPath={openFileAndOpenEditor}
-              setChatHistoriesMetadata={setChatHistoriesMetadata}
               currentChatHistory={currentChatHistory}
               setCurrentChatHistory={setCurrentChatHistory}
               showSimilarFiles={showSimilarFiles}
