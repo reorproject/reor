@@ -4,6 +4,7 @@ import Modal from "../../Generic/Modal";
 import ExternalLink from "../../Generic/ExternalLink";
 import { errorToString } from "@/functions/error";
 import { ProgressResponse } from "ollama";
+import { toast } from "react-toastify";
 
 interface NewOllamaModelModalProps {
   isOpen: boolean;
@@ -38,14 +39,17 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
     try {
       await window.llm.pullOllamaModel(taggedModelName);
       await window.llm.setDefaultLLM(taggedModelName);
+      toast.success(`${taggedModelName} download complete!`);
     } catch (e) {
+      const errorMessage = errorToString(e);
       setDownloadProgress((prevProgress) => ({
         ...prevProgress,
         [taggedModelName]: {
           ...prevProgress[taggedModelName],
-          error: errorToString(e),
+          error: errorMessage,
         },
       }));
+      toast.error(`${taggedModelName} download failed: ${errorMessage}`);
     }
   };
 
