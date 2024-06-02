@@ -1,5 +1,6 @@
 import React, { useState, useEffect, ReactNode } from "react";
 import CustomSelect from "../Generic/Select";
+import posthog from "posthog-js";
 
 interface ChunkSizeSettingsProps {
   children?: ReactNode; // Define children prop
@@ -26,6 +27,9 @@ const ChunkSizeSettings: React.FC<ChunkSizeSettingsProps> = ({ children }) => {
     const numberVersion = parseInt(size);
     setChunkSize(numberVersion);
     window.electronStore.setChunkSize(numberVersion);
+    posthog.capture("change_chunk_size", {
+      chunkSize: numberVersion,
+    });
   };
 
   const possibleChunkSizes = Array.from(

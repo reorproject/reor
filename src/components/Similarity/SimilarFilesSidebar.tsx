@@ -10,6 +10,7 @@ import { HighlightData } from "../Editor/HighlightExtension";
 import { FaArrowRight } from "react-icons/fa";
 import removeMd from "remove-markdown";
 import { CircularProgress } from "@mui/material";
+import posthog from "posthog-js";
 
 interface SidebarComponentProps {
   filePath: string;
@@ -137,7 +138,10 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
         setIsRefined={setIsRefined}
         similarEntries={similarEntries}
         setSimilarEntries={setSimilarEntries}
-        onFileSelect={openFileByPath}
+        onFileSelect={(path: string) => {
+          openFileByPath(path);
+          posthog.capture("open_file_from_related_notes")
+        }}
         saveCurrentFile={async () => {
           await saveCurrentlyOpenedFile();
         }}
@@ -226,6 +230,7 @@ export const SimilarEntriesComponent: React.FC<
                 onClick={() => {
                   setIsRefined(!isRefined);
                   updateSimilarEntries(!isRefined);
+                  posthog.capture("rerank_related_notes")
                 }}
               >
                 {isRefined ? "Un-rerank" : "Rerank results"}
@@ -241,7 +246,9 @@ export const SimilarEntriesComponent: React.FC<
                     <DBResultPreview
                       key={index}
                       dbResult={dbResult}
-                      onSelect={onFileSelect}
+                      onSelect={(path: string) => {
+                        onFileSelect(path)
+                      }}
                     />
                   </div>
                 ))}

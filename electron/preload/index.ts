@@ -33,6 +33,7 @@ declare global {
       openExternal: (url: string) => void;
       getPlatform: () => string;
       openNewWindow: () => void;
+      getReorAppVersion: () => Promise<string>;
     };
     contextMenu: {
       showFileItemContextMenu: (filePath: FileInfoNode) => void;
@@ -224,6 +225,7 @@ contextBridge.exposeInMainWorld("electron", {
   openExternal: (url: string) => ipcRenderer.invoke("open-external", url),
   getPlatform: () => ipcRenderer.invoke("get-platform"),
   openNewWindow: () => ipcRenderer.invoke("open-new-window"),
+  getReorAppVersion: () => ipcRenderer.invoke("get-reor-app-version"),
 });
 
 contextBridge.exposeInMainWorld("electronStore", {

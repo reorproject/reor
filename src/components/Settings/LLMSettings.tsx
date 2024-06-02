@@ -6,6 +6,7 @@ import CloudLLMSetupModal from "./ExtraModals/CloudLLMSetup";
 import RemoteLLMSetupModal from "./ExtraModals/RemoteLLMSetup";
 import NewOllamaModelModal from "./ExtraModals/NewOllamaModel";
 import DefaultLLMSelector from "./DefaultLLMSelector";
+import posthog from "posthog-js";
 
 interface LLMSettingsProps {
   userHasCompleted?: (completed: boolean) => void;
@@ -97,6 +98,9 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
     setDefaultModel(selectedModel);
     setUserMadeChanges(true);
     window.llm.setDefaultLLM(selectedModel);
+    posthog.capture("change_default_llm", {
+      defaultLLM: selectedModel,
+    });
   };
 
   // const handleDeleteModel = async (modelToDelete: string) => {

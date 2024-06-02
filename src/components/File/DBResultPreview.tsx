@@ -55,6 +55,8 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({
   const modified = formatModifiedDate(entry.filemodified);
   const fileName = getFileName(entry.notepath)
 
+  
+
   return (
     <div
       className="bg-neutral-800 border border-gray-600 rounded shadow-md hover:shadow-lg transition-transform duration-300 cursor-pointer hover:scale-104 hover:bg-neutral-500 mt-0 mb-4 p-2"

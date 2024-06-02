@@ -5,6 +5,7 @@ import ExternalLink from "../../Generic/ExternalLink";
 import { errorToString } from "@/functions/error";
 import { ProgressResponse } from "ollama";
 import { toast } from "react-toastify";
+import posthog from "posthog-js";
 
 interface NewOllamaModelModalProps {
   isOpen: boolean;
@@ -37,6 +38,9 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
       taggedModelName = `${taggedModelName}:latest`;
     }
     try {
+      posthog.capture("download_new_llm", {
+        modelName: taggedModelName,
+      });
       await window.llm.pullOllamaModel(taggedModelName);
       await window.llm.setDefaultLLM(taggedModelName);
       toast.success(`${taggedModelName} download complete!`);

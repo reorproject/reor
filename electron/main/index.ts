@@ -273,6 +273,10 @@ ipcMain.handle("open-new-window", () => {
   windowsManager.createWindow(store, preload, url, indexHtml);
 });
 
+ipcMain.handle("get-reor-app-version", async () => {
+  return app.getVersion();
+});
+
 ipcMain.handle("path-basename", (event, pathString: string) => {
   return path.basename(pathString);
 });

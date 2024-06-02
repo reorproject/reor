@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
 import { getInvalidCharacterInFilePath } from "@/functions/strings";
+import posthog from "posthog-js";
 
 interface NewNoteComponentProps {
   isOpen: boolean;
@@ -37,6 +38,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
       return;
     }
     openRelativePath(fileName);
+    posthog.capture("created_new_note_from_new_note_modal")
     onClose();
   };
 

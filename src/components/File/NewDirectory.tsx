@@ -4,6 +4,7 @@ import { Button } from "@material-tailwind/react";
 import { errorToString } from "@/functions/error";
 import { toast } from "react-toastify";
 import { getInvalidCharacterInFilePath } from "@/functions/strings";
+import posthog from "posthog-js";
 
 interface NewDirectoryComponentProps {
   isOpen: boolean;
@@ -45,6 +46,7 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
         normalizedDirectoryName
       );
       window.files.createDirectory(fullPath);
+      posthog.capture("created_new_directory_from_new_directory_modal");
       onDirectoryCreate(fullPath);
       onClose();
     } catch (e) {

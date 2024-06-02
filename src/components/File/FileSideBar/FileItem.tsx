@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { FaChevronRight } from "react-icons/fa";
 import { FaChevronDown } from "react-icons/fa";
 import { isFileNodeDirectory, moveFile } from "./fileOperations";
+import posthog from "posthog-js";
 
 interface FileInfoProps {
   file: FileInfoNode;
@@ -63,6 +64,7 @@ export const FileItem: React.FC<FileInfoProps> = ({
       onDirectoryToggle(file.path);
     } else {
       onFileSelect(file.path);
+      posthog.capture("open_file_from_sidebar");
     }
   };
 

@@ -5,6 +5,7 @@ import { LLMConfig } from "electron/main/Store/storeConfig";
 import CustomSelect from "../../Generic/Select";
 import { errorToString } from "@/functions/error";
 import ExternalLink from "../../Generic/ExternalLink";
+import posthog from "posthog-js";
 
 interface RemoteLLMModalProps {
   isOpen: boolean;
@@ -41,6 +42,10 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
       apiKey,
       engine: "openai",
     };
+    posthog.capture("save_remote_llm", {
+      modelName,
+      contextLength: selectedContextLength,
+    });
     try {
       await window.llm.addOrUpdateLLM(modelConfig);
       parentOnClose();

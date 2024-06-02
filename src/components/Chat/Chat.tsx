@@ -469,7 +469,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         <SimilarEntriesComponent
           similarEntries={currentContext}
           titleText="Context Used in Chat"
-          onFileSelect={openFileByPath}
+          onFileSelect={(path: string) => {
+            openFileByPath(path);
+            posthog.capture("open_file_from_chat_context");
+          }}
           saveCurrentFile={() => {
             return Promise.resolve();
           }}

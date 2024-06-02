@@ -4,6 +4,7 @@ import { Button } from "@material-tailwind/react";
 import NewLocalEmbeddingModelModal from "./ExtraModals/NewLocalEmbeddingModel";
 import { EmbeddingModelConfig } from "electron/main/Store/storeConfig";
 import NewRemoteEmbeddingModelModal from "./ExtraModals/NewRemoteEmbeddingModel";
+import posthog from "posthog-js";
 
 interface EmbeddingModelManagerProps {
   // userHasCompleted?: (completed: boolean) => void;
@@ -62,6 +63,9 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
   const handleChangeOnModelSelect = (newSelectedModel: string) => {
     setSelectedModel(newSelectedModel);
     window.electronStore.setDefaultEmbeddingModel(newSelectedModel);
+    posthog.capture("change_default_embedding_model", {
+      defaultEmbeddingModel: newSelectedModel,
+    });
     if (handleUserHasChangedModel) {
       handleUserHasChangedModel();
     }

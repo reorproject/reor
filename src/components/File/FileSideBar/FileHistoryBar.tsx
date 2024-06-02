@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { IoMdArrowRoundBack, IoMdArrowRoundForward } from "react-icons/io";
 
 import "./../../../styles/history.scss";
+import posthog from "posthog-js";
 
 interface FileHistoryNavigatorProps {
   history: string[];
@@ -50,6 +51,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
       const newIndex = currentIndex - 1;
       setCurrentIndex(newIndex);
       onFileSelect(history[newIndex]);
+      posthog.capture("file_history_navigator_back");
     }
   };
 
@@ -58,6 +60,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
       const newIndex = currentIndex + 1;
       setCurrentIndex(newIndex);
       onFileSelect(history[newIndex]);
+      posthog.capture("file_history_navigator_forward");
     }
   };
 
@@ -66,6 +69,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
       const newIndex = history.indexOf(path);
       setCurrentIndex(newIndex);
       onFileSelect(path);
+      posthog.capture("file_history_navigator_go_to_selected_file");
     }
     setShowMenu("");
   };

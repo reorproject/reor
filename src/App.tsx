@@ -6,6 +6,7 @@ import FileEditorContainer from "./components/FileEditorContainer";
 import IndexingProgress from "./components/IndexingProgress";
 import InitialSetupSinglePage from "./components/Settings/InitialSettingsSinglePage";
 import posthog from "posthog-js";
+import { app } from "electron"; 
 
 interface AppProps {}
 
@@ -29,7 +30,11 @@ const App: React.FC<AppProps> = () => {
       if (await window.electronStore.getAnalyticsMode()) {
         posthog.init("phc_xi4hFToX1cZU657yzge1VW0XImaaRzuvnFUdbAKI8fu", {
           api_host: "https://us.i.posthog.com",
+          autocapture: false,
         });
+        posthog.register({
+          reorAppVersion: await window.electron.getReorAppVersion(),
+      });
       }
     };
     initialisePosthog();

@@ -5,6 +5,7 @@ import {
   OpenAILLMConfig,
   AnthropicLLMConfig,
 } from "electron/main/Store/storeConfig";
+import posthog from "posthog-js";
 
 interface CloudLLMSetupModalProps {
   isOpen: boolean;
@@ -27,6 +28,11 @@ const CloudLLMSetupModal: React.FC<CloudLLMSetupModalProps> = ({
     if (openKey) {
       for (const modelConfig of defaultModels) {
         console.log("modelConfig:", modelConfig);
+        posthog.capture("save_cloud_llm", {
+          modelName: modelConfig.modelName,
+          llmType: LLMType,
+          contextLength: modelConfig.contextLength,
+        });
         modelConfig.apiKey = openKey;
         await window.llm.addOrUpdateLLM(modelConfig);
       }

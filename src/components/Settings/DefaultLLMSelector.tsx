@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import CustomSelect from "../Generic/Select";
 import { LLMConfig } from "electron/main/Store/storeConfig";
+import posthog from "posthog-js";
 
 interface DefaultLLMSelectorProps {
   onModelChange: (model: string) => void;
@@ -35,6 +36,9 @@ const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({
     setDefaultModel(selectedModel);
     window.llm.setDefaultLLM(selectedModel);
     onModelChange(selectedModel);
+    posthog.capture("change_default_llm", {
+      defaultLLM: selectedModel,
+    });
   };
 
   const modelOptions = llmConfigs.map((config) => ({

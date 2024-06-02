@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { DBSearchPreview } from "../File/DBResultPreview";
 import { DBQueryResult } from "electron/main/database/Schema";
 import { FaSearch } from "react-icons/fa";
+import posthog from "posthog-js";
 
 interface SearchComponentProps {
   onFileSelect: (path: string) => void;
@@ -36,6 +37,11 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
     }
   }, [searchQuery]);
 
+  const openFileSelectSearch = (path: string) => {
+    onFileSelect(path);
+    posthog.capture("open_file_from_search")
+  }
+
   return (
     <div className="p-1 h-below-titlebar overflow-y-auto overflow-x-hidden">
       <div className="relative p-2 bg-neutral-800 rounded mr-1">
@@ -58,7 +64,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
               <DBSearchPreview
                 key={index}
                 dbResult={result}
-                onSelect={onFileSelect}
+                onSelect={openFileSelectSearch}
               />
             ))}
           </div>
