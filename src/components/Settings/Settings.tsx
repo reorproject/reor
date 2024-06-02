@@ -111,16 +111,6 @@ const SettingsModal: React.FC<ModalProps> = ({
           >
             Analytics{" "}
           </div>
-          <div
-            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
-              activeTab === SettingsTab.ChunkSize
-                ? "bg-neutral-700 text-white font-semibold"
-                : "text-gray-200"
-            }`}
-            onClick={() => setActiveTab(SettingsTab.ChunkSize)}
-          >
-            Chunk Size{" "}
-          </div>
         </div>
 
         {/* Right Content Area */}
@@ -172,15 +162,7 @@ const SettingsModal: React.FC<ModalProps> = ({
                   Number of notes to feed to the LLM during Q&A:
                 </p>
               </RagSettings>
-            </div>
-          )}
-
-          {activeTab === SettingsTab.ChunkSize && (
-            <div className="w-full">
               <ChunkSizeSettings>
-                <h2 className="text-2xl font-semibold mb-0 text-white">
-                  Chunk Size
-                </h2>{" "}
                 <p className="mt-2 text-sm text-gray-100 mb-1">
                   Change the Chunk Size:
                 </p>
