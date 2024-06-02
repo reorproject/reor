@@ -6,7 +6,6 @@ import FileEditorContainer from "./components/FileEditorContainer";
 import IndexingProgress from "./components/IndexingProgress";
 import InitialSetupSinglePage from "./components/Settings/InitialSettingsSinglePage";
 import posthog from "posthog-js";
-import { app } from "electron"; 
 
 interface AppProps {}
 
