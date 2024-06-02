@@ -79,10 +79,10 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
             <div
               key={index}
               className="flex justify-between items-center py-2 pl-2 pr-2 hover:bg-neutral-100 cursor-pointer rounded-md"
+              onClick={() => handleOptionClick(option.value)}
             >
               <span
                 className="w-full"
-                onClick={() => handleOptionClick(option.value)}
               >
                 {option.label}
               </span>
