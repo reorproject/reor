@@ -1,0 +1,134 @@
+"name": "reor-project",
+"version": "0.2.8",
+"productName": "Reor",
+"main": "dist-electron/main/index.js",
+"description": "An AI note-taking app that runs models locally.",
+"author": "Sam L'Huillier",
+"license": "AGPL-3.0",
+"private": false,
+"debug": {
+	"env": {
+		"VITE_DEV_SERVER_URL": "http://127.0.0.1:7777/"
+	}
+},
+"scripts": {
+	"predev": "node scripts/downloadOllama.js",
+	"dev": "vite",
+	"prebuild": "node scripts/downloadOllama.js",
+	"build": "tsc && vite build && electron-builder",
+	"postbuild": "node scripts/notarize.js",
+	"preview": "vite preview",
+	"pree2e": "vite build --mode=test",
+	"e2e": "playwright test",
+	"test": "jest",
+	"lint": "eslint . --ext .ts,.tsx",
+	"lint:fix": "eslint . --ext .ts,.tsx --fix"
+},
+"dependencies": {
+	"@emotion/react": "^11.11.4",
+	"@emotion/styled": "^11.11.0",
+	"@headlessui/react": "^1.7.19",
+	"@huggingface/hub": "^0.12.0",
+	"@material-tailwind/react": "^2.1.5",
+	"@mui/icons-material": "^5.15.15",
+	"@mui/joy": "^5.0.0-beta.23",
+	"@mui/material": "^5.15.11",
+	"@radix-ui/colors": "^3.0.0",
+	"@tailwindcss/typography": "^0.5.10",
+	"@tiptap/extension-link": "^2.2.4",
+	"@tiptap/extension-task-item": "^2.2.4",
+	"@tiptap/extension-task-list": "^2.2.4",
+	"@tiptap/pm": "^2.2.4",
+	"@tiptap/react": "^2.2.4",
+	"@tiptap/starter-kit": "^2.2.4",
+	"@xenova/transformers": "^2.8.0",
+	"apache-arrow": "^14.0.2",
+	"chokidar": "^3.5.3",
+	"cm6-theme-basic-dark": "^0.2.0",
+	"date-fns": "^3.3.1",
+	"electron-store": "^8.1.0",
+	"electron-updater": "^6.1.1",
+	"install": "^0.13.0",
+	"js-tiktoken": "^1.0.10",
+	"langchain": "^0.1.5",
+	"lit": "^3.0.0",
+	"lodash.debounce": "^4.0.8",
+	"marked": "^12.0.1",
+	"npm": "^10.3.0",
+	"ollama": "^0.4.9",
+	"openai": "^4.20.0",
+	"posthog-js": "^1.130.2",
+	"react-card-flip": "^1.2.2",
+	"react-icons": "^4.12.0",
+	"react-markdown": "^9.0.1",
+	"react-quill": "^2.0.0",
+	"react-rnd": "^10.4.1",
+	"react-switch": "^7.0.0",
+	"react-toastify": "^10.0.4",
+	"react-type-animation": "^3.2.0",
+	"react-window": "^1.8.10",
+	"rehype-raw": "^7.0.0",
+	"remove-markdown": "^0.5.0",
+	"tiptap-markdown": "^0.8.10",
+	"turndown": "^7.1.2",
+	"use-debounce": "^10.0.0",
+	"vectordb": "0.4.10"
+},
+"devDependencies": {
+	"@electron/notarize": "^2.3.0",
+	"@playwright/test": "^1.37.1",
+	"@types/jest": "^29.5.11",
+	"@types/react": "^18.2.20",
+	"@types/react-dom": "^18.2.7",
+	"@types/react-window": "^1.8.8",
+	"@types/remove-markdown": "^0.3.4",
+	"@types/tmp": "^0.2.6",
+	"@types/turndown": "^5.0.4",
+	"@typescript-eslint/eslint-plugin": "^6.19.0",
+	"@typescript-eslint/parser": "^6.19.0",
+	"@vitejs/plugin-react": "^4.0.4",
+	"autoprefixer": "^10.4.16",
+	"electron": "28.2.1",
+	"electron-builder": "^24.6.3",
+	"eslint": "^8.56.0",
+	"eslint-plugin-react": "^7.33.2",
+	"jest": "^29.7.0",
+	"postcss": "^8.4.31",
+	"react": "^18.2.0",
+	"react-dom": "^18.2.0",
+	"sass": "^1.71.1",
+	"tailwindcss": "^3.3.5",
+	"tmp": "^0.2.1",
+	"ts-jest": "^29.1.2",
+	"typescript": "^5.1.6",
+	"vite": "^4.4.9",
+	"vite-plugin-electron": "^0.13.0-beta.3",
+	"vite-plugin-electron-renderer": "^0.14.5"
+},
+"optionalDependencies": {
+	"dmg-license": "^1.0.11"
+},
+"engines": {
+	"node": "^14.18.0 || >=16.0.0"
+},
+"jest": {
+	"preset": "ts-jest",
+	"testEnvironment": "node",
+	"transform": {
+		"^.+\\.tsx?$": "ts-jest"
+	},
+	"globals": {
+		"ts-jest": {
+			"tsconfig": "tsconfig.json"
+		}
+	},
+	"moduleFileExtensions": [
+		"ts",
+		"tsx",
+		"js",
+		"jsx",
+		"json",
+		"node"
+	]
+}
+}

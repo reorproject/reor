@@ -21,6 +21,7 @@ import HighlightExtension, {
 } from "@/components/Editor/HighlightExtension";
 import { toast } from "react-toastify";
 import { RichTextLink } from "@/components/Editor/RichTextLink";
+import { ShowMarkdownOnFocus, CustomHeading } from "@/components/Editor/ShowMarkdownOnFocus";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
@@ -146,6 +147,10 @@ export const useFileByFilepath = () => {
       RichTextLink.configure({
         linkOnPaste: true,
         openOnClick: true,
+      }),
+      ShowMarkdownOnFocus,
+      CustomHeading.configure({
+        levels: [1, 2, 3, 4, 5, 6],
       }),
       BacklinkExtension(
         openRelativePathRef,
