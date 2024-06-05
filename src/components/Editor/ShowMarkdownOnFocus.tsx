@@ -1,7 +1,10 @@
 import { Extension } from '@tiptap/core';
-import { Plugin } from 'prosemirror-state';
+import { Plugin, PluginKey, TextSelection } from 'prosemirror-state';
 import { Decoration, DecorationSet } from 'prosemirror-view';
 import { Heading } from '@tiptap/extension-heading';
+
+const hoverPluginKey = new PluginKey('hoverState');
+const markdownHeaderPluginKey = new PluginKey('markdownState');
 
 const ShowMarkdownOnFocus = Extension.create({
   name: 'showMarkdown',
@@ -9,39 +12,88 @@ const ShowMarkdownOnFocus = Extension.create({
   addProseMirrorPlugins() {
       return [
           new Plugin({
+            key: markdownHeaderPluginKey,
+
+            state: {
+              init() {
+                return { lastInHeading: false, lastHeadingPos: null };
+              },
+              apply(tr, value, oldState, newState, view) {
+                // console.log(`OldState: ${JSON.stringify(oldState)}\n\n\nNewState: ${JSON.stringify(newState)}`);
+                // console.log(`oldHead: ${oldState.selection.$head}\n\nNewHead: ${newState.selection.$head}`);
+                let lastInHeading = value.lastInHeading;
+                let lastHeadingPos = value.lastHeadingPos;
+
+                const oldInHeading = oldState.selection.$head.parent.type.name === 'heading';
+                const newInHeading = newState.selection.$head.parent.type.name === 'heading';
+                const currentPos = newState.selection.$head.pos;
+                const currentDepth = newState.selection.$head.depth;
+
+                // Updating old State
+                if (newInHeading) {
+                  lastInHeading = true;
+                  lastHeadingPos = newState.selection.$head.before();
+                } else {
+                  lastInHeading = false;
+                }
+
+                console.log(`CurrentPos: ${currentPos}... OldPos: ${oldState.selection.$head.pos}`);
+                if (oldInHeading && !newInHeading) {
+                  // Get the position and node where last heading was located
+                  const $lastPos = oldState.doc.resolve(oldState.selection.$head.pos);
+                  if ($lastPos.parent.type.name === "heading") {
+                    const start = $lastPos.start();
+                    const end = $lastPos.end();
+                    const textContent = $lastPos.parent.textContent.replace(/^(#+\s*)+/, '');
+                    console.log(`Start: ${start}, End: ${end}, TextContent: ${textContent}`);
+                    // console.log("Document content before:", oldState.doc.textContent);
+
+                    // tr.replaceRangeWith(start, end, oldState.schema.text(textContent));
+                    // let newState = oldState.apply(tr);
+                    // console.log("Document content after applying transaction:", newState.doc.textContent);
+                    const newHeadingNode = oldState.schema.nodes.heading.create($lastPos.parent.attrs, oldState.schema.text(textContent));
+                    // tr.replaceRangeWith(start, end, newHeadingNode);
+                    tr.replaceWith(0, )
+                    console.log(tr.steps);
+                  }
+                }
+                
+                return {
+                  lastInHeading: newInHeading,
+                  lastHeadingPos: newInHeading ? newState.selection.$head.before() : null
+                };
+              }
+            },
               props: {
                   handleDOMEvents: {
-                      click: (view, event) => {
-                          const { pos } = view.posAtCoords({ left: event.clientX, top: event.clientY });
-                          if (pos === null) return false;
+                      keydown: (view, event) => {
+                          // Small timeout to allow the document to re-render
+                          // console.log("BEFORE TIMEOUT")
+                          setTimeout(() => {
+                            const { state } = view;
+                            const { selection } = state;
+                            const { $head } = selection;
+                            const isSectionHeader = $head.parent.type.name === "heading";
+                            if (!isSectionHeader) return false;
+                            // Check if the selection head is a heading node
+                            const pos = $head.before();
+                            // console.log(`Instead header. Pos: ${pos}`);
+                            const node = $head.parent;
+                            // console.log(`Node: ${$head}`);
+                            if (!node.attrs.showMarkdown) {
+                              const hashText = '#'.repeat(node.attrs.level) + ' ';
+                              const endPos = pos + node.nodeSize;
+                              const transaction = state.tr;
 
-                          const resolvedPos = view.state.doc.resolve(pos);
-                          // const node = resolvedPos.nodeAfter || resolvedPos.nodeBefore;
-                          let nodeType = null;
-                          let node = null;
-                          let depth = 0;
-
-                          for (depth = resolvedPos.depth; depth > 0; depth--) {
-                            node = resolvedPos.node(depth);
-                            if (node.type.isBlock) {
-                              nodeType = node.type.name;
-                              break;
+                              // Update the text to show hashes and setShowmarkdown to true
+                              transaction.insertText(hashText, pos + 1);
+                              transaction.setNodeMarkup(pos, null, { ...node.attrs, showMarkdown: true });
+                              view.dispatch(transaction);
                             }
-                          }
-
-                          if (node && node.type.name === "heading") {
-                              const tr = view.state.tr;
-
-                              console.log(`Clicked header`);
-                              if (node.attrs.showMarkdown) {
-                                console.log(`Showing markdown`)
-                                  // Toggle showMarkdown but do not insert hashes yet
-                                  tr.setNodeMarkup(resolvedPos.before(), undefined, { ...node.attrs, showMarkdown: true });
-                                  view.dispatch(tr);
-                              }
-                              return true;
-                          }
-                          return false;
+                            console.log(`returning true`);
+                            return true;
+                          }, 500);
+                          return true;
                       },
                   }
               }
@@ -49,7 +101,6 @@ const ShowMarkdownOnFocus = Extension.create({
       ];
   },
 });
-
 
 const CustomHeading = Heading.extend({
     addAttributes() {
@@ -67,8 +118,9 @@ const CustomHeading = Heading.extend({
         domNode.setAttribute(`contenteditable`, `true`);
 
         // Listen for focus
-        console.log(domNode.outerHTML);
-        domNode.addEventListener('click', () => {
+        console.log(`DomNode: ${domNode.outerHTML}`);
+        domNode.addEventListener('keydown', () => {
+          console.log(`Focusing!`);
           if (!node.attrs.showMarkdown) {
               const hashText = '#'.repeat(node.attrs.level) + ' ';
               // Create a transaction to update the text
@@ -82,12 +134,15 @@ const CustomHeading = Heading.extend({
       });
 
 
-        console.log("Listening for input");
         // Handle input to dynamically adjust heading level
         domNode.addEventListener('input', () => {
           const hashCount = (domNode.textContent.match(/^#+/) || [''])[0].length;
+          console.log(`Inside input.. Hash: ${hashCount} vs node.attrs: ${node.attrs.level}`);
+
           if (hashCount !== node.attrs.level) {
+            console.log(`Current: ${currentText}`);
             const cleanedText = currentText.replace("/^#+\s*/", '');
+            console.log(`Cleaned: ${cleanedText}`);
             const transaction = editor.view.state.tr.setNodeMarkup(getPos(), undefined, {
                 ...node.attrs,
                 level: hashCount,
