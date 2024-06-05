@@ -71,6 +71,7 @@ export interface StoreSchema {
   };
   analytics?: boolean;
   chunkSize: number;
+  spellCheck: boolean;
 }
 
 export enum StoreKeys {
@@ -87,4 +88,5 @@ export enum StoreKeys {
   LLMGenerationParameters = "llmGenerationParameters",
   ChatHistories = "chatHistories",
   ChunkSize = "chunkSize",
+  SpellCheck = "spellCheck",
 }
