@@ -4,7 +4,7 @@ import { Decoration, DecorationSet } from 'prosemirror-view';
 import { Heading } from '@tiptap/extension-heading';
 
 const hoverPluginKey = new PluginKey('hoverState');
-const markdownHeaderPluginKey = new PluginKey('markdownState');
+const stateTrackerKey = new PluginKey('stateTracker');
 
 const ShowMarkdownOnFocus = Extension.create({
   name: 'showMarkdown',
@@ -12,74 +12,58 @@ const ShowMarkdownOnFocus = Extension.create({
   addProseMirrorPlugins() {
       return [
           new Plugin({
-            key: markdownHeaderPluginKey,
-
-            state: {
-              init() {
-                return { lastInHeading: false, lastHeadingPos: null };
-              },
-              apply(tr, value, oldState, newState, view) {
-                // console.log(`OldState: ${JSON.stringify(oldState)}\n\n\nNewState: ${JSON.stringify(newState)}`);
-                // console.log(`oldHead: ${oldState.selection.$head}\n\nNewHead: ${newState.selection.$head}`);
-                let lastInHeading = value.lastInHeading;
-                let lastHeadingPos = value.lastHeadingPos;
-
-                const oldInHeading = oldState.selection.$head.parent.type.name === 'heading';
-                const newInHeading = newState.selection.$head.parent.type.name === 'heading';
-                const currentPos = newState.selection.$head.pos;
-                const currentDepth = newState.selection.$head.depth;
-
-                // Updating old State
-                if (newInHeading) {
-                  lastInHeading = true;
-                  lastHeadingPos = newState.selection.$head.before();
-                } else {
-                  lastInHeading = false;
-                }
-
-                console.log(`CurrentPos: ${currentPos}... OldPos: ${oldState.selection.$head.pos}`);
-                if (oldInHeading && !newInHeading) {
-                  // Get the position and node where last heading was located
-                  const $lastPos = oldState.doc.resolve(oldState.selection.$head.pos);
-                  if ($lastPos.parent.type.name === "heading") {
-                    const start = $lastPos.start();
-                    const end = $lastPos.end();
-                    const textContent = $lastPos.parent.textContent.replace(/^(#+\s*)+/, '');
-                    console.log(`Start: ${start}, End: ${end}, TextContent: ${textContent}`);
-                    // console.log("Document content before:", oldState.doc.textContent);
-
-                    // tr.replaceRangeWith(start, end, oldState.schema.text(textContent));
-                    // let newState = oldState.apply(tr);
-                    // console.log("Document content after applying transaction:", newState.doc.textContent);
-                    const newHeadingNode = oldState.schema.nodes.heading.create($lastPos.parent.attrs, oldState.schema.text(textContent));
-                    // tr.replaceRangeWith(start, end, newHeadingNode);
-                    tr.replaceWith(0, )
-                    console.log(tr.steps);
+              key: stateTrackerKey,
+              state: {
+                init() {
+                    return {oldState: null, newState: null, value: null};
+                  },
+                  apply(tr, value, oldState, newState) {
+                    value.oldState = oldState;
+                    value.newState = newState;
+                    return value;
                   }
-                }
-                
-                return {
-                  lastInHeading: newInHeading,
-                  lastHeadingPos: newInHeading ? newState.selection.$head.before() : null
-                };
-              }
-            },
-              props: {
+                },
+              props: { 
                   handleDOMEvents: {
                       keydown: (view, event) => {
                           // Small timeout to allow the document to re-render
-                          // console.log("BEFORE TIMEOUT")
                           setTimeout(() => {
+                            const pluginState = stateTrackerKey.getState(view.state);
+                            const { oldState, newState } = pluginState
+                            // const oldInHeading = oldState.selection.$head.parent.type.name === 'heading';
+                            // const newInHeading = newState.selection.$head.parent.type.name === 'heading';
+                            // const currentPos = newState.selection.$head.pos;
+                            // const currentDepth = newState.selection.$head.depth;
+
                             const { state } = view;
                             const { selection } = state;
                             const { $head } = selection;
                             const isSectionHeader = $head.parent.type.name === "heading";
-                            if (!isSectionHeader) return false;
-                            // Check if the selection head is a heading node
+                            if (!isSectionHeader) {
+                              console.log(`No longer in section header`);
+                              const $lastPos = oldState.doc.resolve(oldState.selection.$head.pos);
+                              console.log(`LastPos: ${JSON.stringify($lastPos.path[0].content)}`);
+                              if ($lastPos.parent.type.name === 'heading') {
+                                const start = $lastPos.start();
+                                const end = $lastPos.end();
+                                const textContent = $lastPos.parent.textContent.replace(/^(#+\s*)+/, '');
+                                const transaction = state.tr;
+                                const newNode = $lastPos.parent.type.create({...$lastPos.parent.attrs, showMarkdown: false}, state.schema.text(textContent));
+
+                                // transaction.replaceRangeWith(start, end, view.state.schema.text(textContent));
+                                transaction.replaceRangeWith(start, end, newNode);
+                                // transaction.setNodeMarkup(start, null, { ...$lastPos.parent.attrs, showMarkdown: false });
+                                view.dispatch(transaction);
+
+                              }
+                              return false;
+                            }
+
                             const pos = $head.before();
-                            // console.log(`Instead header. Pos: ${pos}`);
                             const node = $head.parent;
-                            // console.log(`Node: ${$head}`);
+
+                            // Just hovered over a header, display hashes
+                            console.log(`Node attrs: ${node.attrs.showMarkdown}`);
                             if (!node.attrs.showMarkdown) {
                               const hashText = '#'.repeat(node.attrs.level) + ' ';
                               const endPos = pos + node.nodeSize;
