@@ -63,7 +63,7 @@ const ShowMarkdownOnFocus = Extension.create({
                             const node = $head.parent;
 
                             // Just hovered over a header, display hashes
-                            console.log(`Node attrs: ${node.attrs.showMarkdown}`);
+                            // console.log(`Node attrs: ${node.attrs.showMarkdown}`);
                             if (!node.attrs.showMarkdown) {
                               const hashText = '#'.repeat(node.attrs.level) + ' ';
                               const endPos = pos + node.nodeSize;
@@ -74,10 +74,32 @@ const ShowMarkdownOnFocus = Extension.create({
                               transaction.setNodeMarkup(pos, null, { ...node.attrs, showMarkdown: true });
                               view.dispatch(transaction);
                             }
-                            console.log(`returning true`);
                             return true;
                           }, 500);
                           return true;
+                      },
+                      input: (view, event) => {
+                        const { state } = view;
+                        const { selection } = state;
+                        const { $head } = selection;
+                        const node = $head.parent;
+
+                        if (node.type.name === "heading") {
+                          const newText = node.textContent;
+                          const hashCount = newText.match(/^#+/g)?.[0].length || 1;
+
+                          if (node.attrs.level !== hashCount) {
+                            const transaction = state.tr;
+                            const startPos = $head.before();
+                            const endPos = startPos + node.nodeSize;
+                            const newNode = node.type.create({...node.attrs, level:hashCount}, state.schema.text(newText.trim().replace(/^#+\s*/, '')));
+
+                            transaction.replaceRangeWith(startPos, endPos, newNode);
+                            view.dispatch(transaction);
+                          }
+                        }
+
+                        return false;
                       },
                   }
               }
