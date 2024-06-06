@@ -39,6 +39,7 @@ const ShowMarkdownOnFocus = Extension.create({
                             const { selection } = state;
                             const { $head } = selection;
                             const isSectionHeader = $head.parent.type.name === "heading";
+                            // If this is not a sectionHeader, we need to hide the hashes
                             if (!isSectionHeader) {
                               console.log(`No longer in section header`);
                               const $lastPos = oldState.doc.resolve(oldState.selection.$head.pos);
@@ -51,6 +52,7 @@ const ShowMarkdownOnFocus = Extension.create({
                                 const newNode = $lastPos.parent.type.create({...$lastPos.parent.attrs, showMarkdown: false}, state.schema.text(textContent));
 
                                 // transaction.replaceRangeWith(start, end, view.state.schema.text(textContent));
+                                console.log(">>> Hid node");
                                 transaction.replaceRangeWith(start, end, newNode);
                                 // transaction.setNodeMarkup(start, null, { ...$lastPos.parent.attrs, showMarkdown: false });
                                 view.dispatch(transaction);
@@ -75,31 +77,41 @@ const ShowMarkdownOnFocus = Extension.create({
                               view.dispatch(transaction);
                             }
                             return true;
-                          }, 500);
-                          return true;
+                          }, 10);
+                          return false;
                       },
                       input: (view, event) => {
-                        const { state } = view;
-                        const { selection } = state;
-                        const { $head } = selection;
-                        const node = $head.parent;
+                          setTimeout(() => {
+                          const { state } = view;
+                          const { selection } = state;
+                          const { $head } = selection;
+                          const node = $head.parent;
 
-                        if (node.type.name === "heading") {
-                          const newText = node.textContent;
-                          const hashCount = newText.match(/^#+/g)?.[0].length || 1;
+                          if (node.type.name === "heading") {
+                            const newText = node.textContent;
+                            const hashCount = newText.match(/^#+/g)?.[0].length || 1;
 
-                          if (node.attrs.level !== hashCount) {
-                            const transaction = state.tr;
-                            const startPos = $head.before();
-                            const endPos = startPos + node.nodeSize;
-                            const newNode = node.type.create({...node.attrs, level:hashCount}, state.schema.text(newText.trim().replace(/^#+\s*/, '')));
+                            if (node.attrs.level !== hashCount) {
+                              const transaction = state.tr;
+                              const startPos = $head.before();
+                              const endPos = startPos + node.nodeSize;
+                              const newContent = state.schema.text('#'.repeat(hashCount) + ' ' + newText.trim().replace(/^#+\s*/, ''));
 
-                            transaction.replaceRangeWith(startPos, endPos, newNode);
-                            view.dispatch(transaction);
+                              const newNode = node.type.create({...node.attrs, showMarkdown: true, level:hashCount}, newContent);
+
+                              transaction.replaceRangeWith(startPos, endPos, newNode);
+
+                              // Calculate new position of cursor. This is important because if we do not do this, sometimes the cursor will go to the next line
+                              const newCursorPos = startPos + hashCount + 1;
+                              transaction.setSelection(TextSelection.near(transaction.doc.resolve(newCursorPos)));
+
+                              view.dispatch(transaction);
+                              return true;
+                            }
                           }
-                        }
-
-                        return false;
+                          console.log(`Returning false`);
+                          return false;
+                        }, 10);
                       },
                   }
               }
