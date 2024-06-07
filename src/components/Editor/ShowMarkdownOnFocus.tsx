@@ -32,6 +32,12 @@ const ShowMarkdownOnFocus = Extension.create({
                   handleDOMEvents: {
                       keydown: (view, event) => {
                           // Small timeout to allow the document to re-render
+                          const preUpdatePos = view.state.selection.$from.parentOffset;
+                          const preUpdateText = view.state.selection.$from.parent.textContent;
+                          const preStart = view.state.selection.$from.start();
+                          const preEnd = view.state.selection.$from.start();
+                          const pos = view.state.selection.$from.pos;
+                          const preNodeSize = view.state.selection.$from.parent.nodeSize;
                           setTimeout(() => {
                             const pluginState = stateTrackerKey.getState(view.state);
 
@@ -46,35 +52,23 @@ const ShowMarkdownOnFocus = Extension.create({
                               if (!empty) return false; // Prosemirror will handle non-empty selection
                               
                               if (node.type.name === 'heading') {
-                                event.preventDefault(); // let our plugin do the work
+                                event.preventDefault(); // Prevent the default Enter action
 
-                                console.log(`Entered`);
-                                if ($from.parentOffset === 0) {
+                                if (preUpdatePos === 0) {
                                   // Enter at start of header
                                   const newNode = node.type.createAndFill(node.attrs);
                                   tr.insert($from.pos, newNode);
-                                } 
-                                return true;
-                              } else {
-                                const $lastPos = oldState.doc.resolve(oldState.selection.$head.pos);
-                                if ($lastPos.parent.type.name === 'heading') {
-                                  const start = $lastPos.start();
-                                  const end = $lastPos.end();
-                                  const textContent = $lastPos.parent.textContent.replace(/^(#+\s*)+/, '');
-                                  const transaction = state.tr;
-                                  const newNode = $lastPos.parent.type.create({...$lastPos.parent.attrs, showMarkdown: false}, state.schema.text(textContent));
-  
-                                  transaction.replaceRangeWith(start, end, newNode);
-                                  view.dispatch(transaction);
-  
+                                } else {
+                                  // TODO: Hide Markdown when splitting in middle of word.
                                 }
+                              } else {
+                                // At the end of the header and pressing enter.
+                                hideMarkdownHashes(state, view, oldState);
                               }
-                              return true;
                             } else if ((event.key === "Backspace" || event.key === "Delete") && node.type.name === "heading" && $head.parentOffset === 0) {
                               event.preventDefault();
                               // Check if we're at the start of the node 
                               const headerText = node.textContent.slice(node.attrs.level);
-                              console.log(`>> at start: ${$from.parentOffset <= node.attrs.level}`)
                               if ($from.parentOffset <= node.attrs.level) {
                                 const paragraphType = state.schema.nodes.paragraph;
                                 
@@ -83,7 +77,6 @@ const ShowMarkdownOnFocus = Extension.create({
                                 const textNode = state.schema.text(textContent);
                                 const paragraphNode = paragraphType.create(null, textNode);
                                 tr.replaceRangeWith($from.start(), $from.end(), paragraphNode);
-  
                                 
                                 dispatch(tr.scrollIntoView());
                                 return true;
@@ -93,25 +86,10 @@ const ShowMarkdownOnFocus = Extension.create({
                               const isSectionHeader = $head.parent.type.name === "heading";
                               // If this is not a sectionHeader, we need to hide the hashes
                               if (!isSectionHeader || (isSectionHeader && currentPos !== lastHeaderPos)) {
-                                console.log(`No longer in section header`);
-                                const $lastPos = oldState.doc.resolve(oldState.selection.$head.pos);
-                                console.log(`LastPos: ${JSON.stringify($lastPos.path[0].content)}`);
-                                if ($lastPos.parent.type.name === 'heading') {
-                                  const start = $lastPos.start();
-                                  const end = $lastPos.end();
-                                  const textContent = $lastPos.parent.textContent.replace(/^(#+\s*)+/, '');
-                                  const transaction = state.tr;
-                                  const newNode = $lastPos.parent.type.create({...$lastPos.parent.attrs, showMarkdown: false}, state.schema.text(textContent));
-  
-                                  transaction.replaceRangeWith(start, end, newNode);
-                                  view.dispatch(transaction);
-  
-                                }
-                                // return true;
+                                hideMarkdownHashes(state, view, oldState);
                               }
   
                               if (isSectionHeader) {
-  
                                 const pos = $head.before();
                                 const node = $head.parent;
     
@@ -127,8 +105,8 @@ const ShowMarkdownOnFocus = Extension.create({
                                   view.dispatch(transaction);
                                 }
                               }
-                              return true;
-                            }                            
+                            }     
+                            return true;
                           }, 10);
                           return false;
                       },
@@ -142,13 +120,11 @@ const ShowMarkdownOnFocus = Extension.create({
                           if (node.type.name === "heading") {
                             const newText = node.textContent;
                             const hashCount = newText.match(/^#+/g)?.[0].length || 1;
-
                             if (node.attrs.level !== hashCount) {
                               const transaction = state.tr;
                               const startPos = $head.before();
                               const endPos = startPos + node.nodeSize;
                               const newContent = state.schema.text('#'.repeat(hashCount) + ' ' + newText.trim().replace(/^#+\s*/, ''));
-
                               const newNode = node.type.create({...node.attrs, showMarkdown: true, level:hashCount}, newContent);
 
                               transaction.replaceRangeWith(startPos, endPos, newNode);
@@ -185,55 +161,7 @@ const CustomHeading = Heading.extend({
         const domNode = document.createElement('h' + node.attrs.level);
         domNode.textContent = node.textContent;
         domNode.setAttribute(`contenteditable`, `true`);
-
-        // Listen for focus
-        console.log(`DomNode: ${domNode.outerHTML}`);
-        domNode.addEventListener('keydown', () => {
-          console.log(`Focusing!`);
-          if (!node.attrs.showMarkdown) {
-              const hashText = '#'.repeat(node.attrs.level) + ' ';
-              // Create a transaction to update the text
-              const startPos = getPos() + 1; // Assuming the text starts right after the node start
-              const endPos = startPos + node.textContent.length;
-              const transaction = editor.view.state.tr;
-              transaction.replaceRangeWith(startPos, endPos, editor.view.state.schema.text(hashText + node.textContent));
-              transaction.setNodeMarkup(getPos(), null, { ...node.attrs, showMarkdown: true });
-              editor.view.dispatch(transaction);
-          }
-      });
-
-
-        // Handle input to dynamically adjust heading level
-        domNode.addEventListener('input', () => {
-          const hashCount = (domNode.textContent.match(/^#+/) || [''])[0].length;
-          console.log(`Inside input.. Hash: ${hashCount} vs node.attrs: ${node.attrs.level}`);
-
-          if (hashCount !== node.attrs.level) {
-            console.log(`Current: ${currentText}`);
-            const cleanedText = currentText.replace("/^#+\s*/", '');
-            console.log(`Cleaned: ${cleanedText}`);
-            const transaction = editor.view.state.tr.setNodeMarkup(getPos(), undefined, {
-                ...node.attrs,
-                level: hashCount,
-                showMarkdown: true
-            });
-            transaction.replaceRangeWith(getPos()+1, getPos() + 1 + node.textContent.length, editor.view.state.schema.text(cleanedText));
-            editor.view.dispatch(transaction);
-          }
-        });
-
-        // Clear markdown on blur
-        domNode.addEventListener('blur', () => {
-            console.log("Blur called");
-            if (node.attrs.showMarkdown) {
-              const cleanedText = domNode.textContent.replace(/^#+\s*/, '');
-              transaction.replaceRangeWith(getPos() + 1, getPos() + 1 + domNode.textContent.length, editor.view.state.schema.text(cleanedText));
-              transaction.setNodeMarkup(getPos(), null, { ...node.attrs, showMarkdown: false });
-              editor.view.dispatch(transaction);
-            }
-        });
       
-
         return {
           dom: domNode,
           contentDOM: domNode
@@ -242,6 +170,20 @@ const CustomHeading = Heading.extend({
     }
 });
 
+// Hides the markdown hashes after no longer focusing.
+const hideMarkdownHashes = (state, view, oldState) => {
+  const lastPos = oldState.doc.resolve(oldState.selection.$head.pos);
+  if (lastPos.parent.type.name === 'heading') {
+    const start = lastPos.start();
+    const end = lastPos.end();
+    const textContent = lastPos.parent.textContent.replace(/^(#+\s*)+/, '');
+    const transaction = state.tr;
+    const newNode = lastPos.parent.type.create({...lastPos.parent.attrs, showMarkdown: false}, state.schema.text(textContent));
+
+    transaction.replaceRangeWith(start, end, newNode);
+    view.dispatch(transaction);
+  }
+}
 
 
 export { ShowMarkdownOnFocus, CustomHeading }
