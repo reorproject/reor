@@ -15,9 +15,14 @@ const ShowMarkdownOnFocus = Extension.create({
               key: stateTrackerKey,
               state: {
                 init() {
-                    return {oldState: null, newState: null, value: null};
+                    return {oldState: null, newState: null, value: null, lastHeaderPos: null, currentHeaderPos: null};
                   },
                   apply(tr, value, oldState, newState) {
+                    const { $head } = newState.selection;
+                    value.lastHeaderPos = value.currentHeaderPos;
+                    if ($head.parent.type.name === 'heading') {
+                      value.currentHeaderPos = $head.pos - $head.parentOffset;
+                    }
                     value.oldState = oldState;
                     value.newState = newState;
                     return value;
@@ -29,54 +34,101 @@ const ShowMarkdownOnFocus = Extension.create({
                           // Small timeout to allow the document to re-render
                           setTimeout(() => {
                             const pluginState = stateTrackerKey.getState(view.state);
-                            const { oldState, newState } = pluginState
-                            // const oldInHeading = oldState.selection.$head.parent.type.name === 'heading';
-                            // const newInHeading = newState.selection.$head.parent.type.name === 'heading';
-                            // const currentPos = newState.selection.$head.pos;
-                            // const currentDepth = newState.selection.$head.depth;
 
-                            const { state } = view;
-                            const { selection } = state;
-                            const { $head } = selection;
-                            const isSectionHeader = $head.parent.type.name === "heading";
-                            // If this is not a sectionHeader, we need to hide the hashes
-                            if (!isSectionHeader) {
-                              console.log(`No longer in section header`);
-                              const $lastPos = oldState.doc.resolve(oldState.selection.$head.pos);
-                              console.log(`LastPos: ${JSON.stringify($lastPos.path[0].content)}`);
-                              if ($lastPos.parent.type.name === 'heading') {
-                                const start = $lastPos.start();
-                                const end = $lastPos.end();
-                                const textContent = $lastPos.parent.textContent.replace(/^(#+\s*)+/, '');
-                                const transaction = state.tr;
-                                const newNode = $lastPos.parent.type.create({...$lastPos.parent.attrs, showMarkdown: false}, state.schema.text(textContent));
+                            const { state, dispatch } = view;
+                            const { selection, tr } = state;
+                            const { $from, $to, $head, empty } = selection;
+                            const { oldState, newState, lastHeaderPos } = pluginState
+                            const node = $from.parent;
 
-                                // transaction.replaceRangeWith(start, end, view.state.schema.text(textContent));
-                                console.log(">>> Hid node");
-                                transaction.replaceRangeWith(start, end, newNode);
-                                // transaction.setNodeMarkup(start, null, { ...$lastPos.parent.attrs, showMarkdown: false });
-                                view.dispatch(transaction);
+                            // Behavior dealing with going to next line/splitting header up
+                            if (event.key === "Enter") {
+                              if (!empty) return false; // Prosemirror will handle non-empty selection
+                              
+                              if (node.type.name === 'heading') {
+                                event.preventDefault(); // let our plugin do the work
 
+                                console.log(`Entered`);
+                                if ($from.parentOffset === 0) {
+                                  // Enter at start of header
+                                  const newNode = node.type.createAndFill(node.attrs);
+                                  tr.insert($from.pos, newNode);
+                                } 
+                                return true;
+                              } else {
+                                const $lastPos = oldState.doc.resolve(oldState.selection.$head.pos);
+                                if ($lastPos.parent.type.name === 'heading') {
+                                  const start = $lastPos.start();
+                                  const end = $lastPos.end();
+                                  const textContent = $lastPos.parent.textContent.replace(/^(#+\s*)+/, '');
+                                  const transaction = state.tr;
+                                  const newNode = $lastPos.parent.type.create({...$lastPos.parent.attrs, showMarkdown: false}, state.schema.text(textContent));
+  
+                                  transaction.replaceRangeWith(start, end, newNode);
+                                  view.dispatch(transaction);
+  
+                                }
                               }
-                              return false;
-                            }
-
-                            const pos = $head.before();
-                            const node = $head.parent;
-
-                            // Just hovered over a header, display hashes
-                            // console.log(`Node attrs: ${node.attrs.showMarkdown}`);
-                            if (!node.attrs.showMarkdown) {
-                              const hashText = '#'.repeat(node.attrs.level) + ' ';
-                              const endPos = pos + node.nodeSize;
-                              const transaction = state.tr;
-
-                              // Update the text to show hashes and setShowmarkdown to true
-                              transaction.insertText(hashText, pos + 1);
-                              transaction.setNodeMarkup(pos, null, { ...node.attrs, showMarkdown: true });
-                              view.dispatch(transaction);
-                            }
-                            return true;
+                              return true;
+                            } else if ((event.key === "Backspace" || event.key === "Delete") && node.type.name === "heading" && $head.parentOffset === 0) {
+                              event.preventDefault();
+                              // Check if we're at the start of the node 
+                              const headerText = node.textContent.slice(node.attrs.level);
+                              console.log(`>> at start: ${$from.parentOffset <= node.attrs.level}`)
+                              if ($from.parentOffset <= node.attrs.level) {
+                                const paragraphType = state.schema.nodes.paragraph;
+                                
+                                // Replace the entire node with a paragraph containing the text without hashes
+                                const textContent = headerText.trim();
+                                const textNode = state.schema.text(textContent);
+                                const paragraphNode = paragraphType.create(null, textNode);
+                                tr.replaceRangeWith($from.start(), $from.end(), paragraphNode);
+  
+                                
+                                dispatch(tr.scrollIntoView());
+                                return true;
+                              }
+                            } else {  
+                              const currentPos = $head.pos - $head.parentOffset;
+                              const isSectionHeader = $head.parent.type.name === "heading";
+                              // If this is not a sectionHeader, we need to hide the hashes
+                              if (!isSectionHeader || (isSectionHeader && currentPos !== lastHeaderPos)) {
+                                console.log(`No longer in section header`);
+                                const $lastPos = oldState.doc.resolve(oldState.selection.$head.pos);
+                                console.log(`LastPos: ${JSON.stringify($lastPos.path[0].content)}`);
+                                if ($lastPos.parent.type.name === 'heading') {
+                                  const start = $lastPos.start();
+                                  const end = $lastPos.end();
+                                  const textContent = $lastPos.parent.textContent.replace(/^(#+\s*)+/, '');
+                                  const transaction = state.tr;
+                                  const newNode = $lastPos.parent.type.create({...$lastPos.parent.attrs, showMarkdown: false}, state.schema.text(textContent));
+  
+                                  transaction.replaceRangeWith(start, end, newNode);
+                                  view.dispatch(transaction);
+  
+                                }
+                                // return true;
+                              }
+  
+                              if (isSectionHeader) {
+  
+                                const pos = $head.before();
+                                const node = $head.parent;
+    
+                                // Just hovered over a header, display hashes
+                                if (!node.attrs.showMarkdown) {
+                                  const hashText = '#'.repeat(node.attrs.level) + ' ';
+                                  const endPos = pos + node.nodeSize;
+                                  const transaction = state.tr;
+    
+                                  // Update the text to show hashes and setShowmarkdown to true
+                                  transaction.insertText(hashText, pos + 1);
+                                  transaction.setNodeMarkup(pos, null, { ...node.attrs, showMarkdown: true });
+                                  view.dispatch(transaction);
+                                }
+                              }
+                              return true;
+                            }                            
                           }, 10);
                           return false;
                       },
@@ -109,7 +161,6 @@ const ShowMarkdownOnFocus = Extension.create({
                               return true;
                             }
                           }
-                          console.log(`Returning false`);
                           return false;
                         }, 10);
                       },
@@ -190,7 +241,6 @@ const CustomHeading = Heading.extend({
       };
     }
 });
-
 
 
 
