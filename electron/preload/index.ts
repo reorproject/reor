@@ -54,11 +54,6 @@ declare global {
       ) => Promise<DBQueryResult[]>;
       deleteLanceDBEntriesByFilePath: (filePath: string) => Promise<void>;
       indexFilesInDirectory: () => Promise<void>;
-      augmentPromptWithRAG: (
-        prompt: string,
-        llmName: string,
-        filter?: string
-      ) => Promise<PromptWithRagResults>;
       augmentPromptWithTemporalAgent: ({
         query,
         llmName,
