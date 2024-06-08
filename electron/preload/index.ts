@@ -1,12 +1,6 @@
+import { ChatHistory } from "@/components/Chat/Chat";
+import { ChatHistoryMetadata } from "@/components/Chat/hooks/use-chat-history";
 import { IpcRendererEvent, contextBridge, ipcRenderer } from "electron";
-import {
-  EmbeddingModelConfig,
-  EmbeddingModelWithLocalPath,
-  EmbeddingModelWithRepo,
-  HardwareConfig,
-  LLMGenerationParameters,
-  LLMConfig,
-} from "electron/main/Store/storeConfig";
 import {
   AugmentPromptWithFileProps,
   FileInfoNode,
@@ -14,12 +8,18 @@ import {
   RenameFileProps,
   WriteFileProps,
 } from "electron/main/Files/Types";
-import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
-import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
+import {
+  EmbeddingModelConfig,
+  EmbeddingModelWithLocalPath,
+  EmbeddingModelWithRepo,
+  HardwareConfig,
+  LLMConfig,
+  LLMGenerationParameters,
+} from "electron/main/Store/storeConfig";
+import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
-import { ChatHistory } from "@/components/Chat/Chat";
-import { ChatHistoryMetadata } from "@/components/Chat/hooks/use-chat-history";
+import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
 
@@ -177,18 +177,6 @@ contextBridge.exposeInMainWorld("database", {
   },
   indexFilesInDirectory: async () => {
     return ipcRenderer.invoke("index-files-in-directory");
-  },
-  augmentPromptWithRAG: async (
-    prompt: string,
-    llmName: string,
-    filter?: string
-  ): Promise<PromptWithRagResults> => {
-    return ipcRenderer.invoke(
-      "augment-prompt-with-rag",
-      prompt,
-      llmName,
-      filter
-    );
   },
   augmentPromptWithTemporalAgent: async ({
     query,

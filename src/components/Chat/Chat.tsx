@@ -15,7 +15,9 @@ import { PromptSuggestion } from "./Chat-Prompts";
 import ChatInput from "./ChatInput";
 import {
   formatOpenAIMessageContentIntoString,
-  resolveRAGContext,
+  generateOverallChatHistory,
+  getChatContextFromChatHistory,
+  ragPromptTemplate,
 } from "./chatUtils";
 
 // convert ask options to enum
@@ -92,7 +94,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     useState<boolean>(false);
 
   useEffect(() => {
-    const context = getChatHistoryContext(currentChatHistory);
+    const context = getChatContextFromChatHistory(currentChatHistory);
     setCurrentContext(context);
   }, [currentChatHistory]);
 
@@ -141,17 +143,12 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       }
       if (chatHistory.displayableChatHistory.length === 0) {
         if (chatFilters) {
-          // chatHistory.displayableChatHistory.push({
-          //   role: "system",
-          //   content:
-          //     "You are an advanced question answer agent answering questions based on provided context. You will respond to queries in second person: saying things like 'you'. The context provided was written by the same user who is asking the question.",
-          //   messageType: "success",
-
-          //   context: [],
-          // });
-          chatHistory.displayableChatHistory.push(
-            await resolveRAGContext(userTextFieldInput, chatFilters)
+          const newChatHistory = await generateOverallChatHistory(
+            userTextFieldInput,
+            chatFilters,
+            ragPromptTemplate
           );
+          chatHistory.displayableChatHistory.push(...newChatHistory);
         }
       } else {
         chatHistory.displayableChatHistory.push({
@@ -395,18 +392,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       )}
     </div>
   );
-};
-
-const getChatHistoryContext = (
-  chatHistory: ChatHistory | undefined
-): DBQueryResult[] => {
-  if (!chatHistory) return [];
-  const contextForChat = chatHistory.displayableChatHistory
-    .map((message) => {
-      return message.context;
-    })
-    .flat();
-  return contextForChat as DBQueryResult[];
 };
 
 export default ChatWithLLM;
