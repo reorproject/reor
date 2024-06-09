@@ -1,21 +1,24 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { LLMSessionService } from "../Types";
-import { Tiktoken, TiktokenModel, encodingForModel } from "js-tiktoken";
+import { exec } from "child_process";
+import * as os from "os";
+import * as path from "path";
+
+import { app } from "electron";
 import {
   LLMGenerationParameters,
   OpenAILLMConfig,
 } from "electron/main/Store/storeConfig";
+import { Tiktoken, TiktokenModel, encodingForModel } from "js-tiktoken";
+import { ModelResponse, ProgressResponse, Ollama } from "ollama";
 import {
   ChatCompletionChunk,
   ChatCompletionMessageParam,
 } from "openai/resources/chat/completions";
-import { app } from "electron";
-import * as path from "path";
-import * as os from "os";
-import * as fs from "fs";
-import { exec } from "child_process";
+
+
 // import ollama,"ollama";
-import { ModelResponse, ProgressResponse, Ollama } from "ollama";
+
+import { LLMSessionService } from "../Types";
 
 const OllamaServeType = {
   SYSTEM: "system", // ollama is installed on the system

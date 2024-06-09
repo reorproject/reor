@@ -1,4 +1,5 @@
-import { errorToString } from "@/functions/error";
+import React, { useEffect, useState } from "react";
+
 import { MessageStreamEvent } from "@anthropic-ai/sdk/resources";
 import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import {
@@ -6,10 +7,11 @@ import {
   ChatCompletionMessageParam,
 } from "openai/resources/chat/completions";
 import posthog from "posthog-js";
-import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
+
 import { SimilarEntriesComponent } from "../Similarity/SimilarFilesSidebar";
+
 import AddContextFiltersModal from "./AddContextFiltersModal";
 import { PromptSuggestion } from "./Chat-Prompts";
 import ChatInput from "./ChatInput";
@@ -18,6 +20,8 @@ import {
   resolveRAGContext,
 } from "./chatUtils";
 
+import { errorToString } from "@/functions/error";
+
 // convert ask options to enum
 enum AskOptions {
   Ask = "Ask",
@@ -25,7 +29,7 @@ enum AskOptions {
   // TemporalAsk = "Temporal Ask",
   // FlashcardAsk = "Flashcard Ask",
 }
-const ASK_OPTIONS = Object.values(AskOptions);
+// const ASK_OPTIONS = Object.values(AskOptions);
 
 const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
   [AskOptions.Ask]: [
@@ -84,7 +88,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   setChatFilters,
 }) => {
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>("");
-  const [askText, setAskText] = useState<AskOptions>(AskOptions.Ask);
+  const [askText] = useState<AskOptions>(AskOptions.Ask);
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
   const [readyToSave, setReadyToSave] = useState<boolean>(false);
   const [currentContext, setCurrentContext] = useState<DBQueryResult[]>([]);

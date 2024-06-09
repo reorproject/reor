@@ -1,11 +1,25 @@
-import { ipcMain, BrowserWindow } from "electron";
+import * as fs from "fs";
 import * as path from "path";
+
+import { ipcMain, BrowserWindow } from "electron";
+import Store from "electron-store";
+
+
+import { DBEntry } from "../database/Schema";
 import {
-  FileInfoTree,
-  AugmentPromptWithFileProps,
-  WriteFileProps,
-  RenameFileProps,
-} from "./Types";
+  convertFileInfoListToDBItems,
+  updateFileInTable,
+} from "../database/TableHelperFunctions";
+import { addExtensionToFilenameIfNoExtensionPresent } from "../Generic/path";
+import { getLLMConfig } from "../llm/llmConfig";
+import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
+import {
+  PromptWithContextLimit,
+  createPromptWithContextLimitFromContent,
+} from "../Prompts/Prompts";
+import { StoreKeys, StoreSchema } from "../Store/storeConfig";
+import WindowsManager from "../windowManager";
+
 import {
   GetFilesInfoTree,
   orchestrateEntryMove,
@@ -17,22 +31,13 @@ import {
   startWatchingDirectory,
   updateFileListForRenderer,
 } from "./Filesystem";
-import * as fs from "fs";
 import {
-  convertFileInfoListToDBItems,
-  updateFileInTable,
-} from "../database/TableHelperFunctions";
-import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
-import {
-  PromptWithContextLimit,
-  createPromptWithContextLimitFromContent,
-} from "../Prompts/Prompts";
-import Store from "electron-store";
-import { StoreKeys, StoreSchema } from "../Store/storeConfig";
-import { getLLMConfig } from "../llm/llmConfig";
-import WindowsManager from "../windowManager";
-import { DBEntry } from "../database/Schema";
-import { addExtensionToFilenameIfNoExtensionPresent } from "../Generic/path";
+  FileInfoTree,
+  AugmentPromptWithFileProps,
+  WriteFileProps,
+  RenameFileProps,
+} from "./Types";
+
 
 export const registerFileHandlers = (
   store: Store<StoreSchema>,

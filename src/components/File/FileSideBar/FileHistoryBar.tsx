@@ -1,9 +1,10 @@
-import { removeFileExtension } from "@/functions/strings";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
+
+import posthog from "posthog-js";
 import { IoMdArrowRoundBack, IoMdArrowRoundForward } from "react-icons/io";
 
+import { removeFileExtension } from "@/functions/strings";
 import "./../../../styles/history.scss";
-import posthog from "posthog-js";
 
 interface FileHistoryNavigatorProps {
   history: string[];
