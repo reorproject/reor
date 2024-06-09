@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from "react";
 
 import { DBQueryResult } from "electron/main/database/Schema";

@@ -4,6 +4,7 @@ import { LLMConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
 
 import { OllamaService } from "./models/Ollama";
 
+
 export function validateAIModelConfig(config: LLMConfig): string | null {
   // Validate localPath: ensure it's not empty
   if (!config.modelName.trim()) {

@@ -5,6 +5,7 @@ import * as path from "path";
 import chokidar from "chokidar";
 import { BrowserWindow } from "electron";
 
+
 import { LanceDBTableWrapper } from "../database/LanceTableWrapper";
 import {
   addFileTreeToDBTable,
@@ -12,6 +13,7 @@ import {
 } from "../database/TableHelperFunctions";
 
 import { FileInfo, FileInfoTree, isFileNodeDirectory } from "./Types";
+
 
 export const markdownExtensions = [
   ".md",

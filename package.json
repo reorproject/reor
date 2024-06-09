@@ -73,7 +73,7 @@
     "remove-markdown": "^0.5.0",
     "tiptap-markdown": "^0.8.10",
     "turndown": "^7.1.2",
-    "use-debounce": "^10.0.0",
+    "use-debounce": "^10.0.1",
     "vectordb": "0.4.10"
   },
   "devDependencies": {
@@ -93,6 +93,9 @@
     "electron": "28.2.1",
     "electron-builder": "^24.6.3",
     "eslint": "^8.56.0",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-import-resolver-node": "^0.3.9",
+    "eslint-import-resolver-typescript": "^3.6.1",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-unused-imports": "^4.0.0",

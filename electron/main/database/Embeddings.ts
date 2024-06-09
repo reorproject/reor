@@ -16,8 +16,9 @@ import {
   EmbeddingModelWithRepo,
 } from "../Store/storeConfig";
 
-
 import { DBEntry } from "./Schema";
+
+
 
 export interface EnhancedEmbeddingFunction<T>
   extends lancedb.EmbeddingFunction<T> {

@@ -5,19 +5,15 @@ import * as path from "path";
 import {
   app,
   BrowserWindow,
-  shell,
-  ipcMain,
   dialog,
+  ipcMain,
   Menu,
   MenuItem,
+  shell,
 } from "electron";
 import Store from "electron-store";
-
-
-// import contextMenus from "./contextMenus";
 import * as lancedb from "vectordb";
 
-// import { FileInfoNode } from "./Files/Types";
 import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
 import { RepopulateTableWithMissingItems } from "./database/TableHelperFunctions";
 import {

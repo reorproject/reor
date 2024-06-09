@@ -6,6 +6,7 @@ import {
   FileInfoTree,
 } from "electron/main/Files/Types";
 
+
 import { sortFilesAndDirectories } from "../fileOperations";
 
 export const useFileInfoTree = (currentFilePath: string | null) => {

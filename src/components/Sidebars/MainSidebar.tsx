@@ -12,6 +12,7 @@ import { SidebarAbleToShow } from "../FileEditorContainer";
 
 import SearchComponent from "./FileSidebarSearch";
 
+
 interface SidebarManagerProps {
   files: FileInfoTree;
   expandedDirectories: Map<string, boolean>;

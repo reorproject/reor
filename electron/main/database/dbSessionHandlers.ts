@@ -3,6 +3,7 @@ import * as fs from "fs";
 import { ipcMain } from "electron";
 import Store from "electron-store";
 
+
 import { errorToString } from "../Generic/error";
 import { getLLMConfig } from "../llm/llmConfig";
 import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
@@ -14,12 +15,13 @@ import { BasePromptRequirements } from "./dbSessionHandlerTypes";
 import { rerankSearchedEmbeddings } from "./Embeddings";
 import { DBEntry, DatabaseFields } from "./Schema";
 
+
 export interface PromptWithRagResults {
   ragPrompt: string;
   uniqueFilesReferenced: string[];
 }
 
-const MAX_COSINE_DISTANCE = 0.4;
+// const MAX_COSINE_DISTANCE = 0.4;
 
 export const registerDBSessionHandlers = (
   // dbTable: LanceDBTableWrapper,

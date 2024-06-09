@@ -11,6 +11,7 @@ import { SearchBarWithFilesSuggestion } from "../Generic/SearchBarWithFilesSugge
 import { ChatFilters } from "./Chat";
 
 
+
 interface Props {
   isOpen: boolean;
   onClose: () => void;

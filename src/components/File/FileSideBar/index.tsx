@@ -9,6 +9,7 @@ import RenameNoteModal from "../RenameNote";
 import { FileItem } from "./FileItem";
 import { isFileNodeDirectory } from "./fileOperations";
 
+
 interface FileListProps {
   files: FileInfoTree;
   expandedDirectories: Map<string, boolean>;

@@ -12,6 +12,7 @@ import { chunkMarkdownByHeadingsAndByCharsIfBig } from "../RAG/Chunking";
 import { LanceDBTableWrapper } from "./LanceTableWrapper";
 import { DBEntry, DBQueryResult, DatabaseFields } from "./Schema";
 
+
 export const RepopulateTableWithMissingItems = async (
   table: LanceDBTableWrapper,
   directoryPath: string,

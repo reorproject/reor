@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState, useMemo } from "react";
 
 import posthog from "posthog-js";
 
+
 import { removeFileExtension } from "@/functions/strings";
 
 export interface SuggestionsState {

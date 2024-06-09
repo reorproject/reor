@@ -1,5 +1,6 @@
 import * as lancedb from "vectordb";
 
+
 import { errorToString } from "../Generic/error";
 
 import { EnhancedEmbeddingFunction } from "./Embeddings";

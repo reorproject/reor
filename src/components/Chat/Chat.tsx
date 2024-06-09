@@ -29,7 +29,7 @@ enum AskOptions {
   // TemporalAsk = "Temporal Ask",
   // FlashcardAsk = "Flashcard Ask",
 }
-const ASK_OPTIONS = Object.values(AskOptions);
+// const ASK_OPTIONS = Object.values(AskOptions);
 
 const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
   [AskOptions.Ask]: [
@@ -88,7 +88,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   setChatFilters,
 }) => {
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>("");
-  const [askText, setAskText] = useState<AskOptions>(AskOptions.Ask);
+  const [askText] = useState<AskOptions>(AskOptions.Ask);
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
   const [readyToSave, setReadyToSave] = useState<boolean>(false);
   const [currentContext, setCurrentContext] = useState<DBQueryResult[]>([]);

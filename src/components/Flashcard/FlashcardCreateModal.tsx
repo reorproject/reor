@@ -1,9 +1,11 @@
+
 import React, { useEffect, useRef, useState } from "react";
 
 import { Button } from "@material-tailwind/react";
 import { CircularProgress } from "@mui/material";
 import posthog from "posthog-js";
 import { TypeAnimation } from "react-type-animation";
+
 
 import FilesSuggestionsDisplay from "../Editor/BacklinkSuggestionsDisplay";
 import { useFileInfoTree } from "../File/FileSideBar/hooks/use-file-info-tree";

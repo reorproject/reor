@@ -4,6 +4,7 @@ import * as path from "path";
 import { ipcMain, BrowserWindow } from "electron";
 import Store from "electron-store";
 
+
 import { DBEntry } from "../database/Schema";
 import {
   convertFileInfoListToDBItems,
@@ -36,6 +37,7 @@ import {
   WriteFileProps,
   RenameFileProps,
 } from "./Types";
+
 
 export const registerFileHandlers = (
   store: Store<StoreSchema>,
