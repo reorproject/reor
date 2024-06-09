@@ -2,15 +2,16 @@ import React, { useEffect, useState } from "react";
 import SettingsModal from "../Settings/Settings";
 import { MdOutlineQuiz, MdSettings } from "react-icons/md";
 import { SidebarAbleToShow } from "../FileEditorContainer";
-import { IoFolderOutline } from "react-icons/io5";
+import { ImFilesEmpty } from "react-icons/im";
 import { FaSearch } from "react-icons/fa";
-import { FaRegPenToSquare } from "react-icons/fa6";
+import { VscNewFile } from "react-icons/vsc";
 import NewNoteComponent from "../File/NewNote";
 import NewDirectoryComponent from "../File/NewDirectory";
 import { GrNewWindow } from "react-icons/gr";
-import { LuFolderPlus } from "react-icons/lu";
-import { BsChatLeftDots, BsFillChatLeftDotsFill } from "react-icons/bs";
+import { VscNewFolder } from "react-icons/vsc";
+import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import FlashcardMenuModal from "../Flashcard/FlashcardMenuModal";
+import { IconContext } from "react-icons";
 
 interface IconsSidebarProps {
   openRelativePath: (path: string) => void;
@@ -50,74 +51,64 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
   }, []);
 
   return (
-    <div className="w-full h-full bg-neutral-800 flex flex-col items-center justify-between">
+    <div className="w-full h-full bg-neutral-800 flex flex-col items-center justify-between gap-1">
       <div
         className=" flex items-center justify-center w-full h-8 cursor-pointer"
         onClick={() => makeSidebarShow("files")}
       >
-        <div
-          className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700"
-          style={{
-            backgroundColor: sidebarShowing === "files" ? "rgb(82 82 82)" : "",
-          }}
-        >
-          <IoFolderOutline
-            className="mx-auto text-gray-200 "
-            size={22}
-            title="Files"
-          />
-        </div>
+        <IconContext.Provider value={{ color: sidebarShowing === "files" ? "salmon" : "" }}>
+          <div
+            className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700"
+          >
+            <ImFilesEmpty
+              className="mx-auto text-gray-200 "
+              size={22}
+              title="Files"
+            />
+          </div>
+        </IconContext.Provider>
       </div>
       <div
         className=" flex items-center justify-center w-full h-8 cursor-pointer"
         onClick={() => makeSidebarShow("chats")}
       >
-        <div
-          className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700"
-          style={{
-            backgroundColor: sidebarShowing === "chats" ? "rgb(82 82 82)" : "",
-          }}
-        >
-          {sidebarShowing === "chats" ? (
-            <BsFillChatLeftDotsFill
-              size={22}
-              className="text-gray-100 cursor-pointer"
-              title="Open Chatbot"
-            />
-          ) : (
-            <BsChatLeftDots
+
+        <IconContext.Provider value={{ color: sidebarShowing === "chats" ? "salmon" : "" }}>
+          <div
+            className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700"
+          >
+            <IoChatbubbleEllipsesOutline
               className="text-gray-100 cursor-pointer "
               size={22}
-              title="Close Chatbot"
+              title={sidebarShowing === "chats" ? "Close Chatbot" : "Open Chatbot"}
             />
-          )}
-        </div>
+          </div>
+        </IconContext.Provider>
       </div>
       <div
         className="flex items-center justify-center w-full h-8 cursor-pointer"
         onClick={() => makeSidebarShow("search")}
       >
-        <div
-          className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700"
-          style={{
-            backgroundColor: sidebarShowing === "search" ? "rgb(82 82 82)" : "",
-          }}
-        >
-          <FaSearch
-            size={18}
-            className=" text-gray-200"
-            title="Semantic Search"
-          />
-        </div>
+        <IconContext.Provider value={{ color: sidebarShowing === "search" ? "salmon" : ""}}>
+          <div
+            className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700"
+          >
+            <FaSearch
+              size={18}
+              className=" text-gray-200"
+              title="Semantic Search"
+            />
+          </div>
+        </IconContext.Provider>
       </div>
       <div
         className="bg-transparent border-none cursor-pointer flex items-center justify-center w-full h-8 "
         onClick={() => setIsNewNoteModalOpen(true)}
       >
         <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
-          <FaRegPenToSquare
+          <VscNewFile
             className="text-gray-200"
-            size={20}
+            size={22}
             title="New Note"
           />
         </div>
@@ -127,9 +118,9 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         onClick={() => setIsNewDirectoryModalOpen(true)}
       >
         <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
-          <LuFolderPlus
+          <VscNewFolder
             className="text-gray-200"
-            size={23}
+            size={22}
             title="New Directory"
           />
           {/* < /> */}

@@ -59,13 +59,13 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   };
 
   return (
-    <div className="relative w-full " ref={wrapperRef}>
+    <div className="flex flex-end" ref={wrapperRef}>
       <div
-        className="flex justify-between items-center w-full py-2 border border-gray-300 rounded-md bg-neutral-200 cursor-pointer"
+        className="flex justify-between items-center w-[192px] py-2 border border-gray-300 rounded-md cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten"
         onClick={toggleDropdown}
       >
         {centerText ? <span></span> : null}
-        <span className="ml-2 text-[13px] text-gray-600">{selectedValue}</span>
+        <span className="pl-6 text-[13px] text-gray-100">{selectedValue}</span>
         <span
           className="transform transition-transform mr-2"
           style={{ transform: isOpen ? "rotate(180deg)" : "none" }}
@@ -74,11 +74,11 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         </span>
       </div>
       {isOpen && (
-        <div className="absolute w-full text-[13px] border text-gray-600 border-gray-300 rounded-md shadow-lg z-10 bg-white max-h-60 overflow-auto">
+        <div className="absolute w-[192px] text-[13px] border text-gray-600 border-gray-300 rounded-md shadow-lg z-10 bg-white max-h-60 overflow-auto">
           {options.map((option, index) => (
             <div
               key={index}
-              className="flex justify-between items-center py-2 pl-2 pr-2 hover:bg-neutral-100 cursor-pointer rounded-md"
+              className="flex justify-between items-center py-2 pl-6 pr-2 bg-dark-gray-c-eight cursor-pointer text-white hover:bg-dark-gray-c-ten "
               onClick={() => handleOptionClick(option.value)}
             >
               <span

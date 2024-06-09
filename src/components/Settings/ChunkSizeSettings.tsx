@@ -38,7 +38,7 @@ const ChunkSizeSettings: React.FC<ChunkSizeSettingsProps> = ({ children }) => {
   );
 
   return (
-    <div className="w-full bg-neutral-800 rounded pb-7">
+    <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2 pt-3">
       {children}
       {chunkSize && (
         <CustomSelect

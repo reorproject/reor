@@ -30,11 +30,10 @@ const AnalyticsSettings: React.FC<AnalyticsSettingsProps> = () => {
   };
 
   return (
-    <div className="w-full bg-neutral-800 rounded pb-7 ">
+    <div className="w-full bg-dark-gray-c-three rounded pb-7 ">
       <h2 className="text-2xl font-semibold mb-0 text-white">Analytics</h2>{" "}
-      <p className="text-gray-300 text-sm mb-2 mt-1">
-        Reor tracks anonymous usage data to help improve the app. We never send
-        of your personal data. This is solely to track which features are
+      <p className="text-gray-200 text-sm mb-2 mt-5">
+        Reor tracks anonymous usage data to help improve the app. We never share this personal data. This is solely to track which features are
         popular. You can disable this at any time:
       </p>
       <Switch

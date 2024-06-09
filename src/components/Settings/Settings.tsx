@@ -45,8 +45,8 @@ const SettingsModal: React.FC<ModalProps> = ({
         handleSave();
       }}
     >
-      <div className="mt-0 flex w-[600px] ">
-        <div className="flex flex-col ml-2 mb-2 pr-1 w-[100px]  bg-neutral-800 text-white border-r-[0.1px] border-gray-700 border-solid border-b-0 border-t-0 border-l-0">
+      <div className="flex w-full h-full">
+        <div className="flex flex-col w-[150px] h-[600px] bg-dark-gray-c-seven text-white border-r-[0.1px] border-gray-700 border-solid border-b-0 border-t-0 border-l-0 p-2">
           <div
             className={`flex items-center mt-2 rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
               activeTab === SettingsTab.LLMSettings
@@ -101,15 +101,15 @@ const SettingsModal: React.FC<ModalProps> = ({
         </div>
 
         {/* Right Content Area */}
-        <div className="flex-1 ml-2">
+        <div className="w-full h-[600px] flex-1 ml-2 pl-16 pr-16">
           {/* <h2 className="text-2xl font-semibold mb-4 text-white">Settings</h2> */}
           {activeTab === SettingsTab.LLMSettings && (
-            <div className="mt-2 w-full">
+            <div className="w-full h-full">
               <LLMSettings />
             </div>
           )}
           {activeTab === SettingsTab.EmbeddingModel && (
-            <div className="w-full">
+            <div className="w-full h-full">
               <EmbeddingModelSettings
                 handleUserHasChangedModel={() => setWillNeedToReIndex(true)}
               />
@@ -131,15 +131,15 @@ const SettingsModal: React.FC<ModalProps> = ({
 
           {activeTab === SettingsTab.RAG && (
             <div className="w-full">
+              <h2 className="text-2xl font-semibold mb-5 text-white">RAG</h2>{" "}
               <RagSettings>
-                <h2 className="text-2xl font-semibold mb-0 text-white">RAG</h2>{" "}
-                <p className="mt-2 text-sm text-gray-100 mb-1">
-                  Number of notes to feed to the LLM during Q&A:
+                <p className="mt-5 text-sm text-gray-100 mb-1 flex pb-3">
+                  Number of notes to feed to the LLM during Q&A
                 </p>
               </RagSettings>
               <ChunkSizeSettings>
-                <p className="mt-2 text-sm text-gray-100 mb-1">
-                  Change the Chunk Size:
+                <p className="mt-5 text-sm text-gray-100 mb-1 flex pb-3">
+                  Change the Chunk Size
                 </p>
               </ChunkSizeSettings>
             </div>
