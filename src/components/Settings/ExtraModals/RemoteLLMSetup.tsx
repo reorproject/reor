@@ -1,11 +1,17 @@
+
 import React, { useState } from "react";
+
 import { Button } from "@material-tailwind/react";
-import Modal from "../../Generic/Modal";
 import { LLMConfig } from "electron/main/Store/storeConfig";
-import CustomSelect from "../../Generic/Select";
-import { errorToString } from "@/functions/error";
-import ExternalLink from "../../Generic/ExternalLink";
 import posthog from "posthog-js";
+
+import ExternalLink from "../../Generic/ExternalLink";
+import Modal from "../../Generic/Modal";
+import CustomSelect from "../../Generic/Select";
+
+import { errorToString } from "@/functions/error";
+
+
 
 interface RemoteLLMModalProps {
   isOpen: boolean;

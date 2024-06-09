@@ -5,7 +5,6 @@ import {
   PasteRule,
 } from "@tiptap/core";
 import { Link } from "@tiptap/extension-link";
-
 import type { LinkOptions } from "@tiptap/extension-link";
 
 /**

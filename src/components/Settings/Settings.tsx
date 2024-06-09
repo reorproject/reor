@@ -1,11 +1,14 @@
 import React, { useState } from "react";
+
+
 import Modal from "../Generic/Modal";
-import LLMSettings from "./LLMSettings";
-import EmbeddingModelSettings from "./EmbeddingSettings";
-import RagSettings from "./RagSettings";
-import TextGenerationSettings from "./TextGenerationSettings";
+
 import AnalyticsSettings from "./AnalyticsSettings";
 import ChunkSizeSettings from "./ChunkSizeSettings";
+import EmbeddingModelSettings from "./EmbeddingSettings";
+import LLMSettings from "./LLMSettings";
+import RagSettings from "./RagSettings";
+import TextGenerationSettings from "./TextGenerationSettings";
 
 interface ModalProps {
   isOpen: boolean;

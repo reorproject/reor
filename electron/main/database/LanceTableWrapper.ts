@@ -4,17 +4,21 @@ import {
   MetricType,
   makeArrowTable,
 } from "vectordb";
-import GetOrCreateLanceTable from "./Lance";
+
+
+import { EmbeddingModelConfig } from "../Store/storeConfig";
+
 import {
   EnhancedEmbeddingFunction,
   createEmbeddingFunction,
 } from "./Embeddings";
+import GetOrCreateLanceTable from "./Lance";
+import { DBEntry, DBQueryResult, DatabaseFields } from "./Schema";
 import {
   convertRecordToDBType,
   sanitizePathForDatabase,
 } from "./TableHelperFunctions";
-import { DBEntry, DBQueryResult, DatabaseFields } from "./Schema";
-import { EmbeddingModelConfig } from "../Store/storeConfig";
+
 
 export class LanceDBTableWrapper {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
