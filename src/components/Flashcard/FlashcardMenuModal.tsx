@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 
-import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
-import FlashcardReviewModal from "./FlashcardReviewModal";
-import FlashcardCreateModal from "./FlashcardCreateModal";
 import posthog from "posthog-js";
+
+import Modal from "../Generic/Modal";
+
+import FlashcardCreateModal from "./FlashcardCreateModal";
+import FlashcardReviewModal from "./FlashcardReviewModal";
+
 
 interface FlashcardMenuModalProps {
   isOpen: boolean;

@@ -1,7 +1,9 @@
 import React from "react";
-import ReactCardFlip from "react-card-flip";
-import ProgressBar from "./ProgressBar";
+
 import { Button } from "@material-tailwind/react";
+import ReactCardFlip from "react-card-flip";
+
+import ProgressBar from "./ProgressBar";
 import { FlashcardQAPairUI } from "./types";
 
 interface FlashcardCoreProps {

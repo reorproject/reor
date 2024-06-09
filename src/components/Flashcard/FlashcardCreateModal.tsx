@@ -1,16 +1,21 @@
 import React, { useEffect, useRef, useState } from "react";
+
+import { Button } from "@material-tailwind/react";
+import { CircularProgress } from "@mui/material";
+import posthog from "posthog-js";
 import { TypeAnimation } from "react-type-animation";
 
-import Modal from "../Generic/Modal";
-import { Button } from "@material-tailwind/react";
-import { storeFlashcardPairsAsJSON } from "./utils";
-import { FlashcardQAPairUI } from "./types";
-import { FlashcardCore } from "./FlashcardsCore";
-import { CircularProgress } from "@mui/material";
+import FilesSuggestionsDisplay from "../Editor/BacklinkSuggestionsDisplay";
 import { useFileInfoTree } from "../File/FileSideBar/hooks/use-file-info-tree";
 import { useFileByFilepath } from "../File/hooks/use-file-by-filepath";
-import FilesSuggestionsDisplay from "../Editor/BacklinkSuggestionsDisplay";
-import posthog from "posthog-js";
+import Modal from "../Generic/Modal";
+
+import { FlashcardCore } from "./FlashcardsCore";
+import { FlashcardQAPairUI } from "./types";
+import { storeFlashcardPairsAsJSON } from "./utils";
+
+
+
 
 interface FlashcardCreateModalProps {
   isOpen: boolean;

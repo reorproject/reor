@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
-import CustomSelect from "../Generic/Select";
+
 import { Button } from "@material-tailwind/react";
-import NewLocalEmbeddingModelModal from "./ExtraModals/NewLocalEmbeddingModel";
 import { EmbeddingModelConfig } from "electron/main/Store/storeConfig";
-import NewRemoteEmbeddingModelModal from "./ExtraModals/NewRemoteEmbeddingModel";
 import posthog from "posthog-js";
+
+import CustomSelect from "../Generic/Select";
+
+import NewLocalEmbeddingModelModal from "./ExtraModals/NewLocalEmbeddingModel";
+import NewRemoteEmbeddingModelModal from "./ExtraModals/NewRemoteEmbeddingModel";
+
 
 interface EmbeddingModelManagerProps {
   // userHasCompleted?: (completed: boolean) => void;

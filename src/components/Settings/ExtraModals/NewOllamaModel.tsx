@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
+
 import { Button } from "@material-tailwind/react";
-import Modal from "../../Generic/Modal";
-import ExternalLink from "../../Generic/ExternalLink";
-import { errorToString } from "@/functions/error";
 import { ProgressResponse } from "ollama";
-import { toast } from "react-toastify";
 import posthog from "posthog-js";
+import { toast } from "react-toastify";
+
+import ExternalLink from "../../Generic/ExternalLink";
+import Modal from "../../Generic/Modal";
+
+import { errorToString } from "@/functions/error";
+
 
 interface NewOllamaModelModalProps {
   isOpen: boolean;

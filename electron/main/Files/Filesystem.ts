@@ -1,14 +1,17 @@
-import * as path from "path";
 import * as fs from "fs";
-import { FileInfo, FileInfoTree, isFileNodeDirectory } from "./Types";
+import * as fsPromises from "fs/promises";
+import * as path from "path";
+
 import chokidar from "chokidar";
 import { BrowserWindow } from "electron";
-import * as fsPromises from "fs/promises";
+
+import { LanceDBTableWrapper } from "../database/LanceTableWrapper";
 import {
   addFileTreeToDBTable,
   removeFileTreeFromDBTable,
 } from "../database/TableHelperFunctions";
-import { LanceDBTableWrapper } from "../database/LanceTableWrapper";
+
+import { FileInfo, FileInfoTree, isFileNodeDirectory } from "./Types";
 
 export const markdownExtensions = [
   ".md",

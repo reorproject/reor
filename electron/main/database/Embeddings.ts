@@ -1,17 +1,22 @@
-import * as lancedb from "vectordb";
-import { Pipeline, PreTrainedTokenizer } from "@xenova/transformers";
-
 import path from "path";
+
+import { Pipeline, PreTrainedTokenizer } from "@xenova/transformers";
 import { app } from "electron";
+import removeMd from "remove-markdown";
+import * as lancedb from "vectordb";
+
+
+
+import { DownloadModelFilesFromHFRepo } from "../download/download";
+import { splitDirectoryPathIntoBaseAndRepo } from "../Files/Filesystem";
 import { errorToString } from "../Generic/error";
 import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
 } from "../Store/storeConfig";
-import { splitDirectoryPathIntoBaseAndRepo } from "../Files/Filesystem";
-import { DownloadModelFilesFromHFRepo } from "../download/download";
-import removeMd from "remove-markdown";
+
+
 import { DBEntry } from "./Schema";
 
 export interface EnhancedEmbeddingFunction<T>

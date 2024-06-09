@@ -1,4 +1,5 @@
-import { errorToString } from "@/functions/error";
+import React, { useEffect, useState } from "react";
+
 import { MessageStreamEvent } from "@anthropic-ai/sdk/resources";
 import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import {
@@ -6,10 +7,11 @@ import {
   ChatCompletionMessageParam,
 } from "openai/resources/chat/completions";
 import posthog from "posthog-js";
-import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
+
 import { SimilarEntriesComponent } from "../Similarity/SimilarFilesSidebar";
+
 import AddContextFiltersModal from "./AddContextFiltersModal";
 import { PromptSuggestion } from "./Chat-Prompts";
 import ChatInput from "./ChatInput";
@@ -17,6 +19,8 @@ import {
   formatOpenAIMessageContentIntoString,
   resolveRAGContext,
 } from "./chatUtils";
+
+import { errorToString } from "@/functions/error";
 
 // convert ask options to enum
 enum AskOptions {

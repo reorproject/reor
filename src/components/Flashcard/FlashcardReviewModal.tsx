@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 
 import Modal from "../Generic/Modal";
+import CustomSelect from "../Generic/Select";
+
+import { FlashcardCore } from "./FlashcardsCore";
+import { FlashcardQAPairUI } from "./types";
 import {
   getFlashcardQnaPairsFromJsonFile,
   getFlashcardVaultDirectory,
 } from "./utils";
-import { FlashcardQAPairUI } from "./types";
-import { FlashcardCore } from "./FlashcardsCore";
-import CustomSelect from "../Generic/Select";
+
 
 interface FlashcardReviewModalProps {
   isOpen: boolean;

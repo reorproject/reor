@@ -1,6 +1,7 @@
 import React from "react";
-import { CircularProgress } from "@mui/material";
+
 import Textarea from "@mui/joy/Textarea";
+import { CircularProgress } from "@mui/material";
 interface ChatInputProps {
   userTextFieldInput: string;
   setUserTextFieldInput: (value: string) => void;

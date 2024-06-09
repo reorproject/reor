@@ -1,6 +1,8 @@
-import { listFiles, downloadFile } from "@huggingface/hub";
 import fs from "fs";
 import * as path from "path";
+
+import { listFiles, downloadFile } from "@huggingface/hub";
+
 import { customFetchUsingElectronNet } from "../Generic/network";
 
 export const DownloadModelFilesFromHFRepo = async (

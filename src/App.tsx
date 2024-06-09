@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { ToastContainer, toast } from "react-toastify";
+
 import { Portal } from "@headlessui/react";
+import { ToastContainer, toast } from "react-toastify";
+
 import "react-toastify/dist/ReactToastify.css";
 import FileEditorContainer from "./components/FileEditorContainer";
 import IndexingProgress from "./components/IndexingProgress";
 import InitialSetupSinglePage from "./components/Settings/InitialSettingsSinglePage";
+
 import posthog from "posthog-js";
 
 interface AppProps {}

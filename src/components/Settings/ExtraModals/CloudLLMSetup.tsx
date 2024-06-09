@@ -1,11 +1,13 @@
 import React, { useState } from "react";
+
 import { Button } from "@material-tailwind/react";
-import Modal from "../../Generic/Modal";
 import {
   OpenAILLMConfig,
   AnthropicLLMConfig,
 } from "electron/main/Store/storeConfig";
 import posthog from "posthog-js";
+
+import Modal from "../../Generic/Modal";
 
 interface CloudLLMSetupModalProps {
   isOpen: boolean;

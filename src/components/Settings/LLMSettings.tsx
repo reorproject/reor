@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { LLMConfig } from "electron/main/Store/storeConfig";
-import CustomSelect from "../Generic/Select";
+
 import { Button } from "@material-tailwind/react";
-import CloudLLMSetupModal from "./ExtraModals/CloudLLMSetup";
-import RemoteLLMSetupModal from "./ExtraModals/RemoteLLMSetup";
-import NewOllamaModelModal from "./ExtraModals/NewOllamaModel";
-import DefaultLLMSelector from "./DefaultLLMSelector";
+import { LLMConfig } from "electron/main/Store/storeConfig";
 import posthog from "posthog-js";
+
+import CustomSelect from "../Generic/Select";
+
+import DefaultLLMSelector from "./DefaultLLMSelector";
+import CloudLLMSetupModal from "./ExtraModals/CloudLLMSetup";
+import NewOllamaModelModal from "./ExtraModals/NewOllamaModel";
+import RemoteLLMSetupModal from "./ExtraModals/RemoteLLMSetup";
+
 
 interface LLMSettingsProps {
   userHasCompleted?: (completed: boolean) => void;

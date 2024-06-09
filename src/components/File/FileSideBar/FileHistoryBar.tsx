@@ -1,5 +1,7 @@
 import { removeFileExtension } from "@/functions/strings";
+
 import React, { useState, useRef, useEffect } from "react";
+
 import { IoMdArrowRoundBack, IoMdArrowRoundForward } from "react-icons/io";
 
 import "./../../../styles/history.scss";

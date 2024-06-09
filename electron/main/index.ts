@@ -1,3 +1,7 @@
+import { release } from "node:os";
+import { join } from "node:path";
+import * as path from "path";
+
 import {
   app,
   BrowserWindow,
@@ -7,33 +11,33 @@ import {
   Menu,
   MenuItem,
 } from "electron";
-import { release } from "node:os";
-import { join } from "node:path";
 import Store from "electron-store";
-import * as path from "path";
-import { StoreKeys, StoreSchema } from "./Store/storeConfig";
+
+
 // import contextMenus from "./contextMenus";
 import * as lancedb from "vectordb";
+
+// import { FileInfoNode } from "./Files/Types";
+import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
+import { RepopulateTableWithMissingItems } from "./database/TableHelperFunctions";
 import {
   markdownExtensions,
   startWatchingDirectory,
   updateFileListForRenderer,
 } from "./Files/Filesystem";
+import { registerFileHandlers } from "./Files/registerFilesHandler";
+import { errorToString } from "./Generic/error";
+import { addExtensionToFilenameIfNoExtensionPresent } from "./Generic/path";
 import {
   ollamaService,
   registerLLMSessionHandlers,
 } from "./llm/llmSessionHandlers";
-// import { FileInfoNode } from "./Files/Types";
-import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
+import { StoreKeys, StoreSchema } from "./Store/storeConfig";
 import {
   getDefaultEmbeddingModelConfig,
   registerStoreHandlers,
 } from "./Store/storeHandlers";
-import { registerFileHandlers } from "./Files/registerFilesHandler";
-import { RepopulateTableWithMissingItems } from "./database/TableHelperFunctions";
 import WindowsManager from "./windowManager";
-import { errorToString } from "./Generic/error";
-import { addExtensionToFilenameIfNoExtensionPresent } from "./Generic/path";
 
 const store = new Store<StoreSchema>();
 // store.clear(); // clear store for testing

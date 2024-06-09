@@ -1,16 +1,18 @@
-import { ipcMain } from "electron";
 import * as fs from "fs";
 
+import { ipcMain } from "electron";
 import Store from "electron-store";
+
 import { errorToString } from "../Generic/error";
-import { createPromptWithContextLimitFromContent } from "../Prompts/Prompts";
-import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import { getLLMConfig } from "../llm/llmConfig";
 import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
+import { createPromptWithContextLimitFromContent } from "../Prompts/Prompts";
+import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import WindowsManager from "../windowManager";
+
+import { BasePromptRequirements } from "./dbSessionHandlerTypes";
 import { rerankSearchedEmbeddings } from "./Embeddings";
 import { DBEntry, DatabaseFields } from "./Schema";
-import { BasePromptRequirements } from "./dbSessionHandlerTypes";
 
 export interface PromptWithRagResults {
   ragPrompt: string;

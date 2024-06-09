@@ -1,13 +1,16 @@
 import React, { useState } from "react";
-import { FileSidebar } from "../File/FileSideBar";
-import SearchComponent from "./FileSidebarSearch";
+
 import { DBQueryResult } from "electron/main/database/Schema";
 import { FileInfoTree } from "electron/main/Files/Types";
-import { ChatsSidebar } from "../Chat/ChatsSidebar";
-import { SidebarAbleToShow } from "../FileEditorContainer";
-import { ChatFilters, ChatHistory } from "../Chat/Chat";
-import { ChatHistoryMetadata } from "../Chat/hooks/use-chat-history";
 import posthog from "posthog-js";
+
+import { ChatFilters, ChatHistory } from "../Chat/Chat";
+import { ChatsSidebar } from "../Chat/ChatsSidebar";
+import { ChatHistoryMetadata } from "../Chat/hooks/use-chat-history";
+import { FileSidebar } from "../File/FileSideBar";
+import { SidebarAbleToShow } from "../FileEditorContainer";
+
+import SearchComponent from "./FileSidebarSearch";
 
 interface SidebarManagerProps {
   files: FileInfoTree;

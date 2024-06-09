@@ -1,9 +1,12 @@
 import React, { useState } from "react";
-import Modal from "../Generic/Modal";
+
 import { Button } from "@material-tailwind/react";
-import LLMSettings from "./LLMSettings";
+
+import Modal from "../Generic/Modal";
+
 import DirectorySelector from "./DirectorySelector";
 import InitialEmbeddingModelSettings from "./InitialEmbeddingSettings";
+import LLMSettings from "./LLMSettings";
 
 interface OldInitialSettingsProps {
   readyForIndexing: () => void;

@@ -1,16 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { DBResultPreview } from "../File/DBResultPreview";
+
+import { CircularProgress } from "@mui/material";
 import { DBQueryResult } from "electron/main/database/Schema";
+import posthog from "posthog-js";
+import { FaArrowRight } from "react-icons/fa";
+import { FiRefreshCw } from "react-icons/fi";
 import { PiGraph } from "react-icons/pi";
 import { toast } from "react-toastify";
-import { errorToString } from "@/functions/error";
-import { FiRefreshCw } from "react-icons/fi";
-import ResizableComponent from "../Generic/ResizableComponent";
-import { HighlightData } from "../Editor/HighlightExtension";
-import { FaArrowRight } from "react-icons/fa";
 import removeMd from "remove-markdown";
-import { CircularProgress } from "@mui/material";
-import posthog from "posthog-js";
+
+import { HighlightData } from "../Editor/HighlightExtension";
+import { DBResultPreview } from "../File/DBResultPreview";
+import ResizableComponent from "../Generic/ResizableComponent";
+
+import { errorToString } from "@/functions/error";
+
+
+
 
 interface SidebarComponentProps {
   filePath: string;

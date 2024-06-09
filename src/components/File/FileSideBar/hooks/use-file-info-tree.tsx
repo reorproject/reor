@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { sortFilesAndDirectories } from "../fileOperations";
+
 import {
   FileInfo,
   FileInfoNode,
   FileInfoTree,
 } from "electron/main/Files/Types";
+
+import { sortFilesAndDirectories } from "../fileOperations";
 
 export const useFileInfoTree = (currentFilePath: string | null) => {
   const [fileInfoTree, setFileInfoTree] = useState<FileInfoTree>([]);

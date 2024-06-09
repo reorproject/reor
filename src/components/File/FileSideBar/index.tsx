@@ -1,10 +1,13 @@
-import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
 import React, { useEffect, useState } from "react";
+
+import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
 import { FixedSizeList as List, ListChildComponentProps } from "react-window";
-import { isFileNodeDirectory } from "./fileOperations";
-import { FileItem } from "./FileItem";
-import RenameNoteModal from "../RenameNote";
+
 import RenameDirModal from "../RenameDirectory";
+import RenameNoteModal from "../RenameNote";
+
+import { FileItem } from "./FileItem";
+import { isFileNodeDirectory } from "./fileOperations";
 
 interface FileListProps {
   files: FileInfoTree;
