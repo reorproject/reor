@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-
+import React, { useState, useEffect } from "react";
 import Modal from "../Generic/Modal";
-import { Button, List, ListItem } from "@material-tailwind/react";
+import { Button, List, ListItem, Select, MenuItem } from "@material-tailwind/react";
 import { SearchBarWithFilesSuggestion } from "../Generic/SearchBarWithFilesSuggestion";
 import { SuggestionsState } from "../Editor/FilesSuggestionsDisplay";
 import { ChatFilters } from "./Chat";
 import { ListItemIcon, ListItemText } from "@mui/material";
 import FolderIcon from "@mui/icons-material/Folder";
+import CustomSelect from "../Generic/Select";
 
 interface Props {
   isOpen: boolean;
@@ -31,19 +31,38 @@ const AddContextFiltersModal: React.FC<Props> = ({
   const [searchText, setSearchText] = useState<string>("");
   const [suggestionsState, setSuggestionsState] =
     useState<SuggestionsState | null>(null);
+  const [numberOfChunksToFetch, setNumberOfChunksToFetch] = useState<number>(chatFilters.numberOfChunksToFetch || 15);
 
-  const handleAddFilesToChatFilters = (files: string[]) => {
-    const currentChatFilters: ChatFilters = chatFilters
-      ? {
-          ...chatFilters,
-          files: [...new Set([...chatFilters.files, ...files])],
-        }
-      : {
-          numberOfChunksToFetch: 15,
-          files: [...files],
-        };
-    setChatFilters(currentChatFilters);
+  useEffect(() => {
+    const loadNumberOfChunks = async () => {
+      // Assuming you have a method to get this setting, replace with your actual method
+      const storedChunks = await window.electronStore.getNoOfRAGExamples();
+      ;
+      if (storedChunks !== undefined) {
+        setNumberOfChunksToFetch(storedChunks);
+      }
+    };
+
+    loadNumberOfChunks();
+  }, []);
+
+  const handleAddFilesToChatFilters = () => {
+    const updatedChatFilters: ChatFilters = {
+      ...chatFilters,
+      files: [...new Set([...chatFilters.files, ...internalFilesSelected])],
+      numberOfChunksToFetch: numberOfChunksToFetch
+    };
+    setChatFilters(updatedChatFilters);
+    onClose();
   };
+
+  const handleNumberOfChunksChange = (value: string) => {
+    const newNumberOfChunks = parseInt(value, 10); // Convert the string value to an integer
+    setNumberOfChunksToFetch(newNumberOfChunks);
+    window.electronStore.setNoOfRAGExamples(newNumberOfChunks);  // Assuming this needs to be a number
+  };
+
+  const possibleNoOfExamples = Array.from({ length: 30 }, (_, i) => i + 1);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -77,6 +96,19 @@ const AddContextFiltersModal: React.FC<Props> = ({
             })}
           </List>
         </div>
+        <p className="text-white max-w-lg">Select number of notes to draw from:</p>
+        <div className="w-full bg-neutral-800 rounded pb-7">
+          {numberOfChunksToFetch && (
+            <CustomSelect
+              options={possibleNoOfExamples.map((num) => ({
+                label: num.toString(),
+                value: num.toString(),
+              }))}
+              selectedValue={numberOfChunksToFetch?.toString()}
+              onChange={handleNumberOfChunksChange}
+            />
+          )}
+        </div>
         <div className="flex justify-end">
           {internalFilesSelected && (
             <Button
@@ -85,13 +117,13 @@ const AddContextFiltersModal: React.FC<Props> = ({
                 disabled:pointer-events-none
                 disabled:opacity-25"
               onClick={() => {
-                handleAddFilesToChatFilters(internalFilesSelected);
+                handleAddFilesToChatFilters();
                 onClose();
               }}
               placeholder={""}
             >
               <div className="flex items-center justify-around h-full space-x-2">
-                Add to context
+                Update filters
               </div>
             </Button>
           )}
