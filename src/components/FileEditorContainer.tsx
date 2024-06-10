@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import TitleBar from "./TitleBar";
 import ChatWithLLM, { ChatFilters, ChatHistory } from "./Chat/Chat";
 import IconsSidebar from "./Sidebars/IconsSidebar";
@@ -10,6 +10,7 @@ import InEditorBacklinkSuggestionsDisplay from "./Editor/BacklinkSuggestionsDisp
 import { useFileInfoTree } from "./File/FileSideBar/hooks/use-file-info-tree";
 import SidebarComponent from "./Similarity/SimilarFilesSidebar";
 import { useChatHistory } from "./Chat/hooks/use-chat-history";
+import { SearchInput } from "./SearchComponent";
 import posthog from "posthog-js";
 
 interface FileEditorContainerProps {}
@@ -47,13 +48,17 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     setShowSimilarFiles(!showSimilarFiles);
   };
 
+  // const [fileIsOpen, setFileIsOpen] = useState(false);
+
   const openFileAndOpenEditor = async (path: string) => {
     setShowChatbot(false);
+    // setFileIsOpen(true);
     openFileByPath(path);
   };
 
   const openChatAndOpenChat = (chatHistory: ChatHistory | undefined) => {
     setShowChatbot(true);
+    // setFileIsOpen(false);
     setCurrentChatHistory(chatHistory);
   };
 
@@ -63,9 +68,48 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     numberOfChunksToFetch: 15,
   });
 
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // showSearch should be set to false when:
+  //    1) User presses ctrl-f
+  //    2)  Navigates away from the editor
+  const toggleSearch = useCallback(() => {
+    setShowSearch(prevShowSearch => !prevShowSearch);
+  })
+
+  const handleSearchChange = (value) => {
+    setSearchTerm(value);
+    editor.commands.setSearchTerm(value);
+  };  
+
+  // Global listener that triggers search functionality
+  useEffect(() => {
+    const handleKeyDown = () => {
+      if (event.ctrlKey && event.key === 'f') {
+        toggleSearch();
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [])
+
+  
+  const handleNextSearch = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      if (editor && editor.commands.nextSearchResult) {
+        editor.commands.nextSearchResult();
+      } 
+    }
+  }
+  
+
   const handleAddFileToChatFilters = (file: string) => {
     setSidebarShowing("chats");
     setShowChatbot(true);
+    setFileIsOpen(false);
     setCurrentChatHistory(undefined);
     setChatFilters((prevChatFilters) => ({
       ...prevChatFilters,
@@ -144,15 +188,30 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         </ResizableComponent>
 
         {!showChatbot && filePath && (
-          <div className="w-full h-full flex overflow-x-hidden">
+          <div className="relative w-full h-full flex overflow-x-hidden">
             <div className="w-full flex h-full">
               <div
-                className="h-full w-full overflow-y-auto cursor-text text-slate-400"
+                className="relative h-full w-full overflow-y-auto cursor-text text-slate-400"
                 onClick={() => editor?.commands.focus()}
                 style={{
                   backgroundColor: "rgb(30, 30, 30)",
                 }}
               >
+                {showSearch && (
+                    <input
+                      type="text"
+                      value={searchTerm}
+                      onKeyDown={handleNextSearch}
+                      onChange={(event) => handleSearchChange(event.target.value)}
+                      onBlur={() => {
+                        setShowSearch(false);
+                        handleSearchChange("");
+                      }}
+                      placeholder="Search..."
+                      autoFocus
+                      className="absolute top-0 right-0 mt-4 mr-4 z-50 border-none rounded-md p-2 bg-transparent bg-dark-gray-c-ten text-white"
+                    />
+                )}
                 <EditorContent
                   style={{ wordBreak: "break-word" }}
                   editor={editor}

@@ -32,7 +32,7 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
       onClose={onClose}
       // tailwindStylesOnBackground="bg-gradient-to-r from-orange-900 to-yellow-900"
     >
-      <div className="ml-6 mt-2 mb-6 w-full h-full min-w-[900px]">
+      <div className="ml-2 mt-2 mb-6 w-full h-full min-w-[900px]">
         <h2 className="text-xl font-semibold mb-3 text-white">
           Flashcard Mode
         </h2>
