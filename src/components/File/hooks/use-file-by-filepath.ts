@@ -1,26 +1,29 @@
 import { useEffect, useRef, useState } from "react";
-import { useEditor, Editor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
+
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
+import TextStyle from "@tiptap/extension-text-style";
 import Text from "@tiptap/extension-text";
-import "../tiptap.scss";
-import { useDebounce } from "use-debounce";
+import { Editor, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import { toast } from "react-toastify";
 import { Markdown } from "tiptap-markdown";
+import { useDebounce } from "use-debounce";
 
 import { BacklinkExtension } from "@/components/Editor/BacklinkExtension";
-import {
-  getInvalidCharacterInFilePath,
-  removeFileExtension,
-} from "@/functions/strings";
 import { SuggestionsState } from "@/components/Editor/BacklinkSuggestionsDisplay";
 import HighlightExtension, {
   HighlightData,
 } from "@/components/Editor/HighlightExtension";
-import { toast } from "react-toastify";
 import { RichTextLink } from "@/components/Editor/RichTextLink";
+import SearchAndReplace from "@/components/Editor/SearchAndReplace";
+import {
+  getInvalidCharacterInFilePath,
+  removeFileExtension,
+} from "@/functions/strings";
+import "../tiptap.scss";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
@@ -129,6 +132,12 @@ export const useFileByFilepath = () => {
       Paragraph,
       Text,
       TaskList,
+      TextStyle,
+      SearchAndReplace.configure({
+       searchResultClass: "bg-yellow-400",
+       caseSensitive: false,
+       disableRegex: false,
+      }),
       Markdown.configure({
         html: true, // Allow HTML input/output
         tightLists: true, // No <p> inside <li> in markdown output

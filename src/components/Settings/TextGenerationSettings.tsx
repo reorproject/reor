@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
+import { Button } from "@material-tailwind/react";
+
 import Slider from "@mui/material/Slider";
 import { LLMGenerationParameters } from "electron/main/Store/storeConfig";
-import { Button } from "@material-tailwind/react";
 
 interface TextGenerationSettingsProps {}
 const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {

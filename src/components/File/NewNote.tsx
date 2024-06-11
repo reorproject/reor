@@ -1,8 +1,13 @@
+
 import React, { useState } from "react";
-import Modal from "../Generic/Modal";
+
 import { Button } from "@material-tailwind/react";
-import { getInvalidCharacterInFilePath } from "@/functions/strings";
 import posthog from "posthog-js";
+
+import Modal from "../Generic/Modal";
+
+import { getInvalidCharacterInFilePath } from "@/functions/strings";
+
 
 interface NewNoteComponentProps {
   isOpen: boolean;

@@ -3,15 +3,15 @@ import SettingsModal from "../Settings/Settings";
 import { MdOutlineQuiz, MdSettings } from "react-icons/md";
 import { SidebarAbleToShow } from "../FileEditorContainer";
 import { ImFilesEmpty } from "react-icons/im";
-import { FaSearch } from "react-icons/fa";
-import { VscNewFile } from "react-icons/vsc";
+import { FaSearch, FaRegPenToSquare } from "react-icons/fa";
 import NewNoteComponent from "../File/NewNote";
 import NewDirectoryComponent from "../File/NewDirectory";
-import { GrNewWindow } from "react-icons/gr";
-import { VscNewFolder } from "react-icons/vsc";
-import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
+import { VscNewFile, VscNewFolder } from "react-icons/vsc";
 import FlashcardMenuModal from "../Flashcard/FlashcardMenuModal";
 import { IconContext } from "react-icons";
+import { GrNewWindow } from "react-icons/gr";
+import { IoChatbubbleEllipsesOutline, IoFolderOutline } from "react-icons/io5";
+import { LuFolderPlus } from "react-icons/lu";
 
 interface IconsSidebarProps {
   openRelativePath: (path: string) => void;

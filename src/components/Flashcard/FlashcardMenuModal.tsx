@@ -1,15 +1,18 @@
+
 import React, { useState } from "react";
 
-import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
-import FlashcardReviewModal from "./FlashcardReviewModal";
-import FlashcardCreateModal from "./FlashcardCreateModal";
 import posthog from "posthog-js";
 
 import { BsPencilSquare } from "react-icons/bs";
 import { VscFeedback } from "react-icons/vsc";
 import { FaArrowAltCircleRight } from "react-icons/fa";
 import { FaRegArrowAltCircleRight } from "react-icons/fa";
+
+import Modal from "../Generic/Modal";
+
+import FlashcardCreateModal from "./FlashcardCreateModal";
+import FlashcardReviewModal from "./FlashcardReviewModal";
 
 
 interface FlashcardMenuModalProps {
