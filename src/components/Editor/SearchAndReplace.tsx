@@ -316,26 +316,17 @@ export const SearchAndReplace = Extension.create<
       nextSearchResult:
         () =>
         ({ editor }) => {
-            const { results, resultIndex } = editor.storage.searchAndReplace;
-            const nextIndex = resultIndex + 1 >= results.length ? 0 : resultIndex + 1; // Wrap around to the start
-        
-            if (results.length > 0) {
-                editor.storage.searchAndReplace.resultIndex = nextIndex;
-                const nextResult = results[nextIndex];
-        
-                if (nextResult) {
-                  const { from, to } = nextResult;
-                  
-                  const startPos = editor.view.state.doc.resolve(from);
-                  const endPos = editor.view.state.doc.resolve(to);
-          
-                  const transaction = editor.view.state.tr.setSelection(new TextSelection(startPos, endPos));
-                  editor.view.dispatch(transaction.scrollIntoView());
-                  editor.view.focus();
-                }
-            }
-        
-            return true;
+          const { results, resultIndex } = editor.storage.searchAndReplace;
+
+          const nextIndex = resultIndex + 1;
+
+          if (results[nextIndex]) {
+            editor.storage.searchAndReplace.resultIndex = nextIndex;
+          } else {
+            editor.storage.searchAndReplace.resultIndex = 0;
+          }
+
+          return false;
         },
       previousSearchResult:
         () =>

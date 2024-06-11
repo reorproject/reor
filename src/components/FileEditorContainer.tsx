@@ -99,9 +99,23 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const handleNextSearch = (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
-      if (editor && editor.commands.nextSearchResult) {
-        editor.commands.nextSearchResult();
-      } 
+      editor.commands.nextSearchResult();
+      goToSelection();
+      event.target.focus();
+    }
+  }
+
+  const goToSelection = () => {
+    if (!editor) return;
+
+    const { results, resultIndex } = editor.storage.searchAndReplace;
+    const position = results[resultIndex]; 
+    if (!position) return;
+    
+    editor.commands.setTextSelection(position);
+    const { node } = editor.view.domAtPos(editor.state.selection.anchor);
+    if (node) {
+        (node as any).scrollIntoView?.(false);
     }
   }
   
@@ -209,7 +223,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                       }}
                       placeholder="Search..."
                       autoFocus
-                      className="absolute top-0 right-0 mt-4 mr-4 z-50 border-none rounded-md p-2 bg-transparent bg-dark-gray-c-ten text-white"
+                      className="fixed top-8 right-64  mt-4 mr-14 z-50 border-none rounded-md p-2 bg-transparent bg-dark-gray-c-ten text-white"
                     />
                 )}
                 <EditorContent
