@@ -12,7 +12,6 @@ import IconsSidebar from "./Sidebars/IconsSidebar";
 import SidebarManager from "./Sidebars/MainSidebar";
 import SidebarComponent from "./Similarity/SimilarFilesSidebar";
 
-import { SearchInput } from "./SearchComponent";
 import TitleBar from "./TitleBar";
 
 interface FileEditorContainerProps {}
