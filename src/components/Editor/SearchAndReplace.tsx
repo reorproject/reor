@@ -25,7 +25,6 @@ import { Decoration, DecorationSet } from "@tiptap/pm/view";
 import {
   Plugin,
   PluginKey,
-  TextSelection,
   type EditorState,
   type Transaction,
 } from "@tiptap/pm/state";

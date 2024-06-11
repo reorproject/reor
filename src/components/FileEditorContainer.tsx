@@ -11,6 +11,7 @@ import ResizableComponent from "./Generic/ResizableComponent";
 import IconsSidebar from "./Sidebars/IconsSidebar";
 import SidebarManager from "./Sidebars/MainSidebar";
 import SidebarComponent from "./Similarity/SimilarFilesSidebar";
+
 import { SearchInput } from "./SearchComponent";
 import TitleBar from "./TitleBar";
 
@@ -76,27 +77,26 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   //    1) User presses ctrl-f
   //    2)  Navigates away from the editor
   const toggleSearch = useCallback(() => {
-    setShowSearch(prevShowSearch => !prevShowSearch);
-  })
+    setShowSearch((prevShowSearch) => !prevShowSearch);
+  });
 
   const handleSearchChange = (value) => {
     setSearchTerm(value);
     editor.commands.setSearchTerm(value);
-  };  
+  };
 
   // Global listener that triggers search functionality
   useEffect(() => {
     const handleKeyDown = () => {
-      if (event.ctrlKey && event.key === 'f') {
+      if (event.ctrlKey && event.key === "f") {
         toggleSearch();
       }
-    }
+    };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [])
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
-  
   const handleNextSearch = (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
@@ -107,22 +107,21 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
       toggleSearch();
       handleSearchChange("");
     }
-  }
+  };
 
   const goToSelection = () => {
     if (!editor) return;
 
     const { results, resultIndex } = editor.storage.searchAndReplace;
-    const position = results[resultIndex]; 
+    const position = results[resultIndex];
     if (!position) return;
-    
+
     editor.commands.setTextSelection(position);
     const { node } = editor.view.domAtPos(editor.state.selection.anchor);
     if (node) {
-        (node as any).scrollIntoView?.(false);
+      (node as any).scrollIntoView?.(false);
     }
-  }
-  
+  };
 
   const handleAddFileToChatFilters = (file: string) => {
     setSidebarShowing("chats");
@@ -216,19 +215,19 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                 }}
               >
                 {showSearch && (
-                    <input
-                      type="text"
-                      value={searchTerm}
-                      onKeyDown={handleNextSearch}
-                      onChange={(event) => handleSearchChange(event.target.value)}
-                      onBlur={() => {
-                        setShowSearch(false);
-                        handleSearchChange("");
-                      }}
-                      placeholder="Search..."
-                      autoFocus
-                      className="fixed top-8 right-64  mt-4 mr-14 z-50 border-none rounded-md p-2 bg-transparent bg-dark-gray-c-ten text-white"
-                    />
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onKeyDown={handleNextSearch}
+                    onChange={(event) => handleSearchChange(event.target.value)}
+                    onBlur={() => {
+                      setShowSearch(false);
+                      handleSearchChange("");
+                    }}
+                    placeholder="Search..."
+                    autoFocus
+                    className="fixed top-8 right-64  mt-4 mr-14 z-50 border-none rounded-md p-2 bg-transparent bg-dark-gray-c-ten text-white"
+                  />
                 )}
                 <EditorContent
                   style={{ wordBreak: "break-word" }}
