@@ -17,7 +17,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   askText,
 }) => {
   return (
-    <div className="p-3 bg-neutral-600">
+    <div className="p-3 bg-transparent border-solid border-0 border-t-[0.001px] border-neutral-700">
       <div className="flex h-full">
         <Textarea
           onKeyDown={(e) => {
@@ -30,11 +30,12 @@ const ChatInput: React.FC<ChatInputProps> = ({
           value={userTextFieldInput}
           className="w-full mr-2 bg-gray-300"
           name="Outlined"
-          placeholder="Ask your knowledge..."
+          placeholder="Type here to search notes..."
           variant="outlined"
           style={{
-            backgroundColor: "rgb(64 64 64)",
+            backgroundColor: "rgba(255, 255, 255, 0)",
             color: "rgb(212 212 212)",
+            border: "none",
           }}
         />
         <div className="flex justify-center items-center h-full">

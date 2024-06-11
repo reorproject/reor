@@ -16,6 +16,11 @@ export default {
         'dark-gray-c-eight': '#333333',
         'dark-gray-c-nine': '#343434',
         'dark-gray-c-ten': '#383838',
+
+        "dark-slate-gray": "#2F4F4F",
+        "light-arsenic": "#182c44",
+        "distinct-dark-purple": "#3a395e",
+        "moodly-blue": "#7f7dcb",
       },
       fontFamily: {
         // "material-icons": ["Material Icons"],
@@ -27,6 +32,14 @@ export default {
       minHeight: {
         "below-titlebar-min": "calc(100vh - 30px)",
       },
+      transitionProperty: {
+        'height': 'height',
+        'spacing': 'margin, padding',
+        'transform': 'transform'
+      },
+      transitionDuration: {
+        '400': '400ms'
+      }
     },
   },
   corePlugins: {

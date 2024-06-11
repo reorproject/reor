@@ -154,6 +154,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         <FlashcardMenuModal
           isOpen={isFlashcardModeOpen}
           onClose={() => {
+            console.log(`clicked`);
             setIsFlashcardModeOpen(false);
             setInitialFileToCreateFlashcard("");
             setInitialFileToReviewFlashcard("");

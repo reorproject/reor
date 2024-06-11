@@ -52,8 +52,8 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
   }, [selectedFlashcardFile]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="ml-6 mt-2 mb-6 w-full h-full w-[900px]">
+    <Modal isOpen={isOpen} onClose={onClose} name="flashcardReviewMode">
+      <div className="ml-6 mt-2 mb-6 w-full h-full w-[200px]">
         <h2 className="text-xl font-semibold mb-3 text-white">
           Flashcard Review Mode
         </h2>

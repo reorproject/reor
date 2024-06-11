@@ -19,6 +19,8 @@ const customDimensionsMap = {
   newDirectory: '[500px]',
   renameNote: '[500px]',
   renameDirectory: '[500px]',
+  flashcardMode: '[750px]',
+  flashcardReviewMode: '[300px]',
 }
 
 const getDimension = (name) => {
@@ -62,7 +64,7 @@ const Modal: React.FC<ModalProps> = ({
         ref={modalRef}
         className={`bg-dark-gray-c-three rounded-lg shadow-xl w-${widthClass} max-w-4xl flex flex-col justify-center items-center border-solid border-gray-600 border`}
       >
-        <div className="w-full items-end border-b border-gray-700 px-4 h-0">
+        <div className="w-full items-end border-b border-gray-700 px-4 h-0 z-50">
             {!hideCloseButton && (
             <div className="flex justify-end m-2">
               <button

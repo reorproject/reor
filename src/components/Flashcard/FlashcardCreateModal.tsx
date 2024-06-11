@@ -105,7 +105,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="ml-6 mt-2 mb-6 w-[900px] h-full">
+      <div className="ml-6 mt-2 mb-6 w-[800px] h-full">
         <h2 className="text-xl font-semibold mb-3 text-white">
           Select a file to generate flashcards for:
           <input
@@ -128,7 +128,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
             <FilesSuggestionsDisplay
               suggestionsState={suggestionsState}
               suggestions={flattenedFiles.map((file) => file.path)}
-              maxWidth={"w-[900px]"}
+              maxWidth={"w-[800px]"}
             />
           )}
         </h2>
@@ -167,8 +167,10 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
           {selectedFile && (
             <Button
               className="bg-slate-600 border-none h-20 w-96 text-center vertical-align text-white
-            mt-4 mr-16
+            mt-4
             cursor-pointer
+            transition-transform duration-300
+            hover:-translate-y-2
             disabled:pointer-events-none
             disabled:opacity-25"
               onClick={() => createFlashcardsFromFile()}
@@ -177,7 +179,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
               placeholder={""}
               disabled={isLoadingFlashcards}
             >
-              <div className="flex items-center justify-around h-full space-x-2">
+              <div className="flex items-center justify-around h-full space-x-2 ">
                 {"Generate cards"} {isLoadingFlashcards && <CircularProgress />}
               </div>
             </Button>
