@@ -1,6 +1,8 @@
+
+import { Readable } from "stream";
+
 import { net } from "electron";
 import { ClientRequestConstructorOptions } from "electron/main";
-import { Readable } from "stream";
 
 export const customFetchUsingElectronNet = async (
   input: RequestInfo | URL,

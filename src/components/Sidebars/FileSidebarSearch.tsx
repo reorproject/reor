@@ -1,8 +1,11 @@
+
 import React, { useEffect, useRef } from "react";
-import { DBSearchPreview } from "../File/DBResultPreview";
+
 import { DBQueryResult } from "electron/main/database/Schema";
-import { FaSearch } from "react-icons/fa";
 import posthog from "posthog-js";
+import { FaSearch } from "react-icons/fa";
+
+import { DBSearchPreview } from "../File/DBResultPreview";
 
 interface SearchComponentProps {
   onFileSelect: (path: string) => void;

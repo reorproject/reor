@@ -1,5 +1,6 @@
-import { removeFileExtension } from "@/functions/strings";
 import React, { useRef, useEffect, useState, useMemo } from "react";
+
+import { removeFileExtension } from "@/functions/strings";
 
 export interface SuggestionsState {
   textWithinBrackets: string;

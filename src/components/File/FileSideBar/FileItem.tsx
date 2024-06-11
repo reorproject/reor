@@ -1,10 +1,14 @@
-import { removeFileExtension } from "@/functions/strings";
-import { FileInfoNode } from "electron/main/Files/Types";
+
 import React, { useState } from "react";
-import { FaChevronRight } from "react-icons/fa";
-import { FaChevronDown } from "react-icons/fa";
-import { isFileNodeDirectory, moveFile } from "./fileOperations";
+
+import { FileInfoNode } from "electron/main/Files/Types";
 import posthog from "posthog-js";
+import { FaChevronRight , FaChevronDown } from "react-icons/fa";
+
+import { isFileNodeDirectory, moveFile } from "./fileOperations";
+
+
+import { removeFileExtension } from "@/functions/strings";
 
 interface FileInfoProps {
   file: FileInfoNode;
