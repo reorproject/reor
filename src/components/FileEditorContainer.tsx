@@ -10,7 +10,6 @@ import InEditorBacklinkSuggestionsDisplay from "./Editor/BacklinkSuggestionsDisp
 import { useFileInfoTree } from "./File/FileSideBar/hooks/use-file-info-tree";
 import SidebarComponent from "./Similarity/SimilarFilesSidebar";
 import { useChatHistory } from "./Chat/hooks/use-chat-history";
-import { SearchInput } from "./SearchComponent";
 import posthog from "posthog-js";
 
 interface FileEditorContainerProps {}
