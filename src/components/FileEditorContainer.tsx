@@ -102,6 +102,9 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
       editor.commands.nextSearchResult();
       goToSelection();
       event.target.focus();
+    } else if (event.key === "Escape") {
+      toggleSearch();
+      handleSearchChange("");
     }
   }
 
