@@ -1,5 +1,6 @@
-import { StoreKeys, StoreSchema } from "./storeConfig";
 import Store from "electron-store";
+
+import { StoreKeys, StoreSchema } from "./storeConfig";
 
 const currentSchemaVersion = 1;
 

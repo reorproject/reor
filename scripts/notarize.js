@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const { notarize } = require("@electron/notarize");
-const { version } = require("../package.json");
-const path = require("path");
-const os = require("os");
 const fs = require("fs"); // Import the filesystem module
+const os = require("os");
+const path = require("path");
+
+const { notarize } = require("@electron/notarize");
+
+const { version } = require("../package.json");
 
 // Recursive function to print directory tree
 function printDirectoryTree(startPath, indent = "") {

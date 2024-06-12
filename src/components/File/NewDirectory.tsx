@@ -1,10 +1,15 @@
+
 import React, { useState } from "react";
-import Modal from "../Generic/Modal";
+
 import { Button } from "@material-tailwind/react";
-import { errorToString } from "@/functions/error";
-import { toast } from "react-toastify";
-import { getInvalidCharacterInFilePath } from "@/functions/strings";
 import posthog from "posthog-js";
+import { toast } from "react-toastify";
+
+import Modal from "../Generic/Modal";
+
+import { errorToString } from "@/functions/error";
+import { getInvalidCharacterInFilePath } from "@/functions/strings";
+
 
 interface NewDirectoryComponentProps {
   isOpen: boolean;

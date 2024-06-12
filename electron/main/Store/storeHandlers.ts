@@ -1,4 +1,9 @@
+import path from "path";
+
 import { ipcMain } from "electron";
+import Store from "electron-store";
+
+
 import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
@@ -6,10 +11,12 @@ import {
   StoreKeys,
   StoreSchema,
 } from "../Store/storeConfig";
-import Store from "electron-store";
-import path from "path";
-import { initializeAndMaybeMigrateStore } from "./storeMigrator";
 import WindowsManager from "../windowManager";
+
+import { initializeAndMaybeMigrateStore } from "./storeMigrator";
+
+
+
 import { ChatHistory } from "@/components/Chat/Chat";
 
 export const registerStoreHandlers = (
