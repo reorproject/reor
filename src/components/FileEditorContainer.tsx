@@ -87,7 +87,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   // Global listener that triggers search functionality
   useEffect(() => {
     const handleKeyDown = () => {
-      if (event.ctrlKey && event.key === "f") {
+      if ((event.ctrlKey || event.metaKey) && event.key === "f") {
         toggleSearch();
       }
     };
@@ -225,7 +225,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                     }}
                     placeholder="Search..."
                     autoFocus
-                    className="fixed top-8 right-64  mt-4 mr-14 z-50 border-none rounded-md p-2 bg-transparent bg-dark-gray-c-ten text-white"
+                    className="absolute top-0 right-0 mt-4 mr-4 z-50 border-none rounded-md p-2 bg-transparent bg-dark-gray-c-ten text-white"
                   />
                 )}
                 <EditorContent
