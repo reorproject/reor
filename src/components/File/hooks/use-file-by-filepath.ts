@@ -33,6 +33,17 @@ export const useFileByFilepath = () => {
     useState<boolean>(false);
   const [needToIndexEditorContent, setNeedToIndexEditorContent] =
     useState<boolean>(false);
+  const [spellCheckEnabled, setSpellCheckEnabled] = useState<string>("false");
+
+  useEffect(() => {
+    const fetchSpellCheckMode = async () => {
+      const storedSpellCheckEnabled =
+        await window.electronStore.getSpellCheckMode();
+      console.log("Stored Spell Check Mode:", storedSpellCheckEnabled); // Debugging line
+      setSpellCheckEnabled(storedSpellCheckEnabled);
+    };
+    fetchSpellCheckMode();
+  }, [spellCheckEnabled]);
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>("");
   const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>("");
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
@@ -121,7 +132,7 @@ export const useFileByFilepath = () => {
     },
     editorProps: {
       attributes: {
-        spellcheck: "false", // Disable spellcheck
+        spellcheck: spellCheckEnabled, // Disable spellcheck
       },
     },
     extensions: [
@@ -310,6 +321,7 @@ export const useFileByFilepath = () => {
     openFileByPath,
     openRelativePath,
     suggestionsState,
+    spellCheckEnabled,
     highlightData,
     noteToBeRenamed,
     setNoteToBeRenamed,
@@ -317,6 +329,7 @@ export const useFileByFilepath = () => {
     setFileDirToBeRenamed,
     renameFile: renameFileNode,
     setSuggestionsState,
+    setSpellCheckEnabled,
   };
 };
 

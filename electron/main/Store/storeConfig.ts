@@ -71,7 +71,7 @@ export interface StoreSchema {
   };
   analytics?: boolean;
   chunkSize: number;
-  spellCheck: boolean;
+  spellCheck: string;
 }
 
 export enum StoreKeys {

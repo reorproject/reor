@@ -1,20 +1,23 @@
-import React, { useState, useEffect } from "react";
 import { Button } from "@material-tailwind/react";
 import Switch from "@mui/material/Switch";
+import React, { useEffect, useState } from "react";
+import { useFileByFilepath } from "../File/hooks/use-file-by-filepath";
 
 interface GeneralSettingsProps {}
 const GeneralSettings: React.FC<GeneralSettingsProps> = () => {
-  const [isSpellCheckEnabled, setSpellCheckEnabled] = useState<boolean>(false);
-
+  const { spellCheckEnabled, setSpellCheckEnabled } = useFileByFilepath();
   const [userHasMadeUpdate, setUserHasMadeUpdate] = useState(false);
+  const [tempSpellCheckEnabled, setTempSpellCheckEnabled] = useState("false");
 
   useEffect(() => {
+    console.log("spellcheck: ", spellCheckEnabled);
     const fetchParams = async () => {
       const isSpellCheckEnabled =
         await window.electronStore.getSpellCheckMode();
 
       if (isSpellCheckEnabled !== undefined) {
         setSpellCheckEnabled(isSpellCheckEnabled);
+        setTempSpellCheckEnabled(isSpellCheckEnabled);
       }
     };
 
@@ -23,10 +26,10 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = () => {
 
   const handleSave = () => {
     // Execute the save function here
-    if (isSpellCheckEnabled !== undefined) {
-      window.electronStore.setSpellCheckMode(isSpellCheckEnabled);
-      setUserHasMadeUpdate(false);
-    }
+    console.log("saved spellcheck: ", tempSpellCheckEnabled);
+    window.electronStore.setSpellCheckMode(tempSpellCheckEnabled);
+    setSpellCheckEnabled(tempSpellCheckEnabled);
+    setUserHasMadeUpdate(false);
   };
 
   return (
@@ -34,10 +37,12 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = () => {
       <h2 className="text-2xl font-semibold mb-0 text-white">General</h2>{" "}
       <p className="text-gray-300 text-sm mb-2 mt-1">Spell Check</p>
       <Switch
-        checked={isSpellCheckEnabled}
+        checked={tempSpellCheckEnabled == "true" ? true : false}
         onChange={() => {
           setUserHasMadeUpdate(true);
-          setSpellCheckEnabled(!isSpellCheckEnabled);
+          if (tempSpellCheckEnabled == "true")
+            setTempSpellCheckEnabled("false");
+          else setTempSpellCheckEnabled("true");
         }}
         inputProps={{ "aria-label": "controlled" }}
       />
@@ -53,11 +58,11 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = () => {
           </Button>
         </div>
       )}
-      {!isSpellCheckEnabled && (
+      {
         <p className="text-yellow-500 text-xs">
           Quit and restart the app for it to take effect
         </p>
-      )}
+      }
     </div>
   );
 };

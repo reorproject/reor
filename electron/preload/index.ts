@@ -148,8 +148,8 @@ declare global {
       setLLMGenerationParams: (params: LLMGenerationParameters) => void;
       getAnalyticsMode: () => Promise<boolean>;
       setAnalyticsMode: (isAnalytics: boolean) => void;
-      getSpellCheckMode: () => Promise<boolean>;
-      setSpellCheckMode: (isSpellCheck: boolean) => void;
+      getSpellCheckMode: () => Promise<string>;
+      setSpellCheckMode: (isSpellCheck: string) => void;
       getHasUserOpenedAppBefore: () => boolean;
       setHasUserOpenedAppBefore: () => void;
       getAllChatHistories: () => Promise<ChatHistory[]>;

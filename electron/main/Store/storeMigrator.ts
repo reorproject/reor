@@ -40,7 +40,7 @@ const setupDefaultAnalyticsValue = (store: Store<StoreSchema>) => {
 
 const setupDefaultSpellCheckValue = (store: Store<StoreSchema>) => {
   if (store.get(StoreKeys.SpellCheck) === undefined) {
-    store.set(StoreKeys.SpellCheck, false);
+    store.set(StoreKeys.SpellCheck, "false");
   }
 };
 
