@@ -39,11 +39,11 @@ export const useFileByFilepath = () => {
     const fetchSpellCheckMode = async () => {
       const storedSpellCheckEnabled =
         await window.electronStore.getSpellCheckMode();
-      console.log("Stored Spell Check Mode:", storedSpellCheckEnabled); // Debugging line
       setSpellCheckEnabled(storedSpellCheckEnabled);
     };
     fetchSpellCheckMode();
   }, [spellCheckEnabled]);
+
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>("");
   const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>("");
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
@@ -130,11 +130,7 @@ export const useFileByFilepath = () => {
       setNeedToWriteEditorContentToDisk(true);
       setNeedToIndexEditorContent(true);
     },
-    editorProps: {
-      attributes: {
-        spellcheck: spellCheckEnabled, // Disable spellcheck
-      },
-    },
+    editorProps: {},
     extensions: [
       StarterKit,
       Document,
@@ -165,6 +161,18 @@ export const useFileByFilepath = () => {
       ),
     ],
   });
+
+  useEffect(() => {
+    if (editor) {
+      editor.setOptions({
+        editorProps: {
+          attributes: {
+            spellcheck: spellCheckEnabled,
+          },
+        },
+      });
+    }
+  }, [spellCheckEnabled, editor]);
 
   const [debouncedEditor] = useDebounce(editor?.state.doc.content, 4000);
 

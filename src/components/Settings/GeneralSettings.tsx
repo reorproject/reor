@@ -10,7 +10,6 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = () => {
   const [tempSpellCheckEnabled, setTempSpellCheckEnabled] = useState("false");
 
   useEffect(() => {
-    console.log("spellcheck: ", spellCheckEnabled);
     const fetchParams = async () => {
       const isSpellCheckEnabled =
         await window.electronStore.getSpellCheckMode();
@@ -22,11 +21,10 @@ const GeneralSettings: React.FC<GeneralSettingsProps> = () => {
     };
 
     fetchParams();
-  }, []);
+  }, [spellCheckEnabled]);
 
   const handleSave = () => {
     // Execute the save function here
-    console.log("saved spellcheck: ", tempSpellCheckEnabled);
     window.electronStore.setSpellCheckMode(tempSpellCheckEnabled);
     setSpellCheckEnabled(tempSpellCheckEnabled);
     setUserHasMadeUpdate(false);
