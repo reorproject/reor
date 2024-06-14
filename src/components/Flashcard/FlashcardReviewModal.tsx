@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 
-
 import Modal from "../Generic/Modal";
 import CustomSelect from "../Generic/Select";
 
@@ -10,7 +9,6 @@ import {
   getFlashcardQnaPairsFromJsonFile,
   getFlashcardVaultDirectory,
 } from "./utils";
-
 
 interface FlashcardReviewModalProps {
   isOpen: boolean;
@@ -56,12 +54,12 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} name="flashcardReviewMode">
-      <div className="ml-6 mt-2 mb-6 w-full h-full w-[200px]">
+      <div className="ml-6 mt-2 mb-6 w-full h-full w-[200px] flex-col ">
         <h2 className="text-xl font-semibold mb-3 text-white">
           Flashcard Review Mode
         </h2>
 
-        <div className="py-2 w-[900px]">
+        <div className="py-2">
           <CustomSelect
             options={flashcardFiles.map((file) => {
               return { label: file, value: file };

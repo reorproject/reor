@@ -22,7 +22,7 @@ import CreateAppearanceSection from "./GeneralSections";
 
 const GeneralSettings: React.FC<GenSettingsProps> = ({}) => {
   return (
-    <div className="w-full h-full flex-col justify-between bg-dark-gray-c-three rounded">
+    <div className="w-full flex-col justify-between bg-dark-gray-c-three rounded">
       <h2 className="text-2xl font-semibold mb-0 text-white">General</h2>
       <CreateAppearanceSection />
     </div>

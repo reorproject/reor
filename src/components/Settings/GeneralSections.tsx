@@ -47,7 +47,7 @@ const CreateAppearanceSection = ({}) => {
   }, []);
 
   return (
-    <div className="flex-col w-full h-full">
+    <div className="flex-col w-full">
       <h4 className="text-white flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-4 mt-6">
         Appearance
       </h4>

@@ -135,7 +135,11 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
   };
 
   return (
-    <div className="w-full h-full flex flex-col justify-between bg-dark-gray-c-three rounded">
+    <div
+      className={`w-full flex flex-col justify-between bg-dark-gray-c-three rounded ${
+        isInitialSetup ? "" : "h-full"
+      }`}
+    >
       {isInitialSetup ? (
         <div className="flex justify-between items-center border-b-2 border-solid border-neutral-700 border-0 py-1">
           <p className="mb-2 pb-3 text-gray-100">LLM</p>{" "}
@@ -273,7 +277,7 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
           LLMType="anthropic"
         />
       )}
-      {userMadeChanges && (
+      {!isInitialSetup && userMadeChanges && (
         <p className="text-xs text-slate-100 mt-1">
           Note: You&apos;ll need to refresh the chat window to apply these
           changes.

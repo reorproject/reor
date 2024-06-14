@@ -33,8 +33,8 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
       onClose={() => console.log("Not allowing a close for now")}
       hideCloseButton={true}
     >
-      <div className="max-w-[550px] mr-4 ml-2">
-        <div className="ml-2 mt-0 h-full  ">
+      <div className="max-w-[550px] mr-4 ml-2 py-3">
+        <div className="ml-2 mt-0 h-[450px]  ">
           <h2 className="text-2xl font-semibold mb-0 text-white text-center">
             Welcome to the Reor Project.
           </h2>
@@ -68,15 +68,15 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
             )}
           </div>
           <LLMSettings isInitialSetup={true} />
-          <div className="flex justify-end">
-            <Button
-              className="bg-blue-300 mt-4 mb-3  border-none h-10 hover:bg-blue-400 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
-              onClick={handleNext}
-              placeholder=""
-            >
-              Next
-            </Button>
-          </div>
+        </div>
+        <div className="flex justify-end">
+          <Button
+            className="bg-blue-300 mt-4 mb-3  border-none h-10 hover:bg-blue-400 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
+            onClick={handleNext}
+            placeholder=""
+          >
+            Next
+          </Button>
         </div>
       </div>
     </Modal>
