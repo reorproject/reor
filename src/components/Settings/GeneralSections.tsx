@@ -70,7 +70,7 @@ const CreateAppearanceSection = ({}) => {
           }}
         />
       </div>
-      <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-3 h-[64px] mt-6">
+      <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-3 h-[64px] mt-6 opacity-50">
         <div className="flex flex-col justify-center">
           <div className="flex gap-2">
             <p className="text-gray-100 m-0">Dynamic Markdown Heading</p>
@@ -90,6 +90,7 @@ const CreateAppearanceSection = ({}) => {
               window.electronStore.setDisplayMarkdown(!displayMarkdown);
             }
           }}
+          disabled={true}
         />
       </div>
     </div>

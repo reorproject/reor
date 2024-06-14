@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 
 import { CircularProgress } from "@mui/material";
@@ -15,9 +14,6 @@ import { DBResultPreview } from "../File/DBResultPreview";
 import ResizableComponent from "../Generic/ResizableComponent";
 
 import { errorToString } from "@/functions/error";
-
-
-
 
 interface SidebarComponentProps {
   filePath: string;
@@ -147,7 +143,7 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
         setSimilarEntries={setSimilarEntries}
         onFileSelect={(path: string) => {
           openFileByPath(path);
-          posthog.capture("open_file_from_related_notes")
+          posthog.capture("open_file_from_related_notes");
         }}
         saveCurrentFile={async () => {
           await saveCurrentlyOpenedFile();
@@ -237,7 +233,7 @@ export const SimilarEntriesComponent: React.FC<
                 onClick={() => {
                   setIsRefined(!isRefined);
                   updateSimilarEntries(!isRefined);
-                  posthog.capture("rerank_related_notes")
+                  posthog.capture("rerank_related_notes");
                 }}
               >
                 {isRefined ? "Un-rerank" : "Rerank results"}
@@ -254,7 +250,7 @@ export const SimilarEntriesComponent: React.FC<
                       key={index}
                       dbResult={dbResult}
                       onSelect={(path: string) => {
-                        onFileSelect(path)
+                        onFileSelect(path);
                       }}
                     />
                   </div>
@@ -289,13 +285,16 @@ const HighlightButton: React.FC<HighlightButtonProps> = ({
     if (!highlightData.position) {
       setShowArrow(false);
     }
+    console.log(`pos: ${JSON.stringify(highlightData.position)}`);
   }, [highlightData.position]);
 
   if (!highlightData.position) {
     return null;
   }
 
-  const { top, left } = highlightData.position;
+  let { top, left } = highlightData.position;
+  // top -= 55;
+  // left -= 190;
 
   const handleClick = () => {
     onClick(); // This calls the provided onClick handler

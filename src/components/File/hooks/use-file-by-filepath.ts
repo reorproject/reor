@@ -24,10 +24,6 @@ import {
   removeFileExtension,
 } from "@/functions/strings";
 import "../tiptap.scss";
-import {
-  ShowMarkdownOnFocus,
-  CustomHeading,
-} from "@/components/Editor/ShowMarkdownOnFocus";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
@@ -180,12 +176,6 @@ export const useFileByFilepath = () => {
         linkOnPaste: true,
         openOnClick: true,
       }),
-      displayMarkdown ? ShowMarkdownOnFocus : null,
-      displayMarkdown
-        ? CustomHeading.configure({
-            levels: [1, 2, 3, 4, 5, 6],
-          })
-        : null,
       BacklinkExtension(
         openRelativePathRef,
         handleSuggestionsStateWithEventCapture

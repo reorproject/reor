@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 
 import { Button } from "@material-tailwind/react";
 
-
 interface DirectorySelectorProps {
   setErrorMsg: (error: string) => void;
 }
@@ -42,7 +41,7 @@ const DirectorySelector: React.FC<DirectorySelectorProps> = ({
   return (
     <div>
       <Button
-        className="bg-orange-700  border-none h-10 hover:bg-orange-900 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
+        className="bg-blue-300  border-none h-10 hover:bg-blue-400 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
         onClick={handleDirectorySelection}
         placeholder=""
       >
