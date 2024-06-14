@@ -10,6 +10,7 @@ import { Editor, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { toast } from "react-toastify";
 import { Markdown } from "tiptap-markdown";
+import { MathExtension } from "@aarkue/tiptap-math-extension";
 import { useDebounce } from "use-debounce";
 
 import { BacklinkExtension } from "@/components/Editor/BacklinkExtension";
@@ -24,6 +25,7 @@ import {
   removeFileExtension,
 } from "@/functions/strings";
 import "../tiptap.scss";
+import "katex/dist/katex.min.css";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
@@ -157,6 +159,8 @@ export const useFileByFilepath = () => {
         searchResultClass: "bg-yellow-400",
         caseSensitive: false,
         disableRegex: false,
+      MathExtension.configure({
+        evaluation: true,
       }),
       Markdown.configure({
         html: true, // Allow HTML input/output
