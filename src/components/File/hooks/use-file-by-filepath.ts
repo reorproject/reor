@@ -159,6 +159,7 @@ export const useFileByFilepath = () => {
         searchResultClass: "bg-yellow-400",
         caseSensitive: false,
         disableRegex: false,
+      }),
       MathExtension.configure({
         evaluation: true,
       }),
