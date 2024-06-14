@@ -71,6 +71,8 @@ export interface StoreSchema {
   };
   analytics?: boolean;
   chunkSize: number;
+  isSBCompact: boolean;
+  DisplayMarkdown: boolean;
 }
 
 export enum StoreKeys {
@@ -87,4 +89,6 @@ export enum StoreKeys {
   LLMGenerationParameters = "llmGenerationParameters",
   ChatHistories = "chatHistories",
   ChunkSize = "chunkSize",
+  IsSBCompact = "isSBCompact",
+  DisplayMarkdown = "DisplayMarkdown",
 }

@@ -1,33 +1,37 @@
 import { useEffect, useRef, useState } from "react";
-
+import { useEditor, Editor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
-import TextStyle from "@tiptap/extension-text-style";
 import Text from "@tiptap/extension-text";
-import { Editor, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import { toast } from "react-toastify";
+import "../tiptap.scss";
+import { useDebounce, useDebouncedCallback } from "use-debounce";
 import { Markdown } from "tiptap-markdown";
+<<<<<<< HEAD
+import posthog from "posthog-js";
+=======
+import { MathExtension } from "@aarkue/tiptap-math-extension";
 import { useDebounce } from "use-debounce";
+>>>>>>> 2d5208b (Added LaTeX support. Missing support for Matrices)
 
 import { BacklinkExtension } from "@/components/Editor/BacklinkExtension";
-import { SuggestionsState } from "@/components/Editor/BacklinkSuggestionsDisplay";
-import HighlightExtension, {
-  HighlightData,
-} from "@/components/Editor/HighlightExtension";
-import { RichTextLink } from "@/components/Editor/RichTextLink";
-import SearchAndReplace from "@/components/Editor/SearchAndReplace";
 import {
   getInvalidCharacterInFilePath,
   removeFileExtension,
 } from "@/functions/strings";
+<<<<<<< HEAD
+import { SuggestionsState } from "@/components/Editor/BacklinkSuggestionsDisplay";
+import HighlightExtension, {
+  HighlightData,
+} from "@/components/Editor/HighlightExtension";
+import { toast } from "react-toastify";
+import { RichTextLink } from "@/components/Editor/RichTextLink";
+=======
 import "../tiptap.scss";
-import {
-  ShowMarkdownOnFocus,
-  CustomHeading,
-} from "@/components/Editor/ShowMarkdownOnFocus";
+import "katex/dist/katex.min.css";
+>>>>>>> 2d5208b (Added LaTeX support. Missing support for Matrices)
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
@@ -48,7 +52,6 @@ export const useFileByFilepath = () => {
     text: "",
     position: null,
   });
-  const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
 
   const setFileNodeToBeRenamed = async (filePath: string) => {
     const isDirectory = await window.files.isDirectory(filePath);
@@ -113,30 +116,16 @@ export const useFileByFilepath = () => {
   const openRelativePathRef = useRef<(newFilePath: string) => Promise<void>>();
   openRelativePathRef.current = openRelativePath;
 
+  const debouncedBacklinkCapture = useDebouncedCallback(
+    () => posthog.capture("initialize_backlinks_2"),
+    4000
+  );
   const handleSuggestionsStateWithEventCapture = (
     suggState: SuggestionsState | null
   ): void => {
+    debouncedBacklinkCapture();
     setSuggestionsState(suggState);
   };
-
-  // Check if we should display markdown or not
-  useEffect(() => {
-    const handleInitialStartup = async () => {
-      const isMarkdownSet = await window.electronStore.getDisplayMarkdown();
-      setDisplayMarkdown(isMarkdownSet);
-    };
-
-    // Even listener
-    const handleChangeMarkdown = (isMarkdownSet) => {
-      setDisplayMarkdown(isMarkdownSet);
-    };
-
-    handleInitialStartup();
-    window.ipcRenderer.receive(
-      "display-markdown-changed",
-      handleChangeMarkdown
-    );
-  }, []);
 
   const editor = useEditor({
     autofocus: true,
@@ -156,12 +145,18 @@ export const useFileByFilepath = () => {
       Paragraph,
       Text,
       TaskList,
+<<<<<<< HEAD
+=======
       TextStyle,
       SearchAndReplace.configure({
         searchResultClass: "bg-yellow-400",
         caseSensitive: false,
         disableRegex: false,
       }),
+      MathExtension.configure({
+        evaluation: true,
+      }),
+>>>>>>> 2d5208b (Added LaTeX support. Missing support for Matrices)
       Markdown.configure({
         html: true, // Allow HTML input/output
         tightLists: true, // No <p> inside <li> in markdown output
@@ -180,12 +175,6 @@ export const useFileByFilepath = () => {
         linkOnPaste: true,
         openOnClick: true,
       }),
-      displayMarkdown ? ShowMarkdownOnFocus : null,
-      displayMarkdown
-        ? CustomHeading.configure({
-            levels: [1, 2, 3, 4, 5, 6],
-          })
-        : null,
       BacklinkExtension(
         openRelativePathRef,
         handleSuggestionsStateWithEventCapture
