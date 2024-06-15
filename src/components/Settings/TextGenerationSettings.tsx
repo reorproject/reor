@@ -1,7 +1,6 @@
-
-import React, { useState, useEffect } from "react";
-
+import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@material-tailwind/react";
+
 import Slider from "@mui/material/Slider";
 import { LLMGenerationParameters } from "electron/main/Store/storeConfig";
 
@@ -15,6 +14,8 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
     });
 
   const [userHasMadeUpdate, setUserHasMadeUpdate] = useState(false);
+  const [invalidInputErr, setInvalidInputErr] = useState(false);
+  const inputRef = useRef(null);
   // const [temperature, setTemperature] = useState<number | null>();
   // const [maxTokens, setMaxTokens] = useState<number | null>();
 
@@ -37,89 +38,113 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
     }
   };
 
+  const handleTokenInput = (e) => {
+    setUserHasMadeUpdate(true);
+    const inputVal = e.target.value;
+    let newMaxTokens;
+
+    // Check if the input value is an empty string, set newMaxTokens to undefined.
+    if (inputVal === "") {
+      newMaxTokens = undefined;
+    } else {
+      // Parse the input value to an integer and use it if it's a valid number
+      const parsedValue = parseInt(inputVal, 10);
+      if (!isNaN(parsedValue)) {
+        newMaxTokens = parsedValue;
+      } else {
+        // Optional: handle the case for invalid input that's not empty, e.g., non-numeric characters.
+        // For now, we'll just return to avoid setting newMaxTokens to an invalid value.
+        return;
+      }
+    }
+
+    setTextGenerationParams({
+      ...textGenerationParams,
+      maxTokens: newMaxTokens,
+    });
+  }
+
+
   return (
-    <div className="w-full bg-neutral-800 rounded pb-7 ">
+    <div className="w-full h-full flex flex-col justify-between bg-dark-gray-c-three rounded pb-7">
       <h2 className="text-2xl font-semibold mb-0 text-white">
         Text Generation
       </h2>{" "}
-      <p className="mt-2 text-sm text-gray-100 mb-1">Temperature:</p>
-      <div className="pl-1 mt-6">
-        <Slider
-          aria-label="Temperature"
-          value={textGenerationParams.temperature}
-          valueLabelDisplay="on" // Changed from "auto" to "on" to always show the value label
-          step={0.1}
-          marks
-          min={0}
-          max={2}
-          onChange={(event, val) => {
-            setUserHasMadeUpdate(true);
-            const newTemperature = Array.isArray(val) ? val[0] : val;
-            setTextGenerationParams({
-              ...textGenerationParams,
-              temperature: newTemperature,
-            });
-          }}
-          sx={{
-            // Targeting the value label component
-            "& .MuiSlider-thumb": {
-              "&:focus, &:hover, &.Mui-active, &.Mui-focusVisible": {
-                boxShadow: "none",
+      <div className="justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2 mt-5">
+
+        <p className="mt-2 text-gray-100 mb-1">Temperature:</p>
+        <div className="pl-1 mt-2 ">
+          <Slider
+            aria-label="Temperature"
+            value={textGenerationParams.temperature}
+            valueLabelDisplay="on" // Changed from "auto" to "on" to always show the value label
+            step={0.1}
+            marks
+            min={0}
+            max={2}
+            onChange={(event, val) => {
+              setUserHasMadeUpdate(true);
+              const newTemperature = Array.isArray(val) ? val[0] : val;
+              setTextGenerationParams({
+                ...textGenerationParams,
+                temperature: newTemperature,
+              });
+            }}
+            sx={{
+              // Targeting the value label component
+              "& .MuiSlider-thumb": {
+                "&:focus, &:hover, &.Mui-active, &.Mui-focusVisible": {
+                  boxShadow: "none",
+                },
+                // If you need to remove the ripple effect explicitly
+                "&::after": {
+                  content: "none",
+                },
               },
-              // If you need to remove the ripple effect explicitly
-              "&::after": {
-                content: "none",
+              "& .MuiSlider-valueLabel": {
+                fontSize: "0.75rem", // Reduce font size
+                padding: "3px 6px", // Adjust padding to make the label smaller
+                // You may need to adjust lineHeight if the text is not vertically aligned
+                lineHeight: "1.2em",
               },
-            },
-            "& .MuiSlider-valueLabel": {
-              fontSize: "0.75rem", // Reduce font size
-              padding: "3px 6px", // Adjust padding to make the label smaller
-              // You may need to adjust lineHeight if the text is not vertically aligned
-              lineHeight: "1.2em",
-            },
-          }}
-        />
+            }}
+          />
+        </div>
+        <p className="mt-0 text-xs text-gray-100 mb-3 ">
+          Note: Higher temperature means more randomess in generated text.
+        </p>
       </div>
-      <p className="mt-0 text-xs text-gray-100 mb-3">
-        Higher temperature means more randomess in generated text.
-      </p>
-      <p className="mt-2 text-sm text-gray-100 mb-1">Max Tokens:</p>
-      <input
-        type="text"
-        className="block w-full px-3 py-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
-        value={textGenerationParams?.maxTokens}
-        onChange={(e) => {
-          setUserHasMadeUpdate(true);
-          const inputVal = e.target.value;
-          let newMaxTokens;
+      <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pt-3 pb-4">
+        <div className="flex flex-col">
+          <p className="mt-2 text-gray-100 mb-1">Max Tokens</p>
+          <p className="mt-1 text-xs text-gray-100 mb-0">
+            Maximum number of tokens to generate.
+          </p>
+        </div>
+        <div className="flex flex-col">
+          <input
+            type="text"
+            className="w-[80px] p-2 bg-dark-gray-c-eight hover:bg-dark-gray-c-ten border-none rounded-md text-gray-100"
+            value={textGenerationParams?.maxTokens}
+            onChange={(e) => handleTokenInput(e)}
+            ref={inputRef}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleSave();
+                if (inputRef.current) inputRef.current.blur();
+              }
 
-          // Check if the input value is an empty string, set newMaxTokens to undefined.
-          if (inputVal === "") {
-            newMaxTokens = undefined;
-          } else {
-            // Parse the input value to an integer and use it if it's a valid number
-            const parsedValue = parseInt(inputVal, 10);
-            if (!isNaN(parsedValue)) {
-              newMaxTokens = parsedValue;
-            } else {
-              // Optional: handle the case for invalid input that's not empty, e.g., non-numeric characters.
-              // For now, we'll just return to avoid setting newMaxTokens to an invalid value.
-              return;
-            }
+            }}
+            placeholder="0.0"
+          />
+          {invalidInputErr && 
+            <div className='pt-4'>
+              Testing
+            </div>
           }
-
-          setTextGenerationParams({
-            ...textGenerationParams,
-            maxTokens: newMaxTokens,
-          });
-        }}
-        // onKeyDown={handleKeyPress}
-        placeholder="Maximum tokens to generate"
-      />
-      <p className="mt-1 text-xs text-gray-100 mb-0">
-        Maximum number of tokens to generate.
-      </p>
-      {userHasMadeUpdate && (
+        </div>
+      </div>
+      {/* {userHasMadeUpdate && (
         <div className="flex">
           <Button
             // variant="contained"
@@ -130,7 +155,7 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
             Save
           </Button>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

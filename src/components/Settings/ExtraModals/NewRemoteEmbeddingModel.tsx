@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 
 import { Button } from "@material-tailwind/react";
@@ -47,12 +46,14 @@ const NewRemoteEmbeddingModelModal: React.FC<
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={saveModelConfigToElectronStore}>
+    <Modal
+      isOpen={isOpen}
+      onClose={saveModelConfigToElectronStore}
+      name="newEmbeddingModel"
+    >
       <div className="w-[400px] ml-2 mr-2 mb-2 pl-3">
-        <h2 className="text-white  font-semibold mb-0">
-          New Remote Embedding Model
-        </h2>
-        <p className="text-white text-sm mb-2 mt-2">
+        <h2 className="text-white  font-semibold mb-0">Set up remote model</h2>
+        <p className="text-white text-sm mb-6 mt-2 text-xs">
           Provide the repo name from Hugging Face like
           &quot;Xenova/roberta-base-squad2&quot;.
         </p>
@@ -78,13 +79,15 @@ const NewRemoteEmbeddingModelModal: React.FC<
           for more info.{" "}
         </p>
 
-        <Button
-          className="bg-orange-700 border-none h-8 hover:bg-orange-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
-          onClick={saveModelConfigToElectronStore}
-          placeholder=""
-        >
-          Load
-        </Button>
+        <div className="w-full flex justify-end pb-2">
+          <Button
+            className="bg-blue-300 border-none h-8 hover:bg-blue-400 cursor-pointer w-[120px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
+            onClick={saveModelConfigToElectronStore}
+            placeholder=""
+          >
+            Attach Remote
+          </Button>
+        </div>
       </div>
     </Modal>
   );

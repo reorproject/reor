@@ -54,7 +54,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} name="newNote">
       <div className="ml-3 mr-6 mt-2 mb-2 h-full min-w-[400px]">
         <h2 className="text-xl font-semibold mb-3 text-white">New Note</h2>
         <input

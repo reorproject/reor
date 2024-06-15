@@ -53,7 +53,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
         />
       </div>
       <div
-        className="flex justify-content-right align-items-right mt-[0.5px]"
+        className="flex justify-end align-items-right mt-[0.5px]"
         style={
           platform === "win32"
             ? { marginRight: "8.5rem" }
@@ -62,15 +62,15 @@ const TitleBar: React.FC<TitleBarProps> = ({
       >
         {similarFilesOpen ? (
           <PiSidebarFill
-            className="text-gray-100 cursor-pointer mt-[0.04rem] transform scale-x-[-1]"
-            size={28}
+            className="text-gray-100 cursor-pointer mt-[0.2rem] transform scale-x-[-1]"
+            size={22}
             onClick={toggleSimilarFiles}
             title="Hide Similar Files"
           />
         ) : (
           <PiSidebar
-            className="text-gray-100 cursor-pointer mt-[0.04rem] transform scale-x-[-1]"
-            size={28}
+            className="text-gray-100 cursor-pointer mt-[0.2rem] transform scale-x-[-1]"
+            size={22}
             onClick={toggleSimilarFiles}
             title="Show Similar Files"
           />

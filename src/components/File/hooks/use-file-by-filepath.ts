@@ -46,6 +46,7 @@ export const useFileByFilepath = () => {
     text: "",
     position: null,
   });
+  const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
 
   const setFileNodeToBeRenamed = async (filePath: string) => {
     const isDirectory = await window.files.isDirectory(filePath);
@@ -115,6 +116,25 @@ export const useFileByFilepath = () => {
   ): void => {
     setSuggestionsState(suggState);
   };
+
+  // Check if we should display markdown or not
+  useEffect(() => {
+    const handleInitialStartup = async () => {
+      const isMarkdownSet = await window.electronStore.getDisplayMarkdown();
+      setDisplayMarkdown(isMarkdownSet);
+    };
+
+    // Even listener
+    const handleChangeMarkdown = (isMarkdownSet) => {
+      setDisplayMarkdown(isMarkdownSet);
+    };
+
+    handleInitialStartup();
+    window.ipcRenderer.receive(
+      "display-markdown-changed",
+      handleChangeMarkdown
+    );
+  }, []);
 
   const editor = useEditor({
     autofocus: true,

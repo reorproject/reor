@@ -3,7 +3,6 @@ import path from "path";
 import { ipcMain } from "electron";
 import Store from "electron-store";
 
-
 import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
@@ -14,8 +13,6 @@ import {
 import WindowsManager from "../windowManager";
 
 import { initializeAndMaybeMigrateStore } from "./storeMigrator";
-
-
 
 import { ChatHistory } from "@/components/Chat/Chat";
 
@@ -142,6 +139,24 @@ export const registerStoreHandlers = (
       store.get(StoreKeys.LLMGenerationParameters)
     );
     return store.get(StoreKeys.LLMGenerationParameters);
+  });
+
+  ipcMain.handle("set-display-markdown", (event, displayMarkdown) => {
+    store.set(StoreKeys.DisplayMarkdown, displayMarkdown);
+    event.sender.send("display-markdown-changed", displayMarkdown);
+  });
+
+  ipcMain.handle("get-display-markdown", () => {
+    return store.get(StoreKeys.DisplayMarkdown);
+  });
+
+  ipcMain.handle("set-sb-compact", (event, isSBCompact) => {
+    store.set(StoreKeys.IsSBCompact, isSBCompact);
+    event.sender.send("sb-compact-changed", isSBCompact);
+  });
+
+  ipcMain.handle("get-sb-compact", () => {
+    return store.get(StoreKeys.IsSBCompact);
   });
 
   ipcMain.handle("set-analytics-mode", (event, isAnalytics) => {

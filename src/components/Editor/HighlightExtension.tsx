@@ -1,5 +1,5 @@
-import { Plugin } from "@tiptap/pm/state";
 import { Extension } from "@tiptap/react";
+import { Plugin } from "@tiptap/pm/state";
 
 export interface HighlightData {
   text: string;
@@ -24,9 +24,12 @@ const HighlightExtension = (setHighlightData: (data: HighlightData) => void) =>
                   const { top, left, right } = editorView.coordsAtPos(to);
 
                   // Calculate the button position below the last word
-                  const buttonTop = top + 20; // Adjust the vertical offset as needed
-                  const buttonLeft = (left + right) / 2; // Position the button horizontally centered
+                  const buttonTop = top - 35; // Adjust the vertical offset as needed
+                  const buttonLeft = (left + right) / 2 - 190; // Position the button horizontally centered
 
+                  console.log(
+                    `buttonTop: ${buttonTop}, buttonLeft: ${buttonLeft}`
+                  );
                   setHighlightData({
                     text: highlightedText,
                     position: { top: buttonTop, left: buttonLeft },
