@@ -26,11 +26,13 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix"
   },
   "dependencies": {
+    "@aarkue/tiptap-math-extension": "^1.2.2",
     "@anthropic-ai/sdk": "^0.21.1",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
     "@headlessui/react": "^1.7.19",
     "@huggingface/hub": "^0.12.0",
+    "@lancedb/vectordb-win32-x64-msvc": "^0.5.0",
     "@material-tailwind/react": "^2.1.5",
     "@mui/icons-material": "^5.15.15",
     "@mui/joy": "^5.0.0-beta.23",
@@ -52,6 +54,7 @@
     "electron-updater": "^6.1.1",
     "install": "^0.13.0",
     "js-tiktoken": "^1.0.10",
+    "katex": "^0.16.10",
     "langchain": "^0.1.5",
     "lit": "^3.0.0",
     "lodash.debounce": "^4.0.8",
