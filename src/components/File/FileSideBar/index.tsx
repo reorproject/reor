@@ -7,8 +7,7 @@ import RenameDirModal from "../RenameDirectory";
 import RenameNoteModal from "../RenameNote";
 
 import { FileItem } from "./FileItem";
-import { isFileNodeDirectory } from "./fileOperations";
-
+import { isFileNodeDirectory, moveFile } from "./fileOperations";
 
 interface FileListProps {
   files: FileInfoTree;
@@ -139,6 +138,17 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     return visibleItems;
   };
 
+  const handleDropOnBlank = async (e: React.DragEvent) => {
+    e.preventDefault();
+    const sourcePath = e.dataTransfer.getData("text/plain");
+    const root = await window.electronStore.getVaultDirectoryForWindow();
+    try {
+      moveFile(sourcePath, root);
+    } catch (error) {
+      console.error("Failed to move file to root:", error);
+    }
+  };
+
   // Calculate visible items and item count
   const visibleItems = getVisibleFilesAndFlatten(files, expandedDirectories);
   const itemCount = visibleItems.length;
@@ -165,14 +175,20 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   };
 
   return (
-    <List
-      height={listHeight}
-      itemCount={itemCount}
-      itemSize={30}
-      width={"100%"}
-      style={{ padding: 0, margin: 0 }}
+    <div
+      onDrop={handleDropOnBlank}
+      onDragOver={(e) => e.preventDefault()}
+      style={{ height: listHeight, width: "100%" }}
     >
-      {Rows}
-    </List>
+      <List
+        height={listHeight}
+        itemCount={itemCount}
+        itemSize={30}
+        width={"100%"}
+        style={{ padding: 0, margin: 0 }}
+      >
+        {Rows}
+      </List>
+    </div>
   );
 };
