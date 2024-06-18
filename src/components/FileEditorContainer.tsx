@@ -12,6 +12,7 @@ import IconsSidebar from "./Sidebars/IconsSidebar";
 import SidebarManager from "./Sidebars/MainSidebar";
 import SidebarComponent from "./Similarity/SimilarFilesSidebar";
 import { SearchInput } from "./SearchComponent";
+import QueryInput from "./Editor/QueryInput";
 import TitleBar from "./TitleBar";
 
 interface FileEditorContainerProps {}
@@ -25,6 +26,8 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const {
     filePath,
     editor,
+    showQueryBox,
+    setShowQueryBox,
     openFileByPath,
     openRelativePath,
     saveCurrentlyOpenedFile,
@@ -251,10 +254,17 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                     className="fixed top-8 right-64  mt-4 mr-14 z-50 border-none rounded-md p-2 bg-transparent bg-dark-gray-c-ten text-white"
                   />
                 )}
-                <EditorContent
-                  style={{ wordBreak: "break-word" }}
-                  editor={editor}
-                />
+                <div className="flex-col h-full">
+                  <EditorContent
+                    style={{ wordBreak: "break-word" }}
+                    editor={editor}
+                  />
+                  {showQueryBox && (
+                    <div className="absolute bottom-0 w-full">
+                      <QueryInput setShowQueryBox={setShowQueryBox} />
+                    </div>
+                  )}
+                </div>
 
                 {suggestionsState && (
                   <InEditorBacklinkSuggestionsDisplay

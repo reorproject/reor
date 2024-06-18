@@ -79,7 +79,6 @@
     "tiptap-markdown": "^0.8.10",
     "turndown": "^7.1.2",
     "use-debounce": "^10.0.1",
-    "uuid": "^10.0.0",
     "vectordb": "0.4.10"
   },
   "devDependencies": {

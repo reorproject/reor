@@ -285,7 +285,6 @@ const HighlightButton: React.FC<HighlightButtonProps> = ({
     if (!highlightData.position) {
       setShowArrow(false);
     }
-    console.log(`pos: ${JSON.stringify(highlightData.position)}`);
   }, [highlightData.position]);
 
   if (!highlightData.position) {

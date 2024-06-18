@@ -50,6 +50,15 @@ export type HardwareConfig = {
   useVulkan: boolean;
 };
 
+export type Tab = {
+  id: string; // Unique ID for the tab, useful for operations
+  filePath: string; // Path to the file open in the tab
+  title: string; // Title of the tab
+  timeOpened: Date; // Timestamp to preserve order
+  isDirty: boolean; // Flag to indicate unsaved changes
+  lastAccessed: Date; // Timestamp for the last access to enable features in the future
+};
+
 export interface StoreSchema {
   hasUserOpenedAppBefore: boolean;
   schemaVersion: number;
@@ -73,6 +82,7 @@ export interface StoreSchema {
   chunkSize: number;
   isSBCompact: boolean;
   DisplayMarkdown: boolean;
+  OpenTabs: Tab[];
 }
 
 export enum StoreKeys {
@@ -91,4 +101,5 @@ export enum StoreKeys {
   ChunkSize = "chunkSize",
   IsSBCompact = "isSBCompact",
   DisplayMarkdown = "DisplayMarkdown",
+  OpenTabs = "OpenTabs",
 }

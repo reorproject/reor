@@ -20,6 +20,7 @@ import HighlightExtension, {
 } from "@/components/Editor/HighlightExtension";
 import { RichTextLink } from "@/components/Editor/RichTextLink";
 import SearchAndReplace from "@/components/Editor/SearchAndReplace";
+import OpenQueryTab from "@/components/Editor/LLMQueryTab";
 import {
   getInvalidCharacterInFilePath,
   removeFileExtension,
@@ -39,7 +40,7 @@ export const useFileByFilepath = () => {
     useState<boolean>(false);
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>("");
   const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>("");
-  const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
+  const [navigationHistory, setNavigationHistory] = useState<Tab[]>([]);
   const [currentlyChangingFilePath, setCurrentlyChangingFilePath] =
     useState(false);
   const [highlightData, setHighlightData] = useState<HighlightData>({
@@ -47,6 +48,7 @@ export const useFileByFilepath = () => {
     position: null,
   });
   const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
+  const [showQueryBox, setShowQueryBox] = useState<boolean>(false);
 
   const setFileNodeToBeRenamed = async (filePath: string) => {
     const isDirectory = await window.files.isDirectory(filePath);
@@ -159,9 +161,9 @@ export const useFileByFilepath = () => {
       }),
       TextStyle,
       SearchAndReplace.configure({
-       searchResultClass: "bg-yellow-400",
-       caseSensitive: false,
-       disableRegex: false,
+        searchResultClass: "bg-yellow-400",
+        caseSensitive: false,
+        disableRegex: false,
       }),
       Markdown.configure({
         html: true, // Allow HTML input/output
@@ -185,6 +187,7 @@ export const useFileByFilepath = () => {
         openRelativePathRef,
         handleSuggestionsStateWithEventCapture
       ),
+      OpenQueryTab(setShowQueryBox),
     ],
   });
 
@@ -338,6 +341,8 @@ export const useFileByFilepath = () => {
     filePath: currentlyOpenedFilePath,
     saveCurrentlyOpenedFile,
     editor,
+    showQueryBox,
+    setShowQueryBox,
     navigationHistory,
     setNavigationHistory,
     openFileByPath,

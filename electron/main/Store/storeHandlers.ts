@@ -251,6 +251,49 @@ export const registerStoreHandlers = (
     chatHistoriesMap[vaultDir] = filteredChatHistories.reverse();
     store.set(StoreKeys.ChatHistories, chatHistoriesMap);
   });
+
+  ipcMain.handle("get-current-open-files", () => {
+    return store.get(StoreKeys.OpenTabs) || [];
+  });
+
+  ipcMain.handle("set-current-open-files", (event, { action, tab }) => {
+    console.log(`Event: ${event}, Action: ${action}`);
+
+    const addTab = (tab) => {
+      console.log(`Adding new tab. TabId: ${tab.id}`);
+      const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || [];
+      const existingTab = openTabs.findIndex((item) => item.id === tab.id);
+
+      /* If tab is already open, do not do anything */
+      console.log(`Existing tab:`, existingTab);
+      console.log(`Open tabs:`, openTabs);
+      if (existingTab !== -1) return;
+
+      openTabs.push(tab);
+      store.set(StoreKeys.OpenTabs, openTabs);
+
+      /* Notify the renderer process that a new tab has been added */
+      event.sender.send("new-tab-added", tab);
+    };
+
+    const removeTab = (tabId: string) => {};
+
+    const updateTab = (tab: Tab) => {};
+
+    switch (action) {
+      case "add":
+        addTab(tab);
+        break;
+      case "remove":
+        removeTab(tab.id);
+        break;
+      case "update":
+        updateTab(tab);
+        break;
+      default:
+        throw new Error("Unsupported action type");
+    }
+  });
 };
 
 export function getDefaultEmbeddingModelConfig(

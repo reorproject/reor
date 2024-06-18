@@ -33,6 +33,16 @@ const TitleBar: React.FC<TitleBarProps> = ({
     fetchPlatform();
   }, []);
 
+  useEffect(() => {
+    const fetchHistory = async () => {
+      const response = await window.electronStore.getCurrentOpenFiles();
+      setHistory(response);
+      console.log(`Fetching stored history: ${JSON.stringify(history)}`);
+    };
+
+    fetchHistory();
+  }, []);
+
   return (
     <div
       id="customTitleBar"
