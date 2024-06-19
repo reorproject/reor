@@ -32,11 +32,6 @@
     "@emotion/styled": "^11.11.0",
     "@headlessui/react": "^1.7.19",
     "@huggingface/hub": "^0.12.0",
-<<<<<<< HEAD
-    "@lancedb/vectordb-win32-x64-msvc": "^0.5.0",
-=======
-    "@lancedb/vectordb-darwin-x64": "^0.5.0",
->>>>>>> 3d91329ca52efb1eab8a55a9c61d1018de00f32c
     "@material-tailwind/react": "^2.1.5",
     "@mui/icons-material": "^5.15.15",
     "@mui/joy": "^5.0.0-beta.23",
@@ -122,7 +117,10 @@
     "vite-plugin-electron-renderer": "^0.14.5"
   },
   "optionalDependencies": {
-    "dmg-license": "^1.0.11"
+    "dmg-license": "^1.0.11",
+    "@lancedb/vectordb-win32-x64-msvc": "^0.5.0",
+    "@lancedb/vectordb-darwin-x64": "^0.5.0",
+    "@lancedb/vectordb-linux-x64-msvc": "0.5.0"
   },
   "engines": {
     "node": "^14.18.0 || >=16.0.0"
