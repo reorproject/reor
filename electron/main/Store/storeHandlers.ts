@@ -262,7 +262,9 @@ export const registerStoreHandlers = (
     const addTab = (tab) => {
       console.log(`Adding new tab. TabId: ${tab.id}`);
       const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || [];
-      const existingTab = openTabs.findIndex((item) => item.id === tab.id);
+      const existingTab = openTabs.findIndex(
+        (item) => item.filePath === tab.filePath
+      );
 
       /* If tab is already open, do not do anything */
       console.log(`Existing tab:`, existingTab);

@@ -40,7 +40,8 @@ export const useFileByFilepath = () => {
     useState<boolean>(false);
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>("");
   const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>("");
-  const [navigationHistory, setNavigationHistory] = useState<Tab[]>([]);
+  const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
+  const [openTabs, setOpenTabs] = useState<Tab[]>([]);
   const [currentlyChangingFilePath, setCurrentlyChangingFilePath] =
     useState(false);
   const [highlightData, setHighlightData] = useState<HighlightData>({
@@ -343,6 +344,8 @@ export const useFileByFilepath = () => {
     editor,
     showQueryBox,
     setShowQueryBox,
+    openTabs,
+    setOpenTabs,
     navigationHistory,
     setNavigationHistory,
     openFileByPath,

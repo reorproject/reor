@@ -28,6 +28,8 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     editor,
     showQueryBox,
     setShowQueryBox,
+    openTabs,
+    setOpenTabs,
     openFileByPath,
     openRelativePath,
     saveCurrentlyOpenedFile,
@@ -187,6 +189,8 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
       <TitleBar
         history={navigationHistory}
         setHistory={setNavigationHistory}
+        openTabs={openTabs}
+        setOpenTabs={setOpenTabs}
         currentFilePath={filePath}
         onFileSelect={openFileAndOpenEditor}
         similarFilesOpen={showSimilarFiles}

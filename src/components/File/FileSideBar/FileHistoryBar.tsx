@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 
 import posthog from "posthog-js";
 import { IoMdArrowRoundBack, IoMdArrowRoundForward } from "react-icons/io";
@@ -12,6 +11,7 @@ interface FileHistoryNavigatorProps {
   setHistory: (string: string[]) => void;
   onFileSelect: (path: string) => void;
   currentPath: string;
+  syncTabsWithBackend: (string: path) => void;
 }
 
 const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
@@ -19,6 +19,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
   setHistory,
   onFileSelect,
   currentPath,
+  syncTabsWithBackend,
 }) => {
   const [showMenu, setShowMenu] = useState<string>("");
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
@@ -32,45 +33,16 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
       handleFileSelect(currentPath);
   }, [currentPath]);
 
-  useEffect(() => {
-    console.log(`currentIndex: ${currentIndex}`, { history });
-  }, [currentIndex]);
+  useEffect(() => {}, [currentIndex]);
 
   const handleFileSelect = (path: string) => {
-    const newTab = createTabObjectFromPath(path);
-    console.log(`history: ${history}`);
     const updatedHistory = [
-      ...history
-        .filter((tab) => tab.filePath != path)
-        .slice(0, currentIndex + 1),
-      newTab,
+      ...history.filter((val) => val !== path).slice(0, currentIndex + 1),
+      path,
     ];
     setHistory(updatedHistory);
     setCurrentIndex(updatedHistory.length - 1);
-    syncTabsWithBackend(newTab);
-  };
-
-  const createTabObjectFromPath = (path) => {
-    return {
-      id: uuidv4(),
-      filePath: path,
-      title: extractFileName(path),
-      timeOpened: new Date(),
-      isDirty: false,
-      lastAccessed: new Date(),
-    };
-  };
-
-  /* IPC Communication for Tab updates */
-  const syncTabsWithBackend = async (tab) => {
-    /* Deals with already open files */
-    console.log(`Tab:`, tab);
-    await window.electronStore.setCurrentOpenFiles("add", tab);
-  };
-
-  const extractFileName = (path: string) => {
-    const parts = path.split(/[/\\]/); // Split on both forward slash and backslash
-    return parts.pop(); // Returns the last element, which is the file name
+    syncTabsWithBackend(path);
   };
 
   const canGoBack = currentIndex > 0;
