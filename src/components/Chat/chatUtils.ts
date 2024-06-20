@@ -3,6 +3,7 @@ import {
   ChatCompletionContentPart,
   ChatCompletionMessageParam,
 } from "openai/resources/chat/completions";
+
 import { ChatFilters, ChatMessageToDisplay } from "./Chat";
 
 export function formatOpenAIMessageContentIntoString(
