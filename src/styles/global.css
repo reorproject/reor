@@ -56,3 +56,19 @@ button {
   background: rgb(164, 164, 164); /* Set the thumb color */
   border-radius: 10px;
 }
+
+.my-day-picker .rdp {
+  @apply text-xs; /* Adjust font size */
+}
+
+.my-day-picker .rdp-months {
+  @apply p-2; /* Adjust padding */
+}
+
+.my-day-picker .rdp-caption {
+  @apply text-sm; /* Adjust caption font size */
+}
+
+.my-day-picker .rdp-day {
+  @apply w-6 h-6 leading-6; /* Adjust day cell size */
+}

@@ -61,6 +61,8 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const [chatFilters, setChatFilters] = useState<ChatFilters>({
     files: [],
     numberOfChunksToFetch: 15,
+    minDate: new Date(0),
+    maxDate: new Date(),  
   });
 
   const handleAddFileToChatFilters = (file: string) => {
