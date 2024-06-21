@@ -35,6 +35,17 @@ export const useFileByFilepath = () => {
     useState<boolean>(false);
   const [needToIndexEditorContent, setNeedToIndexEditorContent] =
     useState<boolean>(false);
+  const [spellCheckEnabled, setSpellCheckEnabled] = useState<string>("false");
+
+  useEffect(() => {
+    const fetchSpellCheckMode = async () => {
+      const storedSpellCheckEnabled =
+        await window.electronStore.getSpellCheckMode();
+      setSpellCheckEnabled(storedSpellCheckEnabled);
+    };
+    fetchSpellCheckMode();
+  }, [spellCheckEnabled]);
+
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>("");
   const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>("");
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
@@ -121,11 +132,7 @@ export const useFileByFilepath = () => {
       setNeedToWriteEditorContentToDisk(true);
       setNeedToIndexEditorContent(true);
     },
-    editorProps: {
-      attributes: {
-        spellcheck: "false", // Disable spellcheck
-      },
-    },
+    editorProps: {},
     extensions: [
       StarterKit,
       Document,
@@ -159,6 +166,18 @@ export const useFileByFilepath = () => {
       ),
     ],
   });
+
+  useEffect(() => {
+    if (editor) {
+      editor.setOptions({
+        editorProps: {
+          attributes: {
+            spellcheck: spellCheckEnabled,
+          },
+        },
+      });
+    }
+  }, [spellCheckEnabled, editor]);
 
   const [debouncedEditor] = useDebounce(editor?.state.doc.content, 4000);
 
@@ -315,6 +334,7 @@ export const useFileByFilepath = () => {
     openFileByPath,
     openRelativePath,
     suggestionsState,
+    spellCheckEnabled,
     highlightData,
     noteToBeRenamed,
     setNoteToBeRenamed,
@@ -322,6 +342,7 @@ export const useFileByFilepath = () => {
     setFileDirToBeRenamed,
     renameFile: renameFileNode,
     setSuggestionsState,
+    setSpellCheckEnabled,
   };
 };
 
