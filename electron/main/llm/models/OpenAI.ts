@@ -65,7 +65,6 @@ export class OpenAIModelSessionService implements LLMSessionService {
     handleChunk: (chunk: ChatCompletionChunk) => void,
     generationParams?: LLMGenerationParameters
   ): Promise<void> {
-    console.log("making call to url: ", modelConfig);
     const openai = new OpenAI({
       apiKey: modelConfig.apiKey,
       baseURL: modelConfig.apiURL,

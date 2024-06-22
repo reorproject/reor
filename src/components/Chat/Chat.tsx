@@ -297,13 +297,12 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                 <ReactMarkdown
                   key={index}
                   rehypePlugins={[rehypeRaw]}
-                  className={`p-1 pl-1 markdown-content rounded-lg break-words ${
-                    message.messageType === "error"
-                      ? "bg-red-100 text-red-800"
-                      : message.role === "assistant"
+                  className={`p-1 pl-1 markdown-content rounded-lg break-words ${message.messageType === "error"
+                    ? "bg-red-100 text-red-800"
+                    : message.role === "assistant"
                       ? "bg-neutral-600	text-gray-200"
                       : "bg-blue-100	text-blue-800"
-                  } `}
+                    } `}
                 >
                   {message.visibleContent
                     ? message.visibleContent
@@ -313,25 +312,25 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           </div>
           {(!currentChatHistory ||
             currentChatHistory?.displayableChatHistory.length == 0) && (
-            <>
-              <div className="flex items-center justify-center text-gray-300 text-sm">
-                Start a conversation with your notes by typing a message below.
-              </div>
-              <div className="flex items-center justify-center text-gray-300 text-sm">
-                <button
-                  className="bg-slate-600 m-2 rounded-lg border-none 
+              <>
+                <div className="flex items-center justify-center text-gray-300 text-sm">
+                  Start a conversation with your notes by typing a message below.
+                </div>
+                <div className="flex items-center justify-center text-gray-300 text-sm">
+                  <button
+                    className="bg-slate-600 m-2 rounded-lg border-none 
                   h-6 w-40 text-center cursor-pointer vertical-align text-white"
-                  onClick={() => {
-                    setIsAddContextFiltersModalOpen(true);
-                  }}
-                >
-                  {chatFilters.files.length > 0
-                    ? "Update filters"
-                    : "Add filters"}
-                </button>
-              </div>
-            </>
-          )}
+                    onClick={() => {
+                      setIsAddContextFiltersModalOpen(true);
+                    }}
+                  >
+                    {chatFilters.files.length > 0
+                      ? "Update filters"
+                      : "Add filters"}
+                  </button>
+                </div>
+              </>
+            )}
           {isAddContextFiltersModalOpen && (
             <AddContextFiltersModal
               vaultDirectory={vaultDirectory}
@@ -354,8 +353,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             );
           })} */}
           {userTextFieldInput === "" &&
-          (!currentChatHistory ||
-            currentChatHistory?.displayableChatHistory.length == 0) ? (
+            (!currentChatHistory ||
+              currentChatHistory?.displayableChatHistory.length == 0) ? (
             <>
               {EXAMPLE_PROMPTS[askText].map((option, index) => {
                 return (
@@ -393,7 +392,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             return Promise.resolve();
           }}
           isLoadingSimilarEntries={false}
-          setIsRefined={() => {}} // to allow future toggling
+          setIsRefined={() => { }} // to allow future toggling
           isRefined={true} // always refined for now
         />
       )}

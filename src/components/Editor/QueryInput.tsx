@@ -184,7 +184,7 @@ const QueryInput: React.FC<QueryInputProps> = ({
         remote: false,
         args: [args],
         filePath: filePath,
-        displayableChatHistory: [args],
+        displayableChatHistory: [],
       };
     }
   };

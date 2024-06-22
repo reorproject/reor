@@ -1,24 +1,23 @@
-import React, { useEffect, useState, useCallback } from "react";
 import { EditorContent } from "@tiptap/react";
 import posthog from "posthog-js";
+import React, { useCallback, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import ChatWithLLM, { ChatFilters, ChatHistory } from "./Chat/Chat";
 import { useChatHistory } from "./Chat/hooks/use-chat-history";
+import { DraggableTabs } from "./DraggableTabs";
 import InEditorBacklinkSuggestionsDisplay from "./Editor/BacklinkSuggestionsDisplay";
+import QueryInput from "./Editor/QueryInput";
 import { useFileInfoTree } from "./File/FileSideBar/hooks/use-file-info-tree";
+import CreatePreviewFile from "./File/PreviewFile";
 import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
 import ResizableComponent from "./Generic/ResizableComponent";
 import IconsSidebar from "./Sidebars/IconsSidebar";
 import SidebarManager from "./Sidebars/MainSidebar";
 import SidebarComponent from "./Similarity/SimilarFilesSidebar";
-import { SearchInput } from "./SearchComponent";
-import QueryInput from "./Editor/QueryInput";
 import TitleBar from "./TitleBar";
-import { DraggableTabs } from "./DraggableTabs";
-import CreatePreviewFile from "./File/PreviewFile";
 
-interface FileEditorContainerProps {}
+interface FileEditorContainerProps { }
 export type SidebarAbleToShow = "files" | "search" | "chats";
 
 const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
@@ -354,7 +353,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                     editor={editor}
                   />
                   {showQueryBox && (
-                    <div className="absolute bottom-0 w-full">
+                    <div className="fixed bottom-0 w-full">
                       <QueryInput
                         setShowQueryBox={setShowQueryBox}
                         filePath={filePath}
@@ -385,7 +384,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                 />
               ) : (
                 <ResizableComponent resizeSide="left">
-                  <CreatePreviewFile query={query} />
+                  <CreatePreviewFile
+                    query={query}
+                    editorContent={editor?.getText()}
+                  />
                 </ResizableComponent>
               )}
             </div>

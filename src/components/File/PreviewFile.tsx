@@ -1,19 +1,55 @@
-import { useEffect } from "react";
+import { Query } from "@/components/Editor/QueryInput";
+import { useEffect, useState } from "react";
+
+interface CreatePreviewFileProps {
+  query: Query,
+  editorContent: string,
+}
 
 /**
  * A function to handle creating or updating a preview file.
  */
-const CreatePreviewFile = ({ query }) => {
-  console.log(`Displaying preview file:`, query);
+const CreatePreviewFile: React.FC<CreatePreviewFileProps> = ({
+  query,
+  editorContent
+}) => {
+  const [queryChatWindow, setQueryChatWindow] = useState<string>("");
 
-  const TEMPORARY_CONTENT = `
-        This is just a test
+  /**
+   * Updates the queryChatWindow state and attaches listeners for 
+   *  ipc calls
+   */
+  useEffect(() => {
+    /**
+       * Updates state depending on content inside ChatCompletionChunk
+       * 
+       * @param chunk: response from LLM
+       */
+    const handleOpenAIChunk = (
+      receivedChatID: string,
+      chunk: ChatCompletionChunk
+    ) => {
+      const newContent = chunk.choices[0].delta.content ?? "";
+      appendContentToInlineQueryWindow(newContent);
+    }
 
-        In Reality, it would contain the content of the query executing on the editor
+    const openAITokenStreamListener = window.ipcRenderer.receive(
+      "openAITokenStream",
+      handleOpenAIChunk
+    );
 
+    return () => {
+      openAITokenStreamListener();
+    };
+  }, [])
 
-        !!!!
-    `;
+  const appendContentToInlineQueryWindow = (
+    newContent: string
+  ) => {
+    setQueryChatWindow((prevContent) => {
+      return prevContent + newContent;
+    });
+  }
 
   const capitalizeFirstLetter = (word: string) => {
     return word.charAt(0).toUpperCase() + word.slice(1);
@@ -38,6 +74,26 @@ const CreatePreviewFile = ({ query }) => {
             currentModelConfig
           )}`
         );
+
+        query.displayableChatHistory.push({
+          role: "system",
+          content: "You are an expert in syntax and formatting, especially for enhancing note-taking efficiency and clarity. You will only follow the instructions given that relates to formatting. Do not provide extranneous information. The content will be given in JSON.",
+          messageType: "info",
+          context: [],
+        })
+
+        query.displayableChatHistory.push({
+          role: "user",
+          content: query.args[0],
+          messageType: "success",
+          context: [],
+        });
+
+        query.displayableChatHistory.push({
+          role: "user",
+          content: editorContent,
+
+        })
 
         await window.llm.streamingLLMResponse(
           defaultLLMName,
@@ -67,7 +123,7 @@ const CreatePreviewFile = ({ query }) => {
         <div className="px-2 py-1 bg-blue-500 text-white rounded">Query</div>
         <p className="ml-2 text-white">{query.args[0]}</p>
       </div>
-      <div className="w-full text-white bg-black p-4">{TEMPORARY_CONTENT}</div>
+      <div className="w-full text-white bg-black p-4">{queryChatWindow}</div>
     </div>
   );
 };
