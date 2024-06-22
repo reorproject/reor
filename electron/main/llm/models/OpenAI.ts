@@ -1,6 +1,6 @@
 import {
-  LLMGenerationParameters,
   LLMConfig,
+  LLMGenerationParameters,
 } from "electron/main/Store/storeConfig";
 import { Tiktoken, TiktokenModel, encodingForModel } from "js-tiktoken";
 import OpenAI from "openai";
@@ -71,7 +71,7 @@ export class OpenAIModelSessionService implements LLMSessionService {
       baseURL: modelConfig.apiURL,
       fetch: customFetchUsingElectronNetStreaming,
     });
-    console.log("messageHistory: ");
+    console.log("messageHistory: ", messageHistory);
 
     const stream = await openai.chat.completions.create({
       model: modelName,

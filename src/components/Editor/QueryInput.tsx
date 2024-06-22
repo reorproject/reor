@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import createPreviewFile from "../File/PreviewFile";
+import { ChatMessageToDisplay } from "../Chat/Chat";
 
 /*
  * Contains the options that users can query on
@@ -42,6 +42,11 @@ export interface Query {
    * Path where query is made
    */
   filePath: string;
+
+  /**
+   * Response of Query
+   */
+  displayableChatHistory: ChatMessageToDisplay[];
 }
 
 /**
@@ -179,6 +184,7 @@ const QueryInput: React.FC<QueryInputProps> = ({
         remote: false,
         args: [args],
         filePath: filePath,
+        displayableChatHistory: [args],
       };
     }
   };
@@ -190,9 +196,8 @@ const QueryInput: React.FC<QueryInputProps> = ({
           {suggestions.map((suggestion, index) => (
             <li
               key={index}
-              className={`${
-                index === suggestChoice ? "bg-white" : ""
-              } pl-4 py-1 cursor-pointer hover:bg-gray-200`}
+              className={`${index === suggestChoice ? "bg-white" : ""
+                } pl-4 py-1 cursor-pointer hover:bg-gray-200`}
             >
               {suggestion}
             </li>

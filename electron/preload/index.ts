@@ -1,7 +1,4 @@
 import { IpcRendererEvent, contextBridge, ipcRenderer } from "electron";
-import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
-import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
-import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import {
   AugmentPromptWithFileProps,
   FileInfoNode,
@@ -15,9 +12,12 @@ import {
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
   HardwareConfig,
-  LLMGenerationParameters,
   LLMConfig,
+  LLMGenerationParameters,
 } from "electron/main/Store/storeConfig";
+import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
+import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
+import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
 
 import { ChatHistory } from "@/components/Chat/Chat";
 import { ChatHistoryMetadata } from "@/components/Chat/hooks/use-chat-history";
@@ -459,7 +459,6 @@ contextBridge.exposeInMainWorld("llm", {
     isJSONMode: boolean,
     request: ChatHistory | Query
   ) => {
-    let requestType = "remote" in request ? "query" : "chatHistory";
 
     return await ipcRenderer.invoke(
       "streaming-llm-response",
@@ -467,7 +466,6 @@ contextBridge.exposeInMainWorld("llm", {
       llmConfig,
       isJSONMode,
       request,
-      requestType
     );
   },
 

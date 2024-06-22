@@ -1,8 +1,6 @@
-import { MessageStreamEvent } from "@anthropic-ai/sdk/resources";
 import { ipcMain, IpcMainInvokeEvent } from "electron";
 import Store from "electron-store";
 import { ProgressResponse } from "ollama";
-import { ChatCompletionChunk } from "openai/resources/chat/completions";
 
 import { LLMConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
 
@@ -12,16 +10,15 @@ import {
 } from "./contextLimit";
 import {
   addOrUpdateLLMSchemaInStore,
-  removeLLM,
   getAllLLMConfigs,
   getLLMConfig,
+  removeLLM,
 } from "./llmConfig";
 import { AnthropicModelSessionService } from "./models/Anthropic";
 import { OllamaService } from "./models/Ollama";
 import { OpenAIModelSessionService } from "./models/OpenAI";
 import { LLMSessionService } from "./Types";
 
-import { ChatHistory } from "@/components/Chat/Chat";
 import { Query } from "@/components/Editor/QueryInput";
 
 enum LLMType {
@@ -46,45 +43,43 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       llmName: string,
       llmConfig: LLMConfig,
       isJSONMode: boolean,
-      // chatHistory: ChatHistory | Query,
       request: ChatHistories | Query,
-      requestType: boolean
     ): Promise<void> => {
-      // const handleOpenAIChunk = (chunk: ChatCompletionChunk) => {
-      //   event.sender.send("openAITokenStream", request.id, chunk);
-      // };
+      const handleOpenAIChunk = (chunk: ChatCompletionChunk) => {
+        event.sender.send("openAITokenStream", request.id, chunk);
+      };
 
-      // const handleAnthropicChunk = (chunk: MessageStreamEvent) => {
-      //   event.sender.send("anthropicTokenStream", request.id, chunk);
-      // };
+      const handleAnthropicChunk = (chunk: MessageStreamEvent) => {
+        event.sender.send("anthropicTokenStream", request.id, chunk);
+      };
 
-      console.log(`requestType:`, requestType);
+      console.log("Registered LLM");
 
-    //   switch (llmConfig.type) {
-    //     case LLMType.OpenAI:
-    //       await openAISession.streamingResponse(
-    //         llmName,
-    //         llmConfig,
-    //         isJSONMode,
-    //         request.displayableChatHistory,
-    //         handleOpenAIChunk,
-    //         store.get(StoreKeys.LLMGenerationParameters)
-    //       );
-    //       break;
-    //     case LLMType.Anthropic:
-    //       await anthropicSession.streamingResponse(
-    //         llmName,
-    //         llmConfig,
-    //         isJSONMode,
-    //         request.displayableChatHistory,
-    //         handleAnthropicChunk,
-    //         store.get(StoreKeys.LLMGenerationParameters)
-    //       );
-    //       break;
-    //     default:
-    //       throw new Error(`LLM type ${llmConfig.type} not supported.`);
-    //   }
-    // }
+      switch (llmConfig.type) {
+        case LLMType.OpenAI:
+          await openAISession.streamingResponse(
+            llmName,
+            llmConfig,
+            isJSONMode,
+            request.displayableChatHistory,
+            handleOpenAIChunk,
+            store.get(StoreKeys.LLMGenerationParameters)
+          );
+          break;
+        case LLMType.Anthropic:
+          await anthropicSession.streamingResponse(
+            llmName,
+            llmConfig,
+            isJSONMode,
+            request.displayableChatHistory,
+            handleAnthropicChunk,
+            store.get(StoreKeys.LLMGenerationParameters)
+          );
+          break;
+        default:
+          throw new Error(`LLM type ${llmConfig.type} not supported.`);
+      }
+    }
   );
   ipcMain.handle("set-default-llm", (event, modelName: string) => {
     // TODO: validate that the model exists
