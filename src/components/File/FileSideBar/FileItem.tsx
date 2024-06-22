@@ -1,12 +1,10 @@
-
 import React, { useState } from "react";
 
 import { FileInfoNode } from "electron/main/Files/Types";
 import posthog from "posthog-js";
-import { FaChevronRight , FaChevronDown } from "react-icons/fa";
+import { FaChevronRight, FaChevronDown } from "react-icons/fa";
 
 import { isFileNodeDirectory, moveFile } from "./fileOperations";
-
 
 import { removeFileExtension } from "@/functions/strings";
 
@@ -63,6 +61,7 @@ export const FileItem: React.FC<FileInfoProps> = ({
       // Handle error (e.g., show an error message)
     }
   };
+
   const toggle = () => {
     if (isFileNodeDirectory(file)) {
       onDirectoryToggle(file.path);

@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 
+import createPreviewFile from "../File/PreviewFile";
+
 /*
  * Contains the options that users can query on
  */
@@ -13,7 +15,7 @@ enum QueryOptions {
 /**
  * Represents a query with a specified action and its associated arguments
  */
-interface Query {
+export interface Query {
   /**
    * The query operation to be performed.
    */
@@ -35,6 +37,11 @@ interface Query {
    * If remote is true, then URL is stored at args[0]
    */
   args: string[];
+
+  /**
+   * Path where query is made
+   */
+  filePath: string;
 }
 
 /**
@@ -42,11 +49,24 @@ interface Query {
  */
 const quotePattern = /^"(.+)"$/;
 
-const QueryInput = ({ setShowQueryBox }) => {
+interface QueryInputProps {
+  setShowQueryBox: (show: boolean) => void;
+  onFileSelect: (path: string) => void;
+  setShowQueryWindow: (show: boolean) => void;
+  setQuery: (query: Query) => void;
+}
+
+const QueryInput: React.FC<QueryInputProps> = ({
+  setShowQueryBox,
+  filePath,
+  setShowQueryWindow,
+  setQuery,
+}) => {
   const [input, setInput] = useState(":");
-  const [query, setQuery] = useState<Query | null>(null);
+  // const [query, setQuery] = useState<Query | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [suggestChoice, setSuggestChoice] = useState<number>(0);
+  const [displayPreview, setDisplayPreview] = useState<boolean>(false);
 
   const handleKeyDown = (event) => {
     const length = Object.values(QueryOptions).length;
@@ -63,9 +83,9 @@ const QueryInput = ({ setShowQueryBox }) => {
         setInput(newInput);
         updateSuggestions(newInput);
       } else {
-        console.log("Did not select a choice!");
         /* Set up new Query Object*/
-        parseInput();
+        createQuery();
+        setShowQueryWindow(true);
       }
     } else if (event.key === "Escape") {
       /* Close query box */
@@ -98,7 +118,7 @@ const QueryInput = ({ setShowQueryBox }) => {
     setSuggestions(filteredSuggestions);
   };
 
-  const parseInput = () => {
+  const createQuery = () => {
     // Extract command
     const commandMatch = input.match(/^:([a-z]+)\s+(.*)$/i);
     if (!commandMatch) {
@@ -107,15 +127,20 @@ const QueryInput = ({ setShowQueryBox }) => {
     }
     const command = commandMatch[1];
     const content = commandMatch[2];
+    let newQuery = null;
     switch (command) {
       case "summarize":
-        handleSummarizeCommand(content);
+        newQuery = handleSummarizeCommand(content);
         break;
       case "format":
-        handleFormatCommand(content);
+        newQuery = handleFormatCommand(content, filePath);
         break;
       default:
         break;
+    }
+
+    if (newQuery) {
+      setQuery(newQuery);
     }
   };
 
@@ -125,7 +150,6 @@ const QueryInput = ({ setShowQueryBox }) => {
   const handleSummarizeCommand = (content: string) => {
     // Regex to match exactly one URL enclosed in square brackets
     const summarizePattern = /^\[\s*https?:\/\/[^\s\]]+\s*\]$/i;
-    console.log(`content: ${content}`);
     if (!summarizePattern.test(content.trim())) {
       console.error(
         "Invalid argument for summarize command. Expected a URL within square brackets."
@@ -135,31 +159,27 @@ const QueryInput = ({ setShowQueryBox }) => {
 
     // If valid, extract URL and build the query object
     const url = content.slice(1, -1); // Remove the square brackets
-    const newQuery: Query = {
+    return {
       options: QueryOptions.summarize,
       remote: true,
       args: [url],
+      // filePath:
     };
-
-    setQuery(newQuery);
-    console.log("Summarize command processed:", newQuery);
   };
 
   /**
    * Constructs the Query object when format command is invoked
    */
-  const handleFormatCommand = (content: string) => {
+  const handleFormatCommand = (content: string, filePath: string) => {
     const match = content.match(quotePattern);
     if (match) {
       const args = match[1];
-      const newQuery: Query = {
+      return {
         options: QueryOptions.format,
         remote: false,
         args: [args],
+        filePath: filePath,
       };
-
-      setQuery(newQuery);
-      console.log(`Format command processed:`, newQuery);
     }
   };
 

@@ -256,41 +256,44 @@ export const registerStoreHandlers = (
     return store.get(StoreKeys.OpenTabs) || [];
   });
 
-  ipcMain.handle("set-current-open-files", (event, { action, tab }) => {
-    console.log(`Event: ${event}, Action: ${action}`);
+  ipcMain.handle("set-current-open-files", (event, { action, args }) => {
+    const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || [];
 
-    const addTab = (tab) => {
-      console.log(`Adding new tab. TabId: ${tab.id}`);
-      const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || [];
+    const addTab = ({ tab }) => {
       const existingTab = openTabs.findIndex(
         (item) => item.filePath === tab.filePath
       );
 
       /* If tab is already open, do not do anything */
-      console.log(`Existing tab:`, existingTab);
-      console.log(`Open tabs:`, openTabs);
       if (existingTab !== -1) return;
 
       openTabs.push(tab);
       store.set(StoreKeys.OpenTabs, openTabs);
-
-      /* Notify the renderer process that a new tab has been added */
-      event.sender.send("new-tab-added", tab);
     };
 
-    const removeTab = (tabId: string) => {};
+    const removeTab = ({ tabId }) => {
+      const updatedTabs = openTabs.filter((tab) => tab.id !== tabId);
+      store.set(StoreKeys.OpenTabs, updatedTabs);
+    };
 
-    const updateTab = (tab: Tab) => {};
+    const updateTab = ({ draggedIndex, targetIndex }) => {
+      // Swap dragged and target
+      [openTabs[draggedIndex], openTabs[targetIndex]] = [
+        openTabs[targetIndex],
+        openTabs[draggedIndex],
+      ];
+      store.set(StoreKeys.OpenTabs, openTabs);
+    };
 
     switch (action) {
       case "add":
-        addTab(tab);
+        addTab(args);
         break;
       case "remove":
-        removeTab(tab.id);
+        removeTab(args);
         break;
       case "update":
-        updateTab(tab);
+        updateTab(args);
         break;
       default:
         throw new Error("Unsupported action type");

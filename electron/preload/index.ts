@@ -21,6 +21,7 @@ import {
 
 import { ChatHistory } from "@/components/Chat/Chat";
 import { ChatHistoryMetadata } from "@/components/Chat/hooks/use-chat-history";
+import { Query } from "@/components/Editor/QueryInput";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
 
@@ -108,7 +109,7 @@ declare global {
         llmName: string,
         llmConfig: LLMConfig,
         isJSONMode: boolean,
-        chatHistory: ChatHistory
+        chatHistory: ChatHistory | Query
       ) => Promise<string>;
       getLLMConfigs: () => Promise<LLMConfig[]>;
       pullOllamaModel: (modelName: string) => Promise<void>;
@@ -327,8 +328,8 @@ contextBridge.exposeInMainWorld("electronStore", {
   getCurrentOpenFiles: () => {
     return ipcRenderer.invoke("get-current-open-files");
   },
-  setCurrentOpenFiles: (action, tab) => {
-    ipcRenderer.invoke("set-current-open-files", { action, tab });
+  setCurrentOpenFiles: (action, args) => {
+    ipcRenderer.invoke("set-current-open-files", { action, args });
   },
 });
 
@@ -456,14 +457,17 @@ contextBridge.exposeInMainWorld("llm", {
     llmName: string,
     llmConfig: LLMConfig,
     isJSONMode: boolean,
-    chatHistory: ChatHistory
+    request: ChatHistory | Query
   ) => {
+    let requestType = "remote" in request ? "query" : "chatHistory";
+
     return await ipcRenderer.invoke(
       "streaming-llm-response",
       llmName,
       llmConfig,
       isJSONMode,
-      chatHistory
+      request,
+      requestType
     );
   },
 

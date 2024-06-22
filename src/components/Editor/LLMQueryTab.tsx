@@ -6,7 +6,6 @@ const OpenQueryTab = (setShowQueryBox) =>
     addKeyboardShortcuts() {
       return {
         "Mod-Shift-l": () => {
-          console.log(`Toggling query box`);
           setShowQueryBox((prev) => !prev);
         },
       };

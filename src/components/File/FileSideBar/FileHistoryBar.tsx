@@ -11,7 +11,6 @@ interface FileHistoryNavigatorProps {
   setHistory: (string: string[]) => void;
   onFileSelect: (path: string) => void;
   currentPath: string;
-  syncTabsWithBackend: (string: path) => void;
 }
 
 const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
@@ -19,7 +18,6 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
   setHistory,
   onFileSelect,
   currentPath,
-  syncTabsWithBackend,
 }) => {
   const [showMenu, setShowMenu] = useState<string>("");
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
@@ -42,7 +40,6 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
     ];
     setHistory(updatedHistory);
     setCurrentIndex(updatedHistory.length - 1);
-    syncTabsWithBackend(path);
   };
 
   const canGoBack = currentIndex > 0;

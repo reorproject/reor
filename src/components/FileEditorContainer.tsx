@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { EditorContent } from "@tiptap/react";
 import posthog from "posthog-js";
+import { v4 as uuidv4 } from "uuid";
 
 import ChatWithLLM, { ChatFilters, ChatHistory } from "./Chat/Chat";
 import { useChatHistory } from "./Chat/hooks/use-chat-history";
@@ -14,6 +15,8 @@ import SidebarComponent from "./Similarity/SimilarFilesSidebar";
 import { SearchInput } from "./SearchComponent";
 import QueryInput from "./Editor/QueryInput";
 import TitleBar from "./TitleBar";
+import { DraggableTabs } from "./DraggableTabs";
+import CreatePreviewFile from "./File/PreviewFile";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search" | "chats";
@@ -54,7 +57,8 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     setShowSimilarFiles(!showSimilarFiles);
   };
 
-  // const [fileIsOpen, setFileIsOpen] = useState(false);
+  const [showQueryWindow, setShowQueryWindow] = useState<boolean>(false);
+  const [query, setQuery] = useState<Query | null>(null);
 
   const openFileAndOpenEditor = async (path: string) => {
     setShowChatbot(false);
@@ -184,13 +188,92 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const fetchHistoryTabs = async () => {
+      const response = await window.electronStore.getCurrentOpenFiles();
+      setOpenTabs(response);
+      console.log(`Fetching stored history: ${JSON.stringify(openTabs)}`);
+    };
+
+    fetchHistoryTabs();
+  }, []);
+
+  /* IPC Communication for Tab updates */
+  const syncTabsWithBackend = async (path: string) => {
+    /* Deals with already open files */
+    const tab = createTabObjectFromPath(path);
+    await window.electronStore.setCurrentOpenFiles("add", {
+      tab: tab,
+    });
+  };
+
+  const extractFileName = (path: string) => {
+    const parts = path.split(/[/\\]/); // Split on both forward slash and backslash
+    return parts.pop(); // Returns the last element, which is the file name
+  };
+
+  /* Creates Tab to display */
+  const createTabObjectFromPath = (path) => {
+    return {
+      id: uuidv4(),
+      filePath: path,
+      title: extractFileName(path),
+      timeOpened: new Date(),
+      isDirty: false,
+      lastAccessed: new Date(),
+    };
+  };
+
+  useEffect(() => {
+    if (!filePath) return;
+    console.log(`Filepath changed!`);
+    const existingTab = openTabs.find((tab) => tab.filePath === filePath);
+
+    if (!existingTab) {
+      syncTabsWithBackend(filePath);
+      const newTab = createTabObjectFromPath(filePath);
+      // Update the tabs state by adding the new tab
+      setOpenTabs((prevTabs) => [...prevTabs, newTab]);
+    }
+  }, [filePath]);
+
+  const handleTabSelect = (path: string) => {
+    console.log("Tab Selected:", path);
+    openFileAndOpenEditor(path);
+  };
+
+  const handleTabClose = async (tabId) => {
+    // Get current file path from the tab to be closed
+    let closedFilePath = "";
+    let newIndex = -1;
+
+    // Update tabs state and determine the new file to select
+    setOpenTabs((prevTabs) => {
+      const index = prevTabs.findIndex((tab) => tab.id === tabId);
+      closedFilePath = index !== -1 ? prevTabs[index].filePath : "";
+      newIndex = index > 0 ? index - 1 : 0; // Set newIndex to previous one or 0
+      return prevTabs.filter((tab, idx) => idx !== index);
+    });
+
+    // Update the selected file path after state update
+    if (closedFilePath === filePath) {
+      // If the closed tab was the current file, update the file selection
+      if (newIndex === -1 || newIndex >= openTabs.length) {
+        openFileAndOpenEditor(""); // If no tabs left or out of range, clear selection
+      } else {
+        openFileAndOpenEditor(openTabs[newIndex].filePath); // Select the new index's file
+      }
+    }
+    await window.electronStore.setCurrentOpenFiles("remove", {
+      tabId: tabId,
+    });
+  };
+
   return (
     <div>
       <TitleBar
         history={navigationHistory}
         setHistory={setNavigationHistory}
-        openTabs={openTabs}
-        setOpenTabs={setOpenTabs}
         currentFilePath={filePath}
         onFileSelect={openFileAndOpenEditor}
         similarFilesOpen={showSimilarFiles}
@@ -259,13 +342,25 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                   />
                 )}
                 <div className="flex-col h-full">
+                  <DraggableTabs
+                    openTabs={openTabs}
+                    setOpenTabs={setOpenTabs}
+                    onTabSelect={handleTabSelect}
+                    onTabClose={handleTabClose}
+                    currentFilePath={filePath}
+                  />
                   <EditorContent
                     style={{ wordBreak: "break-word" }}
                     editor={editor}
                   />
                   {showQueryBox && (
                     <div className="absolute bottom-0 w-full">
-                      <QueryInput setShowQueryBox={setShowQueryBox} />
+                      <QueryInput
+                        setShowQueryBox={setShowQueryBox}
+                        filePath={filePath}
+                        setShowQueryWindow={setShowQueryWindow}
+                        setQuery={setQuery}
+                      />
                     </div>
                   )}
                 </div>
@@ -279,7 +374,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                   />
                 )}
               </div>
-              {showSimilarFiles && (
+              {showSimilarFiles && !showQueryWindow ? (
                 <SidebarComponent
                   filePath={filePath}
                   highlightData={highlightData}
@@ -288,6 +383,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                     await saveCurrentlyOpenedFile();
                   }}
                 />
+              ) : (
+                <ResizableComponent resizeSide="left">
+                  <CreatePreviewFile query={query} />
+                </ResizableComponent>
               )}
             </div>
           </div>
