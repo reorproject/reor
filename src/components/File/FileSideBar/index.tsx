@@ -178,10 +178,10 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     <div
       onDrop={handleDropOnBlank}
       onDragOver={(e) => e.preventDefault()}
-      style={{ height: listHeight, width: "100%" }}
+      style={{ height: listHeight, width: "100%", overflow: "hidden" }}
     >
       <List
-        height={listHeight}
+        height={listHeight - 30}
         itemCount={itemCount}
         itemSize={30}
         width={"100%"}
