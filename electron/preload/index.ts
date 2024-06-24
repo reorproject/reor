@@ -1,7 +1,4 @@
 import { IpcRendererEvent, contextBridge, ipcRenderer } from "electron";
-import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
-import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
-import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import {
   AugmentPromptWithFileProps,
   FileInfoNode,
@@ -15,9 +12,12 @@ import {
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
   HardwareConfig,
-  LLMGenerationParameters,
   LLMConfig,
+  LLMGenerationParameters,
 } from "electron/main/Store/storeConfig";
+import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
+import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
+import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
 
 import { ChatHistory } from "@/components/Chat/Chat";
 import { ChatHistoryMetadata } from "@/components/Chat/hooks/use-chat-history";
@@ -38,6 +38,9 @@ declare global {
     };
     contextMenu: {
       showFileItemContextMenu: (filePath: FileInfoNode) => void;
+    };
+    contextFileMenu: {
+      showMenuItemContext: () => void;
     };
     contextChatMenu: {
       showChatItemContext: (chatRow: ChatHistoryMetadata) => void;
@@ -333,6 +336,12 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
 contextBridge.exposeInMainWorld("contextMenu", {
   showFileItemContextMenu: (file: FileInfoNode) => {
     ipcRenderer.invoke("show-context-menu-file-item", file);
+  },
+});
+
+contextBridge.exposeInMainWorld("contextFileMenu", {
+  showMenuItemContext: () => {
+    ipcRenderer.invoke("show-context-menu-item");
   },
 });
 
