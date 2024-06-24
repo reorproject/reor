@@ -1,12 +1,10 @@
-
 import React, { useState } from "react";
 
 import { FileInfoNode } from "electron/main/Files/Types";
 import posthog from "posthog-js";
-import { FaChevronRight , FaChevronDown } from "react-icons/fa";
+import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 
 import { isFileNodeDirectory, moveFile } from "./fileOperations";
-
 
 import { removeFileExtension } from "@/functions/strings";
 
@@ -45,6 +43,7 @@ export const FileItem: React.FC<FileInfoProps> = ({
 
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragOver(false); // Reset drag over state
     const sourcePath = e.dataTransfer.getData("text/plain");
     let destinationPath = file.path; // Default destination path is the path of the file item itself

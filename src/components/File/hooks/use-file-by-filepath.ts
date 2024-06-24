@@ -9,6 +9,7 @@ import { Editor, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { toast } from "react-toastify";
 import { Markdown } from "tiptap-markdown";
+import { MathExtension } from "@aarkue/tiptap-math-extension";
 import { useDebounce } from "use-debounce";
 
 import { BacklinkExtension } from "@/components/Editor/BacklinkExtension";
@@ -22,6 +23,7 @@ import {
   removeFileExtension,
 } from "@/functions/strings";
 import "../tiptap.scss";
+import "katex/dist/katex.min.css";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
@@ -33,6 +35,17 @@ export const useFileByFilepath = () => {
     useState<boolean>(false);
   const [needToIndexEditorContent, setNeedToIndexEditorContent] =
     useState<boolean>(false);
+  const [spellCheckEnabled, setSpellCheckEnabled] = useState<string>("false");
+
+  useEffect(() => {
+    const fetchSpellCheckMode = async () => {
+      const storedSpellCheckEnabled =
+        await window.electronStore.getSpellCheckMode();
+      setSpellCheckEnabled(storedSpellCheckEnabled);
+    };
+    fetchSpellCheckMode();
+  }, [spellCheckEnabled]);
+
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>("");
   const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>("");
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
@@ -119,17 +132,16 @@ export const useFileByFilepath = () => {
       setNeedToWriteEditorContentToDisk(true);
       setNeedToIndexEditorContent(true);
     },
-    editorProps: {
-      attributes: {
-        spellcheck: "false", // Disable spellcheck
-      },
-    },
+    editorProps: {},
     extensions: [
       StarterKit,
       Document,
       Paragraph,
       Text,
       TaskList,
+      MathExtension.configure({
+        evaluation: true,
+      }),
       Markdown.configure({
         html: true, // Allow HTML input/output
         tightLists: true, // No <p> inside <li> in markdown output
@@ -154,6 +166,18 @@ export const useFileByFilepath = () => {
       ),
     ],
   });
+
+  useEffect(() => {
+    if (editor) {
+      editor.setOptions({
+        editorProps: {
+          attributes: {
+            spellcheck: spellCheckEnabled,
+          },
+        },
+      });
+    }
+  }, [spellCheckEnabled, editor]);
 
   const [debouncedEditor] = useDebounce(editor?.state.doc.content, 4000);
 
@@ -310,6 +334,7 @@ export const useFileByFilepath = () => {
     openFileByPath,
     openRelativePath,
     suggestionsState,
+    spellCheckEnabled,
     highlightData,
     noteToBeRenamed,
     setNoteToBeRenamed,
@@ -317,6 +342,7 @@ export const useFileByFilepath = () => {
     setFileDirToBeRenamed,
     renameFile: renameFileNode,
     setSuggestionsState,
+    setSpellCheckEnabled,
   };
 };
 

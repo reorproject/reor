@@ -148,6 +148,8 @@ declare global {
       setLLMGenerationParams: (params: LLMGenerationParameters) => void;
       getAnalyticsMode: () => Promise<boolean>;
       setAnalyticsMode: (isAnalytics: boolean) => void;
+      getSpellCheckMode: () => Promise<string>;
+      setSpellCheckMode: (isSpellCheck: string) => void;
       getHasUserOpenedAppBefore: () => boolean;
       setHasUserOpenedAppBefore: () => void;
       getAllChatHistories: () => Promise<ChatHistory[]>;
@@ -287,6 +289,12 @@ contextBridge.exposeInMainWorld("electronStore", {
   },
   setAnalyticsMode: (isAnalytics: boolean) => {
     ipcRenderer.invoke("set-analytics-mode", isAnalytics);
+  },
+  getSpellCheckMode: () => {
+    return ipcRenderer.invoke("get-spellcheck-mode");
+  },
+  setSpellCheckMode: (isSpellCheck: boolean) => {
+    ipcRenderer.invoke("set-spellcheck-mode", isSpellCheck);
   },
   getHasUserOpenedAppBefore: () => {
     return ipcRenderer.invoke("has-user-opened-app-before");
