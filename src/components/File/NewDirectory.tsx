@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
 import { errorToString } from "@/functions/error";
@@ -8,7 +8,7 @@ import { getInvalidCharacterInFilePath } from "@/functions/strings";
 interface NewDirectoryComponentProps {
   isOpen: boolean;
   onClose: () => void;
-  onDirectoryCreate: (path: string) => void;
+  onDirectoryCreate: string;
 }
 
 const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
@@ -18,6 +18,13 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
 }) => {
   const [directoryName, setDirectoryName] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setDirectoryName("");
+      setErrorMessage(null);
+    }
+  }, [isOpen]);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
@@ -40,12 +47,10 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
         return;
       }
       const normalizedDirectoryName = directoryName.replace(/\\/g, "/");
-      const fullPath = await window.path.join(
-        await window.electronStore.getVaultDirectoryForWindow(),
-        normalizedDirectoryName
-      );
+      const basePath = onDirectoryCreate || await window.electronStore.getVaultDirectoryForWindow();
+      const fullPath = await window.path.join(basePath, normalizedDirectoryName);
+
       window.files.createDirectory(fullPath);
-      onDirectoryCreate(fullPath);
       onClose();
     } catch (e) {
       toast.error(errorToString(e), {
