@@ -1,10 +1,9 @@
 import { Button } from "@material-tailwind/react";
+import posthog from "posthog-js";
 import React, { useEffect, useState } from "react";
 import Modal from "../Generic/Modal";
 
-
 import { getInvalidCharacterInFilePath } from "@/functions/strings";
-
 
 interface NewNoteComponentProps {
   isOpen: boolean;
@@ -51,6 +50,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
     const pathPrefix = customFilePath ? customFilePath.replace(/\/?$/, '/') : '';
     const fullPath = pathPrefix + fileName;
     openRelativePath(fullPath);
+    posthog.capture("created_new_note_from_new_note_modal");
     onClose();
   };
 

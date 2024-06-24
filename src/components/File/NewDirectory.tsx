@@ -6,6 +6,7 @@ import Modal from "../Generic/Modal";
 
 import { errorToString } from "@/functions/error";
 import { getInvalidCharacterInFilePath } from "@/functions/strings";
+import posthog from "posthog-js";
 
 
 interface NewDirectoryComponentProps {
@@ -53,6 +54,7 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
       const basePath = onDirectoryCreate || await window.electronStore.getVaultDirectoryForWindow();
       const fullPath = await window.path.join(basePath, normalizedDirectoryName);
 
+      posthog.capture('created_new_directory_from_new_directory_modal');
       window.files.createDirectory(fullPath);
       onClose();
     } catch (e) {
