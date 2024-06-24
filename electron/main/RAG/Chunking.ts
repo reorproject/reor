@@ -1,10 +1,16 @@
+import Store from "electron-store";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 
+import { StoreKeys, StoreSchema } from "../Store/storeConfig";
+
 // Chunk by markdown headings and then use Langchain chunker if the heading chunk is too big:
+const store = new Store<StoreSchema>();
+
+const chunkSize = store.get(StoreKeys.ChunkSize);
+
 export const chunkMarkdownByHeadingsAndByCharsIfBig = async (
   markdownContent: string
 ): Promise<string[]> => {
-  const chunkSize = 500;
   const chunkOverlap = 20;
   const chunksByHeading = chunkMarkdownByHeadings(markdownContent);
 

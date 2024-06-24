@@ -1,11 +1,25 @@
-import { ipcMain } from "electron";
+import * as fs from "fs";
 import * as path from "path";
+
+import { ipcMain, BrowserWindow } from "electron";
+import Store from "electron-store";
+
+
+import { DBEntry } from "../database/Schema";
 import {
-  FileInfoTree,
-  AugmentPromptWithFileProps,
-  WriteFileProps,
-  RenameFileProps,
-} from "./Types";
+  convertFileInfoListToDBItems,
+  updateFileInTable,
+} from "../database/TableHelperFunctions";
+import { addExtensionToFilenameIfNoExtensionPresent } from "../Generic/path";
+import { getLLMConfig } from "../llm/llmConfig";
+import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
+import {
+  PromptWithContextLimit,
+  createPromptWithContextLimitFromContent,
+} from "../Prompts/Prompts";
+import { StoreKeys, StoreSchema } from "../Store/storeConfig";
+import WindowsManager from "../windowManager";
+
 import {
   GetFilesInfoTree,
   orchestrateEntryMove,
@@ -14,23 +28,16 @@ import {
   GetFilesInfoListForListOfPaths,
   GetFilesInfoList,
   markdownExtensions,
+  startWatchingDirectory,
+  updateFileListForRenderer,
 } from "./Filesystem";
-import * as fs from "fs";
 import {
-  convertFileInfoListToDBItems,
-  updateFileInTable,
-} from "../database/TableHelperFunctions";
-import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
-import {
-  PromptWithContextLimit,
-  createPromptWithContextLimitFromContent,
-} from "../Prompts/Prompts";
-import Store from "electron-store";
-import { StoreKeys, StoreSchema } from "../Store/storeConfig";
-import { getLLMConfig } from "../llm/llmConfig";
-import WindowsManager from "../windowManager";
-import { DBEntry } from "../database/Schema";
-import { addExtensionToFilenameIfNoExtensionPresent } from "../Generic/path";
+  FileInfoTree,
+  AugmentPromptWithFileProps,
+  WriteFileProps,
+  RenameFileProps,
+} from "./Types";
+
 
 export const registerFileHandlers = (
   store: Store<StoreSchema>,
@@ -140,23 +147,43 @@ export const registerFileHandlers = (
     "rename-file-recursive",
     async (event, renameFileProps: RenameFileProps) => {
       const windowInfo = windowsManager.getWindowInfoForContents(event.sender);
-
+    
       if (!windowInfo) {
         throw new Error("Window info not found.");
       }
+
       windowsManager.watcher?.unwatch(windowInfo?.vaultDirectoryForWindow);
 
-      fs.rename(
-        renameFileProps.oldFilePath,
-        renameFileProps.newFilePath,
-        (err) => {
+      if (process.platform == 'win32') {
+        windowsManager.watcher?.close().then(() => {
+          fs.rename(renameFileProps.oldFilePath, renameFileProps.newFilePath, (err) => {
+            if (err) {
+              throw err;
+            }
+            
+            // Re-start watching all paths in array
+            const win = BrowserWindow.fromWebContents(event.sender);
+            if (win) {
+              windowsManager.watcher = startWatchingDirectory(
+                win,
+                windowInfo.vaultDirectoryForWindow,
+              );
+              updateFileListForRenderer(win, windowInfo.vaultDirectoryForWindow);
+            }
+          })
+        });
+      } else {
+        // On non-Windows platforms, directly perform the rename operation
+        fs.rename(renameFileProps.oldFilePath, renameFileProps.newFilePath, (err) => {
           if (err) {
             throw err;
           }
+          // Re-watch the vault directory after renaming
           windowsManager.watcher?.add(windowInfo?.vaultDirectoryForWindow);
-        }
-      );
-
+        });
+      }
+      
+      console.log("reindexing folder");
       // then need to trigger reindexing of folder
       windowInfo.dbTableClient.updateDBItemsWithNewFilePath(
         renameFileProps.oldFilePath,

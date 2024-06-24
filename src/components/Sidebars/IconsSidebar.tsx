@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
-import SettingsModal from "../Settings/Settings";
-import { MdOutlineQuiz, MdSettings } from "react-icons/md";
-import { SidebarAbleToShow } from "../FileEditorContainer";
-import { IoFolderOutline } from "react-icons/io5";
+
+import { BsChatLeftDots, BsFillChatLeftDotsFill } from "react-icons/bs";
 import { FaSearch } from "react-icons/fa";
 import { FaRegPenToSquare } from "react-icons/fa6";
-import NewNoteComponent from "../File/NewNote";
-import NewDirectoryComponent from "../File/NewDirectory";
 import { GrNewWindow } from "react-icons/gr";
+import { IoFolderOutline } from "react-icons/io5";
 import { LuFolderPlus } from "react-icons/lu";
-import { BsChatLeftDots, BsFillChatLeftDotsFill } from "react-icons/bs";
+import { MdOutlineQuiz, MdSettings } from "react-icons/md";
+
+import NewDirectoryComponent from "../File/NewDirectory";
+import NewNoteComponent from "../File/NewNote";
+import { SidebarAbleToShow } from "../FileEditorContainer";
 import FlashcardMenuModal from "../Flashcard/FlashcardMenuModal";
-import { ipcRenderer } from "electron";
+import SettingsModal from "../Settings/Settings";
 
 interface IconsSidebarProps {
   openRelativePath: (path: string) => void;

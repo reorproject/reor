@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { ChatHistory, formatOpenAIMessageContentIntoString } from "../Chat";
+
+import { ChatHistory } from "../Chat";
+import { formatOpenAIMessageContentIntoString } from "../chatUtils";
 
 export interface ChatHistoryMetadata {
   id: string;
@@ -11,14 +13,14 @@ export const useChatHistory = () => {
   const [chatHistoriesMetadata, setChatHistoriesMetadata] = useState<
     ChatHistoryMetadata[]
   >([]);
-  const [allChatHistories, setAllChatHistories] = useState<ChatHistory[]>([]);
+  // const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
 
   const fetchChatHistories = async () => {
     let allChatHistories = await window.electronStore.getAllChatHistories();
     if (!allChatHistories) {
       allChatHistories = [];
     }
-    setAllChatHistories(allChatHistories);
+    // setAllChatHistories(allChatHistories);
     setChatHistoriesMetadata(
       allChatHistories.map((chat) => ({
         id: chat.id,
@@ -30,16 +32,31 @@ export const useChatHistory = () => {
   };
 
   useEffect(() => {
+    const updateChatHistoriesMetadata = window.ipcRenderer.receive(
+      "update-chat-histories",
+      (chatHistoriesMetadata: ChatHistory[]) => {
+        setChatHistoriesMetadata(
+          chatHistoriesMetadata.map((chat: ChatHistory) => ({
+            id: chat.id,
+            displayName: getDisplayableChatName(chat),
+          }))
+        );
+      }
+    );
+
+    return () => {
+      updateChatHistoriesMetadata();
+    };
+  }, []);
+
+  useEffect(() => {
     fetchChatHistories();
   }, []);
 
   return {
-    allChatHistories,
-    setAllChatHistories,
     currentChatHistory,
     setCurrentChatHistory,
     chatHistoriesMetadata,
-    setChatHistoriesMetadata,
   };
 };
 

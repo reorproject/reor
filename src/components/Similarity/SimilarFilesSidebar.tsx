@@ -1,15 +1,23 @@
+
 import React, { useEffect, useState } from "react";
-import { DBResultPreview } from "../File/DBResultPreview";
+
+import { CircularProgress } from "@mui/material";
 import { DBQueryResult } from "electron/main/database/Schema";
+import posthog from "posthog-js";
+import { FaArrowRight } from "react-icons/fa";
+import { FiRefreshCw } from "react-icons/fi";
 import { PiGraph } from "react-icons/pi";
 import { toast } from "react-toastify";
-import { errorToString } from "@/functions/error";
-import { FiRefreshCw } from "react-icons/fi";
-import ResizableComponent from "../Generic/ResizableComponent";
-import { HighlightData } from "../Editor/HighlightExtension";
-import { FaArrowRight } from "react-icons/fa";
 import removeMd from "remove-markdown";
-import { CircularProgress } from "@mui/material";
+
+import { HighlightData } from "../Editor/HighlightExtension";
+import { DBResultPreview } from "../File/DBResultPreview";
+import ResizableComponent from "../Generic/ResizableComponent";
+
+import { errorToString } from "@/functions/error";
+
+
+
 
 interface SidebarComponentProps {
   filePath: string;
@@ -137,7 +145,10 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
         setIsRefined={setIsRefined}
         similarEntries={similarEntries}
         setSimilarEntries={setSimilarEntries}
-        onFileSelect={openFileByPath}
+        onFileSelect={(path: string) => {
+          openFileByPath(path);
+          posthog.capture("open_file_from_related_notes")
+        }}
         saveCurrentFile={async () => {
           await saveCurrentlyOpenedFile();
         }}
@@ -226,6 +237,7 @@ export const SimilarEntriesComponent: React.FC<
                 onClick={() => {
                   setIsRefined(!isRefined);
                   updateSimilarEntries(!isRefined);
+                  posthog.capture("rerank_related_notes")
                 }}
               >
                 {isRefined ? "Un-rerank" : "Rerank results"}
@@ -241,7 +253,9 @@ export const SimilarEntriesComponent: React.FC<
                     <DBResultPreview
                       key={index}
                       dbResult={dbResult}
-                      onSelect={onFileSelect}
+                      onSelect={(path: string) => {
+                        onFileSelect(path)
+                      }}
                     />
                   </div>
                 ))}

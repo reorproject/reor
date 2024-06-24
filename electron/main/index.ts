@@ -1,39 +1,39 @@
+import { release } from "node:os";
+import { join } from "node:path";
+import * as path from "path";
+
 import {
   app,
   BrowserWindow,
-  shell,
-  ipcMain,
   dialog,
+  ipcMain,
   Menu,
   MenuItem,
+  shell,
 } from "electron";
-import { release } from "node:os";
-import { join } from "node:path";
 import Store from "electron-store";
-import * as path from "path";
-import { StoreSchema } from "./Store/storeConfig";
-// import contextMenus from "./contextMenus";
 import * as lancedb from "vectordb";
+
+import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
+import { RepopulateTableWithMissingItems } from "./database/TableHelperFunctions";
 import {
   markdownExtensions,
   startWatchingDirectory,
   updateFileListForRenderer,
 } from "./Files/Filesystem";
+import { registerFileHandlers } from "./Files/registerFilesHandler";
+import { errorToString } from "./Generic/error";
+import { addExtensionToFilenameIfNoExtensionPresent } from "./Generic/path";
 import {
   ollamaService,
   registerLLMSessionHandlers,
 } from "./llm/llmSessionHandlers";
-// import { FileInfoNode } from "./Files/Types";
-import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
+import { StoreKeys, StoreSchema } from "./Store/storeConfig";
 import {
   getDefaultEmbeddingModelConfig,
   registerStoreHandlers,
 } from "./Store/storeHandlers";
-import { registerFileHandlers } from "./Files/registerFilesHandler";
-import { RepopulateTableWithMissingItems } from "./database/TableHelperFunctions";
 import WindowsManager from "./windowManager";
-import { errorToString } from "./Generic/error";
-import { addExtensionToFilenameIfNoExtensionPresent } from "./Generic/path";
 
 const fs = require('fs').promises;
 
@@ -173,7 +173,7 @@ ipcMain.handle("show-context-menu-file-item", async (event, file) => {
   const menu = new Menu();
   const stats = await fs.stat(file.path);
   const isDirectory = stats.isDirectory();
-  
+
   if (isDirectory) {
     menu.append(
       new MenuItem({
@@ -192,14 +192,25 @@ ipcMain.handle("show-context-menu-file-item", async (event, file) => {
         },
       })
     );
-  } 
+  }
 
   menu.append(
     new MenuItem({
       label: "Delete",
       click: () => {
-        console.log(file.path);
-        event.sender.send("delete-file-listener", file.path);
+        return dialog
+          .showMessageBox({
+            type: "question",
+            title: "Delete File",
+            message: `Are you sure you want to delete "${file.name}"?`,
+            buttons: ["Yes", "No"],
+          })
+          .then((confirm) => {
+            if (confirm.response === 0) {
+              console.log(file.path);
+              event.sender.send("delete-file-listener", file.path);
+            }
+          });
       },
     })
   );
@@ -250,7 +261,7 @@ ipcMain.handle("show-context-menu-item", (event) => {
       click: () => {
         event.sender.send("add-new-note-listener");
       },
-    })  
+    })
   );
 
   menu.append(
@@ -259,12 +270,46 @@ ipcMain.handle("show-context-menu-item", (event) => {
       click: () => {
         event.sender.send("add-new-directory-listener");
       },
-    })  
+    })
   );
 
   const browserWindow = BrowserWindow.fromWebContents(event.sender);
   if (browserWindow)
-      menu.popup({ window: browserWindow })
+    menu.popup({ window: browserWindow })
+});
+
+ipcMain.handle("show-chat-menu-item", (event, chatID) => {
+  const menu = new Menu();
+
+  menu.append(
+    new MenuItem({
+      label: "Delete Chat",
+      click: () => {
+        const vaultDir = windowsManager.getVaultDirectoryForWinContents(
+          event.sender
+        );
+
+        if (!vaultDir) {
+          return;
+        }
+
+        const chatHistoriesMap = store.get(StoreKeys.ChatHistories);
+        const allChatHistories = chatHistoriesMap[vaultDir] || [];
+        const filteredChatHistories = allChatHistories.filter(
+          (item) => item.id !== chatID
+        );
+        chatHistoriesMap[vaultDir] = filteredChatHistories;
+        store.set(StoreKeys.ChatHistories, chatHistoriesMap);
+        event.sender.send(
+          "update-chat-histories",
+          chatHistoriesMap[vaultDir] || []
+        );
+      },
+    })
+  );
+
+  const browserWindow = BrowserWindow.fromWebContents(event.sender);
+  if (browserWindow) menu.popup({ window: browserWindow });
 });
 
 ipcMain.handle("open-external", (event, url) => {
@@ -277,6 +322,10 @@ ipcMain.handle("get-platform", async () => {
 
 ipcMain.handle("open-new-window", () => {
   windowsManager.createWindow(store, preload, url, indexHtml);
+});
+
+ipcMain.handle("get-reor-app-version", async () => {
+  return app.getVersion();
 });
 
 ipcMain.handle("path-basename", (event, pathString: string) => {

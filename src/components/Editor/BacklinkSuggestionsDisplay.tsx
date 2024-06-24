@@ -1,5 +1,9 @@
-import { removeFileExtension } from "@/functions/strings";
 import React, { useRef, useEffect, useState, useMemo } from "react";
+
+import posthog from "posthog-js";
+
+
+import { removeFileExtension } from "@/functions/strings";
 
 export interface SuggestionsState {
   textWithinBrackets: string;
@@ -67,11 +71,14 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
       }}
     >
       <ul className="m-0 p-0 list-none">
-        {filteredSuggestions.map((suggestion) => (
+        {filteredSuggestions.map((suggestion, index) => (
           <li
             key={suggestion} // Use a unique id property from the suggestion
             className="p-1.25 cursor-pointer hover:bg-gray-100 p-1 text-sm rounded"
             onClick={() => {
+              posthog.capture("select_backlink_suggestion", {
+                rank: index + 1,
+              });
               suggestionsState.onSelect?.(suggestion);
             }}
           >

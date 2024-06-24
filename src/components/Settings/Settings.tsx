@@ -1,9 +1,13 @@
 import React, { useState } from "react";
+
+
 import Modal from "../Generic/Modal";
-import LLMSettings from "./LLMSettings";
+
+import AnalyticsSettings from "./AnalyticsSettings";
+import ChunkSizeSettings from "./ChunkSizeSettings";
 import EmbeddingModelSettings from "./EmbeddingSettings";
+import LLMSettings from "./LLMSettings";
 import RagSettings from "./RagSettings";
-import HardwareSettings from "./HardwareSettings";
 import TextGenerationSettings from "./TextGenerationSettings";
 
 interface ModalProps {
@@ -14,9 +18,10 @@ interface ModalProps {
 enum SettingsTab {
   LLMSettings = "llmSettings",
   EmbeddingModel = "embeddingModel",
-  Hardware = "hardware",
   TextGeneration = "textGeneration",
   RAG = "RAG",
+  ANALYTICS = "analytics",
+  ChunkSize = "chunkSize",
 }
 
 const SettingsModal: React.FC<ModalProps> = ({
@@ -66,17 +71,6 @@ const SettingsModal: React.FC<ModalProps> = ({
             Embedding Model
           </div>
 
-          {/* gpu settings: */}
-          <div
-            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
-              activeTab === SettingsTab.Hardware
-                ? "bg-neutral-700 text-white font-semibold"
-                : "text-gray-200"
-            }`}
-            onClick={() => setActiveTab(SettingsTab.Hardware)}
-          >
-            Hardware
-          </div>
           <div
             className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
               activeTab === SettingsTab.TextGeneration
@@ -97,6 +91,16 @@ const SettingsModal: React.FC<ModalProps> = ({
           >
             RAG{" "}
           </div>
+          <div
+            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
+              activeTab === SettingsTab.ANALYTICS
+                ? "bg-neutral-700 text-white font-semibold"
+                : "text-gray-200"
+            }`}
+            onClick={() => setActiveTab(SettingsTab.ANALYTICS)}
+          >
+            Analytics{" "}
+          </div>
         </div>
 
         {/* Right Content Area */}
@@ -115,22 +119,16 @@ const SettingsModal: React.FC<ModalProps> = ({
             </div>
           )}
 
-          {activeTab === SettingsTab.Hardware && (
-            <div className="w-full">
-              <HardwareSettings>
-                <h2 className="text-2xl font-semibold mb-0 text-white">
-                  Hardware
-                </h2>{" "}
-                <p className="mt-2 text-sm text-gray-100 mb-1">
-                  Number of notes to feed to the LLM during Q&A:
-                </p>
-              </HardwareSettings>
-            </div>
-          )}
 
           {activeTab === SettingsTab.TextGeneration && (
             <div className="w-full">
               <TextGenerationSettings />
+            </div>
+          )}
+
+          {activeTab === SettingsTab.ANALYTICS && (
+            <div className="w-full">
+              <AnalyticsSettings />
             </div>
           )}
 
@@ -142,6 +140,11 @@ const SettingsModal: React.FC<ModalProps> = ({
                   Number of notes to feed to the LLM during Q&A:
                 </p>
               </RagSettings>
+              <ChunkSizeSettings>
+                <p className="mt-2 text-sm text-gray-100 mb-1">
+                  Change the Chunk Size:
+                </p>
+              </ChunkSizeSettings>
             </div>
           )}
         </div>

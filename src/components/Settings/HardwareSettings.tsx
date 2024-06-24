@@ -1,4 +1,5 @@
 import React from "react";
+
 import ExternalLink from "../Generic/ExternalLink";
 
 interface HardwareSettingsProps {}

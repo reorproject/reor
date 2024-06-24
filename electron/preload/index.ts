@@ -1,24 +1,26 @@
 import { IpcRendererEvent, contextBridge, ipcRenderer } from "electron";
 import {
-  EmbeddingModelConfig,
-  EmbeddingModelWithLocalPath,
-  EmbeddingModelWithRepo,
-  HardwareConfig,
-  LLMGenerationParameters,
-  LLMConfig,
-} from "electron/main/Store/storeConfig";
-import {
   AugmentPromptWithFileProps,
   FileInfoNode,
   FileInfoTree,
   RenameFileProps,
   WriteFileProps,
 } from "electron/main/Files/Types";
-import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
-import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
+import {
+  EmbeddingModelConfig,
+  EmbeddingModelWithLocalPath,
+  EmbeddingModelWithRepo,
+  HardwareConfig,
+  LLMConfig,
+  LLMGenerationParameters,
+} from "electron/main/Store/storeConfig";
+import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
+import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
+
 import { ChatHistory } from "@/components/Chat/Chat";
+import { ChatHistoryMetadata } from "@/components/Chat/hooks/use-chat-history";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ReceiveCallback = (...args: any[]) => void;
 
@@ -32,6 +34,7 @@ declare global {
       openExternal: (url: string) => void;
       getPlatform: () => string;
       openNewWindow: () => void;
+      getReorAppVersion: () => Promise<string>;
     };
     contextMenu: {
       showFileItemContextMenu: (filePath: FileInfoNode) => void;
@@ -39,6 +42,9 @@ declare global {
     contextFileMenu: {
       showMenuItemContext: () => void;
     }
+    contextChatMenu: {
+      showChatItemContext: (chatRow: ChatHistoryMetadata) => void;
+    };
     database: {
       search: (
         query: string,
@@ -52,11 +58,6 @@ declare global {
       ) => Promise<DBQueryResult[]>;
       deleteLanceDBEntriesByFilePath: (filePath: string) => Promise<void>;
       indexFilesInDirectory: () => Promise<void>;
-      augmentPromptWithRAG: (
-        prompt: string,
-        llmName: string,
-        filter?: string
-      ) => Promise<PromptWithRagResults>;
       augmentPromptWithTemporalAgent: ({
         query,
         llmName,
@@ -142,15 +143,20 @@ declare global {
       removeEmbeddingModel: (modelName: string) => void;
       getNoOfRAGExamples: () => Promise<number>;
       setNoOfRAGExamples: (noOfExamples: number) => void;
+      getChunkSize: () => Promise<number>;
+      setChunkSize: (chunkSize: number) => void;
       getHardwareConfig: () => Promise<HardwareConfig>;
       setHardwareConfig: (config: HardwareConfig) => void;
       getLLMGenerationParams: () => Promise<LLMGenerationParameters>;
       setLLMGenerationParams: (params: LLMGenerationParameters) => void;
+      getAnalyticsMode: () => Promise<boolean>;
+      setAnalyticsMode: (isAnalytics: boolean) => void;
       getHasUserOpenedAppBefore: () => boolean;
       setHasUserOpenedAppBefore: () => void;
       getAllChatHistories: () => Promise<ChatHistory[]>;
       updateChatHistory: (chatHistory: ChatHistory) => void;
       getChatHistory: (chatID: string) => Promise<ChatHistory>;
+      removeChatHistoryAtID: (chatID: string) => void;
     };
   }
 }
@@ -218,6 +224,7 @@ contextBridge.exposeInMainWorld("electron", {
   openExternal: (url: string) => ipcRenderer.invoke("open-external", url),
   getPlatform: () => ipcRenderer.invoke("get-platform"),
   openNewWindow: () => ipcRenderer.invoke("open-new-window"),
+  getReorAppVersion: () => ipcRenderer.invoke("get-reor-app-version"),
 });
 
 contextBridge.exposeInMainWorld("electronStore", {
@@ -260,6 +267,12 @@ contextBridge.exposeInMainWorld("electronStore", {
   setNoOfRAGExamples: (noOfExamples: number) => {
     ipcRenderer.invoke("set-no-of-rag-examples", noOfExamples);
   },
+  getChunkSize: () => {
+    return ipcRenderer.invoke("get-chunk-size");
+  },
+  setChunkSize: (chunkSize: number) => {
+    ipcRenderer.invoke("set-chunk-size", chunkSize);
+  },
   getHardwareConfig: () => {
     return ipcRenderer.invoke("get-hardware-config");
   },
@@ -272,6 +285,12 @@ contextBridge.exposeInMainWorld("electronStore", {
   setLLMGenerationParams: (params: LLMGenerationParameters) => {
     ipcRenderer.invoke("set-llm-generation-params", params);
   },
+  getAnalyticsMode: () => {
+    return ipcRenderer.invoke("get-analytics-mode");
+  },
+  setAnalyticsMode: (isAnalytics: boolean) => {
+    ipcRenderer.invoke("set-analytics-mode", isAnalytics);
+  },
   getHasUserOpenedAppBefore: () => {
     return ipcRenderer.invoke("has-user-opened-app-before");
   },
@@ -283,6 +302,9 @@ contextBridge.exposeInMainWorld("electronStore", {
   },
   updateChatHistory: (chatHistory: ChatHistory) => {
     ipcRenderer.invoke("update-chat-history", chatHistory);
+  },
+  removeChatHistoryAtID: (chatID: string) => {
+    ipcRenderer.invoke("remove-chat-history-at-id", chatID);
   },
   getChatHistory: (chatID: string) => {
     return ipcRenderer.invoke("get-chat-history", chatID);
@@ -312,6 +334,12 @@ contextBridge.exposeInMainWorld("contextMenu", {
 contextBridge.exposeInMainWorld("contextFileMenu", {
   showMenuItemContext: () => {
     ipcRenderer.invoke("show-context-menu-item");
+  },
+});
+
+contextBridge.exposeInMainWorld("contextChatMenu", {
+  showChatItemContext: (chatRow: ChatHistoryMetadata) => {
+    ipcRenderer.invoke("show-chat-menu-item", chatRow.id);
   },
 });
 

@@ -1,15 +1,23 @@
+
 import React, { useEffect, useRef, useState } from "react";
+
+import { Button } from "@material-tailwind/react";
+import { CircularProgress } from "@mui/material";
+import posthog from "posthog-js";
 import { TypeAnimation } from "react-type-animation";
 
-import Modal from "../Generic/Modal";
-import { Button } from "@material-tailwind/react";
-import { storeFlashcardPairsAsJSON } from "./utils";
-import { FlashcardQAPairUI } from "./types";
-import { FlashcardCore } from "./FlashcardsCore";
-import { CircularProgress } from "@mui/material";
+
+import FilesSuggestionsDisplay from "../Editor/BacklinkSuggestionsDisplay";
 import { useFileInfoTree } from "../File/FileSideBar/hooks/use-file-info-tree";
 import { useFileByFilepath } from "../File/hooks/use-file-by-filepath";
-import FilesSuggestionsDisplay from "../Editor/BacklinkSuggestionsDisplay";
+import Modal from "../Generic/Modal";
+
+import { FlashcardCore } from "./FlashcardsCore";
+import { FlashcardQAPairUI } from "./types";
+import { storeFlashcardPairsAsJSON } from "./utils";
+
+
+
 
 interface FlashcardCreateModalProps {
   isOpen: boolean;
@@ -64,6 +72,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
 
   // handle the creation process
   const createFlashcardsFromFile = async (): Promise<void> => {
+    posthog.capture("create_flashcard_from_file");
     // send the file as context to the backend
     const llmName = await window.llm.getDefaultLLMName();
     setIsLoadingFlashcards(true);

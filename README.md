@@ -4,7 +4,7 @@
 </p> -->
 
 <h4 align="center">
-Private & offline AI personal knowledge management app.</h4>
+Private & local AI personal knowledge management app.</h4>
 
 <p align="center">
     <a href="https://tooomm.github.io/github-release-stats/?username=reorproject&repository=reor">    <img alt="GitHub Downloads (all assets, all releases)" src="https://img.shields.io/github/downloads/reorproject/reor/total"></a>
@@ -19,20 +19,21 @@ Private & offline AI personal knowledge management app.</h4>
 
 
 ## About
-**Reor** is an AI-powered desktop note-taking app: it automatically links related notes, answers questions on your notes, provides semantic search and can generate AI flashcards. Everything is stored locally and you can edit your notes with an Obsidian-like markdown editor. The hypothesis of the project is that AI tools for thought should **run models locally** by default. Reor stands on the shoulders of the giants [Ollama](https://github.com/ollama/ollama), [Transformers.js](https://github.com/xenova/transformers.js) & [LanceDB](https://github.com/lancedb/lancedb) to enable both LLMs and embedding models to run locally. Connecting to OpenAI or OpenAI-compatible APIs like Oobabooga is also supported.
+**Reor** is an AI-powered desktop note-taking app: it automatically links related notes, answers questions on your notes, provides semantic search and can generate AI flashcards. Everything is stored locally and you can edit your notes with an Obsidian-like markdown editor. 
 
-### How can it possibly be "self-organizing"?
+The hypothesis of the project is that AI tools for thought should run models locally *by default*. Reor stands on the shoulders of the giants [Ollama](https://github.com/ollama/ollama), [Transformers.js](https://github.com/xenova/transformers.js) & [LanceDB](https://github.com/lancedb/lancedb) to enable both LLMs and embedding models to run locally:
 
 1.  Every note you write is chunked and embedded into an internal vector database.
 2.  Related notes are connected automatically via vector similarity.
-3.  LLM-powered Q&A does RAG on the corpus of notes.
+3.  LLM-powered Q&A does RAG on your corpus of notes.
 4.  Everything can be searched semantically.
 
-One way to think about Reor is as a RAG app with two generators: the LLM and the human. In Q&A mode, the LLM is fed retrieved context from the corpus to help answer a query. Similarly, in editor mode, the human can toggle the sidebar to reveal related notes "retrieved" from the corpus. This is quite a powerful way of "augmenting" your thoughts by cross-referencing ideas in a current note against related ideas from your corpus.
 
 
 
 https://github.com/reorproject/reor/assets/17236551/94a1dfeb-3361-45cd-8ebc-5cfed81ed9cb
+
+One way to think about Reor is as a RAG app with two generators: the LLM and the human. In Q&A mode, the LLM is fed retrieved context from the corpus to help answer a query. Similarly, in editor mode, the human can toggle the sidebar to reveal related notes "retrieved" from the corpus. This is quite a powerful way of "augmenting" your thoughts by cross-referencing ideas in a current note against related ideas from your corpus.
 
   
 ### Getting Started

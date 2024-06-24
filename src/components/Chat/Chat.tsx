@@ -1,32 +1,26 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState, useEffect } from "react";
-import rehypeRaw from "rehype-raw";
-import {
-  Menu,
-  MenuHandler,
-  MenuItem,
-  MenuList,
-} from "@material-tailwind/react";
-import { errorToString } from "@/functions/error";
-import Textarea from "@mui/joy/Textarea";
-import CircularProgress from "@mui/material/CircularProgress";
-import ReactMarkdown from "react-markdown";
-import { PromptSuggestion } from "./Chat-Prompts";
+import React, { useEffect, useState } from "react";
+
+import { MessageStreamEvent } from "@anthropic-ai/sdk/resources";
+import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import {
   ChatCompletionChunk,
-  ChatCompletionContentPart,
   ChatCompletionMessageParam,
 } from "openai/resources/chat/completions";
-import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
+import posthog from "posthog-js";
+import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
+
+import { SimilarEntriesComponent } from "../Similarity/SimilarFilesSidebar";
+
+import AddContextFiltersModal from "./AddContextFiltersModal";
+import { PromptSuggestion } from "./Chat-Prompts";
 import ChatInput from "./ChatInput";
 import {
-  ChatHistoryMetadata,
-  getDisplayableChatName,
-} from "./hooks/use-chat-history";
-import { useDebounce } from "use-debounce";
-import { SimilarEntriesComponent } from "../Similarity/SimilarFilesSidebar";
-import ResizableComponent from "../Generic/ResizableComponent";
-import AddContextFiltersModal from "./AddContextFiltersModal";
+  formatOpenAIMessageContentIntoString,
+  resolveRAGContext,
+} from "./chatUtils";
+
+import { errorToString } from "@/functions/error";
 
 // convert ask options to enum
 enum AskOptions {
@@ -35,10 +29,13 @@ enum AskOptions {
   // TemporalAsk = "Temporal Ask",
   // FlashcardAsk = "Flashcard Ask",
 }
-const ASK_OPTIONS = Object.values(AskOptions);
+// const ASK_OPTIONS = Object.values(AskOptions);
 
 const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
-  [AskOptions.Ask]: [],
+  [AskOptions.Ask]: [
+    "What are my thoughts on AGI?",
+    "Tell me about my notes on Nietzsche",
+  ],
   // [AskOptions.AskFile]: [
   //   "Summarize this file",
   //   "What are the key points in this file?",
@@ -68,102 +65,10 @@ export interface ChatFilters {
   files: string[];
 }
 
-export function formatOpenAIMessageContentIntoString(
-  content: string | ChatCompletionContentPart[] | null | undefined
-): string | undefined {
-  if (Array.isArray(content)) {
-    return content.reduce((acc, part) => {
-      if (part.type === "text") {
-        return acc + part.text; // Concatenate text parts
-      }
-      return acc; // Skip image parts
-    }, "");
-  }
-  return content || undefined;
-}
-
-interface ChatProperties {
-  [key: string]: string; // Values must be strings
-}
-
-export type ChatTemplate = {
-  messageHistory: ChatCompletionMessageParam[];
-  properties: ChatProperties;
-};
-
-// function replaceContentInMessages(
-//   messages: ChatMessageToDisplay[],
-//   context: ChatProperties
-// ): ChatMessageToDisplay[] {
-//   return messages.map((message) => {
-//     if ("content" in message) {
-//       if (typeof message.content === "string") {
-//         message.content = message.content.replace(
-//           /\{(\w+)\}/g,
-//           (match, key) => {
-//             return key in context ? context[key] : match;
-//           }
-//         );
-//       }
-//     }
-//     return message;
-//   });
-// }
-
-// const ragPromptTemplate: ChatCompletionMessageParam[] = [
-//   {
-//     content:
-//       "You are an advanced question answer agent answering questions based on provided context.",
-//     role: "system",
-//   },
-//   {
-//     content: `
-// Context:
-// {context}
-
-// Query:
-// {query}`,
-//     role: "user",
-//   },
-// ];
-
-export const resolveRAGContext = async (
-  query: string,
-  chatFilters: ChatFilters
-): Promise<ChatMessageToDisplay> => {
-  // I mean like the only real places to get context from are like particular files or semantic search or full text search.
-  // and like it could be like that if a file is here
-
-  let results: DBEntry[] = [];
-  if (chatFilters.files.length > 0) {
-    console.log("chatFilters.files", chatFilters.files);
-    results = await window.files.getFilesystemPathsAsDBItems(chatFilters.files);
-  } else {
-    results = await window.database.search(
-      query,
-      chatFilters.numberOfChunksToFetch
-    );
-  }
-  console.log("results", results);
-  return {
-    messageType: "success",
-    role: "user",
-    context: results,
-    content: `Based on the following context answer the question down below. \n\n\nContext: \n${results
-      .map((dbItem) => dbItem.content)
-      .join("\n\n")}\n\n\nQuery:\n${query}`,
-    visibleContent: query,
-  };
-};
-
 interface ChatWithLLMProps {
   vaultDirectory: string;
   openFileByPath: (path: string) => Promise<void>;
 
-  setChatHistoriesMetadata: React.Dispatch<
-    React.SetStateAction<ChatHistoryMetadata[]>
-  >;
-  // setAllChatHistories: React.Dispatch<React.SetStateAction<ChatHistory[]>>;
   currentChatHistory: ChatHistory | undefined;
   setCurrentChatHistory: React.Dispatch<
     React.SetStateAction<ChatHistory | undefined>
@@ -176,7 +81,6 @@ interface ChatWithLLMProps {
 const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   vaultDirectory,
   openFileByPath,
-  setChatHistoriesMetadata,
   currentChatHistory,
   setCurrentChatHistory,
   showSimilarFiles,
@@ -184,16 +88,13 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   setChatFilters,
 }) => {
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>("");
-  const [askText, setAskText] = useState<AskOptions>(AskOptions.Ask);
+  const [askText] = useState<AskOptions>(AskOptions.Ask);
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
   const [readyToSave, setReadyToSave] = useState<boolean>(false);
   const [currentContext, setCurrentContext] = useState<DBQueryResult[]>([]);
   const [isAddContextFiltersModalOpen, setIsAddContextFiltersModalOpen] =
     useState<boolean>(false);
 
-  // chat filters related state: this is the only thing that the Chat component cares about
-  // chat component doesn't care about previous states and suggestions, and it can reset it
-  // RESET when a new chat occurs
   useEffect(() => {
     const context = getChatHistoryContext(currentChatHistory);
     setCurrentContext(context);
@@ -225,8 +126,13 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const handleSubmitNewMessage = async (
     chatHistory: ChatHistory | undefined
   ) => {
+    posthog.capture("chat_message_submitted", {
+      chatId: chatHistory?.id,
+      chatLength: chatHistory?.displayableChatHistory.length,
+    });
     try {
       if (loadingResponse) return;
+      setLoadingResponse(true);
       if (!userTextFieldInput.trim()) return;
       const defaultLLMName = await window.llm.getDefaultLLMName();
 
@@ -237,7 +143,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           displayableChatHistory: [],
         };
       }
-      console.log(chatFilters);
       if (chatHistory.displayableChatHistory.length === 0) {
         if (chatFilters) {
           // chatHistory.displayableChatHistory.push({
@@ -260,32 +165,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           context: [],
         });
       }
-      console.log(chatHistory);
 
       setUserTextFieldInput("");
 
       setCurrentChatHistory(chatHistory);
-      setChatHistoriesMetadata((prev) => {
-        if (!chatHistory) return prev;
-        if (prev?.find((chat) => chat.id === chatHistory?.id)) {
-          return prev;
-        }
-        const newChatHistories = prev
-          ? [
-              ...prev,
-              {
-                id: chatHistory.id,
-                displayName: getDisplayableChatName(chatHistory),
-              },
-            ]
-          : [
-              {
-                id: chatHistory.id,
-                displayName: getDisplayableChatName(chatHistory),
-              },
-            ];
-        return newChatHistories;
-      });
 
       if (!chatHistory) return;
 
@@ -366,23 +249,40 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   };
 
   useEffect(() => {
-    const handleChunk = async (
-      recievedChatID: string,
+    const handleOpenAIChunk = async (
+      receivedChatID: string,
       chunk: ChatCompletionChunk
     ) => {
       const newContent = chunk.choices[0].delta.content ?? "";
       if (newContent) {
-        appendNewContentToMessageHistory(recievedChatID, newContent, "success");
+        appendNewContentToMessageHistory(receivedChatID, newContent, "success");
       }
     };
 
-    const removeTokenStreamListener = window.ipcRenderer.receive(
-      "tokenStream",
-      handleChunk
+    const handleAnthropicChunk = async (
+      receivedChatID: string,
+      chunk: MessageStreamEvent
+    ) => {
+      const newContent =
+        chunk.type === "content_block_delta" ? chunk.delta.text ?? "" : "";
+      if (newContent) {
+        appendNewContentToMessageHistory(receivedChatID, newContent, "success");
+      }
+    };
+
+    const removeOpenAITokenStreamListener = window.ipcRenderer.receive(
+      "openAITokenStream",
+      handleOpenAIChunk
+    );
+
+    const removeAnthropicTokenStreamListener = window.ipcRenderer.receive(
+      "anthropicTokenStream",
+      handleAnthropicChunk
     );
 
     return () => {
-      removeTokenStreamListener();
+      removeOpenAITokenStreamListener();
+      removeAnthropicTokenStreamListener();
     };
   }, []);
 
@@ -442,8 +342,20 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
               setChatFilters={setChatFilters}
             />
           )}
+          {/* {EXAMPLE_PROMPTS[askText].map((option, index) => {
+            return (
+              <PromptSuggestion
+                key={index}
+                promptText={option}
+                onClick={() => {
+                  setUserTextFieldInput(option);
+                }}
+              />
+            );
+          })} */}
           {userTextFieldInput === "" &&
-          currentChatHistory?.displayableChatHistory.length == 0 ? (
+          (!currentChatHistory ||
+            currentChatHistory?.displayableChatHistory.length == 0) ? (
             <>
               {EXAMPLE_PROMPTS[askText].map((option, index) => {
                 return (
@@ -473,7 +385,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         <SimilarEntriesComponent
           similarEntries={currentContext}
           titleText="Context Used in Chat"
-          onFileSelect={openFileByPath}
+          onFileSelect={(path: string) => {
+            openFileByPath(path);
+            posthog.capture("open_file_from_chat_context");
+          }}
           saveCurrentFile={() => {
             return Promise.resolve();
           }}
@@ -490,8 +405,6 @@ const getChatHistoryContext = (
   chatHistory: ChatHistory | undefined
 ): DBQueryResult[] => {
   if (!chatHistory) return [];
-  console.log("chatHistory", chatHistory.displayableChatHistory);
-
   const contextForChat = chatHistory.displayableChatHistory
     .map((message) => {
       return message.context;

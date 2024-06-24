@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useFileInfoTree } from "../File/FileSideBar/hooks/use-file-info-tree";
+
 import FilesSuggestionsDisplay, {
   SuggestionsState,
 } from "../Editor/FilesSuggestionsDisplay";
+import { useFileInfoTree } from "../File/FileSideBar/hooks/use-file-info-tree";
 
 interface Props {
   vaultDirectory: string;
@@ -38,7 +39,7 @@ export const SearchBarWithFilesSuggestion = ({
         left: inputCoords.x,
       },
       textWithinBrackets: searchText,
-      onSelect: (suggestion) => onSelectSuggestion(suggestion),
+      onSelect: (suggestion) => onSelectSuggestion(suggestion + ".md"),
     });
   };
 

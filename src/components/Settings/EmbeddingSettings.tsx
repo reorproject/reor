@@ -1,9 +1,16 @@
+
 import React, { useState, useEffect } from "react";
-import CustomSelect from "../Generic/Select";
+
 import { Button } from "@material-tailwind/react";
-import NewLocalEmbeddingModelModal from "./ExtraModals/NewLocalEmbeddingModel";
 import { EmbeddingModelConfig } from "electron/main/Store/storeConfig";
+import posthog from "posthog-js";
+
+
+import CustomSelect from "../Generic/Select";
+
+import NewLocalEmbeddingModelModal from "./ExtraModals/NewLocalEmbeddingModel";
 import NewRemoteEmbeddingModelModal from "./ExtraModals/NewRemoteEmbeddingModel";
+
 
 interface EmbeddingModelManagerProps {
   // userHasCompleted?: (completed: boolean) => void;
@@ -62,6 +69,9 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
   const handleChangeOnModelSelect = (newSelectedModel: string) => {
     setSelectedModel(newSelectedModel);
     window.electronStore.setDefaultEmbeddingModel(newSelectedModel);
+    posthog.capture("change_default_embedding_model", {
+      defaultEmbeddingModel: newSelectedModel,
+    });
     if (handleUserHasChangedModel) {
       handleUserHasChangedModel();
     }

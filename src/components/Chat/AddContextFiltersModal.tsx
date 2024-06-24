@@ -1,12 +1,16 @@
 import React, { useState } from "react";
 
-import Modal from "../Generic/Modal";
 import { Button, List, ListItem } from "@material-tailwind/react";
-import { SearchBarWithFilesSuggestion } from "../Generic/SearchBarWithFilesSuggestion";
-import { SuggestionsState } from "../Editor/FilesSuggestionsDisplay";
-import { ChatFilters } from "./Chat";
-import { ListItemIcon, ListItemText } from "@mui/material";
 import FolderIcon from "@mui/icons-material/Folder";
+import { ListItemIcon, ListItemText } from "@mui/material";
+
+import { SuggestionsState } from "../Editor/FilesSuggestionsDisplay";
+import Modal from "../Generic/Modal";
+import { SearchBarWithFilesSuggestion } from "../Generic/SearchBarWithFilesSuggestion";
+
+import { ChatFilters } from "./Chat";
+
+
 
 interface Props {
   isOpen: boolean;
@@ -36,7 +40,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
     const currentChatFilters: ChatFilters = chatFilters
       ? {
           ...chatFilters,
-          files: [...chatFilters.files, ...files],
+          files: [...new Set([...chatFilters.files, ...files])],
         }
       : {
           numberOfChunksToFetch: 15,
@@ -56,10 +60,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
           onSelectSuggestion={(file: string) => {
             if (file && !internalFilesSelected.includes(file)) {
               //TODO: add markdown extension properly
-              setInternalFilesSelected([
-                ...internalFilesSelected,
-                file + ".md",
-              ]);
+              setInternalFilesSelected([...internalFilesSelected, file]);
             }
             setSuggestionsState(null);
           }}

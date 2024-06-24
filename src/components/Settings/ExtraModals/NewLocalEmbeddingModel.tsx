@@ -1,8 +1,12 @@
+
 import React, { useState } from "react";
+
 import { Button } from "@material-tailwind/react";
-import Modal from "../../Generic/Modal";
-import ExternalLink from "../../Generic/ExternalLink";
 import { EmbeddingModelWithLocalPath } from "electron/main/Store/storeConfig";
+import posthog from "posthog-js";
+
+import ExternalLink from "../../Generic/ExternalLink";
+import Modal from "../../Generic/Modal";
 
 interface NewLocalEmbeddingModelModalProps {
   isOpen: boolean;
@@ -33,6 +37,9 @@ const NewLocalEmbeddingModelModal: React.FC<
     };
 
     await window.electronStore.addNewLocalEmbeddingModel(modelObject);
+    posthog.capture("save_local_embedding_model", {
+      modelPath: newModelPath,
+    });
     if (handleUserHasChangedModel) {
       handleUserHasChangedModel();
     }

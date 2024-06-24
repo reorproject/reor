@@ -1,21 +1,24 @@
+import Anthropic from "@anthropic-ai/sdk";
+import {
+  Message,
+  MessageParam,
+  MessageStreamEvent,
+} from "@anthropic-ai/sdk/resources";
 import {
   LLMGenerationParameters,
   LLMConfig,
 } from "electron/main/Store/storeConfig";
 import { Tiktoken, TiktokenModel, encodingForModel } from "js-tiktoken";
-import OpenAI from "openai";
-import {
-  ChatCompletion,
-  ChatCompletionChunk,
-  ChatCompletionMessageParam,
-} from "openai/resources/chat/completions";
+import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
 import { customFetchUsingElectronNetStreaming } from "../../Generic/network";
 import { LLMSessionService } from "../Types";
 
+
 import { ChatMessageToDisplay } from "@/components/Chat/Chat";
 
-export class OpenAIModelSessionService implements LLMSessionService {
+
+export class AnthropicModelSessionService implements LLMSessionService {
   public getTokenizer = (llmName: string): ((text: string) => number[]) => {
     let tokenEncoding: Tiktoken;
     try {
@@ -39,22 +42,20 @@ export class OpenAIModelSessionService implements LLMSessionService {
     messageHistory: ChatCompletionMessageParam[],
     isJSONMode: boolean,
     generationParams?: LLMGenerationParameters
-  ): Promise<ChatCompletion> {
-    const openai = new OpenAI({
+  ): Promise<Message> {
+    const anthropic = new Anthropic({
       apiKey: modelConfig.apiKey,
       baseURL: modelConfig.apiURL,
       fetch: customFetchUsingElectronNetStreaming,
     });
-    const response = await openai.chat.completions.create({
+    const msg = await anthropic.messages.create({
       model: modelName,
-      messages: messageHistory,
-      max_tokens: generationParams?.maxTokens,
+      messages: messageHistory as MessageParam[],
       temperature: generationParams?.temperature,
-      response_format: {
-        type: isJSONMode ? "json_object" : "text",
-      },
+      max_tokens: generationParams?.maxTokens || 1024,
     });
-    return response;
+
+    return msg;
   }
 
   async streamingResponse(
@@ -62,30 +63,26 @@ export class OpenAIModelSessionService implements LLMSessionService {
     modelConfig: LLMConfig,
     isJSONMode: boolean,
     messageHistory: ChatMessageToDisplay[],
-    handleChunk: (chunk: ChatCompletionChunk) => void,
+    handleChunk: (chunk: MessageStreamEvent) => void,
     generationParams?: LLMGenerationParameters
   ): Promise<void> {
     console.log("making call to url: ", modelConfig);
-    const openai = new OpenAI({
+    const anthropic = new Anthropic({
       apiKey: modelConfig.apiKey,
       baseURL: modelConfig.apiURL,
       fetch: customFetchUsingElectronNetStreaming,
     });
-    console.log("messageHistory: ");
+    console.log("messageHistory: ", messageHistory);
 
-    const stream = await openai.chat.completions.create({
+    const stream = await anthropic.messages.create({
       model: modelName,
-      messages: messageHistory.map(cleanMessage),
+      messages: messageHistory.map(cleanMessage) as MessageParam[],
       stream: true,
-      max_tokens: generationParams?.maxTokens,
       temperature: generationParams?.temperature,
-      response_format: {
-        type: isJSONMode ? "json_object" : "text",
-      },
+      max_tokens: generationParams?.maxTokens || 1024,
     });
-
-    for await (const chunk of stream) {
-      handleChunk(chunk);
+    for await (const messageStreamEvent of stream) {
+      handleChunk(messageStreamEvent);
     }
   }
 }

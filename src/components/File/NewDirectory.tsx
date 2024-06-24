@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from "react";
-import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
-import { errorToString } from "@/functions/error";
+import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import Modal from "../Generic/Modal";
+
+
+import { errorToString } from "@/functions/error";
 import { getInvalidCharacterInFilePath } from "@/functions/strings";
+
 
 interface NewDirectoryComponentProps {
   isOpen: boolean;

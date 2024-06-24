@@ -1,4 +1,9 @@
+import path from "path";
+
 import { ipcMain } from "electron";
+import Store from "electron-store";
+
+
 import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
@@ -6,10 +11,12 @@ import {
   StoreKeys,
   StoreSchema,
 } from "../Store/storeConfig";
-import Store from "electron-store";
-import path from "path";
-import { initializeAndMaybeMigrateStore } from "./storeMigrator";
 import WindowsManager from "../windowManager";
+
+import { initializeAndMaybeMigrateStore } from "./storeMigrator";
+
+
+
 import { ChatHistory } from "@/components/Chat/Chat";
 
 export const registerStoreHandlers = (
@@ -104,6 +111,14 @@ export const registerStoreHandlers = (
     return store.get(StoreKeys.MaxRAGExamples);
   });
 
+  ipcMain.handle("set-chunk-size", (event, chunkSize: number) => {
+    store.set(StoreKeys.ChunkSize, chunkSize);
+  });
+
+  ipcMain.handle("get-chunk-size", () => {
+    return store.get(StoreKeys.ChunkSize);
+  });
+
   ipcMain.handle("get-default-embedding-model", () => {
     return store.get(StoreKeys.DefaultEmbeddingModelAlias);
   });
@@ -127,6 +142,16 @@ export const registerStoreHandlers = (
       store.get(StoreKeys.LLMGenerationParameters)
     );
     return store.get(StoreKeys.LLMGenerationParameters);
+  });
+
+  ipcMain.handle("set-analytics-mode", (event, isAnalytics) => {
+    console.log("setting analytics mode", isAnalytics);
+    store.set(StoreKeys.Analytics, isAnalytics);
+  });
+
+  ipcMain.handle("get-analytics-mode", () => {
+    console.log("getting analytics params", store.get(StoreKeys.Analytics));
+    return store.get(StoreKeys.Analytics);
   });
 
   ipcMain.handle("has-user-opened-app-before", () => {
@@ -175,6 +200,11 @@ export const registerStoreHandlers = (
       ...allChatHistories,
       [vaultDir]: chatHistoriesCorrespondingToVault,
     });
+
+    event.sender.send(
+      "update-chat-histories",
+      chatHistoriesCorrespondingToVault
+    );
   });
 
   ipcMain.handle("get-chat-history", (event, chatId: string) => {
@@ -187,6 +217,24 @@ export const registerStoreHandlers = (
     const allChatHistories = store.get(StoreKeys.ChatHistories);
     const vaultChatHistories = allChatHistories[vaultDir] || [];
     return vaultChatHistories.find((chat) => chat.id === chatId);
+  });
+
+  ipcMain.handle("remove-chat-history-at-id", (event, chatID: string) => {
+    const vaultDir = windowsManager.getVaultDirectoryForWinContents(
+      event.sender
+    );
+
+    if (!vaultDir) {
+      return;
+    }
+
+    const chatHistoriesMap = store.get(StoreKeys.ChatHistories);
+    const allChatHistories = chatHistoriesMap[vaultDir] || [];
+    const filteredChatHistories = allChatHistories.filter(
+      (item) => item.id !== chatID
+    );
+    chatHistoriesMap[vaultDir] = filteredChatHistories.reverse();
+    store.set(StoreKeys.ChatHistories, chatHistoriesMap);
   });
 };
 

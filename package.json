@@ -1,6 +1,6 @@
 {
   "name": "reor-project",
-  "version": "0.2.7",
+  "version": "0.2.10",
   "productName": "Reor",
   "main": "dist-electron/main/index.js",
   "description": "An AI note-taking app that runs models locally.",
@@ -26,6 +26,7 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.21.1",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
     "@headlessui/react": "^1.7.19",
@@ -39,6 +40,7 @@
     "@tiptap/extension-link": "^2.2.4",
     "@tiptap/extension-task-item": "^2.2.4",
     "@tiptap/extension-task-list": "^2.2.4",
+    "@tiptap/extension-text-style": "^2.4.0",
     "@tiptap/pm": "^2.2.4",
     "@tiptap/react": "^2.2.4",
     "@tiptap/starter-kit": "^2.2.4",
@@ -58,6 +60,8 @@
     "npm": "^10.3.0",
     "ollama": "^0.4.9",
     "openai": "^4.20.0",
+    "posthog-js": "^1.130.2",
+    "prosemirror-utils": "^1.2.2",
     "react-card-flip": "^1.2.2",
     "react-icons": "^4.12.0",
     "react-markdown": "^9.0.1",
@@ -71,7 +75,7 @@
     "remove-markdown": "^0.5.0",
     "tiptap-markdown": "^0.8.10",
     "turndown": "^7.1.2",
-    "use-debounce": "^10.0.0",
+    "use-debounce": "^10.0.1",
     "vectordb": "0.4.10"
   },
   "devDependencies": {
@@ -91,7 +95,12 @@
     "electron": "28.2.1",
     "electron-builder": "^24.6.3",
     "eslint": "^8.56.0",
+    "eslint-import-resolver-alias": "^1.1.2",
+    "eslint-import-resolver-node": "^0.3.9",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-unused-imports": "^4.0.0",
     "jest": "^29.7.0",
     "postcss": "^8.4.31",
     "react": "^18.2.0",

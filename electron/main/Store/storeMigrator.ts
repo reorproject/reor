@@ -1,5 +1,6 @@
-import { StoreKeys, StoreSchema } from "./storeConfig";
 import Store from "electron-store";
+
+import { StoreKeys, StoreSchema } from "./storeConfig";
 
 const currentSchemaVersion = 1;
 
@@ -17,10 +18,22 @@ export function setupDefaultStoreValues(store: Store<StoreSchema>) {
   if (!store.get(StoreKeys.MaxRAGExamples)) {
     store.set(StoreKeys.MaxRAGExamples, 15);
   }
+
+  if (!store.get(StoreKeys.ChunkSize)) {
+    store.set(StoreKeys.ChunkSize, 500);
+  }
+  setupDefaultAnalyticsValue(store);
+
   setupDefaultEmbeddingModels(store);
 
   setupDefaultHardwareConfig(store);
 }
+
+const setupDefaultAnalyticsValue = (store: Store<StoreSchema>) => {
+  if (store.get(StoreKeys.Analytics) === undefined) {
+    store.set(StoreKeys.Analytics, true);
+  }
+};
 
 const setupDefaultHardwareConfig = (store: Store<StoreSchema>) => {
   const hardwareConfig = store.get(StoreKeys.Hardware);

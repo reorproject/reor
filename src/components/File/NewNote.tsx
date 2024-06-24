@@ -1,7 +1,10 @@
-import React, { useState, useEffect } from "react";
-import Modal from "../Generic/Modal";
 import { Button } from "@material-tailwind/react";
+import React, { useEffect, useState } from "react";
+import Modal from "../Generic/Modal";
+
+
 import { getInvalidCharacterInFilePath } from "@/functions/strings";
+
 
 interface NewNoteComponentProps {
   isOpen: boolean;

@@ -1,12 +1,17 @@
 import React, { useState } from "react";
-import { FileSidebar } from "../File/FileSideBar";
-import SearchComponent from "./FileSidebarSearch";
+
 import { DBQueryResult } from "electron/main/database/Schema";
 import { FileInfoTree } from "electron/main/Files/Types";
-import { ChatsSidebar } from "../Chat/ChatsSidebar";
-import { SidebarAbleToShow } from "../FileEditorContainer";
+import posthog from "posthog-js";
+
 import { ChatFilters, ChatHistory } from "../Chat/Chat";
+import { ChatsSidebar } from "../Chat/ChatsSidebar";
 import { ChatHistoryMetadata } from "../Chat/hooks/use-chat-history";
+import { FileSidebar } from "../File/FileSideBar";
+import { SidebarAbleToShow } from "../FileEditorContainer";
+
+import SearchComponent from "./FileSidebarSearch";
+
 
 interface SidebarManagerProps {
   files: FileInfoTree;
@@ -24,6 +29,7 @@ interface SidebarManagerProps {
   chatHistoriesMetadata: ChatHistoryMetadata[];
   setCurrentChatHistory: (chat: ChatHistory | undefined) => void;
   setChatFilters: (chatFilters: ChatFilters) => void;
+  setShowChatbot: (showChat: boolean) => void;
 }
 
 const SidebarManager: React.FC<SidebarManagerProps> = ({
@@ -42,6 +48,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
   chatHistoriesMetadata,
   setCurrentChatHistory,
   setChatFilters,
+  setShowChatbot,
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [searchResults, setSearchResults] = useState<DBQueryResult[]>([]);
@@ -82,12 +89,14 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
             });
           }}
           newChat={() => {
+            posthog.capture("create_new_chat");
             setCurrentChatHistory(undefined);
             setChatFilters({
               files: [],
               numberOfChunksToFetch: 15,
             });
           }}
+          setShowChatbot={setShowChatbot}
         />
       )}
     </div>

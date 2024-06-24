@@ -1,6 +1,9 @@
 import Store from "electron-store";
+
 import { LLMConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
+
 import { OllamaService } from "./models/Ollama";
+
 
 export function validateAIModelConfig(config: LLMConfig): string | null {
   // Validate localPath: ensure it's not empty
@@ -14,7 +17,7 @@ export function validateAIModelConfig(config: LLMConfig): string | null {
   }
 
   // Validate engine: ensure it's either "openai" or "llamacpp"
-  if (config.engine !== "openai") {
+  if (config.engine !== "openai" && config.engine !== "anthropic") {
     return "Engine must be either 'openai' or 'llamacpp'.";
   }
 
