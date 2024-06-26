@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 
 import { EditorContent } from "@tiptap/react";
@@ -14,6 +13,7 @@ import IconsSidebar from "./Sidebars/IconsSidebar";
 import SidebarManager from "./Sidebars/MainSidebar";
 import SidebarComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
+import FloatingMenu from "./Writing-Assistant/WritingAssistantFloatingMenu";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search" | "chats";
@@ -180,6 +180,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                   }}
                 />
               )}
+              <FloatingMenu highlightData={highlightData} />
             </div>
           </div>
         )}
