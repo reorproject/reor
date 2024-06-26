@@ -92,7 +92,8 @@ const CreatePreviewFile: React.FC<CreatePreviewFileProps> = ({
         query.displayableChatHistory.push({
           role: "user",
           content: editorContent,
-
+          messageType: "success",
+          context: [],
         })
 
         await window.llm.streamingLLMResponse(

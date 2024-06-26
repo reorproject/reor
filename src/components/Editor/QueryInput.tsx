@@ -56,7 +56,7 @@ const quotePattern = /^"(.+)"$/;
 
 interface QueryInputProps {
   setShowQueryBox: (show: boolean) => void;
-  onFileSelect: (path: string) => void;
+  filePath: string;
   setShowQueryWindow: (show: boolean) => void;
   setQuery: (query: Query) => void;
 }
@@ -71,13 +71,12 @@ const QueryInput: React.FC<QueryInputProps> = ({
   // const [query, setQuery] = useState<Query | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [suggestChoice, setSuggestChoice] = useState<number>(0);
-  const [displayPreview, setDisplayPreview] = useState<boolean>(false);
 
-  const handleKeyDown = (event) => {
+  const handleKeyDown = (event: any) => {
     const length = Object.values(QueryOptions).length;
 
     if (event.key === " ") {
-      const command = input.slice(1).trim().split(" ")[0];
+      const command: string = input.slice(1).trim().split(" ")[0];
       if (!QueryOptions[command]) {
         event.preventDefault();
       }
@@ -211,6 +210,7 @@ const QueryInput: React.FC<QueryInputProps> = ({
         className="w-full bg-light-arsenic p-2 text-white"
         onChange={handleChange}
         onKeyDown={handleKeyDown}
+        onBlur={() => setShowQueryBox(false)}
         autoFocus
       />
     </div>

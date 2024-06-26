@@ -4,8 +4,8 @@ interface DraggableTabsProps {
   openTabs: Tab[];
   setOpenTabs: (openTabs: Tab[]) => void;
   onTabSelect: (path: string) => void;
-  onTabClose: (tabId) => void;
-  currentFilePath: (path: string) => void;
+  onTabClose: (event: any, tabId: string) => void;
+  currentFilePath: string;
 }
 
 const DraggableTabs: React.FC<DraggableTabsProps> = ({
@@ -15,11 +15,12 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
   onTabClose,
   currentFilePath,
 }) => {
-  const onDragStart = (event, tabId) => {
+  console.log("OpenTabs:", openTabs);
+  const onDragStart = (event: any, tabId: string) => {
     event.dataTransfer.setData("tabId", tabId);
   };
 
-  const onDrop = (event) => {
+  const onDrop = (event: any) => {
     const draggedTabId = event.dataTransfer.getData("tabId");
     const targetTabId = event.target.getAttribute("data-tabid");
     const newTabs = [...openTabs];
@@ -36,21 +37,21 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
   };
 
   /* Sync New tab update with backened */
-  const syncTabsWithBackend = async (draggedIndex, targetIndex) => {
-    await window.electronStore.setCurrentOpenFiles("update", {
+  const syncTabsWithBackend = (draggedIndex: number, targetIndex: number) => {
+    window.electronStore.setCurrentOpenFiles("update", {
       draggedIndex: draggedIndex,
       targetIndex: targetIndex,
     });
   };
 
-  const onDragOver = (event) => {
+  const onDragOver = (event: any) => {
     event.preventDefault();
   };
 
   return (
-    <div className="flex">
+    <div className="flex whitespace-nowrap custom-scrollbar">
       {openTabs.map((tab) => (
-        <div className="flex justify-center items-align mr-1">
+        <div className="flex justify-center items-center bg-dark-gray-c-ten h-[28px]">
           <div
             key={tab.id}
             data-tabid={tab.id}
@@ -58,21 +59,18 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
             onDragStart={(event) => onDragStart(event, tab.id)}
             onDrop={onDrop}
             onDragOver={onDragOver}
-            className={`mx-2 py-1 bg-transparent text-white cursor-pointer ${
-              currentFilePath === tab.filePath
-                ? "border-solid border-0 border-b-2 border-yellow-300"
-                : ""
-            }`}
+            className={`py-4 px-2 text-white cursor-pointer flex justify-center gap-1 items-center text-sm ${currentFilePath === tab.filePath
+              ? "bg-dark-gray-c-three" : ""}`}
             onClick={() => onTabSelect(tab.filePath)}
           >
             {tab.title}
+            <span
+              className="text-md cursor-pointer px-1 hover:bg-orange-500"
+              onClick={(e) => onTabClose(e, tab.id)}
+            >
+              &times;
+            </span>
           </div>
-          <span
-            className="text-lg cursor-pointer"
-            onClick={() => onTabClose(tab.id)}
-          >
-            &times;
-          </span>
         </div>
       ))}
     </div>

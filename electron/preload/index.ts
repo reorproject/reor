@@ -165,7 +165,7 @@ declare global {
       getChatHistory: (chatID: string) => Promise<ChatHistory>;
       removeChatHistoryAtID: (chatID: string) => void;
       getCurrentOpenFiles: () => Promise<boolean>;
-      setCurrentOpenFiles: (filePath: string) => void;
+      setCurrentOpenFiles: (action: any, args: any) => void;
     };
   }
 }
@@ -339,7 +339,7 @@ contextBridge.exposeInMainWorld("electronStore", {
   getCurrentOpenFiles: () => {
     return ipcRenderer.invoke("get-current-open-files");
   },
-  setCurrentOpenFiles: (action, args) => {
+  setCurrentOpenFiles: (action: any, args: any) => {
     ipcRenderer.invoke("set-current-open-files", { action, args });
   },
 });

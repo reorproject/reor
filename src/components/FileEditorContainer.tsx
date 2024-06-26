@@ -1,6 +1,8 @@
 import { EditorContent } from "@tiptap/react";
 import posthog from "posthog-js";
 import React, { useCallback, useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+
 
 import "../styles/global.css";
 import ChatWithLLM, { ChatFilters, ChatHistory } from "./Chat/Chat";
@@ -234,6 +236,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
       // Update the tabs state by adding the new tab
       setOpenTabs((prevTabs) => [...prevTabs, newTab]);
     }
+    setShowQueryBox(false);
   }, [filePath]);
 
   const handleTabSelect = (path: string) => {
@@ -319,7 +322,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
           <div className="relative w-full h-full flex overflow-x-hidden scrollable-y-thin">
             <div className="w-full flex h-full">
               <div
-                className="relative h-full w-full cursor-text text-slate-400"
+                className="relative h-full w-full overflow-y-hidden cursor-text text-slate-400"
                 onClick={() => editor?.commands.focus()}
                 style={{
                   backgroundColor: "rgb(30, 30, 30)",
@@ -341,29 +344,34 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                   />
                 )}
                 <div className="flex-col h-full">
-                  <DraggableTabs
-                    openTabs={openTabs}
-                    setOpenTabs={setOpenTabs}
-                    onTabSelect={handleTabSelect}
-                    onTabClose={handleTabClose}
-                    currentFilePath={filePath}
-                  />
-                  <EditorContent
-                    style={{ wordBreak: "break-word" }}
-                    editor={editor}
-                  />
-                  {showQueryBox && (
-                    <div className="fixed bottom-0 w-full">
-                      <QueryInput
-                        setShowQueryBox={setShowQueryBox}
-                        filePath={filePath}
-                        setShowQueryWindow={setShowQueryWindow}
-                        setQuery={setQuery}
+                  <div className="sticky top-0 z-50">
+                    <div className="overflow-x-auto scrollable-x-thin overflow-y-hidden">
+                      <DraggableTabs
+                        openTabs={openTabs}
+                        setOpenTabs={setOpenTabs}
+                        onTabSelect={handleTabSelect}
+                        onTabClose={handleTabClose}
+                        currentFilePath={filePath}
                       />
                     </div>
-                  )}
+                  </div>
+                  <div className="relative flex-col h-full pt-[20px] overflow-y-auto">
+                    <EditorContent
+                      style={{ wordBreak: "break-word" }}
+                      editor={editor}
+                    />
+                    {showQueryBox && (
+                      <div className="absolute bottom-0 left-0 right-0">
+                        <QueryInput
+                          setShowQueryBox={setShowQueryBox}
+                          filePath={filePath}
+                          setShowQueryWindow={setShowQueryWindow}
+                          setQuery={setQuery}
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
-
                 {suggestionsState && (
                   <InEditorBacklinkSuggestionsDisplay
                     suggestionsState={suggestionsState}
