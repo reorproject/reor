@@ -72,6 +72,8 @@ export interface StoreSchema {
   analytics?: boolean;
   chunkSize: number;
   spellCheck: string;
+  isSBCompact: boolean;
+  DisplayMarkdown: boolean;
 }
 
 export enum StoreKeys {
@@ -89,4 +91,6 @@ export enum StoreKeys {
   ChatHistories = "chatHistories",
   ChunkSize = "chunkSize",
   SpellCheck = "spellCheck",
+  IsSBCompact = "isSBCompact",
+  DisplayMarkdown = "DisplayMarkdown",
 }

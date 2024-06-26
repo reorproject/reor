@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-
 import { FaTrash } from "react-icons/fa";
 
 type OptionType = {
@@ -84,6 +83,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
             >
               <span
                 className="w-full"
+                onClick={() => handleOptionClick(option.value)}
               >
                 {option.label}
               </span>

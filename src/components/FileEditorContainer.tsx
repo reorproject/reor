@@ -1,9 +1,8 @@
-
-import React, { useEffect, useState } from "react";
-
 import { EditorContent } from "@tiptap/react";
 import posthog from "posthog-js";
+import React, { useCallback, useEffect, useState } from "react";
 
+import "../styles/global.css";
 import ChatWithLLM, { ChatFilters, ChatHistory } from "./Chat/Chat";
 import { useChatHistory } from "./Chat/hooks/use-chat-history";
 import InEditorBacklinkSuggestionsDisplay from "./Editor/BacklinkSuggestionsDisplay";
@@ -15,7 +14,7 @@ import SidebarManager from "./Sidebars/MainSidebar";
 import SidebarComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 
-interface FileEditorContainerProps {}
+interface FileEditorContainerProps { }
 export type SidebarAbleToShow = "files" | "search" | "chats";
 
 const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
@@ -50,13 +49,17 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     setShowSimilarFiles(!showSimilarFiles);
   };
 
+  // const [fileIsOpen, setFileIsOpen] = useState(false);
+
   const openFileAndOpenEditor = async (path: string) => {
     setShowChatbot(false);
+    // setFileIsOpen(true);
     openFileByPath(path);
   };
 
   const openChatAndOpenChat = (chatHistory: ChatHistory | undefined) => {
     setShowChatbot(true);
+    // setFileIsOpen(false);
     setCurrentChatHistory(chatHistory);
   };
 
@@ -66,9 +69,65 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     numberOfChunksToFetch: 15,
   });
 
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [sidebarWidth, setSidebarWidth] = useState(40);
+
+  // showSearch should be set to false when:
+  //    1) User presses ctrl-f
+  //    2)  Navigates away from the editor
+  const toggleSearch = useCallback(() => {
+    setShowSearch((prevShowSearch) => !prevShowSearch);
+  }, []);
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    editor?.commands.setSearchTerm(value);
+  };
+
+  // Global listener that triggers search functionality
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === "f") {
+        toggleSearch();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  const handleNextSearch = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      editor?.commands.nextSearchResult();
+      goToSelection();
+      event.target.focus();
+    } else if (event.key === "Escape") {
+      toggleSearch();
+      handleSearchChange("");
+    }
+  };
+
+  const goToSelection = () => {
+    if (!editor) return;
+
+    const { results, resultIndex } = editor.storage.searchAndReplace;
+    const position = results[resultIndex];
+    if (!position) return;
+
+    editor.commands.setTextSelection(position);
+    const { node } = editor.view.domAtPos(editor.state.selection.anchor);
+    if (node) {
+      (node as any).scrollIntoView?.(false);
+    }
+  };
+
   const handleAddFileToChatFilters = (file: string) => {
     setSidebarShowing("chats");
     setShowChatbot(true);
+    // setFileIsOpen(false);
     setCurrentChatHistory(undefined);
     setChatFilters((prevChatFilters) => ({
       ...prevChatFilters,
@@ -81,13 +140,31 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
 
   // find all available files
   useEffect(() => {
+    console.log(`Inside useEffect!`);
+    const updateWidth = async () => {
+      const isCompact = await window.electronStore.getSBCompact();
+      setSidebarWidth(isCompact ? 40 : 60);
+    };
+
+    // Listen for changes on settings
+    const handleSettingsChange = (isCompact: number) => {
+      setSidebarWidth(isCompact ? 40 : 60);
+    };
+
     const setFileDirectory = async () => {
       const windowDirectory =
         await window.electronStore.getVaultDirectoryForWindow();
       setVaultDirectory(windowDirectory);
     };
     setFileDirectory();
+    updateWidth();
+
+    window.ipcRenderer.receive("sb-compact-changed", handleSettingsChange);
   }, []);
+
+  useEffect(() => {
+    console.log(`Sidebar width updated to: ${sidebarWidth}`);
+  }, [sidebarWidth]);
 
   useEffect(() => {
     const removeAddChatToFileListener = window.ipcRenderer.receive(
@@ -114,7 +191,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
       />
 
       <div className="flex h-below-titlebar">
-        <div className="w-[35px] border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid">
+        <div
+          className={`border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid pt-2.5`}
+          style={{ width: `${sidebarWidth}px` }}
+        >
           <IconsSidebar
             openRelativePath={openRelativePath}
             sidebarShowing={sidebarShowing}
@@ -147,15 +227,30 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         </ResizableComponent>
 
         {!showChatbot && filePath && (
-          <div className="w-full h-full flex overflow-x-hidden">
+          <div className="relative w-full h-full flex overflow-x-hidden scrollable-y-thin">
             <div className="w-full flex h-full">
               <div
-                className="h-full w-full overflow-y-auto cursor-text text-slate-400"
+                className="relative h-full w-full cursor-text text-slate-400"
                 onClick={() => editor?.commands.focus()}
                 style={{
                   backgroundColor: "rgb(30, 30, 30)",
                 }}
               >
+                {showSearch && (
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onKeyDown={handleNextSearch}
+                    onChange={(event) => handleSearchChange(event.target.value)}
+                    onBlur={() => {
+                      setShowSearch(false);
+                      handleSearchChange("");
+                    }}
+                    placeholder="Search..."
+                    autoFocus
+                    className="absolute top-4 right-0  mt-4 mr-14 z-50 border-none rounded-md p-2 bg-transparent bg-dark-gray-c-ten text-white "
+                  />
+                )}
                 <EditorContent
                   style={{ wordBreak: "break-word" }}
                   editor={editor}
