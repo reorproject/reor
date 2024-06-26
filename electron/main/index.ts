@@ -35,6 +35,8 @@ import {
 } from "./Store/storeHandlers";
 import WindowsManager from "./windowManager";
 
+const fs = require('fs').promises;
+
 const store = new Store<StoreSchema>();
 // store.clear(); // clear store for testing
 const windowsManager = new WindowsManager();
@@ -167,8 +169,58 @@ ipcMain.handle("index-files-in-directory", async (event) => {
   }
 });
 
-ipcMain.handle("show-context-menu-file-item", (event, file) => {
+ipcMain.handle("show-context-menu-item", (event) => {
   const menu = new Menu();
+
+  menu.append(
+    new MenuItem({
+      label: "New Note",
+      click: () => {
+        event.sender.send("add-new-note-listener");
+      },
+    })
+  );
+
+  menu.append(
+    new MenuItem({
+      label: "New Directory",
+      click: () => {
+        event.sender.send("add-new-directory-listener");
+      },
+    })
+  );
+
+  const browserWindow = BrowserWindow.fromWebContents(event.sender);
+  if (browserWindow)
+    menu.popup({ window: browserWindow })
+});
+
+ipcMain.handle("show-context-menu-file-item", async (event, file) => {
+  const menu = new Menu();
+
+  const stats = await fs.stat(file.path);
+  const isDirectory = stats.isDirectory();
+
+  if (isDirectory) {
+    menu.append(
+      new MenuItem({
+        label: "New Note",
+        click: () => {
+          event.sender.send("add-new-note-listener", file.relativePath);
+        },
+      })
+    );
+
+    menu.append(
+      new MenuItem({
+        label: "New Directory",
+        click: () => {
+          event.sender.send("add-new-directory-listener", file.path);
+        },
+      })
+    );
+  }
+
   menu.append(
     new MenuItem({
       label: "Delete",

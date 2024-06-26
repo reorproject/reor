@@ -80,6 +80,7 @@ export interface StoreSchema {
   };
   analytics?: boolean;
   chunkSize: number;
+  spellCheck: string;
   isSBCompact: boolean;
   DisplayMarkdown: boolean;
   OpenTabs: Tab[];
@@ -99,6 +100,7 @@ export enum StoreKeys {
   LLMGenerationParameters = "llmGenerationParameters",
   ChatHistories = "chatHistories",
   ChunkSize = "chunkSize",
+  SpellCheck = "spellCheck",
   IsSBCompact = "isSBCompact",
   DisplayMarkdown = "DisplayMarkdown",
   OpenTabs = "OpenTabs",

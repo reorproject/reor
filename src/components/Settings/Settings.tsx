@@ -22,7 +22,7 @@ enum SettingsTab {
   TextGeneration = "textGeneration",
   RAG = "RAG",
   ANALYTICS = "analytics",
-  ChunkSize = "chunkSize",
+  GENERAL = "general",
 }
 
 const SettingsModal: React.FC<ModalProps> = ({
@@ -112,6 +112,16 @@ const SettingsModal: React.FC<ModalProps> = ({
           >
             Analytics{" "}
           </div>
+          <div
+            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
+              activeTab === SettingsTab.GENERAL
+                ? "bg-neutral-700 text-white font-semibold"
+                : "text-gray-200"
+            }`}
+            onClick={() => setActiveTab(SettingsTab.GENERAL)}
+          >
+            General{" "}
+          </div>
         </div>
 
         {/* Right Content Area */}
@@ -160,6 +170,12 @@ const SettingsModal: React.FC<ModalProps> = ({
                   Change the Chunk Size
                 </p>
               </ChunkSizeSettings>
+            </div>
+          )}
+
+          {activeTab === SettingsTab.GENERAL && (
+            <div className="w-full">
+              <GeneralSettings />
             </div>
           )}
         </div>

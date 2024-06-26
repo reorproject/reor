@@ -1,5 +1,5 @@
-import { Extension } from "@tiptap/react";
 import { Plugin } from "@tiptap/pm/state";
+import { Extension } from "@tiptap/react";
 
 export interface HighlightData {
   text: string;

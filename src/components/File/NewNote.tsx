@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Button } from "@material-tailwind/react";
 import posthog from "posthog-js";
@@ -13,15 +13,24 @@ interface NewNoteComponentProps {
   isOpen: boolean;
   onClose: () => void;
   openRelativePath: (path: string) => void;
+  customFilePath: string;
 }
 
 const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
   isOpen,
   onClose,
   openRelativePath,
+  customFilePath,
 }) => {
   const [fileName, setFileName] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setFileName("");
+      setErrorMessage(null);
+    }
+  }, [isOpen]);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
@@ -42,8 +51,10 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
     if (!fileName || errorMessage) {
       return;
     }
-    openRelativePath(fileName);
-    posthog.capture("created_new_note_from_new_note_modal")
+    const pathPrefix = customFilePath ? customFilePath.replace(/\/?$/, '/') : '';
+    const fullPath = pathPrefix + fileName;
+    openRelativePath(fullPath);
+    posthog.capture("created_new_note_from_new_note_modal");
     onClose();
   };
 

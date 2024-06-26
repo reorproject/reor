@@ -1,8 +1,8 @@
 import { EditorContent } from "@tiptap/react";
 import posthog from "posthog-js";
 import React, { useCallback, useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 
+import "../styles/global.css";
 import ChatWithLLM, { ChatFilters, ChatHistory } from "./Chat/Chat";
 import { useChatHistory } from "./Chat/hooks/use-chat-history";
 import { DraggableTabs } from "./DraggableTabs";
@@ -87,16 +87,16 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   //    2)  Navigates away from the editor
   const toggleSearch = useCallback(() => {
     setShowSearch((prevShowSearch) => !prevShowSearch);
-  });
+  }, []);
 
-  const handleSearchChange = (value) => {
+  const handleSearchChange = (value: string) => {
     setSearchTerm(value);
-    editor.commands.setSearchTerm(value);
+    editor?.commands.setSearchTerm(value);
   };
 
   // Global listener that triggers search functionality
   useEffect(() => {
-    const handleKeyDown = () => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === "f") {
         toggleSearch();
       }
@@ -109,7 +109,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const handleNextSearch = (event) => {
     if (event.key === "Enter") {
       event.preventDefault();
-      editor.commands.nextSearchResult();
+      editor?.commands.nextSearchResult();
       goToSelection();
       event.target.focus();
     } else if (event.key === "Escape") {
@@ -135,7 +135,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const handleAddFileToChatFilters = (file: string) => {
     setSidebarShowing("chats");
     setShowChatbot(true);
-    setFileIsOpen(false);
+    // setFileIsOpen(false);
     setCurrentChatHistory(undefined);
     setChatFilters((prevChatFilters) => ({
       ...prevChatFilters,
@@ -155,7 +155,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     };
 
     // Listen for changes on settings
-    const handleSettingsChange = (isCompact) => {
+    const handleSettingsChange = (isCompact: number) => {
       setSidebarWidth(isCompact ? 40 : 60);
     };
 
@@ -316,10 +316,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         </ResizableComponent>
 
         {!showChatbot && filePath && (
-          <div className="relative w-full h-full flex overflow-x-hidden">
+          <div className="relative w-full h-full flex overflow-x-hidden scrollable-y-thin">
             <div className="w-full flex h-full">
               <div
-                className="relative h-full w-full overflow-y-auto cursor-text text-slate-400"
+                className="relative h-full w-full cursor-text text-slate-400"
                 onClick={() => editor?.commands.focus()}
                 style={{
                   backgroundColor: "rgb(30, 30, 30)",
@@ -337,7 +337,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                     }}
                     placeholder="Search..."
                     autoFocus
-                    className="fixed top-8 right-64  mt-4 mr-14 z-50 border-none rounded-md p-2 bg-transparent bg-dark-gray-c-ten text-white"
+                    className="absolute top-4 right-0  mt-4 mr-14 z-50 border-none rounded-md p-2 bg-transparent bg-dark-gray-c-ten text-white "
                   />
                 )}
                 <div className="flex-col h-full">
