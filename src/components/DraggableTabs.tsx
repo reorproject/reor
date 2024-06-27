@@ -51,22 +51,28 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
   return (
     <div className="flex whitespace-nowrap custom-scrollbar">
       {openTabs.map((tab) => (
-        <div className="flex justify-center items-center bg-dark-gray-c-ten h-[28px]">
+        <div
+          key={tab.id}
+          className="flex justify-center items-center bg-dark-gray-c-ten h-[28px]"
+        >
           <div
-            key={tab.id}
             data-tabid={tab.id}
             draggable="true"
             onDragStart={(event) => onDragStart(event, tab.id)}
             onDrop={onDrop}
             onDragOver={onDragOver}
-            className={`py-4 px-2 text-white cursor-pointer flex justify-center gap-1 items-center text-sm ${currentFilePath === tab.filePath
-              ? "bg-dark-gray-c-three" : ""}`}
+            className={`py-4 px-2 text-white cursor-pointer flex justify-center gap-1 items-center text-sm ${
+              currentFilePath === tab.filePath ? "bg-dark-gray-c-three" : ""
+            }`}
             onClick={() => onTabSelect(tab.filePath)}
           >
             {tab.title}
             <span
-              className="text-md cursor-pointer px-1 hover:bg-orange-500"
-              onClick={(e) => onTabClose(e, tab.id)}
+              className="text-md cursor-pointer px-1 hover:bg-dark-gray-c-five hover:rounded-md"
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent triggering onClick of parent div
+                onTabClose(e, tab.id);
+              }}
             >
               &times;
             </span>

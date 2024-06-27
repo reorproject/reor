@@ -3,7 +3,6 @@ import posthog from "posthog-js";
 import React, { useCallback, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-
 import "../styles/global.css";
 import ChatWithLLM, { ChatFilters, ChatHistory } from "./Chat/Chat";
 import { useChatHistory } from "./Chat/hooks/use-chat-history";
@@ -19,7 +18,7 @@ import SidebarManager from "./Sidebars/MainSidebar";
 import SidebarComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 
-interface FileEditorContainerProps { }
+interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search" | "chats";
 
 const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
@@ -244,8 +243,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     openFileAndOpenEditor(path);
   };
 
-  const handleTabClose = async (tabId) => {
+  const handleTabClose = async (event, tabId) => {
     // Get current file path from the tab to be closed
+    event.stopPropagation();
+    console.log("Closing tab!");
     let closedFilePath = "";
     let newIndex = -1;
 

@@ -1,9 +1,10 @@
 import { Query } from "@/components/Editor/QueryInput";
 import { useEffect, useState } from "react";
+import { TypeAnimation } from "react-type-animation";
 
 interface CreatePreviewFileProps {
-  query: Query,
-  editorContent: string,
+  query: Query;
+  editorContent: string;
 }
 
 /**
@@ -11,27 +12,34 @@ interface CreatePreviewFileProps {
  */
 const CreatePreviewFile: React.FC<CreatePreviewFileProps> = ({
   query,
-  editorContent
+  editorContent,
 }) => {
   const [queryChatWindow, setQueryChatWindow] = useState<string>("");
+  const [isLoadingQuery, setIsLoadingQuery] = useState<boolean>(true);
+  const [errorOccured, setErrorOccured] = useState<string | Error>("");
+
+  useEffect(() => {
+    setIsLoadingQuery(true);
+    setErrorOccured("");
+  }, []);
 
   /**
-   * Updates the queryChatWindow state and attaches listeners for 
+   * Updates the queryChatWindow state and attaches listeners for
    *  ipc calls
    */
   useEffect(() => {
     /**
-       * Updates state depending on content inside ChatCompletionChunk
-       * 
-       * @param chunk: response from LLM
-       */
+     * Updates state depending on content inside ChatCompletionChunk
+     *
+     * @param chunk: response from LLM
+     */
     const handleOpenAIChunk = (
       receivedChatID: string,
       chunk: ChatCompletionChunk
     ) => {
       const newContent = chunk.choices[0].delta.content ?? "";
       appendContentToInlineQueryWindow(newContent);
-    }
+    };
 
     const openAITokenStreamListener = window.ipcRenderer.receive(
       "openAITokenStream",
@@ -41,15 +49,13 @@ const CreatePreviewFile: React.FC<CreatePreviewFileProps> = ({
     return () => {
       openAITokenStreamListener();
     };
-  }, [])
+  }, []);
 
-  const appendContentToInlineQueryWindow = (
-    newContent: string
-  ) => {
+  const appendContentToInlineQueryWindow = (newContent: string) => {
     setQueryChatWindow((prevContent) => {
       return prevContent + newContent;
     });
-  }
+  };
 
   const capitalizeFirstLetter = (word: string) => {
     return word.charAt(0).toUpperCase() + word.slice(1);
@@ -57,6 +63,8 @@ const CreatePreviewFile: React.FC<CreatePreviewFileProps> = ({
 
   useEffect(() => {
     const fetchLLMConfig = async () => {
+      setIsLoadingQuery(true);
+      setErrorOccured("");
       try {
         const defaultLLMName = await window.llm.getDefaultLLMName();
         const llmConfigs = await window.llm.getLLMConfigs();
@@ -77,10 +85,11 @@ const CreatePreviewFile: React.FC<CreatePreviewFileProps> = ({
 
         query.displayableChatHistory.push({
           role: "system",
-          content: "You are an expert in syntax and formatting, especially for enhancing note-taking efficiency and clarity. You will only follow the instructions given that relates to formatting. Do not provide extranneous information. The content will be given in JSON.",
+          content:
+            "You are an expert in syntax and formatting, especially for enhancing note-taking efficiency and clarity. You will only follow the instructions given that relates to formatting. Do not provide extranneous information. The content will be given in JSON.",
           messageType: "info",
           context: [],
-        })
+        });
 
         query.displayableChatHistory.push({
           role: "user",
@@ -94,17 +103,22 @@ const CreatePreviewFile: React.FC<CreatePreviewFileProps> = ({
           content: editorContent,
           messageType: "success",
           context: [],
-        })
+        });
 
-        await window.llm.streamingLLMResponse(
+        const response = await window.llm.streamingLLMResponse(
           defaultLLMName,
           currentModelConfig,
           false,
           query
         );
+
+        setIsLoadingQuery(false);
       } catch (error) {
         console.error("Failed to fetch LLM Config:", error);
-        // Handle errors as appropriate for your application
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        setErrorOccured(errorMessage);
+        setIsLoadingQuery(false);
       }
     };
 
@@ -124,7 +138,20 @@ const CreatePreviewFile: React.FC<CreatePreviewFileProps> = ({
         <div className="px-2 py-1 bg-blue-500 text-white rounded">Query</div>
         <p className="ml-2 text-white">{query.args[0]}</p>
       </div>
-      <div className="w-full text-white bg-black p-4">{queryChatWindow}</div>
+      <div className="w-full text-white bg-black p-4">
+        {isLoadingQuery ? (
+          <TypeAnimation
+            className="text-xl font-semibold mb-3 text-white"
+            sequence={[`Generating ${query.options}...`, 500]}
+            wrapper="span"
+            speed={50}
+          />
+        ) : errorOccured ? (
+          <div className="text-red-500">{errorOccured}</div>
+        ) : (
+          <div>We here</div>
+        )}
+      </div>
     </div>
   );
 };

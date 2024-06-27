@@ -270,6 +270,7 @@ export const registerStoreHandlers = (
     const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || [];
 
     const addTab = ({ tab }) => {
+      if (tab === null) return;
       const existingTab = openTabs.findIndex(
         (item) => item.filePath === tab.filePath
       );
@@ -284,6 +285,10 @@ export const registerStoreHandlers = (
     const removeTab = ({ tabId }) => {
       const updatedTabs = openTabs.filter((tab) => tab.id !== tabId);
       store.set(StoreKeys.OpenTabs, updatedTabs);
+    };
+
+    const clearAllTabs = () => {
+      store.set(StoreKeys.OpenTabs, []);
     };
 
     const updateTab = ({ draggedIndex, targetIndex }) => {
@@ -304,6 +309,9 @@ export const registerStoreHandlers = (
         break;
       case "update":
         updateTab(args);
+        break;
+      case "clear":
+        clearAllTabs();
         break;
       default:
         throw new Error("Unsupported action type");
