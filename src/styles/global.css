@@ -111,3 +111,23 @@ button {
   scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
   /* For Firefox, color and transparent track */
 }
+
+/* CSS for menu that appears when selecting/highlighting text */
+.bubble-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 125px;
+  background-color: #323232;
+  border: 1px solid #b3b3b3;
+  border-radius: 4px;
+}
+
+.bubble-menu button {
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: white;
+  padding: 6px;
+  border-bottom: 1px solid lightgray;
+}
