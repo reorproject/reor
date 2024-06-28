@@ -75,7 +75,10 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         </span>
       </div>
       {isOpen && (
-        <div className="absolute w-full text-[13px] border text-gray-600 border-gray-300 rounded-md shadow-lg z-10 bg-white max-h-60 overflow-auto">
+        <div
+          className="absolute w-full text-[13px] border text-gray-600 border-gray-300 rounded-md shadow-lg z-50 bg-white max-h-60 overflow-auto"
+          style={{ position: 'fixed', top: 'auto', left: wrapperRef.current?.getBoundingClientRect().left, width: wrapperRef.current?.getBoundingClientRect().width }}
+        >
           {options.map((option, index) => (
             <div
               key={index}

@@ -1,16 +1,16 @@
-import React, { useState } from "react";
-
-import { Button, List, ListItem } from "@material-tailwind/react";
-import FolderIcon from "@mui/icons-material/Folder";
-import { ListItemIcon, ListItemText } from "@mui/material";
-
-import { SuggestionsState } from "../Editor/FilesSuggestionsDisplay";
+import React, { useState, useEffect } from "react";
 import Modal from "../Generic/Modal";
+import { List, ListItem } from "@material-tailwind/react";
 import { SearchBarWithFilesSuggestion } from "../Generic/SearchBarWithFilesSuggestion";
-
+import { SuggestionsState } from "../Editor/FilesSuggestionsDisplay";
 import { ChatFilters } from "./Chat";
-
-
+import { ListItemIcon, ListItemText } from "@mui/material";
+import FolderIcon from "@mui/icons-material/Folder";
+import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/dist/style.css';
+import Slider from '@mui/material/Slider';
+import { sub } from 'date-fns';
+import CustomSelect from "../Generic/Select";
 
 interface Props {
   isOpen: boolean;
@@ -29,29 +29,99 @@ const AddContextFiltersModal: React.FC<Props> = ({
   chatFilters,
   setChatFilters,
 }) => {
-  const [internalFilesSelected, setInternalFilesSelected] = useState<string[]>(
-    chatFilters?.files || []
-  );
+  const [internalFilesSelected, setInternalFilesSelected] = useState<string[]>(chatFilters?.files || []);
   const [searchText, setSearchText] = useState<string>("");
-  const [suggestionsState, setSuggestionsState] =
-    useState<SuggestionsState | null>(null);
+  const [suggestionsState, setSuggestionsState] = useState<SuggestionsState | null>(null);
+  const [numberOfChunksToFetch, setNumberOfChunksToFetch] = useState<number>(chatFilters.numberOfChunksToFetch || 15);
+  const [minDate, setMinDate] = useState<Date | undefined>(chatFilters.minDate);
+  const [maxDate, setMaxDate] = useState<Date | undefined>(chatFilters.maxDate);
+  const [showAdvanced, setShowAdvanced] = useState<boolean>(false);
+  const [selectedDateRange, setSelectedDateRange] = useState<string>("Anytime");
 
-  const handleAddFilesToChatFilters = (files: string[]) => {
-    const currentChatFilters: ChatFilters = chatFilters
-      ? {
-          ...chatFilters,
-          files: [...new Set([...chatFilters.files, ...files])],
-        }
-      : {
-          numberOfChunksToFetch: 15,
-          files: [...files],
-        };
-    setChatFilters(currentChatFilters);
+  const dateRangeOptions = [
+    { label: 'Anytime', value: 'anytime' },
+    { label: 'Past hour', value: 'lastHour' },
+    { label: 'Past 24 hours', value: 'lastDay' },
+    { label: 'Past week', value: 'lastWeek' },
+    { label: 'Past month', value: 'lastMonth' },
+    { label: 'Past year', value: 'lastYear' },
+  ];
+
+  useEffect(() => {
+    const loadNumberOfChunks = async () => {
+      const storedChunks = await window.electronStore.getNoOfRAGExamples();
+      if (storedChunks !== undefined) {
+        setNumberOfChunksToFetch(storedChunks);
+      }
+    };
+
+    loadNumberOfChunks();
+  }, []);
+
+  useEffect(() => {
+    const updatedChatFilters: ChatFilters = {
+      ...chatFilters,
+      files: [...new Set([...chatFilters.files, ...internalFilesSelected])],
+      numberOfChunksToFetch: numberOfChunksToFetch,
+      minDate: minDate ? minDate : undefined,
+      maxDate: maxDate ? maxDate : undefined,
+    };
+    setChatFilters(updatedChatFilters);
+  }, [internalFilesSelected, numberOfChunksToFetch, minDate, maxDate]);
+
+  const handleNumberOfChunksChange = (event: Event, value: number | number[]) => {
+    const newValue = Array.isArray(value) ? value[0] : value;
+    setNumberOfChunksToFetch(newValue);
+    window.electronStore.setNoOfRAGExamples(newValue);
   };
+
+  const handleDateRangeChange = (value: string) => {
+    const now = new Date();
+    let newMinDate: Date | undefined;
+    switch (value) {
+      case 'anytime':
+        newMinDate = undefined;
+        break;
+      case 'lastHour':
+        newMinDate = sub(now, { hours: 1 });
+        break;
+      case 'lastDay':
+        newMinDate = sub(now, { days: 1 });
+        break;
+      case 'lastWeek':
+        newMinDate = sub(now, { weeks: 1 });
+        break;
+      case 'lastMonth':
+        newMinDate = sub(now, { months: 1 });
+        break;
+      case 'lastYear':
+        newMinDate = sub(now, { years: 1 });
+        break;
+      default:
+        newMinDate = undefined;
+    }
+    setMinDate(newMinDate);
+    setMaxDate(value === 'anytime' ? undefined : now);
+    setSelectedDateRange(dateRangeOptions.find(option => option.value === value)?.label || "");
+  };
+
+  const handleAdvancedToggle = () => {
+    setShowAdvanced(!showAdvanced);
+  };
+
+  // Define the marks to be closer together
+  const marks = Array.from({ length: 31 }, (_, i) => ({
+    value: i,
+    label: i % 5 === 0 ? i.toString() : '', // Show label every 5 steps
+  }));
+
+  useEffect(() => {
+    console.log("chatFilters updated:", chatFilters);
+  }, [chatFilters]);
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="ml-6 mt-2 mb-6 h-full w-[600px]">
+      <div className="ml-6 mt-2 mb-6 h-full w-[600px] max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <SearchBarWithFilesSuggestion
           vaultDirectory={vaultDirectory}
           titleText={titleText}
@@ -59,7 +129,6 @@ const AddContextFiltersModal: React.FC<Props> = ({
           setSearchText={setSearchText}
           onSelectSuggestion={(file: string) => {
             if (file && !internalFilesSelected.includes(file)) {
-              //TODO: add markdown extension properly
               setInternalFilesSelected([...internalFilesSelected, file]);
             }
             setSuggestionsState(null);
@@ -67,37 +136,93 @@ const AddContextFiltersModal: React.FC<Props> = ({
           suggestionsState={suggestionsState}
           setSuggestionsState={setSuggestionsState}
         />
-        <div className="text-white max-w-lg">
+        <div className="text-white w-full">
           <List placeholder="">
-            {internalFilesSelected.map((fileItem, index) => {
-              return (
-                <ListItem key={index} placeholder="">
-                  <ListItemIcon>
-                    <FolderIcon color="primary" />
-                  </ListItemIcon>
-                  <ListItemText primary={fileItem} />
-                </ListItem>
-              );
-            })}
+            {internalFilesSelected.map((fileItem, index) => (
+              <ListItem key={index} placeholder="">
+                <ListItemIcon>
+                  <FolderIcon color="primary" />
+                </ListItemIcon>
+                <ListItemText primary={fileItem} />
+              </ListItem>
+            ))}
           </List>
         </div>
-        <div className="flex justify-end">
-          {internalFilesSelected && (
-            <Button
-              className="bg-slate-600 border-none h-8 w-48 text-center vertical-align
-                cursor-pointer
-                disabled:pointer-events-none
-                disabled:opacity-25"
-              onClick={() => {
-                handleAddFilesToChatFilters(internalFilesSelected);
-                onClose();
-              }}
-              placeholder={""}
-            >
-              <div className="flex items-center justify-around h-full space-x-2">
-                Add to context
+        <p className="text-white w-full">Select number of notes to draw from:</p>
+        <div className="w-full bg-neutral-800 rounded pb-3 max-w-xl mx-auto">
+          <Slider
+            aria-label="Number of Notes"
+            value={numberOfChunksToFetch}
+            valueLabelDisplay="on"
+            step={1}
+            marks={marks}
+            min={0}
+            max={30}
+            onChange={handleNumberOfChunksChange}
+            sx={{
+              "& .MuiSlider-thumb": {
+                "&:focus, &:hover, &.Mui-active, &.Mui-focusVisible": {
+                  boxShadow: "none",
+                },
+                "&::after": {
+                  content: "none",
+                },
+              },
+              "& .MuiSlider-valueLabel": {
+                fontSize: "0.75rem",
+                padding: "3px 6px",
+                lineHeight: "1.2em",
+              },
+              "& .MuiSlider-markLabel": {
+                color: "#FFFFFF",
+              },
+              "& .MuiSlider-mark": {
+                color: "#FFFFFF",
+              },
+            }}
+          />
+        </div>
+        <div className="text-white mb-7 text-center">{numberOfChunksToFetch}</div>
+        <div className="text-white max-w-lg">
+            <p>Select notes from:</p>
+        </div>
+        {!showAdvanced && (
+          <div className="w-full bg-neutral-800 rounded pb-1">
+            <CustomSelect
+              options={dateRangeOptions}
+              selectedValue={selectedDateRange}
+              onChange={handleDateRangeChange}
+            />
+          </div>
+        )}
+        <div>
+          <div
+            className="text-gray-500 text-xs underline cursor-pointer"
+            onClick={handleAdvancedToggle}
+          >
+            {showAdvanced ? 'Hide Advanced' : 'Show Advanced'}
+          </div>
+          {showAdvanced && (
+            <div className="flex space-x-4 mt-4 w-full">
+              <div className="text-white flex-1 flex flex-col items-center">
+                <p className="mb-1">Min Date:</p>
+                <DayPicker 
+                  selected={minDate}
+                  onSelect={(date) => setMinDate(date || undefined)}
+                  mode="single"
+                  className="my-day-picker w-full"
+                />
               </div>
-            </Button>
+              <div className="text-white flex-1 flex flex-col items-center">
+                <p className="mb-1">Max Date:</p>
+                <DayPicker 
+                  selected={maxDate}
+                  onSelect={(date) => setMaxDate(date || undefined)}
+                  mode="single"
+                  className="my-day-picker w-full"
+                />
+              </div>
+            </div>
           )}
         </div>
       </div>

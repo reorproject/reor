@@ -29,7 +29,7 @@ const RagSettings: React.FC<RagSettingsProps> = ({ children }) => {
     window.electronStore.setNoOfRAGExamples(numberVersion);
   };
 
-  const possibleNoOfExamples = Array.from({ length: 30 }, (_, i) => i + 1);
+  const possibleNoOfExamples = Array.from({ length: 31 }, (_, i) => i);
 
   return (
     <div className="w-full bg-neutral-800 rounded pb-7">
