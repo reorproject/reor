@@ -179,8 +179,8 @@ export const SimilarEntriesComponent: React.FC<
   // filePath,
   similarEntries,
   setSimilarEntries,
-  isRefined,
-  setIsRefined,
+  // isRefined,
+  // setIsRefined,
   onFileSelect,
   saveCurrentFile,
   updateSimilarEntries,
@@ -229,7 +229,7 @@ export const SimilarEntriesComponent: React.FC<
               )}
             </div>
           </div>
-          <div className="text-sm flex items-center justify-center">
+          {/* <div className="text-sm flex items-center justify-center">
             {updateSimilarEntries && (
               <button
                 className="bg-slate-600 m-2 rounded-lg border-none h-6 w-40 text-center vertical-align text-white cursor-pointer"
@@ -242,7 +242,7 @@ export const SimilarEntriesComponent: React.FC<
                 {isRefined ? "Un-rerank" : "Rerank results"}
               </button>
             )}
-          </div>
+          </div> */}
           {similarEntries.length > 0 && (
             <div className="h-full w-full">
               {similarEntries
