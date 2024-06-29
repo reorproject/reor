@@ -43,7 +43,11 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({
             ? "Initializing vector database..."
             : "Indexing files..."}
         </h6>
-        <div className="w-full h-4 bg-neutral-800 rounded-full overflow-hidden mb-2 border-2 border-gray-400">
+        <div
+          className={`w-full h-4 rounded-full overflow-hidden mb-2 border-2 border-gray-400 ${
+            indexingProgress !== 0 ? "bg-neutral-800" : ""
+          }`}
+        >
           <div
             className="bg-blue-400 h-full transition-all duration-300 ease-out"
             style={{ width: `${indexingProgress * 100}%` }}
