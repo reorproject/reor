@@ -1,3 +1,4 @@
+import * as fs from "fs/promises";
 import { release } from "node:os";
 import { join } from "node:path";
 import * as path from "path";
@@ -34,8 +35,6 @@ import {
   registerStoreHandlers,
 } from "./Store/storeHandlers";
 import WindowsManager from "./windowManager";
-
-const fs = require('fs').promises;
 
 const store = new Store<StoreSchema>();
 // store.clear(); // clear store for testing
@@ -191,8 +190,7 @@ ipcMain.handle("show-context-menu-item", (event) => {
   );
 
   const browserWindow = BrowserWindow.fromWebContents(event.sender);
-  if (browserWindow)
-    menu.popup({ window: browserWindow })
+  if (browserWindow) menu.popup({ window: browserWindow });
 });
 
 ipcMain.handle("show-context-menu-file-item", async (event, file) => {

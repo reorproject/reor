@@ -15,7 +15,6 @@ import {
   ChatCompletionMessageParam,
 } from "openai/resources/chat/completions";
 
-
 // import ollama,"ollama";
 
 import { LLMSessionService } from "../Types";
@@ -236,12 +235,12 @@ export class OllamaService implements LLMSessionService {
   }
 
   async streamingResponse(
-    modelName: string,
-    modelConfig: OpenAILLMConfig,
-    isJSONMode: boolean,
-    messageHistory: ChatCompletionMessageParam[],
-    handleChunk: (chunk: ChatCompletionChunk) => void,
-    generationParams?: LLMGenerationParameters
+    _modelName: string,
+    _modelConfig: OpenAILLMConfig,
+    _isJSONMode: boolean,
+    _messageHistory: ChatCompletionMessageParam[],
+    _handleChunk: (chunk: ChatCompletionChunk) => void,
+    _generationParams?: LLMGenerationParameters
   ): Promise<void> {
     throw new Error("Method not implemented.");
   }

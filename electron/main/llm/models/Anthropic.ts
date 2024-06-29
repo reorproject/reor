@@ -14,9 +14,7 @@ import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { customFetchUsingElectronNetStreaming } from "../../Generic/network";
 import { LLMSessionService } from "../Types";
 
-
 import { ChatMessageToDisplay } from "@/components/Chat/Chat";
-
 
 export class AnthropicModelSessionService implements LLMSessionService {
   public getTokenizer = (llmName: string): ((text: string) => number[]) => {
@@ -91,6 +89,6 @@ function cleanMessage(
   message: ChatMessageToDisplay
 ): ChatCompletionMessageParam {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { messageType, context, visibleContent, ...cleanMessage } = message;
+  const { ...cleanMessage } = message;
   return cleanMessage;
 }

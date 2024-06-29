@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
+import { MathExtension } from "@aarkue/tiptap-math-extension";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import TaskItem from "@tiptap/extension-task-item";
@@ -10,7 +11,6 @@ import { Editor, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { toast } from "react-toastify";
 import { Markdown } from "tiptap-markdown";
-import { MathExtension } from "@aarkue/tiptap-math-extension";
 import { useDebounce } from "use-debounce";
 
 import { BacklinkExtension } from "@/components/Editor/BacklinkExtension";

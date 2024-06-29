@@ -94,6 +94,6 @@ function cleanMessage(
   message: ChatMessageToDisplay
 ): ChatCompletionMessageParam {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { messageType, context, visibleContent, ...cleanMessage } = message;
+  const { ...cleanMessage } = message;
   return cleanMessage;
 }

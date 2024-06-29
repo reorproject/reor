@@ -1,6 +1,7 @@
+import React, { useEffect, useState } from "react";
+
 import { Button } from "@material-tailwind/react";
 import Switch from "@mui/material/Switch";
-import React, { useEffect, useState } from "react";
 
 import { useFileByFilepath } from "../File/hooks/use-file-by-filepath";
 

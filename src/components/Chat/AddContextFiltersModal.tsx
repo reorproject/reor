@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from "react";
-import Modal from "../Generic/Modal";
+
 import { List, ListItem } from "@material-tailwind/react";
-import { SearchBarWithFilesSuggestion } from "../Generic/SearchBarWithFilesSuggestion";
-import { SuggestionsState } from "../Editor/FilesSuggestionsDisplay";
-import { ChatFilters } from "./Chat";
-import { ListItemIcon, ListItemText } from "@mui/material";
 import FolderIcon from "@mui/icons-material/Folder";
-import { DayPicker } from 'react-day-picker';
-import 'react-day-picker/dist/style.css';
-import Slider from '@mui/material/Slider';
-import { sub } from 'date-fns';
+import { ListItemIcon, ListItemText } from "@mui/material";
+import Slider from "@mui/material/Slider";
+import { sub } from "date-fns";
+import { DayPicker } from "react-day-picker";
+
+import { SuggestionsState } from "../Editor/FilesSuggestionsDisplay";
+import "react-day-picker/dist/style.css";
+import Modal from "../Generic/Modal";
+import { SearchBarWithFilesSuggestion } from "../Generic/SearchBarWithFilesSuggestion";
 import CustomSelect from "../Generic/Select";
+
+import { ChatFilters } from "./Chat";
 
 interface Props {
   isOpen: boolean;
@@ -29,22 +32,27 @@ const AddContextFiltersModal: React.FC<Props> = ({
   chatFilters,
   setChatFilters,
 }) => {
-  const [internalFilesSelected, setInternalFilesSelected] = useState<string[]>(chatFilters?.files || []);
+  const [internalFilesSelected, setInternalFilesSelected] = useState<string[]>(
+    chatFilters?.files || []
+  );
   const [searchText, setSearchText] = useState<string>("");
-  const [suggestionsState, setSuggestionsState] = useState<SuggestionsState | null>(null);
-  const [numberOfChunksToFetch, setNumberOfChunksToFetch] = useState<number>(chatFilters.numberOfChunksToFetch || 15);
+  const [suggestionsState, setSuggestionsState] =
+    useState<SuggestionsState | null>(null);
+  const [numberOfChunksToFetch, setNumberOfChunksToFetch] = useState<number>(
+    chatFilters.numberOfChunksToFetch || 15
+  );
   const [minDate, setMinDate] = useState<Date | undefined>(chatFilters.minDate);
   const [maxDate, setMaxDate] = useState<Date | undefined>(chatFilters.maxDate);
   const [showAdvanced, setShowAdvanced] = useState<boolean>(false);
   const [selectedDateRange, setSelectedDateRange] = useState<string>("Anytime");
 
   const dateRangeOptions = [
-    { label: 'Anytime', value: 'anytime' },
-    { label: 'Past hour', value: 'lastHour' },
-    { label: 'Past 24 hours', value: 'lastDay' },
-    { label: 'Past week', value: 'lastWeek' },
-    { label: 'Past month', value: 'lastMonth' },
-    { label: 'Past year', value: 'lastYear' },
+    { label: "Anytime", value: "anytime" },
+    { label: "Past hour", value: "lastHour" },
+    { label: "Past 24 hours", value: "lastDay" },
+    { label: "Past week", value: "lastWeek" },
+    { label: "Past month", value: "lastMonth" },
+    { label: "Past year", value: "lastYear" },
   ];
 
   useEffect(() => {
@@ -69,7 +77,10 @@ const AddContextFiltersModal: React.FC<Props> = ({
     setChatFilters(updatedChatFilters);
   }, [internalFilesSelected, numberOfChunksToFetch, minDate, maxDate]);
 
-  const handleNumberOfChunksChange = (event: Event, value: number | number[]) => {
+  const handleNumberOfChunksChange = (
+    event: Event,
+    value: number | number[]
+  ) => {
     const newValue = Array.isArray(value) ? value[0] : value;
     setNumberOfChunksToFetch(newValue);
     window.electronStore.setNoOfRAGExamples(newValue);
@@ -79,30 +90,32 @@ const AddContextFiltersModal: React.FC<Props> = ({
     const now = new Date();
     let newMinDate: Date | undefined;
     switch (value) {
-      case 'anytime':
+      case "anytime":
         newMinDate = undefined;
         break;
-      case 'lastHour':
+      case "lastHour":
         newMinDate = sub(now, { hours: 1 });
         break;
-      case 'lastDay':
+      case "lastDay":
         newMinDate = sub(now, { days: 1 });
         break;
-      case 'lastWeek':
+      case "lastWeek":
         newMinDate = sub(now, { weeks: 1 });
         break;
-      case 'lastMonth':
+      case "lastMonth":
         newMinDate = sub(now, { months: 1 });
         break;
-      case 'lastYear':
+      case "lastYear":
         newMinDate = sub(now, { years: 1 });
         break;
       default:
         newMinDate = undefined;
     }
     setMinDate(newMinDate);
-    setMaxDate(value === 'anytime' ? undefined : now);
-    setSelectedDateRange(dateRangeOptions.find(option => option.value === value)?.label || "");
+    setMaxDate(value === "anytime" ? undefined : now);
+    setSelectedDateRange(
+      dateRangeOptions.find((option) => option.value === value)?.label || ""
+    );
   };
 
   const handleAdvancedToggle = () => {
@@ -112,7 +125,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
   // Define the marks to be closer together
   const marks = Array.from({ length: 31 }, (_, i) => ({
     value: i,
-    label: i % 5 === 0 ? i.toString() : '', // Show label every 5 steps
+    label: i % 5 === 0 ? i.toString() : "", // Show label every 5 steps
   }));
 
   useEffect(() => {
@@ -148,7 +161,9 @@ const AddContextFiltersModal: React.FC<Props> = ({
             ))}
           </List>
         </div>
-        <p className="text-white w-full">Select number of notes to draw from:</p>
+        <p className="text-white w-full">
+          Select number of notes to draw from:
+        </p>
         <div className="w-full bg-neutral-800 rounded pb-3 max-w-xl mx-auto">
           <Slider
             aria-label="Number of Notes"
@@ -182,9 +197,11 @@ const AddContextFiltersModal: React.FC<Props> = ({
             }}
           />
         </div>
-        <div className="text-white mb-7 text-center">{numberOfChunksToFetch}</div>
+        <div className="text-white mb-7 text-center">
+          {numberOfChunksToFetch}
+        </div>
         <div className="text-white max-w-lg">
-            <p>Select notes from:</p>
+          <p>Select notes from:</p>
         </div>
         {!showAdvanced && (
           <div className="w-full bg-neutral-800 rounded pb-1">
@@ -200,13 +217,13 @@ const AddContextFiltersModal: React.FC<Props> = ({
             className="text-gray-500 text-xs underline cursor-pointer"
             onClick={handleAdvancedToggle}
           >
-            {showAdvanced ? 'Hide Advanced' : 'Show Advanced'}
+            {showAdvanced ? "Hide Advanced" : "Show Advanced"}
           </div>
           {showAdvanced && (
             <div className="flex space-x-4 mt-4 w-full">
               <div className="text-white flex-1 flex flex-col items-center">
                 <p className="mb-1">Min Date:</p>
-                <DayPicker 
+                <DayPicker
                   selected={minDate}
                   onSelect={(date) => setMinDate(date || undefined)}
                   mode="single"
@@ -215,7 +232,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
               </div>
               <div className="text-white flex-1 flex flex-col items-center">
                 <p className="mb-1">Max Date:</p>
-                <DayPicker 
+                <DayPicker
                   selected={maxDate}
                   onSelect={(date) => setMaxDate(date || undefined)}
                   mode="single"

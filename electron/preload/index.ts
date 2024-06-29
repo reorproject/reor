@@ -1,4 +1,7 @@
 import { IpcRendererEvent, contextBridge, ipcRenderer } from "electron";
+import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
+import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
+import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import {
   AugmentPromptWithFileProps,
   FileInfoNode,
@@ -15,9 +18,6 @@ import {
   LLMConfig,
   LLMGenerationParameters,
 } from "electron/main/Store/storeConfig";
-import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
-import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
-import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
 
 import { ChatHistory } from "@/components/Chat/Chat";
 import { ChatHistoryMetadata } from "@/components/Chat/hooks/use-chat-history";
