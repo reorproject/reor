@@ -23,9 +23,10 @@ type ModalName =
   | "flashcardReviewMode"
   | "newEmbeddingModel"
   | "localLLMSetting"
-  | "remoteLLMSetting";
+  | "remoteLLMSetting"
+  | "indexingProgress";
 
-type Dimension = "[500px]" | "[750px]" | "[300px]" | "full";
+type Dimension = "[500px]" | "[750px]" | "[300px]" | "full" | "[850px]";
 
 const customDimensionsMap: Record<ModalName, Dimension> = {
   newNote: "[500px]",
@@ -37,6 +38,7 @@ const customDimensionsMap: Record<ModalName, Dimension> = {
   newEmbeddingModel: "[500px]",
   localLLMSetting: "[500px]",
   remoteLLMSetting: "[500px]",
+  indexingProgress: "[850px]",
 };
 
 const getDimension = (name: ModalName | undefined): Dimension => {

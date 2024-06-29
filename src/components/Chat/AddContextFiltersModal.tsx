@@ -204,7 +204,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
           <p>Select notes from:</p>
         </div>
         {!showAdvanced && (
-          <div className="w-full bg-neutral-800 rounded pb-1">
+          <div className="w-full  rounded pb-1">
             <CustomSelect
               options={dateRangeOptions}
               selectedValue={selectedDateRange}

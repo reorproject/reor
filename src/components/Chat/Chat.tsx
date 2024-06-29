@@ -33,8 +33,8 @@ enum AskOptions {
 
 const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
   [AskOptions.Ask]: [
-    "What are my thoughts on AGI?",
-    "Tell me about my notes on Nietzsche",
+    // "What are my thoughts on AGI?",
+    // "Tell me about my notes on Nietzsche",
   ],
   // [AskOptions.AskFile]: [
   //   "Summarize this file",
