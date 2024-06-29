@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Button } from "@material-tailwind/react";
 
+import { Button } from "@material-tailwind/react";
 import Slider from "@mui/material/Slider";
 import { LLMGenerationParameters } from "electron/main/Store/storeConfig";
 
@@ -14,7 +14,6 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
     });
 
   const [userHasMadeUpdate, setUserHasMadeUpdate] = useState(false);
-  const [invalidInputErr, setInvalidInputErr] = useState(false);
   const inputRef = useRef(null);
   // const [temperature, setTemperature] = useState<number | null>();
   // const [maxTokens, setMaxTokens] = useState<number | null>();
@@ -38,7 +37,7 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
     }
   };
 
-  const handleTokenInput = (e) => {
+  const handleTokenInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUserHasMadeUpdate(true);
     const inputVal = e.target.value;
     let newMaxTokens;
@@ -62,8 +61,8 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
       ...textGenerationParams,
       maxTokens: newMaxTokens,
     });
-  }
-
+    // window.electronStore.setLLMGenerationParams(textGenerationParams);
+  };
 
   return (
     <div className="w-full h-full flex flex-col justify-between bg-dark-gray-c-three rounded pb-7">
@@ -71,7 +70,6 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
         Text Generation
       </h2>{" "}
       <div className="justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2 mt-5">
-
         <p className="mt-2 text-gray-100 mb-1">Temperature:</p>
         <div className="pl-1 mt-2 ">
           <Slider
@@ -118,7 +116,8 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
         <div className="flex flex-col">
           <p className="mt-2 text-gray-100 mb-1">Max Tokens</p>
           <p className="mt-1 text-xs text-gray-100 mb-0">
-            Maximum number of tokens to generate.
+            Maximum number of tokens to generate per output. Recommend to keep
+            as is and let the model decide.
           </p>
         </div>
         <div className="flex flex-col">
@@ -128,23 +127,11 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
             value={textGenerationParams?.maxTokens}
             onChange={(e) => handleTokenInput(e)}
             ref={inputRef}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                handleSave();
-                if (inputRef.current) inputRef.current.blur();
-              }
-
-            }}
-            placeholder="0.0"
+            placeholder="None"
           />
-          {invalidInputErr && 
-            <div className='pt-4'>
-              Testing
-            </div>
-          }
         </div>
       </div>
-      {/* {userHasMadeUpdate && (
+      {userHasMadeUpdate && (
         <div className="flex">
           <Button
             // variant="contained"
@@ -155,7 +142,7 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
             Save
           </Button>
         </div>
-      )} */}
+      )}
     </div>
   );
 };
