@@ -1,6 +1,7 @@
+import React, { useCallback, useEffect, useState } from "react";
+
 import { EditorContent } from "@tiptap/react";
 import posthog from "posthog-js";
-import React, { useCallback, useEffect, useState } from "react";
 
 import "../styles/global.css";
 import ChatWithLLM, { ChatFilters, ChatHistory } from "./Chat/Chat";
@@ -14,7 +15,7 @@ import SidebarManager from "./Sidebars/MainSidebar";
 import SidebarComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 
-interface FileEditorContainerProps { }
+interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search" | "chats";
 
 const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
@@ -68,7 +69,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     files: [],
     numberOfChunksToFetch: 15,
     minDate: new Date(0),
-    maxDate: new Date(),  
+    maxDate: new Date(),
   });
 
   const [showSearch, setShowSearch] = useState(false);
@@ -100,12 +101,12 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  const handleNextSearch = (event) => {
+  const handleNextSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       event.preventDefault();
       editor?.commands.nextSearchResult();
       goToSelection();
-      event.target.focus();
+      (event.target as HTMLInputElement).focus();
     } else if (event.key === "Escape") {
       toggleSearch();
       handleSearchChange("");
@@ -114,15 +115,13 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
 
   const goToSelection = () => {
     if (!editor) return;
-
     const { results, resultIndex } = editor.storage.searchAndReplace;
     const position = results[resultIndex];
     if (!position) return;
-
     editor.commands.setTextSelection(position);
     const { node } = editor.view.domAtPos(editor.state.selection.anchor);
-    if (node) {
-      (node as any).scrollIntoView?.(false);
+    if (node instanceof Element) {
+      node.scrollIntoView?.(false);
     }
   };
 

@@ -5,8 +5,8 @@ import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
-import TextStyle from "@tiptap/extension-text-style";
 import Text from "@tiptap/extension-text";
+import TextStyle from "@tiptap/extension-text-style";
 import { Editor, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { toast } from "react-toastify";
@@ -57,6 +57,7 @@ export const useFileByFilepath = () => {
     text: "",
     position: null,
   });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
 
   const setFileNodeToBeRenamed = async (filePath: string) => {
@@ -136,7 +137,7 @@ export const useFileByFilepath = () => {
     };
 
     // Even listener
-    const handleChangeMarkdown = (isMarkdownSet) => {
+    const handleChangeMarkdown = (isMarkdownSet: boolean) => {
       setDisplayMarkdown(isMarkdownSet);
     };
 
@@ -166,9 +167,8 @@ export const useFileByFilepath = () => {
       }),
       TextStyle,
       SearchAndReplace.configure({
-       searchResultClass: "bg-yellow-400",
-       caseSensitive: false,
-       disableRegex: false,
+        searchResultClass: "bg-yellow-400",
+        disableRegex: false,
       }),
       Markdown.configure({
         html: true, // Allow HTML input/output

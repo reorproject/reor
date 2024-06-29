@@ -6,7 +6,7 @@ interface ModalProps {
   children: React.ReactNode;
   hideCloseButton?: boolean;
   tailwindStylesOnBackground?: string;
-  name?: string;
+  name?: ModalName;
 }
 
 /*
@@ -14,7 +14,20 @@ interface ModalProps {
  * should display is different than what settings should be. This is a wrapper to select the width
  * that should be displayed.
  */
-const customDimensionsMap = {
+type ModalName =
+  | "newNote"
+  | "newDirectory"
+  | "renameNote"
+  | "renameDirectory"
+  | "flashcardMode"
+  | "flashcardReviewMode"
+  | "newEmbeddingModel"
+  | "localLLMSetting"
+  | "remoteLLMSetting";
+
+type Dimension = "[500px]" | "[750px]" | "[300px]" | "full";
+
+const customDimensionsMap: Record<ModalName, Dimension> = {
   newNote: "[500px]",
   newDirectory: "[500px]",
   renameNote: "[500px]",
@@ -26,7 +39,10 @@ const customDimensionsMap = {
   remoteLLMSetting: "[500px]",
 };
 
-const getDimension = (name) => {
+const getDimension = (name: ModalName | undefined): Dimension => {
+  if (name === undefined) {
+    return "full";
+  }
   return customDimensionsMap[name] || "full";
 };
 
@@ -39,7 +55,7 @@ const Modal: React.FC<ModalProps> = ({
   name,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
-  const widthClass = getDimension(name);
+  const widthClass = getDimension(name as ModalName);
 
   const handleOffClick = (event: MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(event.target as Node)) {

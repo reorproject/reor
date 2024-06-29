@@ -63,8 +63,8 @@ export type ChatMessageToDisplay = ChatCompletionMessageParam & {
 export interface ChatFilters {
   numberOfChunksToFetch: number;
   files: string[];
-  minDate?: Date; 
-  maxDate?: Date; 
+  minDate?: Date;
+  maxDate?: Date;
 }
 
 interface ChatWithLLMProps {
@@ -386,7 +386,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       {showSimilarFiles && (
         <SimilarEntriesComponent
           similarEntries={currentContext}
-          titleText="Context Used in Chat"
+          titleText="Context used in chat"
           onFileSelect={(path: string) => {
             openFileByPath(path);
             posthog.capture("open_file_from_chat_context");

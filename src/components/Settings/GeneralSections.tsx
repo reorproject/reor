@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 
 import Switch from "@mui/material/Switch";
 
-enum SettingsAppearance {
-  light = "lightMode",
-  dark = "darkMode",
-  materialDark = "materialDarkMode",
-  lightBlue = "lightBlueMode",
-  /* custom = "NOT-YET-IMPLEMENTED */
-}
+// enum SettingsAppearance {
+//   light = "lightMode",
+//   dark = "darkMode",
+//   materialDark = "materialDarkMode",
+//   lightBlue = "lightBlueMode",
+//   /* custom = "NOT-YET-IMPLEMENTED */
+// }
 
 export interface GenSettingsProps {
   // iconSBIsCompact?: boolean /* True: Sets padding on Icon Sidebar */;
@@ -17,9 +17,10 @@ export interface GenSettingsProps {
 
 const CreateAppearanceSection: React.FC = () => {
   const [isIconSBCompact, setIsIconSBCompact] = useState<boolean>(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
-  const [editorAppearance, setEditorApperance] =
-    useState<SettingsAppearance>("dark");
+  // const [editorAppearance, setEditorApperance] =
+  //   useState<SettingsAppearance>("dark");
 
   // Check if SidebarCompact is on or not
   useEffect(() => {
