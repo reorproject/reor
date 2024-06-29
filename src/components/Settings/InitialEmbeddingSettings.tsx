@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 
 import { EmbeddingModelConfig } from "electron/main/Store/storeConfig";
 
-
 import CustomSelect from "../Generic/Select";
 
 import NewEmbeddingModelModalBothTypes from "./ExtraModals/NewEmbeddingModelBothTypes";
@@ -88,8 +87,8 @@ const InitialEmbeddingModelSettings: React.FC<
   };
 
   return (
-    <div className="w-full bg-neutral-800 rounded">
-      <h3 className="font-semibold mb-2 text-white">Embedding Model</h3>{" "}
+    <div className="w-full bg-dark-gray-c-three rounded flex justify-between items-center">
+      <p className="mb-2 pb-3 text-gray-100">Embedding Model</p>{" "}
       {/* <CustomSelect
         options={modelRepos}
         value={selectedModel}

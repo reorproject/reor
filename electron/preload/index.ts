@@ -149,6 +149,10 @@ declare global {
       setHardwareConfig: (config: HardwareConfig) => void;
       getLLMGenerationParams: () => Promise<LLMGenerationParameters>;
       setLLMGenerationParams: (params: LLMGenerationParameters) => void;
+      getDisplayMarkdown: () => Promise<boolean>;
+      setDisplayMarkdown: (displayMarkdown: boolean) => void;
+      getSBCompact: () => Promise<boolean>;
+      setSBCompact: (isCompact: boolean) => void;
       getAnalyticsMode: () => Promise<boolean>;
       setAnalyticsMode: (isAnalytics: boolean) => void;
       getSpellCheckMode: () => Promise<string>;
@@ -316,6 +320,18 @@ contextBridge.exposeInMainWorld("electronStore", {
   },
   getChatHistory: (chatID: string) => {
     return ipcRenderer.invoke("get-chat-history", chatID);
+  },
+  getSBCompact: () => {
+    return ipcRenderer.invoke("get-sb-compact");
+  },
+  setSBCompact: (isSBCompact: boolean) => {
+    ipcRenderer.invoke("set-sb-compact", isSBCompact);
+  },
+  getDisplayMarkdown: () => {
+    return ipcRenderer.invoke("get-display-markdown");
+  },
+  setDisplayMarkdown: (displayMarkdown: boolean) => {
+    ipcRenderer.invoke("set-display-markdown", displayMarkdown);
   },
 });
 
