@@ -31,3 +31,4 @@ release
 
 data
 binaries
+.env
