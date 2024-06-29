@@ -8,15 +8,15 @@ const path = require("path");
 // Mapping of OS to binary info
 const binariesInfo = {
   darwin: {
-    url: "https://github.com/ollama/ollama/releases/download/v0.1.30/ollama-darwin",
+    url: "https://github.com/ollama/ollama/releases/download/v0.1.48/ollama-darwin",
     path: "../binaries/darwin/ollama-darwin",
   },
   linux: {
-    url: "https://github.com/ollama/ollama/releases/download/v0.1.30/ollama-linux-amd64",
+    url: "https://github.com/ollama/ollama/releases/download/v0.1.48/ollama-linux-amd64",
     path: "../binaries/linux/ollama-linux-amd64",
   },
   win32: {
-    url: "https://github.com/ollama/ollama/releases/download/v0.1.30/ollama-windows-amd64.exe",
+    url: "https://github.com/ollama/ollama/releases/download/v0.1.48/ollama-windows-amd64.exe",
     path: "../binaries/win32/ollama-windows-amd64.exe",
   },
 };
