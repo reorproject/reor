@@ -3,11 +3,9 @@ import React, { useState } from "react";
 import Modal from "../Generic/Modal";
 
 import AnalyticsSettings from "./AnalyticsSettings";
-import ChunkSizeSettings from "./ChunkSizeSettings";
 import EmbeddingModelSettings from "./EmbeddingSettings";
 import GeneralSettings from "./GeneralSettings";
 import LLMSettings from "./LLMSettings";
-import RagSettings from "./RagSettings";
 import TextGenerationSettings from "./TextGenerationSettings";
 
 interface ModalProps {
@@ -20,7 +18,7 @@ enum SettingsTab {
   LLMSettings = "llmSettings",
   EmbeddingModel = "embeddingModel",
   TextGeneration = "textGeneration",
-  RAG = "RAG",
+  // RAG = "RAG",
   ANALYTICS = "analytics",
 }
 
@@ -93,7 +91,7 @@ const SettingsModal: React.FC<ModalProps> = ({
           >
             Text Generation{" "}
           </div>
-          <div
+          {/* <div
             className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
               activeTab === SettingsTab.RAG
                 ? "bg-neutral-700 text-white font-semibold"
@@ -102,7 +100,7 @@ const SettingsModal: React.FC<ModalProps> = ({
             onClick={() => setActiveTab(SettingsTab.RAG)}
           >
             RAG{" "}
-          </div>
+          </div> */}
           <div
             className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
               activeTab === SettingsTab.ANALYTICS
@@ -158,7 +156,7 @@ const SettingsModal: React.FC<ModalProps> = ({
             </div>
           )}
 
-          {activeTab === SettingsTab.RAG && (
+          {/* {activeTab === SettingsTab.RAG && (
             <div className="w-full">
               <h2 className="text-2xl font-semibold mb-5 text-white">RAG</h2>{" "}
               <RagSettings>
@@ -172,7 +170,7 @@ const SettingsModal: React.FC<ModalProps> = ({
                 </p>
               </ChunkSizeSettings>
             </div>
-          )}
+          )} */}
 
           {activeTab === SettingsTab.GeneralSettings && (
             <div className="w-full">
