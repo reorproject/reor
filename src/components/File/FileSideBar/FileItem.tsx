@@ -1,12 +1,10 @@
-
 import React, { useState } from "react";
 
 import { FileInfoNode } from "electron/main/Files/Types";
 import posthog from "posthog-js";
-import { FaChevronRight , FaChevronDown } from "react-icons/fa";
+import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 
 import { isFileNodeDirectory, moveFile } from "./fileOperations";
-
 
 import { removeFileExtension } from "@/functions/strings";
 
@@ -45,6 +43,7 @@ export const FileItem: React.FC<FileInfoProps> = ({
 
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     setIsDragOver(false); // Reset drag over state
     const sourcePath = e.dataTransfer.getData("text/plain");
     let destinationPath = file.path; // Default destination path is the path of the file item itself
@@ -79,12 +78,12 @@ export const FileItem: React.FC<FileInfoProps> = ({
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     window.contextMenu.showFileItemContextMenu(file);
   };
 
-  const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-neutral-700 h-full mt-0 mb-0 ${
-    isSelected ? "bg-neutral-700 text-white font-semibold" : "text-gray-200"
-  } ${isDragOver ? "bg-neutral-500" : ""}`;
+  const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-neutral-700 h-full mt-0 mb-0 ${isSelected ? "bg-neutral-700 text-white font-semibold" : "text-gray-200"
+    } ${isDragOver ? "bg-neutral-500" : ""}`;
 
   return (
     <div
@@ -107,9 +106,8 @@ export const FileItem: React.FC<FileInfoProps> = ({
           </span>
         )}
         <span
-          className={`text-[13px] flex-1 truncate mt-0 ${
-            isDirectory ? "font-semibold" : ""
-          }`}
+          className={`text-[13px] flex-1 truncate mt-0 ${isDirectory ? "font-semibold" : ""
+            }`}
         >
           {isDirectory ? file.name : removeFileExtension(file.name)}
         </span>

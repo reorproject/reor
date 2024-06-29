@@ -76,12 +76,27 @@ export const resolveRAGContext = async (
   if (chatFilters.files.length > 0) {
     console.log("chatFilters.files", chatFilters.files);
     results = await window.files.getFilesystemPathsAsDBItems(chatFilters.files);
-  } else {
+  } else if (chatFilters.numberOfChunksToFetch > 0) {
+    const timeStampFilter = generateTimeStampFilter(chatFilters.minDate, chatFilters.maxDate);
     results = await window.database.search(
       query,
-      chatFilters.numberOfChunksToFetch
+      chatFilters.numberOfChunksToFetch,
+      timeStampFilter
     );
   }
+
+  // Provide default context if no files are selected and numberOfChunksToFetch is 0
+  if (results.length === 0) {
+    results = [{
+      notepath: 'default/path',
+      content: 'Default context content when no notes are selected.',
+      subnoteindex: 0,
+      timeadded: new Date(),
+      filemodified: new Date(),
+      filecreated: new Date(),
+    }];
+  }
+
   console.log("RESULTS", results);
   return {
     messageType: "success",
@@ -93,3 +108,25 @@ export const resolveRAGContext = async (
     visibleContent: query,
   };
 };
+
+export const generateTimeStampFilter = (
+  minDate?: Date,
+  maxDate?: Date
+): string => {
+  let filter = '';
+
+  if (minDate) {
+    const minDateStr = minDate.toISOString().slice(0, 19).replace('T', ' ');
+    filter += `filemodified > timestamp '${minDateStr}'`;
+  }
+
+  if (maxDate) {
+    const maxDateStr = maxDate.toISOString().slice(0, 19).replace('T', ' ');
+    if (filter) {
+      filter += ' AND ';
+    }
+    filter += `filemodified < timestamp '${maxDateStr}'`;
+  }
+
+  return filter;
+}

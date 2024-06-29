@@ -169,6 +169,16 @@ export const registerStoreHandlers = (
     return store.get(StoreKeys.Analytics);
   });
 
+  ipcMain.handle("set-spellcheck-mode", (event, isSpellCheck) => {
+    console.log("setting spellcheck params", isSpellCheck);
+    store.set(StoreKeys.SpellCheck, isSpellCheck);
+  });
+
+  ipcMain.handle("get-spellcheck-mode", () => {
+    console.log("getting spellcheck params", store.get(StoreKeys.SpellCheck));
+    return store.get(StoreKeys.SpellCheck);
+  });
+
   ipcMain.handle("has-user-opened-app-before", () => {
     return store.get(StoreKeys.hasUserOpenedAppBefore);
   });

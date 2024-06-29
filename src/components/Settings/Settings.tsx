@@ -22,7 +22,6 @@ enum SettingsTab {
   TextGeneration = "textGeneration",
   RAG = "RAG",
   ANALYTICS = "analytics",
-  ChunkSize = "chunkSize",
 }
 
 const SettingsModal: React.FC<ModalProps> = ({
@@ -30,7 +29,9 @@ const SettingsModal: React.FC<ModalProps> = ({
   onClose: onCloseFromParent,
 }) => {
   const [willNeedToReIndex, setWillNeedToReIndex] = useState(false);
-  const [activeTab, setActiveTab] = useState("generalSettings");
+  const [activeTab, setActiveTab] = useState<SettingsTab>(
+    SettingsTab.LLMSettings
+  );
 
   const handleSave = () => {
     if (willNeedToReIndex) {
@@ -51,7 +52,7 @@ const SettingsModal: React.FC<ModalProps> = ({
     >
       <div className="flex w-full h-full">
         <div className="flex flex-col w-[150px] h-[600px] bg-dark-gray-c-seven text-white border-r-[0.1px] border-gray-700 border-solid border-b-0 border-t-0 border-l-0 p-2">
-          <div
+          {/* <div
             className={`flex items-center mt-2 rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
               activeTab === SettingsTab.GeneralSettings
                 ? "bg-neutral-700 text-white font-semibold"
@@ -60,7 +61,7 @@ const SettingsModal: React.FC<ModalProps> = ({
             onClick={() => setActiveTab(SettingsTab.GeneralSettings)}
           >
             General
-          </div>
+          </div> */}
           <div
             className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
               activeTab === SettingsTab.LLMSettings
@@ -112,6 +113,16 @@ const SettingsModal: React.FC<ModalProps> = ({
           >
             Analytics{" "}
           </div>
+          <div
+            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
+              activeTab === SettingsTab.GeneralSettings
+                ? "bg-neutral-700 text-white font-semibold"
+                : "text-gray-200"
+            }`}
+            onClick={() => setActiveTab(SettingsTab.GeneralSettings)}
+          >
+            General{" "}
+          </div>
         </div>
 
         {/* Right Content Area */}
@@ -160,6 +171,12 @@ const SettingsModal: React.FC<ModalProps> = ({
                   Change the Chunk Size
                 </p>
               </ChunkSizeSettings>
+            </div>
+          )}
+
+          {activeTab === SettingsTab.GeneralSettings && (
+            <div className="w-full">
+              <GeneralSettings />
             </div>
           )}
         </div>

@@ -22,7 +22,10 @@ export function setupDefaultStoreValues(store: Store<StoreSchema>) {
   if (!store.get(StoreKeys.ChunkSize)) {
     store.set(StoreKeys.ChunkSize, 500);
   }
+
   setupDefaultAnalyticsValue(store);
+
+  setupDefaultSpellCheckValue(store);
 
   setupDefaultEmbeddingModels(store);
 
@@ -32,6 +35,12 @@ export function setupDefaultStoreValues(store: Store<StoreSchema>) {
 const setupDefaultAnalyticsValue = (store: Store<StoreSchema>) => {
   if (store.get(StoreKeys.Analytics) === undefined) {
     store.set(StoreKeys.Analytics, true);
+  }
+};
+
+const setupDefaultSpellCheckValue = (store: Store<StoreSchema>) => {
+  if (store.get(StoreKeys.SpellCheck) === undefined) {
+    store.set(StoreKeys.SpellCheck, "false");
   }
 };
 

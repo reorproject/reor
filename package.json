@@ -65,6 +65,7 @@
     "posthog-js": "^1.130.2",
     "prosemirror-utils": "^1.2.2",
     "react-card-flip": "^1.2.2",
+    "react-day-picker": "^8.10.1",
     "react-icons": "^4.12.0",
     "react-markdown": "^9.0.1",
     "react-quill": "^2.0.0",

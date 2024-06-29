@@ -29,6 +29,8 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
   const [isNewNoteModalOpen, setIsNewNoteModalOpen] = useState(false);
   const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false);
   const [isFlashcardModeOpen, setIsFlashcardModeOpen] = useState(false);
+  const [customDirectoryPath, setCustomDirectoryPath] = useState("");
+  const [customFilePath, setCustomFilePath] = useState("");
 
   const [initialFileToCreateFlashcard, setInitialFileToCreateFlashcard] =
     useState("");
@@ -48,6 +50,30 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
     return () => {
       createFlashcardFileListener();
     };
+  }, []);
+
+  // open a new note window
+  useEffect(() => {
+    const handleNewNote = (relativePath: string) => {
+      setCustomFilePath(relativePath);
+      setIsNewNoteModalOpen(true);
+    }
+
+    window.ipcRenderer.receive("add-new-note-listener", (relativePath: string) => {
+      handleNewNote(relativePath);
+    })
+  }, []);
+
+  // open a new directory window
+  useEffect(() => {
+    const handleNewDirectory = (dirPath: string) => {
+      setCustomDirectoryPath(dirPath);
+      setIsNewDirectoryModalOpen(true);
+    }
+
+    window.ipcRenderer.receive("add-new-directory-listener", (dirPath) => {
+      handleNewDirectory(dirPath);
+    });
   }, []);
 
   return (
@@ -144,11 +170,12 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
         openRelativePath={openRelativePath}
+        customFilePath={customFilePath}
       />
       <NewDirectoryComponent
         isOpen={isNewDirectoryModalOpen}
         onClose={() => setIsNewDirectoryModalOpen(false)}
-        onDirectoryCreate={() => console.log("Directory created")}
+        onDirectoryCreate={customDirectoryPath}
       />
       {isFlashcardModeOpen && (
         <FlashcardMenuModal

@@ -63,6 +63,8 @@ export type ChatMessageToDisplay = ChatCompletionMessageParam & {
 export interface ChatFilters {
   numberOfChunksToFetch: number;
   files: string[];
+  minDate?: Date; 
+  maxDate?: Date; 
 }
 
 interface ChatWithLLMProps {

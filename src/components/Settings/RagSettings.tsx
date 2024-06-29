@@ -29,7 +29,7 @@ const RagSettings: React.FC<RagSettingsProps> = ({ children }) => {
     window.electronStore.setNoOfRAGExamples(numberVersion);
   };
 
-  const possibleNoOfExamples = Array.from({ length: 30 }, (_, i) => i + 1);
+  const possibleNoOfExamples = Array.from({ length: 31 }, (_, i) => i);
 
   return (
     <div className="pb-2 flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2">

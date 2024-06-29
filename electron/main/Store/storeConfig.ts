@@ -73,6 +73,7 @@ export interface StoreSchema {
   chunkSize: number;
   isSBCompact: boolean;
   DisplayMarkdown: boolean;
+  spellCheck: string;
 }
 
 export enum StoreKeys {
@@ -91,4 +92,5 @@ export enum StoreKeys {
   ChunkSize = "chunkSize",
   IsSBCompact = "isSBCompact",
   DisplayMarkdown = "DisplayMarkdown",
+  SpellCheck = "spellCheck",
 }
