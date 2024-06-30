@@ -62,6 +62,7 @@ export const useFileByFilepath = () => {
     text: "",
     position: null,
   });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
 
   const setFileNodeToBeRenamed = async (filePath: string) => {
@@ -141,7 +142,7 @@ export const useFileByFilepath = () => {
     };
 
     // Even listener
-    const handleChangeMarkdown = (isMarkdownSet) => {
+    const handleChangeMarkdown = (isMarkdownSet: boolean) => {
       setDisplayMarkdown(isMarkdownSet);
     };
 
@@ -178,7 +179,6 @@ export const useFileByFilepath = () => {
       TextStyle,
       SearchAndReplace.configure({
         searchResultClass: "bg-yellow-400",
-        caseSensitive: false,
         disableRegex: false,
       }),
       Markdown.configure({

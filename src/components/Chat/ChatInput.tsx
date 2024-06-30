@@ -1,4 +1,3 @@
-
 import React from "react";
 
 import Textarea from "@mui/joy/Textarea";
@@ -32,7 +31,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           value={userTextFieldInput}
           className="w-full mr-2 bg-gray-300"
           name="Outlined"
-          placeholder="Type here to search notes..."
+          placeholder="Type here to ask your notes..."
           variant="outlined"
           style={{
             backgroundColor: "rgba(255, 255, 255, 0)",

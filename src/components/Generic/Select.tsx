@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { FaTrash } from "react-icons/fa";
 
@@ -75,18 +75,22 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         </span>
       </div>
       {isOpen && (
-        <div className="absolute w-[192px] text-[13px] border text-gray-600 border-gray-300 rounded-md shadow-lg z-10 bg-white max-h-60 overflow-auto">
+        <div
+          className="absolute w-[192px] text-[13px] border text-gray-600 border-gray-300 rounded-md shadow-lg z-10 bg-white max-h-60 overflow-auto"
+          style={{
+            position: "fixed",
+            top: "auto",
+            left: wrapperRef.current?.getBoundingClientRect().left,
+            width: wrapperRef.current?.getBoundingClientRect().width,
+          }}
+        >
           {options.map((option, index) => (
             <div
               key={index}
               className="flex justify-between items-center py-2 pl-6 pr-2 bg-dark-gray-c-eight cursor-pointer text-white hover:bg-dark-gray-c-ten "
               onClick={() => handleOptionClick(option.value)}
             >
-              <span
-                className="w-full"
-              >
-                {option.label}
-              </span>
+              <span className="w-full">{option.label}</span>
               {selectedValue === option.value ? (
                 <span className="text-blue-500">&#10003;</span>
               ) : onDelete ? (

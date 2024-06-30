@@ -1,23 +1,26 @@
+import React, { useEffect, useState } from "react";
+
 import Switch from "@mui/material/Switch";
-import { useEffect, useState } from "react";
 
-enum SettingsAppearance {
-  light = "lightMode",
-  dark = "darkMode",
-  materialDark = "materialDarkMode",
-  lightBlue = "lightBlueMode",
-  /* custom = "NOT-YET-IMPLEMENTED */
-}
+// enum SettingsAppearance {
+//   light = "lightMode",
+//   dark = "darkMode",
+//   materialDark = "materialDarkMode",
+//   lightBlue = "lightBlueMode",
+//   /* custom = "NOT-YET-IMPLEMENTED */
+// }
 
-interface GenSettingsProps {
+export interface GenSettingsProps {
   // iconSBIsCompact?: boolean /* True: Sets padding on Icon Sidebar */;
   // editorAppearance?: SettingsAppearance;
 }
 
-const CreateAppearanceSection = ({ }) => {
+const CreateAppearanceSection: React.FC = () => {
   const [isIconSBCompact, setIsIconSBCompact] = useState<boolean>(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
-
+  // const [editorAppearance, setEditorApperance] =
+  //   useState<SettingsAppearance>("dark");
 
   // Check if SidebarCompact is on or not
   useEffect(() => {
@@ -52,11 +55,9 @@ const CreateAppearanceSection = ({ }) => {
       </h4>
       <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-3 h-[64px]">
         <div className="flex flex-col justify-center">
-          <p className="text-gray-100">
-            IconSidebar Compact
-            <p className="text-gray-100 text-xs">
-              If on, decreases padding on IconSidebar
-            </p>
+          <p className="text-gray-100">IconSidebar Compact</p>
+          <p className="text-gray-100 text-xs">
+            If on, decreases padding on IconSidebar
           </p>
         </div>
         <Switch
@@ -69,7 +70,7 @@ const CreateAppearanceSection = ({ }) => {
           }}
         />
       </div>
-      <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-3 h-[64px] mt-6 opacity-50">
+      {/* <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-3 h-[64px] mt-6 opacity-50">
         <div className="flex flex-col justify-center">
           <div className="flex gap-2">
             <p className="text-gray-100 m-0">Dynamic Markdown Heading</p>
@@ -89,9 +90,9 @@ const CreateAppearanceSection = ({ }) => {
               window.electronStore.setDisplayMarkdown(!displayMarkdown);
             }
           }}
-          disabled={true}
+          disabled={false}
         />
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -1,4 +1,3 @@
-
 import React from "react";
 
 import { formatDistanceToNow } from "date-fns"; // for human-readable time format
@@ -25,7 +24,7 @@ export const DBResultPreview: React.FC<DBResultPreview> = ({
         className="text-gray-200 break-words text-sm"
         components={{
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          h1: ({ node, ...props }) => (
+          h1: ({ node: _, ...props }) => (
             <h1 className="leading-relaxed" {...props} />
           ),
         }}
@@ -33,10 +32,8 @@ export const DBResultPreview: React.FC<DBResultPreview> = ({
         {entry.content}
       </ReactMarkdown>
       <div className="text-xs text-gray-400 mt-0">
-        {fileName && (
-          <span className="text-xs text-gray-400">{fileName} </span>
-        )} |{" "}
-        Similarity: {cosineDistanceToPercentage(entry._distance)}% |{" "}
+        {fileName && <span className="text-xs text-gray-400">{fileName} </span>}{" "}
+        | Similarity: {cosineDistanceToPercentage(entry._distance)}% |{" "}
         {modified && (
           <span className="text-xs text-gray-400">Modified {modified}</span>
         )}
@@ -55,9 +52,7 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({
   onSelect,
 }) => {
   const modified = formatModifiedDate(entry.filemodified);
-  const fileName = getFileName(entry.notepath)
-
-  
+  const fileName = getFileName(entry.notepath);
 
   return (
     <div
@@ -68,7 +63,7 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({
         className="text-gray-200 break-words text-sm"
         components={{
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          h1: ({ node, ...props }) => (
+          h1: ({ node: _, ...props }) => (
             <h1 className="leading-relaxed" {...props} />
           ),
         }}
@@ -76,10 +71,8 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({
         {entry.content}
       </ReactMarkdown>
       <div className="text-xs text-gray-400 mt-0">
-        {fileName && (
-          <span className="text-xs text-gray-400">{fileName} </span>
-        )} |{" "}
-        Similarity: {cosineDistanceToPercentage(entry._distance)}% |{" "}
+        {fileName && <span className="text-xs text-gray-400">{fileName} </span>}{" "}
+        | Similarity: {cosineDistanceToPercentage(entry._distance)}% |{" "}
         {modified && (
           <span className="text-xs text-gray-400">Modified {modified}</span>
         )}

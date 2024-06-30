@@ -2,6 +2,7 @@
 const fs = require("fs"); // Import the filesystem module
 const os = require("os");
 const path = require("path");
+require("dotenv").config();
 
 const { notarize } = require("@electron/notarize");
 
@@ -24,7 +25,7 @@ function printDirectoryTree(startPath, indent = "") {
 }
 
 async function notarizeApp() {
-  const productName = "Reor"; // Replace with your actual product name
+  const productName = "Reor";
 
   // Get the current platform
   const platform = os.platform();
@@ -48,7 +49,6 @@ async function notarizeApp() {
       console.log(`Found ${productName}.app at ${appPath}`);
       console.log(`Notarizing ${productName}.app`);
       await notarize({
-        tool: "notarytool",
         appPath: appPath,
         teamId: "ZHJMNQM65Q",
         appleId: process.env.APPLE_ID,

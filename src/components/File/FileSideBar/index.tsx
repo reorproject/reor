@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { CSSProperties, useEffect, useState } from "react";
 
 import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
 import { FixedSizeList as List, ListChildComponentProps } from "react-window";
@@ -7,7 +7,8 @@ import RenameDirModal from "../RenameDirectory";
 import RenameNoteModal from "../RenameNote";
 
 import { FileItem } from "./FileItem";
-import { isFileNodeDirectory, moveFile } from "./fileOperations";
+import { isFileNodeDirectory } from "./fileOperations";
+
 
 interface FileListProps {
   files: FileInfoTree;
@@ -36,8 +37,13 @@ export const FileSidebar: React.FC<FileListProps> = ({
   setFileDirToBeRenamed,
   listHeight,
 }) => {
+
+
+
   return (
-    <div className="flex flex-col h-below-titlebar text-white overflow-y-auto overflow-x-hidden">
+    <div
+      className="flex flex-col h-below-titlebar text-white overflow-y-auto overflow-x-hidden"
+    >
       {noteToBeRenamed && (
         <RenameNoteModal
           isOpen={!!noteToBeRenamed}
@@ -138,16 +144,21 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     return visibleItems;
   };
 
-  const handleDropOnBlank = async (e: React.DragEvent) => {
+  const handleMenuContext = (e: React.MouseEvent) => {
     e.preventDefault();
-    const sourcePath = e.dataTransfer.getData("text/plain");
-    const root = await window.electronStore.getVaultDirectoryForWindow();
-    try {
-      moveFile(sourcePath, root);
-    } catch (error) {
-      console.error("Failed to move file to root:", error);
-    }
+    window.contextFileMenu.showMenuItemContext();
+  }
+
+  const hideScrollbarStyle: CSSProperties = {
+    overflowY: 'auto',
+    scrollbarWidth: 'none',
   };
+
+  const webKitScrollBarStyles = `
+    div::-webkit-scrollbar {
+      display: none;
+    }
+  `;
 
   // Calculate visible items and item count
   const visibleItems = getVisibleFilesAndFlatten(files, expandedDirectories);
@@ -176,12 +187,14 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
 
   return (
     <div
-      onDrop={handleDropOnBlank}
-      onDragOver={(e) => e.preventDefault()}
-      style={{ height: listHeight, width: "100%", overflow: "hidden" }}
+      onContextMenu={handleMenuContext}
+      style={hideScrollbarStyle}
     >
+      <style>
+        {webKitScrollBarStyles}
+      </style>
       <List
-        height={listHeight - 30}
+        height={listHeight}
         itemCount={itemCount}
         itemSize={30}
         width={"100%"}
@@ -191,4 +204,5 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
       </List>
     </div>
   );
+
 };

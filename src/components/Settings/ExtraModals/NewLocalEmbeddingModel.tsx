@@ -3,12 +3,12 @@ import React, { useState } from "react";
 import { Button } from "@material-tailwind/react";
 import { EmbeddingModelWithLocalPath } from "electron/main/Store/storeConfig";
 import posthog from "posthog-js";
+import { IconContext } from "react-icons";
+import { CiFileOn } from "react-icons/ci";
+import { FaUpload, FaRegTrashAlt } from "react-icons/fa";
 
 import ExternalLink from "../../Generic/ExternalLink";
 import Modal from "../../Generic/Modal";
-import { FaUpload, FaRegTrashAlt } from "react-icons/fa";
-import { CiFileOn } from "react-icons/ci";
-import { IconContext } from "react-icons";
 
 interface NewLocalEmbeddingModelModalProps {
   isOpen: boolean;

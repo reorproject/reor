@@ -1,19 +1,16 @@
-
 import React, { useState } from "react";
 
 import { Button } from "@material-tailwind/react";
 import posthog from "posthog-js";
-
 import { BsPencilSquare } from "react-icons/bs";
-import { VscFeedback } from "react-icons/vsc";
 import { FaArrowAltCircleRight } from "react-icons/fa";
 import { FaRegArrowAltCircleRight } from "react-icons/fa";
+import { VscFeedback } from "react-icons/vsc";
 
 import Modal from "../Generic/Modal";
 
 import FlashcardCreateModal from "./FlashcardCreateModal";
 import FlashcardReviewModal from "./FlashcardReviewModal";
-
 
 interface FlashcardMenuModalProps {
   isOpen: boolean;
@@ -77,15 +74,11 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
             // onClick={async () => await storeFlashcardPairsAsJSON(flashcardQAPairs, fileToGenerateFlashcardsFor)}
             placeholder={""}
           >
-            <BsPencilSquare
-              className="mt-6" 
-              size={55}  
-            />
-            <div className="text-white font-bold mb-3 mt-3 text-lg">Create new flashcards</div>
-            <FaArrowAltCircleRight
-              size={35}
-            />
-
+            <BsPencilSquare className="mt-6" size={55} />
+            <div className="text-white font-bold mb-3 mt-3 text-lg">
+              Create new flashcards
+            </div>
+            <FaArrowAltCircleRight size={35} />
           </Button>
 
           <Button
@@ -104,17 +97,13 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
             }}
             placeholder={""}
           >
-            <VscFeedback 
-              className="mt-6"
-              size={55}
-            />
-            <div className="text-white font-bold mb-3 mt-3 text-lg">Review my existing cards</div>
-            <FaRegArrowAltCircleRight
-              size={35}
-            />
+            <VscFeedback className="mt-6" size={55} />
+            <div className="text-white font-bold mb-3 mt-3 text-lg">
+              Review my existing cards
+            </div>
+            <FaRegArrowAltCircleRight size={35} />
           </Button>
         </div>
-
       </div>
     </Modal>
   );

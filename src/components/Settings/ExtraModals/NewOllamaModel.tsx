@@ -102,7 +102,7 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
         />
         <p className="text-white text-xs mb-2 mt-2 italic">
           {" "}
-          We recommended either mistral, llama2, or command-r.
+          We recommended either mistral, llama3, or phi3.
         </p>
 
         <div className="pb-2 flex justify-end">

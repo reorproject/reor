@@ -2,10 +2,8 @@ import React, { useState, useEffect } from "react";
 
 import { Button } from "@material-tailwind/react";
 import { LLMConfig } from "electron/main/Store/storeConfig";
-import posthog from "posthog-js";
-import Modal from "../Generic/Modal";
 
-import CustomSelect from "../Generic/Select";
+import Modal from "../Generic/Modal";
 
 import DefaultLLMSelector from "./DefaultLLMSelector";
 import CloudLLMSetupModal from "./ExtraModals/CloudLLMSetup";
@@ -36,26 +34,6 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
     useState<boolean>(false);
   const [selectedCloudLLMModal, setSelectedCloudLLMModal] =
     useState<string>("");
-
-  const modalOptions = [
-    {
-      label: "OpenAI Setup",
-      value: "openai",
-    },
-    {
-      label: "Anthropic Setup",
-      value: "anthropic",
-    },
-  ];
-
-  const handleSetUpSelection = () => {
-    setIsSetupModalOpen(true);
-  };
-
-  const handleModalSelection = (selectedValue: string) => {
-    setSelectedCloudLLMModal(selectedValue);
-    setIsCloudLLMModalOpen(true);
-  };
 
   const handleModalClose = () => {
     setIsCloudLLMModalOpen(false);
@@ -102,27 +80,6 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
       }
     }
   }, [defaultModel]);
-
-  const handleDefaultModelChange = (selectedModel: string) => {
-    setDefaultModel(selectedModel);
-    setUserMadeChanges(true);
-    window.llm.setDefaultLLM(selectedModel);
-    posthog.capture("change_default_llm", {
-      defaultLLM: selectedModel,
-    });
-  };
-
-  // const handleDeleteModel = async (modelToDelete: string) => {
-  //   await window.llm.removeLLM(modelToDelete);
-  //   fetchAndUpdateModelConfigs();
-  // };
-
-  const modelOptions = llmConfigs.map((config) => {
-    return {
-      label: config.modelName,
-      value: config.modelName,
-    };
-  });
 
   const handleModelChange = (model: string) => {
     setUserMadeChanges(true);
