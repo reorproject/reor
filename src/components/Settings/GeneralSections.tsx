@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
 import Switch from "@mui/material/Switch";
+import { useEffect, useState } from "react";
 
 enum SettingsAppearance {
   light = "lightMode",
@@ -14,11 +14,10 @@ interface GenSettingsProps {
   // editorAppearance?: SettingsAppearance;
 }
 
-const CreateAppearanceSection = ({}) => {
+const CreateAppearanceSection = ({ }) => {
   const [isIconSBCompact, setIsIconSBCompact] = useState<boolean>(false);
   const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
-  const [editorAppearance, setEditorApperance] =
-    useState<SettingsAppearance>("dark");
+
 
   // Check if SidebarCompact is on or not
   useEffect(() => {

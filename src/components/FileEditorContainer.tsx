@@ -70,10 +70,25 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     numberOfChunksToFetch: 15,
   });
 
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
   const [showSearch, setShowSearch] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
   const [sidebarWidth, setSidebarWidth] = useState(40);
+
+  const handleContextMenu = (event: any) => {
+    event.preventDefault();
+    setMenuPosition({
+      x: event.pageX,
+      y: event.pageY
+    });
+    setMenuVisible(true);
+  }
+
+  const hideMenu = () => {
+    if (menuVisible)
+      setMenuVisible(false);
+  }
 
   // showSearch should be set to false when:
   //    1) User presses ctrl-f
@@ -92,6 +107,13 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === "f") {
         toggleSearch();
+      }
+
+      if (event.key === "Escape") {
+        if (showSearch)
+          setShowSearch(false);
+        if (menuVisible)
+          setMenuVisible(false);
       }
     };
 
@@ -252,11 +274,17 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                     className="absolute top-4 right-0  mt-4 mr-14 z-50 border-none rounded-md p-2 bg-transparent bg-dark-gray-c-ten text-white "
                   />
                 )}
-                <MenuOnHighlight
-                  editor={editor}
-                />
+                {menuVisible && (
+                  <MenuOnHighlight
+                    editor={editor}
+                    menuPosition={menuPosition}
+                    setMenuVisible={setMenuVisible}
+                  />
+                )}
                 <EditorContent
                   style={{ wordBreak: "break-word" }}
+                  onContextMenu={handleContextMenu}
+                  onClick={hideMenu}
                   editor={editor}
                 />
                 {suggestionsState && (

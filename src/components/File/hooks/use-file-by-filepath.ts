@@ -23,7 +23,6 @@ import { SuggestionsState } from "@/components/Editor/BacklinkSuggestionsDisplay
 import HighlightExtension, {
   HighlightData,
 } from "@/components/Editor/HighlightExtension";
-import { CustomMenuCommands } from "@/components/Editor/MenuOnHighlight";
 import { RichTextLink } from "@/components/Editor/RichTextLink";
 import SearchAndReplace from "@/components/Editor/SearchAndReplace";
 import {
@@ -177,7 +176,6 @@ export const useFileByFilepath = () => {
       TableHeader,
       TableCell,
       TextStyle,
-      CustomMenuCommands,
       SearchAndReplace.configure({
         searchResultClass: "bg-yellow-400",
         caseSensitive: false,
