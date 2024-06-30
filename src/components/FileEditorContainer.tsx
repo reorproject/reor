@@ -7,7 +7,7 @@ import "../styles/global.css";
 import ChatWithLLM, { ChatFilters, ChatHistory } from "./Chat/Chat";
 import { useChatHistory } from "./Chat/hooks/use-chat-history";
 import InEditorBacklinkSuggestionsDisplay from "./Editor/BacklinkSuggestionsDisplay";
-import MenuOnHighlight from "./Editor/MenuOnHighlight";
+import EditorContextMenu from "./Editor/EditorContextMenu";
 import { useFileInfoTree } from "./File/FileSideBar/hooks/use-file-info-tree";
 import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
 import ResizableComponent from "./Generic/ResizableComponent";
@@ -16,7 +16,7 @@ import SidebarManager from "./Sidebars/MainSidebar";
 import SidebarComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 
-interface FileEditorContainerProps {}
+interface FileEditorContainerProps { }
 export type SidebarAbleToShow = "files" | "search" | "chats";
 
 const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
@@ -276,7 +276,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                   />
                 )}
                 {menuVisible && (
-                  <MenuOnHighlight
+                  <EditorContextMenu
                     editor={editor}
                     menuPosition={menuPosition}
                     setMenuVisible={setMenuVisible}

@@ -33,7 +33,7 @@ interface EditorContextMenu {
  * @returns Dropdown menu to perform actions on selected text
  * 
  */
-const MenuOnHighlight: React.FC<EditorContextMenu> = ({ editor, menuPosition, setMenuVisible }) => {
+const EditorContextMenu: React.FC<EditorContextMenu> = ({ editor, menuPosition, setMenuVisible }) => {
 	const [showTableSelector, setShowTableSelector] = useState(false);
 	const tableButtonRef = useRef(null);
 	const tableSelectorRef = useRef(null);
@@ -256,4 +256,4 @@ const deleteCommand = (state: any, dispatch: any) => {
 }
 
 
-export default MenuOnHighlight;
+export default EditorContextMenu;
