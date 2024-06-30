@@ -7,7 +7,6 @@ import { useFileInfoTree } from "../File/FileSideBar/hooks/use-file-info-tree";
 
 interface Props {
   vaultDirectory: string;
-  titleText: string;
   searchText: string;
   setSearchText: (text: string) => void;
   onSelectSuggestion: (suggestion: string) => void;
@@ -17,7 +16,6 @@ interface Props {
 
 export const SearchBarWithFilesSuggestion = ({
   vaultDirectory,
-  titleText,
   searchText,
   setSearchText,
   onSelectSuggestion,
@@ -66,8 +64,7 @@ export const SearchBarWithFilesSuggestion = ({
 
   return (
     <>
-      <h2 className="text-xl font-semibold mb-3 text-white">
-        {titleText}
+      <div className="text-xl font-semibold mb-3 text-white">
         <input
           ref={inputRef}
           type="text"
@@ -91,7 +88,7 @@ export const SearchBarWithFilesSuggestion = ({
             maxWidth={`${sidebarWidth}`}
           />
         )}
-      </h2>
+      </div>
       {!searchText && (
         <p className="text-red-500 text-xs">
           Choose a file by searching or by right clicking a file in directory

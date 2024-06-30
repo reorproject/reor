@@ -5,6 +5,7 @@ import FolderIcon from "@mui/icons-material/Folder";
 import { ListItemIcon, ListItemText } from "@mui/material";
 import Slider from "@mui/material/Slider";
 import { sub } from "date-fns";
+import posthog from "posthog-js";
 import { DayPicker } from "react-day-picker";
 
 import { SuggestionsState } from "../Editor/FilesSuggestionsDisplay";
@@ -83,7 +84,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
   ) => {
     const newValue = Array.isArray(value) ? value[0] : value;
     setNumberOfChunksToFetch(newValue);
-    window.electronStore.setNoOfRAGExamples(newValue);
+    posthog.capture("change_number_of_chunks_to_search_for_context");
   };
 
   const handleDateRangeChange = (value: string) => {
@@ -135,9 +136,10 @@ const AddContextFiltersModal: React.FC<Props> = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="ml-6 mt-2 mb-6 h-full w-[600px] max-h-[90vh] overflow-y-auto overflow-x-hidden">
+        <h2 className="text-white text-2xl mb-4">{titleText}</h2>
+        <p className="text-white">Select notes to include in context:</p>
         <SearchBarWithFilesSuggestion
           vaultDirectory={vaultDirectory}
-          titleText={titleText}
           searchText={searchText}
           setSearchText={setSearchText}
           onSelectSuggestion={(file: string) => {
@@ -162,7 +164,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
           </List>
         </div>
         <p className="text-white w-full">
-          Select number of notes to draw from:
+          Number of notes to fetch for context:
         </p>
         <div className="w-full bg-neutral-800 rounded pb-3 max-w-xl mx-auto">
           <Slider
@@ -201,7 +203,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
           {numberOfChunksToFetch}
         </div>
         <div className="text-white max-w-lg">
-          <p>Select notes from:</p>
+          <p>Filter by last modified date:</p>
         </div>
         {!showAdvanced && (
           <div className="w-full  rounded pb-1">

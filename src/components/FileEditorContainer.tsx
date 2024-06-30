@@ -137,11 +137,11 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     posthog.capture("add_file_to_chat", {
       chatFilesLength: files.length,
     });
+    posthog.capture("user_added_a_file_to_chat_context");
   };
 
   // find all available files
   useEffect(() => {
-    console.log(`Inside useEffect!`);
     const updateWidth = async () => {
       const isCompact = await window.electronStore.getSBCompact();
       setSidebarWidth(isCompact ? 40 : 60);

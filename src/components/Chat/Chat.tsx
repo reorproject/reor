@@ -328,8 +328,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                   }}
                 >
                   {chatFilters.files.length > 0
-                    ? "Update filters"
-                    : "Add filters"}
+                    ? "Update RAG filters"
+                    : "Customise context"}
                 </button>
               </div>
             </>
@@ -339,7 +339,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
               vaultDirectory={vaultDirectory}
               isOpen={isAddContextFiltersModalOpen}
               onClose={() => setIsAddContextFiltersModalOpen(false)}
-              titleText="Add file(s) into chat context"
+              titleText="Chat Context Customisation"
               chatFilters={chatFilters}
               setChatFilters={setChatFilters}
             />
