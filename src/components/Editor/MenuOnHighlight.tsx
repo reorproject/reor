@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 import { CiViewTable } from "react-icons/ci";
 import { FaRegCopy } from "react-icons/fa";
@@ -7,6 +7,16 @@ import { MdContentPaste } from "react-icons/md";
 
 import "../../styles/global.css";
 
+interface MenuPosition {
+	x: number;
+	y: number;
+}
+
+interface EditorContextMenu {
+	editor: any;
+	menuPosition: MenuPosition;
+	setMenuVisible: (visible: boolean) => void;
+}
 /**
  * 
  * Options:
@@ -23,13 +33,13 @@ import "../../styles/global.css";
  * @returns Dropdown menu to perform actions on selected text
  * 
  */
-const MenuOnHighlight = ({ editor, menuPosition, setMenuVisible }) => {
+const MenuOnHighlight: React.FC<EditorContextMenu> = ({ editor, menuPosition, setMenuVisible }) => {
 	const [showTableSelector, setShowTableSelector] = useState(false);
 	const tableButtonRef = useRef(null);
 	const tableSelectorRef = useRef(null);
 
 	useEffect(() => {
-		const checkIfOutside = (event) => {
+		const checkIfOutside = (event: any) => {
 			if (tableButtonRef.current && tableSelectorRef.current &&
 				!tableButtonRef.current.contains(event.target) &&
 				!tableSelectorRef.current.contains(event.target)) {
@@ -96,7 +106,6 @@ const MenuOnHighlight = ({ editor, menuPosition, setMenuVisible }) => {
 				<li
 					onClick={() => handleCommand('cut')}
 					className={`bubble-menu-item ${!isTextCurrentlySelected() ? "disabled opacity-50" : ""}`}
-					style={{ pointerEvents: isTextCurrentlySelected() ? 'auto' : 'none' }}
 				>
 					<IoMdCut className="icon" />
 					<span className="text">Cut</span>
@@ -109,7 +118,7 @@ const MenuOnHighlight = ({ editor, menuPosition, setMenuVisible }) => {
 					<span className="text">Paste</span>
 				</li>
 				<li
-					onClick={() => console.log("Delete")}
+					onClick={() => deleteCommand(editor.state, editor.view.dispatch)}
 					className={`bubble-menu-item ${!isTextCurrentlySelected() ? "disabled opacity-50" : ""}`}
 				>
 					<AiOutlineDelete className="icon" />
@@ -229,6 +238,21 @@ const pasteCommand = async (editor: any) => {
 			console.error(`Failed to read error`, err);
 		}
 	}
+}
+
+/**
+ * Deletes the text that is selected.
+ */
+const deleteCommand = (state: any, dispatch: any) => {
+	if (state.selection.empty) return false; // Do nothing if there is no selection.
+
+	const transaction = state.tr.deleteSelection();
+
+	if (dispatch) {
+		dispatch(transaction);
+	}
+
+	return true;
 }
 
 
