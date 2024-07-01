@@ -339,7 +339,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
               vaultDirectory={vaultDirectory}
               isOpen={isAddContextFiltersModalOpen}
               onClose={() => setIsAddContextFiltersModalOpen(false)}
-              titleText="Chat Context Customisation"
               chatFilters={chatFilters}
               setChatFilters={setChatFilters}
             />

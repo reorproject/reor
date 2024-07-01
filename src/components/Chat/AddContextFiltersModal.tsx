@@ -19,7 +19,6 @@ import { ChatFilters } from "./Chat";
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  titleText: string;
   vaultDirectory: string;
   setChatFilters: (chatFilters: ChatFilters) => void;
   chatFilters: ChatFilters;
@@ -29,7 +28,6 @@ const AddContextFiltersModal: React.FC<Props> = ({
   vaultDirectory,
   isOpen,
   onClose,
-  titleText,
   chatFilters,
   setChatFilters,
 }) => {
@@ -55,17 +53,6 @@ const AddContextFiltersModal: React.FC<Props> = ({
     { label: "Past month", value: "lastMonth" },
     { label: "Past year", value: "lastYear" },
   ];
-
-  useEffect(() => {
-    const loadNumberOfChunks = async () => {
-      const storedChunks = await window.electronStore.getNoOfRAGExamples();
-      if (storedChunks !== undefined) {
-        setNumberOfChunksToFetch(storedChunks);
-      }
-    };
-
-    loadNumberOfChunks();
-  }, []);
 
   useEffect(() => {
     const updatedChatFilters: ChatFilters = {
@@ -135,114 +122,141 @@ const AddContextFiltersModal: React.FC<Props> = ({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="ml-6 mt-2 mb-6 h-full w-[600px] max-h-[90vh] overflow-y-auto overflow-x-hidden">
-        <h2 className="text-white text-2xl mb-4">{titleText}</h2>
-        <p className="text-white">Select notes to include in context:</p>
-        <SearchBarWithFilesSuggestion
-          vaultDirectory={vaultDirectory}
-          searchText={searchText}
-          setSearchText={setSearchText}
-          onSelectSuggestion={(file: string) => {
-            if (file && !internalFilesSelected.includes(file)) {
-              setInternalFilesSelected([...internalFilesSelected, file]);
-            }
-            setSuggestionsState(null);
-          }}
-          suggestionsState={suggestionsState}
-          setSuggestionsState={setSuggestionsState}
-        />
-        <div className="text-white w-full">
-          <List placeholder="">
-            {internalFilesSelected.map((fileItem, index) => (
-              <ListItem key={index} placeholder="">
-                <ListItemIcon>
-                  <FolderIcon color="primary" />
-                </ListItemIcon>
-                <ListItemText primary={fileItem} />
-              </ListItem>
-            ))}
-          </List>
-        </div>
-        <p className="text-white w-full">
-          Number of notes to fetch for context:
-        </p>
-        <div className="w-full bg-neutral-800 rounded pb-3 max-w-xl mx-auto">
-          <Slider
-            aria-label="Number of Notes"
-            value={numberOfChunksToFetch}
-            valueLabelDisplay="on"
-            step={1}
-            marks={marks}
-            min={0}
-            max={30}
-            onChange={handleNumberOfChunksChange}
-            sx={{
-              "& .MuiSlider-thumb": {
-                "&:focus, &:hover, &.Mui-active, &.Mui-focusVisible": {
-                  boxShadow: "none",
-                },
-                "&::after": {
-                  content: "none",
-                },
-              },
-              "& .MuiSlider-valueLabel": {
-                fontSize: "0.75rem",
-                padding: "3px 6px",
-                lineHeight: "1.2em",
-              },
-              "& .MuiSlider-markLabel": {
-                color: "#FFFFFF",
-              },
-              "& .MuiSlider-mark": {
-                color: "#FFFFFF",
-              },
-            }}
-          />
-        </div>
-        <div className="text-white mb-7 text-center">
-          {numberOfChunksToFetch}
-        </div>
-        <div className="text-white max-w-lg">
-          <p>Filter by last modified date:</p>
-        </div>
-        {!showAdvanced && (
-          <div className="w-full  rounded pb-1">
-            <CustomSelect
-              options={dateRangeOptions}
-              selectedValue={selectedDateRange}
-              onChange={handleDateRangeChange}
+      <div className="ml-6 mt-2 mb-6 h-full w-[800px] max-h-[90vh] overflow-y-auto overflow-x-hidden">
+        <h4 className="text-white text-2xl mb-4 text-center">
+          Choose specific context files or customise the RAG search
+        </h4>
+        <div className="flex">
+          {/* Left side: File selection */}
+          <div className="flex-1 pr-4">
+            <h3 className="text-white text-lg mb-2">
+              Select files for context
+            </h3>
+            <SearchBarWithFilesSuggestion
+              vaultDirectory={vaultDirectory}
+              searchText={searchText}
+              setSearchText={setSearchText}
+              onSelectSuggestion={(file: string) => {
+                if (file && !internalFilesSelected.includes(file)) {
+                  setInternalFilesSelected([...internalFilesSelected, file]);
+                }
+                setSuggestionsState(null);
+              }}
+              suggestionsState={suggestionsState}
+              setSuggestionsState={setSuggestionsState}
             />
+            <div className="text-white w-full mt-2 max-h-[300px] overflow-y-auto">
+              <List placeholder="">
+                {internalFilesSelected.map((fileItem, index) => (
+                  <ListItem key={index} placeholder="">
+                    <ListItemIcon>
+                      <FolderIcon color="primary" />
+                    </ListItemIcon>
+                    <ListItemText primary={fileItem} />
+                  </ListItem>
+                ))}
+              </List>
+            </div>
           </div>
-        )}
-        <div>
+
+          {/* Vertical divider */}
+          <div className="flex flex-col items-center justify-center mx-4">
+            <div className="w-px bg-gray-600 flex-grow"></div>
+            <div className="bg-gray-800 text-white text-sm font-bold rounded-full w-8 h-8 flex items-center justify-center my-2">
+              Or
+            </div>
+            <div className="w-px bg-gray-600 flex-grow"></div>
+          </div>
+          {/* Right side: Context settings */}
           <div
-            className="text-gray-500 text-xs underline cursor-pointer"
-            onClick={handleAdvancedToggle}
+            className={`flex-1 pl-4
+              
+                `}
           >
-            {showAdvanced ? "Hide Advanced" : "Show Advanced"}
-          </div>
-          {showAdvanced && (
-            <div className="flex space-x-4 mt-4 w-full">
-              <div className="text-white flex-1 flex flex-col items-center">
-                <p className="mb-1">Min Date:</p>
-                <DayPicker
-                  selected={minDate}
-                  onSelect={(date) => setMinDate(date || undefined)}
-                  mode="single"
-                  className="my-day-picker w-full"
+            {/* ${
+              internalFilesSelected.length > 0
+                ? "opacity-30	 pointer-events-none"
+                : ""
+            } */}
+            <h3 className="text-white text-lg mb-2">Context settings</h3>
+            <div className="text-white mb-4">
+              <p>Number of notes to add to context:</p>
+              <div className="w-full bg-neutral-800 rounded pb-3 mt-2 pr-2">
+                <Slider
+                  aria-label="Number of Notes"
+                  value={numberOfChunksToFetch}
+                  valueLabelDisplay="on"
+                  step={1}
+                  marks={marks}
+                  min={0}
+                  max={30}
+                  onChange={handleNumberOfChunksChange}
+                  sx={{
+                    "& .MuiSlider-thumb": {
+                      "&:focus, &:hover, &.Mui-active, &.Mui-focusVisible": {
+                        boxShadow: "none",
+                      },
+                      "&::after": {
+                        content: "none",
+                      },
+                    },
+                    "& .MuiSlider-valueLabel": {
+                      fontSize: "0.75rem",
+                      padding: "3px 6px",
+                      lineHeight: "1.2em",
+                    },
+                    "& .MuiSlider-markLabel": {
+                      color: "#FFFFFF",
+                    },
+                    "& .MuiSlider-mark": {
+                      color: "#FFFFFF",
+                    },
+                  }}
                 />
               </div>
-              <div className="text-white flex-1 flex flex-col items-center">
-                <p className="mb-1">Max Date:</p>
-                <DayPicker
-                  selected={maxDate}
-                  onSelect={(date) => setMaxDate(date || undefined)}
-                  mode="single"
-                  className="my-day-picker w-full"
+              <div className="text-center mt-2">{numberOfChunksToFetch}</div>
+            </div>
+            <div className="text-white mb-4">
+              <p>Filter context notes by last modified date:</p>
+              <div className="w-full rounded pb-1 mt-2">
+                <CustomSelect
+                  options={dateRangeOptions}
+                  selectedValue={selectedDateRange}
+                  onChange={handleDateRangeChange}
                 />
               </div>
             </div>
-          )}
+            <div>
+              <div
+                className="text-gray-500 text-xs underline cursor-pointer mb-2"
+                onClick={handleAdvancedToggle}
+              >
+                {showAdvanced ? "Hide Advanced" : "Show Advanced"}
+              </div>
+              {showAdvanced && (
+                <div className="flex space-x-4 mt-2">
+                  <div className="text-white flex-1 flex flex-col items-center">
+                    <p className="mb-1">Min Date:</p>
+                    <DayPicker
+                      selected={minDate}
+                      onSelect={(date) => setMinDate(date || undefined)}
+                      mode="single"
+                      className="my-day-picker w-full"
+                    />
+                  </div>
+                  <div className="text-white flex-1 flex flex-col items-center">
+                    <p className="mb-1">Max Date:</p>
+                    <DayPicker
+                      selected={maxDate}
+                      onSelect={(date) => setMaxDate(date || undefined)}
+                      mode="single"
+                      className="my-day-picker w-full"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </Modal>
