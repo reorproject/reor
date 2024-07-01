@@ -5,7 +5,6 @@ import FolderIcon from "@mui/icons-material/Folder";
 import { ListItemIcon, ListItemText } from "@mui/material";
 import Slider from "@mui/material/Slider";
 import { sub } from "date-fns";
-import posthog from "posthog-js";
 import { DayPicker } from "react-day-picker";
 
 import { SuggestionsState } from "../Editor/FilesSuggestionsDisplay";
