@@ -134,10 +134,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
       ...prevChatFilters,
       files: [...prevChatFilters.files, file],
     }));
-    posthog.capture("add_file_to_chat", {
-      chatFilesLength: files.length,
-    });
-    posthog.capture("user_added_a_file_to_chat_context");
   };
 
   // find all available files

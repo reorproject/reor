@@ -71,7 +71,6 @@ const AddContextFiltersModal: React.FC<Props> = ({
   ) => {
     const newValue = Array.isArray(value) ? value[0] : value;
     setNumberOfChunksToFetch(newValue);
-    posthog.capture("change_number_of_chunks_to_search_for_context");
   };
 
   const handleDateRangeChange = (value: string) => {

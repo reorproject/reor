@@ -67,6 +67,25 @@ export interface ChatFilters {
   maxDate?: Date;
 }
 
+interface AnonymizedChatFilters {
+  numberOfChunksToFetch: number;
+  filesLength: number;
+  minDate?: Date;
+  maxDate?: Date;
+}
+
+function anonymizeChatFiltersForPosthog(
+  chatFilters: ChatFilters
+): AnonymizedChatFilters {
+  const { numberOfChunksToFetch, files, minDate, maxDate } = chatFilters;
+  return {
+    numberOfChunksToFetch,
+    filesLength: files.length,
+    minDate,
+    maxDate,
+  };
+}
+
 interface ChatWithLLMProps {
   vaultDirectory: string;
   openFileByPath: (path: string) => Promise<void>;
@@ -131,6 +150,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     posthog.capture("chat_message_submitted", {
       chatId: chatHistory?.id,
       chatLength: chatHistory?.displayableChatHistory.length,
+      chatFilters: anonymizeChatFiltersForPosthog(chatFilters),
     });
     try {
       if (loadingResponse) return;
