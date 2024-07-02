@@ -4,7 +4,6 @@ import * as path from "path";
 import { ipcMain, BrowserWindow } from "electron";
 import Store from "electron-store";
 
-
 import { DBEntry } from "../database/Schema";
 import {
   convertFileInfoListToDBItems,
@@ -37,7 +36,6 @@ import {
   WriteFileProps,
   RenameFileProps,
 } from "./Types";
-
 
 export const registerFileHandlers = (
   store: Store<StoreSchema>,
@@ -147,42 +145,53 @@ export const registerFileHandlers = (
     "rename-file-recursive",
     async (event, renameFileProps: RenameFileProps) => {
       const windowInfo = windowsManager.getWindowInfoForContents(event.sender);
-    
+
       if (!windowInfo) {
         throw new Error("Window info not found.");
       }
 
       windowsManager.watcher?.unwatch(windowInfo?.vaultDirectoryForWindow);
 
-      if (process.platform == 'win32') {
+      if (process.platform == "win32") {
         windowsManager.watcher?.close().then(() => {
-          fs.rename(renameFileProps.oldFilePath, renameFileProps.newFilePath, (err) => {
-            if (err) {
-              throw err;
+          fs.rename(
+            renameFileProps.oldFilePath,
+            renameFileProps.newFilePath,
+            (err) => {
+              if (err) {
+                throw err;
+              }
+
+              // Re-start watching all paths in array
+              const win = BrowserWindow.fromWebContents(event.sender);
+              if (win) {
+                windowsManager.watcher = startWatchingDirectory(
+                  win,
+                  windowInfo.vaultDirectoryForWindow
+                );
+                updateFileListForRenderer(
+                  win,
+                  windowInfo.vaultDirectoryForWindow
+                );
+              }
             }
-            
-            // Re-start watching all paths in array
-            const win = BrowserWindow.fromWebContents(event.sender);
-            if (win) {
-              windowsManager.watcher = startWatchingDirectory(
-                win,
-                windowInfo.vaultDirectoryForWindow,
-              );
-              updateFileListForRenderer(win, windowInfo.vaultDirectoryForWindow);
-            }
-          })
+          );
         });
       } else {
         // On non-Windows platforms, directly perform the rename operation
-        fs.rename(renameFileProps.oldFilePath, renameFileProps.newFilePath, (err) => {
-          if (err) {
-            throw err;
+        fs.rename(
+          renameFileProps.oldFilePath,
+          renameFileProps.newFilePath,
+          (err) => {
+            if (err) {
+              throw err;
+            }
+            // Re-watch the vault directory after renaming
+            windowsManager.watcher?.add(windowInfo?.vaultDirectoryForWindow);
           }
-          // Re-watch the vault directory after renaming
-          windowsManager.watcher?.add(windowInfo?.vaultDirectoryForWindow);
-        });
+        );
       }
-      
+
       console.log("reindexing folder");
       // then need to trigger reindexing of folder
       windowInfo.dbTableClient.updateDBItemsWithNewFilePath(
@@ -289,7 +298,8 @@ export const registerFileHandlers = (
         console.error("Error searching database:", error);
         throw error;
       }
-    });
+    }
+  );
 
   ipcMain.handle(
     "generate-flashcards-from-file",
@@ -299,9 +309,7 @@ export const registerFileHandlers = (
     ): Promise<string> => {
       // actual response required { question: string, answer: string} []
       const llmSession = openAISession;
-      console.log("llmName:   ", llmName);
       const llmConfig = await getLLMConfig(store, ollamaService, llmName);
-      console.log("llmConfig", llmConfig);
       if (!llmConfig) {
         throw new Error(`LLM ${llmName} not configured.`);
       }
@@ -391,9 +399,14 @@ export const registerFileHandlers = (
 
       const fileList = GetFilesInfoList(dirName);
       fileList.forEach((file) => {
-        fileNameSet.add(addExtensionToFilenameIfNoExtensionPresent(file.path, markdownExtensions,
-          ".md"));
-      })
+        fileNameSet.add(
+          addExtensionToFilenameIfNoExtensionPresent(
+            file.path,
+            markdownExtensions,
+            ".md"
+          )
+        );
+      });
       return Array.from(fileNameSet);
     }
   );

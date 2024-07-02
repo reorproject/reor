@@ -29,12 +29,23 @@ const FloatingMenu: React.FC<{ highlightData: HighlightData }> = ({
   const getLLMResponse = async (action: string, text: string) => {
     // Implement the logic to get a response from the LLM
     // This is a placeholder implementation
-    return { content: `Response for ${action}: ${text}` };
+    const defaultLLMName = await window.llm.getDefaultLLMName();
+    const llmConfigs = await window.llm.getLLMConfigs();
+
+    const currentModelConfig = llmConfigs.find(
+      (config) => config.modelName === defaultLLMName
+    );
+    if (!currentModelConfig) {
+      throw new Error(`No model config found for model: ${defaultLLMName}`);
+    }
+    console.log(defaultLLMName);
+    const result = await window.llm.summarize(defaultLLMName, text);
+    return result;
   };
 
-  const displayLLMResponse = (response: { content: string }) => {
+  const displayLLMResponse = (result: string) => {
     // Implement the logic to display the LLM response
-    alert(response.content); // Simple alert for demonstration
+    console.log(result); // Simple alert for demonstration
   };
 
   return (

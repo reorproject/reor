@@ -256,6 +256,11 @@ const llm = {
       chatHistory: ChatHistory
     ) => Promise<string>
   >("streaming-llm-response"),
+
+  summarize:
+    createIPCHandler<(llmName: string, text: string) => Promise<string>>(
+      "summarize"
+    ),
   getLLMConfigs:
     createIPCHandler<() => Promise<LLMConfig[]>>("get-llm-configs"),
   pullOllamaModel:

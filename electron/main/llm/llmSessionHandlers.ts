@@ -4,7 +4,7 @@ import Store from "electron-store";
 import { ProgressResponse } from "ollama";
 import { ChatCompletionChunk } from "openai/resources/chat/completions";
 
-
+import { createPromptWithContextLimitFromContent } from "../Prompts/Prompts";
 import { LLMConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
 
 import {
@@ -82,6 +82,39 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       }
     }
   );
+
+  ipcMain.handle("summarize", async (event, llmName, text) => {
+    const llmSession = openAISession;
+    console.log(llmName);
+    console.log("text:", text);
+    const llmConfig = await getLLMConfig(store, ollamaService, llmName);
+    if (!llmConfig) {
+      throw new Error(`LLM ${llmName} not configured.`);
+    }
+    const { prompt: promptToCreateSummerization } =
+      createPromptWithContextLimitFromContent(
+        text,
+        "",
+        `Summarize the text: ${text}`,
+        llmSession.getTokenizer(llmName),
+        llmConfig.contextLength
+      );
+
+    const llmGeneratedSummerization = await llmSession.response(
+      llmName,
+      llmConfig,
+      [
+        {
+          role: "user",
+          content: promptToCreateSummerization,
+        },
+      ],
+      false,
+      store.get(StoreKeys.LLMGenerationParameters)
+    );
+
+    return llmGeneratedSummerization.choices[0].message.content || "";
+  });
   ipcMain.handle("set-default-llm", (event, modelName: string) => {
     // TODO: validate that the model exists
     store.set(StoreKeys.DefaultLLM, modelName);
