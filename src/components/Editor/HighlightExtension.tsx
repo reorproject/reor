@@ -24,8 +24,8 @@ const HighlightExtension = (setHighlightData: (data: HighlightData) => void) =>
                   const { top, left, right } = editorView.coordsAtPos(to);
 
                   // Calculate the button position below the last word
-                  const buttonTop = top + 20; // Adjust the vertical offset as needed
-                  const buttonLeft = (left + right) / 2; // Position the button horizontally centered
+                  const buttonTop = top - 35; // Adjust the vertical offset as needed
+                  const buttonLeft = (left + right) / 2 - 190; // Position the button horizontally centered
 
                   setHighlightData({
                     text: highlightedText,

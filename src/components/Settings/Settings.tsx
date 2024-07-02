@@ -3,11 +3,9 @@ import React, { useState } from "react";
 import Modal from "../Generic/Modal";
 
 import AnalyticsSettings from "./AnalyticsSettings";
-import ChunkSizeSettings from "./ChunkSizeSettings";
 import EmbeddingModelSettings from "./EmbeddingSettings";
 import GeneralSettings from "./GeneralSettings";
 import LLMSettings from "./LLMSettings";
-import RagSettings from "./RagSettings";
 import TextGenerationSettings from "./TextGenerationSettings";
 
 interface ModalProps {
@@ -16,12 +14,12 @@ interface ModalProps {
 }
 
 enum SettingsTab {
+  GeneralSettings = "generalSettings",
   LLMSettings = "llmSettings",
   EmbeddingModel = "embeddingModel",
   TextGeneration = "textGeneration",
-  RAG = "RAG",
+  // RAG = "RAG",
   ANALYTICS = "analytics",
-  GENERAL = "general",
 }
 
 const SettingsModal: React.FC<ModalProps> = ({
@@ -29,7 +27,9 @@ const SettingsModal: React.FC<ModalProps> = ({
   onClose: onCloseFromParent,
 }) => {
   const [willNeedToReIndex, setWillNeedToReIndex] = useState(false);
-  const [activeTab, setActiveTab] = useState("llmSettings");
+  const [activeTab, setActiveTab] = useState<SettingsTab>(
+    SettingsTab.LLMSettings
+  );
 
   const handleSave = () => {
     if (willNeedToReIndex) {
@@ -48,10 +48,20 @@ const SettingsModal: React.FC<ModalProps> = ({
         handleSave();
       }}
     >
-      <div className="mt-0 flex w-[600px] ">
-        <div className="flex flex-col ml-2 mb-2 pr-1 w-[100px]  bg-neutral-800 text-white border-r-[0.1px] border-gray-700 border-solid border-b-0 border-t-0 border-l-0">
-          <div
+      <div className="flex w-full h-full">
+        <div className="flex flex-col w-[150px] h-[600px] bg-dark-gray-c-seven text-white border-r-[0.1px] border-gray-700 border-solid border-b-0 border-t-0 border-l-0 p-2">
+          {/* <div
             className={`flex items-center mt-2 rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
+              activeTab === SettingsTab.GeneralSettings
+                ? "bg-neutral-700 text-white font-semibold"
+                : "text-gray-200"
+            }`}
+            onClick={() => setActiveTab(SettingsTab.GeneralSettings)}
+          >
+            General
+          </div> */}
+          <div
+            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
               activeTab === SettingsTab.LLMSettings
                 ? "bg-neutral-700 text-white font-semibold"
                 : "text-gray-200"
@@ -81,7 +91,7 @@ const SettingsModal: React.FC<ModalProps> = ({
           >
             Text Generation{" "}
           </div>
-          <div
+          {/* <div
             className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
               activeTab === SettingsTab.RAG
                 ? "bg-neutral-700 text-white font-semibold"
@@ -90,7 +100,7 @@ const SettingsModal: React.FC<ModalProps> = ({
             onClick={() => setActiveTab(SettingsTab.RAG)}
           >
             RAG{" "}
-          </div>
+          </div> */}
           <div
             className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
               activeTab === SettingsTab.ANALYTICS
@@ -103,26 +113,31 @@ const SettingsModal: React.FC<ModalProps> = ({
           </div>
           <div
             className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
-              activeTab === SettingsTab.GENERAL
+              activeTab === SettingsTab.GeneralSettings
                 ? "bg-neutral-700 text-white font-semibold"
                 : "text-gray-200"
             }`}
-            onClick={() => setActiveTab(SettingsTab.GENERAL)}
+            onClick={() => setActiveTab(SettingsTab.GeneralSettings)}
           >
             General{" "}
           </div>
         </div>
 
         {/* Right Content Area */}
-        <div className="flex-1 ml-2">
+        <div className="w-full h-[600px] flex-1 ml-2 pl-16 pr-16">
           {/* <h2 className="text-2xl font-semibold mb-4 text-white">Settings</h2> */}
+          {activeTab === SettingsTab.GeneralSettings && (
+            <div className="w-full h-full">
+              <GeneralSettings />
+            </div>
+          )}
           {activeTab === SettingsTab.LLMSettings && (
-            <div className="mt-2 w-full">
+            <div className="w-full h-full">
               <LLMSettings />
             </div>
           )}
           {activeTab === SettingsTab.EmbeddingModel && (
-            <div className="w-full">
+            <div className="w-full h-full">
               <EmbeddingModelSettings
                 handleUserHasChangedModel={() => setWillNeedToReIndex(true)}
               />
@@ -141,23 +156,23 @@ const SettingsModal: React.FC<ModalProps> = ({
             </div>
           )}
 
-          {activeTab === SettingsTab.RAG && (
+          {/* {activeTab === SettingsTab.RAG && (
             <div className="w-full">
+              <h2 className="text-2xl font-semibold mb-5 text-white">RAG</h2>{" "}
               <RagSettings>
-                <h2 className="text-2xl font-semibold mb-0 text-white">RAG</h2>{" "}
-                <p className="mt-2 text-sm text-gray-100 mb-1">
-                  Number of notes to feed to the LLM during Q&A:
+                <p className="mt-5 text-sm text-gray-100 mb-1 flex pb-3">
+                  Number of notes to feed to the LLM during Q&A
                 </p>
               </RagSettings>
               <ChunkSizeSettings>
-                <p className="mt-2 text-sm text-gray-100 mb-1">
-                  Change the Chunk Size:
+                <p className="mt-5 text-sm text-gray-100 mb-1 flex pb-3">
+                  Change the Chunk Size
                 </p>
               </ChunkSizeSettings>
             </div>
-          )}
+          )} */}
 
-          {activeTab === SettingsTab.GENERAL && (
+          {activeTab === SettingsTab.GeneralSettings && (
             <div className="w-full">
               <GeneralSettings />
             </div>

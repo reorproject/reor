@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 
 import { Button } from "@material-tailwind/react";
@@ -10,8 +9,6 @@ import Modal from "../../Generic/Modal";
 import CustomSelect from "../../Generic/Select";
 
 import { errorToString } from "@/functions/error";
-
-
 
 interface RemoteLLMModalProps {
   isOpen: boolean;
@@ -69,7 +66,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
     }
   };
   return (
-    <Modal isOpen={isOpen} onClose={handleClose}>
+    <Modal isOpen={isOpen} onClose={handleClose} name="remoteLLMSetting">
       <div className="w-[400px] ml-3 mr-2 mb-2">
         <h2 className="font-semibold mb-0 text-white">Remote LLM Setup</h2>
         <p className="text-gray-100 mb-2 mt-2 text-sm">
@@ -130,13 +127,15 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
           }}
         />
 
-        <Button
-          className="bg-orange-700 border-none h-8 hover:bg-orange-900 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mt-3 w-[80px]"
-          onClick={handleSave}
-          placeholder=""
-        >
-          Save
-        </Button>
+        <div className="pb-2 flex justify-end">
+          <Button
+            className="bg-blue-300 border-none h-8 hover:bg-blue-400 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mt-3 w-[80px]"
+            onClick={handleSave}
+            placeholder=""
+          >
+            Save
+          </Button>
+        </div>
         {currentError && (
           <p className="text-xs text-red-500 mt-2">{currentError}</p>
         )}

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 
 import { Button } from "@material-tailwind/react";
@@ -10,7 +9,6 @@ import ExternalLink from "../../Generic/ExternalLink";
 import Modal from "../../Generic/Modal";
 
 import { errorToString } from "@/functions/error";
-
 
 interface NewOllamaModelModalProps {
   isOpen: boolean;
@@ -84,10 +82,10 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
   }, []);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} name="localLLMSetting">
       <div className="w-[400px] ml-2 mr-2 mb-2 pl-3">
         <h2 className="text-white  font-semibold mb-0">New Local LLM</h2>
-        <p className="text-white text-sm mb-2 mt-1">
+        <p className="text-white text-xs mb-6 mt-1">
           Reor will automaticaly download an LLM. Please choose an LLM from the{" "}
           <ExternalLink href="https://ollama.com/library">
             Ollama Library
@@ -104,16 +102,18 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
         />
         <p className="text-white text-xs mb-2 mt-2 italic">
           {" "}
-          We recommended either mistral, llama2, or command-r.
+          We recommended either mistral, llama3, or phi3.
         </p>
 
-        <Button
-          className="bg-slate-700 border-none h-8 hover:bg-slate-900 cursor-pointer w-[100px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
-          onClick={downloadSelectedModel}
-          placeholder=""
-        >
-          Download
-        </Button>
+        <div className="pb-2 flex justify-end">
+          <Button
+            className="bg-blue-300 border-none h-8 hover:bg-blue-400 cursor-pointer w-[100px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
+            onClick={downloadSelectedModel}
+            placeholder=""
+          >
+            Download
+          </Button>
+        </div>
         {modelNameerror && (
           <p className="text-xs text-red-500 break-words">{modelNameerror}</p>
         )}

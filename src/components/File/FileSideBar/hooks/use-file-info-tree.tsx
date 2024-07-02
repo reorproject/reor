@@ -6,7 +6,6 @@ import {
   FileInfoTree,
 } from "electron/main/Files/Types";
 
-
 import { sortFilesAndDirectories } from "../fileOperations";
 
 export const useFileInfoTree = (currentFilePath: string | null) => {
@@ -66,12 +65,19 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
 
   //initial load of files
   useEffect(() => {
-    window.files.getFilesTreeForWindow().then((fetchedFiles) => {
-      const sortedFiles = sortFilesAndDirectories(fetchedFiles, null);
-      setFileInfoTree(sortedFiles);
-      const flattenedFiles = flattenFileInfoTree(sortedFiles);
-      setFlattenedFiles(flattenedFiles);
-    });
+    const fetchAndSetFiles = async () => {
+      try {
+        const fetchedFiles = await window.files.getFilesTreeForWindow();
+        const sortedFiles = sortFilesAndDirectories(fetchedFiles, null);
+        setFileInfoTree(sortedFiles);
+        const flattenedFiles = flattenFileInfoTree(sortedFiles);
+        setFlattenedFiles(flattenedFiles);
+      } catch (error) {
+        console.error("Error fetching and setting files:", error);
+      }
+    };
+
+    fetchAndSetFiles();
   }, []);
 
   return {

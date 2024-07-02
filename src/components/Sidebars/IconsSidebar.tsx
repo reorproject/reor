@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 
-import { BsChatLeftDots, BsFillChatLeftDotsFill } from "react-icons/bs";
+import { IconContext } from "react-icons";
 import { FaSearch } from "react-icons/fa";
-import { FaRegPenToSquare } from "react-icons/fa6";
 import { GrNewWindow } from "react-icons/gr";
-import { IoFolderOutline } from "react-icons/io5";
-import { LuFolderPlus } from "react-icons/lu";
+import { ImFilesEmpty } from "react-icons/im";
+import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
 import { MdOutlineQuiz, MdSettings } from "react-icons/md";
+import { VscNewFile, VscNewFolder } from "react-icons/vsc";
 
 import NewDirectoryComponent from "../File/NewDirectory";
 import NewNoteComponent from "../File/NewNote";
@@ -30,6 +30,8 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
   const [isNewNoteModalOpen, setIsNewNoteModalOpen] = useState(false);
   const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false);
   const [isFlashcardModeOpen, setIsFlashcardModeOpen] = useState(false);
+  const [customDirectoryPath, setCustomDirectoryPath] = useState("");
+  const [customFilePath, setCustomFilePath] = useState("");
 
   const [initialFileToCreateFlashcard, setInitialFileToCreateFlashcard] =
     useState("");
@@ -51,77 +53,91 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
     };
   }, []);
 
+  // open a new note window
+  useEffect(() => {
+    const handleNewNote = (relativePath: string) => {
+      setCustomFilePath(relativePath);
+      setIsNewNoteModalOpen(true);
+    };
+
+    window.ipcRenderer.receive(
+      "add-new-note-listener",
+      (relativePath: string) => {
+        handleNewNote(relativePath);
+      }
+    );
+  }, []);
+
+  // open a new directory window
+  useEffect(() => {
+    const handleNewDirectory = (dirPath: string) => {
+      setCustomDirectoryPath(dirPath);
+      setIsNewDirectoryModalOpen(true);
+    };
+
+    window.ipcRenderer.receive("add-new-directory-listener", (dirPath) => {
+      handleNewDirectory(dirPath);
+    });
+  }, []);
+
   return (
-    <div className="w-full h-full bg-neutral-800 flex flex-col items-center justify-between">
+    <div className="w-full h-full bg-neutral-800 flex flex-col items-center justify-between gap-1">
       <div
         className=" flex items-center justify-center w-full h-8 cursor-pointer"
         onClick={() => makeSidebarShow("files")}
       >
-        <div
-          className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700"
-          style={{
-            backgroundColor: sidebarShowing === "files" ? "rgb(82 82 82)" : "",
-          }}
+        <IconContext.Provider
+          value={{ color: sidebarShowing === "files" ? "salmon" : "" }}
         >
-          <IoFolderOutline
-            className="mx-auto text-gray-200 "
-            size={22}
-            title="Files"
-          />
-        </div>
+          <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
+            <ImFilesEmpty
+              className="mx-auto text-gray-200 "
+              size={22}
+              title="Files"
+            />
+          </div>
+        </IconContext.Provider>
       </div>
       <div
         className=" flex items-center justify-center w-full h-8 cursor-pointer"
         onClick={() => makeSidebarShow("chats")}
       >
-        <div
-          className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700"
-          style={{
-            backgroundColor: sidebarShowing === "chats" ? "rgb(82 82 82)" : "",
-          }}
+        <IconContext.Provider
+          value={{ color: sidebarShowing === "chats" ? "salmon" : "" }}
         >
-          {sidebarShowing === "chats" ? (
-            <BsFillChatLeftDotsFill
-              size={22}
-              className="text-gray-100 cursor-pointer"
-              title="Open Chatbot"
-            />
-          ) : (
-            <BsChatLeftDots
+          <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
+            <IoChatbubbleEllipsesOutline
               className="text-gray-100 cursor-pointer "
               size={22}
-              title="Close Chatbot"
+              title={
+                sidebarShowing === "chats" ? "Close Chatbot" : "Open Chatbot"
+              }
             />
-          )}
-        </div>
+          </div>
+        </IconContext.Provider>
       </div>
       <div
         className="flex items-center justify-center w-full h-8 cursor-pointer"
         onClick={() => makeSidebarShow("search")}
       >
-        <div
-          className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700"
-          style={{
-            backgroundColor: sidebarShowing === "search" ? "rgb(82 82 82)" : "",
-          }}
+        <IconContext.Provider
+          value={{ color: sidebarShowing === "search" ? "salmon" : "" }}
         >
-          <FaSearch
-            size={18}
-            className=" text-gray-200"
-            title="Semantic Search"
-          />
-        </div>
+          <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
+            <FaSearch
+              size={18}
+              className=" text-gray-200"
+              title="Semantic Search"
+            />
+          </div>
+        </IconContext.Provider>
       </div>
       <div
         className="bg-transparent border-none cursor-pointer flex items-center justify-center w-full h-8 "
         onClick={() => setIsNewNoteModalOpen(true)}
       >
         <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
-          <FaRegPenToSquare
-            className="text-gray-200"
-            size={20}
-            title="New Note"
-          />
+          <VscNewFile className="text-gray-200" size={22} title="New Note" />
         </div>
       </div>
       <div
@@ -129,9 +145,9 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         onClick={() => setIsNewDirectoryModalOpen(true)}
       >
         <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
-          <LuFolderPlus
+          <VscNewFolder
             className="text-gray-200"
-            size={23}
+            size={22}
             title="New Directory"
           />
           {/* < /> */}
@@ -155,16 +171,18 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
         openRelativePath={openRelativePath}
+        customFilePath={customFilePath}
       />
       <NewDirectoryComponent
         isOpen={isNewDirectoryModalOpen}
         onClose={() => setIsNewDirectoryModalOpen(false)}
-        onDirectoryCreate={() => console.log("Directory created")}
+        onDirectoryCreate={customDirectoryPath}
       />
       {isFlashcardModeOpen && (
         <FlashcardMenuModal
           isOpen={isFlashcardModeOpen}
           onClose={() => {
+            console.log(`clicked`);
             setIsFlashcardModeOpen(false);
             setInitialFileToCreateFlashcard("");
             setInitialFileToReviewFlashcard("");

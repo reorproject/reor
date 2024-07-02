@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 
+import { MathExtension } from "@aarkue/tiptap-math-extension";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import Text from "@tiptap/extension-text";
+import TextStyle from "@tiptap/extension-text-style";
 import { Editor, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { toast } from "react-toastify";
 import { Markdown } from "tiptap-markdown";
-import { MathExtension } from "@aarkue/tiptap-math-extension";
 import { useDebounce } from "use-debounce";
 
 import { BacklinkExtension } from "@/components/Editor/BacklinkExtension";
@@ -18,6 +19,7 @@ import HighlightExtension, {
   HighlightData,
 } from "@/components/Editor/HighlightExtension";
 import { RichTextLink } from "@/components/Editor/RichTextLink";
+import SearchAndReplace from "@/components/Editor/SearchAndReplace";
 import {
   getInvalidCharacterInFilePath,
   removeFileExtension,
@@ -55,6 +57,8 @@ export const useFileByFilepath = () => {
     text: "",
     position: null,
   });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
 
   const setFileNodeToBeRenamed = async (filePath: string) => {
     const isDirectory = await window.files.isDirectory(filePath);
@@ -125,6 +129,25 @@ export const useFileByFilepath = () => {
     setSuggestionsState(suggState);
   };
 
+  // Check if we should display markdown or not
+  useEffect(() => {
+    const handleInitialStartup = async () => {
+      const isMarkdownSet = await window.electronStore.getDisplayMarkdown();
+      setDisplayMarkdown(isMarkdownSet);
+    };
+
+    // Even listener
+    const handleChangeMarkdown = (isMarkdownSet: boolean) => {
+      setDisplayMarkdown(isMarkdownSet);
+    };
+
+    handleInitialStartup();
+    window.ipcRenderer.receive(
+      "display-markdown-changed",
+      handleChangeMarkdown
+    );
+  }, []);
+
   const editor = useEditor({
     autofocus: true,
 
@@ -141,6 +164,11 @@ export const useFileByFilepath = () => {
       TaskList,
       MathExtension.configure({
         evaluation: true,
+      }),
+      TextStyle,
+      SearchAndReplace.configure({
+        searchResultClass: "bg-yellow-400",
+        disableRegex: false,
       }),
       Markdown.configure({
         html: true, // Allow HTML input/output

@@ -41,6 +41,7 @@
     "@tiptap/extension-link": "^2.2.4",
     "@tiptap/extension-task-item": "^2.2.4",
     "@tiptap/extension-task-list": "^2.2.4",
+    "@tiptap/extension-text-style": "^2.4.0",
     "@tiptap/pm": "^2.2.4",
     "@tiptap/react": "^2.2.4",
     "@tiptap/starter-kit": "^2.2.4",
@@ -49,6 +50,7 @@
     "chokidar": "^3.5.3",
     "cm6-theme-basic-dark": "^0.2.0",
     "date-fns": "^3.3.1",
+    "dotenv": "^16.4.5",
     "electron-store": "^8.1.0",
     "electron-updater": "^6.1.1",
     "install": "^0.13.0",
@@ -62,7 +64,9 @@
     "ollama": "^0.4.9",
     "openai": "^4.20.0",
     "posthog-js": "^1.130.2",
+    "prosemirror-utils": "^1.2.2",
     "react-card-flip": "^1.2.2",
+    "react-day-picker": "^8.10.1",
     "react-icons": "^4.12.0",
     "react-markdown": "^9.0.1",
     "react-quill": "^2.0.0",
@@ -73,13 +77,14 @@
     "react-window": "^1.8.10",
     "rehype-raw": "^7.0.0",
     "remove-markdown": "^0.5.0",
+    "tailwind-scrollbar": "^3.1.0",
     "tiptap-markdown": "^0.8.10",
     "turndown": "^7.1.2",
     "use-debounce": "^10.0.1",
     "vectordb": "0.4.10"
   },
   "devDependencies": {
-    "@electron/notarize": "^2.3.0",
+    "@electron/notarize": "2.3.2",
     "@playwright/test": "^1.37.1",
     "@types/jest": "^29.5.11",
     "@types/react": "^18.2.20",
@@ -115,8 +120,10 @@
     "vite-plugin-electron-renderer": "^0.14.5"
   },
   "optionalDependencies": {
-    "dmg-license": "^1.0.11",
-    "@lancedb/vectordb-win32-x64-msvc": "^0.5.0"
+    "@lancedb/vectordb-darwin-x64": "^0.5.0",
+    "@lancedb/vectordb-linux-x64-msvc": "0.5.0",
+    "@lancedb/vectordb-win32-x64-msvc": "^0.5.0",
+    "dmg-license": "^1.0.11"
   },
   "engines": {
     "node": "^14.18.0 || >=16.0.0"

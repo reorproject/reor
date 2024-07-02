@@ -1,5 +1,4 @@
-
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Button } from "@material-tailwind/react";
 import posthog from "posthog-js";
@@ -8,20 +7,28 @@ import Modal from "../Generic/Modal";
 
 import { getInvalidCharacterInFilePath } from "@/functions/strings";
 
-
 interface NewNoteComponentProps {
   isOpen: boolean;
   onClose: () => void;
   openRelativePath: (path: string) => void;
+  customFilePath: string;
 }
 
 const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
   isOpen,
   onClose,
   openRelativePath,
+  customFilePath,
 }) => {
   const [fileName, setFileName] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setFileName("");
+      setErrorMessage(null);
+    }
+  }, [isOpen]);
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value;
@@ -42,8 +49,12 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
     if (!fileName || errorMessage) {
       return;
     }
-    openRelativePath(fileName);
-    posthog.capture("created_new_note_from_new_note_modal")
+    const pathPrefix = customFilePath
+      ? customFilePath.replace(/\/?$/, "/")
+      : "";
+    const fullPath = pathPrefix + fileName;
+    openRelativePath(fullPath);
+    posthog.capture("created_new_note_from_new_note_modal");
     onClose();
   };
 
@@ -54,7 +65,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} name="newNote">
       <div className="ml-3 mr-6 mt-2 mb-2 h-full min-w-[400px]">
         <h2 className="text-xl font-semibold mb-3 text-white">New Note</h2>
         <input

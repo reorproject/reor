@@ -76,13 +76,17 @@ export const resolveRAGContext = async (
   if (chatFilters.files.length > 0) {
     console.log("chatFilters.files", chatFilters.files);
     results = await window.files.getFilesystemPathsAsDBItems(chatFilters.files);
-  } else {
+  } else if (chatFilters.numberOfChunksToFetch > 0) {
+    const timeStampFilter = generateTimeStampFilter(
+      chatFilters.minDate,
+      chatFilters.maxDate
+    );
     results = await window.database.search(
       query,
-      chatFilters.numberOfChunksToFetch
+      chatFilters.numberOfChunksToFetch,
+      timeStampFilter
     );
   }
-  console.log("RESULTS", results);
   return {
     messageType: "success",
     role: "user",
@@ -92,4 +96,26 @@ export const resolveRAGContext = async (
       .join("\n\n")}\n\n\nQuery:\n${query}`,
     visibleContent: query,
   };
+};
+
+export const generateTimeStampFilter = (
+  minDate?: Date,
+  maxDate?: Date
+): string => {
+  let filter = "";
+
+  if (minDate) {
+    const minDateStr = minDate.toISOString().slice(0, 19).replace("T", " ");
+    filter += `filemodified > timestamp '${minDateStr}'`;
+  }
+
+  if (maxDate) {
+    const maxDateStr = maxDate.toISOString().slice(0, 19).replace("T", " ");
+    if (filter) {
+      filter += " AND ";
+    }
+    filter += `filemodified < timestamp '${maxDateStr}'`;
+  }
+
+  return filter;
 };

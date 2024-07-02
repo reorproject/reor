@@ -12,7 +12,6 @@ import { SidebarAbleToShow } from "../FileEditorContainer";
 
 import SearchComponent from "./FileSidebarSearch";
 
-
 interface SidebarManagerProps {
   files: FileInfoTree;
   expandedDirectories: Map<string, boolean>;
@@ -84,16 +83,21 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
           chatHistoriesMetadata={chatHistoriesMetadata}
           currentChatHistory={currentChatHistory}
           onSelect={(chatID) => {
-            window.electronStore.getChatHistory(chatID).then((chat) => {
+            async function fetchChatHistory() {
+              const chat = await window.electronStore.getChatHistory(chatID);
               setCurrentChatHistory(chat);
-            });
+            }
+            fetchChatHistory();
           }}
           newChat={() => {
             posthog.capture("create_new_chat");
             setCurrentChatHistory(undefined);
+            console.log("resetting chat filters");
             setChatFilters({
               files: [],
               numberOfChunksToFetch: 15,
+              minDate: new Date(0),
+              maxDate: new Date(),
             });
           }}
           setShowChatbot={setShowChatbot}

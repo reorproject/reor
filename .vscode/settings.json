@@ -12,7 +12,7 @@
   ],
   "editor.codeActionsOnSave": {
     "source.fixAll": "explicit",
-    "source.organizeImports": "explicit"
+    // "source.organizeImports": "explicit"
   },
   "eslint.alwaysShowStatus": true,
   "eslint.format.enable": true,

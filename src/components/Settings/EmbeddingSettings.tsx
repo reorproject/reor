@@ -1,16 +1,14 @@
-
 import React, { useState, useEffect } from "react";
 
 import { Button } from "@material-tailwind/react";
 import { EmbeddingModelConfig } from "electron/main/Store/storeConfig";
 import posthog from "posthog-js";
 
-
 import CustomSelect from "../Generic/Select";
 
+import ChunkSizeSettings from "./ChunkSizeSettings";
 import NewLocalEmbeddingModelModal from "./ExtraModals/NewLocalEmbeddingModel";
 import NewRemoteEmbeddingModelModal from "./ExtraModals/NewRemoteEmbeddingModel";
-
 
 interface EmbeddingModelManagerProps {
   // userHasCompleted?: (completed: boolean) => void;
@@ -78,44 +76,89 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
   };
 
   return (
-    <div className="w-full bg-neutral-800 rounded">
-      <h2 className="text-2xl font-semibold mb-0 text-white">
-        Embedding Model
-      </h2>{" "}
-      <p className="mt-5 text-gray-100">
-        If you change this, your files will be re-indexed:
-      </p>{" "}
-      {Object.keys(embeddingModels).length > 0 && (
-        <CustomSelect
-          options={Object.keys(embeddingModels).map((model) => {
-            return { label: model, value: model };
-          })}
-          selectedValue={selectedModel}
-          onChange={handleChangeOnModelSelect}
-        />
-      )}
+    <div className="w-full h-full flex flex-col justify-between bg-dark-gray-c-three rounded">
+      <div>
+        <h2 className="text-2xl font-semibold mb-0 text-white">
+          Embedding Model
+        </h2>{" "}
+        <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2 mt-2">
+          <div className="flex-col">
+            <p className="mt-5 text-gray-100">
+              Select Model
+              <p className="text-gray-100 text-xs">
+                If you change this your files will be re-indexed
+              </p>
+            </p>{" "}
+          </div>
+          <div className="flex items-end">
+            {Object.keys(embeddingModels).length > 0 && (
+              <CustomSelect
+                options={Object.keys(embeddingModels).map((model) => {
+                  return { label: model, value: model };
+                })}
+                selectedValue={selectedModel}
+                onChange={handleChangeOnModelSelect}
+              />
+            )}
+          </div>
+        </div>
+        <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2">
+          <div className="flex-col">
+            <h4 className="text-gray-200 font-normal mb-0">
+              Attach Local Model
+            </h4>
+            <p className="text-gray-100 text-xs">
+              Attach a local HuggingFace model.
+            </p>
+          </div>
+          <div className="flex">
+            <Button
+              className="flex justify-between items-center w-[80px] py-2 border border-gray-300 rounded-md border-none cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten font-normal"
+              onClick={() => setIsNewLocalEmbeddingModelModalOpen(true)}
+              placeholder=""
+            >
+              Attach
+            </Button>
+          </div>
+        </div>
+        <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2">
+          <div className="flex-col">
+            <h4 className="text-gray-200 font-normal mb-0">
+              Download Remote Model
+            </h4>
+            <p className="text-gray-100 text-xs">
+              Reor will download a HuggingFace embedding model for you.
+            </p>
+          </div>
+          <div className="flex">
+            <Button
+              className="flex justify-between items-center w-[80px] py-2 border border-gray-300 rounded-md border-none cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten font-normal"
+              onClick={() => setIsContextLengthModalOpen(true)}
+              placeholder=""
+            >
+              Attach
+            </Button>
+          </div>
+        </div>
+        <ChunkSizeSettings>
+          <div className="flex-col">
+            <h4 className="text-gray-200 font-normal mb-0">
+              Change Chunk Size
+            </h4>
+            <p className="text-gray-100 text-xs">
+              A larger chunk size means more context is fed to the model at the
+              cost of &quot;needle in a haystack&quot; effects.
+            </p>
+          </div>
+        </ChunkSizeSettings>
+      </div>
+      {/* Warning message at the bottom */}
       <p className=" text-gray-100 text-xs">
         <i>
-          If you notice some lag in the editor it is likely because you chose
-          too large of a model...
+          Note: If you notice some lag in the editor it is likely because you
+          chose too large of a model...
         </i>
       </p>{" "}
-      <div className="flex">
-        <Button
-          className="bg-orange-700  border-none h-8 hover:bg-orange-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
-          onClick={() => setIsNewLocalEmbeddingModelModalOpen(true)}
-          placeholder={""}
-        >
-          Attach Local Model
-        </Button>
-        <Button
-          className="bg-orange-700  border-none h-8 hover:bg-orange-900 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-2 mb-3 mr-4"
-          onClick={() => setIsContextLengthModalOpen(true)}
-          placeholder={""}
-        >
-          Attach Remote Model
-        </Button>
-      </div>
       <NewLocalEmbeddingModelModal
         isOpen={isNewLocalEmbeddingModelModalOpen}
         onClose={() => {

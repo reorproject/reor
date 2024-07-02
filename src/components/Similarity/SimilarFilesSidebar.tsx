@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 
 import { CircularProgress } from "@mui/material";
@@ -10,14 +9,12 @@ import { PiGraph } from "react-icons/pi";
 import { toast } from "react-toastify";
 import removeMd from "remove-markdown";
 
+import "../../styles/global.css";
 import { HighlightData } from "../Editor/HighlightExtension";
 import { DBResultPreview } from "../File/DBResultPreview";
 import ResizableComponent from "../Generic/ResizableComponent";
 
 import { errorToString } from "@/functions/error";
-
-
-
 
 interface SidebarComponentProps {
   filePath: string;
@@ -147,14 +144,14 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
         setSimilarEntries={setSimilarEntries}
         onFileSelect={(path: string) => {
           openFileByPath(path);
-          posthog.capture("open_file_from_related_notes")
+          posthog.capture("open_file_from_related_notes");
         }}
         saveCurrentFile={async () => {
           await saveCurrentlyOpenedFile();
         }}
         updateSimilarEntries={updateSimilarEntries}
         isLoadingSimilarEntries={isLoadingSimilarEntries}
-        titleText="Related Notes"
+        titleText="Related notes"
       />
       {/* </ResizableComponent> */}
     </>
@@ -182,8 +179,8 @@ export const SimilarEntriesComponent: React.FC<
   // filePath,
   similarEntries,
   setSimilarEntries,
-  isRefined,
-  setIsRefined,
+  // isRefined,
+  // setIsRefined,
   onFileSelect,
   saveCurrentFile,
   updateSimilarEntries,
@@ -195,7 +192,9 @@ export const SimilarEntriesComponent: React.FC<
       <ResizableComponent resizeSide="left" initialWidth={300}>
         <div
           className={`h-below-titlebar ${
-            similarEntries.length > 0 ? "overflow-y-auto" : "overflow-y-hidden"
+            similarEntries.length > 0
+              ? "overflow-y-auto scrollable-y-thin"
+              : "overflow-y-hidden"
           } overflow-x-hidden mt-0 border-l-[0.1px] border-t-0 border-b-0 border-r-0 border-neutral-700  border-solid`}
         >
           {/* {similarEntries.length > 0 && ( */}
@@ -230,20 +229,20 @@ export const SimilarEntriesComponent: React.FC<
               )}
             </div>
           </div>
-          <div className="text-sm flex items-center justify-center">
+          {/* <div className="text-sm flex items-center justify-center">
             {updateSimilarEntries && (
               <button
                 className="bg-slate-600 m-2 rounded-lg border-none h-6 w-40 text-center vertical-align text-white cursor-pointer"
                 onClick={() => {
                   setIsRefined(!isRefined);
                   updateSimilarEntries(!isRefined);
-                  posthog.capture("rerank_related_notes")
+                  posthog.capture("rerank_related_notes");
                 }}
               >
                 {isRefined ? "Un-rerank" : "Rerank results"}
               </button>
             )}
-          </div>
+          </div> */}
           {similarEntries.length > 0 && (
             <div className="h-full w-full">
               {similarEntries
@@ -254,7 +253,7 @@ export const SimilarEntriesComponent: React.FC<
                       key={index}
                       dbResult={dbResult}
                       onSelect={(path: string) => {
-                        onFileSelect(path)
+                        onFileSelect(path);
                       }}
                     />
                   </div>
@@ -296,6 +295,8 @@ const HighlightButton: React.FC<HighlightButtonProps> = ({
   }
 
   const { top, left } = highlightData.position;
+  // top -= 55;
+  // left -= 190;
 
   const handleClick = () => {
     onClick(); // This calls the provided onClick handler
