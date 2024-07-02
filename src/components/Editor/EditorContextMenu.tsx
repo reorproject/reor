@@ -35,10 +35,16 @@ interface EditorContextMenu {
  */
 const EditorContextMenu: React.FC<EditorContextMenu> = ({ editor, menuPosition, setMenuVisible }) => {
 	const [showTableSelector, setShowTableSelector] = useState(false);
+	/**
+	 * We use useRef instead of state's because we are changing the style of our DOM but DO NOT 
+	 * want to re-render. This style gets applied once and does not change, so no re-render is needed.
+	 */
 	const tableButtonRef = useRef(null);
 	const tableSelectorRef = useRef(null);
+	const menuRef = useRef(null);
 
 	useEffect(() => {
+		// Checks if we hover outside the table. In that case, do not display table selector
 		const checkIfOutside = (event: any) => {
 			if (tableButtonRef.current && tableSelectorRef.current &&
 				!tableButtonRef.current.contains(event.target) &&
@@ -53,7 +59,6 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({ editor, menuPosition, 
 		};
 	}, []);
 
-
 	const handleTableSelect = (rows: number, cols: number) => {
 		editor.chain().focus().insertTable({ rows: rows, cols: cols, withHeaderRow: true }).run();
 		setShowTableSelector(false); // Hide selector after selection
@@ -64,25 +69,24 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({ editor, menuPosition, 
 		return !editor.state.selection.empty;
 	}
 
-	// If text is selected, then do not perform action.
+	// If text is not selected, then do not perform action.
 	const handleCommand = (command: string) => {
 		if (!isTextCurrentlySelected()) return;
 
 		switch (command) {
 			case 'cut':
-				editor.commands.cut();
 				cutCommand(editor.state, editor.view.dispatch);
 				break;
 			case 'copy':
-				// editor.commands.copy();
 				copyCommand(editor.state, editor.view.dispatch);
 				break;
 			case 'delete':
-				// editor.commands.delete();
+				deleteCommand(editor.state, editor.view.dispatch);
 				break;
 			default:
 				break;
 		}
+		setMenuVisible(false);
 	}
 
 	return (
@@ -111,14 +115,17 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({ editor, menuPosition, 
 					<span className="text">Cut</span>
 				</li>
 				<li
-					onClick={() => pasteCommand(editor)}
+					onClick={() => {
+						pasteCommand(editor);
+						setMenuVisible(false);
+					}}
 					className={`bubble-menu-item`}
 				>
 					<MdContentPaste className="icon" />
 					<span className="text">Paste</span>
 				</li>
 				<li
-					onClick={() => deleteCommand(editor.state, editor.view.dispatch)}
+					onClick={() => handleCommand('delete')}
 					className={`bubble-menu-item ${!isTextCurrentlySelected() ? "disabled opacity-50" : ""}`}
 				>
 					<AiOutlineDelete className="icon" />
@@ -235,7 +242,7 @@ const pasteCommand = async (editor: any) => {
 			const text = await navigator.clipboard.readText();
 			editor.commands.insertContent(text);
 		} catch (err) {
-			console.error(`Failed to read error`, err);
+			console.error(`Failed to read from clipboard:`, err);
 		}
 	}
 }
@@ -244,8 +251,6 @@ const pasteCommand = async (editor: any) => {
  * Deletes the text that is selected.
  */
 const deleteCommand = (state: any, dispatch: any) => {
-	if (state.selection.empty) return false; // Do nothing if there is no selection.
-
 	const transaction = state.tr.deleteSelection();
 
 	if (dispatch) {
