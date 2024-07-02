@@ -3,6 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import { MathExtension } from "@aarkue/tiptap-math-extension";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
+import Table from '@tiptap/extension-table';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
+import TableRow from '@tiptap/extension-table-row';
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import Text from "@tiptap/extension-text";
@@ -12,6 +16,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { toast } from "react-toastify";
 import { Markdown } from "tiptap-markdown";
 import { useDebounce } from "use-debounce";
+
 
 import { BacklinkExtension } from "@/components/Editor/BacklinkExtension";
 import { SuggestionsState } from "@/components/Editor/BacklinkSuggestionsDisplay";
@@ -24,8 +29,8 @@ import {
   getInvalidCharacterInFilePath,
   removeFileExtension,
 } from "@/functions/strings";
-import "../tiptap.scss";
 import "katex/dist/katex.min.css";
+import "../tiptap.scss";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
@@ -70,11 +75,11 @@ export const useFileByFilepath = () => {
   };
 
   /**
-	 * with this editor, we want to take the HTML on the following scenarios:
-		1. when the file path changes, causing a re-render
-		2. When the component unmounts
-		3. when the file is deleted
-	 */
+   * with this editor, we want to take the HTML on the following scenarios:
+    1. when the file path changes, causing a re-render
+    2. When the component unmounts
+    3. when the file is deleted
+   */
 
   const openFileByPath = async (newFilePath: string) => {
     setCurrentlyChangingFilePath(true);
@@ -165,6 +170,12 @@ export const useFileByFilepath = () => {
       MathExtension.configure({
         evaluation: true,
       }),
+      Table.configure({
+        resizable: true,
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
       TextStyle,
       SearchAndReplace.configure({
         searchResultClass: "bg-yellow-400",
