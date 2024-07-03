@@ -83,38 +83,65 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
     }
   );
 
-  ipcMain.handle("summarize", async (event, llmName, text) => {
+  ipcMain.handle("writing-assistant", async (event, llmName, text, mode) => {
     const llmSession = openAISession;
-    console.log(llmName);
-    console.log("text:", text);
     const llmConfig = await getLLMConfig(store, ollamaService, llmName);
     if (!llmConfig) {
       throw new Error(`LLM ${llmName} not configured.`);
     }
-    const { prompt: promptToCreateSummerization } =
-      createPromptWithContextLimitFromContent(
-        text,
-        "",
-        `Summarize the text: ${text}`,
-        llmSession.getTokenizer(llmName),
-        llmConfig.contextLength
-      );
 
-    const llmGeneratedSummerization = await llmSession.response(
+    let promptText;
+    switch (mode) {
+      case "copy-editor":
+        promptText = `Act as a copy editor. Go through the text in triple quotes below. Edit it for spelling mistakes, grammar issues, punctuation, and generally for readability and flow. Format the text into appropriately sized paragraphs. Make your best effort.
+ 
+""" ${text} """
+Return only the edited text. Do not wrap your response in quotes. Do not offer anything else other than the edited text in the response. Do not translate the text. If in doubt, or you can't make edits, just return the original text.`;
+        break;
+      case "simplify":
+        promptText = `The following text in triple quotes below has already been written:
+"""
+${text}
+"""
+Simplify and condense the writing. Do not return anything other than the simplified writing. Do not wrap responses in quotes.`;
+        break;
+      case "takeaways":
+        promptText = `My notes are below in triple quotes:
+""" ${text} """
+Write a markdown list (using dashes) of key takeaways from my notes. Write at least 3 items, but write more if the text requires it. Be very detailed and don't leave any information out. Do not wrap responses in quotes.`;
+        break;
+      default:
+        promptText = `Please process the following text:
+"""
+${text}
+"""`;
+        break;
+    }
+
+    const { prompt: promptToCreate } = createPromptWithContextLimitFromContent(
+      text,
+      "",
+      promptText,
+      llmSession.getTokenizer(llmName),
+      llmConfig.contextLength
+    );
+
+    const llmGeneratedResponse = await llmSession.response(
       llmName,
       llmConfig,
       [
         {
           role: "user",
-          content: promptToCreateSummerization,
+          content: promptToCreate,
         },
       ],
       false,
       store.get(StoreKeys.LLMGenerationParameters)
     );
 
-    return llmGeneratedSummerization.choices[0].message.content || "";
+    return llmGeneratedResponse.choices[0].message.content || "";
   });
+
   ipcMain.handle("set-default-llm", (event, modelName: string) => {
     // TODO: validate that the model exists
     store.set(StoreKeys.DefaultLLM, modelName);

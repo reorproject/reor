@@ -12,21 +12,21 @@ const FloatingMenu: React.FC<{ highlightData: HighlightData }> = ({
     let response;
 
     switch (option) {
-      case "summarize":
-        response = await getLLMResponse("summarize", selectedText);
+      case "simplify":
+        response = await getLLMResponse("simplify", selectedText);
         break;
-      case "translate":
-        response = await getLLMResponse("translate", selectedText);
+      case "copy-editor":
+        response = await getLLMResponse("copy-editor", selectedText);
         break;
-      case "expand":
-        response = await getLLMResponse("expand", selectedText);
+      case "takeaways":
+        response = await getLLMResponse("takeaways", selectedText);
         break;
     }
 
     displayLLMResponse(response);
   };
 
-  const getLLMResponse = async (action: string, text: string) => {
+  const getLLMResponse = async (mode: string, text: string) => {
     // Implement the logic to get a response from the LLM
     // This is a placeholder implementation
     const defaultLLMName = await window.llm.getDefaultLLMName();
@@ -38,8 +38,11 @@ const FloatingMenu: React.FC<{ highlightData: HighlightData }> = ({
     if (!currentModelConfig) {
       throw new Error(`No model config found for model: ${defaultLLMName}`);
     }
-    console.log(defaultLLMName);
-    const result = await window.llm.summarize(defaultLLMName, text);
+    const result = await window.llm.writingAssistant(
+      defaultLLMName,
+      text,
+      mode
+    );
     return result;
   };
 
@@ -60,9 +63,9 @@ const FloatingMenu: React.FC<{ highlightData: HighlightData }> = ({
         zIndex: 1000,
       }}
     >
-      <button onClick={() => handleOption("summarize")}>Summarize</button>
-      <button onClick={() => handleOption("translate")}>Translate</button>
-      <button onClick={() => handleOption("expand")}>Expand</button>
+      <button onClick={() => handleOption("simplify")}>Simplify</button>
+      <button onClick={() => handleOption("copy-editor")}>Copy Editor</button>
+      <button onClick={() => handleOption("takeaways")}>Key Takeaways</button>
     </div>
   );
 };

@@ -257,10 +257,10 @@ const llm = {
     ) => Promise<string>
   >("streaming-llm-response"),
 
-  summarize:
-    createIPCHandler<(llmName: string, text: string) => Promise<string>>(
-      "summarize"
-    ),
+  writingAssistant:
+    createIPCHandler<
+      (llmName: string, text: string, mode: string) => Promise<string>
+    >("writing-assistant"),
   getLLMConfigs:
     createIPCHandler<() => Promise<LLMConfig[]>>("get-llm-configs"),
   pullOllamaModel:
