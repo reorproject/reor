@@ -157,6 +157,7 @@ const electronStore = {
     createIPCHandler<(chatID: string) => Promise<ChatHistory>>(
       "get-chat-history"
     ),
+
   getSBCompact: createIPCHandler<() => Promise<boolean>>("get-sb-compact"),
   setSBCompact:
     createIPCHandler<(isSBCompact: boolean) => Promise<void>>("set-sb-compact"),
@@ -332,10 +333,8 @@ declare global {
     llm: typeof llm;
     ipcRenderer: {
       on: typeof ipcRenderer.on;
-      receive: (
-        channel: string,
-        func: (...args: unknown[]) => void
-      ) => () => void;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      receive: (channel: string, func: (...args: any[]) => void) => () => void;
     };
     contextMenu: {
       showFileItemContextMenu: (file: FileInfoNode) => Promise<void>;
