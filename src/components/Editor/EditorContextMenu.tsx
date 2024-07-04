@@ -39,9 +39,8 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({ editor, menuPosition, 
 	 * We use useRef instead of state's because we are changing the style of our DOM but DO NOT 
 	 * want to re-render. This style gets applied once and does not change, so no re-render is needed.
 	 */
-	const tableButtonRef = useRef(null);
-	const tableSelectorRef = useRef(null);
-	const menuRef = useRef(null);
+	const tableButtonRef = useRef<HTMLLIElement>(null);
+	const tableSelectorRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
 		// Checks if we hover outside the table. In that case, do not display table selector
@@ -153,6 +152,9 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({ editor, menuPosition, 
 	)
 };
 
+
+
+
 /**
  * Table that is displayed when hovering over table in contextMenu
  * 
@@ -160,7 +162,11 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({ editor, menuPosition, 
  * 
  * @returns number of rows and cols selected
  */
-const TableSizeSelector = ({ onSelect }) => {
+type TableSizeSelectorProps = {
+	onSelect: (rows: number, cols: number) => void;
+};
+
+const TableSizeSelector: React.FC<TableSizeSelectorProps> = ({ onSelect }) => {
 	const maxRows = 10;
 	const maxCols = 10;
 	const [hoveredRows, setHoveredRows] = useState(0);
