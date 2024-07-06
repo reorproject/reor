@@ -74,7 +74,7 @@ export class AnthropicModelSessionService implements LLMSessionService {
 
     const stream = await anthropic.messages.create({
       model: modelName,
-      messages: messageHistory.map(cleanMessage) as MessageParam[],
+      messages: messageHistory.map(cleanMessage),
       stream: true,
       temperature: generationParams?.temperature,
       max_tokens: generationParams?.maxTokens || 1024,
@@ -85,10 +85,16 @@ export class AnthropicModelSessionService implements LLMSessionService {
   }
 }
 
-function cleanMessage(
-  message: ChatMessageToDisplay
-): ChatCompletionMessageParam {
+function cleanMessage(message: ChatMessageToDisplay): MessageParam {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { ...cleanMessage } = message;
-  return cleanMessage;
+  //  check that message.content is a string and not undefined:
+  if (typeof message.content !== "string") {
+    throw new Error("Message content is not a string");
+  }
+  if (message.role === "system") {
+    return { role: "user", content: message.content };
+  } else if (message.role === "user" || message.role === "assistant") {
+    return { role: message.role, content: message.content };
+  }
+  throw new Error("Message role is not valid");
 }

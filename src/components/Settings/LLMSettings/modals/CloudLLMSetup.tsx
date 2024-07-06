@@ -124,23 +124,7 @@ const openAIDefaultModels: OpenAILLMConfig[] = [
 const AnthropicDefaultModels: AnthropicLLMConfig[] = [
   {
     contextLength: 180000,
-    modelName: "claude-3-haiku-20240307",
-    engine: "anthropic",
-    type: "anthropic",
-    apiKey: "",
-    apiURL: "",
-  },
-  {
-    contextLength: 180000,
-    modelName: "claude-3-sonnet-20240229",
-    engine: "anthropic",
-    type: "anthropic",
-    apiKey: "",
-    apiURL: "",
-  },
-  {
-    contextLength: 180000,
-    modelName: "claude-3-opus-20240229",
+    modelName: "claude-3-5-sonnet-20240620",
     engine: "anthropic",
     type: "anthropic",
     apiKey: "",
