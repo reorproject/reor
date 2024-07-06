@@ -36,7 +36,7 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      name="flashcardMode"
+      widthName="flashcardMode"
       // tailwindStylesOnBackground="bg-gradient-to-r from-orange-900 to-yellow-900"
     >
       <div className="ml-6 mr-6 mt-2 mb-6 w-full h-full flex-col align-center justify-center">

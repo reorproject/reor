@@ -6,7 +6,7 @@ interface ModalProps {
   children: React.ReactNode;
   hideCloseButton?: boolean;
   tailwindStylesOnBackground?: string;
-  name?: ModalName;
+  widthName?: ModalName;
 }
 
 /*
@@ -54,7 +54,7 @@ const Modal: React.FC<ModalProps> = ({
   children,
   hideCloseButton,
   tailwindStylesOnBackground,
-  name,
+  widthName: name,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const widthClass = getDimension(name as ModalName);
