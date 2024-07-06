@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 
-import CloudLLMSetupModal from "../modals/CloudLLMSetup";
+import CloudLLMSetupModal, {
+  CloudLLMSetupModalProps,
+} from "../modals/CloudLLMSetup";
 import NewOllamaModelModal from "../modals/NewOllamaModel";
 import RemoteLLMSetupModal from "../modals/RemoteLLMSetup";
 
@@ -10,15 +12,13 @@ const useModals = () => {
     remoteLLM: { isOpen: false, Component: RemoteLLMSetupModal },
     openai: {
       isOpen: false,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      Component: (props: any) => (
+      Component: (props: Omit<CloudLLMSetupModalProps, "LLMType">) => (
         <CloudLLMSetupModal {...props} LLMType="openai" />
       ),
     },
     anthropic: {
       isOpen: false,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      Component: (props: any) => (
+      Component: (props: Omit<CloudLLMSetupModalProps, "LLMType">) => (
         <CloudLLMSetupModal {...props} LLMType="anthropic" />
       ),
     },
