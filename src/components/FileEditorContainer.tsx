@@ -276,11 +276,11 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                   />
                 )}
                 <EditorContent
+                  className="h-full overflow-y-auto scrollbar-thin   scrollbar-cursor-pointer
+"
                   style={{
                     wordBreak: "break-word",
                     backgroundColor: "rgb(30, 30, 30)",
-                    height: "100%",
-                    overflowY: "auto",
                   }}
                   onContextMenu={handleContextMenu}
                   onClick={hideMenu}
@@ -295,7 +295,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                   />
                 )}
               </div>
-            </div>
+            </div>{" "}
             {showSimilarFiles && (
               <div className="flex-shrink-0 h-full overflow-y-auto">
                 <SidebarComponent
