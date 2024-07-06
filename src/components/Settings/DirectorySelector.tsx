@@ -25,7 +25,6 @@ const DirectorySelector: React.FC<DirectorySelectorProps> = ({
         setUserDirectory(directory);
       }
     };
-
     fetchDirectory();
   }, []);
 
@@ -36,19 +35,19 @@ const DirectorySelector: React.FC<DirectorySelectorProps> = ({
       window.electronStore.setVaultDirectoryForWindow(userDirectory);
       setErrorMsg("");
     }
-  }, [userDirectory]);
+  }, [userDirectory, setErrorMsg]);
 
   return (
-    <div>
+    <div className="flex flex-col items-end">
       <Button
-        className="bg-blue-300  border-none h-10 hover:bg-blue-400 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
+        className="bg-blue-300 border-none h-10 hover:bg-blue-400 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
         onClick={handleDirectorySelection}
-        placeholder=""
+        placeholder={""}
       >
         Select Directory
       </Button>
       {userDirectory && (
-        <p className="mt-2 text-xs text-gray-100">
+        <p className="mt-2 text-xs text-gray-100 text-right w-full">
           Selected: <strong>{userDirectory}</strong>
         </p>
       )}
