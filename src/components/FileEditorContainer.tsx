@@ -16,7 +16,7 @@ import SidebarManager from "./Sidebars/MainSidebar";
 import SidebarComponent from "./Similarity/SimilarFilesSidebar";
 import TitleBar from "./TitleBar";
 
-interface FileEditorContainerProps { }
+interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search" | "chats";
 
 const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
@@ -79,19 +79,18 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sidebarWidth, setSidebarWidth] = useState(40);
 
-  const handleContextMenu = (event: any) => {
+  const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
     setMenuPosition({
       x: event.pageX,
-      y: event.pageY
+      y: event.pageY,
     });
     setMenuVisible(true);
-  }
+  };
 
   const hideMenu = () => {
-    if (menuVisible)
-      setMenuVisible(false);
-  }
+    if (menuVisible) setMenuVisible(false);
+  };
 
   // showSearch should be set to false when:
   //    1) User presses ctrl-f
@@ -113,10 +112,8 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
       }
 
       if (event.key === "Escape") {
-        if (showSearch)
-          setShowSearch(false);
-        if (menuVisible)
-          setMenuVisible(false);
+        if (showSearch) setShowSearch(false);
+        if (menuVisible) setMenuVisible(false);
       }
     };
 
