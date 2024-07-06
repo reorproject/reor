@@ -86,7 +86,8 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = ({
       />
       {!isInitialSetup && userMadeChanges && (
         <p className="text-xs text-slate-100 mt-1">
-          Note: You'll need to refresh the chat window to apply these changes.
+          Note: You&apos;ll need to refresh the chat window to apply these
+          changes.
         </p>
       )}
       {userTriedToSubmit && !defaultLLM && (
@@ -97,7 +98,10 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = ({
         <Component
           key={key}
           isOpen={isOpen}
-          onClose={() => closeModal(key as keyof typeof modals)}
+          onClose={() => {
+            closeModal(key as keyof typeof modals);
+            fetchAndUpdateModelConfigs();
+          }}
           //   refreshLLMs={fetchAndUpdateModelConfigs}
         />
       ))}
