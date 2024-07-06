@@ -61,58 +61,6 @@ button {
 }
 
 
-/* X Scrollbar */
-.scrollable-x-thin::-webkit-scrollbar {
-  height: 3px;
-  /* Set the height of the horizontal scrollbar to 5px */
-}
-
-.scrollable-x-thin::-webkit-scrollbar-track {
-  background: transparent;
-  /* Optional: make the track transparent */
-}
-
-.scrollable-x-thin::-webkit-scrollbar-thumb {
-  background-color: rgba(95, 125, 139, 0.5);
-  /* Gray color with some transparency */
-  border-radius: 2px;
-  /* Optional: rounded corners for the scrollbar thumb */
-}
-
-.scrollable-x-thin {
-  scrollbar-width: thin;
-  /* For Firefox */
-  scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
-  /* For Firefox, color and transparent track */
-}
-
-
-/* y scroll bar */
-.scrollable-y-thin::-webkit-scrollbar {
-  width: 3px;
-  /* Set the height of the horizontal scrollbar to 5px */
-}
-
-.scrollable-y-thin::-webkit-scrollbar-track {
-  background: transparent;
-  /* Optional: make the track transparent */
-}
-
-.scrollable-y-thin::-webkit-scrollbar-thumb {
-  background-color: rgba(95, 125, 139, 0.5);
-  /* Gray color with some transparency */
-  border-radius: 2px;
-  /* Optional: rounded corners for the scrollbar thumb */
-}
-
-.scrollable-y-thin {
-  scrollbar-width: thin;
-  /* For Firefox */
-  scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
-  /* For Firefox, color and transparent track */
-}
-/* Custom scrollbar cursor styles */
-
 
 .scrollbar-cursor-pointer {
   /* Ensure the content area keeps the default cursor */

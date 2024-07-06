@@ -276,7 +276,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                   />
                 )}
                 <EditorContent
-                  className="h-full overflow-y-auto scrollbar-thin   scrollbar-cursor-pointer
+                  className="h-full overflow-y-auto scrollbar-thin scrollbar-cursor-pointer
 "
                   style={{
                     wordBreak: "break-word",
