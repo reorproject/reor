@@ -247,7 +247,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
           <div className="relative w-full h-full flex overflow-x-hidden scrollable-y-thin">
             <div className="w-full flex h-full">
               <div
-                className="relative h-screen w-full cursor-text text-slate-400"
+                className="relative h-full w-full cursor-text text-slate-400"
                 onClick={() => editor?.commands.focus()}
                 style={{
                   backgroundColor: "rgb(30, 30, 30)",
