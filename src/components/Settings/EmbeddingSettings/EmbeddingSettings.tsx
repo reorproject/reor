@@ -4,11 +4,11 @@ import { Button } from "@material-tailwind/react";
 import { EmbeddingModelConfig } from "electron/main/Store/storeConfig";
 import posthog from "posthog-js";
 
-import CustomSelect from "../Generic/Select";
+import CustomSelect from "../../Generic/Select";
 
-import ChunkSizeSettings from "./ChunkSizeSettings";
-import NewLocalEmbeddingModelModal from "./ExtraModals/NewLocalEmbeddingModel";
-import NewRemoteEmbeddingModelModal from "./ExtraModals/NewRemoteEmbeddingModel";
+import ChunkSizeSettings from "../ChunkSizeSettings";
+import NewLocalEmbeddingModelModal from "./modals/NewLocalEmbeddingModel";
+import NewRemoteEmbeddingModelModal from "./modals/NewRemoteEmbeddingModel";
 
 interface EmbeddingModelManagerProps {
   // userHasCompleted?: (completed: boolean) => void;

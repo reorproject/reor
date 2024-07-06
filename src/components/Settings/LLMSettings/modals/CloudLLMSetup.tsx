@@ -7,9 +7,9 @@ import {
 } from "electron/main/Store/storeConfig";
 import posthog from "posthog-js";
 
-import Modal from "../../Generic/Modal";
+import Modal from "../../../Generic/Modal";
 
-interface CloudLLMSetupModalProps {
+export interface CloudLLMSetupModalProps {
   isOpen: boolean;
   onClose: () => void;
   LLMType: "openai" | "anthropic";
@@ -83,7 +83,7 @@ const CloudLLMSetupModal: React.FC<CloudLLMSetupModalProps> = ({
         </p>
 
         <Button
-          className="bg-orange-700 border-none h-8 hover:bg-orange-900 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mt-1 w-[80px]"
+          className="bg-blue-300  border-none h-8 hover:bg-blue-400 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mt-1 w-[80px]"
           onClick={handleSave}
           placeholder=""
         >
