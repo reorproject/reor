@@ -244,10 +244,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         </ResizableComponent>
 
         {!showChatbot && filePath && (
-          <div className="relative w-full h-full flex overflow-x-hidden scrollable-y-thin">
-            <div className="w-full flex h-full">
+          <div className="relative w-full h-full flex overflow-hidden">
+            <div className="flex-grow h-full overflow-hidden">
               <div
-                className="relative h-screen w-full cursor-text text-slate-400"
+                className="relative h-full w-full cursor-text text-slate-400 overflow-y-auto"
                 onClick={() => editor?.commands.focus()}
                 style={{
                   backgroundColor: "rgb(30, 30, 30)",
@@ -265,7 +265,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                     }}
                     placeholder="Search..."
                     autoFocus
-                    className="absolute top-4 right-0  mt-4 mr-14 z-50 border-none rounded-md p-2 bg-transparent bg-dark-gray-c-ten text-white "
+                    className="absolute top-4 right-0 mt-4 mr-14 z-50 border-none rounded-md p-2 bg-transparent bg-dark-gray-c-ten text-white"
                   />
                 )}
                 {menuVisible && (
@@ -276,6 +276,8 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                   />
                 )}
                 <EditorContent
+                  className="h-full overflow-y-auto
+"
                   style={{
                     wordBreak: "break-word",
                     backgroundColor: "rgb(30, 30, 30)",
@@ -293,7 +295,9 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                   />
                 )}
               </div>
-              {showSimilarFiles && (
+            </div>{" "}
+            {showSimilarFiles && (
+              <div className="flex-shrink-0 h-full overflow-y-auto ">
                 <SidebarComponent
                   filePath={filePath}
                   highlightData={highlightData}
@@ -302,8 +306,8 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                     await saveCurrentlyOpenedFile();
                   }}
                 />
-              )}
-            </div>
+              </div>
+            )}
           </div>
         )}
 
