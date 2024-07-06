@@ -4,9 +4,9 @@ import { Button } from "@material-tailwind/react";
 import { LLMConfig } from "electron/main/Store/storeConfig";
 import posthog from "posthog-js";
 
-import ExternalLink from "../../Generic/ExternalLink";
-import Modal from "../../Generic/Modal";
-import CustomSelect from "../../Generic/Select";
+import ExternalLink from "../../../Generic/ExternalLink";
+import Modal from "../../../Generic/Modal";
+import CustomSelect from "../../../Generic/Select";
 
 import { errorToString } from "@/functions/error";
 

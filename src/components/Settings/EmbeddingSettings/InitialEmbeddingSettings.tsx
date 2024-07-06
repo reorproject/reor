@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 
 import { EmbeddingModelConfig } from "electron/main/Store/storeConfig";
 
-import CustomSelect from "../Generic/Select";
+import NewEmbeddingModelModalBothTypes from "./modals/NewEmbeddingModelBothTypes";
 
-import NewEmbeddingModelModalBothTypes from "./ExtraModals/NewEmbeddingModelBothTypes";
+import CustomSelect from "@/components/Generic/Select";
 
 // import { modelRepos } from "./EmbeddingSettings";
 

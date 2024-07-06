@@ -7,9 +7,9 @@ import {
 } from "electron/main/Store/storeConfig";
 import posthog from "posthog-js";
 
-import Modal from "../../Generic/Modal";
+import Modal from "../../../Generic/Modal";
 
-interface CloudLLMSetupModalProps {
+export interface CloudLLMSetupModalProps {
   isOpen: boolean;
   onClose: () => void;
   LLMType: "openai" | "anthropic";

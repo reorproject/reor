@@ -3,9 +3,9 @@ import React, { useState } from "react";
 import Modal from "../Generic/Modal";
 
 import AnalyticsSettings from "./AnalyticsSettings";
-import EmbeddingModelSettings from "./EmbeddingSettings";
+import EmbeddingModelSettings from "./EmbeddingSettings/EmbeddingSettings";
 import GeneralSettings from "./GeneralSettings";
-import LLMSettings from "./LLMSettings";
+import LLMSettings from "./LLMSettings/LLMSettings";
 import TextGenerationSettings from "./TextGenerationSettings";
 
 interface ModalProps {

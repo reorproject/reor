@@ -5,9 +5,8 @@ import { ProgressResponse } from "ollama";
 import posthog from "posthog-js";
 import { toast } from "react-toastify";
 
-import ExternalLink from "../../Generic/ExternalLink";
-import Modal from "../../Generic/Modal";
-
+import ExternalLink from "@/components/Generic/ExternalLink";
+import Modal from "@/components/Generic/Modal";
 import { errorToString } from "@/functions/error";
 
 interface NewOllamaModelModalProps {

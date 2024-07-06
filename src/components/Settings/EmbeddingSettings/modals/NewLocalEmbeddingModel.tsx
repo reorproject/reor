@@ -7,8 +7,8 @@ import { IconContext } from "react-icons";
 import { CiFileOn } from "react-icons/ci";
 import { FaUpload, FaRegTrashAlt } from "react-icons/fa";
 
-import ExternalLink from "../../Generic/ExternalLink";
-import Modal from "../../Generic/Modal";
+import ExternalLink from "../../../Generic/ExternalLink";
+import Modal from "../../../Generic/Modal";
 
 interface NewLocalEmbeddingModelModalProps {
   isOpen: boolean;
