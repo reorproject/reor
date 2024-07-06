@@ -125,6 +125,111 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
           >
             Setup
           </Button>
+          <Modal
+            isOpen={isSetupModalOpen}
+            onClose={() => setIsSetupModalOpen(false)}
+            widthName="newNote"
+          >
+            <div>
+              <h2 className="font-semibold mb-4 text-white">LLM</h2>
+              {llmConfigs.length > 0 && (
+                <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2">
+                  <h4 className="text-gray-200 text-center font-normal">
+                    Default LLM
+                  </h4>
+                  <div className="mb-1">
+                    <DefaultLLMSelector
+                      onModelChange={handleModelChange}
+                      llmConfigs={llmConfigs}
+                      defaultLLM={defaultLLM}
+                      setDefaultLLM={setDefaultLLM}
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2">
+                <h4 className="text-gray-200 text-center font-normal">
+                  Local LLM
+                </h4>
+                <div className="flex">
+                  <Button
+                    className="flex justify-between items-center min-w-[192px] py-2 border border-gray-300 rounded-md border-none cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten font-normal"
+                    onClick={() => setIsNewLocalModelModalOpen(true)}
+                    placeholder={""}
+                  >
+                    Add New Local LLM
+                  </Button>
+                </div>
+              </div>
+              <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2">
+                <div className="flex-col">
+                  <p className="mt-5 text-gray-100">
+                    Setup OpenAI/Anthropic
+                    <p className="text-gray-200 text-xs mt-2 ">
+                      Add your API key
+                    </p>
+                  </p>{" "}
+                </div>
+                <div className="flex">
+                  <div className="w-full mb-1">
+                    <CustomSelect
+                      options={modalOptions}
+                      selectedValue={"Attach Cloud LLM"}
+                      onChange={handleModalSelection}
+                      centerText={true}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2">
+                <div className="flex-col">
+                  <p className="mt-5 text-gray-100">
+                    Setup remote LLMs
+                    <p className="text-gray-200 text-xs mt-2 ">
+                      Non-OpenAI/Anthropic LLMs
+                    </p>
+                  </p>{" "}
+                </div>
+                <div className="flex">
+                  <Button
+                    className="flex justify-between items-center min-w-[192px] py-2 border border-gray-300 rounded-md border-none cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten font-normal"
+                    onClick={() => setIsRemoteLLMModalOpen(true)}
+                    placeholder=""
+                  >
+                    Remote LLM Setup
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <NewOllamaModelModal
+              isOpen={isNewLocalModelModalOpen}
+              onClose={() => {
+                setIsNewLocalModelModalOpen(false);
+              }}
+            />
+            <RemoteLLMSetupModal
+              isOpen={isRemoteLLMModalOpen}
+              onClose={() => {
+                setIsRemoteLLMModalOpen(false);
+              }}
+            />
+            {isCloudLLMModalOpen && selectedCloudLLMModal === "openai" && (
+              <CloudLLMSetupModal
+                isOpen={isCloudLLMModalOpen}
+                onClose={handleModalClose}
+                LLMType="openai"
+                refreshLLMs={fetchAndUpdateModelConfigs} // Probably not necessary given the modal setup.
+              />
+            )}
+            {isCloudLLMModalOpen && selectedCloudLLMModal === "anthropic" && (
+              <CloudLLMSetupModal
+                isOpen={isCloudLLMModalOpen}
+                onClose={handleModalClose}
+                LLMType="anthropic"
+              />
+            )}
+          </Modal>
         </div>
       ) : (
         <div>
@@ -186,110 +291,34 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
               </Button>
             </div>
           </div>
-        </div>
-      )}
-
-      <Modal
-        isOpen={isSetupModalOpen}
-        onClose={() => setIsSetupModalOpen(false)}
-        widthName="newNote"
-      >
-        <div>
-          <h2 className="font-semibold mb-4 text-white">LLM</h2>
-          {llmConfigs.length > 0 && (
-            <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2">
-              <h4 className="text-gray-200 text-center font-normal">
-                Default LLM
-              </h4>
-              <div className="mb-1">
-                <DefaultLLMSelector
-                  onModelChange={handleModelChange}
-                  llmConfigs={llmConfigs}
-                  defaultLLM={defaultLLM}
-                  setDefaultLLM={setDefaultLLM}
-                />
-              </div>
-            </div>
+          <NewOllamaModelModal
+            isOpen={isNewLocalModelModalOpen}
+            onClose={() => {
+              setIsNewLocalModelModalOpen(false);
+            }}
+          />
+          <RemoteLLMSetupModal
+            isOpen={isRemoteLLMModalOpen}
+            onClose={() => {
+              setIsRemoteLLMModalOpen(false);
+            }}
+          />
+          {isCloudLLMModalOpen && selectedCloudLLMModal === "openai" && (
+            <CloudLLMSetupModal
+              isOpen={isCloudLLMModalOpen}
+              onClose={handleModalClose}
+              LLMType="openai"
+              refreshLLMs={fetchAndUpdateModelConfigs} // Probably not necessary given the modal setup.
+            />
           )}
-
-          <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2">
-            <h4 className="text-gray-200 text-center font-normal">Local LLM</h4>
-            <div className="flex">
-              <Button
-                className="flex justify-between items-center min-w-[192px] py-2 border border-gray-300 rounded-md border-none cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten font-normal"
-                onClick={() => setIsNewLocalModelModalOpen(true)}
-                placeholder={""}
-              >
-                Add New Local LLM
-              </Button>
-            </div>
-          </div>
-          <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2">
-            <div className="flex-col">
-              <p className="mt-5 text-gray-100">
-                Setup OpenAI/Anthropic
-                <p className="text-gray-200 text-xs mt-2 ">Add your API key</p>
-              </p>{" "}
-            </div>
-            <div className="flex">
-              <div className="w-full mb-1">
-                <CustomSelect
-                  options={modalOptions}
-                  selectedValue={"Attach Cloud LLM"}
-                  onChange={handleModalSelection}
-                  centerText={true}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2">
-            <div className="flex-col">
-              <p className="mt-5 text-gray-100">
-                Setup remote LLMs
-                <p className="text-gray-200 text-xs mt-2 ">
-                  Non-OpenAI/Anthropic LLMs
-                </p>
-              </p>{" "}
-            </div>
-            <div className="flex">
-              <Button
-                className="flex justify-between items-center min-w-[192px] py-2 border border-gray-300 rounded-md border-none cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten font-normal"
-                onClick={() => setIsRemoteLLMModalOpen(true)}
-                placeholder=""
-              >
-                Remote LLM Setup
-              </Button>
-            </div>
-          </div>
+          {isCloudLLMModalOpen && selectedCloudLLMModal === "anthropic" && (
+            <CloudLLMSetupModal
+              isOpen={isCloudLLMModalOpen}
+              onClose={handleModalClose}
+              LLMType="anthropic"
+            />
+          )}
         </div>
-      </Modal>
-
-      <NewOllamaModelModal
-        isOpen={isNewLocalModelModalOpen}
-        onClose={() => {
-          setIsNewLocalModelModalOpen(false);
-        }}
-      />
-      <RemoteLLMSetupModal
-        isOpen={isRemoteLLMModalOpen}
-        onClose={() => {
-          setIsRemoteLLMModalOpen(false);
-        }}
-      />
-      {isCloudLLMModalOpen && selectedCloudLLMModal === "openai" && (
-        <CloudLLMSetupModal
-          isOpen={isCloudLLMModalOpen}
-          onClose={handleModalClose}
-          LLMType="openai"
-          refreshLLMs={fetchAndUpdateModelConfigs} // Probably not necessary given the modal setup.
-        />
-      )}
-      {isCloudLLMModalOpen && selectedCloudLLMModal === "anthropic" && (
-        <CloudLLMSetupModal
-          isOpen={isCloudLLMModalOpen}
-          onClose={handleModalClose}
-          LLMType="anthropic"
-        />
       )}
       {!isInitialSetup && userMadeChanges && (
         <p className="text-xs text-slate-100 mt-1">
