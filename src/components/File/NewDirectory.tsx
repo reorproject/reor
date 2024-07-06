@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 
 import { Button } from "@material-tailwind/react";
@@ -9,7 +8,6 @@ import Modal from "../Generic/Modal";
 
 import { errorToString } from "@/functions/error";
 import { getInvalidCharacterInFilePath } from "@/functions/strings";
-
 
 interface NewDirectoryComponentProps {
   isOpen: boolean;
@@ -53,10 +51,15 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
         return;
       }
       const normalizedDirectoryName = directoryName.replace(/\\/g, "/");
-      const basePath = onDirectoryCreate || await window.electronStore.getVaultDirectoryForWindow();
-      const fullPath = await window.path.join(basePath, normalizedDirectoryName);
+      const basePath =
+        onDirectoryCreate ||
+        (await window.electronStore.getVaultDirectoryForWindow());
+      const fullPath = await window.path.join(
+        basePath,
+        normalizedDirectoryName
+      );
 
-      posthog.capture('created_new_directory_from_new_directory_modal');
+      posthog.capture("created_new_directory_from_new_directory_modal");
       window.files.createDirectory(fullPath);
       onClose();
     } catch (e) {
@@ -76,7 +79,7 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} name='newDirectory'>
+    <Modal isOpen={isOpen} onClose={onClose} widthName="newDirectory">
       <div className="ml-3 mr-6 mt-2 mb-2 h-full min-w-[400px]">
         <h2 className="text-xl font-semibold mb-3 text-white">New Directory</h2>
         <input

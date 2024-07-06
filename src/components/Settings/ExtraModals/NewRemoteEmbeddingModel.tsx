@@ -49,7 +49,7 @@ const NewRemoteEmbeddingModelModal: React.FC<
     <Modal
       isOpen={isOpen}
       onClose={saveModelConfigToElectronStore}
-      name="newEmbeddingModel"
+      widthName="newEmbeddingModel"
     >
       <div className="w-[400px] ml-2 mr-2 mb-2 pl-3">
         <h2 className="text-white  font-semibold mb-0">Set up remote model</h2>

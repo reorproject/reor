@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 
 import { Button } from "@material-tailwind/react";
@@ -14,12 +13,14 @@ interface CloudLLMSetupModalProps {
   isOpen: boolean;
   onClose: () => void;
   LLMType: "openai" | "anthropic";
+  refreshLLMs?: () => void;
 }
 
 const CloudLLMSetupModal: React.FC<CloudLLMSetupModalProps> = ({
   isOpen,
   onClose,
   LLMType,
+  refreshLLMs,
 }) => {
   const [openKey, setOpenKey] = useState("");
 
@@ -28,6 +29,7 @@ const CloudLLMSetupModal: React.FC<CloudLLMSetupModalProps> = ({
   const LLMDisplayName = LLMType === "openai" ? "OpenAI" : "Anthropic";
 
   const handleSave = async () => {
+    console.log("openKey:", openKey);
     if (openKey) {
       for (const modelConfig of defaultModels) {
         console.log("modelConfig:", modelConfig);
@@ -37,10 +39,14 @@ const CloudLLMSetupModal: React.FC<CloudLLMSetupModalProps> = ({
           contextLength: modelConfig.contextLength,
         });
         modelConfig.apiKey = openKey;
+        console.log("saving modelConfig:", modelConfig);
         await window.llm.addOrUpdateLLM(modelConfig);
       }
       if (defaultModels.length > 0) {
         window.llm.setDefaultLLM(defaultModels[0].modelName);
+      }
+      if (refreshLLMs) {
+        refreshLLMs();
       }
     }
 
@@ -53,7 +59,7 @@ const CloudLLMSetupModal: React.FC<CloudLLMSetupModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleSave}>
+    <Modal isOpen={isOpen} onClose={handleSave} widthName="newNote">
       <div className="w-[300px] ml-3 mr-2 mb-2">
         <h3 className="font-semibold mb-0 text-white">
           {LLMDisplayName} Setup

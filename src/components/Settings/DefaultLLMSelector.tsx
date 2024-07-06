@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 import { LLMConfig } from "electron/main/Store/storeConfig";
 import posthog from "posthog-js";
@@ -8,35 +7,39 @@ import CustomSelect from "../Generic/Select";
 
 interface DefaultLLMSelectorProps {
   onModelChange: (model: string) => void;
-  onModelError: (error: string) => void;
+  llmConfigs: LLMConfig[];
+  defaultLLM: string;
+  setDefaultLLM: (model: string) => void;
 }
 
 const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({
   onModelChange,
-  onModelError,
+  llmConfigs,
+  defaultLLM,
+  setDefaultLLM,
 }) => {
-  const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([]);
-  const [defaultModel, setDefaultModel] = useState("");
+  // const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([]);
+  // const [defaultModel, setDefaultModel] = useState("");
 
-  useEffect(() => {
-    const fetchAndUpdateModelConfigs = async () => {
-      try {
-        const fetchedLLMConfigs = await window.llm.getLLMConfigs();
-        setLLMConfigs(fetchedLLMConfigs);
-        const defaultModelName = await window.llm.getDefaultLLMName();
-        setDefaultModel(defaultModelName);
-        onModelChange(defaultModelName);
-      } catch (error) {
-        console.error("Failed to fetch model configurations:", error);
-        onModelError("Failed to fetch model configurations");
-      }
-    };
+  // useEffect(() => {
+  //   const fetchAndUpdateModelConfigs = async () => {
+  //     try {
+  //       const fetchedLLMConfigs = await window.llm.getLLMConfigs();
+  //       setLLMConfigs(fetchedLLMConfigs);
+  //       const defaultModelName = await window.llm.getDefaultLLMName();
+  //       setDefaultModel(defaultModelName);
+  //       onModelChange(defaultModelName);
+  //     } catch (error) {
+  //       console.error("Failed to fetch model configurations:", error);
+  //       onModelError("Failed to fetch model configurations");
+  //     }
+  //   };
 
-    fetchAndUpdateModelConfigs();
-  }, []);
+  //   fetchAndUpdateModelConfigs();
+  // }, []);
 
   const handleDefaultModelChange = (selectedModel: string) => {
-    setDefaultModel(selectedModel);
+    setDefaultLLM(selectedModel);
     window.llm.setDefaultLLM(selectedModel);
     onModelChange(selectedModel);
     posthog.capture("change_default_llm", {
@@ -52,7 +55,7 @@ const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({
   return (
     <CustomSelect
       options={modelOptions}
-      selectedValue={defaultModel}
+      selectedValue={defaultLLM}
       onChange={handleDefaultModelChange}
     />
   );
