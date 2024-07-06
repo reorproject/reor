@@ -55,36 +55,14 @@ button {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgb(164, 164, 164);
+  background: rgb(112, 112, 112);
   /* Set the thumb color */
   border-radius: 10px;
 }
 
 
 
-.scrollbar-cursor-pointer {
-  /* Ensure the content area keeps the default cursor */
-  cursor: text;
-}
 
-.scrollbar-cursor-pointer::-webkit-scrollbar {
-  width: 8px; /* Adjust as needed */
-}
-
-.scrollbar-cursor-pointer::-webkit-scrollbar-thumb {
-  background-color: #4e4e4e; /* Adjust color as needed */
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.scrollbar-cursor-pointer::-webkit-scrollbar-thumb:hover {
-  background-color: #555; /* Darker on hover */
-}
-
-.scrollbar-cursor-pointer::-webkit-scrollbar-track {
-  background: transparent;
-  cursor: default;
-}
 
 /* CSS for menu that appears when selecting/highlighting text */
 .bubble-menu {
