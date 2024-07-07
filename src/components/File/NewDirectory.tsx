@@ -60,7 +60,7 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
       );
 
       posthog.capture("created_new_directory_from_new_directory_modal");
-      window.files.createDirectory(fullPath);
+      window.fileSystem.createDirectory(fullPath);
       onClose();
     } catch (e) {
       toast.error(errorToString(e), {

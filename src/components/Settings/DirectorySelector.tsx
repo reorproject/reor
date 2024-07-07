@@ -12,7 +12,7 @@ const DirectorySelector: React.FC<DirectorySelectorProps> = ({
   const [userDirectory, setUserDirectory] = useState<string>("");
 
   const handleDirectorySelection = async () => {
-    const paths = await window.files.openDirectoryDialog();
+    const paths = await window.fileSystem.openDirectoryDialog();
     if (paths && paths[0]) {
       setUserDirectory(paths[0]);
     }

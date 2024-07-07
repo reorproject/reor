@@ -64,7 +64,7 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
 
   const getChunkForInitialSearchFromFile = async (filePath: string) => {
     // TODO: proper semantic chunking - current quick win is just to take top 500 characters
-    const fileContent: string = await window.files.readFile(filePath);
+    const fileContent: string = await window.fileSystem.readFile(filePath);
     if (!fileContent) {
       return undefined;
     }

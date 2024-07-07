@@ -50,5 +50,5 @@ export const isFileNodeDirectory = (fileInfo: FileInfoNode): boolean => {
 };
 
 export const moveFile = async (sourcePath: string, destinationPath: string) => {
-  await window.files.moveFileOrDir(sourcePath, destinationPath);
+  await window.fileSystem.moveFileOrDir(sourcePath, destinationPath);
 };

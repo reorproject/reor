@@ -169,7 +169,7 @@ const electronStore = {
   >("set-display-markdown"),
 };
 
-const files = {
+const fileSystem = {
   openDirectoryDialog: createIPCHandler<() => Promise<string[]>>(
     "open-directory-dialog"
   ),
@@ -285,7 +285,7 @@ const llm = {
 contextBridge.exposeInMainWorld("database", database);
 contextBridge.exposeInMainWorld("electron", electron);
 contextBridge.exposeInMainWorld("electronStore", electronStore);
-contextBridge.exposeInMainWorld("files", files);
+contextBridge.exposeInMainWorld("fileSystem", fileSystem);
 contextBridge.exposeInMainWorld("path", path);
 contextBridge.exposeInMainWorld("llm", llm);
 
@@ -328,7 +328,7 @@ declare global {
     database: typeof database;
     electron: typeof electron;
     electronStore: typeof electronStore;
-    files: typeof files;
+    fileSystem: typeof fileSystem;
     path: typeof path;
     llm: typeof llm;
     ipcRenderer: {

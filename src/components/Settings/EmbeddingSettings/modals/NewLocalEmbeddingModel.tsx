@@ -22,7 +22,7 @@ const NewLocalEmbeddingModelModal: React.FC<
   const [newModelPath, setNewModelPath] = useState<string>("");
 
   const handleModelDirectorySelection = async () => {
-    const paths = await window.files.openDirectoryDialog();
+    const paths = await window.fileSystem.openDirectoryDialog();
     if (paths && paths.length > 0) {
       setNewModelPath(paths[0]);
     }

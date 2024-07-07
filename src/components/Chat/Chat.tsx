@@ -124,7 +124,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   useEffect(() => {
     const setContextOnFileAdded = async () => {
       if (chatFilters.files.length > 0) {
-        const results = await window.files.getFilesystemPathsAsDBItems(
+        const results = await window.fileSystem.getFilesystemPathsAsDBItems(
           chatFilters.files
         );
         setCurrentContext(results as DBQueryResult[]);
