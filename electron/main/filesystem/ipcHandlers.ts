@@ -10,8 +10,8 @@ import {
   createPromptWithContextLimitFromContent,
   PromptWithContextLimit,
 } from "../llm/contextLimit";
-import { getLLMConfig } from "../llm/llmConfig";
 import { ollamaService, openAISession } from "../llm/ipcHandlers";
+import { getLLMConfig } from "../llm/llmConfig";
 import { addExtensionToFilenameIfNoExtensionPresent } from "../path/path";
 import { DBEntry } from "../vector-database/schema";
 import {

@@ -18,7 +18,7 @@ import { PromptWithContextLimit } from "electron/main/llm/contextLimit";
 import {
   BasePromptRequirements,
   PromptWithRagResults,
-} from "electron/main/vector-database/dbSessionHandlers";
+} from "electron/main/vector-database/ipcHandlers";
 import { DBEntry, DBQueryResult } from "electron/main/vector-database/schema";
 
 import { ChatHistory } from "@/components/Chat/Chat";

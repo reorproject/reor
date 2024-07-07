@@ -7,15 +7,15 @@ import * as lancedb from "vectordb";
 
 import { errorToStringMainProcess } from "../common/error";
 import WindowsManager from "../common/windowManager";
+import { getDefaultEmbeddingModelConfig } from "../electron-store/ipcHandlers";
 import { StoreKeys, StoreSchema } from "../electron-store/storeConfig";
-import { getDefaultEmbeddingModelConfig } from "../electron-store/storeHandlers";
 import {
   startWatchingDirectory,
   updateFileListForRenderer,
 } from "../filesystem/filesystem";
 import { createPromptWithContextLimitFromContent } from "../llm/contextLimit";
+import { ollamaService, openAISession } from "../llm/ipcHandlers";
 import { getLLMConfig } from "../llm/llmConfig";
-import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
 
 import { rerankSearchedEmbeddings } from "./embeddings";
 import { DBEntry, DatabaseFields } from "./schema";
