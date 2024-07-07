@@ -19,7 +19,6 @@ import { ChatHistory } from "@/components/Chat/Chat";
 export const registerStoreHandlers = (
   store: Store<StoreSchema>,
   windowsManager: WindowsManager
-  // fileWatcher: FSWatcher | null
 ) => {
   initializeAndMaybeMigrateStore(store);
   ipcMain.handle(
