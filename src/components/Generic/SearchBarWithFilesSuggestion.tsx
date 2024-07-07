@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import FilesSuggestionsDisplay, {
+import InEditorBacklinkSuggestionsDisplay, {
   SuggestionsState,
-} from "../Editor/FilesSuggestionsDisplay";
+} from "../Editor/BacklinkSuggestionsDisplay";
 import { useFileInfoTree } from "../File/FileSideBar/hooks/use-file-info-tree";
 
 interface Props {
@@ -82,7 +82,7 @@ export const SearchBarWithFilesSuggestion = ({
           placeholder="Search for the files by name"
         />
         {suggestionsState && (
-          <FilesSuggestionsDisplay
+          <InEditorBacklinkSuggestionsDisplay
             suggestionsState={suggestionsState}
             suggestions={flattenedFiles.map((file) => file.path)}
             maxWidth={`${sidebarWidth}`}
