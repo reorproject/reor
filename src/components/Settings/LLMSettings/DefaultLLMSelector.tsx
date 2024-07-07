@@ -1,9 +1,9 @@
 import React from "react";
 
-import { LLMConfig } from "electron/main/Store/storeConfig";
+import { LLMConfig } from "electron/main/electron-store/storeConfig";
 import posthog from "posthog-js";
 
-import CustomSelect from "../../Generic/Select";
+import CustomSelect from "../../Common/Select";
 
 interface DefaultLLMSelectorProps {
   onModelChange: (model: string) => void;

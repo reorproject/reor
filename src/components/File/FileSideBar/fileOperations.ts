@@ -1,4 +1,4 @@
-import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
+import { FileInfoNode, FileInfoTree } from "electron/main/filesystem/types";
 
 export const sortFilesAndDirectories = (
   fileList: FileInfoTree,

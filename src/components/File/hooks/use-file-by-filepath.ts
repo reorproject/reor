@@ -27,7 +27,7 @@ import SearchAndReplace from "@/components/Editor/SearchAndReplace";
 import {
   getInvalidCharacterInFilePath,
   removeFileExtension,
-} from "@/functions/strings";
+} from "@/utils/strings";
 import "katex/dist/katex.min.css";
 import "../tiptap.scss";
 

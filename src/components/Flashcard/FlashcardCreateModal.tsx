@@ -5,10 +5,10 @@ import { CircularProgress } from "@mui/material";
 import posthog from "posthog-js";
 import { TypeAnimation } from "react-type-animation";
 
+import ReorModal from "../Common/Modal";
 import FilesSuggestionsDisplay from "../Editor/BacklinkSuggestionsDisplay";
 import { useFileInfoTree } from "../File/FileSideBar/hooks/use-file-info-tree";
 import { useFileByFilepath } from "../File/hooks/use-file-by-filepath";
-import Modal from "../Generic/Modal";
 
 import { FlashcardCore } from "./FlashcardsCore";
 import { FlashcardQAPairUI } from "./types";
@@ -106,7 +106,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
   }, []);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <ReorModal isOpen={isOpen} onClose={onClose}>
       <div className="ml-6 mt-2 mb-6 w-[800px] h-full">
         <h2 className="text-xl font-semibold mb-3 text-white">
           Select a file to generate flashcards for:
@@ -188,7 +188,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
           )}
         </div>
       </div>
-    </Modal>
+    </ReorModal>
   );
 };
 

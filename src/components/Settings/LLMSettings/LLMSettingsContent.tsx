@@ -6,7 +6,7 @@ import DefaultLLMSelector from "./DefaultLLMSelector";
 import useLLMConfigs from "./hooks/useLLMConfigs";
 import useModals from "./hooks/useModals";
 
-import CustomSelect from "@/components/Generic/Select";
+import CustomSelect from "@/components/Common/Select";
 
 interface LLMSettingsContentProps {
   userHasCompleted?: (completed: boolean) => void;

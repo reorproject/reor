@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { MessageStreamEvent } from "@anthropic-ai/sdk/resources";
-import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
+import { DBEntry, DBQueryResult } from "electron/main/vector-database/schema";
 import {
   ChatCompletionChunk,
   ChatCompletionMessageParam,
@@ -10,7 +10,7 @@ import posthog from "posthog-js";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 
-import { SimilarEntriesComponent } from "../Similarity/SimilarFilesSidebar";
+import { SimilarEntriesComponent } from "../Sidebars/SimilarFilesSidebar";
 
 import AddContextFiltersModal from "./AddContextFiltersModal";
 import { PromptSuggestion } from "./Chat-Prompts";
@@ -20,7 +20,7 @@ import {
   resolveRAGContext,
 } from "./chatUtils";
 
-import { errorToString } from "@/functions/error";
+import { errorToStringRendererProcess } from "@/utils/error";
 
 // convert ask options to enum
 enum AskOptions {
@@ -215,7 +215,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       if (chatHistory) {
         appendNewContentToMessageHistory(
           chatHistory.id,
-          errorToString(error),
+          errorToStringRendererProcess(error),
           "error"
         );
       }

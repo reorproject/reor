@@ -3,10 +3,10 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@material-tailwind/react";
 import { toast } from "react-toastify";
 
-import Modal from "../Generic/Modal";
+import ReorModal from "../Common/Modal";
 
-import { errorToString } from "@/functions/error";
-import { getInvalidCharacterInFileName } from "@/functions/strings";
+import { errorToStringRendererProcess } from "@/utils/error";
+import { getInvalidCharacterInFileName } from "@/utils/strings";
 export interface RenameDirFuncProps {
   path: string;
   newDirName: string;
@@ -80,7 +80,7 @@ const RenameDirModal: React.FC<RenameDirModalProps> = ({
       onClose();
       setIsUpdatingDirName(false);
     } catch (e) {
-      toast.error(errorToString(e), {
+      toast.error(errorToStringRendererProcess(e), {
         className: "mt-5",
         autoClose: false,
         closeOnClick: false,
@@ -96,7 +96,7 @@ const RenameDirModal: React.FC<RenameDirModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} widthName="renameDirectory">
+    <ReorModal isOpen={isOpen} onClose={onClose} widthType="renameDirectory">
       <div className="ml-3 mr-6 mt-2 mb-2 h-full min-w-[400px]">
         <h2 className="text-xl font-semibold mb-3 text-white">
           Rename Directory
@@ -119,7 +119,7 @@ const RenameDirModal: React.FC<RenameDirModalProps> = ({
         </Button>
         {errorMessage && <p className="text-red-500 text-xs">{errorMessage}</p>}
       </div>
-    </Modal>
+    </ReorModal>
   );
 };
 

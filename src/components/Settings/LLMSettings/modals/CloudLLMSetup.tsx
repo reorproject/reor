@@ -4,10 +4,10 @@ import { Button } from "@material-tailwind/react";
 import {
   OpenAILLMConfig,
   AnthropicLLMConfig,
-} from "electron/main/Store/storeConfig";
+} from "electron/main/electron-store/storeConfig";
 import posthog from "posthog-js";
 
-import Modal from "../../../Generic/Modal";
+import ReorModal from "../../../Common/Modal";
 
 export interface CloudLLMSetupModalProps {
   isOpen: boolean;
@@ -59,7 +59,7 @@ const CloudLLMSetupModal: React.FC<CloudLLMSetupModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleSave} widthName="newNote">
+    <ReorModal isOpen={isOpen} onClose={handleSave} widthType="newNote">
       <div className="w-[300px] ml-3 mr-2 mb-2">
         <h3 className="font-semibold mb-0 text-white">
           {LLMDisplayName} Setup
@@ -90,7 +90,7 @@ const CloudLLMSetupModal: React.FC<CloudLLMSetupModalProps> = ({
           Save
         </Button>
       </div>
-    </Modal>
+    </ReorModal>
   );
 };
 

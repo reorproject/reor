@@ -5,9 +5,9 @@ import { ProgressResponse } from "ollama";
 import posthog from "posthog-js";
 import { toast } from "react-toastify";
 
-import ExternalLink from "@/components/Generic/ExternalLink";
-import Modal from "@/components/Generic/Modal";
-import { errorToString } from "@/functions/error";
+import ExternalLink from "@/components/Common/ExternalLink";
+import ReorModal from "@/components/Common/Modal";
+import { errorToStringRendererProcess } from "@/utils/error";
 
 interface NewOllamaModelModalProps {
   isOpen: boolean;
@@ -47,7 +47,7 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
       await window.llm.setDefaultLLM(taggedModelName);
       toast.success(`${taggedModelName} download complete!`);
     } catch (e) {
-      const errorMessage = errorToString(e);
+      const errorMessage = errorToStringRendererProcess(e);
       setDownloadProgress((prevProgress) => ({
         ...prevProgress,
         [taggedModelName]: {
@@ -81,7 +81,7 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
   }, []);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} widthName="localLLMSetting">
+    <ReorModal isOpen={isOpen} onClose={onClose} widthType="localLLMSetting">
       <div className="w-[400px] ml-2 mr-2 mb-2 pl-3">
         <h2 className="text-white  font-semibold mb-0">New Local LLM</h2>
         <p className="text-white text-xs mb-6 mt-1">
@@ -147,7 +147,7 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
           )}
         </div>
       </div>
-    </Modal>
+    </ReorModal>
   );
 };
 

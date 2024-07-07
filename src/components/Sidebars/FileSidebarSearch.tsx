@@ -1,7 +1,6 @@
-
 import React, { useEffect, useRef } from "react";
 
-import { DBQueryResult } from "electron/main/database/Schema";
+import { DBQueryResult } from "electron/main/vector-database/schema";
 import posthog from "posthog-js";
 import { FaSearch } from "react-icons/fa";
 
@@ -42,8 +41,8 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
 
   const openFileSelectSearch = (path: string) => {
     onFileSelect(path);
-    posthog.capture("open_file_from_search")
-  }
+    posthog.capture("open_file_from_search");
+  };
 
   return (
     <div className="p-1 h-below-titlebar overflow-y-auto overflow-x-hidden">

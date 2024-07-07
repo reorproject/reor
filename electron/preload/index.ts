@@ -1,15 +1,4 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
-import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
-import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
-import {
-  AugmentPromptWithFileProps,
-  FileInfoNode,
-  FileInfoTree,
-  RenameFileProps,
-  WriteFileProps,
-} from "electron/main/Files/Types";
-import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
 import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
@@ -17,7 +6,20 @@ import {
   HardwareConfig,
   LLMConfig,
   LLMGenerationParameters,
-} from "electron/main/Store/storeConfig";
+} from "electron/main/electron-store/storeConfig";
+import {
+  AugmentPromptWithFileProps,
+  FileInfoNode,
+  FileInfoTree,
+  RenameFileProps,
+  WriteFileProps,
+} from "electron/main/filesystem/types";
+import { PromptWithContextLimit } from "electron/main/llm/contextLimit";
+import {
+  BasePromptRequirements,
+  PromptWithRagResults,
+} from "electron/main/vector-database/ipcHandlers";
+import { DBEntry, DBQueryResult } from "electron/main/vector-database/schema";
 
 import { ChatHistory } from "@/components/Chat/Chat";
 import { ChatHistoryMetadata } from "@/components/Chat/hooks/use-chat-history";
@@ -72,7 +74,6 @@ const electronUtils = {
   getReorAppVersion: createIPCHandler<() => Promise<string>>(
     "get-reor-app-version"
   ),
-  // Add the new handlers here
   showFileItemContextMenu: createIPCHandler<
     (file: FileInfoNode) => Promise<void>
   >("show-context-menu-file-item"),

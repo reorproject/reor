@@ -1,7 +1,7 @@
 import React from "react";
 
 import { formatDistanceToNow } from "date-fns"; // for human-readable time format
-import { DBQueryResult } from "electron/main/database/Schema";
+import { DBQueryResult } from "electron/main/vector-database/schema";
 import ReactMarkdown from "react-markdown";
 
 interface DBResultPreview {

@@ -6,7 +6,7 @@ import { Button } from "@material-tailwind/react";
 import useLLMConfigs from "./hooks/useLLMConfigs";
 import LLMSettingsContent from "./LLMSettingsContent";
 
-import Modal from "@/components/Generic/Modal";
+import ReorModal from "@/components/Common/Modal";
 
 interface InitialSetupLLMSettingsProps {
   userHasCompleted?: (completed: boolean) => void;
@@ -54,20 +54,20 @@ const InitialSetupLLMSettings: React.FC<InitialSetupLLMSettingsProps> = ({
             </>
           )}
         </Button>
-        <Modal
+        <ReorModal
           isOpen={isSetupModalOpen}
           onClose={() => {
             setIsSetupModalOpen(false);
             fetchAndUpdateModelConfigs();
           }}
-          widthName="newNote"
+          widthType="newNote"
         >
           <LLMSettingsContent
             userHasCompleted={userHasCompleted}
             userTriedToSubmit={userTriedToSubmit}
             isInitialSetup={true}
           />
-        </Modal>
+        </ReorModal>
       </div>
       {userTriedToSubmit && llmConfigs.length === 0 && (
         <p className="text-red-500 text-sm mt-1">

@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 
 import { Button } from "@material-tailwind/react";
-import { LLMConfig } from "electron/main/Store/storeConfig";
+import { LLMConfig } from "electron/main/electron-store/storeConfig";
 import posthog from "posthog-js";
 
-import ExternalLink from "../../../Generic/ExternalLink";
-import Modal from "../../../Generic/Modal";
-import CustomSelect from "../../../Generic/Select";
+import ExternalLink from "../../../Common/ExternalLink";
+import ReorModal from "../../../Common/Modal";
+import CustomSelect from "../../../Common/Select";
 
-import { errorToString } from "@/functions/error";
+import { errorToStringRendererProcess } from "@/utils/error";
 
 interface RemoteLLMModalProps {
   isOpen: boolean;
@@ -54,7 +54,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
       parentOnClose();
     } catch (error) {
       console.error("Failed to save remote model configuration:", error);
-      setCurrentError(errorToString(error));
+      setCurrentError(errorToStringRendererProcess(error));
     }
   };
 
@@ -66,7 +66,11 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
     }
   };
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} widthName="remoteLLMSetting">
+    <ReorModal
+      isOpen={isOpen}
+      onClose={handleClose}
+      widthType="remoteLLMSetting"
+    >
       <div className="w-[400px] ml-3 mr-2 mb-2">
         <h2 className="font-semibold mb-0 text-white">Remote LLM Setup</h2>
         <p className="text-gray-100 mb-2 mt-2 text-sm">
@@ -140,7 +144,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
           <p className="text-xs text-red-500 mt-2">{currentError}</p>
         )}
       </div>
-    </Modal>
+    </ReorModal>
   );
 };
 

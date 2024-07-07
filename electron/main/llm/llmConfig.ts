@@ -1,9 +1,12 @@
 import Store from "electron-store";
 
-import { LLMConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
+import {
+  LLMConfig,
+  StoreKeys,
+  StoreSchema,
+} from "../electron-store/storeConfig";
 
 import { OllamaService } from "./models/Ollama";
-
 
 export function validateAIModelConfig(config: LLMConfig): string | null {
   // Validate localPath: ensure it's not empty
