@@ -8,7 +8,7 @@ import { ChatFilters, ChatHistory } from "../Chat/Chat";
 import { ChatsSidebar } from "../Chat/ChatsSidebar";
 import { ChatHistoryMetadata } from "../Chat/hooks/use-chat-history";
 import { FileSidebar } from "../File/FileSideBar";
-import { SidebarAbleToShow } from "../FileEditorContainer";
+import { SidebarAbleToShow } from "../MainPage";
 
 import SearchComponent from "./FileSidebarSearch";
 

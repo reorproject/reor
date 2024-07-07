@@ -6,7 +6,7 @@ import { ToastContainer, toast } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
 import IndexingProgress from "./components/Common/IndexingProgress";
-import FileEditorContainer from "./components/FileEditorContainer";
+import FileEditorContainer from "./components/MainPage";
 import InitialSetupSinglePage from "./components/Settings/InitialSettingsSinglePage";
 
 interface AppProps {}

@@ -10,7 +10,7 @@ import { VscNewFile, VscNewFolder } from "react-icons/vsc";
 
 import NewDirectoryComponent from "../File/NewDirectory";
 import NewNoteComponent from "../File/NewNote";
-import { SidebarAbleToShow } from "../FileEditorContainer";
+import { SidebarAbleToShow } from "../MainPage";
 import FlashcardMenuModal from "../Flashcard/FlashcardMenuModal";
 import SettingsModal from "../Settings/Settings";
 
