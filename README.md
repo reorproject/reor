@@ -71,8 +71,8 @@ npm run dev
 npm run build
 ```
 
-### Contributions
-Contributions are welcome in all areas: features, ideas, bug fixes, design, etc. This is very much a community driven project. There are some open issues to choose from. For new features, please open an issue to discuss it before beginning work on a PR :)
+### Interested in contributing?
+We are always on the lookout for contributors keen on building the future of knowledge management. Have a feature idea? Want to squash a bug? Want to improve some styling? We'd love to hear it. Check out our issues page and the [contributing guide](https://www.reorproject.org/docs/documentation/contributing) to get started.
 
 ## License
 AGPL-3.0 license. See `LICENSE` for details.
