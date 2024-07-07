@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { CircularProgress } from "@mui/material";
-import { DBQueryResult } from "electron/main/vectorDatabase/Schema";
+import { DBQueryResult } from "electron/main/vector-database/schema";
 import posthog from "posthog-js";
 import { FaArrowRight } from "react-icons/fa";
 import { FiRefreshCw } from "react-icons/fi";

@@ -1,4 +1,4 @@
-import { DBEntry } from "electron/main/vectorDatabase/Schema";
+import { DBEntry } from "electron/main/vector-database/schema";
 import {
   ChatCompletionContentPart,
   ChatCompletionMessageParam,

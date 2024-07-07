@@ -6,11 +6,11 @@ import {
   GetFilesInfoList,
   flattenFileInfoTree,
   readFile,
-} from "../filesystem/Filesystem";
-import { FileInfo, FileInfoTree } from "../filesystem/Types";
+} from "../filesystem/filesystem";
+import { FileInfo, FileInfoTree } from "../filesystem/types";
 
-import { LanceDBTableWrapper } from "./LanceTableWrapper";
-import { DBEntry, DBQueryResult, DatabaseFields } from "./Schema";
+import { LanceDBTableWrapper } from "./lanceTableWrapper";
+import { DBEntry, DBQueryResult, DatabaseFields } from "./schema";
 
 export const RepopulateTableWithMissingItems = async (
   table: LanceDBTableWrapper,

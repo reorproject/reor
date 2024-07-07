@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
-import { FileInfoTree } from "electron/main/filesystem/Types";
-import { DBQueryResult } from "electron/main/vectorDatabase/Schema";
+import { FileInfoTree } from "electron/main/filesystem/types";
+import { DBQueryResult } from "electron/main/vector-database/schema";
 import posthog from "posthog-js";
 
 import { ChatFilters, ChatHistory } from "../Chat/Chat";

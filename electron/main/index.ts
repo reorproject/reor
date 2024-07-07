@@ -13,28 +13,19 @@ import {
   shell,
 } from "electron";
 import Store from "electron-store";
-import * as lancedb from "vectordb";
 
 import { errorToStringMainProcess } from "./common/error";
 import { addExtensionToFilenameIfNoExtensionPresent } from "./common/path";
+import WindowsManager from "./common/windowManager";
 import { StoreKeys, StoreSchema } from "./electron-store/storeConfig";
-import {
-  getDefaultEmbeddingModelConfig,
-  registerStoreHandlers,
-} from "./electron-store/storeHandlers";
-import {
-  markdownExtensions,
-  startWatchingDirectory,
-  updateFileListForRenderer,
-} from "./filesystem/Filesystem";
+import { registerStoreHandlers } from "./electron-store/storeHandlers";
+import { markdownExtensions } from "./filesystem/filesystem";
 import { registerFileHandlers } from "./filesystem/registerFilesHandler";
 import {
   ollamaService,
   registerLLMSessionHandlers,
 } from "./llm/llmSessionHandlers";
-import { registerDBSessionHandlers } from "./vectorDatabase/dbSessionHandlers";
-import { RepopulateTableWithMissingItems } from "./vectorDatabase/TableHelperFunctions";
-import WindowsManager from "./windowManager";
+import { registerDBSessionHandlers } from "./vector-database/dbSessionHandlers";
 
 const store = new Store<StoreSchema>();
 // store.clear(); // clear store for testing CAUTION: THIS WILL DELETE YOUR CHAT HISTORY
@@ -61,8 +52,6 @@ const preload = join(__dirname, "../preload/index.js");
 const url = process.env.VITE_DEV_SERVER_URL;
 console.log("process.env.DIST", process.env.DIST);
 const indexHtml = join(process.env.DIST, "index.html");
-
-let dbConnection: lancedb.Connection;
 
 app.whenReady().then(async () => {
   try {
@@ -121,52 +110,6 @@ ipcMain.handle("open-file-dialog", async (event, extensions) => {
     return result.filePaths;
   } else {
     return [];
-  }
-});
-
-ipcMain.handle("index-files-in-directory", async (event) => {
-  try {
-    console.log("Indexing files in directory");
-    const windowInfo = windowsManager.getWindowInfoForContents(event.sender);
-    if (!windowInfo) {
-      throw new Error("No window info found");
-    }
-    const defaultEmbeddingModelConfig = getDefaultEmbeddingModelConfig(store);
-    const dbPath = path.join(app.getPath("userData"), "vectordb");
-    dbConnection = await lancedb.connect(dbPath);
-
-    await windowInfo.dbTableClient.initialize(
-      dbConnection,
-      windowInfo.vaultDirectoryForWindow,
-      defaultEmbeddingModelConfig
-    );
-    await RepopulateTableWithMissingItems(
-      windowInfo.dbTableClient,
-      windowInfo.vaultDirectoryForWindow,
-      (progress) => {
-        event.sender.send("indexing-progress", progress);
-      }
-    );
-    const win = BrowserWindow.fromWebContents(event.sender);
-
-    if (win) {
-      windowsManager.watcher = startWatchingDirectory(
-        win,
-        windowInfo.vaultDirectoryForWindow
-      );
-      updateFileListForRenderer(win, windowInfo.vaultDirectoryForWindow);
-    }
-    event.sender.send("indexing-progress", 1);
-  } catch (error) {
-    let errorStr = "";
-
-    if (errorToStringMainProcess(error).includes("Embedding function error")) {
-      errorStr = `${error}. Please try downloading an embedding model from Hugging Face and attaching it in settings. More information can be found in settings.`;
-    } else {
-      errorStr = `${error}. Please try restarting or open a Github issue.`;
-    }
-    event.sender.send("error-to-display-in-window", errorStr);
-    console.error("Error during file indexing:", error);
   }
 });
 

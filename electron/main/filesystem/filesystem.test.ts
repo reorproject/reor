@@ -3,7 +3,7 @@ import * as path from "path";
 
 import * as tmp from "tmp";
 
-import { GetFilesInfoTree } from "./Filesystem";
+import { GetFilesInfoTree } from "./filesystem";
 
 describe("GetFilesInfoTree", () => {
   let tempDir: string;

@@ -23,7 +23,7 @@ import {
 import { AnthropicModelSessionService } from "./models/Anthropic";
 import { OllamaService } from "./models/Ollama";
 import { OpenAIModelSessionService } from "./models/OpenAI";
-import { LLMSessionService } from "./Types";
+import { LLMSessionService } from "./types";
 
 import { ChatHistory } from "@/components/Chat/Chat";
 

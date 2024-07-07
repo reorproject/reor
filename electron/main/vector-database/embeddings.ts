@@ -11,10 +11,10 @@ import {
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
 } from "../electron-store/storeConfig";
-import { splitDirectoryPathIntoBaseAndRepo } from "../filesystem/Filesystem";
+import { splitDirectoryPathIntoBaseAndRepo } from "../filesystem/filesystem";
 
 import { DownloadModelFilesFromHFRepo } from "./downloadModelsFromHF";
-import { DBEntry } from "./Schema";
+import { DBEntry } from "./schema";
 
 export interface EnhancedEmbeddingFunction<T>
   extends lancedb.EmbeddingFunction<T> {

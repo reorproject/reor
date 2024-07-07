@@ -1,28 +1,43 @@
 import * as fs from "fs";
+import * as path from "path";
 
-import { ipcMain } from "electron";
+import { app, BrowserWindow, ipcMain } from "electron";
 import Store from "electron-store";
+import * as lancedb from "vectordb";
 
 import { errorToStringMainProcess } from "../common/error";
+import WindowsManager from "../common/windowManager";
 import { StoreKeys, StoreSchema } from "../electron-store/storeConfig";
+import { getDefaultEmbeddingModelConfig } from "../electron-store/storeHandlers";
+import {
+  startWatchingDirectory,
+  updateFileListForRenderer,
+} from "../filesystem/filesystem";
 import { createPromptWithContextLimitFromContent } from "../llm/contextLimit";
 import { getLLMConfig } from "../llm/llmConfig";
 import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
-import WindowsManager from "../windowManager";
 
-import { BasePromptRequirements } from "./dbSessionHandlerTypes";
-import { rerankSearchedEmbeddings } from "./Embeddings";
-import { DBEntry, DatabaseFields } from "./Schema";
+import { rerankSearchedEmbeddings } from "./embeddings";
+import { DBEntry, DatabaseFields } from "./schema";
+import { RepopulateTableWithMissingItems } from "./tableHelperFunctions";
 
 export interface PromptWithRagResults {
   ragPrompt: string;
   uniqueFilesReferenced: string[];
 }
 
+export interface BasePromptRequirements {
+  query: string;
+  llmName: string;
+  filePathToBeUsedAsContext?: string;
+}
+
 export const registerDBSessionHandlers = (
   store: Store<StoreSchema>,
   windowManager: WindowsManager
 ) => {
+  let dbConnection: lancedb.Connection;
+
   ipcMain.handle(
     "search",
     async (
@@ -48,6 +63,54 @@ export const registerDBSessionHandlers = (
       }
     }
   );
+
+  ipcMain.handle("index-files-in-directory", async (event) => {
+    try {
+      console.log("Indexing files in directory");
+      const windowInfo = windowManager.getWindowInfoForContents(event.sender);
+      if (!windowInfo) {
+        throw new Error("No window info found");
+      }
+      const defaultEmbeddingModelConfig = getDefaultEmbeddingModelConfig(store);
+      const dbPath = path.join(app.getPath("userData"), "vectordb");
+      dbConnection = await lancedb.connect(dbPath);
+
+      await windowInfo.dbTableClient.initialize(
+        dbConnection,
+        windowInfo.vaultDirectoryForWindow,
+        defaultEmbeddingModelConfig
+      );
+      await RepopulateTableWithMissingItems(
+        windowInfo.dbTableClient,
+        windowInfo.vaultDirectoryForWindow,
+        (progress) => {
+          event.sender.send("indexing-progress", progress);
+        }
+      );
+      const win = BrowserWindow.fromWebContents(event.sender);
+
+      if (win) {
+        windowManager.watcher = startWatchingDirectory(
+          win,
+          windowInfo.vaultDirectoryForWindow
+        );
+        updateFileListForRenderer(win, windowInfo.vaultDirectoryForWindow);
+      }
+      event.sender.send("indexing-progress", 1);
+    } catch (error) {
+      let errorStr = "";
+
+      if (
+        errorToStringMainProcess(error).includes("Embedding function error")
+      ) {
+        errorStr = `${error}. Please try downloading an embedding model from Hugging Face and attaching it in settings. More information can be found in settings.`;
+      } else {
+        errorStr = `${error}. Please try restarting or open a Github issue.`;
+      }
+      event.sender.send("error-to-display-in-window", errorStr);
+      console.error("Error during file indexing:", error);
+    }
+  });
 
   ipcMain.handle(
     "search-with-reranking",

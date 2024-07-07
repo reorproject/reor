@@ -10,13 +10,13 @@ import { EmbeddingModelConfig } from "../electron-store/storeConfig";
 import {
   EnhancedEmbeddingFunction,
   createEmbeddingFunction,
-} from "./Embeddings";
-import GetOrCreateLanceTable from "./Lance";
-import { DBEntry, DBQueryResult, DatabaseFields } from "./Schema";
+} from "./embeddings";
+import GetOrCreateLanceTable from "./lance";
+import { DBEntry, DBQueryResult, DatabaseFields } from "./schema";
 import {
-  convertRecordToDBType,
   sanitizePathForDatabase,
-} from "./TableHelperFunctions";
+  convertRecordToDBType,
+} from "./tableHelperFunctions";
 
 export class LanceDBTableWrapper {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -2,8 +2,8 @@ import chokidar from "chokidar";
 import { BrowserWindow, WebContents, screen, shell } from "electron";
 import Store from "electron-store";
 
-import { StoreKeys, StoreSchema } from "./electron-store/storeConfig";
-import { LanceDBTableWrapper } from "./vectorDatabase/LanceTableWrapper";
+import { StoreSchema, StoreKeys } from "../electron-store/storeConfig";
+import { LanceDBTableWrapper } from "../vector-database/lanceTableWrapper";
 
 type WindowInfo = {
   windowID: number;

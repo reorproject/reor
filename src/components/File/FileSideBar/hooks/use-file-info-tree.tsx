@@ -4,7 +4,7 @@ import {
   FileInfo,
   FileInfoNode,
   FileInfoTree,
-} from "electron/main/filesystem/Types";
+} from "electron/main/filesystem/types";
 
 import { sortFilesAndDirectories } from "../fileOperations";
 

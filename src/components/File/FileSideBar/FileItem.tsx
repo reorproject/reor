@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { FileInfoNode } from "electron/main/filesystem/Types";
+import { FileInfoNode } from "electron/main/filesystem/types";
 import posthog from "posthog-js";
 import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 

@@ -1,7 +1,7 @@
 import {
   sanitizePathForDatabase,
   unsanitizePathForFileSystem,
-} from "./TableHelperFunctions";
+} from "./tableHelperFunctions";
 
 describe("Path Sanitization Tests", () => {
   it("should sanitize file path correctly", () => {

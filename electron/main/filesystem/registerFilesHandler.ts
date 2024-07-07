@@ -5,6 +5,7 @@ import { ipcMain, BrowserWindow } from "electron";
 import Store from "electron-store";
 
 import { addExtensionToFilenameIfNoExtensionPresent } from "../common/path";
+import WindowsManager from "../common/windowManager";
 import { StoreKeys, StoreSchema } from "../electron-store/storeConfig";
 import {
   createPromptWithContextLimitFromContent,
@@ -12,12 +13,11 @@ import {
 } from "../llm/contextLimit";
 import { getLLMConfig } from "../llm/llmConfig";
 import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
-import { DBEntry } from "../vectorDatabase/Schema";
+import { DBEntry } from "../vector-database/schema";
 import {
   convertFileInfoListToDBItems,
   updateFileInTable,
-} from "../vectorDatabase/TableHelperFunctions";
-import WindowsManager from "../windowManager";
+} from "../vector-database/tableHelperFunctions";
 
 import {
   GetFilesInfoTree,
@@ -29,13 +29,13 @@ import {
   markdownExtensions,
   startWatchingDirectory,
   updateFileListForRenderer,
-} from "./Filesystem";
+} from "./filesystem";
 import {
   FileInfoTree,
   AugmentPromptWithFileProps,
   WriteFileProps,
   RenameFileProps,
-} from "./Types";
+} from "./types";
 
 export const registerFileHandlers = (
   store: Store<StoreSchema>,

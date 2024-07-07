@@ -12,7 +12,7 @@ import { Tiktoken, TiktokenModel, encodingForModel } from "js-tiktoken";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
 import { customFetchUsingElectronNetStreaming } from "../../common/network";
-import { LLMSessionService } from "../Types";
+import { LLMSessionService } from "../types";
 
 export class AnthropicModelSessionService implements LLMSessionService {
   public getTokenizer = (llmName: string): ((text: string) => number[]) => {

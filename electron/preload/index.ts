@@ -13,11 +13,13 @@ import {
   FileInfoTree,
   RenameFileProps,
   WriteFileProps,
-} from "electron/main/filesystem/Types";
+} from "electron/main/filesystem/types";
 import { PromptWithContextLimit } from "electron/main/llm/contextLimit";
-import { PromptWithRagResults } from "electron/main/vectorDatabase/dbSessionHandlers";
-import { BasePromptRequirements } from "electron/main/vectorDatabase/dbSessionHandlerTypes";
-import { DBEntry, DBQueryResult } from "electron/main/vectorDatabase/Schema";
+import {
+  BasePromptRequirements,
+  PromptWithRagResults,
+} from "electron/main/vector-database/dbSessionHandlers";
+import { DBEntry, DBQueryResult } from "electron/main/vector-database/schema";
 
 import { ChatHistory } from "@/components/Chat/Chat";
 import { ChatHistoryMetadata } from "@/components/Chat/hooks/use-chat-history";

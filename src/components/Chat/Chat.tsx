@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import { MessageStreamEvent } from "@anthropic-ai/sdk/resources";
-import { DBEntry, DBQueryResult } from "electron/main/vectorDatabase/Schema";
+import { DBEntry, DBQueryResult } from "electron/main/vector-database/schema";
 import {
   ChatCompletionChunk,
   ChatCompletionMessageParam,

@@ -17,7 +17,7 @@ import {
 
 // import ollama,"ollama";
 
-import { LLMSessionService } from "../Types";
+import { LLMSessionService } from "../types";
 
 const OllamaServeType = {
   SYSTEM: "system", // ollama is installed on the system

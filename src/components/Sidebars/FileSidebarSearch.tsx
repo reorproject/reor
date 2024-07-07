@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
-import { DBQueryResult } from "electron/main/vectorDatabase/Schema";
+import { DBQueryResult } from "electron/main/vector-database/schema";
 import posthog from "posthog-js";
 import { FaSearch } from "react-icons/fa";
 

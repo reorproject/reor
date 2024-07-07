@@ -2,8 +2,8 @@ import * as lancedb from "vectordb";
 
 import { errorToStringMainProcess } from "../common/error";
 
-import { EnhancedEmbeddingFunction } from "./Embeddings";
-import CreateDatabaseSchema, { isStringifiedSchemaEqual } from "./Schema";
+import { EnhancedEmbeddingFunction } from "./embeddings";
+import CreateDatabaseSchema, { isStringifiedSchemaEqual } from "./schema";
 
 const GetOrCreateLanceTable = async (
   db: lancedb.Connection,

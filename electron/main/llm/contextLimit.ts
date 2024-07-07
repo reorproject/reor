@@ -1,4 +1,4 @@
-import { DBEntry } from "../vectorDatabase/Schema";
+import { DBEntry } from "../vector-database/schema";
 export interface PromptWithContextLimit {
   prompt: string;
   contextCutoffAt?: string;

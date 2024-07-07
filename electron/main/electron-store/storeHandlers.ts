@@ -3,6 +3,8 @@ import path from "path";
 import { ipcMain } from "electron";
 import Store from "electron-store";
 
+import WindowsManager from "../common/windowManager";
+
 import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
@@ -10,8 +12,6 @@ import {
   StoreKeys,
   StoreSchema,
 } from "./storeConfig";
-import WindowsManager from "../windowManager";
-
 import { initializeAndMaybeMigrateStore } from "./storeSchemaMigrator";
 
 import { ChatHistory } from "@/components/Chat/Chat";
