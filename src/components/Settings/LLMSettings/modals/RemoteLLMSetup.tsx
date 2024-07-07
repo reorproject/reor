@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { Button } from "@material-tailwind/react";
-import { LLMConfig } from "electron/main/Store/storeConfig";
+import { LLMConfig } from "electron/main/electronStore/storeConfig";
 import posthog from "posthog-js";
 
 import ExternalLink from "../../../Common/ExternalLink";

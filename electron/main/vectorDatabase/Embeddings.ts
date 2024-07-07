@@ -5,16 +5,17 @@ import { app } from "electron";
 import removeMd from "remove-markdown";
 import * as lancedb from "vectordb";
 
-import { splitDirectoryPathIntoBaseAndRepo } from "../Files/Filesystem";
-import { errorToString } from "../Generic/error";
 import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
-} from "../Store/storeConfig";
+} from "../electronStore/storeConfig";
+import { splitDirectoryPathIntoBaseAndRepo } from "../filesystem/Filesystem";
 
 import { DownloadModelFilesFromHFRepo } from "./downloadModelsFromHF";
 import { DBEntry } from "./Schema";
+
+import { errorToString } from "@/utils/error";
 
 export interface EnhancedEmbeddingFunction<T>
   extends lancedb.EmbeddingFunction<T> {

@@ -1,7 +1,7 @@
 import {
   LLMGenerationParameters,
   LLMConfig,
-} from "electron/main/Store/storeConfig";
+} from "electron/main/electronStore/storeConfig";
 import { Tiktoken, TiktokenModel, encodingForModel } from "js-tiktoken";
 import OpenAI from "openai";
 import {
@@ -10,7 +10,7 @@ import {
   ChatCompletionMessageParam,
 } from "openai/resources/chat/completions";
 
-import { customFetchUsingElectronNetStreaming } from "../../Generic/network";
+import { customFetchUsingElectronNetStreaming } from "../../common/network";
 import { LLMSessionService } from "../Types";
 
 export class OpenAIModelSessionService implements LLMSessionService {

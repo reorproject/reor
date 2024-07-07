@@ -5,8 +5,7 @@ import {
   makeArrowTable,
 } from "vectordb";
 
-
-import { EmbeddingModelConfig } from "../Store/storeConfig";
+import { EmbeddingModelConfig } from "../electronStore/storeConfig";
 
 import {
   EnhancedEmbeddingFunction,
@@ -18,7 +17,6 @@ import {
   convertRecordToDBType,
   sanitizePathForDatabase,
 } from "./TableHelperFunctions";
-
 
 export class LanceDBTableWrapper {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -70,8 +68,7 @@ export class LanceDBTableWrapper {
       chunks.push(recordEntry.slice(i, i + numberOfChunksToIndexAtOnce));
     }
 
-    if (chunks.length == 0) return
-
+    if (chunks.length == 0) return;
 
     let index = 0;
     const totalChunks = chunks.length;

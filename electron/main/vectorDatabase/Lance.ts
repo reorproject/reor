@@ -1,7 +1,6 @@
 import * as lancedb from "vectordb";
 
-
-import { errorToString } from "../Generic/error";
+import { errorToString } from "../common/error";
 
 import { EnhancedEmbeddingFunction } from "./Embeddings";
 import CreateDatabaseSchema, { isStringifiedSchemaEqual } from "./Schema";

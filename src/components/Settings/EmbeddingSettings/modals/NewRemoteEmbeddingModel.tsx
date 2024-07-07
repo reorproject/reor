@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 import { Button } from "@material-tailwind/react";
-import { EmbeddingModelWithRepo } from "electron/main/Store/storeConfig";
+import { EmbeddingModelWithRepo } from "electron/main/electronStore/storeConfig";
 import posthog from "posthog-js";
 
 import ExternalLink from "../../../Common/ExternalLink";

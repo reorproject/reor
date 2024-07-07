@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { FileInfoTree } from "electron/main/Files/Types";
+import { FileInfoTree } from "electron/main/filesystem/Types";
 import { DBQueryResult } from "electron/main/vectorDatabase/Schema";
 import posthog from "posthog-js";
 

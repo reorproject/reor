@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import { EmbeddingModelConfig } from "electron/main/Store/storeConfig";
+import { EmbeddingModelConfig } from "electron/main/electronStore/storeConfig";
 
 import NewEmbeddingModelModalBothTypes from "./modals/NewEmbeddingModelBothTypes";
 

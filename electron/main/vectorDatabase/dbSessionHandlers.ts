@@ -3,11 +3,11 @@ import * as fs from "fs";
 import { ipcMain } from "electron";
 import Store from "electron-store";
 
-import { errorToString } from "../Generic/error";
+import { errorToString } from "../common/error";
+import { StoreKeys, StoreSchema } from "../electronStore/storeConfig";
 import { createPromptWithContextLimitFromContent } from "../llm/contextLimit";
 import { getLLMConfig } from "../llm/llmConfig";
 import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
-import { StoreKeys, StoreSchema } from "../Store/storeConfig";
 import WindowsManager from "../windowManager";
 
 import { BasePromptRequirements } from "./dbSessionHandlerTypes";

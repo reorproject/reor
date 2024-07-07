@@ -15,26 +15,27 @@ import {
 import Store from "electron-store";
 import * as lancedb from "vectordb";
 
+import { addExtensionToFilenameIfNoExtensionPresent } from "./common/path";
+import { StoreKeys, StoreSchema } from "./electronStore/storeConfig";
+import {
+  getDefaultEmbeddingModelConfig,
+  registerStoreHandlers,
+} from "./electronStore/storeHandlers";
 import {
   markdownExtensions,
   startWatchingDirectory,
   updateFileListForRenderer,
-} from "./Files/Filesystem";
-import { registerFileHandlers } from "./Files/registerFilesHandler";
-import { errorToString } from "./Generic/error";
-import { addExtensionToFilenameIfNoExtensionPresent } from "./Generic/path";
+} from "./filesystem/Filesystem";
+import { registerFileHandlers } from "./filesystem/registerFilesHandler";
 import {
   ollamaService,
   registerLLMSessionHandlers,
 } from "./llm/llmSessionHandlers";
-import { StoreKeys, StoreSchema } from "./Store/storeConfig";
-import {
-  getDefaultEmbeddingModelConfig,
-  registerStoreHandlers,
-} from "./Store/storeHandlers";
 import { registerDBSessionHandlers } from "./vectorDatabase/dbSessionHandlers";
 import { RepopulateTableWithMissingItems } from "./vectorDatabase/TableHelperFunctions";
 import WindowsManager from "./windowManager";
+
+import { errorToString } from "@/utils/error";
 
 const store = new Store<StoreSchema>();
 // store.clear(); // clear store for testing CAUTION: THIS WILL DELETE YOUR CHAT HISTORY

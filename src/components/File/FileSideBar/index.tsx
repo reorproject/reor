@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
+import { FileInfoNode, FileInfoTree } from "electron/main/filesystem/Types";
 import { FixedSizeList as List, ListChildComponentProps } from "react-window";
 
 import RenameDirModal from "../RenameDirectory";

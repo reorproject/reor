@@ -4,7 +4,10 @@ import {
   ChatCompletionMessageParam,
 } from "openai/resources/chat/completions";
 
-import { LLMGenerationParameters, LLMConfig } from "../Store/storeConfig";
+import {
+  LLMGenerationParameters,
+  LLMConfig,
+} from "../electronStore/storeConfig";
 
 // Any LLM engine should implement this interface:
 export interface LLMSessionService {

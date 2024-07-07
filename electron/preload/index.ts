@@ -1,20 +1,20 @@
 import { contextBridge, ipcRenderer } from "electron";
 import {
-  AugmentPromptWithFileProps,
-  FileInfoNode,
-  FileInfoTree,
-  RenameFileProps,
-  WriteFileProps,
-} from "electron/main/Files/Types";
-import { PromptWithContextLimit } from "electron/main/llm/contextLimit";
-import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
   HardwareConfig,
   LLMConfig,
   LLMGenerationParameters,
-} from "electron/main/Store/storeConfig";
+} from "electron/main/electronStore/storeConfig";
+import {
+  AugmentPromptWithFileProps,
+  FileInfoNode,
+  FileInfoTree,
+  RenameFileProps,
+  WriteFileProps,
+} from "electron/main/filesystem/Types";
+import { PromptWithContextLimit } from "electron/main/llm/contextLimit";
 import { PromptWithRagResults } from "electron/main/vectorDatabase/dbSessionHandlers";
 import { BasePromptRequirements } from "electron/main/vectorDatabase/dbSessionHandlerTypes";
 import { DBEntry, DBQueryResult } from "electron/main/vectorDatabase/Schema";

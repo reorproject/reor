@@ -9,7 +9,7 @@ import {
   EmbeddingModelWithRepo,
   StoreKeys,
   StoreSchema,
-} from "../Store/storeConfig";
+} from "./storeConfig";
 import WindowsManager from "../windowManager";
 
 import { initializeAndMaybeMigrateStore } from "./storeSchemaMigrator";

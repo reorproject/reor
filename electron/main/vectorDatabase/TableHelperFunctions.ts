@@ -1,13 +1,13 @@
 import * as fs from "fs";
 
+import { chunkMarkdownByHeadingsAndByCharsIfBig } from "../common/chunking";
+import { errorToString } from "../common/error";
 import {
   GetFilesInfoList,
   flattenFileInfoTree,
   readFile,
-} from "../Files/Filesystem";
-import { FileInfo, FileInfoTree } from "../Files/Types";
-import { chunkMarkdownByHeadingsAndByCharsIfBig } from "../Generic/chunking";
-import { errorToString } from "../Generic/error";
+} from "../filesystem/Filesystem";
+import { FileInfo, FileInfoTree } from "../filesystem/Types";
 
 import { LanceDBTableWrapper } from "./LanceTableWrapper";
 import { DBEntry, DBQueryResult, DatabaseFields } from "./Schema";

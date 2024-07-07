@@ -3,8 +3,7 @@ import * as path from "path";
 
 import { listFiles, downloadFile } from "@huggingface/hub";
 
-
-import { customFetchUsingElectronNet } from "../Generic/network";
+import { customFetchUsingElectronNet } from "../common/network";
 
 export const DownloadModelFilesFromHFRepo = async (
   repo: string,

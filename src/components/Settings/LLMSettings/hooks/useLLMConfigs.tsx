@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-import { LLMConfig } from "electron/main/Store/storeConfig";
+import { LLMConfig } from "electron/main/electronStore/storeConfig";
 
 const useLLMConfigs = () => {
   const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([]);
