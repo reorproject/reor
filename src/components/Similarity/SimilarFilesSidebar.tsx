@@ -16,14 +16,14 @@ import ResizableComponent from "../Generic/ResizableComponent";
 
 import { errorToString } from "@/functions/error";
 
-interface SidebarComponentProps {
+interface SimilarFilesSidebarComponent {
   filePath: string;
   highlightData: HighlightData;
   openFileByPath: (filePath: string) => void;
   saveCurrentlyOpenedFile: () => Promise<void>;
 }
 
-const SidebarComponent: React.FC<SidebarComponentProps> = ({
+const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponent> = ({
   filePath,
   highlightData,
   openFileByPath,
@@ -158,7 +158,7 @@ const SidebarComponent: React.FC<SidebarComponentProps> = ({
   );
 };
 
-export default SidebarComponent;
+export default SimilarFilesSidebarComponent;
 
 interface SimilarEntriesComponentProps {
   // filePath: string;
@@ -216,7 +216,7 @@ export const SimilarEntriesComponent: React.FC<
               )}
             </div>
           </div>
-          <div className="flex-grow overflow-y-auto">
+          <div className="flex-grow overflow-y-auto overflow-x-hidden">
             {similarEntries.length > 0 ? (
               <div className="h-full w-full">
                 {similarEntries

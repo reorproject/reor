@@ -7,8 +7,8 @@ import Slider from "@mui/material/Slider";
 import { sub } from "date-fns";
 import { DayPicker } from "react-day-picker";
 
-import { SuggestionsState } from "../Editor/FilesSuggestionsDisplay";
 import "react-day-picker/dist/style.css";
+import { SuggestionsState } from "../Editor/BacklinkSuggestionsDisplay";
 import Modal from "../Generic/Modal";
 import { SearchBarWithFilesSuggestion } from "../Generic/SearchBarWithFilesSuggestion";
 import CustomSelect from "../Generic/Select";
