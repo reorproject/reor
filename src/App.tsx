@@ -34,7 +34,7 @@ const App: React.FC<AppProps> = () => {
           autocapture: false,
         });
         posthog.register({
-          reorAppVersion: await window.electron.getReorAppVersion(),
+          reorAppVersion: await window.electronUtils.getReorAppVersion(),
         });
       }
     };

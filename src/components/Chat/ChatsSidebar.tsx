@@ -84,12 +84,13 @@ export const ChatItem: React.FC<ChatItemProps> = ({
 }) => {
   const isSelected = chatMetadata.id === selectedChatID;
 
-  const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-neutral-700 h-full mt-0 mb-0 ${isSelected ? "bg-neutral-700 text-white font-semibold" : "text-gray-200"
-    }`;
+  const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-neutral-700 h-full mt-0 mb-0 ${
+    isSelected ? "bg-neutral-700 text-white font-semibold" : "text-gray-200"
+  }`;
 
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
-    window.contextChatMenu.showChatItemContext(chatMetadata);
+    window.electronUtils.showChatItemContext(chatMetadata);
   };
 
   return (

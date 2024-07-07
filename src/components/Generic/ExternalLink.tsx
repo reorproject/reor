@@ -11,7 +11,7 @@ const ExternalLink: React.FC<ExternalLinkProps> = ({ href: url, children }) => {
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
   ) => {
     e.preventDefault();
-    window.electron.openExternal(url);
+    window.electronUtils.openExternal(url);
   };
 
   return (

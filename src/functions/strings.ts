@@ -14,7 +14,7 @@ export const getInvalidCharacterInFilePath = async (
   filename: string
 ): Promise<string | null> => {
   let invalidCharacters: RegExp;
-  const platform = await window.electron.getPlatform();
+  const platform = await window.electronUtils.getPlatform();
 
   switch (platform) {
     case "win32":
@@ -37,7 +37,7 @@ export const getInvalidCharacterInFileName = async (
   filename: string
 ): Promise<string | null> => {
   let invalidCharacters: RegExp;
-  const platform = await window.electron.getPlatform();
+  const platform = await window.electronUtils.getPlatform();
 
   switch (platform) {
     case "win32":

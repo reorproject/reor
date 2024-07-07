@@ -64,7 +64,7 @@ const database = {
   ),
 };
 
-const electron = {
+const electronUtils = {
   openExternal:
     createIPCHandler<(url: string) => Promise<void>>("open-external"),
   getPlatform: createIPCHandler<() => Promise<string>>("get-platform"),
@@ -72,6 +72,16 @@ const electron = {
   getReorAppVersion: createIPCHandler<() => Promise<string>>(
     "get-reor-app-version"
   ),
+  // Add the new handlers here
+  showFileItemContextMenu: createIPCHandler<
+    (file: FileInfoNode) => Promise<void>
+  >("show-context-menu-file-item"),
+  showMenuItemContext: createIPCHandler<() => Promise<void>>(
+    "show-context-menu-item"
+  ),
+  showChatItemContext: createIPCHandler<
+    (chatRow: ChatHistoryMetadata) => Promise<void>
+  >("show-chat-menu-item"),
 };
 
 const electronStore = {
@@ -283,7 +293,7 @@ const llm = {
 
 // Expose to renderer process
 contextBridge.exposeInMainWorld("database", database);
-contextBridge.exposeInMainWorld("electron", electron);
+contextBridge.exposeInMainWorld("electronUtils", electronUtils);
 contextBridge.exposeInMainWorld("electronStore", electronStore);
 contextBridge.exposeInMainWorld("fileSystem", fileSystem);
 contextBridge.exposeInMainWorld("path", path);
@@ -304,29 +314,11 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
   },
 });
 
-contextBridge.exposeInMainWorld("contextMenu", {
-  showFileItemContextMenu: createIPCHandler<
-    (file: FileInfoNode) => Promise<void>
-  >("show-context-menu-file-item"),
-});
-
-contextBridge.exposeInMainWorld("contextFileMenu", {
-  showMenuItemContext: createIPCHandler<() => Promise<void>>(
-    "show-context-menu-item"
-  ),
-});
-
-contextBridge.exposeInMainWorld("contextChatMenu", {
-  showChatItemContext: createIPCHandler<
-    (chatRow: ChatHistoryMetadata) => Promise<void>
-  >("show-chat-menu-item"),
-});
-
 // Type declarations
 declare global {
   interface Window {
     database: typeof database;
-    electron: typeof electron;
+    electronUtils: typeof electronUtils;
     electronStore: typeof electronStore;
     fileSystem: typeof fileSystem;
     path: typeof path;
@@ -335,15 +327,6 @@ declare global {
       on: typeof ipcRenderer.on;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       receive: (channel: string, func: (...args: any[]) => void) => () => void;
-    };
-    contextMenu: {
-      showFileItemContextMenu: (file: FileInfoNode) => Promise<void>;
-    };
-    contextFileMenu: {
-      showMenuItemContext: () => Promise<void>;
-    };
-    contextChatMenu: {
-      showChatItemContext: (chatRow: ChatHistoryMetadata) => Promise<void>;
     };
   }
 }

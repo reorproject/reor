@@ -79,11 +79,12 @@ export const FileItem: React.FC<FileInfoProps> = ({
   const handleContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    window.contextMenu.showFileItemContextMenu(file);
+    window.electronUtils.showFileItemContextMenu(file);
   };
 
-  const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-neutral-700 h-full mt-0 mb-0 ${isSelected ? "bg-neutral-700 text-white font-semibold" : "text-gray-200"
-    } ${isDragOver ? "bg-neutral-500" : ""}`;
+  const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-neutral-700 h-full mt-0 mb-0 ${
+    isSelected ? "bg-neutral-700 text-white font-semibold" : "text-gray-200"
+  } ${isDragOver ? "bg-neutral-500" : ""}`;
 
   return (
     <div
@@ -106,8 +107,9 @@ export const FileItem: React.FC<FileInfoProps> = ({
           </span>
         )}
         <span
-          className={`text-[13px] flex-1 truncate mt-0 ${isDirectory ? "font-semibold" : ""
-            }`}
+          className={`text-[13px] flex-1 truncate mt-0 ${
+            isDirectory ? "font-semibold" : ""
+          }`}
         >
           {isDirectory ? file.name : removeFileExtension(file.name)}
         </span>
