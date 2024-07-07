@@ -198,7 +198,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
       />
       <div
         className="bg-transparent border-none pb-2 mb-[2px] cursor-pointer flex items-center justify-center w-full"
-        onClick={() => window.electron.openNewWindow()}
+        onClick={() => window.electronUtils.openNewWindow()}
       >
         <GrNewWindow
           className="text-gray-100"

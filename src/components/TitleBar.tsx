@@ -26,7 +26,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
 
   useEffect(() => {
     const fetchPlatform = async () => {
-      const response = await window.electron.getPlatform();
+      const response = await window.electronUtils.getPlatform();
       setPlatform(response);
     };
 
