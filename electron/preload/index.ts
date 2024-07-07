@@ -72,6 +72,16 @@ const electronUtils = {
   getReorAppVersion: createIPCHandler<() => Promise<string>>(
     "get-reor-app-version"
   ),
+  // Add the new handlers here
+  showFileItemContextMenu: createIPCHandler<
+    (file: FileInfoNode) => Promise<void>
+  >("show-context-menu-file-item"),
+  showMenuItemContext: createIPCHandler<() => Promise<void>>(
+    "show-context-menu-item"
+  ),
+  showChatItemContext: createIPCHandler<
+    (chatRow: ChatHistoryMetadata) => Promise<void>
+  >("show-chat-menu-item"),
 };
 
 const electronStore = {
@@ -304,24 +314,6 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
   },
 });
 
-contextBridge.exposeInMainWorld("contextMenu", {
-  showFileItemContextMenu: createIPCHandler<
-    (file: FileInfoNode) => Promise<void>
-  >("show-context-menu-file-item"),
-});
-
-contextBridge.exposeInMainWorld("contextFileMenu", {
-  showMenuItemContext: createIPCHandler<() => Promise<void>>(
-    "show-context-menu-item"
-  ),
-});
-
-contextBridge.exposeInMainWorld("contextChatMenu", {
-  showChatItemContext: createIPCHandler<
-    (chatRow: ChatHistoryMetadata) => Promise<void>
-  >("show-chat-menu-item"),
-});
-
 // Type declarations
 declare global {
   interface Window {
@@ -335,15 +327,6 @@ declare global {
       on: typeof ipcRenderer.on;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       receive: (channel: string, func: (...args: any[]) => void) => () => void;
-    };
-    contextMenu: {
-      showFileItemContextMenu: (file: FileInfoNode) => Promise<void>;
-    };
-    contextFileMenu: {
-      showMenuItemContext: () => Promise<void>;
-    };
-    contextChatMenu: {
-      showChatItemContext: (chatRow: ChatHistoryMetadata) => Promise<void>;
     };
   }
 }

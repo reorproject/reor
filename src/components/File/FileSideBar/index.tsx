@@ -140,7 +140,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
 
   const handleMenuContext = (e: React.MouseEvent) => {
     e.preventDefault();
-    window.contextFileMenu.showMenuItemContext();
+    window.electronUtils.showMenuItemContext();
   };
 
   // Calculate visible items and item count
