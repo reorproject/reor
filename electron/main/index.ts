@@ -12,7 +12,7 @@ import { electronUtilsHandlers } from "./electron-utils/ipcHandlers";
 import { registerFileHandlers } from "./filesystem/ipcHandlers";
 import { ollamaService, registerLLMSessionHandlers } from "./llm/ipcHandlers";
 import { pathHandlers } from "./path/ipcHandlers";
-import { registerDBSessionHandlers } from "./vector-database/dbSessionHandlers";
+import { registerDBSessionHandlers } from "./vector-database/ipcHandlers";
 
 const store = new Store<StoreSchema>();
 // store.clear(); // clear store for testing CAUTION: THIS WILL DELETE YOUR CHAT HISTORY

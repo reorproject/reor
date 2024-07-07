@@ -5,10 +5,10 @@ import { CircularProgress } from "@mui/material";
 import posthog from "posthog-js";
 import { TypeAnimation } from "react-type-animation";
 
+import ReorModal from "../Common/Modal";
 import FilesSuggestionsDisplay from "../Editor/BacklinkSuggestionsDisplay";
 import { useFileInfoTree } from "../File/FileSideBar/hooks/use-file-info-tree";
 import { useFileByFilepath } from "../File/hooks/use-file-by-filepath";
-import ReorModal from "../Common/Modal";
 
 import { FlashcardCore } from "./FlashcardsCore";
 import { FlashcardQAPairUI } from "./types";
