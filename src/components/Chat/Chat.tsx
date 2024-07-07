@@ -51,7 +51,6 @@ const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
 
 export type ChatHistory = {
   id: string;
-  // openAIChatHistory: ChatCompletionMessageParam[];
   displayableChatHistory: ChatMessageToDisplay[];
 };
 export type ChatMessageToDisplay = ChatCompletionMessageParam & {
