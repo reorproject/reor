@@ -20,7 +20,7 @@ import {
   resolveRAGContext,
 } from "./chatUtils";
 
-import { errorToString } from "@/utils/error";
+import { errorToStringRendererProcess } from "@/utils/error";
 
 // convert ask options to enum
 enum AskOptions {
@@ -215,7 +215,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       if (chatHistory) {
         appendNewContentToMessageHistory(
           chatHistory.id,
-          errorToString(error),
+          errorToStringRendererProcess(error),
           "error"
         );
       }

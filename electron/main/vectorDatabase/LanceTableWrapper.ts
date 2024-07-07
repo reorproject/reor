@@ -5,7 +5,7 @@ import {
   makeArrowTable,
 } from "vectordb";
 
-import { EmbeddingModelConfig } from "../electronStore/storeConfig";
+import { EmbeddingModelConfig } from "../electron-store/storeConfig";
 
 import {
   EnhancedEmbeddingFunction,

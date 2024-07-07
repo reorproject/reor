@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 
 import { Button } from "@material-tailwind/react";
-import { LLMConfig } from "electron/main/electronStore/storeConfig";
+import { LLMConfig } from "electron/main/electron-store/storeConfig";
 import posthog from "posthog-js";
 
 import ExternalLink from "../../../Common/ExternalLink";
 import ReorModal from "../../../Common/Modal";
 import CustomSelect from "../../../Common/Select";
 
-import { errorToString } from "@/utils/error";
+import { errorToStringRendererProcess } from "@/utils/error";
 
 interface RemoteLLMModalProps {
   isOpen: boolean;
@@ -54,7 +54,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
       parentOnClose();
     } catch (error) {
       console.error("Failed to save remote model configuration:", error);
-      setCurrentError(errorToString(error));
+      setCurrentError(errorToStringRendererProcess(error));
     }
   };
 

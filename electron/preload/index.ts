@@ -6,7 +6,7 @@ import {
   HardwareConfig,
   LLMConfig,
   LLMGenerationParameters,
-} from "electron/main/electronStore/storeConfig";
+} from "electron/main/electron-store/storeConfig";
 import {
   AugmentPromptWithFileProps,
   FileInfoNode,

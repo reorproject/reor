@@ -1,6 +1,6 @@
 import * as lancedb from "vectordb";
 
-import { errorToString } from "../common/error";
+import { errorToStringMainProcess } from "../common/error";
 
 import { EnhancedEmbeddingFunction } from "./Embeddings";
 import CreateDatabaseSchema, { isStringifiedSchemaEqual } from "./Schema";
@@ -39,7 +39,7 @@ const GetOrCreateLanceTable = async (
     });
     return newTable;
   } catch (error) {
-    const errorMessage = `Error in GetOrCreateLanceTable: ${errorToString(
+    const errorMessage = `Error in GetOrCreateLanceTable: ${errorToStringMainProcess(
       error
     )}`;
     console.error(errorMessage);

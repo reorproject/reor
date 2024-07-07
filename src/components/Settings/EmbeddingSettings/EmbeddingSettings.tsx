@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 import { Button } from "@material-tailwind/react";
-import { EmbeddingModelConfig } from "electron/main/electronStore/storeConfig";
+import { EmbeddingModelConfig } from "electron/main/electron-store/storeConfig";
 import posthog from "posthog-js";
 
 import CustomSelect from "../../Common/Select";

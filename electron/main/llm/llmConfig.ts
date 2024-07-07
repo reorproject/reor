@@ -4,7 +4,7 @@ import {
   LLMConfig,
   StoreKeys,
   StoreSchema,
-} from "../electronStore/storeConfig";
+} from "../electron-store/storeConfig";
 
 import { OllamaService } from "./models/Ollama";
 

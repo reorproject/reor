@@ -4,7 +4,7 @@ import { Button } from "@material-tailwind/react";
 import {
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
-} from "electron/main/electronStore/storeConfig";
+} from "electron/main/electron-store/storeConfig";
 
 import ExternalLink from "../../../Common/ExternalLink";
 import ReorModal from "../../../Common/Modal";

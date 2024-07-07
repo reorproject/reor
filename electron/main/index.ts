@@ -15,12 +15,13 @@ import {
 import Store from "electron-store";
 import * as lancedb from "vectordb";
 
+import { errorToStringMainProcess } from "./common/error";
 import { addExtensionToFilenameIfNoExtensionPresent } from "./common/path";
-import { StoreKeys, StoreSchema } from "./electronStore/storeConfig";
+import { StoreKeys, StoreSchema } from "./electron-store/storeConfig";
 import {
   getDefaultEmbeddingModelConfig,
   registerStoreHandlers,
-} from "./electronStore/storeHandlers";
+} from "./electron-store/storeHandlers";
 import {
   markdownExtensions,
   startWatchingDirectory,
@@ -34,8 +35,6 @@ import {
 import { registerDBSessionHandlers } from "./vectorDatabase/dbSessionHandlers";
 import { RepopulateTableWithMissingItems } from "./vectorDatabase/TableHelperFunctions";
 import WindowsManager from "./windowManager";
-
-import { errorToString } from "@/utils/error";
 
 const store = new Store<StoreSchema>();
 // store.clear(); // clear store for testing CAUTION: THIS WILL DELETE YOUR CHAT HISTORY
@@ -69,7 +68,9 @@ app.whenReady().then(async () => {
   try {
     await ollamaService.init();
   } catch (error) {
-    windowsManager.appendNewErrorToDisplayInWindow(errorToString(error));
+    windowsManager.appendNewErrorToDisplayInWindow(
+      errorToStringMainProcess(error)
+    );
   }
   windowsManager.createWindow(store, preload, url, indexHtml);
 });
@@ -159,7 +160,7 @@ ipcMain.handle("index-files-in-directory", async (event) => {
   } catch (error) {
     let errorStr = "";
 
-    if (errorToString(error).includes("Embedding function error")) {
+    if (errorToStringMainProcess(error).includes("Embedding function error")) {
       errorStr = `${error}. Please try downloading an embedding model from Hugging Face and attaching it in settings. More information can be found in settings.`;
     } else {
       errorStr = `${error}. Please try restarting or open a Github issue.`;

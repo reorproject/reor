@@ -8,7 +8,7 @@ import {
   LLMConfig,
   StoreKeys,
   StoreSchema,
-} from "../electronStore/storeConfig";
+} from "../electron-store/storeConfig";
 
 import {
   sliceListOfStringsToContextLength,

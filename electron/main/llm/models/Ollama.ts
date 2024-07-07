@@ -7,7 +7,7 @@ import { app } from "electron";
 import {
   LLMGenerationParameters,
   OpenAILLMConfig,
-} from "electron/main/electronStore/storeConfig";
+} from "electron/main/electron-store/storeConfig";
 import { Tiktoken, TiktokenModel, encodingForModel } from "js-tiktoken";
 import { ModelResponse, ProgressResponse, Ollama } from "ollama";
 import {

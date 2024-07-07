@@ -4,7 +4,7 @@ import { Button } from "@material-tailwind/react";
 import {
   OpenAILLMConfig,
   AnthropicLLMConfig,
-} from "electron/main/electronStore/storeConfig";
+} from "electron/main/electron-store/storeConfig";
 import posthog from "posthog-js";
 
 import ReorModal from "../../../Common/Modal";

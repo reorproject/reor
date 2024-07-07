@@ -1,7 +1,7 @@
 import Store from "electron-store";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 
-import { StoreKeys, StoreSchema } from "../electronStore/storeConfig";
+import { StoreKeys, StoreSchema } from "../electron-store/storeConfig";
 
 // Chunk by markdown headings and then use Langchain chunker if the heading chunk is too big:
 const store = new Store<StoreSchema>();

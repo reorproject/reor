@@ -5,7 +5,7 @@ import { ipcMain, BrowserWindow } from "electron";
 import Store from "electron-store";
 
 import { addExtensionToFilenameIfNoExtensionPresent } from "../common/path";
-import { StoreKeys, StoreSchema } from "../electronStore/storeConfig";
+import { StoreKeys, StoreSchema } from "../electron-store/storeConfig";
 import {
   createPromptWithContextLimitFromContent,
   PromptWithContextLimit,

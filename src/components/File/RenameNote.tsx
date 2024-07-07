@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 import ReorModal from "../Common/Modal";
 
-import { errorToString } from "@/utils/error";
+import { errorToStringRendererProcess } from "@/utils/error";
 import {
   getInvalidCharacterInFileName,
   removeFileExtension,
@@ -82,7 +82,7 @@ const RenameNoteModal: React.FC<RenameNoteModalProps> = ({
       });
       onClose();
     } catch (e) {
-      toast.error(errorToString(e), {
+      toast.error(errorToStringRendererProcess(e), {
         className: "mt-5",
         autoClose: false,
         closeOnClick: false,

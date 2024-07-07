@@ -1,7 +1,7 @@
 import * as fs from "fs";
 
 import { chunkMarkdownByHeadingsAndByCharsIfBig } from "../common/chunking";
-import { errorToString } from "../common/error";
+import { errorToStringMainProcess } from "../common/error";
 import {
   GetFilesInfoList,
   flattenFileInfoTree,
@@ -22,14 +22,18 @@ export const RepopulateTableWithMissingItems = async (
   try {
     filesInfoTree = GetFilesInfoList(directoryPath);
   } catch (error) {
-    throw new Error(`Error getting file info list: ${errorToString(error)}`);
+    throw new Error(
+      `Error getting file info list: ${errorToStringMainProcess(error)}`
+    );
   }
 
   let tableArray;
   try {
     tableArray = await getTableAsArray(table);
   } catch (error) {
-    throw new Error(`Error converting table to array: ${errorToString(error)}`);
+    throw new Error(
+      `Error converting table to array: ${errorToStringMainProcess(error)}`
+    );
   }
   let itemsToRemove;
   try {
@@ -39,7 +43,9 @@ export const RepopulateTableWithMissingItems = async (
     );
   } catch (error) {
     throw new Error(
-      `Error computing items to remove from table: ${errorToString(error)}`
+      `Error computing items to remove from table: ${errorToStringMainProcess(
+        error
+      )}`
     );
   }
 
@@ -48,7 +54,7 @@ export const RepopulateTableWithMissingItems = async (
     await table.deleteDBItemsByFilePaths(filePathsToRemove);
   } catch (error) {
     throw new Error(
-      `Error deleting items by file paths: ${errorToString(error)}`
+      `Error deleting items by file paths: ${errorToStringMainProcess(error)}`
     );
   }
 
@@ -56,7 +62,9 @@ export const RepopulateTableWithMissingItems = async (
   try {
     dbItemsToAdd = await computeDbItemsToAddOrUpdate(filesInfoTree, tableArray);
   } catch (error) {
-    throw new Error(`Error computing DB items to add: ${errorToString(error)}`);
+    throw new Error(
+      `Error computing DB items to add: ${errorToStringMainProcess(error)}`
+    );
   }
 
   if (dbItemsToAdd.length === 0) {
@@ -69,7 +77,9 @@ export const RepopulateTableWithMissingItems = async (
     await table.deleteDBItemsByFilePaths(filePathsToDelete);
   } catch (error) {
     throw new Error(
-      `Error deleting DB items by file paths: ${errorToString(error)}`
+      `Error deleting DB items by file paths: ${errorToStringMainProcess(
+        error
+      )}`
     );
   }
 
@@ -77,7 +87,9 @@ export const RepopulateTableWithMissingItems = async (
   try {
     await table.add(flattenedItemsToAdd, onProgress);
   } catch (error) {
-    throw new Error(`Error adding items to table: ${errorToString(error)}`);
+    throw new Error(
+      `Error adding items to table: ${errorToStringMainProcess(error)}`
+    );
   }
 
   onProgress && onProgress(1);

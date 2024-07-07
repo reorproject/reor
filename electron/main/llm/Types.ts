@@ -7,7 +7,7 @@ import {
 import {
   LLMGenerationParameters,
   LLMConfig,
-} from "../electronStore/storeConfig";
+} from "../electron-store/storeConfig";
 
 // Any LLM engine should implement this interface:
 export interface LLMSessionService {

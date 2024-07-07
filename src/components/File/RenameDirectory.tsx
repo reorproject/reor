@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 
 import ReorModal from "../Common/Modal";
 
-import { errorToString } from "@/utils/error";
+import { errorToStringRendererProcess } from "@/utils/error";
 import { getInvalidCharacterInFileName } from "@/utils/strings";
 export interface RenameDirFuncProps {
   path: string;
@@ -80,7 +80,7 @@ const RenameDirModal: React.FC<RenameDirModalProps> = ({
       onClose();
       setIsUpdatingDirName(false);
     } catch (e) {
-      toast.error(errorToString(e), {
+      toast.error(errorToStringRendererProcess(e), {
         className: "mt-5",
         autoClose: false,
         closeOnClick: false,

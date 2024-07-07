@@ -7,7 +7,7 @@ import {
 import {
   LLMGenerationParameters,
   LLMConfig,
-} from "electron/main/electronStore/storeConfig";
+} from "electron/main/electron-store/storeConfig";
 import { Tiktoken, TiktokenModel, encodingForModel } from "js-tiktoken";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 

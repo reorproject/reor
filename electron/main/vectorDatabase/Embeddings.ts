@@ -5,17 +5,16 @@ import { app } from "electron";
 import removeMd from "remove-markdown";
 import * as lancedb from "vectordb";
 
+import { errorToStringMainProcess } from "../common/error";
 import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
-} from "../electronStore/storeConfig";
+} from "../electron-store/storeConfig";
 import { splitDirectoryPathIntoBaseAndRepo } from "../filesystem/Filesystem";
 
 import { DownloadModelFilesFromHFRepo } from "./downloadModelsFromHF";
 import { DBEntry } from "./Schema";
-
-import { errorToString } from "@/utils/error";
 
 export interface EnhancedEmbeddingFunction<T>
   extends lancedb.EmbeddingFunction<T> {
@@ -67,12 +66,18 @@ export async function createEmbeddingFunctionForLocalModel(
     } catch (error) {
       // here we could run a catch and try manually downloading the model...
       throw new Error(
-        `Pipeline initialization failed for repo ${errorToString(error)}`
+        `Pipeline initialization failed for repo ${errorToStringMainProcess(
+          error
+        )}`
       );
     }
   } catch (error) {
-    console.error(`Resource initialization failed: ${errorToString(error)}`);
-    throw new Error(`Resource initialization failed: ${errorToString(error)}`);
+    console.error(
+      `Resource initialization failed: ${errorToStringMainProcess(error)}`
+    );
+    throw new Error(
+      `Resource initialization failed: ${errorToStringMainProcess(error)}`
+    );
   }
   const tokenize = setupTokenizeFunction(pipe.tokenizer);
   const embed = await setupEmbedFunction(pipe);
@@ -110,12 +115,16 @@ export async function createEmbeddingFunctionForRepo(
         pipe = (await pipeline("feature-extraction", repoName)) as Pipeline;
       } catch (error) {
         throw new Error(
-          `Pipeline initialization failed for repo ${errorToString(error)}`
+          `Pipeline initialization failed for repo ${errorToStringMainProcess(
+            error
+          )}`
         );
       }
     }
   } catch (error) {
-    throw new Error(`Resource initialization failed: ${errorToString(error)}`);
+    throw new Error(
+      `Resource initialization failed: ${errorToStringMainProcess(error)}`
+    );
   }
   const tokenize = setupTokenizeFunction(pipe.tokenizer);
   const embed = await setupEmbedFunction(pipe);
@@ -145,7 +154,9 @@ function setupTokenizeFunction(
         return res;
       } catch (error) {
         throw new Error(
-          `Tokenization process failed for text: ${errorToString(error)}`
+          `Tokenization process failed for text: ${errorToStringMainProcess(
+            error
+          )}`
         );
       }
     });
@@ -178,7 +189,9 @@ async function setupEmbedFunction(
           return Array.from(res.data);
         } catch (error) {
           throw new Error(
-            `Embedding process failed for text: ${errorToString(error)}`
+            `Embedding process failed for text: ${errorToStringMainProcess(
+              error
+            )}`
           );
         }
       })

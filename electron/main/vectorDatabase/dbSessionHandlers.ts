@@ -3,8 +3,8 @@ import * as fs from "fs";
 import { ipcMain } from "electron";
 import Store from "electron-store";
 
-import { errorToString } from "../common/error";
-import { StoreKeys, StoreSchema } from "../electronStore/storeConfig";
+import { errorToStringMainProcess } from "../common/error";
+import { StoreKeys, StoreSchema } from "../electron-store/storeConfig";
 import { createPromptWithContextLimitFromContent } from "../llm/contextLimit";
 import { getLLMConfig } from "../llm/llmConfig";
 import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
@@ -174,7 +174,7 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
         };
       } catch (error) {
         console.error("Error searching database:", error);
-        throw errorToString(error);
+        throw errorToStringMainProcess(error);
       }
     }
   );

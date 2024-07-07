@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 
 import ReorModal from "../Common/Modal";
 
-import { errorToString } from "@/utils/error";
+import { errorToStringRendererProcess } from "@/utils/error";
 import { getInvalidCharacterInFilePath } from "@/utils/strings";
 
 interface NewDirectoryComponentProps {
@@ -63,7 +63,7 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
       window.fileSystem.createDirectory(fullPath);
       onClose();
     } catch (e) {
-      toast.error(errorToString(e), {
+      toast.error(errorToStringRendererProcess(e), {
         className: "mt-5",
         autoClose: false,
         closeOnClick: false,

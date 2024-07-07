@@ -10,11 +10,11 @@ import { toast } from "react-toastify";
 import removeMd from "remove-markdown";
 
 import "../../styles/global.css";
+import ResizableComponent from "../Common/ResizableComponent";
 import { HighlightData } from "../Editor/HighlightExtension";
 import { DBResultPreview } from "../File/DBResultPreview";
-import ResizableComponent from "../Common/ResizableComponent";
 
-import { errorToString } from "@/utils/error";
+import { errorToStringRendererProcess } from "@/utils/error";
 
 interface SimilarFilesSidebarComponent {
   filePath: string;
@@ -94,7 +94,7 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponent> = ({
       return searchResults;
     } catch (error) {
       console.error("Error:", error);
-      toast.error(errorToString(error), {
+      toast.error(errorToStringRendererProcess(error), {
         className: "mt-5",
         autoClose: false,
         closeOnClick: false,
