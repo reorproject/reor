@@ -4,8 +4,8 @@ import { Button } from "@material-tailwind/react";
 import { EmbeddingModelWithRepo } from "electron/main/Store/storeConfig";
 import posthog from "posthog-js";
 
-import ExternalLink from "../../../Generic/ExternalLink";
-import Modal from "../../../Generic/Modal";
+import ExternalLink from "../../../Common/ExternalLink";
+import ReorModal from "../../../Common/Modal";
 
 interface NewRemoteEmbeddingModelModalProps {
   isOpen: boolean;
@@ -46,10 +46,10 @@ const NewRemoteEmbeddingModelModal: React.FC<
   };
 
   return (
-    <Modal
+    <ReorModal
       isOpen={isOpen}
       onClose={saveModelConfigToElectronStore}
-      widthName="newEmbeddingModel"
+      widthType="newEmbeddingModel"
     >
       <div className="w-[400px] ml-2 mr-2 mb-2 pl-3">
         <h2 className="text-white  font-semibold mb-0">Set up remote model</h2>
@@ -89,7 +89,7 @@ const NewRemoteEmbeddingModelModal: React.FC<
           </Button>
         </div>
       </div>
-    </Modal>
+    </ReorModal>
   );
 };
 

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 
 import { Button } from "@material-tailwind/react";
 
-import Modal from "../Generic/Modal";
+import ReorModal from "../Common/Modal";
 
 import DirectorySelector from "./DirectorySelector";
 import InitialEmbeddingModelSettings from "./EmbeddingSettings/InitialEmbeddingSettings";
@@ -28,7 +28,7 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
   };
 
   return (
-    <Modal
+    <ReorModal
       isOpen={true}
       onClose={() => console.log("Not allowing a close for now")}
       hideCloseButton={true}
@@ -79,7 +79,7 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
           </Button>
         </div>
       </div>
-    </Modal>
+    </ReorModal>
   );
 };
 

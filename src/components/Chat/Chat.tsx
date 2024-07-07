@@ -10,7 +10,7 @@ import posthog from "posthog-js";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 
-import { SimilarEntriesComponent } from "../Similarity/SimilarFilesSidebar";
+import { SimilarEntriesComponent } from "../Sidebars/SimilarFilesSidebar";
 
 import AddContextFiltersModal from "./AddContextFiltersModal";
 import { PromptSuggestion } from "./Chat-Prompts";
@@ -20,7 +20,7 @@ import {
   resolveRAGContext,
 } from "./chatUtils";
 
-import { errorToString } from "@/functions/error";
+import { errorToString } from "@/utils/error";
 
 // convert ask options to enum
 enum AskOptions {

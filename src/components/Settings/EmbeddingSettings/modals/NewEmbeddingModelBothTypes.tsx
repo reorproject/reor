@@ -6,8 +6,8 @@ import {
   EmbeddingModelWithRepo,
 } from "electron/main/Store/storeConfig";
 
-import ExternalLink from "../../../Generic/ExternalLink";
-import Modal from "../../../Generic/Modal";
+import ExternalLink from "../../../Common/ExternalLink";
+import ReorModal from "../../../Common/Modal";
 
 interface NewLocalEmbeddingModelModalBothTypesProps {
   isOpen: boolean;
@@ -65,7 +65,7 @@ const NewEmbeddingModelModalBothTypes: React.FC<
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <ReorModal isOpen={isOpen} onClose={onClose}>
       <div className="w-[400px] ml-2 mr-2 mb-2 pl-3">
         <h2 className="text-white  font-semibold mb-0">
           Attach a custom embedding model
@@ -104,7 +104,7 @@ const NewEmbeddingModelModalBothTypes: React.FC<
           for more info.{" "}
         </p>
 
-        <Modal
+        <ReorModal
           isOpen={isRepoModalOpen}
           onClose={() => {
             handleSaveHuggingFaceRepo();
@@ -143,9 +143,9 @@ const NewEmbeddingModelModalBothTypes: React.FC<
               Download
             </Button>
           </div>
-        </Modal>
+        </ReorModal>
       </div>
-    </Modal>
+    </ReorModal>
   );
 };
 

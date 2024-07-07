@@ -4,7 +4,7 @@ import { Button } from "@material-tailwind/react";
 import { EmbeddingModelConfig } from "electron/main/Store/storeConfig";
 import posthog from "posthog-js";
 
-import CustomSelect from "../../Generic/Select";
+import CustomSelect from "../../Common/Select";
 import ChunkSizeSettings from "../ChunkSizeSettings";
 
 import NewLocalEmbeddingModelModal from "./modals/NewLocalEmbeddingModel";

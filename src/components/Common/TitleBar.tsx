@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import { PiSidebar, PiSidebarFill } from "react-icons/pi";
 
-import FileHistoryNavigator from "./File/FileSideBar/FileHistoryBar";
+import FileHistoryNavigator from "../File/FileSideBar/FileHistoryBar";
 
 export const titleBarHeight = "30px";
 interface TitleBarProps {

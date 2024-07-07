@@ -7,8 +7,8 @@ import { IconContext } from "react-icons";
 import { CiFileOn } from "react-icons/ci";
 import { FaUpload, FaRegTrashAlt } from "react-icons/fa";
 
-import ExternalLink from "../../../Generic/ExternalLink";
-import Modal from "../../../Generic/Modal";
+import ExternalLink from "../../../Common/ExternalLink";
+import ReorModal from "../../../Common/Modal";
 
 interface NewLocalEmbeddingModelModalProps {
   isOpen: boolean;
@@ -53,10 +53,10 @@ const NewLocalEmbeddingModelModal: React.FC<
   };
 
   return (
-    <Modal
+    <ReorModal
       isOpen={isOpen}
       onClose={saveModelConfigToElectronStore}
-      widthName="newEmbeddingModel"
+      widthType="newEmbeddingModel"
     >
       <div className="w-[400px] ml-2 mr-2 mb-2 pl-3">
         <h3 className="text-white font-semibold mb-0">
@@ -122,7 +122,7 @@ const NewLocalEmbeddingModelModal: React.FC<
           </Button>
         </div>
       </div>
-    </Modal>
+    </ReorModal>
   );
 };
 

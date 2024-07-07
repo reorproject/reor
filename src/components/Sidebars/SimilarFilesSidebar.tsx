@@ -12,9 +12,9 @@ import removeMd from "remove-markdown";
 import "../../styles/global.css";
 import { HighlightData } from "../Editor/HighlightExtension";
 import { DBResultPreview } from "../File/DBResultPreview";
-import ResizableComponent from "../Generic/ResizableComponent";
+import ResizableComponent from "../Common/ResizableComponent";
 
-import { errorToString } from "@/functions/error";
+import { errorToString } from "@/utils/error";
 
 interface SimilarFilesSidebarComponent {
   filePath: string;

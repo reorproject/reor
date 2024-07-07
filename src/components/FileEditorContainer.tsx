@@ -5,14 +5,14 @@ import posthog from "posthog-js";
 import "../styles/global.css";
 import ChatWithLLM, { ChatFilters, ChatHistory } from "./Chat/Chat";
 import { useChatHistory } from "./Chat/hooks/use-chat-history";
+import ResizableComponent from "./Common/ResizableComponent";
+import TitleBar from "./Common/TitleBar";
 import EditorManager from "./Editor/EditorManager";
 import { useFileInfoTree } from "./File/FileSideBar/hooks/use-file-info-tree";
 import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
-import ResizableComponent from "./Generic/ResizableComponent";
 import IconsSidebar from "./Sidebars/IconsSidebar";
 import SidebarManager from "./Sidebars/MainSidebar";
-import SimilarFilesSidebarComponent from "./Similarity/SimilarFilesSidebar";
-import TitleBar from "./TitleBar";
+import SimilarFilesSidebarComponent from "./Sidebars/SimilarFilesSidebar";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search" | "chats";

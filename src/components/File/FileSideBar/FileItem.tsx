@@ -6,7 +6,7 @@ import { FaChevronDown, FaChevronRight } from "react-icons/fa";
 
 import { isFileNodeDirectory, moveFile } from "./fileOperations";
 
-import { removeFileExtension } from "@/functions/strings";
+import { removeFileExtension } from "@/utils/strings";
 
 interface FileInfoProps {
   file: FileInfoNode;

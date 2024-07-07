@@ -6,7 +6,7 @@ interface ModalProps {
   children: React.ReactNode;
   hideCloseButton?: boolean;
   tailwindStylesOnBackground?: string;
-  widthName?: ModalName;
+  widthType?: ModalWidthType;
 }
 
 /*
@@ -14,7 +14,7 @@ interface ModalProps {
  * should display is different than what settings should be. This is a wrapper to select the width
  * that should be displayed.
  */
-type ModalName =
+type ModalWidthType =
   | "newNote"
   | "newDirectory"
   | "renameNote"
@@ -28,7 +28,7 @@ type ModalName =
 
 type Dimension = "[500px]" | "[750px]" | "[300px]" | "full" | "[850px]";
 
-const customDimensionsMap: Record<ModalName, Dimension> = {
+const customDimensionsMap: Record<ModalWidthType, Dimension> = {
   newNote: "[500px]",
   newDirectory: "[500px]",
   renameNote: "[500px]",
@@ -41,23 +41,23 @@ const customDimensionsMap: Record<ModalName, Dimension> = {
   indexingProgress: "[850px]",
 };
 
-const getDimension = (name: ModalName | undefined): Dimension => {
+const getDimension = (name: ModalWidthType | undefined): Dimension => {
   if (name === undefined) {
     return "full";
   }
   return customDimensionsMap[name] || "full";
 };
 
-const Modal: React.FC<ModalProps> = ({
+const ReorModal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   children,
   hideCloseButton,
   tailwindStylesOnBackground,
-  widthName: name,
+  widthType,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
-  const widthClass = getDimension(name as ModalName);
+  const widthClass = getDimension(widthType as ModalWidthType);
 
   const handleOffClick = (event: MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
@@ -102,4 +102,4 @@ const Modal: React.FC<ModalProps> = ({
   );
 };
 
-export default Modal;
+export default ReorModal;

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 
 import CircularProgress from "@mui/material/CircularProgress";
 
-import Modal from "./Generic/Modal";
+import ReorModal from "./Modal";
 
 interface IndexingProgressProps {
   indexingProgress: number;
@@ -31,11 +31,11 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({
   }, [indexingProgress, startTime]);
 
   return (
-    <Modal
+    <ReorModal
       isOpen={true}
       onClose={() => console.log("Not allowing a close for now")}
       hideCloseButton={true}
-      widthName="indexingProgress"
+      widthType="indexingProgress"
     >
       <div className="w-[500px] h-[100px] ml-3 mb-3 mt-2 mr-3">
         <h6 className="mt-2 mb-2 text-2xl font-semibold text-white">
@@ -71,7 +71,7 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({
           </span>
         </div>
       </div>
-    </Modal>
+    </ReorModal>
   );
 };
 
