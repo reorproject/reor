@@ -4,7 +4,6 @@ import Store from "electron-store";
 import { ProgressResponse } from "ollama";
 import { ChatCompletionChunk } from "openai/resources/chat/completions";
 
-
 import { LLMConfig, StoreKeys, StoreSchema } from "../Store/storeConfig";
 
 import {
@@ -35,8 +34,6 @@ export const openAISession = new OpenAIModelSessionService();
 export const anthropicSession = new AnthropicModelSessionService();
 
 export const ollamaService = new OllamaService();
-
-// This function takes a ChatMessageToDisplay object and returns a ChatCompletionMessageParam
 
 export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
   ipcMain.handle(

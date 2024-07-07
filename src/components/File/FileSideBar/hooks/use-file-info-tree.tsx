@@ -67,7 +67,7 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
   useEffect(() => {
     const fetchAndSetFiles = async () => {
       try {
-        const fetchedFiles = await window.files.getFilesTreeForWindow();
+        const fetchedFiles = await window.fileSystem.getFilesTreeForWindow();
         const sortedFiles = sortFilesAndDirectories(fetchedFiles, null);
         setFileInfoTree(sortedFiles);
         const flattenedFiles = flattenFileInfoTree(sortedFiles);

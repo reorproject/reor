@@ -14,8 +14,6 @@ import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { customFetchUsingElectronNetStreaming } from "../../Generic/network";
 import { LLMSessionService } from "../Types";
 
-import { ChatMessageToDisplay } from "@/components/Chat/Chat";
-
 export class AnthropicModelSessionService implements LLMSessionService {
   public getTokenizer = (llmName: string): ((text: string) => number[]) => {
     let tokenEncoding: Tiktoken;
@@ -60,17 +58,15 @@ export class AnthropicModelSessionService implements LLMSessionService {
     modelName: string,
     modelConfig: LLMConfig,
     isJSONMode: boolean,
-    messageHistory: ChatMessageToDisplay[],
+    messageHistory: ChatCompletionMessageParam[],
     handleChunk: (chunk: MessageStreamEvent) => void,
     generationParams?: LLMGenerationParameters
   ): Promise<void> {
-    console.log("making call to url: ", modelConfig);
     const anthropic = new Anthropic({
       apiKey: modelConfig.apiKey,
       baseURL: modelConfig.apiURL,
       fetch: customFetchUsingElectronNetStreaming,
     });
-    console.log("messageHistory: ", messageHistory);
 
     const stream = await anthropic.messages.create({
       model: modelName,
@@ -85,9 +81,7 @@ export class AnthropicModelSessionService implements LLMSessionService {
   }
 }
 
-function cleanMessage(message: ChatMessageToDisplay): MessageParam {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  //  check that message.content is a string and not undefined:
+function cleanMessage(message: ChatCompletionMessageParam): MessageParam {
   if (typeof message.content !== "string") {
     throw new Error("Message content is not a string");
   }

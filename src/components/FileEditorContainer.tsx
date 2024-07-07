@@ -276,8 +276,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                   />
                 )}
                 <EditorContent
-                  className="h-full overflow-y-auto
-"
+                  className="h-full overflow-y-auto"
                   style={{
                     wordBreak: "break-word",
                     backgroundColor: "rgb(30, 30, 30)",
@@ -295,7 +294,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                   />
                 )}
               </div>
-            </div>{" "}
+            </div>
             {showSimilarFiles && (
               <div className="flex-shrink-0 h-full overflow-y-auto ">
                 <SidebarComponent
@@ -313,7 +312,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
 
         {showChatbot && (
           <div className={`w-full h-below-titlebar`}>
-            {/* <ResizableComponent resizeSide="left" initialWidth={450}> */}
             <ChatWithLLM
               vaultDirectory={vaultDirectory}
               openFileByPath={openFileAndOpenEditor}
@@ -329,7 +327,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                 setChatFilters(chatFilters);
               }}
             />
-            {/* </ResizableComponent> */}
           </div>
         )}
       </div>

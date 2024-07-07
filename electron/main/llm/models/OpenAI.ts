@@ -13,8 +13,6 @@ import {
 import { customFetchUsingElectronNetStreaming } from "../../Generic/network";
 import { LLMSessionService } from "../Types";
 
-import { ChatMessageToDisplay } from "@/components/Chat/Chat";
-
 export class OpenAIModelSessionService implements LLMSessionService {
   public getTokenizer = (llmName: string): ((text: string) => number[]) => {
     let tokenEncoding: Tiktoken;
@@ -61,21 +59,19 @@ export class OpenAIModelSessionService implements LLMSessionService {
     modelName: string,
     modelConfig: LLMConfig,
     isJSONMode: boolean,
-    messageHistory: ChatMessageToDisplay[],
+    messageHistory: ChatCompletionMessageParam[],
     handleChunk: (chunk: ChatCompletionChunk) => void,
     generationParams?: LLMGenerationParameters
   ): Promise<void> {
-    console.log("making call to url: ", modelConfig);
     const openai = new OpenAI({
       apiKey: modelConfig.apiKey,
       baseURL: modelConfig.apiURL,
       fetch: customFetchUsingElectronNetStreaming,
     });
-    console.log("messageHistory: ");
 
     const stream = await openai.chat.completions.create({
       model: modelName,
-      messages: messageHistory.map(cleanMessage),
+      messages: messageHistory,
       stream: true,
       max_tokens: generationParams?.maxTokens,
       temperature: generationParams?.temperature,
@@ -88,12 +84,4 @@ export class OpenAIModelSessionService implements LLMSessionService {
       handleChunk(chunk);
     }
   }
-}
-
-function cleanMessage(
-  message: ChatMessageToDisplay
-): ChatCompletionMessageParam {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { ...cleanMessage } = message;
-  return cleanMessage;
 }

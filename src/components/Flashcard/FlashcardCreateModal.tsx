@@ -1,11 +1,9 @@
-
 import React, { useEffect, useRef, useState } from "react";
 
 import { Button } from "@material-tailwind/react";
 import { CircularProgress } from "@mui/material";
 import posthog from "posthog-js";
 import { TypeAnimation } from "react-type-animation";
-
 
 import FilesSuggestionsDisplay from "../Editor/BacklinkSuggestionsDisplay";
 import { useFileInfoTree } from "../File/FileSideBar/hooks/use-file-info-tree";
@@ -15,9 +13,6 @@ import Modal from "../Generic/Modal";
 import { FlashcardCore } from "./FlashcardsCore";
 import { FlashcardQAPairUI } from "./types";
 import { storeFlashcardPairsAsJSON } from "./utils";
-
-
-
 
 interface FlashcardCreateModalProps {
   isOpen: boolean;
@@ -76,7 +71,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
     // send the file as context to the backend
     const llmName = await window.llm.getDefaultLLMName();
     setIsLoadingFlashcards(true);
-    const result = await window.files.generateFlashcardsWithFile({
+    const result = await window.fileSystem.generateFlashcardsWithFile({
       prompt: "Generate flashcards as json from this file",
       llmName,
       filePath: selectedFile,
