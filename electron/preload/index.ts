@@ -74,7 +74,6 @@ const electronUtils = {
   getReorAppVersion: createIPCHandler<() => Promise<string>>(
     "get-reor-app-version"
   ),
-  // Add the new handlers here
   showFileItemContextMenu: createIPCHandler<
     (file: FileInfoNode) => Promise<void>
   >("show-context-menu-file-item"),

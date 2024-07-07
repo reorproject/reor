@@ -1,10 +1,9 @@
 import * as fs from "fs";
 import * as path from "path";
 
-import { ipcMain, BrowserWindow } from "electron";
+import { ipcMain, BrowserWindow, dialog } from "electron";
 import Store from "electron-store";
 
-import { addExtensionToFilenameIfNoExtensionPresent } from "../common/path";
 import WindowsManager from "../common/windowManager";
 import { StoreKeys, StoreSchema } from "../electron-store/storeConfig";
 import {
@@ -13,6 +12,7 @@ import {
 } from "../llm/contextLimit";
 import { getLLMConfig } from "../llm/llmConfig";
 import { ollamaService, openAISession } from "../llm/llmSessionHandlers";
+import { addExtensionToFilenameIfNoExtensionPresent } from "../path/path";
 import { DBEntry } from "../vector-database/schema";
 import {
   convertFileInfoListToDBItems,
@@ -412,4 +412,33 @@ export const registerFileHandlers = (
       return Array.from(fileNameSet);
     }
   );
+
+  ipcMain.handle("open-directory-dialog", async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ["openDirectory", "createDirectory"],
+    });
+    if (!result.canceled) {
+      return result.filePaths;
+    } else {
+      return null;
+    }
+  });
+
+  ipcMain.handle("open-file-dialog", async (event, extensions) => {
+    const filters =
+      extensions && extensions.length > 0
+        ? [{ name: "Files", extensions }]
+        : [];
+
+    const result = await dialog.showOpenDialog({
+      properties: ["openFile", "multiSelections", "showHiddenFiles"], // Add 'showHiddenFiles' here
+      filters: filters,
+    });
+
+    if (!result.canceled) {
+      return result.filePaths;
+    } else {
+      return [];
+    }
+  });
 };
