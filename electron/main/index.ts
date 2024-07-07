@@ -15,8 +15,6 @@ import {
 import Store from "electron-store";
 import * as lancedb from "vectordb";
 
-import { registerDBSessionHandlers } from "./database/dbSessionHandlers";
-import { RepopulateTableWithMissingItems } from "./database/TableHelperFunctions";
 import {
   markdownExtensions,
   startWatchingDirectory,
@@ -34,6 +32,8 @@ import {
   getDefaultEmbeddingModelConfig,
   registerStoreHandlers,
 } from "./Store/storeHandlers";
+import { registerDBSessionHandlers } from "./vectorDatabase/dbSessionHandlers";
+import { RepopulateTableWithMissingItems } from "./vectorDatabase/TableHelperFunctions";
 import WindowsManager from "./windowManager";
 
 const store = new Store<StoreSchema>();

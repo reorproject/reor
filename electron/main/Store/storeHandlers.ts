@@ -12,7 +12,7 @@ import {
 } from "../Store/storeConfig";
 import WindowsManager from "../windowManager";
 
-import { initializeAndMaybeMigrateStore } from "./storeMigrator";
+import { initializeAndMaybeMigrateStore } from "./storeSchemaMigrator";
 
 import { ChatHistory } from "@/components/Chat/Chat";
 

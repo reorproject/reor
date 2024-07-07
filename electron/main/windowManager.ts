@@ -2,7 +2,7 @@ import chokidar from "chokidar";
 import { BrowserWindow, WebContents, screen, shell } from "electron";
 import Store from "electron-store";
 
-import { LanceDBTableWrapper } from "./database/LanceTableWrapper";
+import { LanceDBTableWrapper } from "./vectorDatabase/LanceTableWrapper";
 import { StoreKeys, StoreSchema } from "./Store/storeConfig";
 
 type WindowInfo = {

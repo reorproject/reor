@@ -6,12 +6,11 @@ import {
   readFile,
 } from "../Files/Filesystem";
 import { FileInfo, FileInfoTree } from "../Files/Types";
+import { chunkMarkdownByHeadingsAndByCharsIfBig } from "../Generic/chunking";
 import { errorToString } from "../Generic/error";
-import { chunkMarkdownByHeadingsAndByCharsIfBig } from "../RAG/Chunking";
 
 import { LanceDBTableWrapper } from "./LanceTableWrapper";
 import { DBEntry, DBQueryResult, DatabaseFields } from "./Schema";
-
 
 export const RepopulateTableWithMissingItems = async (
   table: LanceDBTableWrapper,

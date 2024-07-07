@@ -1,7 +1,4 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
-import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
-import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
 import {
   AugmentPromptWithFileProps,
   FileInfoNode,
@@ -9,7 +6,7 @@ import {
   RenameFileProps,
   WriteFileProps,
 } from "electron/main/Files/Types";
-import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
+import { PromptWithContextLimit } from "electron/main/llm/contextLimit";
 import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
@@ -18,6 +15,9 @@ import {
   LLMConfig,
   LLMGenerationParameters,
 } from "electron/main/Store/storeConfig";
+import { PromptWithRagResults } from "electron/main/vectorDatabase/dbSessionHandlers";
+import { BasePromptRequirements } from "electron/main/vectorDatabase/dbSessionHandlerTypes";
+import { DBEntry, DBQueryResult } from "electron/main/vectorDatabase/Schema";
 
 import { ChatHistory } from "@/components/Chat/Chat";
 import { ChatHistoryMetadata } from "@/components/Chat/hooks/use-chat-history";

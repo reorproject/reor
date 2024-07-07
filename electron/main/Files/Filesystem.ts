@@ -5,15 +5,13 @@ import * as path from "path";
 import chokidar from "chokidar";
 import { BrowserWindow } from "electron";
 
-
-import { LanceDBTableWrapper } from "../database/LanceTableWrapper";
+import { LanceDBTableWrapper } from "../vectorDatabase/LanceTableWrapper";
 import {
   addFileTreeToDBTable,
   removeFileTreeFromDBTable,
-} from "../database/TableHelperFunctions";
+} from "../vectorDatabase/TableHelperFunctions";
 
 import { FileInfo, FileInfoTree, isFileNodeDirectory } from "./Types";
-
 
 export const markdownExtensions = [
   ".md",

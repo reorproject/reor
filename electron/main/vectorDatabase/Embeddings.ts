@@ -5,9 +5,6 @@ import { app } from "electron";
 import removeMd from "remove-markdown";
 import * as lancedb from "vectordb";
 
-
-
-import { DownloadModelFilesFromHFRepo } from "../download/download";
 import { splitDirectoryPathIntoBaseAndRepo } from "../Files/Filesystem";
 import { errorToString } from "../Generic/error";
 import {
@@ -16,9 +13,8 @@ import {
   EmbeddingModelWithRepo,
 } from "../Store/storeConfig";
 
+import { DownloadModelFilesFromHFRepo } from "./downloadModelsFromHF";
 import { DBEntry } from "./Schema";
-
-
 
 export interface EnhancedEmbeddingFunction<T>
   extends lancedb.EmbeddingFunction<T> {
@@ -73,7 +69,6 @@ export async function createEmbeddingFunctionForLocalModel(
         `Pipeline initialization failed for repo ${errorToString(error)}`
       );
     }
-
   } catch (error) {
     console.error(`Resource initialization failed: ${errorToString(error)}`);
     throw new Error(`Resource initialization failed: ${errorToString(error)}`);
@@ -100,13 +95,12 @@ export async function createEmbeddingFunctionForRepo(
   try {
     const { pipeline, env } = await import("@xenova/transformers");
     env.cacheDir = path.join(app.getPath("userData"), "models", "embeddings"); // set for all. Just to deal with library and remote inconsistencies
-    console.log("config is: ", embeddingModelConfig);
 
     repoName = embeddingModelConfig.repoName;
     env.allowRemoteModels = true;
     functionName = embeddingModelConfig.repoName;
 
-    console.log(repoName, env.cacheDir)
+    console.log(repoName, env.cacheDir);
     try {
       pipe = (await pipeline("feature-extraction", repoName)) as Pipeline;
     } catch (error) {
@@ -193,28 +187,40 @@ async function setupEmbedFunction(
   };
 }
 
-
-export const rerankSearchedEmbeddings = async (query: string, searchResults: DBEntry[]) => {
-
-  const { env, AutoModelForSequenceClassification, AutoTokenizer } = await import("@xenova/transformers");
+export const rerankSearchedEmbeddings = async (
+  query: string,
+  searchResults: DBEntry[]
+) => {
+  const { env, AutoModelForSequenceClassification, AutoTokenizer } =
+    await import("@xenova/transformers");
   env.cacheDir = path.join(app.getPath("userData"), "models", "reranker"); // set for all. Just to deal with library and remote inconsistencies
 
-  const tokenizer = await AutoTokenizer.from_pretrained('Xenova/bge-reranker-base')
-  const model = await AutoModelForSequenceClassification.from_pretrained('Xenova/bge-reranker-base')
+  const tokenizer = await AutoTokenizer.from_pretrained(
+    "Xenova/bge-reranker-base"
+  );
+  const model = await AutoModelForSequenceClassification.from_pretrained(
+    "Xenova/bge-reranker-base"
+  );
 
-  const queries = Array(searchResults.length).fill(query)
+  const queries = Array(searchResults.length).fill(query);
 
-  const inputs = tokenizer(queries, { text_pair: searchResults.map(item => item.content), padding: true, truncation: true })
+  const inputs = tokenizer(queries, {
+    text_pair: searchResults.map((item) => item.content),
+    padding: true,
+    truncation: true,
+  });
 
-  const scores = await model(inputs)
+  const scores = await model(inputs);
   // map logits to searchResults by index
   const resultsWithIndex = searchResults.map((item, index) => {
     return {
       ...item,
-      score: scores.logits.data[index]
-    }
+      score: scores.logits.data[index],
+    };
   });
 
   // TODO: we should allow users to set threshold for sensitivity too.
-  return resultsWithIndex.sort((a, b) => b.score - a.score).filter(item => item.score > 0);
-}
+  return resultsWithIndex
+    .sort((a, b) => b.score - a.score)
+    .filter((item) => item.score > 0);
+};
