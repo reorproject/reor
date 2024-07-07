@@ -1,4 +1,4 @@
-import React, { CSSProperties, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
 import { FixedSizeList as List, ListChildComponentProps } from "react-window";
