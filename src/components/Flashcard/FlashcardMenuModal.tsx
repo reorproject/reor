@@ -7,7 +7,7 @@ import { FaArrowAltCircleRight } from "react-icons/fa";
 import { FaRegArrowAltCircleRight } from "react-icons/fa";
 import { VscFeedback } from "react-icons/vsc";
 
-import Modal from "../Generic/Modal";
+import ReorModal from "../Common/Modal";
 
 import FlashcardCreateModal from "./FlashcardCreateModal";
 import FlashcardReviewModal from "./FlashcardReviewModal";
@@ -33,10 +33,10 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
   );
 
   return (
-    <Modal
+    <ReorModal
       isOpen={isOpen}
       onClose={onClose}
-      name="flashcardMode"
+      widthType="flashcardMode"
       // tailwindStylesOnBackground="bg-gradient-to-r from-orange-900 to-yellow-900"
     >
       <div className="ml-6 mr-6 mt-2 mb-6 w-full h-full flex-col align-center justify-center">
@@ -105,7 +105,7 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
           </Button>
         </div>
       </div>
-    </Modal>
+    </ReorModal>
   );
 };
 

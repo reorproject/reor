@@ -1,7 +1,7 @@
 import React from "react";
 
 import { formatDistanceToNow } from "date-fns"; // for human-readable time format
-import { DBQueryResult } from "electron/main/database/Schema";
+import { DBQueryResult } from "electron/main/vector-database/schema";
 import ReactMarkdown from "react-markdown";
 
 interface DBResultPreview {
@@ -15,23 +15,29 @@ export const DBResultPreview: React.FC<DBResultPreview> = ({
 }) => {
   const modified = formatModifiedDate(entry.filemodified);
   const fileName = getFileName(entry.notepath);
+
   return (
     <div
-      className="pr-2 pb-1 mt-0 text-slate-300 pt-1 rounded border-solid border-gray-600 bg-neutral-800 border-[0.1px] pl-2 shadow-md cursor-pointer hover:scale-104 hover:shadow-lg hover:bg-neutral-700 transition-transform duration-300"
+      className="pr-2 pb-1 mt-0 text-slate-300 pt-1 rounded border-solid border-gray-600 bg-neutral-800 border-[0.1px] pl-2 shadow-md cursor-pointer hover:scale-104 hover:shadow-lg hover:bg-neutral-700 transition-transform duration-300 max-w-full overflow-hidden"
       onClick={() => onSelect(entry.notepath)}
     >
-      <ReactMarkdown
-        className="text-gray-200 break-words text-sm"
-        components={{
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          h1: ({ node: _, ...props }) => (
-            <h1 className="leading-relaxed" {...props} />
-          ),
-        }}
-      >
-        {entry.content}
-      </ReactMarkdown>
-      <div className="text-xs text-gray-400 mt-0">
+      <div className="max-h-60 overflow-y-auto scrollbar-hide">
+        <ReactMarkdown
+          className="text-gray-200 break-words text-sm"
+          components={{
+            h1: (props) => <h1 className="leading-relaxed" {...props} />,
+            pre: (props) => (
+              <pre className="whitespace-pre-wrap break-all" {...props} />
+            ),
+            code: (props) => (
+              <code className="whitespace-pre-wrap break-all" {...props} />
+            ),
+          }}
+        >
+          {entry.content}
+        </ReactMarkdown>
+      </div>
+      <div className="text-xs text-gray-400 mt-2">
         {fileName && <span className="text-xs text-gray-400">{fileName} </span>}{" "}
         | Similarity: {cosineDistanceToPercentage(entry._distance)}% |{" "}
         {modified && (
@@ -41,12 +47,10 @@ export const DBResultPreview: React.FC<DBResultPreview> = ({
     </div>
   );
 };
-
 interface DBSearchPreviewProps {
   dbResult: DBQueryResult;
   onSelect: (path: string) => void;
 }
-
 export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({
   dbResult: entry,
   onSelect,
@@ -56,21 +60,26 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({
 
   return (
     <div
-      className="bg-neutral-800 border border-gray-600 rounded shadow-md hover:shadow-lg transition-transform duration-300 cursor-pointer hover:scale-104 hover:bg-neutral-500 mt-0 mb-4 p-2"
+      className="bg-neutral-800 border border-gray-600 rounded shadow-md hover:shadow-lg transition-transform duration-300 cursor-pointer hover:scale-104 hover:bg-neutral-500 mt-0 mb-4 p-2 max-w-full overflow-hidden"
       onClick={() => onSelect(entry.notepath)}
     >
-      <ReactMarkdown
-        className="text-gray-200 break-words text-sm"
-        components={{
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          h1: ({ node: _, ...props }) => (
-            <h1 className="leading-relaxed" {...props} />
-          ),
-        }}
-      >
-        {entry.content}
-      </ReactMarkdown>
-      <div className="text-xs text-gray-400 mt-0">
+      <div className="max-h-60 overflow-y-auto scrollbar-hide">
+        <ReactMarkdown
+          className="text-gray-200 break-words text-sm"
+          components={{
+            h1: (props) => <h1 className="leading-relaxed" {...props} />,
+            pre: (props) => (
+              <pre className="whitespace-pre-wrap break-all" {...props} />
+            ),
+            code: (props) => (
+              <code className="whitespace-pre-wrap break-all" {...props} />
+            ),
+          }}
+        >
+          {entry.content}
+        </ReactMarkdown>
+      </div>
+      <div className="text-xs text-gray-400 mt-2">
         {fileName && <span className="text-xs text-gray-400">{fileName} </span>}{" "}
         | Similarity: {cosineDistanceToPercentage(entry._distance)}% |{" "}
         {modified && (
@@ -80,7 +89,6 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({
     </div>
   );
 };
-
 const cosineDistanceToPercentage = (similarity: number) => {
   return ((1 - similarity) * 100).toFixed(2);
 };

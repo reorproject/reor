@@ -10,8 +10,8 @@ import { VscNewFile, VscNewFolder } from "react-icons/vsc";
 
 import NewDirectoryComponent from "../File/NewDirectory";
 import NewNoteComponent from "../File/NewNote";
-import { SidebarAbleToShow } from "../FileEditorContainer";
 import FlashcardMenuModal from "../Flashcard/FlashcardMenuModal";
+import { SidebarAbleToShow } from "../MainPage";
 import SettingsModal from "../Settings/Settings";
 
 interface IconsSidebarProps {
@@ -198,7 +198,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
       />
       <div
         className="bg-transparent border-none pb-2 mb-[2px] cursor-pointer flex items-center justify-center w-full"
-        onClick={() => window.electron.openNewWindow()}
+        onClick={() => window.electronUtils.openNewWindow()}
       >
         <GrNewWindow
           className="text-gray-100"

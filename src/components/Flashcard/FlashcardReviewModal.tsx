@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 
-import Modal from "../Generic/Modal";
-import CustomSelect from "../Generic/Select";
+import ReorModal from "../Common/Modal";
+import CustomSelect from "../Common/Select";
 
 import { FlashcardCore } from "./FlashcardsCore";
 import { FlashcardQAPairUI } from "./types";
@@ -53,7 +53,11 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
   }, [selectedFlashcardFile]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} name="flashcardReviewMode">
+    <ReorModal
+      isOpen={isOpen}
+      onClose={onClose}
+      widthType="flashcardReviewMode"
+    >
       <div className="ml-6 mt-2 mb-6 w-full h-full w-[200px] flex-col ">
         <h2 className="text-xl font-semibold mb-3 text-white">
           Flashcard Review Mode
@@ -82,7 +86,7 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
           setCurrentSelectedFlashcard={setCurrentSelectedFlashcard}
         />
       </div>
-    </Modal>
+    </ReorModal>
   );
 };
 

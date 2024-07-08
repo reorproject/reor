@@ -5,8 +5,8 @@ import posthog from "posthog-js";
 import { ToastContainer, toast } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
-import FileEditorContainer from "./components/FileEditorContainer";
-import IndexingProgress from "./components/IndexingProgress";
+import IndexingProgress from "./components/Common/IndexingProgress";
+import FileEditorContainer from "./components/MainPage";
 import InitialSetupSinglePage from "./components/Settings/InitialSettingsSinglePage";
 
 interface AppProps {}
@@ -34,7 +34,7 @@ const App: React.FC<AppProps> = () => {
           autocapture: false,
         });
         posthog.register({
-          reorAppVersion: await window.electron.getReorAppVersion(),
+          reorAppVersion: await window.electronUtils.getReorAppVersion(),
         });
       }
     };

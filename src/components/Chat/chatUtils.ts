@@ -1,4 +1,4 @@
-import { DBEntry } from "electron/main/database/Schema";
+import { DBEntry } from "electron/main/vector-database/schema";
 import {
   ChatCompletionContentPart,
   ChatCompletionMessageParam,
@@ -75,7 +75,9 @@ export const resolveRAGContext = async (
   let results: DBEntry[] = [];
   if (chatFilters.files.length > 0) {
     console.log("chatFilters.files", chatFilters.files);
-    results = await window.files.getFilesystemPathsAsDBItems(chatFilters.files);
+    results = await window.fileSystem.getFilesystemPathsAsDBItems(
+      chatFilters.files
+    );
   } else if (chatFilters.numberOfChunksToFetch > 0) {
     const timeStampFilter = generateTimeStampFilter(
       chatFilters.minDate,

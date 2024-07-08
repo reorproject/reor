@@ -3,13 +3,13 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@material-tailwind/react";
 import { toast } from "react-toastify";
 
-import Modal from "../Generic/Modal";
+import ReorModal from "../Common/Modal";
 
-import { errorToString } from "@/functions/error";
+import { errorToStringRendererProcess } from "@/utils/error";
 import {
   getInvalidCharacterInFileName,
   removeFileExtension,
-} from "@/functions/strings";
+} from "@/utils/strings";
 
 export interface RenameNoteFuncProps {
   path: string;
@@ -82,7 +82,7 @@ const RenameNoteModal: React.FC<RenameNoteModalProps> = ({
       });
       onClose();
     } catch (e) {
-      toast.error(errorToString(e), {
+      toast.error(errorToStringRendererProcess(e), {
         className: "mt-5",
         autoClose: false,
         closeOnClick: false,
@@ -98,7 +98,7 @@ const RenameNoteModal: React.FC<RenameNoteModalProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} name='renameNote'>
+    <ReorModal isOpen={isOpen} onClose={onClose} widthType="renameNote">
       <div className="ml-3 mr-6 mt-2 mb-2 h-full min-w-[400px]">
         <h2 className="text-xl font-semibold mb-3 text-white">Rename Note</h2>
         <input
@@ -118,7 +118,7 @@ const RenameNoteModal: React.FC<RenameNoteModalProps> = ({
         </Button>
         {errorMessage && <p className="text-red-500 text-xs">{errorMessage}</p>}
       </div>
-    </Modal>
+    </ReorModal>
   );
 };
 

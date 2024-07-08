@@ -1,6 +1,6 @@
 import React, { useState, useEffect, ReactNode } from "react";
 
-import CustomSelect from "../Generic/Select";
+import CustomSelect from "../Common/Select";
 
 interface RagSettingsProps {
   children?: ReactNode; // Define children prop

@@ -45,7 +45,7 @@ button {
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 7px;
   /* Adjust the width of the scrollbar */
 }
 
@@ -55,74 +55,183 @@ button {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgb(164, 164, 164);
+  background: rgb(112, 112, 112);
   /* Set the thumb color */
   border-radius: 10px;
 }
 
 
-/* X Scrollbar */
-.scrollable-x-thin::-webkit-scrollbar {
-  height: 3px;
-  /* Set the height of the horizontal scrollbar to 5px */
+
+
+
+/* CSS for menu that appears when selecting/highlighting text */
+.bubble-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 225px;
+  background: #323232;
+  border: 1px solid gray;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px 2px rgba(60, 64, 67, 0.15);
+  max-height: calc(100vh - 94px);
+  overflow-y: auto;
+
+  cursor: default;
+  font-size: 13px;
+  margin: 0;
+  outline: none;
+  padding: 6px 0;
+  position: absolute;
+  align-items: start;
 }
 
-.scrollable-x-thin::-webkit-scrollbar-track {
+.bubble-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  margin: 0;
   background: transparent;
-  /* Optional: make the track transparent */
+  border: none;
+  color: white;
+  justify-content: flex-start;
+  width: 100%;
 }
 
-.scrollable-x-thin::-webkit-scrollbar-thumb {
-  background-color: rgba(95, 125, 139, 0.5);
-  /* Gray color with some transparency */
-  border-radius: 2px;
-  /* Optional: rounded corners for the scrollbar thumb */
+.bubble-menu-item:hover {
+  background: #242424;
 }
 
-.scrollable-x-thin {
-  scrollbar-width: thin;
-  /* For Firefox */
-  scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
-  /* For Firefox, color and transparent track */
+.bubble-menu-item.disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.icon {
+  margin-right: 16px;
+}
+
+.text {
+  align-self: center;
 }
 
 
-/* y scroll bar */
-.scrollable-y-thin::-webkit-scrollbar {
-  width: 3px;
-  /* Set the height of the horizontal scrollbar to 5px */
+/* Css for table on bubble-menu */
+.table-size-selector {
+  background: #323232;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  z-index: 1050;
 }
 
-.scrollable-y-thin::-webkit-scrollbar-track {
-  background: transparent;
-  /* Optional: make the track transparent */
+.table-size-selector .row {
+  display: flex;
 }
 
-.scrollable-y-thin::-webkit-scrollbar-thumb {
-  background-color: rgba(95, 125, 139, 0.5);
-  /* Gray color with some transparency */
-  border-radius: 2px;
-  /* Optional: rounded corners for the scrollbar thumb */
+.table-size-selector .cell {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #ccc;
+  background-color: #6f6c6c;
+  transition: background-color 0.3s;
+  margin: 1px;
 }
 
-.scrollable-y-thin {
-  scrollbar-width: thin;
-  /* For Firefox */
-  scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
-  /* For Firefox, color and transparent track */
+.table-size-selector .cell.hovered,
+.table-size-selector .cell:hover {
+  background-color: #ddd;
 }
+
+
+/**
+ * TAKEN FROM: https://tiptap.dev/docs/editor/extensions/nodes/table
+ */
+/* Basic editor styles */
+.tiptap :first-child {
+  margin-top: 0;
+}
+
+/* Table-specific styling */
+.tiptap table {
+  border-collapse: collapse;
+  margin: 0;
+  overflow: hidden;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.tiptap td,
+.tiptap th {
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  min-width: 1em;
+  padding: 6px 8px;
+  position: relative;
+  vertical-align: top;
+}
+
+.tiptap td>*,
+.tiptap th>* {
+  margin-bottom: 0;
+}
+
+.tiptap th {
+  /* background-color: rgba(61, 37, 20, .05); */
+  background-color: rgba(162, 157, 153, 0.5);
+  /* 50% transparent white */
+  font-weight: bold;
+  text-align: left;
+}
+
+.tiptap .selectedCell:after {
+  /* background: rgba(61, 37, 20, .08); */
+  content: "";
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 2;
+}
+
+.tiptap .column-resize-handle {
+  background-color: var(--purple);
+  bottom: -2px;
+  pointer-events: none;
+  position: absolute;
+  right: -2px;
+  top: 0;
+  width: 4px;
+}
+
+.tiptap .tableWrapper {
+  margin: 1.5rem 0;
+  overflow-x: auto;
+}
+
+.tiptap.resize-cursor {
+  cursor: ew-resize;
+  cursor: col-resize;
+}
+
 .my-day-picker .rdp {
-  @apply text-xs; /* Adjust font size */
+  @apply text-xs;
+  /* Adjust font size */
 }
 
 .my-day-picker .rdp-months {
-  @apply p-2; /* Adjust padding */
+  @apply p-2;
+  /* Adjust padding */
 }
 
 .my-day-picker .rdp-caption {
-  @apply text-sm; /* Adjust caption font size */
+  @apply text-sm;
+  /* Adjust caption font size */
 }
 
 .my-day-picker .rdp-day {
-  @apply w-6 h-6 leading-6; /* Adjust day cell size */
+  @apply w-6 h-6 leading-6;
+  /* Adjust day cell size */
 }

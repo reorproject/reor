@@ -1,6 +1,6 @@
-import React, { CSSProperties, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
+import { FileInfoNode, FileInfoTree } from "electron/main/filesystem/types";
 import { FixedSizeList as List, ListChildComponentProps } from "react-window";
 
 import RenameDirModal from "../RenameDirectory";
@@ -8,7 +8,6 @@ import RenameNoteModal from "../RenameNote";
 
 import { FileItem } from "./FileItem";
 import { isFileNodeDirectory } from "./fileOperations";
-
 
 interface FileListProps {
   files: FileInfoTree;
@@ -37,13 +36,8 @@ export const FileSidebar: React.FC<FileListProps> = ({
   setFileDirToBeRenamed,
   listHeight,
 }) => {
-
-
-
   return (
-    <div
-      className="flex flex-col h-below-titlebar text-white overflow-y-auto overflow-x-hidden"
-    >
+    <div className="flex flex-col h-full text-white overflow-y-hidden overflow-x-hidden">
       {noteToBeRenamed && (
         <RenameNoteModal
           isOpen={!!noteToBeRenamed}
@@ -146,19 +140,8 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
 
   const handleMenuContext = (e: React.MouseEvent) => {
     e.preventDefault();
-    window.contextFileMenu.showMenuItemContext();
-  }
-
-  const hideScrollbarStyle: CSSProperties = {
-    overflowY: 'auto',
-    scrollbarWidth: 'none',
+    window.electronUtils.showMenuItemContext();
   };
-
-  const webKitScrollBarStyles = `
-    div::-webkit-scrollbar {
-      display: none;
-    }
-  `;
 
   // Calculate visible items and item count
   const visibleItems = getVisibleFilesAndFlatten(files, expandedDirectories);
@@ -188,11 +171,10 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   return (
     <div
       onContextMenu={handleMenuContext}
-      style={hideScrollbarStyle}
+      className="h-full flex-grow overflow-y-none"
+      // style={hideScrollbarStyle}
     >
-      <style>
-        {webKitScrollBarStyles}
-      </style>
+      {/* <style>{webKitScrollBarStyles}</style> */}
       <List
         height={listHeight}
         itemCount={itemCount}
@@ -204,5 +186,4 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
       </List>
     </div>
   );
-
 };

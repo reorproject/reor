@@ -7,14 +7,12 @@ import {
 import {
   LLMGenerationParameters,
   LLMConfig,
-} from "electron/main/Store/storeConfig";
+} from "electron/main/electron-store/storeConfig";
 import { Tiktoken, TiktokenModel, encodingForModel } from "js-tiktoken";
 import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 
-import { customFetchUsingElectronNetStreaming } from "../../Generic/network";
-import { LLMSessionService } from "../Types";
-
-import { ChatMessageToDisplay } from "@/components/Chat/Chat";
+import { customFetchUsingElectronNetStreaming } from "../../common/network";
+import { LLMSessionService } from "../types";
 
 export class AnthropicModelSessionService implements LLMSessionService {
   public getTokenizer = (llmName: string): ((text: string) => number[]) => {
@@ -60,21 +58,19 @@ export class AnthropicModelSessionService implements LLMSessionService {
     modelName: string,
     modelConfig: LLMConfig,
     isJSONMode: boolean,
-    messageHistory: ChatMessageToDisplay[],
+    messageHistory: ChatCompletionMessageParam[],
     handleChunk: (chunk: MessageStreamEvent) => void,
     generationParams?: LLMGenerationParameters
   ): Promise<void> {
-    console.log("making call to url: ", modelConfig);
     const anthropic = new Anthropic({
       apiKey: modelConfig.apiKey,
       baseURL: modelConfig.apiURL,
       fetch: customFetchUsingElectronNetStreaming,
     });
-    console.log("messageHistory: ", messageHistory);
 
     const stream = await anthropic.messages.create({
       model: modelName,
-      messages: messageHistory.map(cleanMessage) as MessageParam[],
+      messages: messageHistory.map(cleanMessage),
       stream: true,
       temperature: generationParams?.temperature,
       max_tokens: generationParams?.maxTokens || 1024,
@@ -85,10 +81,14 @@ export class AnthropicModelSessionService implements LLMSessionService {
   }
 }
 
-function cleanMessage(
-  message: ChatMessageToDisplay
-): ChatCompletionMessageParam {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { ...cleanMessage } = message;
-  return cleanMessage;
+function cleanMessage(message: ChatCompletionMessageParam): MessageParam {
+  if (typeof message.content !== "string") {
+    throw new Error("Message content is not a string");
+  }
+  if (message.role === "system") {
+    return { role: "user", content: message.content };
+  } else if (message.role === "user" || message.role === "assistant") {
+    return { role: message.role, content: message.content };
+  }
+  throw new Error("Message role is not valid");
 }

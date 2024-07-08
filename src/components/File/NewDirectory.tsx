@@ -1,15 +1,13 @@
-
 import React, { useEffect, useState } from "react";
 
 import { Button } from "@material-tailwind/react";
 import posthog from "posthog-js";
 import { toast } from "react-toastify";
 
-import Modal from "../Generic/Modal";
+import ReorModal from "../Common/Modal";
 
-import { errorToString } from "@/functions/error";
-import { getInvalidCharacterInFilePath } from "@/functions/strings";
-
+import { errorToStringRendererProcess } from "@/utils/error";
+import { getInvalidCharacterInFilePath } from "@/utils/strings";
 
 interface NewDirectoryComponentProps {
   isOpen: boolean;
@@ -53,14 +51,19 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
         return;
       }
       const normalizedDirectoryName = directoryName.replace(/\\/g, "/");
-      const basePath = onDirectoryCreate || await window.electronStore.getVaultDirectoryForWindow();
-      const fullPath = await window.path.join(basePath, normalizedDirectoryName);
+      const basePath =
+        onDirectoryCreate ||
+        (await window.electronStore.getVaultDirectoryForWindow());
+      const fullPath = await window.path.join(
+        basePath,
+        normalizedDirectoryName
+      );
 
-      posthog.capture('created_new_directory_from_new_directory_modal');
-      window.files.createDirectory(fullPath);
+      posthog.capture("created_new_directory_from_new_directory_modal");
+      window.fileSystem.createDirectory(fullPath);
       onClose();
     } catch (e) {
-      toast.error(errorToString(e), {
+      toast.error(errorToStringRendererProcess(e), {
         className: "mt-5",
         autoClose: false,
         closeOnClick: false,
@@ -76,7 +79,7 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} name='newDirectory'>
+    <ReorModal isOpen={isOpen} onClose={onClose} widthType="newDirectory">
       <div className="ml-3 mr-6 mt-2 mb-2 h-full min-w-[400px]">
         <h2 className="text-xl font-semibold mb-3 text-white">New Directory</h2>
         <input
@@ -96,7 +99,7 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
         </Button>
         {errorMessage && <p className="text-red-500 text-xs">{errorMessage}</p>}
       </div>
-    </Modal>
+    </ReorModal>
   );
 };
 

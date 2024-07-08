@@ -2,8 +2,7 @@ import React, { useRef, useEffect, useState, useMemo } from "react";
 
 import posthog from "posthog-js";
 
-
-import { removeFileExtension } from "@/functions/strings";
+import { removeFileExtension } from "@/utils/strings";
 
 export interface SuggestionsState {
   textWithinBrackets: string;
@@ -11,7 +10,7 @@ export interface SuggestionsState {
   onSelect: (suggestion: string) => void;
 }
 
-interface SuggestionsDisplayProps {
+export interface SuggestionsDisplayProps {
   suggestionsState: SuggestionsState;
   suggestions: string[];
   maxWidth?: string;

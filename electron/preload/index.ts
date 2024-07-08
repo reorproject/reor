@@ -1,15 +1,4 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { PromptWithRagResults } from "electron/main/database/dbSessionHandlers";
-import { BasePromptRequirements } from "electron/main/database/dbSessionHandlerTypes";
-import { DBEntry, DBQueryResult } from "electron/main/database/Schema";
-import {
-  AugmentPromptWithFileProps,
-  FileInfoNode,
-  FileInfoTree,
-  RenameFileProps,
-  WriteFileProps,
-} from "electron/main/Files/Types";
-import { PromptWithContextLimit } from "electron/main/Prompts/Prompts";
 import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
@@ -17,7 +6,20 @@ import {
   HardwareConfig,
   LLMConfig,
   LLMGenerationParameters,
-} from "electron/main/Store/storeConfig";
+} from "electron/main/electron-store/storeConfig";
+import {
+  AugmentPromptWithFileProps,
+  FileInfoNode,
+  FileInfoTree,
+  RenameFileProps,
+  WriteFileProps,
+} from "electron/main/filesystem/types";
+import { PromptWithContextLimit } from "electron/main/llm/contextLimit";
+import {
+  BasePromptRequirements,
+  PromptWithRagResults,
+} from "electron/main/vector-database/ipcHandlers";
+import { DBEntry, DBQueryResult } from "electron/main/vector-database/schema";
 
 import { ChatHistory } from "@/components/Chat/Chat";
 import { ChatHistoryMetadata } from "@/components/Chat/hooks/use-chat-history";
@@ -64,7 +66,7 @@ const database = {
   ),
 };
 
-const electron = {
+const electronUtils = {
   openExternal:
     createIPCHandler<(url: string) => Promise<void>>("open-external"),
   getPlatform: createIPCHandler<() => Promise<string>>("get-platform"),
@@ -72,6 +74,15 @@ const electron = {
   getReorAppVersion: createIPCHandler<() => Promise<string>>(
     "get-reor-app-version"
   ),
+  showFileItemContextMenu: createIPCHandler<
+    (file: FileInfoNode) => Promise<void>
+  >("show-context-menu-file-item"),
+  showMenuItemContext: createIPCHandler<() => Promise<void>>(
+    "show-context-menu-item"
+  ),
+  showChatItemContext: createIPCHandler<
+    (chatRow: ChatHistoryMetadata) => Promise<void>
+  >("show-chat-menu-item"),
 };
 
 const electronStore = {
@@ -169,7 +180,7 @@ const electronStore = {
   >("set-display-markdown"),
 };
 
-const files = {
+const fileSystem = {
   openDirectoryDialog: createIPCHandler<() => Promise<string[]>>(
     "open-directory-dialog"
   ),
@@ -288,9 +299,9 @@ const llm = {
 
 // Expose to renderer process
 contextBridge.exposeInMainWorld("database", database);
-contextBridge.exposeInMainWorld("electron", electron);
+contextBridge.exposeInMainWorld("electronUtils", electronUtils);
 contextBridge.exposeInMainWorld("electronStore", electronStore);
-contextBridge.exposeInMainWorld("files", files);
+contextBridge.exposeInMainWorld("fileSystem", fileSystem);
 contextBridge.exposeInMainWorld("path", path);
 contextBridge.exposeInMainWorld("llm", llm);
 
@@ -309,46 +320,19 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
   },
 });
 
-contextBridge.exposeInMainWorld("contextMenu", {
-  showFileItemContextMenu: createIPCHandler<
-    (file: FileInfoNode) => Promise<void>
-  >("show-context-menu-file-item"),
-});
-
-contextBridge.exposeInMainWorld("contextFileMenu", {
-  showMenuItemContext: createIPCHandler<() => Promise<void>>(
-    "show-context-menu-item"
-  ),
-});
-
-contextBridge.exposeInMainWorld("contextChatMenu", {
-  showChatItemContext: createIPCHandler<
-    (chatRow: ChatHistoryMetadata) => Promise<void>
-  >("show-chat-menu-item"),
-});
-
 // Type declarations
 declare global {
   interface Window {
     database: typeof database;
-    electron: typeof electron;
+    electronUtils: typeof electronUtils;
     electronStore: typeof electronStore;
-    files: typeof files;
+    fileSystem: typeof fileSystem;
     path: typeof path;
     llm: typeof llm;
     ipcRenderer: {
       on: typeof ipcRenderer.on;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       receive: (channel: string, func: (...args: any[]) => void) => () => void;
-    };
-    contextMenu: {
-      showFileItemContextMenu: (file: FileInfoNode) => Promise<void>;
-    };
-    contextFileMenu: {
-      showMenuItemContext: () => Promise<void>;
-    };
-    contextChatMenu: {
-      showChatItemContext: (chatRow: ChatHistoryMetadata) => Promise<void>;
     };
   }
 }

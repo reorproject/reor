@@ -7,11 +7,11 @@ import Slider from "@mui/material/Slider";
 import { sub } from "date-fns";
 import { DayPicker } from "react-day-picker";
 
-import { SuggestionsState } from "../Editor/FilesSuggestionsDisplay";
 import "react-day-picker/dist/style.css";
-import Modal from "../Generic/Modal";
-import { SearchBarWithFilesSuggestion } from "../Generic/SearchBarWithFilesSuggestion";
-import CustomSelect from "../Generic/Select";
+import ReorModal from "../Common/Modal";
+import { SearchBarWithFilesSuggestion } from "../Common/SearchBarWithFilesSuggestion";
+import CustomSelect from "../Common/Select";
+import { SuggestionsState } from "../Editor/BacklinkSuggestionsDisplay";
 
 import { ChatFilters } from "./Chat";
 
@@ -119,7 +119,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
   }, [chatFilters]);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <ReorModal isOpen={isOpen} onClose={onClose}>
       <div className="ml-6 mt-2 mb-6 h-full w-[800px] max-h-[90vh] overflow-y-auto overflow-x-hidden">
         <h4 className="text-white text-2xl mb-4 text-center">
           Choose specific context files or customise the RAG search
@@ -257,7 +257,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
           </div>
         </div>
       </div>
-    </Modal>
+    </ReorModal>
   );
 };
 

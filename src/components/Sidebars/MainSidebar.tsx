@@ -1,14 +1,14 @@
 import React, { useState } from "react";
 
-import { DBQueryResult } from "electron/main/database/Schema";
-import { FileInfoTree } from "electron/main/Files/Types";
+import { FileInfoTree } from "electron/main/filesystem/types";
+import { DBQueryResult } from "electron/main/vector-database/schema";
 import posthog from "posthog-js";
 
 import { ChatFilters, ChatHistory } from "../Chat/Chat";
 import { ChatsSidebar } from "../Chat/ChatsSidebar";
 import { ChatHistoryMetadata } from "../Chat/hooks/use-chat-history";
 import { FileSidebar } from "../File/FileSideBar";
-import { SidebarAbleToShow } from "../FileEditorContainer";
+import { SidebarAbleToShow } from "../MainPage";
 
 import SearchComponent from "./FileSidebarSearch";
 
@@ -53,7 +53,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
   const [searchResults, setSearchResults] = useState<DBQueryResult[]>([]);
 
   return (
-    <div className="w-full">
+    <div className="w-full h-full overflow-y-hidden">
       {sidebarShowing === "files" && (
         <FileSidebar
           files={files}

@@ -2,7 +2,7 @@ import { toast } from "react-toastify";
 
 import { FlashcardQAPair, FlashcardQAPairUI } from "./types";
 
-import { removeFileExtension } from "@/functions/strings";
+import { removeFileExtension } from "@/utils/strings";
 
 export const QUESTION_FORMAT = "Q:";
 export const ANSWER_FORMAT = "A:";
@@ -56,7 +56,7 @@ export const storeFlashcardPairsAsJSON = async (
     FLASHCARD_DIR,
     `${trimmedFileName}.json`
   );
-  await window.files.writeFile({
+  await window.fileSystem.writeFile({
     filePath: filePath,
     content: JSON.stringify(
       {
@@ -92,7 +92,7 @@ export const getFlashcardQnaPairsFromJsonFile = async (
     selectedFlashcardFile
   );
 
-  const fileData = await window.files.readFile(flashcardFullFilePath);
+  const fileData = await window.fileSystem.readFile(flashcardFullFilePath);
   const qnaPairs: FlashcardQAPairUI[] = (
     JSON.parse(fileData).qnaPairs as FlashcardQAPair[]
   ).map((pair) => {

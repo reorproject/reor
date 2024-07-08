@@ -7,7 +7,7 @@ import { app } from "electron";
 import {
   LLMGenerationParameters,
   OpenAILLMConfig,
-} from "electron/main/Store/storeConfig";
+} from "electron/main/electron-store/storeConfig";
 import { Tiktoken, TiktokenModel, encodingForModel } from "js-tiktoken";
 import { ModelResponse, ProgressResponse, Ollama } from "ollama";
 import {
@@ -17,7 +17,7 @@ import {
 
 // import ollama,"ollama";
 
-import { LLMSessionService } from "../Types";
+import { LLMSessionService } from "../types";
 
 const OllamaServeType = {
   SYSTEM: "system", // ollama is installed on the system

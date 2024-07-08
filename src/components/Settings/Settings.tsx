@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 
-import Modal from "../Generic/Modal";
+import ReorModal from "../Common/Modal";
 
 import AnalyticsSettings from "./AnalyticsSettings";
-import EmbeddingModelSettings from "./EmbeddingSettings";
+import EmbeddingModelSettings from "./EmbeddingSettings/EmbeddingSettings";
 import GeneralSettings from "./GeneralSettings";
-import LLMSettings from "./LLMSettings";
+import LLMSettings from "./LLMSettings/LLMSettings";
 import TextGenerationSettings from "./TextGenerationSettings";
 
 interface ModalProps {
@@ -42,7 +42,7 @@ const SettingsModal: React.FC<ModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <Modal
+    <ReorModal
       isOpen={isOpen}
       onClose={() => {
         handleSave();
@@ -179,7 +179,7 @@ const SettingsModal: React.FC<ModalProps> = ({
           )}
         </div>
       </div>
-    </Modal>
+    </ReorModal>
   );
 };
 

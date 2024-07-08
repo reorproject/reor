@@ -1,4 +1,4 @@
-import { FileInfoNode, FileInfoTree } from "electron/main/Files/Types";
+import { FileInfoNode, FileInfoTree } from "electron/main/filesystem/types";
 
 export const sortFilesAndDirectories = (
   fileList: FileInfoTree,
@@ -50,5 +50,5 @@ export const isFileNodeDirectory = (fileInfo: FileInfoNode): boolean => {
 };
 
 export const moveFile = async (sourcePath: string, destinationPath: string) => {
-  await window.files.moveFileOrDir(sourcePath, destinationPath);
+  await window.fileSystem.moveFileOrDir(sourcePath, destinationPath);
 };

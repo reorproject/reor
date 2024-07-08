@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@material-tailwind/react";
 import posthog from "posthog-js";
 
-import Modal from "../Generic/Modal";
+import ReorModal from "../Common/Modal";
 
-import { getInvalidCharacterInFilePath } from "@/functions/strings";
+import { getInvalidCharacterInFilePath } from "@/utils/strings";
 
 interface NewNoteComponentProps {
   isOpen: boolean;
@@ -65,7 +65,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} name="newNote">
+    <ReorModal isOpen={isOpen} onClose={onClose} widthType="newNote">
       <div className="ml-3 mr-6 mt-2 mb-2 h-full min-w-[400px]">
         <h2 className="text-xl font-semibold mb-3 text-white">New Note</h2>
         <input
@@ -86,7 +86,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
         </Button>
         {errorMessage && <p className="text-red-500 text-xs">{errorMessage}</p>}
       </div>
-    </Modal>
+    </ReorModal>
   );
 };
 

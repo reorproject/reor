@@ -3,6 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import { MathExtension } from "@aarkue/tiptap-math-extension";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
+import Table from "@tiptap/extension-table";
+import TableCell from "@tiptap/extension-table-cell";
+import TableHeader from "@tiptap/extension-table-header";
+import TableRow from "@tiptap/extension-table-row";
 import TaskItem from "@tiptap/extension-task-item";
 import TaskList from "@tiptap/extension-task-list";
 import Text from "@tiptap/extension-text";
@@ -23,9 +27,9 @@ import SearchAndReplace from "@/components/Editor/SearchAndReplace";
 import {
   getInvalidCharacterInFilePath,
   removeFileExtension,
-} from "@/functions/strings";
-import "../tiptap.scss";
+} from "@/utils/strings";
 import "katex/dist/katex.min.css";
+import "../tiptap.scss";
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
@@ -61,7 +65,7 @@ export const useFileByFilepath = () => {
   const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
 
   const setFileNodeToBeRenamed = async (filePath: string) => {
-    const isDirectory = await window.files.isDirectory(filePath);
+    const isDirectory = await window.fileSystem.isDirectory(filePath);
     if (isDirectory) {
       setFileDirToBeRenamed(filePath);
     } else {
@@ -70,20 +74,21 @@ export const useFileByFilepath = () => {
   };
 
   /**
-	 * with this editor, we want to take the HTML on the following scenarios:
-		1. when the file path changes, causing a re-render
-		2. When the component unmounts
-		3. when the file is deleted
-	 */
+   * with this editor, we want to take the HTML on the following scenarios:
+    1. when the file path changes, causing a re-render
+    2. When the component unmounts
+    3. when the file is deleted
+   */
 
   const openFileByPath = async (newFilePath: string) => {
     setCurrentlyChangingFilePath(true);
     await writeEditorContentToDisk(editor, currentlyOpenedFilePath);
     if (currentlyOpenedFilePath && needToIndexEditorContent) {
-      window.files.indexFileInDatabase(currentlyOpenedFilePath);
+      window.fileSystem.indexFileInDatabase(currentlyOpenedFilePath);
       setNeedToIndexEditorContent(false);
     }
-    const newFileContent = (await window.files.readFile(newFilePath)) ?? "";
+    const newFileContent =
+      (await window.fileSystem.readFile(newFilePath)) ?? "";
     editor?.commands.setContent(newFileContent);
     setCurrentlyOpenedFilePath(newFilePath);
     setCurrentlyChangingFilePath(false);
@@ -108,13 +113,13 @@ export const useFileByFilepath = () => {
       await window.electronStore.getVaultDirectoryForWindow(),
       relativePathWithExtension
     );
-    const fileExists = await window.files.checkFileExists(absolutePath);
+    const fileExists = await window.fileSystem.checkFileExists(absolutePath);
     if (!fileExists) {
       const basename = await window.path.basename(absolutePath);
       const content = optionalContentToWriteOnCreate
         ? optionalContentToWriteOnCreate
         : "## " + removeFileExtension(basename) + "\n";
-      await window.files.createFile(absolutePath, content);
+      await window.fileSystem.createFile(absolutePath, content);
       setNeedToIndexEditorContent(true);
     }
     openFileByPath(absolutePath);
@@ -165,6 +170,12 @@ export const useFileByFilepath = () => {
       MathExtension.configure({
         evaluation: true,
       }),
+      Table.configure({
+        resizable: true,
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
       TextStyle,
       SearchAndReplace.configure({
         searchResultClass: "bg-yellow-400",
@@ -231,7 +242,7 @@ export const useFileByFilepath = () => {
     if (filePath !== null && needToWriteEditorContentToDisk && editor) {
       const markdownContent = getMarkdown(editor);
       if (markdownContent !== null) {
-        await window.files.writeFile({
+        await window.fileSystem.writeFile({
           filePath: filePath,
           content: markdownContent,
         });
@@ -247,7 +258,7 @@ export const useFileByFilepath = () => {
   // delete file depending on file path returned by the listener
   useEffect(() => {
     const deleteFile = async (path: string) => {
-      await window.files.deleteFile(path);
+      await window.fileSystem.deleteFile(path);
 
       // if it is the current file, clear the content and set filepath to null so that it won't save anything else
       if (currentlyOpenedFilePath === path) {
@@ -282,7 +293,7 @@ export const useFileByFilepath = () => {
   }, [editor, currentlyOpenedFilePath]);
 
   const renameFileNode = async (oldFilePath: string, newFilePath: string) => {
-    await window.files.renameFileRecursive({
+    await window.fileSystem.renameFileRecursive({
       oldFilePath,
       newFilePath,
     });
@@ -335,11 +346,11 @@ export const useFileByFilepath = () => {
         editor.getHTML() !== null
       ) {
         const markdown = getMarkdown(editor);
-        await window.files.writeFile({
+        await window.fileSystem.writeFile({
           filePath: currentlyOpenedFilePath,
           content: markdown,
         });
-        await window.files.indexFileInDatabase(currentlyOpenedFilePath);
+        await window.fileSystem.indexFileInDatabase(currentlyOpenedFilePath);
       }
     };
 
