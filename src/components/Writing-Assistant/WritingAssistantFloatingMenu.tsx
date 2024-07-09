@@ -26,14 +26,14 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
   const [customPrompt, setCustomPrompt] = useState<string>("");
   const [isOptionsVisible, setIsOptionsVisible] = useState<boolean>(false);
-  const markdownContainerRef = useRef(null); // Create a ref for the markdown container
-  const optionsContainerRef = useRef(null); // Create a ref for the options container
+  const markdownContainerRef = useRef(null);
+  const optionsContainerRef = useRef(null);
 
   useOutsideClick(markdownContainerRef, () => {
-    setCurrentChatHistory(undefined); // Clear the chat history
+    setCurrentChatHistory(undefined);
   });
   useOutsideClick(optionsContainerRef, () => {
-    setIsOptionsVisible(false); // Hide the options container
+    setIsOptionsVisible(false);
   });
   const appendNewContentToMessageHistory = (
     chatID: string,
@@ -143,7 +143,13 @@ Return only the edited text. Do not wrap your response in quotes. Do not offer a
 Write a markdown list (using dashes) of key takeaways from my notes. Write at least 3 items, but write more if the text requires it. Be very detailed and don't leave any information out. Do not wrap responses in quotes.`;
         break;
       case "custom":
-        prompt = customPromptInput || "default prompt";
+        prompt =
+          `prompt(in triple #): ` +
+            `### ` +
+            customPromptInput +
+            ` ###` +
+            ` ,apply the prompt to the text in triple quotes """ ${selectedText} """` ||
+          "default prompt";
         break;
       default:
         prompt = "default prompt";
@@ -156,8 +162,6 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
     prompt: string,
     chatHistory: ChatHistory | undefined
   ) => {
-    // Implement the logic to get a response from the LLM
-    // This is a placeholder implementation
     const defaultLLMName = await window.llm.getDefaultLLMName();
     const llmConfigs = await window.llm.getLLMConfigs();
 
@@ -251,14 +255,14 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           position: "absolute",
           top: highlightData.position.top,
           left: highlightData.position.left,
-          background: "white",
-          border: "1px solid #ccc",
-          padding: "10px",
+          // background: "white",
+          // border: "1px solid #ccc",
+          // padding: "10px",
           zIndex: 1000,
         }}
       >
         {currentChatHistory?.displayableChatHistory
-          .filter((msg) => msg.role !== "system")
+          .filter((msg) => msg.role !== "system" && msg.role !== "user")
           .map((message, index) => (
             <ReactMarkdown
               key={index}
