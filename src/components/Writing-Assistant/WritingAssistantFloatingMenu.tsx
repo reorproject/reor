@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { MessageStreamEvent } from "@anthropic-ai/sdk/resources";
 import { ChatCompletionChunk } from "openai/resources/chat/completions";
+import { FaMagic } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 
@@ -24,10 +25,15 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
 }) => {
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
   const [customPrompt, setCustomPrompt] = useState<string>("");
+  const [isOptionsVisible, setIsOptionsVisible] = useState<boolean>(false);
   const markdownContainerRef = useRef(null); // Create a ref for the markdown container
+  const optionsContainerRef = useRef(null); // Create a ref for the options container
 
   useOutsideClick(markdownContainerRef, () => {
     setCurrentChatHistory(undefined); // Clear the chat history
+  });
+  useOutsideClick(optionsContainerRef, () => {
+    setIsOptionsVisible(false); // Hide the options container
   });
   const appendNewContentToMessageHistory = (
     chatID: string,
@@ -195,7 +201,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
 
   return (
     <div>
-      <div
+      <button
         style={{
           position: "absolute",
           top: highlightData.position.top,
@@ -205,21 +211,42 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           padding: "10px",
           zIndex: 1000,
         }}
+        onClick={() => setIsOptionsVisible(!isOptionsVisible)}
       >
-        <button onClick={() => handleOption("simplify")}>Simplify</button>
-        <button onClick={() => handleOption("copy-editor")}>Copy Editor</button>
-        <button onClick={() => handleOption("takeaways")}>Key Takeaways</button>
-        <input
-          type="text"
-          value={customPrompt}
-          onChange={(e) => setCustomPrompt(e.target.value)}
-          placeholder="Enter your custom prompt"
-          style={{ margin: "10px 0", padding: "5px" }}
-        />
-        <button onClick={() => handleOption("custom", customPrompt)}>
-          Submit Custom Prompt
-        </button>
-      </div>
+        <FaMagic />
+      </button>
+      {isOptionsVisible && (
+        <div
+          ref={optionsContainerRef}
+          style={{
+            position: "absolute",
+            top: highlightData.position.top,
+            left: highlightData.position.left,
+            background: "white",
+            border: "1px solid #ccc",
+            padding: "10px",
+            zIndex: 1000,
+          }}
+        >
+          <button onClick={() => handleOption("simplify")}>Simplify</button>
+          <button onClick={() => handleOption("copy-editor")}>
+            Copy Editor
+          </button>
+          <button onClick={() => handleOption("takeaways")}>
+            Key Takeaways
+          </button>
+          <input
+            type="text"
+            value={customPrompt}
+            onChange={(e) => setCustomPrompt(e.target.value)}
+            placeholder="Enter your custom prompt"
+            style={{ margin: "10px 0", padding: "5px" }}
+          />
+          <button onClick={() => handleOption("custom", customPrompt)}>
+            Submit Custom Prompt
+          </button>
+        </div>
+      )}
       <div
         ref={markdownContainerRef}
         style={{
