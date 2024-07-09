@@ -13,6 +13,7 @@ import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
 import IconsSidebar from "./Sidebars/IconsSidebar";
 import SidebarManager from "./Sidebars/MainSidebar";
 import SimilarFilesSidebarComponent from "./Sidebars/SimilarFilesSidebar";
+import WritingAssistant from "./Writing-Assistant/WritingAssistantFloatingMenu";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search" | "chats";
@@ -118,6 +119,11 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
 
   return (
     <div>
+      <WritingAssistant
+        highlightData={highlightData}
+        currentChatHistory={currentChatHistory}
+        setCurrentChatHistory={setCurrentChatHistory}
+      />
       <TitleBar
         history={navigationHistory}
         setHistory={setNavigationHistory}
