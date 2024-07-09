@@ -168,7 +168,6 @@ const electronStore = {
     createIPCHandler<(chatID: string) => Promise<ChatHistory>>(
       "get-chat-history"
     ),
-
   getSBCompact: createIPCHandler<() => Promise<boolean>>("get-sb-compact"),
   setSBCompact:
     createIPCHandler<(isSBCompact: boolean) => Promise<void>>("set-sb-compact"),
@@ -185,6 +184,12 @@ const electronStore = {
   setEditorFlexCenter: createIPCHandler<
     (editorFlexCenter: boolean) => Promise<void>
   >("set-editor-flex-center"),
+  getCurrentOpenFiles: createIPCHandler<() => Promise<boolean>>(
+    "get-current-open-files"
+  ),
+  setCurrentOpenFiles: createIPCHandler<
+    (action: any, args: any) => Promise<void>
+  >("set-current-open-files"),
 };
 
 const fileSystem = {

@@ -135,7 +135,6 @@ export const CreateEditorSection = () => {
           onChange={() => {
             setEditorFlexCenter(!editorFlexCenter);
             if (editorFlexCenter !== undefined) {
-              console.log("editorFlexCenter on change:", editorFlexCenter);
               window.electronStore.setEditorFlexCenter(!editorFlexCenter);
             }
           }}

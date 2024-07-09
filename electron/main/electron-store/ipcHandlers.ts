@@ -269,6 +269,62 @@ export const registerStoreHandlers = (
     chatHistoriesMap[vaultDir] = filteredChatHistories.reverse();
     store.set(StoreKeys.ChatHistories, chatHistoriesMap);
   });
+
+  ipcMain.handle("get-current-open-files", () => {
+    return store.get(StoreKeys.OpenTabs) || [];
+  });
+
+  ipcMain.handle("set-current-open-files", (event, { action, args }) => {
+    const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || [];
+
+    const addTab = ({ tab }) => {
+      if (tab === null) return;
+      const existingTab = openTabs.findIndex(
+        (item) => item.filePath === tab.filePath
+      );
+
+      /* If tab is already open, do not do anything */
+      if (existingTab !== -1) return;
+
+      openTabs.push(tab);
+      store.set(StoreKeys.OpenTabs, openTabs);
+    };
+
+    const removeTab = ({ tabId }) => {
+      const updatedTabs = openTabs.filter((tab) => tab.id !== tabId);
+      store.set(StoreKeys.OpenTabs, updatedTabs);
+    };
+
+    const clearAllTabs = () => {
+      store.set(StoreKeys.OpenTabs, []);
+    };
+
+    const updateTab = ({ draggedIndex, targetIndex }) => {
+      // Swap dragged and target
+      [openTabs[draggedIndex], openTabs[targetIndex]] = [
+        openTabs[targetIndex],
+        openTabs[draggedIndex],
+      ];
+      store.set(StoreKeys.OpenTabs, openTabs);
+    };
+
+    switch (action) {
+      case "add":
+        addTab(args);
+        break;
+      case "remove":
+        removeTab(args);
+        break;
+      case "update":
+        updateTab(args);
+        break;
+      case "clear":
+        clearAllTabs();
+        break;
+      default:
+        throw new Error("Unsupported action type");
+    }
+  });
 };
 
 export function getDefaultEmbeddingModelConfig(
