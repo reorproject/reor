@@ -52,8 +52,9 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
     <div className="flex whitespace-nowrap custom-scrollbar">
       {openTabs.map((tab) => (
         <div
+          id="titleBarSingleTab"
           key={tab.id}
-          className="flex justify-center items-center bg-dark-gray-c-ten h-[28px]"
+          className="flex justify-center items-center h-[10px]"
         >
           <div
             data-tabid={tab.id}
@@ -61,8 +62,10 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
             onDragStart={(event) => onDragStart(event, tab.id)}
             onDrop={onDrop}
             onDragOver={onDragOver}
-            className={`py-4 px-2 text-white cursor-pointer flex justify-center gap-1 items-center text-sm ${
-              currentFilePath === tab.filePath ? "bg-dark-gray-c-three" : ""
+            className={`py-2 px-2 text-white cursor-pointer flex justify-center gap-1 items-center text-sm ${
+              currentFilePath === tab.filePath
+                ? "bg-dark-gray-c-three rounded-md"
+                : "rounded-md"
             }`}
             onClick={() => onTabSelect(tab.filePath)}
           >

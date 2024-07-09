@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 
 import posthog from "posthog-js";
-import { v4 as uuidv4 } from "uuid";
 
 import "../styles/global.css";
 import ChatWithLLM, { ChatFilters, ChatHistory } from "./Chat/Chat";
@@ -9,7 +8,6 @@ import { useChatHistory } from "./Chat/hooks/use-chat-history";
 import ResizableComponent from "./Common/ResizableComponent";
 import TitleBar from "./Common/TitleBar";
 import EditorManager from "./Editor/EditorManager";
-import { DraggableTabs } from "./Sidebars/DraggableTabs.tsx";
 import { useFileInfoTree } from "./File/FileSideBar/hooks/use-file-info-tree";
 import CreatePreviewFile from "./File/PreviewFile";
 import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
@@ -28,8 +26,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const {
     filePath,
     editor,
-    showQueryBox,
-    setShowQueryBox,
     openTabs,
     setOpenTabs,
     openFileByPath,
@@ -74,6 +70,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     maxDate: new Date(),
   });
   const [sidebarWidth, setSidebarWidth] = useState(40);
+  const [resizableWidth, setResizableWidth] = useState(300);
 
   const handleAddFileToChatFilters = (file: string) => {
     setSidebarShowing("chats");
@@ -84,6 +81,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
       ...prevChatFilters,
       files: [...prevChatFilters.files, file],
     }));
+  };
+
+  const handleResize = (size) => {
+    setResizableWidth(size);
   };
 
   // find all available files
@@ -122,90 +123,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const fetchHistoryTabs = async () => {
-      const response = await window.electronStore.getCurrentOpenFiles();
-      setOpenTabs(response);
-      console.log(`Fetching stored history: ${JSON.stringify(openTabs)}`);
-    };
-
-    fetchHistoryTabs();
-  }, []);
-
-  /* IPC Communication for Tab updates */
-  const syncTabsWithBackend = async (path: string) => {
-    /* Deals with already open files */
-    const tab = createTabObjectFromPath(path);
-    await window.electronStore.setCurrentOpenFiles("add", {
-      tab: tab,
-    });
-  };
-
-  const extractFileName = (path: string) => {
-    const parts = path.split(/[/\\]/); // Split on both forward slash and backslash
-    return parts.pop(); // Returns the last element, which is the file name
-  };
-
-  /* Creates Tab to display */
-  const createTabObjectFromPath = (path) => {
-    return {
-      id: uuidv4(),
-      filePath: path,
-      title: extractFileName(path),
-      timeOpened: new Date(),
-      isDirty: false,
-      lastAccessed: new Date(),
-    };
-  };
-
-  useEffect(() => {
-    if (!filePath) return;
-    console.log(`Filepath changed!`);
-    const existingTab = openTabs.find((tab) => tab.filePath === filePath);
-
-    if (!existingTab) {
-      syncTabsWithBackend(filePath);
-      const newTab = createTabObjectFromPath(filePath);
-      // Update the tabs state by adding the new tab
-      setOpenTabs((prevTabs) => [...prevTabs, newTab]);
-    }
-    setShowQueryBox(false);
-  }, [filePath]);
-
-  const handleTabSelect = (path: string) => {
-    console.log("Tab Selected:", path);
-    openFileAndOpenEditor(path);
-  };
-
-  const handleTabClose = async (event, tabId) => {
-    // Get current file path from the tab to be closed
-    event.stopPropagation();
-    console.log("Closing tab!");
-    let closedFilePath = "";
-    let newIndex = -1;
-
-    // Update tabs state and determine the new file to select
-    setOpenTabs((prevTabs) => {
-      const index = prevTabs.findIndex((tab) => tab.id === tabId);
-      closedFilePath = index !== -1 ? prevTabs[index].filePath : "";
-      newIndex = index > 0 ? index - 1 : 0; // Set newIndex to previous one or 0
-      return prevTabs.filter((tab, idx) => idx !== index);
-    });
-
-    // Update the selected file path after state update
-    if (closedFilePath === filePath) {
-      // If the closed tab was the current file, update the file selection
-      if (newIndex === -1 || newIndex >= openTabs.length) {
-        openFileAndOpenEditor(""); // If no tabs left or out of range, clear selection
-      } else {
-        openFileAndOpenEditor(openTabs[newIndex].filePath); // Select the new index's file
-      }
-    }
-    await window.electronStore.setCurrentOpenFiles("remove", {
-      tabId: tabId,
-    });
-  };
-
   return (
     <div>
       <TitleBar
@@ -215,6 +132,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         onFileSelect={openFileAndOpenEditor}
         similarFilesOpen={showSimilarFiles} // This might need to be managed differently now
         toggleSimilarFiles={toggleSimilarFiles} // This might need to be managed differently now
+        openTabs={openTabs}
+        setOpenTabs={setOpenTabs}
+        openFileAndOpenEditor={openFileAndOpenEditor}
+        sidebarWidth={resizableWidth}
       />
 
       <div className="flex h-below-titlebar">
@@ -230,7 +151,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
           />
         </div>
 
-        <ResizableComponent resizeSide="right">
+        <ResizableComponent resizeSide="right" onResize={handleResize}>
           <div className="h-full border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid w-full">
             <SidebarManager
               files={files}

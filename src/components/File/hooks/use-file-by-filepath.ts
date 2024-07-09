@@ -64,7 +64,6 @@ export const useFileByFilepath = () => {
   });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
-  const [showQueryBox, setShowQueryBox] = useState<boolean>(false);
 
   const setFileNodeToBeRenamed = async (filePath: string) => {
     const isDirectory = await window.fileSystem.isDirectory(filePath);
@@ -370,8 +369,6 @@ export const useFileByFilepath = () => {
     filePath: currentlyOpenedFilePath,
     saveCurrentlyOpenedFile,
     editor,
-    showQueryBox,
-    setShowQueryBox,
     openTabs,
     setOpenTabs,
     navigationHistory,

@@ -29,10 +29,18 @@ a {
 
 #customTitleBar {
   -webkit-app-region: drag;
+  height: 40px;
 }
 
-#customTitleBar * {
+#customTitleBar #titleBarFileNavigator, 
+#titleBarSimilarFiles {
   -webkit-app-region: no-drag;
+}
+
+#titleBarSingleTab {
+  -webkit-app-region: no-drag;
+  height: 20px;
+  padding-top: 30px;
 }
 
 button {
