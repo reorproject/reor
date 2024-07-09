@@ -24,6 +24,7 @@ import HighlightExtension, {
 } from "@/components/Editor/HighlightExtension";
 import { RichTextLink } from "@/components/Editor/RichTextLink";
 import SearchAndReplace from "@/components/Editor/SearchAndReplace";
+import OpenQueryTab from "@/components/Editor/LLMQueryTab";
 import {
   getInvalidCharacterInFilePath,
   removeFileExtension,
@@ -55,6 +56,7 @@ export const useFileByFilepath = () => {
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>("");
   const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>("");
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
+  const [openTabs, setOpenTabs] = useState<Tab[]>([]);
   const [currentlyChangingFilePath, setCurrentlyChangingFilePath] =
     useState(false);
   const [highlightData, setHighlightData] = useState<HighlightData>({
@@ -63,6 +65,7 @@ export const useFileByFilepath = () => {
   });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
+  const [showQueryBox, setShowQueryBox] = useState<boolean>(false);
 
   const setFileNodeToBeRenamed = async (filePath: string) => {
     const isDirectory = await window.fileSystem.isDirectory(filePath);
@@ -203,6 +206,7 @@ export const useFileByFilepath = () => {
         openRelativePathRef,
         handleSuggestionsStateWithEventCapture
       ),
+      OpenQueryTab(setShowQueryBox),
     ],
   });
 
@@ -368,6 +372,10 @@ export const useFileByFilepath = () => {
     filePath: currentlyOpenedFilePath,
     saveCurrentlyOpenedFile,
     editor,
+    showQueryBox,
+    setShowQueryBox,
+    openTabs,
+    setOpenTabs,
     navigationHistory,
     setNavigationHistory,
     openFileByPath,

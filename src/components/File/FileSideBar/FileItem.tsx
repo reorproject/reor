@@ -62,6 +62,7 @@ export const FileItem: React.FC<FileInfoProps> = ({
       // Handle error (e.g., show an error message)
     }
   };
+
   const toggle = () => {
     if (isFileNodeDirectory(file)) {
       onDirectoryToggle(file.path);

@@ -8,12 +8,15 @@ import { useChatHistory } from "./Chat/hooks/use-chat-history";
 import ResizableComponent from "./Common/ResizableComponent";
 import TitleBar from "./Common/TitleBar";
 import EditorManager from "./Editor/EditorManager";
+import { DraggableTabs } from ./Sidebars/DraggableTabs.tsx
 import { useFileInfoTree } from "./File/FileSideBar/hooks/use-file-info-tree";
+import CreatePreviewFile from "./File/PreviewFile";
 import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
 import IconsSidebar from "./Sidebars/IconsSidebar";
 import SidebarManager from "./Sidebars/MainSidebar";
 import SimilarFilesSidebarComponent from "./Sidebars/SimilarFilesSidebar";
 
+interface FileEditorContainerProps {}
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search" | "chats";
 
@@ -25,6 +28,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   const {
     filePath,
     editor,
+    showQueryBox,
+    setShowQueryBox,
+    openTabs,
+    setOpenTabs,
     openFileByPath,
     openRelativePath,
     saveCurrentlyOpenedFile,
@@ -114,6 +121,90 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
       removeAddChatToFileListener();
     };
   }, []);
+
+  useEffect(() => {
+    const fetchHistoryTabs = async () => {
+      const response = await window.electronStore.getCurrentOpenFiles();
+      setOpenTabs(response);
+      console.log(`Fetching stored history: ${JSON.stringify(openTabs)}`);
+    };
+
+    fetchHistoryTabs();
+  }, []);
+
+  /* IPC Communication for Tab updates */
+  const syncTabsWithBackend = async (path: string) => {
+    /* Deals with already open files */
+    const tab = createTabObjectFromPath(path);
+    await window.electronStore.setCurrentOpenFiles("add", {
+      tab: tab,
+    });
+  };
+
+  const extractFileName = (path: string) => {
+    const parts = path.split(/[/\\]/); // Split on both forward slash and backslash
+    return parts.pop(); // Returns the last element, which is the file name
+  };
+
+  /* Creates Tab to display */
+  const createTabObjectFromPath = (path) => {
+    return {
+      id: uuidv4(),
+      filePath: path,
+      title: extractFileName(path),
+      timeOpened: new Date(),
+      isDirty: false,
+      lastAccessed: new Date(),
+    };
+  };
+
+  useEffect(() => {
+    if (!filePath) return;
+    console.log(`Filepath changed!`);
+    const existingTab = openTabs.find((tab) => tab.filePath === filePath);
+
+    if (!existingTab) {
+      syncTabsWithBackend(filePath);
+      const newTab = createTabObjectFromPath(filePath);
+      // Update the tabs state by adding the new tab
+      setOpenTabs((prevTabs) => [...prevTabs, newTab]);
+    }
+    setShowQueryBox(false);
+  }, [filePath]);
+
+  const handleTabSelect = (path: string) => {
+    console.log("Tab Selected:", path);
+    openFileAndOpenEditor(path);
+  };
+
+  const handleTabClose = async (event, tabId) => {
+    // Get current file path from the tab to be closed
+    event.stopPropagation();
+    console.log("Closing tab!");
+    let closedFilePath = "";
+    let newIndex = -1;
+
+    // Update tabs state and determine the new file to select
+    setOpenTabs((prevTabs) => {
+      const index = prevTabs.findIndex((tab) => tab.id === tabId);
+      closedFilePath = index !== -1 ? prevTabs[index].filePath : "";
+      newIndex = index > 0 ? index - 1 : 0; // Set newIndex to previous one or 0
+      return prevTabs.filter((tab, idx) => idx !== index);
+    });
+
+    // Update the selected file path after state update
+    if (closedFilePath === filePath) {
+      // If the closed tab was the current file, update the file selection
+      if (newIndex === -1 || newIndex >= openTabs.length) {
+        openFileAndOpenEditor(""); // If no tabs left or out of range, clear selection
+      } else {
+        openFileAndOpenEditor(openTabs[newIndex].filePath); // Select the new index's file
+      }
+    }
+    await window.electronStore.setCurrentOpenFiles("remove", {
+      tabId: tabId,
+    });
+  };
 
   return (
     <div>

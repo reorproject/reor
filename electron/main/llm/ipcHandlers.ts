@@ -1,4 +1,3 @@
-import { MessageStreamEvent } from "@anthropic-ai/sdk/resources";
 import { ipcMain, IpcMainInvokeEvent } from "electron";
 import Store from "electron-store";
 import { ProgressResponse } from "ollama";
@@ -16,16 +15,16 @@ import {
 } from "./contextLimit";
 import {
   addOrUpdateLLMSchemaInStore,
-  removeLLM,
   getAllLLMConfigs,
   getLLMConfig,
+  removeLLM,
 } from "./llmConfig";
 import { AnthropicModelSessionService } from "./models/Anthropic";
 import { OllamaService } from "./models/Ollama";
 import { OpenAIModelSessionService } from "./models/OpenAI";
 import { LLMSessionService } from "./types";
 
-import { ChatHistory } from "@/components/Chat/Chat";
+import { Query } from "@/components/Editor/QueryInput";
 
 enum LLMType {
   OpenAI = "openai",
@@ -47,15 +46,17 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       llmName: string,
       llmConfig: LLMConfig,
       isJSONMode: boolean,
-      chatHistory: ChatHistory
+      request: ChatHistories | Query
     ): Promise<void> => {
       const handleOpenAIChunk = (chunk: ChatCompletionChunk) => {
-        event.sender.send("openAITokenStream", chatHistory.id, chunk);
+        event.sender.send("openAITokenStream", request.id, chunk);
       };
 
       const handleAnthropicChunk = (chunk: MessageStreamEvent) => {
-        event.sender.send("anthropicTokenStream", chatHistory.id, chunk);
+        event.sender.send("anthropicTokenStream", request.id, chunk);
       };
+
+      console.log("Registered LLM");
 
       switch (llmConfig.type) {
         case LLMType.OpenAI:
@@ -63,7 +64,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
             llmName,
             llmConfig,
             isJSONMode,
-            chatHistory.displayableChatHistory,
+            request.displayableChatHistory,
             handleOpenAIChunk,
             store.get(StoreKeys.LLMGenerationParameters)
           );
@@ -73,7 +74,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
             llmName,
             llmConfig,
             isJSONMode,
-            chatHistory.displayableChatHistory,
+            request.displayableChatHistory,
             handleAnthropicChunk,
             store.get(StoreKeys.LLMGenerationParameters)
           );

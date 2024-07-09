@@ -5,6 +5,7 @@ import { PiSidebar, PiSidebarFill } from "react-icons/pi";
 import FileHistoryNavigator from "../File/FileSideBar/FileHistoryBar";
 
 export const titleBarHeight = "30px";
+
 interface TitleBarProps {
   onFileSelect: (path: string) => void;
   currentFilePath: string | null;
@@ -52,6 +53,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
           currentPath={currentFilePath || ""}
         />
       </div>
+
       <div
         className="flex justify-end align-items-right mt-[0.5px]"
         style={

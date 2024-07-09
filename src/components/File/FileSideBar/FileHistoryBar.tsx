@@ -31,9 +31,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
       handleFileSelect(currentPath);
   }, [currentPath]);
 
-  useEffect(() => {
-    console.log(`currentIndex: ${currentIndex}`, { history });
-  }, [currentIndex]);
+  useEffect(() => {}, [currentIndex]);
 
   const handleFileSelect = (path: string) => {
     const updatedHistory = [
