@@ -24,7 +24,6 @@ import HighlightExtension, {
 } from "@/components/Editor/HighlightExtension";
 import { RichTextLink } from "@/components/Editor/RichTextLink";
 import SearchAndReplace from "@/components/Editor/SearchAndReplace";
-import OpenQueryTab from "@/components/Editor/LLMQueryTab";
 import {
   getInvalidCharacterInFilePath,
   removeFileExtension,
@@ -206,7 +205,6 @@ export const useFileByFilepath = () => {
         openRelativePathRef,
         handleSuggestionsStateWithEventCapture
       ),
-      OpenQueryTab(setShowQueryBox),
     ],
   });
 

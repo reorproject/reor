@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 
 import posthog from "posthog-js";
+import { v4 as uuidv4 } from "uuid";
 
 import "../styles/global.css";
 import ChatWithLLM, { ChatFilters, ChatHistory } from "./Chat/Chat";
@@ -8,7 +9,7 @@ import { useChatHistory } from "./Chat/hooks/use-chat-history";
 import ResizableComponent from "./Common/ResizableComponent";
 import TitleBar from "./Common/TitleBar";
 import EditorManager from "./Editor/EditorManager";
-import { DraggableTabs } from ./Sidebars/DraggableTabs.tsx
+import { DraggableTabs } from "./Sidebars/DraggableTabs.tsx";
 import { useFileInfoTree } from "./File/FileSideBar/hooks/use-file-info-tree";
 import CreatePreviewFile from "./File/PreviewFile";
 import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
@@ -16,7 +17,6 @@ import IconsSidebar from "./Sidebars/IconsSidebar";
 import SidebarManager from "./Sidebars/MainSidebar";
 import SimilarFilesSidebarComponent from "./Sidebars/SimilarFilesSidebar";
 
-interface FileEditorContainerProps {}
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search" | "chats";
 

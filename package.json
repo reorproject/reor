@@ -88,6 +88,7 @@
     "turndown": "^7.1.2",
     "use-debounce": "^10.0.1",
     "uuid": "^10.0.0",
+    "uuidv4": "^6.2.13",
     "vectordb": "0.4.10"
   },
   "devDependencies": {
