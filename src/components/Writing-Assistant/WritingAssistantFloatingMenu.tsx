@@ -203,14 +203,12 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
     <div>
       <button
         style={{
-          position: "absolute",
-          top: highlightData.position.top,
-          left: highlightData.position.left,
-          background: "white",
-          border: "1px solid #ccc",
-          padding: "10px",
+          top: `${highlightData.position.top}px`,
+          left: `${highlightData.position.left + 30}px`,
           zIndex: 1000,
         }}
+        className="absolute w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer text-gray-600 border-none shadow-md hover:bg-gray-300"
+        aria-label="Writing Assistant button"
         onClick={() => setIsOptionsVisible(!isOptionsVisible)}
       >
         <FaMagic />

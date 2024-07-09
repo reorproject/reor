@@ -119,11 +119,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
 
   return (
     <div>
-      <WritingAssistant
-        highlightData={highlightData}
-        currentChatHistory={currentChatHistory}
-        setCurrentChatHistory={setCurrentChatHistory}
-      />
       <TitleBar
         history={navigationHistory}
         setHistory={setNavigationHistory}
@@ -180,7 +175,11 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                 showSimilarFiles={showSimilarFiles}
               />{" "}
             </div>
-
+            <WritingAssistant
+              highlightData={highlightData}
+              currentChatHistory={currentChatHistory}
+              setCurrentChatHistory={setCurrentChatHistory}
+            />
             {showSimilarFiles && (
               <div className="flex-shrink-0 h-full overflow-y-auto overflow-x-hidden">
                 <SimilarFilesSidebarComponent
