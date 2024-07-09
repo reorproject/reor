@@ -82,7 +82,7 @@ const ReorModal: React.FC<ModalProps> = ({
     >
       <div
         ref={modalRef}
-        className={`bg-dark-gray-c-three rounded-lg shadow-xl w-${widthClass} max-w-4xl flex flex-col justify-center items-center border-solid border-gray-600 border`}
+        className={`bg-dark-gray-c-three rounded-lg shadow-xl w-${widthClass} max-w-6xl  flex flex-col justify-center items-center border-solid border-gray-600 border`}
       >
         <div className="w-full items-end border-b border-gray-700 px-4 h-0 z-50">
           {!hideCloseButton && (

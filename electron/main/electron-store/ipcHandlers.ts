@@ -158,6 +158,15 @@ export const registerStoreHandlers = (
     return store.get(StoreKeys.IsSBCompact);
   });
 
+  ipcMain.handle("get-editor-flex-center", () => {
+    return store.get(StoreKeys.EditorFlexCenter);
+  });
+
+  ipcMain.handle("set-editor-flex-center", (event, setEditorFlexCenter) => {
+    store.set(StoreKeys.EditorFlexCenter, setEditorFlexCenter);
+    event.sender.send("editor-flex-center-changed", setEditorFlexCenter);
+  });
+
   ipcMain.handle("set-analytics-mode", (event, isAnalytics) => {
     console.log("setting analytics mode", isAnalytics);
     store.set(StoreKeys.Analytics, isAnalytics);

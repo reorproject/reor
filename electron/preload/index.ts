@@ -178,6 +178,13 @@ const electronStore = {
   setDisplayMarkdown: createIPCHandler<
     (displayMarkdown: boolean) => Promise<void>
   >("set-display-markdown"),
+
+  getEditorFlexCenter: createIPCHandler<() => Promise<boolean>>(
+    "get-editor-flex-center"
+  ),
+  setEditorFlexCenter: createIPCHandler<
+    (editorFlexCenter: boolean) => Promise<void>
+  >("set-editor-flex-center"),
 };
 
 const fileSystem = {

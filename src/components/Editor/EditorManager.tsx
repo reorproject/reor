@@ -25,7 +25,7 @@ const EditorManager: React.FC<EditorManagerProps> = ({
   const [searchTerm, setSearchTerm] = useState("");
   const [menuVisible, setMenuVisible] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
-  //   const [showSimilarFiles, setShowSimilarFiles] = useState(true);
+  const [editorFlex, setEditorFlex] = useState(true);
 
   const toggleSearch = useCallback(() => {
     setShowSearch((prevShowSearch) => !prevShowSearch);
@@ -92,6 +92,27 @@ const EditorManager: React.FC<EditorManagerProps> = ({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [showSearch, menuVisible, toggleSearch]);
 
+  // If "Content Flex Center" is set to true in Settings, then it centers the content of the Editor
+  useEffect(() => {
+    const initEditorContentCenter = async () => {
+      const isCenter = await window.electronStore.getEditorFlexCenter();
+      setEditorFlex(isCenter);
+    };
+
+    const handleEditorChange = (event, editorFlexCenter: boolean) => {
+      setEditorFlex(editorFlexCenter);
+    };
+
+    initEditorContentCenter();
+    window.ipcRenderer.on("editor-flex-center-changed", handleEditorChange);
+    return () => {
+      window.ipcRenderer.removeListener(
+        "editor-flex-center-changed",
+        handleEditorChange
+      );
+    };
+  }, []);
+
   return (
     <div
       className="relative h-full w-full cursor-text text-slate-400 overflow-y-auto"
@@ -122,16 +143,23 @@ const EditorManager: React.FC<EditorManagerProps> = ({
           setMenuVisible={setMenuVisible}
         />
       )}
-      <EditorContent
-        className="h-full overflow-y-auto"
-        style={{
-          wordBreak: "break-word",
-          backgroundColor: "rgb(30, 30, 30)",
-        }}
-        onContextMenu={handleContextMenu}
-        onClick={hideMenu}
-        editor={editor}
-      />
+      <div
+        className={`${
+          editorFlex ? "flex justify-center items-center h-screen p-4" : ""
+        }`}
+      >
+        <EditorContent
+          className={`w-full ${
+            editorFlex ? "max-w-3xl" : ""
+          } h-full overflow-y-auto p-4 word-break`}
+          style={{
+            backgroundColor: "rgb(30, 30, 30)",
+          }}
+          onContextMenu={handleContextMenu}
+          onClick={hideMenu}
+          editor={editor}
+        />
+      </div>
       {suggestionsState && (
         <InEditorBacklinkSuggestionsDisplay
           suggestionsState={suggestionsState}

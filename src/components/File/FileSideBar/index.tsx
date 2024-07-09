@@ -171,7 +171,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   return (
     <div
       onContextMenu={handleMenuContext}
-      className="h-full flex-grow overflow-y-none"
+      className="h-full flex-grow overflow-y-none p-6 opacity-70"
       // style={hideScrollbarStyle}
     >
       {/* <style>{webKitScrollBarStyles}</style> */}

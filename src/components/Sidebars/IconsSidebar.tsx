@@ -87,12 +87,14 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         onClick={() => makeSidebarShow("files")}
       >
         <IconContext.Provider
-          value={{ color: sidebarShowing === "files" ? "salmon" : "" }}
+          value={{
+            color: sidebarShowing === "files" ? "white" : "gray",
+          }}
         >
           <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
             <ImFilesEmpty
               className="mx-auto text-gray-200 "
-              size={22}
+              size={18}
               title="Files"
             />
           </div>
@@ -103,12 +105,12 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         onClick={() => makeSidebarShow("chats")}
       >
         <IconContext.Provider
-          value={{ color: sidebarShowing === "chats" ? "salmon" : "" }}
+          value={{ color: sidebarShowing === "chats" ? "white" : "gray" }}
         >
           <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
             <IoChatbubbleEllipsesOutline
               className="text-gray-100 cursor-pointer "
-              size={22}
+              size={18}
               title={
                 sidebarShowing === "chats" ? "Close Chatbot" : "Open Chatbot"
               }
@@ -121,7 +123,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         onClick={() => makeSidebarShow("search")}
       >
         <IconContext.Provider
-          value={{ color: sidebarShowing === "search" ? "salmon" : "" }}
+          value={{ color: sidebarShowing === "search" ? "white" : "gray" }}
         >
           <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
             <FaSearch
@@ -137,7 +139,9 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         onClick={() => setIsNewNoteModalOpen(true)}
       >
         <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
-          <VscNewFile className="text-gray-200" size={22} title="New Note" />
+          <IconContext.Provider value={{ color: "gray" }}>
+            <VscNewFile className="text-gray-200" size={22} title="New Note" />
+          </IconContext.Provider>
         </div>
       </div>
       <div
@@ -145,12 +149,13 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         onClick={() => setIsNewDirectoryModalOpen(true)}
       >
         <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
-          <VscNewFolder
-            className="text-gray-200"
-            size={22}
-            title="New Directory"
-          />
-          {/* < /> */}
+          <IconContext.Provider value={{ color: "gray" }}>
+            <VscNewFolder
+              className="text-gray-200"
+              size={18}
+              title="New Directory"
+            />
+          </IconContext.Provider>
         </div>
       </div>
       <div
@@ -158,12 +163,13 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         onClick={() => setIsFlashcardModeOpen(true)}
       >
         <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
-          <MdOutlineQuiz
-            className="text-gray-200"
-            size={23}
-            title="Flashcard quiz"
-          />
-          {/* < /> */}
+          <IconContext.Provider value={{ color: "gray" }}>
+            <MdOutlineQuiz
+              className="text-gray-200"
+              size={19}
+              title="Flashcard quiz"
+            />
+          </IconContext.Provider>
         </div>
       </div>
 
@@ -200,17 +206,25 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         className="bg-transparent border-none pb-2 mb-[2px] cursor-pointer flex items-center justify-center w-full"
         onClick={() => window.electronUtils.openNewWindow()}
       >
-        <GrNewWindow
-          className="text-gray-100"
-          size={21}
-          title="Open New Vault"
-        />
+        <IconContext.Provider value={{ color: "gray" }}>
+          <GrNewWindow
+            className="text-gray-100"
+            size={18}
+            title="Open New Vault"
+          />
+        </IconContext.Provider>
       </div>
       <button
         className="bg-transparent border-none pb-2 cursor-pointer flex items-center justify-center w-full"
         onClick={() => setIsSettingsModalOpen(!isSettingsModalOpen)}
       >
-        <MdSettings className="h-6 w-6 text-gray-100" title="Settings" />
+        <IconContext.Provider value={{ color: "gray" }}>
+          <MdSettings
+            size={18}
+            className="h-6 w-6 text-gray-100"
+            title="Settings"
+          />
+        </IconContext.Provider>
       </button>
     </div>
   );

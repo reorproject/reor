@@ -66,7 +66,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     minDate: new Date(0),
     maxDate: new Date(),
   });
-
   const [sidebarWidth, setSidebarWidth] = useState(40);
 
   const handleAddFileToChatFilters = (file: string) => {

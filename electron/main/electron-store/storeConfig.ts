@@ -74,6 +74,7 @@ export interface StoreSchema {
   isSBCompact: boolean;
   DisplayMarkdown: boolean;
   spellCheck: string;
+  EditorFlexCenter: boolean;
 }
 
 export enum StoreKeys {
@@ -93,4 +94,5 @@ export enum StoreKeys {
   IsSBCompact = "isSBCompact",
   DisplayMarkdown = "DisplayMarkdown",
   SpellCheck = "spellCheck",
+  EditorFlexCenter = "editorFlexCenter",
 }
