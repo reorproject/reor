@@ -140,20 +140,21 @@ const TitleBar: React.FC<TitleBarProps> = ({
 
       <div className="relative flex-grow">
         <div
-          className="absolute top-0 bottom-0 overflow-hidden scrollable-x-thin overflow-y-hidden"
+          className="absolute top-0 bottom-0 left-0 overflow-x-auto scrollable-x-thin overflow-y-hidden"
           style={{
-            left: `${sidebarWidth}px`,
+            left: `${sidebarWidth - 25}px`,
             right: "15px",
-            WebkitAppRegion: "no-drag",
           }}
         >
-          <DraggableTabs
-            openTabs={openTabs}
-            setOpenTabs={setOpenTabs}
-            onTabSelect={handleTabSelect}
-            onTabClose={handleTabClose}
-            currentFilePath={currentFilePath}
-          />
+          <div className="flex whitespace-nowrap">
+            <DraggableTabs
+              openTabs={openTabs}
+              setOpenTabs={setOpenTabs}
+              onTabSelect={handleTabSelect}
+              onTabClose={handleTabClose}
+              currentFilePath={currentFilePath}
+            />
+          </div>
         </div>
       </div>
 

@@ -39,8 +39,8 @@ a {
 
 #titleBarSingleTab {
   -webkit-app-region: no-drag;
-  height: 20px;
-  padding-top: 30px;
+  padding-top: 25px;
+  padding-bottom: 25px;
 }
 
 button {
@@ -54,18 +54,34 @@ button {
 
 ::-webkit-scrollbar {
   width: 7px;
-  /* Adjust the width of the scrollbar */
 }
 
 ::-webkit-scrollbar-track {
   background: transparent;
-  /* Make the scrollbar track transparent */
 }
 
 ::-webkit-scrollbar-thumb {
   background: rgb(112, 112, 112);
-  /* Set the thumb color */
   border-radius: 10px;
+}
+
+/* X Scrollbar */
+.scrollable-x-thin::-webkit-scrollbar {
+  height: 3px;
+}
+
+.scrollable-x-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollable-x-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(95, 125, 139, 0.5);
+  border-radius: 2px;
+}
+
+.scrollable-x-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
 }
 
 

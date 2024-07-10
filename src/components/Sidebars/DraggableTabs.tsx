@@ -1,4 +1,6 @@
 import React from "react";
+import { removeFileExtension } from "@/utils/strings";
+import { FaPlus } from "react-icons/fa6";
 
 interface DraggableTabsProps {
   openTabs: Tab[];
@@ -49,7 +51,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
   };
 
   return (
-    <div className="flex whitespace-nowrap custom-scrollbar">
+    <div className="flex whitespace-nowrap custom-scrollbar items-center relative">
       {openTabs.map((tab) => (
         <div
           id="titleBarSingleTab"
@@ -62,16 +64,17 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
             onDragStart={(event) => onDragStart(event, tab.id)}
             onDrop={onDrop}
             onDragOver={onDragOver}
-            className={`py-2 px-2 text-white cursor-pointer flex justify-center gap-1 items-center text-sm ${
-              currentFilePath === tab.filePath
-                ? "bg-dark-gray-c-three rounded-md"
-                : "rounded-md"
-            }`}
+            className={`relative py-2 px-2 text-white cursor-pointer flex justify-between gap-1 items-center text-sm w-[150px]
+              ${
+                currentFilePath === tab.filePath
+                  ? "bg-dark-gray-c-three rounded-md"
+                  : "rounded-md"
+              }`}
             onClick={() => onTabSelect(tab.filePath)}
           >
-            {tab.title}
+            <span className="truncate">{removeFileExtension(tab.title)}</span>
             <span
-              className="text-md cursor-pointer px-1 hover:bg-dark-gray-c-five hover:rounded-md"
+              className="text-md cursor-pointer px-1 hover:bg-dark-gray-c-five hover:rounded-m"
               onClick={(e) => {
                 e.stopPropagation(); // Prevent triggering onClick of parent div
                 onTabClose(e, tab.id);
@@ -82,6 +85,13 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
           </div>
         </div>
       ))}
+      <div
+        className="flex items-center justify-center px-2 hover:rounded-md hover:bg-dark-gray-c-three cursor-pointer text-white ml-1 h-[28px]"
+        style={{ WebkitAppRegion: "no-drag" }}
+        onClick={() => console.log("Add button clicked")}
+      >
+        <FaPlus size={13} />
+      </div>
     </div>
   );
 };
