@@ -11,7 +11,7 @@ import {
 } from "openai/resources/chat/completions";
 
 import { customFetchUsingElectronNetStreaming } from "../../Generic/network";
-import { LLMSessionService } from "../Types";
+import { LLMSessionService } from "../types";
 
 export class OpenAIModelSessionService implements LLMSessionService {
   public getTokenizer = (llmName: string): ((text: string) => number[]) => {
