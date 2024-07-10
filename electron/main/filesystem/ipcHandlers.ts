@@ -307,7 +307,6 @@ export const registerFileHandlers = (
       event,
       { prompt, llmName, filePath }: AugmentPromptWithFileProps
     ): Promise<string> => {
-      // actual response required { question: string, answer: string} []
       const llmSession = openAISession;
       console.log("llmName:   ", llmName);
       const llmConfig = await getLLMConfig(store, ollamaService, llmName);
