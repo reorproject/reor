@@ -59,7 +59,7 @@ const CloudLLMSetupModal: React.FC<CloudLLMSetupModalProps> = ({
   };
 
   return (
-    <ReorModal isOpen={isOpen} onClose={handleSave} widthType="newNote">
+    <ReorModal isOpen={isOpen} onClose={handleSave} width="500px">
       <div className="w-[300px] ml-3 mr-2 mb-2">
         <h3 className="font-semibold mb-0 text-white">
           {LLMDisplayName} Setup
@@ -96,16 +96,16 @@ const CloudLLMSetupModal: React.FC<CloudLLMSetupModalProps> = ({
 
 const openAIDefaultModels: OpenAILLMConfig[] = [
   {
-    contextLength: 16385,
-    modelName: "gpt-3.5-turbo",
+    contextLength: 128000,
+    modelName: "gpt-4o",
     engine: "openai",
     type: "openai",
     apiKey: "",
     apiURL: "",
   },
   {
-    contextLength: 128000,
-    modelName: "gpt-4o",
+    contextLength: 16385,
+    modelName: "gpt-3.5-turbo",
     engine: "openai",
     type: "openai",
     apiKey: "",

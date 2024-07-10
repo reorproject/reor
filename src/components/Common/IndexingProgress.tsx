@@ -35,7 +35,7 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({
       isOpen={true}
       onClose={() => console.log("Not allowing a close for now")}
       hideCloseButton={true}
-      widthType="indexingProgress"
+      width="850px"
     >
       <div className="w-[500px] h-[100px] ml-3 mb-3 mt-2 mr-3">
         <h6 className="mt-2 mb-2 text-2xl font-semibold text-white">

@@ -60,7 +60,7 @@ const InitialSetupLLMSettings: React.FC<InitialSetupLLMSettingsProps> = ({
             setIsSetupModalOpen(false);
             fetchAndUpdateModelConfigs();
           }}
-          widthType="newNote"
+          width="500px"
         >
           <LLMSettingsContent
             userHasCompleted={userHasCompleted}
