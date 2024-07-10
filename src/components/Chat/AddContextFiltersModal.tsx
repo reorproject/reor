@@ -120,7 +120,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
 
   return (
     <ReorModal isOpen={isOpen} onClose={onClose}>
-      <div className="ml-6 mt-2 mb-6 h-full w-[800px] max-h-[90vh] overflow-y-auto overflow-x-hidden">
+      <div className="ml-6 mt-2 mb-6 h-full w-[800px] max-h-[90vh] overflow-y-auto overflow-x-hidden p-4">
         <h4 className="text-white text-2xl mb-4 text-center">
           Choose specific context files or customise the RAG search
         </h4>

@@ -6,47 +6,7 @@ interface ModalProps {
   children: React.ReactNode;
   hideCloseButton?: boolean;
   tailwindStylesOnBackground?: string;
-  widthType?: ModalWidthType;
 }
-
-/*
- * Modal is used in many places for different functions. The dimensions that newNote window
- * should display is different than what settings should be. This is a wrapper to select the width
- * that should be displayed.
- */
-type ModalWidthType =
-  | "newNote"
-  | "newDirectory"
-  | "renameNote"
-  | "renameDirectory"
-  | "flashcardMode"
-  | "flashcardReviewMode"
-  | "newEmbeddingModel"
-  | "localLLMSetting"
-  | "remoteLLMSetting"
-  | "indexingProgress";
-
-type Dimension = "[500px]" | "[750px]" | "[300px]" | "full" | "[850px]";
-
-const customDimensionsMap: Record<ModalWidthType, Dimension> = {
-  newNote: "[500px]",
-  newDirectory: "[500px]",
-  renameNote: "[500px]",
-  renameDirectory: "[500px]",
-  flashcardMode: "[750px]",
-  flashcardReviewMode: "[300px]",
-  newEmbeddingModel: "[500px]",
-  localLLMSetting: "[500px]",
-  remoteLLMSetting: "[500px]",
-  indexingProgress: "[850px]",
-};
-
-const getDimension = (name: ModalWidthType | undefined): Dimension => {
-  if (name === undefined) {
-    return "full";
-  }
-  return customDimensionsMap[name] || "full";
-};
 
 const ReorModal: React.FC<ModalProps> = ({
   isOpen,
@@ -54,10 +14,9 @@ const ReorModal: React.FC<ModalProps> = ({
   children,
   hideCloseButton,
   tailwindStylesOnBackground,
-  widthType,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
-  const widthClass = getDimension(widthType as ModalWidthType);
+  // const widthClass = getDimension(widthType as ModalWidthType);
 
   const handleOffClick = (event: MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
@@ -78,11 +37,11 @@ const ReorModal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 ${tailwindStylesOnBackground}`}
+      className={`fixed inset-0 z-50 flex items-center justify-center h-full bg-black bg-opacity-40 ${tailwindStylesOnBackground}`}
     >
       <div
         ref={modalRef}
-        className={`bg-dark-gray-c-three rounded-lg shadow-xl w-${widthClass} max-w-4xl flex flex-col justify-center items-center border-solid border-gray-600 border`}
+        className={`bg-dark-gray-c-three rounded-lg shadow-xl  max-w-4xl max-h-3xl flex flex-col justify-center items-center border-solid border-gray-600 border`}
       >
         <div className="w-full items-end border-b border-gray-700 px-4 h-0 z-50">
           {!hideCloseButton && (
