@@ -59,7 +59,7 @@ const CloudLLMSetupModal: React.FC<CloudLLMSetupModalProps> = ({
   };
 
   return (
-    <ReorModal isOpen={isOpen} onClose={handleSave} width="500px">
+    <ReorModal isOpen={isOpen} onClose={handleSave}>
       <div className="w-[300px] ml-3 mr-2 mb-2">
         <h3 className="font-semibold mb-0 text-white">
           {LLMDisplayName} Setup

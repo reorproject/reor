@@ -53,11 +53,7 @@ const NewLocalEmbeddingModelModal: React.FC<
   };
 
   return (
-    <ReorModal
-      isOpen={isOpen}
-      onClose={saveModelConfigToElectronStore}
-      width="500px"
-    >
+    <ReorModal isOpen={isOpen} onClose={saveModelConfigToElectronStore}>
       <div className="w-[400px] ml-2 mr-2 mb-2 pl-3">
         <h3 className="text-white font-semibold mb-0">
           Upload and attach local model

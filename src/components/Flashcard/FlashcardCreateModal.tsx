@@ -107,7 +107,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
 
   return (
     <ReorModal isOpen={isOpen} onClose={onClose}>
-      <div className="ml-6 mt-2 mb-6 w-[800px] h-full">
+      <div className="ml-6 mt-2 mb-6 mr-6 w-[800px] h-full">
         <h2 className="text-xl font-semibold mb-3 text-white">
           Select a file to generate flashcards for:
           <input

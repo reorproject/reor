@@ -1,14 +1,11 @@
 import React, { useRef, useEffect } from "react";
 
-type ValidDimension = "500px" | "750px" | "300px" | "full" | "850px";
-
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: React.ReactNode;
   hideCloseButton?: boolean;
   tailwindStylesOnBackground?: string;
-  width?: ValidDimension;
 }
 
 const ReorModal: React.FC<ModalProps> = ({
@@ -17,7 +14,6 @@ const ReorModal: React.FC<ModalProps> = ({
   children,
   hideCloseButton,
   tailwindStylesOnBackground,
-  width,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   // const widthClass = getDimension(widthType as ModalWidthType);
@@ -41,11 +37,11 @@ const ReorModal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 ${tailwindStylesOnBackground}`}
+      className={`fixed inset-0 z-50 flex items-center justify-center h-full bg-black bg-opacity-40 ${tailwindStylesOnBackground}`}
     >
       <div
         ref={modalRef}
-        className={`bg-dark-gray-c-three rounded-lg shadow-xl w-[${width}] max-w-4xl flex flex-col justify-center items-center border-solid border-gray-600 border`}
+        className={`bg-dark-gray-c-three rounded-lg shadow-xl  max-w-4xl max-h-3xl flex flex-col justify-center items-center border-solid border-gray-600 border`}
       >
         <div className="w-full items-end border-b border-gray-700 px-4 h-0 z-50">
           {!hideCloseButton && (
