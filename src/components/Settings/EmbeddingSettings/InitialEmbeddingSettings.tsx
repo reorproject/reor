@@ -94,17 +94,19 @@ const InitialEmbeddingModelSettings: React.FC<
         value={selectedModel}
         onChange={handleChangeOnModelSelect}
       /> */}
-      <CustomSelect
-        options={Object.keys(embeddingModels).map((model) => {
-          return { label: model, value: model };
-        })}
-        selectedValue={selectedModel}
-        onChange={handleChangeOnModelSelect}
-        addButton={{
-          label: "Attach a Custom Embedding Model",
-          onClick: () => setShowNewEmbeddingModelModal(true),
-        }}
-      />
+      <div className="w-[200px]">
+        <CustomSelect
+          options={Object.keys(embeddingModels).map((model) => {
+            return { label: model, value: model };
+          })}
+          selectedValue={selectedModel}
+          onChange={handleChangeOnModelSelect}
+          addButton={{
+            label: "Attach a Custom Embedding Model",
+            onClick: () => setShowNewEmbeddingModelModal(true),
+          }}
+        />
+      </div>
       <NewEmbeddingModelModalBothTypes
         isOpen={showNewEmbeddingModelModal}
         onClose={() => {

@@ -60,9 +60,9 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   };
 
   return (
-    <div className="flex flex-end" ref={wrapperRef}>
+    <div className="flex flex-end w-full" ref={wrapperRef}>
       <div
-        className="flex justify-between items-center w-[192px] py-2 border border-gray-300 rounded-md cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten"
+        className="flex justify-between w-full items-center  py-2 border border-gray-300 rounded-md cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten"
         onClick={toggleDropdown}
       >
         {centerText ? <span></span> : null}
@@ -76,7 +76,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       </div>
       {isOpen && (
         <div
-          className="absolute w-[192px] text-[13px] border text-gray-600 border-gray-300 rounded-md shadow-lg z-10 bg-white max-h-60 overflow-auto"
+          className="absolute  text-[13px] border text-gray-600 border-gray-300 rounded-md shadow-lg z-10 bg-white max-h-60 overflow-auto"
           style={{
             position: "fixed",
             top: "auto",
