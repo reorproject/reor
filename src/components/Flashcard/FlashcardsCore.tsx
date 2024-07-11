@@ -42,8 +42,8 @@ export const FlashcardCore = ({
             flipDirection="vertical"
           >
             <Button
-              className="bg-orange-900  mt-3 mb-2 border-none rounded-md h-10
-            cursor-pointer w-[900px] h-full
+              className="bg-orange-900  mt-3 mb-2 border-none rounded-md 
+            cursor-pointer w-full h-full
             text-center text-lg normal-case"
               onClick={() =>
                 updateFlashcardUnderReview(currentSelectedFlashcard, {
@@ -60,8 +60,8 @@ export const FlashcardCore = ({
             </Button>
             {flashcardQAPairs[currentSelectedFlashcard].isFlipped && ( // this boolean is required to ensure that we check the flipped boolean to prevent the answer from leaking
               <Button
-                className="bg-slate-700 mt-3 mb-2 border-none rounded-md h-10
-              hover:bg-slate-900 cursor-pointer w-[900px] h-full
+                className="bg-slate-700 mt-3 mb-2 border-none rounded-md 
+              hover:bg-slate-900 cursor-pointer w-full h-full
               text-center text-lg normal-case"
                 onClick={() =>
                   updateFlashcardUnderReview(currentSelectedFlashcard, {

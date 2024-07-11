@@ -52,7 +52,7 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = ({
       {llmConfigs.length > 0 && (
         <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2">
           <h4 className="text-gray-200 text-center font-normal">Default LLM</h4>
-          <div className="mb-1">
+          <div className="mb-1 w-[140px]">
             <DefaultLLMSelector
               onModelChange={handleModelChange}
               llmConfigs={llmConfigs}
