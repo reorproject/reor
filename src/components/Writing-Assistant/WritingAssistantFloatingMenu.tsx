@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
 import { MessageStreamEvent } from "@anthropic-ai/sdk/resources";
+import Button from "@mui/material/Button";
 import { Editor } from "@tiptap/react";
 import { ChatCompletionChunk } from "openai/resources/chat/completions";
 import { FaMagic } from "react-icons/fa";
@@ -240,7 +241,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
         style={{
           top: `${highlightData.position.top}px`,
           left: `${highlightData.position.left + 30}px`,
-          zIndex: 1000,
+          zIndex: 50,
         }}
         className="absolute w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer text-gray-600 border-none shadow-md hover:bg-gray-300"
         aria-label="Writing Assistant button"
@@ -252,34 +253,49 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
         <div
           ref={optionsContainerRef}
           style={{
-            position: "absolute",
             top: highlightData.position.top,
             left: highlightData.position.left,
-            background: "white",
-            border: "1px solid #ccc",
-            padding: "10px",
-            zIndex: 1000,
           }}
+          className="absolute bg-white border border-gray-300 p-2.5 z-50 w-64 rounded-md"
         >
-          <button onClick={() => handleOption("simplify")}>Simplify</button>
-          <button onClick={() => handleOption("copy-editor")}>
-            Copy Editor
-          </button>
-          <button onClick={() => handleOption("takeaways")}>
-            Key Takeaways
-          </button>
           <input
             type="text"
             value={customPrompt}
             onChange={(e) => setCustomPrompt(e.target.value)}
-            placeholder="Enter your custom prompt"
-            style={{ margin: "10px 0", padding: "5px" }}
+            placeholder="Ask AI anything..."
+            className="mb-2.5 p-1 w-full" // TailwindCSS classes for styling
+            onKeyPress={(e) => {
+              if (e.key === "Enter") {
+                handleOption("custom", customPrompt);
+              }
+            }}
           />
-          <button onClick={() => handleOption("custom", customPrompt)}>
-            Submit Custom Prompt
-          </button>
+          <div className="max-h-36 overflow-y-auto">
+            <Button
+              onClick={() => handleOption("simplify")}
+              className="block w-full mb-1"
+              style={{ textTransform: "none" }}
+            >
+              Simplify
+            </Button>
+            <Button
+              onClick={() => handleOption("copy-editor")}
+              className="block w-full mb-1"
+              style={{ textTransform: "none" }}
+            >
+              Copy Editor
+            </Button>
+            <Button
+              onClick={() => handleOption("takeaways")}
+              className="block w-full mb-1"
+              style={{ textTransform: "none" }}
+            >
+              Key Takeaways
+            </Button>
+          </div>
         </div>
       )}
+
       <div
         ref={markdownContainerRef}
         style={{
@@ -311,7 +327,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
                 : formatOpenAIMessageContentIntoString(message.content)}
             </ReactMarkdown>
           ))}
-        <button onClick={replaceHighlightedText}>Replace</button>
+        {/* <button onClick={replaceHighlightedText}>Replace</button> */}
       </div>
     </div>
   );
