@@ -32,6 +32,9 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   const [isOptionsVisible, setIsOptionsVisible] = useState<boolean>(false);
   const markdownContainerRef = useRef(null);
   const optionsContainerRef = useRef(null);
+  const hasValidMessages = currentChatHistory?.displayableChatHistory.some(
+    (msg) => msg.role !== "system" && msg.role !== "user"
+  );
 
   useOutsideClick(markdownContainerRef, () => {
     setCurrentChatHistory(undefined);
@@ -249,14 +252,14 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
       >
         <FaMagic />
       </button>
-      {isOptionsVisible && (
+      {!hasValidMessages && isOptionsVisible && (
         <div
           ref={optionsContainerRef}
           style={{
             top: highlightData.position.top,
             left: highlightData.position.left,
           }}
-          className="absolute bg-white border border-gray-300 p-2.5 z-50 w-64 rounded-md"
+          className="absolute bg-white border border-gray-300 p-2.5 z-50 w-96 rounded-md"
         >
           <input
             type="text"
@@ -276,59 +279,96 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
               className="block w-full mb-1"
               style={{ textTransform: "none" }}
             >
-              Simplify
+              Simplify and condense the writing
             </Button>
             <Button
               onClick={() => handleOption("copy-editor")}
               className="block w-full mb-1"
               style={{ textTransform: "none" }}
             >
-              Copy Editor
+              Fix spelling and grammar
             </Button>
             <Button
               onClick={() => handleOption("takeaways")}
               className="block w-full mb-1"
               style={{ textTransform: "none" }}
             >
-              Key Takeaways
+              List key Takeaways
             </Button>
           </div>
         </div>
       )}
-
-      <div
-        ref={markdownContainerRef}
-        style={{
-          position: "absolute",
-          top: highlightData.position.top,
-          left: highlightData.position.left,
-          // background: "white",
-          // border: "1px solid #ccc",
-          // padding: "10px",
-          zIndex: 1000,
-        }}
-      >
-        {currentChatHistory?.displayableChatHistory
-          .filter((msg) => msg.role !== "system" && msg.role !== "user")
-          .map((message, index) => (
-            <ReactMarkdown
-              key={index}
-              rehypePlugins={[rehypeRaw]}
-              className={`p-1 pl-1 markdown-content rounded-lg break-words ${
-                message.messageType === "error"
-                  ? "bg-red-100 text-red-800"
-                  : message.role === "assistant"
-                  ? "bg-neutral-600	text-gray-200"
-                  : "bg-blue-100	text-blue-800"
-              } `}
+      {hasValidMessages && (
+        <div
+          ref={markdownContainerRef}
+          style={{
+            position: "absolute",
+            top: highlightData.position.top,
+            left: highlightData.position.left,
+            background: "white",
+            border: "1px solid #ccc",
+            borderRadius: "10px",
+            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+            padding: "10px",
+            zIndex: 1000,
+            width: "385px",
+          }}
+        >
+          {currentChatHistory?.displayableChatHistory
+            .filter((msg) => msg.role !== "system" && msg.role !== "user")
+            .map((message, index) => (
+              <ReactMarkdown
+                key={index}
+                rehypePlugins={[rehypeRaw]}
+                className={`p-1 markdown-content break-words ${
+                  message.messageType === "error"
+                    ? "bg-red-100 text-red-800"
+                    : message.role === "assistant"
+                    ? "bg-neutral-600 text-gray-200"
+                    : "bg-blue-100 text-blue-800"
+                }`}
+              >
+                {message.visibleContent
+                  ? message.visibleContent
+                  : formatOpenAIMessageContentIntoString(message.content)}
+              </ReactMarkdown>
+            ))}
+          <div className="flex justify-between mt-2">
+            <button
+              className="bg-blue-100 border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center mr-1"
+              onClick={() => {
+                /* Handle Re-run action */
+              }}
             >
-              {message.visibleContent
-                ? message.visibleContent
-                : formatOpenAIMessageContentIntoString(message.content)}
-            </ReactMarkdown>
-          ))}
-        {/* <button onClick={replaceHighlightedText}>Replace</button> */}
-      </div>
+              Re-run
+            </button>
+            <button
+              className="bg-blue-100 border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center mr-1"
+              onClick={() => {
+                /* Handle Insert action */
+              }}
+            >
+              Insert
+            </button>
+            <button
+              className="bg-blue-100 border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center mr-1"
+              onClick={() => {
+                /* Handle Copy action */
+              }}
+            >
+              Copy
+            </button>
+            <button
+              className="bg-indigo-700 text-white border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center"
+              onClick={() => {
+                /* Handle Replace action */
+              }}
+            >
+              Replace
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
