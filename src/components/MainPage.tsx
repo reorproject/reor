@@ -176,6 +176,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
               />{" "}
             </div>
             <WritingAssistant
+              editor={editor}
               highlightData={highlightData}
               currentChatHistory={currentChatHistory}
               setCurrentChatHistory={setCurrentChatHistory}

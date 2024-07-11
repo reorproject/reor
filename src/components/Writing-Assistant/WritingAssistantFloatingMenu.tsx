@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
 import { MessageStreamEvent } from "@anthropic-ai/sdk/resources";
+import { Editor } from "@tiptap/react";
 import { ChatCompletionChunk } from "openai/resources/chat/completions";
 import { FaMagic } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
@@ -11,6 +12,7 @@ import { formatOpenAIMessageContentIntoString } from "../Chat/chatUtils";
 import { useOutsideClick } from "../Chat/hooks/use-outside-click";
 import { HighlightData } from "../Editor/HighlightExtension";
 interface WritingAssistantProps {
+  editor: Editor | null;
   highlightData: HighlightData;
   currentChatHistory: ChatHistory | undefined;
   setCurrentChatHistory: React.Dispatch<
@@ -19,6 +21,7 @@ interface WritingAssistantProps {
 }
 
 const WritingAssistant: React.FC<WritingAssistantProps> = ({
+  editor,
   highlightData,
   currentChatHistory,
   setCurrentChatHistory,
@@ -35,6 +38,34 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   useOutsideClick(optionsContainerRef, () => {
     setIsOptionsVisible(false);
   });
+
+  const replaceHighlightedText = () => {
+    if (
+      !editor ||
+      !currentChatHistory ||
+      currentChatHistory.displayableChatHistory.length === 0
+    ) {
+      console.error("No chat history available for replacement.");
+      return;
+    }
+
+    const llmResponse =
+      currentChatHistory.displayableChatHistory[
+        currentChatHistory.displayableChatHistory.length - 1
+      ];
+
+    const replacementText = llmResponse.visibleContent
+      ? llmResponse.visibleContent
+      : formatOpenAIMessageContentIntoString(llmResponse.content);
+
+    editor
+      .chain()
+      .focus()
+      .deleteSelection()
+      .insertContent(replacementText)
+      .run();
+  };
+
   const appendNewContentToMessageHistory = (
     chatID: string,
     newContent: string,
@@ -280,6 +311,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
                 : formatOpenAIMessageContentIntoString(message.content)}
             </ReactMarkdown>
           ))}
+        <button onClick={replaceHighlightedText}>Replace</button>
       </div>
     </div>
   );
