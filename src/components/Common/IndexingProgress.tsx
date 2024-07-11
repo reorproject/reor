@@ -48,7 +48,7 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({
           }`}
         >
           <div
-            className="bg-blue-400 h-full transition-all duration-300 ease-out"
+            className="bg-blue-600 h-full transition-all duration-300 ease-out"
             style={{ width: `${indexingProgress * 100}%` }}
           ></div>
         </div>

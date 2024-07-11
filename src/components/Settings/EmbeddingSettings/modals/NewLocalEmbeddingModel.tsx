@@ -103,14 +103,14 @@ const NewLocalEmbeddingModelModal: React.FC<
         )}
         <div className="flex justify-between gap-3 pb-2">
           <Button
-            className="bg-transparent border-2 border-blue-300 h-8 hover:bg-blue-400 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-3 rounded"
+            className="bg-transparent border-2 border-blue-300 h-8 hover:bg-blue-600 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-3 rounded"
             onClick={onClose}
             placeholder=""
           >
             Discard
           </Button>
           <Button
-            className="bg-blue-400 h-8 hover:bg-transparent border-2 border-blue-800 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-3 rounded"
+            className="bg-blue-600 h-8 hover:bg-transparent border-2 border-blue-800 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-3 rounded"
             onClick={saveModelConfigToElectronStore}
             placeholder=""
           >

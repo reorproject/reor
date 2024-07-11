@@ -45,9 +45,7 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
           </p>
           <div className="flex justify-between items-center mt-10 border-b-2 border-solid border-neutral-700 border-0 pb-4">
             <div className="flex-col w-80">
-              <p className="text-gray-100 m-0">
-                Choose your vaut directory here:
-              </p>
+              <p className="text-gray-100 m-0">Vault Directory</p>
               <p className="text-xs text-gray-100 w-50 m-0 pt-1 opacity-40">
                 Your vault directory doesn&apos;t need to be empty. Only
                 markdown files will be indexed.
@@ -71,7 +69,7 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
         </div>
         <div className="flex justify-end">
           <Button
-            className="bg-blue-300 mt-4 mb-3  border-none h-10 hover:bg-blue-400 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
+            className="bg-blue-500 mt-4 mb-3  border-none h-10 hover:bg-blue-600 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
             onClick={handleNext}
             placeholder=""
           >

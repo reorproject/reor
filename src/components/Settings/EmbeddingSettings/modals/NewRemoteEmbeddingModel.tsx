@@ -77,7 +77,7 @@ const NewRemoteEmbeddingModelModal: React.FC<
 
         <div className="w-full flex justify-end pb-2">
           <Button
-            className="bg-blue-300 border-none h-8 hover:bg-blue-400 cursor-pointer w-[120px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
+            className="bg-blue-500 border-none h-8 hover:bg-blue-600 cursor-pointer w-[120px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
             onClick={saveModelConfigToElectronStore}
             placeholder=""
           >

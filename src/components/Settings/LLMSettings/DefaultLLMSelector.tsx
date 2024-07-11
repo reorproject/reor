@@ -37,6 +37,7 @@ const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({
       options={modelOptions}
       selectedValue={defaultLLM}
       onChange={handleDefaultModelChange}
+      centerText={true}
     />
   );
 };
