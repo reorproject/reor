@@ -66,7 +66,9 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         onClick={toggleDropdown}
       >
         {centerText ? <span></span> : null}
-        <span className="pl-6 text-[13px] text-gray-100">{selectedValue}</span>
+        <span className="pl-2 pr-2 text-[13px] text-gray-100">
+          {selectedValue}
+        </span>
         <span
           className="transform transition-transform mr-2"
           style={{ transform: isOpen ? "rotate(180deg)" : "none" }}

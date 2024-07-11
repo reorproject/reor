@@ -110,7 +110,7 @@ const RenameDirModal: React.FC<RenameDirModalProps> = ({
           placeholder="New directory Name"
         />
         <Button
-          className="bg-orange-700 mt-3 mb-2 border-none h-10 hover:bg-orange-900 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
+          className="bg-blue-600 mt-3 mb-2 border-none h-10 hover:bg-blue-600 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
           onClick={sendDirRename}
           placeholder={""}
           disabled={isUpdatingDirName}

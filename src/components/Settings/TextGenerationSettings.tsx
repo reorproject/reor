@@ -137,7 +137,7 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
             // variant="contained"
             placeholder={""}
             onClick={handleSave}
-            className="bg-orange-700 w-[150px] border-none h-8 hover:bg-orange-900 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mb-0 mr-4 mt-2"
+            className="bg-blue-500 w-[150px] border-none h-8 hover:bg-blue-600 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mb-0 mr-4 mt-2"
           >
             Save
           </Button>

@@ -83,7 +83,7 @@ const CloudLLMSetupModal: React.FC<CloudLLMSetupModalProps> = ({
         </p>
 
         <Button
-          className="bg-blue-300  border-none h-8 hover:bg-blue-400 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mt-1 w-[80px]"
+          className="bg-blue-500  border-none h-8 hover:bg-blue-600 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mt-1 w-[80px]"
           onClick={handleSave}
           placeholder=""
         >
