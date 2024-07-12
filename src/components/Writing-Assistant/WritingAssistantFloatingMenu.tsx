@@ -31,11 +31,15 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
   const [customPrompt, setCustomPrompt] = useState<string>("");
   const [isOptionsVisible, setIsOptionsVisible] = useState<boolean>(false);
+  const [prevPrompt, setPrevPrompt] = useState<string>("");
   const markdownContainerRef = useRef(null);
   const optionsContainerRef = useRef(null);
   const hasValidMessages = currentChatHistory?.displayableChatHistory.some(
-    (msg) => msg.role !== "system" && msg.role !== "user"
+    (msg) => msg.role === "assistant"
   );
+  const lastAssistantMessage = currentChatHistory?.displayableChatHistory
+    .filter((msg) => msg.role === "assistant")
+    .pop();
 
   useOutsideClick(markdownContainerRef, () => {
     setCurrentChatHistory(undefined);
@@ -49,7 +53,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       !currentChatHistory ||
       currentChatHistory.displayableChatHistory.length === 0
     ) {
-      console.error("No chat history available for replacement.");
+      console.error("No chat history available for copying.");
       return;
     }
     const llmResponse =
@@ -90,18 +94,16 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       ? llmResponse.visibleContent
       : formatOpenAIMessageContentIntoString(llmResponse.content);
 
-    // Ensure the editor is focused
     editor.view.focus();
 
-    // Move the selection to the end of the current selection
     const { from, to } = editor.state.selection;
     const endOfSelection = Math.max(from, to);
 
     editor
       .chain()
       .focus()
-      .setTextSelection(endOfSelection) // Set the cursor position to the end of the current selection
-      .insertContent("\n" + insertionText) // Insert the new content after the current selection
+      .setTextSelection(endOfSelection)
+      .insertContent("\n" + insertionText)
       .run();
   };
 
@@ -248,10 +250,8 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
             ` ,apply the prompt to the text in triple quotes """ ${selectedText} """` ||
           "default prompt";
         break;
-      default:
-        prompt = "default prompt";
     }
-
+    setPrevPrompt(prompt);
     await getLLMResponse(prompt, currentChatHistory);
   };
 
@@ -378,30 +378,29 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
             width: "385px",
           }}
         >
-          {currentChatHistory?.displayableChatHistory
-            .filter((msg) => msg.role !== "system" && msg.role !== "user")
-            .map((message, index) => (
-              <ReactMarkdown
-                key={index}
-                rehypePlugins={[rehypeRaw]}
-                className={`p-1 markdown-content break-words rounded-md ${
-                  message.messageType === "error"
-                    ? "bg-red-100 text-red-800"
-                    : message.role === "assistant"
-                    ? "bg-neutral-200 text-black"
-                    : "bg-blue-100 text-blue-800"
-                }`}
-              >
-                {message.visibleContent
-                  ? message.visibleContent
-                  : formatOpenAIMessageContentIntoString(message.content)}
-              </ReactMarkdown>
-            ))}
+          {lastAssistantMessage && (
+            <ReactMarkdown
+              rehypePlugins={[rehypeRaw]}
+              className={`p-1 markdown-content break-words rounded-md ${
+                lastAssistantMessage.messageType === "error"
+                  ? "bg-red-100 text-red-800"
+                  : lastAssistantMessage.role === "assistant"
+                  ? "bg-neutral-200 text-black"
+                  : "bg-blue-100 text-blue-800"
+              }`}
+            >
+              {lastAssistantMessage.visibleContent
+                ? lastAssistantMessage.visibleContent
+                : formatOpenAIMessageContentIntoString(
+                    lastAssistantMessage.content
+                  )}
+            </ReactMarkdown>
+          )}
           <div className="flex justify-between mt-2">
             <button
               className="bg-blue-100 border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center mr-1"
               onClick={() => {
-                /* Handle Re-run action */
+                getLLMResponse(prevPrompt, currentChatHistory);
               }}
             >
               Re-run
@@ -425,7 +424,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
             <button
               className="bg-indigo-700 text-white border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center"
               onClick={() => {
-                /* Handle Replace action */
+                replaceHighlightedText();
               }}
             >
               Replace
