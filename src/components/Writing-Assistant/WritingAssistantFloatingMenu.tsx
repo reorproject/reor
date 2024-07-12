@@ -112,6 +112,8 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       .setTextSelection(endOfSelection)
       .insertContent("\n" + insertionText)
       .run();
+
+    setCurrentChatHistory(undefined);
   };
 
   const replaceHighlightedText = () => {
@@ -139,90 +141,9 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       .deleteSelection()
       .insertContent(replacementText)
       .run();
+
+    setCurrentChatHistory(undefined);
   };
-
-  const appendNewContentToMessageHistory = (
-    chatID: string,
-    newContent: string,
-    newMessageType: "success" | "error"
-  ) => {
-    setCurrentChatHistory((prev) => {
-      if (chatID !== prev?.id) return prev;
-      const newDisplayableHistory = prev?.displayableChatHistory || [];
-      if (newDisplayableHistory.length > 0) {
-        const lastMessage =
-          newDisplayableHistory[newDisplayableHistory.length - 1];
-
-        if (lastMessage.role === "assistant") {
-          lastMessage.content += newContent; // Append new content with a space
-          lastMessage.messageType = newMessageType;
-        } else {
-          newDisplayableHistory.push({
-            role: "assistant",
-            content: newContent,
-            messageType: newMessageType,
-            context: [],
-          });
-        }
-      } else {
-        newDisplayableHistory.push({
-          role: "assistant",
-          content: newContent,
-          messageType: newMessageType,
-          context: [],
-        });
-      }
-      return {
-        id: prev!.id,
-        displayableChatHistory: newDisplayableHistory,
-        openAIChatHistory: newDisplayableHistory.map((message) => {
-          return {
-            role: message.role,
-            content: message.content,
-          };
-        }),
-      };
-    });
-  };
-
-  useEffect(() => {
-    const handleOpenAIChunk = async (
-      receivedChatID: string,
-      chunk: ChatCompletionChunk
-    ) => {
-      const newContent = chunk.choices[0].delta.content ?? "";
-      if (newContent) {
-        appendNewContentToMessageHistory(receivedChatID, newContent, "success");
-      }
-    };
-
-    const handleAnthropicChunk = async (
-      receivedChatID: string,
-      chunk: MessageStreamEvent
-    ) => {
-      const newContent =
-        chunk.type === "content_block_delta" ? chunk.delta.text ?? "" : "";
-      if (newContent) {
-        appendNewContentToMessageHistory(receivedChatID, newContent, "success");
-      }
-    };
-
-    const removeOpenAITokenStreamListener = window.ipcRenderer.receive(
-      "openAITokenStream",
-      handleOpenAIChunk
-    );
-
-    const removeAnthropicTokenStreamListener = window.ipcRenderer.receive(
-      "anthropicTokenStream",
-      handleAnthropicChunk
-    );
-
-    return () => {
-      removeOpenAITokenStreamListener();
-      removeAnthropicTokenStreamListener();
-    };
-  }, []);
-  if (!highlightData.position) return null;
 
   const handleOption = async (option: string, customPromptInput?: string) => {
     const selectedText = highlightData.text;
@@ -307,6 +228,90 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
     }
     setLoadingResponse(false);
   };
+
+  const appendNewContentToMessageHistory = (
+    chatID: string,
+    newContent: string,
+    newMessageType: "success" | "error"
+  ) => {
+    setCurrentChatHistory((prev) => {
+      if (chatID !== prev?.id) return prev;
+      const newDisplayableHistory = prev?.displayableChatHistory || [];
+      if (newDisplayableHistory.length > 0) {
+        const lastMessage =
+          newDisplayableHistory[newDisplayableHistory.length - 1];
+
+        if (lastMessage.role === "assistant") {
+          lastMessage.content += newContent; // Append new content with a space
+          lastMessage.messageType = newMessageType;
+        } else {
+          newDisplayableHistory.push({
+            role: "assistant",
+            content: newContent,
+            messageType: newMessageType,
+            context: [],
+          });
+        }
+      } else {
+        newDisplayableHistory.push({
+          role: "assistant",
+          content: newContent,
+          messageType: newMessageType,
+          context: [],
+        });
+      }
+      return {
+        id: prev!.id,
+        displayableChatHistory: newDisplayableHistory,
+        openAIChatHistory: newDisplayableHistory.map((message) => {
+          return {
+            role: message.role,
+            content: message.content,
+          };
+        }),
+      };
+    });
+  };
+
+  useEffect(() => {
+    const handleOpenAIChunk = async (
+      receivedChatID: string,
+      chunk: ChatCompletionChunk
+    ) => {
+      const newContent = chunk.choices[0].delta.content ?? "";
+      if (newContent) {
+        appendNewContentToMessageHistory(receivedChatID, newContent, "success");
+      }
+    };
+
+    const handleAnthropicChunk = async (
+      receivedChatID: string,
+      chunk: MessageStreamEvent
+    ) => {
+      const newContent =
+        chunk.type === "content_block_delta" ? chunk.delta.text ?? "" : "";
+      if (newContent) {
+        appendNewContentToMessageHistory(receivedChatID, newContent, "success");
+      }
+    };
+
+    const removeOpenAITokenStreamListener = window.ipcRenderer.receive(
+      "openAITokenStream",
+      handleOpenAIChunk
+    );
+
+    const removeAnthropicTokenStreamListener = window.ipcRenderer.receive(
+      "anthropicTokenStream",
+      handleAnthropicChunk
+    );
+
+    return () => {
+      removeOpenAITokenStreamListener();
+      removeAnthropicTokenStreamListener();
+    };
+  }, []);
+
+  if (!highlightData.position) return null;
 
   return (
     <div>
