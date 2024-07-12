@@ -43,7 +43,33 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   useOutsideClick(optionsContainerRef, () => {
     setIsOptionsVisible(false);
   });
+  const copyToClipboard = () => {
+    if (
+      !editor ||
+      !currentChatHistory ||
+      currentChatHistory.displayableChatHistory.length === 0
+    ) {
+      console.error("No chat history available for replacement.");
+      return;
+    }
+    const llmResponse =
+      currentChatHistory.displayableChatHistory[
+        currentChatHistory.displayableChatHistory.length - 1
+      ];
 
+    const copiedText = llmResponse.visibleContent
+      ? llmResponse.visibleContent
+      : formatOpenAIMessageContentIntoString(llmResponse.content);
+
+    navigator.clipboard
+      .writeText(copiedText)
+      .then(() => {
+        console.log("Text copied to clipboard successfully!");
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+      });
+  };
   const replaceHighlightedText = () => {
     if (
       !editor ||
@@ -356,7 +382,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
             <button
               className="bg-blue-100 border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center mr-1"
               onClick={() => {
-                /* Handle Copy action */
+                copyToClipboard();
               }}
             >
               Copy
