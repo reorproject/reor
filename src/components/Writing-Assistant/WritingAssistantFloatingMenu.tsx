@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 
 import { MessageStreamEvent } from "@anthropic-ai/sdk/resources";
 import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
 import { Editor } from "@tiptap/react";
 import { ChatCompletionChunk } from "openai/resources/chat/completions";
 import { FaMagic } from "react-icons/fa";
@@ -261,8 +262,10 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           }}
           className="absolute bg-white border border-gray-300 p-2.5 z-50 w-96 rounded-md"
         >
-          <input
+          <TextField
             type="text"
+            variant="outlined"
+            size="small"
             value={customPrompt}
             onChange={(e) => setCustomPrompt(e.target.value)}
             placeholder="Ask AI anything..."
@@ -320,11 +323,11 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
               <ReactMarkdown
                 key={index}
                 rehypePlugins={[rehypeRaw]}
-                className={`p-1 markdown-content break-words ${
+                className={`p-1 markdown-content break-words rounded-md ${
                   message.messageType === "error"
                     ? "bg-red-100 text-red-800"
                     : message.role === "assistant"
-                    ? "bg-neutral-600 text-gray-200"
+                    ? "bg-neutral-200 text-black"
                     : "bg-blue-100 text-blue-800"
                 }`}
               >
