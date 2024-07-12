@@ -47,6 +47,13 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   useOutsideClick(optionsContainerRef, () => {
     setIsOptionsVisible(false);
   });
+
+  useEffect(() => {
+    if (hasValidMessages) {
+      setIsOptionsVisible(false);
+    }
+  }, [hasValidMessages]);
+
   const copyToClipboard = () => {
     if (
       !editor ||
@@ -177,6 +184,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       };
     });
   };
+
   useEffect(() => {
     const handleOpenAIChunk = async (
       receivedChatID: string,
@@ -310,7 +318,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
         }}
         className="absolute w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer text-gray-600 border-none shadow-md hover:bg-gray-300"
         aria-label="Writing Assistant button"
-        onClick={() => setIsOptionsVisible(!isOptionsVisible)}
+        onClick={() => setIsOptionsVisible(true)}
       >
         <FaMagic />
       </button>
@@ -365,16 +373,10 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
       {hasValidMessages && (
         <div
           ref={markdownContainerRef}
+          className="absolute bg-white border border-gray-300 rounded-lg shadow-md p-2.5 z-50"
           style={{
-            position: "absolute",
             top: highlightData.position.top,
             left: highlightData.position.left,
-            background: "white",
-            border: "1px solid #ccc",
-            borderRadius: "10px",
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-            padding: "10px",
-            zIndex: 1000,
             width: "385px",
           }}
         >
