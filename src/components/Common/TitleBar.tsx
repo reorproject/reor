@@ -8,6 +8,7 @@ export const titleBarHeight = "30px";
 
 interface TitleBarProps {
   onFileSelect: (path: string) => void;
+  setFilePath: (path: string) => void;
   currentFilePath: string | null;
   similarFilesOpen: boolean;
   toggleSimilarFiles: () => void;
@@ -21,6 +22,7 @@ interface TitleBarProps {
 
 const TitleBar: React.FC<TitleBarProps> = ({
   onFileSelect,
+  setFilePath,
   currentFilePath,
   similarFilesOpen,
   toggleSimilarFiles,
@@ -77,17 +79,17 @@ const TitleBar: React.FC<TitleBarProps> = ({
     setOpenTabs((prevTabs) => {
       const index = prevTabs.findIndex((tab) => tab.id === tabId);
       closedFilePath = index !== -1 ? prevTabs[index].filePath : "";
-      newIndex = index > 0 ? index - 1 : 0;
+      newIndex = index > 0 ? index - 1 : 1;
+      if (closedFilePath === currentFilePath) {
+        if (newIndex === -1 || newIndex >= openTabs.length) {
+          openFileAndOpenEditor(""); // If no tabs left or out of range, clear selection
+        } else {
+          openFileAndOpenEditor(openTabs[newIndex].filePath); // Select the new index's file
+        }
+      }
       return prevTabs.filter((tab, idx) => idx !== index);
     });
 
-    if (closedFilePath === filePath) {
-      if (newIndex === -1 || newIndex >= openTabs.length) {
-        openFileAndOpenEditor(""); // If no tabs left or out of range, clear selection
-      } else {
-        openFileAndOpenEditor(openTabs[newIndex].filePath); // Select the new index's file
-      }
-    }
     await window.electronStore.setCurrentOpenFiles("remove", {
       tabId: tabId,
     });

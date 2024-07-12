@@ -14,6 +14,7 @@ import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
 import IconsSidebar from "./Sidebars/IconsSidebar";
 import SidebarManager from "./Sidebars/MainSidebar";
 import SimilarFilesSidebarComponent from "./Sidebars/SimilarFilesSidebar";
+import EmptyPage from "./EmptyPage";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search" | "chats";
@@ -174,7 +175,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
           </div>
         </ResizableComponent>
 
-        {!showChatbot && filePath && (
+        {!showChatbot && filePath ? (
           <div className="relative w-full h-full flex overflow-hidden">
             <div className="flex-grow h-full overflow-hidden">
               <EditorManager
@@ -196,6 +197,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                 />
               </div>
             )}
+          </div>
+        ) : (
+          <div className="relative w-full h-full flex overflow-hidden">
+            <EmptyPage vaultDirectory={vaultDirectory} />
           </div>
         )}
 

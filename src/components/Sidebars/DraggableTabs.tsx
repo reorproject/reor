@@ -17,7 +17,6 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
   onTabClose,
   currentFilePath,
 }) => {
-  console.log("OpenTabs:", openTabs);
   const onDragStart = (event: any, tabId: string) => {
     event.dataTransfer.setData("tabId", tabId);
   };
@@ -85,13 +84,17 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
           </div>
         </div>
       ))}
-      <div
-        className="flex items-center justify-center px-2 hover:rounded-md hover:bg-dark-gray-c-three cursor-pointer text-white ml-1 h-[28px]"
-        style={{ WebkitAppRegion: "no-drag" }}
-        onClick={() => console.log("Add button clicked")}
-      >
-        <FaPlus size={13} />
-      </div>
+      {openTabs.length > 0 && (
+        <div
+          className="flex items-center justify-center px-2 hover:rounded-md hover:bg-dark-gray-c-three cursor-pointer text-white ml-1 h-[28px]"
+          style={{ WebkitAppRegion: "no-drag" }}
+          onClick={() => {
+            window.electronUtils.showCreateFileModal();
+          }}
+        >
+          <FaPlus size={13} />
+        </div>
+      )}
     </div>
   );
 };

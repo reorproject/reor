@@ -61,7 +61,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
     };
 
     window.ipcRenderer.receive(
-      "add-new-note-listener",
+      "add-new-note-response",
       (relativePath: string) => {
         handleNewNote(relativePath);
       }
@@ -75,7 +75,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
       setIsNewDirectoryModalOpen(true);
     };
 
-    window.ipcRenderer.receive("add-new-directory-listener", (dirPath) => {
+    window.ipcRenderer.receive("add-new-directory-response", (dirPath) => {
       handleNewDirectory(dirPath);
     });
   }, []);

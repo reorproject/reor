@@ -37,6 +37,13 @@ function createIPCHandler<T extends (...args: any[]) => any>(
     ipcRenderer.invoke(channel, ...args) as Promise<ReturnType<T>>;
 }
 
+function createIPCHandlerWithChannel<T extends (...args: arg[]) => any>(
+  channel: string
+): IPCHandler<T> {
+  return (...args: Parameters<T>) =>
+    ipcRenderer.invoke(channel, ...args) as Promise<ReturnType<T>>;
+}
+
 const database = {
   search:
     createIPCHandler<
@@ -83,6 +90,12 @@ const electronUtils = {
   showChatItemContext: createIPCHandler<
     (chatRow: ChatHistoryMetadata) => Promise<void>
   >("show-chat-menu-item"),
+  showCreateFileModal: createIPCHandler<
+    (relativePath: string) => Promise<void>
+  >("empty-new-note-listener"),
+  showCreateDirectoryModal: createIPCHandler<
+    (relativePath: string) => Promise<void>
+  >("empty-new-directory-listener"),
 };
 
 const electronStore = {
@@ -187,7 +200,7 @@ const electronStore = {
   getCurrentOpenFiles: createIPCHandler<() => Promise<boolean>>(
     "get-current-open-files"
   ),
-  setCurrentOpenFiles: createIPCHandler<
+  setCurrentOpenFiles: createIPCHandlerWithChannel<
     (action: any, args: any) => Promise<void>
   >("set-current-open-files"),
 };

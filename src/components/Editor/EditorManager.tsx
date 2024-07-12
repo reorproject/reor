@@ -105,12 +105,12 @@ const EditorManager: React.FC<EditorManagerProps> = ({
 
     initEditorContentCenter();
     window.ipcRenderer.on("editor-flex-center-changed", handleEditorChange);
-    return () => {
-      window.ipcRenderer.removeListener(
-        "editor-flex-center-changed",
-        handleEditorChange
-      );
-    };
+    // return () => {
+    //   window.ipcRenderer.removeListener(
+    //     "editor-flex-center-changed",
+    //     handleEditorChange
+    //   );
+    // };
   }, []);
 
   return (

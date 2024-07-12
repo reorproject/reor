@@ -274,7 +274,7 @@ export const registerStoreHandlers = (
     return store.get(StoreKeys.OpenTabs) || [];
   });
 
-  ipcMain.handle("set-current-open-files", (event, { action, args }) => {
+  ipcMain.handle("set-current-open-files", (event, action, args) => {
     const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || [];
 
     const addTab = ({ tab }) => {
@@ -308,6 +308,7 @@ export const registerStoreHandlers = (
       store.set(StoreKeys.OpenTabs, openTabs);
     };
 
+    console.log("action: ", action);
     switch (action) {
       case "add":
         addTab(args);

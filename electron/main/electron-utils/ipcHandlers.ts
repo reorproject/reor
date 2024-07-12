@@ -12,6 +12,7 @@ import {
 import Store from "electron-store";
 
 import WindowsManager from "../common/windowManager";
+import { handleAddNewNoteResponse } from "../common/newFiles";
 import { StoreKeys, StoreSchema } from "../electron-store/storeConfig";
 
 export const electronUtilsHandlers = (
@@ -28,7 +29,7 @@ export const electronUtilsHandlers = (
       new MenuItem({
         label: "New Note",
         click: () => {
-          event.sender.send("add-new-note-listener");
+          event.sender.send("add-new-note-response");
         },
       })
     );
@@ -37,7 +38,7 @@ export const electronUtilsHandlers = (
       new MenuItem({
         label: "New Directory",
         click: () => {
-          event.sender.send("add-new-directory-listener");
+          event.sender.send("add-new-directory-response");
         },
       })
     );
@@ -57,7 +58,7 @@ export const electronUtilsHandlers = (
         new MenuItem({
           label: "New Note",
           click: () => {
-            event.sender.send("add-new-note-listener", file.relativePath);
+            event.sender.send("add-new-note-response", file.relativePath);
           },
         })
       );
@@ -66,7 +67,7 @@ export const electronUtilsHandlers = (
         new MenuItem({
           label: "New Directory",
           click: () => {
-            event.sender.send("add-new-directory-listener", file.path);
+            event.sender.send("add-new-directory-response", file.path);
           },
         })
       );
@@ -178,5 +179,15 @@ export const electronUtilsHandlers = (
 
   ipcMain.handle("get-reor-app-version", async () => {
     return app.getVersion();
+  });
+
+  // Used on EmptyPage.tsx to create a new file
+  ipcMain.handle("empty-new-note-listener", (event, relativePath) => {
+    event.sender.send("add-new-note-response", relativePath);
+  });
+
+  // Used on EmptyPage.tsx to create a new directory
+  ipcMain.handle("empty-new-directory-listener", (event, relativePath) => {
+    event.sender.send("add-new-directory-response", relativePath);
   });
 };
