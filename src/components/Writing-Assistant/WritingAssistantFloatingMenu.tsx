@@ -70,6 +70,41 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
         console.error("Failed to copy text: ", err);
       });
   };
+
+  const insertAfterHighlightedText = () => {
+    if (
+      !editor ||
+      !currentChatHistory ||
+      currentChatHistory.displayableChatHistory.length === 0
+    ) {
+      console.error("No chat history available for insertion.");
+      return;
+    }
+
+    const llmResponse =
+      currentChatHistory.displayableChatHistory[
+        currentChatHistory.displayableChatHistory.length - 1
+      ];
+
+    const insertionText = llmResponse.visibleContent
+      ? llmResponse.visibleContent
+      : formatOpenAIMessageContentIntoString(llmResponse.content);
+
+    // Ensure the editor is focused
+    editor.view.focus();
+
+    // Move the selection to the end of the current selection
+    const { from, to } = editor.state.selection;
+    const endOfSelection = Math.max(from, to);
+
+    editor
+      .chain()
+      .focus()
+      .setTextSelection(endOfSelection) // Set the cursor position to the end of the current selection
+      .insertContent("\n" + insertionText) // Insert the new content after the current selection
+      .run();
+  };
+
   const replaceHighlightedText = () => {
     if (
       !editor ||
@@ -374,7 +409,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
             <button
               className="bg-blue-100 border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center mr-1"
               onClick={() => {
-                /* Handle Insert action */
+                insertAfterHighlightedText();
               }}
             >
               Insert
