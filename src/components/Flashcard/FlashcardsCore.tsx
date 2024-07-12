@@ -42,7 +42,7 @@ export const FlashcardCore = ({
             flipDirection="vertical"
           >
             <Button
-              className="bg-orange-900  mt-3 mb-2 border-none rounded-md 
+              className="bg-blue-600  mt-3 mb-2 border-none rounded-md 
             cursor-pointer w-full h-full
             text-center text-lg normal-case"
               onClick={() =>
@@ -81,7 +81,7 @@ export const FlashcardCore = ({
           <div className="flex items-center justify-around w-50 mt-6">
             <Button
               className="bg-slate-700 border-none h-10 w-20 text-center
-          hover:bg-orange-900 cursor-pointer
+          hover:bg-blue-600 cursor-pointer
 
           disabled:pointer-events-none
           disabled:opacity-25"
@@ -96,7 +96,7 @@ export const FlashcardCore = ({
 
             <Button
               className="bg-slate-700 border-none h-10 w-20 text-center
-          hover:bg-orange-900 cursor-pointer
+          hover:bg-blue-600 cursor-pointer
 
           disabled:pointer-events-none
           disabled:opacity-25"
