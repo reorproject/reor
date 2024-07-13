@@ -212,9 +212,7 @@ export function updateFileListForRenderer(
   directory: string
 ): void {
   const files = GetFilesInfoTree(directory);
-  if (win) {
     win.webContents.send("files-list", files);
-  }
 }
 
 export function readFile(filePath: string): string {

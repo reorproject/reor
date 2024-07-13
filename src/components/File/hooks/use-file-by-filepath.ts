@@ -41,7 +41,7 @@ export const useFileByFilepath = () => {
     useState<boolean>(false);
   const [needToIndexEditorContent, setNeedToIndexEditorContent] =
     useState<boolean>(false);
-  const [spellCheckEnabled, setSpellCheckEnabled] = useState<string>("false");
+  const [spellCheckEnabled, setSpellCheckEnabled] = useState(false);
 
   useEffect(() => {
     const fetchSpellCheckMode = async () => {
@@ -210,7 +210,7 @@ export const useFileByFilepath = () => {
       editor.setOptions({
         editorProps: {
           attributes: {
-            spellcheck: spellCheckEnabled,
+            spellcheck: spellCheckEnabled ? "true" : "false",
           },
         },
       });

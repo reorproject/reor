@@ -165,7 +165,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         };
       }
       if (chatHistory.displayableChatHistory.length === 0) {
-        if (chatFilters) {
           // chatHistory.displayableChatHistory.push({
           //   role: "system",
           //   content:
@@ -177,7 +176,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           chatHistory.displayableChatHistory.push(
             await resolveRAGContext(userTextFieldInput, chatFilters)
           );
-        }
       } else {
         chatHistory.displayableChatHistory.push({
           role: "user",
@@ -191,7 +189,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
       setCurrentChatHistory(chatHistory);
 
-      if (!chatHistory) return;
 
       await window.electronStore.updateChatHistory(chatHistory);
 
@@ -231,7 +228,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   ) => {
     setCurrentChatHistory((prev) => {
       if (chatID !== prev?.id) return prev;
-      const newDisplayableHistory = prev.displayableChatHistory || [];
+      const newDisplayableHistory = prev.displayableChatHistory;
       if (newDisplayableHistory.length > 0) {
         const lastMessage =
           newDisplayableHistory[newDisplayableHistory.length - 1];
@@ -270,7 +267,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   };
 
   useEffect(() => {
-    const handleOpenAIChunk = async (
+    const handleOpenAIChunk = (
       receivedChatID: string,
       chunk: ChatCompletionChunk
     ) => {
@@ -280,12 +277,12 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       }
     };
 
-    const handleAnthropicChunk = async (
+    const handleAnthropicChunk = (
       receivedChatID: string,
       chunk: MessageStreamEvent
     ) => {
       const newContent =
-        chunk.type === "content_block_delta" ? chunk.delta.text ?? "" : "";
+        chunk.type === "content_block_delta" ? chunk.delta.text : "";
       if (newContent) {
         appendNewContentToMessageHistory(receivedChatID, newContent, "success");
       }

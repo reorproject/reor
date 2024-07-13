@@ -10,6 +10,7 @@ export const initializeAndMaybeMigrateStore = (store: Store<StoreSchema>) => {
     store.set(StoreKeys.SchemaVersion, currentSchemaVersion);
     store.set(StoreKeys.LLMs, []);
     store.set(StoreKeys.DefaultLLM, "");
+    store.set(StoreKeys.ChatHistories, {});
   }
   setupDefaultStoreValues(store);
 };
@@ -21,6 +22,10 @@ export function setupDefaultStoreValues(store: Store<StoreSchema>) {
 
   if (!store.get(StoreKeys.ChunkSize)) {
     store.set(StoreKeys.ChunkSize, 500);
+  }
+
+  if (!store.get(StoreKeys.ChatHistories)) {
+    store.set(StoreKeys.ChatHistories, {});
   }
 
   setupDefaultAnalyticsValue(store);
@@ -40,7 +45,7 @@ const setupDefaultAnalyticsValue = (store: Store<StoreSchema>) => {
 
 const setupDefaultSpellCheckValue = (store: Store<StoreSchema>) => {
   if (store.get(StoreKeys.SpellCheck) === undefined) {
-    store.set(StoreKeys.SpellCheck, "false");
+    store.set(StoreKeys.SpellCheck, false);
   }
 };
 

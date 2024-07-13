@@ -17,6 +17,6 @@
   "eslint.alwaysShowStatus": true,
   "eslint.format.enable": true,
   "eslint.run": "onSave",
-  "editor.formatOnSave": true,
+  "editor.formatOnSave": false,
   "editor.codeActionsOnSaveMode": "explicit"  // This is the updated setting
 }
