@@ -26,6 +26,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     useState<SidebarAbleToShow>("files");
   const {
     filePath,
+    setFilePath,
     editor,
     openTabs,
     setOpenTabs,
@@ -124,6 +125,21 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     };
   }, []);
 
+  // On new launch of the app, sets the last previously accessed tab (if any) to be
+  // the current file
+  useEffect(() => {
+    const restoreFromLaunch = () => {
+      openTabs.forEach((tab) => {
+        console.log("Tab:", tab.lastAccessed);
+        if (tab.lastAccessed) {
+          openFileByPath(tab.filePath);
+        }
+      });
+    };
+
+    restoreFromLaunch();
+  }, []);
+
   return (
     <div>
       <TitleBar
@@ -131,6 +147,7 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
         setHistory={setNavigationHistory}
         currentFilePath={filePath}
         onFileSelect={openFileAndOpenEditor}
+        setFilePath={setFilePath}
         similarFilesOpen={showSimilarFiles} // This might need to be managed differently now
         toggleSimilarFiles={toggleSimilarFiles} // This might need to be managed differently now
         openTabs={openTabs}

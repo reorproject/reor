@@ -367,6 +367,7 @@ export const useFileByFilepath = () => {
 
   return {
     filePath: currentlyOpenedFilePath,
+    setFilePath: setCurrentlyOpenedFilePath,
     saveCurrentlyOpenedFile,
     editor,
     openTabs,

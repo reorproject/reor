@@ -8,14 +8,14 @@ export const titleBarHeight = "30px";
 
 interface TitleBarProps {
   onFileSelect: (path: string) => void;
-  setFilePath: (path: string) => void;
-  currentFilePath: string | null;
+  setFilePath: (path: string | null) => void; // Used to set file path to null when no tabs are open
+  currentFilePath: string | null; // Used to create new open tabs when user clicks on new file to open
   similarFilesOpen: boolean;
   toggleSimilarFiles: () => void;
   history: string[];
   setHistory: (string: string[]) => void;
-  openTabs: Tab[];
-  setOpenTabs: (string: Tab[]) => void;
+  openTabs: Tab[]; // Current opened tabs
+  setOpenTabs: (string: Tab[]) => void; // Setter for opened tabs
   openFileAndOpenEditor: (path: string) => void;
   sidebarWidth: number;
 }
@@ -42,7 +42,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
     );
 
     if (!existingTab) {
-      syncTabsWithBackend(currentFilePath);
+      addNewTab(currentFilePath);
       const newTab = createTabObjectFromPath(currentFilePath);
       setOpenTabs((prevTabs) => [...prevTabs, newTab]);
     }
@@ -78,14 +78,17 @@ const TitleBar: React.FC<TitleBarProps> = ({
 
     setOpenTabs((prevTabs) => {
       const index = prevTabs.findIndex((tab) => tab.id === tabId);
+      prevTabs[index].lastAccessed = false;
       closedFilePath = index !== -1 ? prevTabs[index].filePath : "";
       newIndex = index > 0 ? index - 1 : 1;
       if (closedFilePath === currentFilePath) {
-        if (newIndex === -1 || newIndex >= openTabs.length) {
-          openFileAndOpenEditor(""); // If no tabs left or out of range, clear selection
-        } else {
-          openFileAndOpenEditor(openTabs[newIndex].filePath); // Select the new index's file
+        console.log("new Index:", newIndex);
+        if (newIndex < openTabs.length) {
+          openTabs[newIndex].lastAccessed = true;
+          openFileAndOpenEditor(openTabs[newIndex].filePath);
         }
+        // Select the new index's file
+        else setFilePath(null);
       }
       return prevTabs.filter((tab, idx) => idx !== index);
     });
@@ -95,7 +98,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
     });
   };
 
-  const syncTabsWithBackend = async (path: string) => {
+  const addNewTab = async (path: string) => {
     const tab = createTabObjectFromPath(path);
     await window.electronStore.setCurrentOpenFiles("add", {
       tab: tab,
@@ -112,9 +115,9 @@ const TitleBar: React.FC<TitleBarProps> = ({
       id: uuidv4(),
       filePath: path,
       title: extractFileName(path),
-      timeOpened: new Date(),
-      isDirty: false,
-      lastAccessed: new Date(),
+      lastAccessed: false,
+      // timeOpened: new Date(),
+      // isDirty: false,
     };
   };
 
