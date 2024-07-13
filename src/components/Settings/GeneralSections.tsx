@@ -10,11 +10,6 @@ import Switch from "@mui/material/Switch";
 //   /* custom = "NOT-YET-IMPLEMENTED */
 // }
 
-export interface GenSettingsProps {
-  // iconSBIsCompact?: boolean /* True: Sets padding on Icon Sidebar */;
-  // editorAppearance?: SettingsAppearance;
-}
-
 const CreateAppearanceSection: React.FC = () => {
   const [isIconSBCompact, setIsIconSBCompact] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

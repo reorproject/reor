@@ -17,7 +17,7 @@ export function formatOpenAIMessageContentIntoString(
       return acc; // Skip image parts
     }, "");
   }
-  return content || undefined;
+  return content ?? undefined;
 }
 
 type ChatProperties = Record<string, string>;

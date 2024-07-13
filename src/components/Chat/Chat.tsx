@@ -87,7 +87,7 @@ function anonymizeChatFiltersForPosthog(
 
 interface ChatWithLLMProps {
   vaultDirectory: string;
-  openFileByPath: (path: string) => Promise<void>;
+  openFileByPath: (path: string) => void;
 
   currentChatHistory: ChatHistory | undefined;
   setCurrentChatHistory: React.Dispatch<
@@ -410,8 +410,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             return Promise.resolve();
           }}
           isLoadingSimilarEntries={false}
-          setIsRefined={() => {}} // to allow future toggling
-          isRefined={true} // always refined for now
         />
       )}
     </div>

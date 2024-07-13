@@ -48,7 +48,7 @@ export class AnthropicModelSessionService implements LLMSessionService {
       model: modelName,
       messages: messageHistory as MessageParam[],
       temperature: generationParams?.temperature,
-      max_tokens: generationParams?.maxTokens || 1024,
+      max_tokens: generationParams?.maxTokens ?? 1024,
     });
 
     return msg;
@@ -73,7 +73,7 @@ export class AnthropicModelSessionService implements LLMSessionService {
       messages: messageHistory.map(cleanMessage),
       stream: true,
       temperature: generationParams?.temperature,
-      max_tokens: generationParams?.maxTokens || 1024,
+      max_tokens: generationParams?.maxTokens ?? 1024,
     });
     for await (const messageStreamEvent of stream) {
       handleChunk(messageStreamEvent);

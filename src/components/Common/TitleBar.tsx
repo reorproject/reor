@@ -49,7 +49,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
           history={history}
           setHistory={setHistory}
           onFileSelect={onFileSelect}
-          currentPath={currentFilePath || ""}
+          currentPath={currentFilePath ?? ""}
         />
       </div>
       <div

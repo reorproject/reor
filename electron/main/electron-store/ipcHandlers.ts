@@ -93,6 +93,11 @@ export const registerStoreHandlers = (
 
   ipcMain.handle("remove-embedding-model", (event, modelName: string) => {
     const currentModels = store.get(StoreKeys.EmbeddingModels);
+    
+    if (!currentModels) {
+      return;
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { [modelName]: _, ...updatedModels } = currentModels;
 
@@ -290,6 +295,12 @@ export function getDefaultEmbeddingModelConfig(
   }
 
   const embeddingModels = store.get(StoreKeys.EmbeddingModels);
+
+  // Check if the embedding models are defined
+  if (!embeddingModels) {
+    throw new Error("No embedding models found");
+  }
+
   if (!(defaultEmbeddingModelAlias in embeddingModels)) {
     throw new Error(`No embedding model found for alias '${defaultEmbeddingModelAlias}'`);
   }

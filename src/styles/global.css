@@ -83,7 +83,7 @@ button {
   outline: none;
   padding: 6px 0;
   position: absolute;
-  align-items: start;
+  align-items: flex-start;
 }
 
 .bubble-menu-item {

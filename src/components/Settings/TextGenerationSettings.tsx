@@ -4,8 +4,7 @@ import { Button } from "@material-tailwind/react";
 import Slider from "@mui/material/Slider";
 import { LLMGenerationParameters } from "electron/main/electron-store/storeConfig";
 
-interface TextGenerationSettingsProps {}
-const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
+const TextGenerationSettings: React.FC = () => {
   const [textGenerationParams, setTextGenerationParams] =
     useState<LLMGenerationParameters>({
       temperature: 0.7, // Default temperature value
