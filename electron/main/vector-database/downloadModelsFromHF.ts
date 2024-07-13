@@ -11,7 +11,7 @@ export const DownloadModelFilesFromHFRepo = async (
   quantized = true
 ) => {
   // List the files:
-  const fileList = await listFiles({
+  const fileList = listFiles({
     repo: repo,
     recursive: true,
     fetch: customFetchUsingElectronNet,

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { exec } from "child_process";
+import { exec, ChildProcess } from "child_process";
 import * as os from "os";
 import * as path from "path";
 
@@ -18,6 +18,7 @@ import {
 // import ollama,"ollama";
 
 import { LLMSessionService } from "../types";
+import { error } from "@material-tailwind/react/types/components/input";
 
 const OllamaServeType = {
   SYSTEM: "system", // ollama is installed on the system
@@ -29,12 +30,7 @@ export class OllamaService implements LLMSessionService {
   private client!: Ollama;
   private host = "http://127.0.0.1:11434";
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private childProcess: any;
-
-  constructor() {
-    // this.client = await import("ollama");
-    // this.client = new ollama.Client();
-  }
+  private childProcess: ChildProcess | null = null;
 
   public init = async () => {
     console.log("Initializing Ollama client...");
@@ -42,11 +38,6 @@ export class OllamaService implements LLMSessionService {
 
     const ollamaLib = await import("ollama");
     this.client = new ollamaLib.Ollama();
-    console.log("Ollama client: ", this.client);
-    // const models = await this.client.default.list();
-    // console.log("Ollama models: ", models);
-    // const lists = await this.client.
-    // console.log("Ollama models: ", lists);
   };
 
   async ping() {
@@ -64,7 +55,6 @@ export class OllamaService implements LLMSessionService {
 
   async serve() {
     try {
-      // see if ollama is already running
       await this.ping();
       return OllamaServeType.SYSTEM;
     } catch (err) {
@@ -114,7 +104,7 @@ export class OllamaService implements LLMSessionService {
       return OllamaServeType.PACKAGED;
     } catch (err) {
       console.log("Failed to start Ollama: ", err);
-      throw new Error(`Failed to start Ollama: ${err}`);
+      throw new Error(`Failed to start Ollama: ${err as string}`);
     }
   }
 
@@ -125,16 +115,16 @@ export class OllamaService implements LLMSessionService {
 
       this.childProcess = exec(command, { env }, (err, stdout, stderr) => {
         if (err) {
-          reject(`exec error: ${err}`);
+          reject(err);
           return;
         }
 
         if (stderr) {
-          reject(`ollama stderr: ${stderr}`);
+          reject(new Error(`ollama stderr: ${stderr}`));
           return;
         }
 
-        reject(`ollama stdout: ${stdout}`);
+        reject(new Error(`ollama stdout: ${stdout}`));
       });
 
       // Once the process is started, try to ping Ollama server.
@@ -142,11 +132,11 @@ export class OllamaService implements LLMSessionService {
         .then(() => {
           resolve(void 0);
         })
-        .catch((pingError) => {
+        .catch((pingError: error) => {
           if (this.childProcess && !this.childProcess.killed) {
             this.childProcess.kill();
           }
-          reject(pingError);
+          reject(new Error(`Failed to ping Ollama server: ${pingError}`));
         });
     });
   }
@@ -234,7 +224,7 @@ export class OllamaService implements LLMSessionService {
     throw new Error("Abort not yet implemented.");
   }
 
-  async streamingResponse(
+  streamingResponse(
     _modelName: string,
     _modelConfig: OpenAILLMConfig,
     _isJSONMode: boolean,

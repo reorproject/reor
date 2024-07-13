@@ -64,12 +64,12 @@ export interface StoreSchema {
   RAG?: RAGConfig;
   hardware: HardwareConfig;
   llmGenerationParameters: LLMGenerationParameters;
-  chatHistories: Record<string, ChatHistory[]>;
+  chatHistories: Record<string, ChatHistory[]> | undefined;
   analytics?: boolean;
   chunkSize: number;
   isSBCompact: boolean;
   DisplayMarkdown: boolean;
-  spellCheck: string;
+  spellCheck: boolean;
 }
 
 export enum StoreKeys {

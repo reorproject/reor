@@ -21,7 +21,7 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
   useEffect(() => {
     const fetchParams = async () => {
       const params = await window.electronStore.getLLMGenerationParams();
-      setTextGenerationParams(params);
+      if (params) setTextGenerationParams(params);
     };
 
     fetchParams();
