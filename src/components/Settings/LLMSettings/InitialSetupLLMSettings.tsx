@@ -39,7 +39,7 @@ const InitialSetupLLMSettings: React.FC<InitialSetupLLMSettingsProps> = ({
               ? "bg-green-700 hover:bg-green-800 text-white"
               : "bg-dark-gray-c-eight hover:bg-dark-gray-c-ten"
           } font-normal transition-colors duration-200`}
-          onClick={() => setIsSetupModalOpen(true)}
+          onClick={() => { setIsSetupModalOpen(true); }}
           placeholder=""
         >
           {isSetupComplete ? (

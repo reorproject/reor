@@ -46,7 +46,7 @@ export function GetFilesInfoListForListOfPaths(paths: string[]): FileInfo[] {
 
 export function GetFilesInfoTree(
   pathInput: string,
-  parentRelativePath: string = ""
+  parentRelativePath = ""
 ): FileInfoTree {
   const fileInfoTree: FileInfoTree = [];
 
@@ -168,11 +168,11 @@ export function startWatchingDirectory(
     };
 
     watcher
-      .on("add", (path) => handleFileEvent("added", path))
-      .on("change", (path) => handleFileEvent("changed", path))
-      .on("unlink", (path) => handleFileEvent("removed", path))
-      .on("addDir", (path) => handleFileEvent("directory added", path))
-      .on("unlinkDir", (path) => handleFileEvent("directory removed", path));
+      .on("add", (path) => { handleFileEvent("added", path); })
+      .on("change", (path) => { handleFileEvent("changed", path); })
+      .on("unlink", (path) => { handleFileEvent("removed", path); })
+      .on("addDir", (path) => { handleFileEvent("directory added", path); })
+      .on("unlinkDir", (path) => { handleFileEvent("directory removed", path); });
 
     // No 'ready' event handler is needed here, as we're ignoring initial scan
     return watcher;
@@ -212,9 +212,7 @@ export function updateFileListForRenderer(
   directory: string
 ): void {
   const files = GetFilesInfoTree(directory);
-  if (win) {
     win.webContents.send("files-list", files);
-  }
 }
 
 export function readFile(filePath: string): string {

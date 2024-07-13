@@ -6,7 +6,7 @@ import { ToastContainer, toast } from "react-toastify";
 
 import "react-toastify/dist/ReactToastify.css";
 import IndexingProgress from "./components/Common/IndexingProgress";
-import FileEditorContainer from "./components/MainPage";
+import MainPageComponent from "./components/MainPage";
 import InitialSetupSinglePage from "./components/Settings/InitialSettingsSinglePage";
 
 interface AppProps {}
@@ -87,7 +87,7 @@ const App: React.FC<AppProps> = () => {
         indexingProgress < 1 ? (
           <IndexingProgress indexingProgress={indexingProgress} />
         ) : (
-          <FileEditorContainer />
+          <MainPageComponent />
         )
       ) : (
         <InitialSetupSinglePage

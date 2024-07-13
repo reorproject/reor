@@ -13,6 +13,7 @@ import Store from "electron-store";
 
 import WindowsManager from "../common/windowManager";
 import { StoreKeys, StoreSchema } from "../electron-store/storeConfig";
+import { FileInfoNode } from "../filesystem/types";
 
 export const electronUtilsHandlers = (
   store: Store<StoreSchema>,
@@ -46,7 +47,7 @@ export const electronUtilsHandlers = (
     if (browserWindow) menu.popup({ window: browserWindow });
   });
 
-  ipcMain.handle("show-context-menu-file-item", async (event, file) => {
+  ipcMain.handle("show-context-menu-file-item", async (event, file: FileInfoNode) => {
     const menu = new Menu();
 
     const stats = await fs.stat(file.path);
@@ -146,7 +147,10 @@ export const electronUtilsHandlers = (
           }
 
           const chatHistoriesMap = store.get(StoreKeys.ChatHistories);
-          const allChatHistories = chatHistoriesMap[vaultDir] || [];
+          if (!chatHistoriesMap) {
+            return;
+          }
+          const allChatHistories = chatHistoriesMap[vaultDir];
           const filteredChatHistories = allChatHistories.filter(
             (item) => item.id !== chatID
           );
@@ -154,7 +158,7 @@ export const electronUtilsHandlers = (
           store.set(StoreKeys.ChatHistories, chatHistoriesMap);
           event.sender.send(
             "update-chat-histories",
-            chatHistoriesMap[vaultDir] || []
+            chatHistoriesMap[vaultDir]
           );
         },
       })
@@ -164,11 +168,11 @@ export const electronUtilsHandlers = (
     if (browserWindow) menu.popup({ window: browserWindow });
   });
 
-  ipcMain.handle("open-external", (event, url) => {
+  ipcMain.handle("open-external", (event, url: string) => {
     shell.openExternal(url);
   });
 
-  ipcMain.handle("get-platform", async () => {
+  ipcMain.handle("get-platform", () => {
     return process.platform;
   });
 
@@ -176,7 +180,7 @@ export const electronUtilsHandlers = (
     windowsManager.createWindow(store, preload, url, indexHtml);
   });
 
-  ipcMain.handle("get-reor-app-version", async () => {
+  ipcMain.handle("get-reor-app-version", () => {
     return app.getVersion();
   });
 };

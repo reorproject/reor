@@ -39,7 +39,6 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
 
   useEffect(() => {
     if (
-      !suggestionsState.position ||
       filteredSuggestions.length === 0 ||
       !suggestionsRef.current
     ) {
@@ -78,7 +77,7 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
               posthog.capture("select_backlink_suggestion", {
                 rank: index + 1,
               });
-              suggestionsState.onSelect?.(suggestion);
+              suggestionsState.onSelect(suggestion);
             }}
           >
             {suggestion}

@@ -69,6 +69,7 @@ const serializeSchema = (schema: Schema): string => {
   return JSON.stringify(
     schema.fields.map((field) => ({
       name: field.name,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       type: field.type.toString(),
       nullable: field.nullable,
     }))

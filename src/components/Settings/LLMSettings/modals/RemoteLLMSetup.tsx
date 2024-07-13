@@ -87,7 +87,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
           type="text"
           placeholder="API URL"
           value={apiURL}
-          onChange={(e) => setApiURL(e.target.value)}
+          onChange={(e) => { setApiURL(e.target.value); }}
           className="block w-full px-3 py-2 mb-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
         />
         <p className="mt-2 text-gray-100 text-xs">
@@ -100,7 +100,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
           type="text"
           placeholder="Model Name"
           value={modelName}
-          onChange={(e) => setModelName(e.target.value)}
+          onChange={(e) => { setModelName(e.target.value); }}
           className="block w-full px-3 py-2 mb-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
         />
         <p className="mt-2 text-gray-100 text-xs">
@@ -112,7 +112,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
           type="text"
           placeholder="API Key"
           value={apiKey}
-          onChange={(e) => setApiKey(e.target.value)}
+          onChange={(e) => { setApiKey(e.target.value); }}
           className="block w-full px-3 py-2 mb-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
         />
         <p className="mt-2 text-gray-100 text-xs">

@@ -1,83 +1,20 @@
 module.exports = {
-  env: {
-    browser: true,
-    es2021: true,
-    node: true,
-  },
   extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:react/recommended",
-    "plugin:import/typescript",
+    'plugin:@typescript-eslint/strict-type-checked',
+    // 'plugin:@typescript-eslint/stylistic-type-checked'
+    // 'plugin:@typescript-eslint/recommended',
   ],
-  overrides: [
-    {
-      env: {
-        node: true,
-      },
-      files: [".eslintrc.{js,cjs}"],
-      parserOptions: {
-        sourceType: "script",
-      },
-    },
-    {
-      files: ["*.ts", "*.tsx"],
-      rules: {
-        "react/prop-types": "off",
-      },
-    },
-    {
-      // Applies to all files
-      files: ["*"],
-      rules: {
-        // "@typescript-eslint/no-unused-vars": "warn",
-        // "react/no-unescaped-entities": "warn",
-        // ... add other specific rules you want as warnings here ...
-      },
-    },
-  ],
-  parser: "@typescript-eslint/parser",
+  parser: '@typescript-eslint/parser',
   parserOptions: {
-    ecmaVersion: "latest",
-    sourceType: "module",
+    project: './tsconfig.json',
   },
-  plugins: ["@typescript-eslint", "react", "import", "unused-imports"],
+  plugins: ['@typescript-eslint'],
+  root: true,
+  ignorePatterns: ['.eslintrc.js'], // Add this line
+  // add some rules:
   rules: {
-    "import/order": [
-      "error",
-      {
-        groups: [
-          "builtin",
-          "external",
-          "internal",
-          "parent",
-          "sibling",
-          "index",
-        ],
-        pathGroups: [
-          {
-            pattern: "react",
-            group: "external",
-            position: "before",
-          },
-        ],
-        pathGroupsExcludedImportTypes: ["react"],
-        "newlines-between": "always",
-        alphabetize: {
-          order: "asc",
-          caseInsensitive: true,
-        },
-      },
-    ],
-    "unused-imports/no-unused-imports": "error",
-    "unused-imports/no-unused-vars": [
-      "warn",
-      {
-        vars: "all",
-        varsIgnorePattern: "^_",
-        args: "after-used",
-        argsIgnorePattern: "^_",
-      },
-    ],
-  },
+    "@typescript-eslint/no-floating-promises": "off",
+    "@typescript-eslint/no-misused-promises": "off"
+  }
+
 };

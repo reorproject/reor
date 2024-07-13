@@ -1,5 +1,5 @@
 export function removeFileExtension(filename: string): string {
-  if (!filename || filename.indexOf(".") === -1) {
+  if (!filename || !filename.includes(".")) {
     return filename;
   }
 

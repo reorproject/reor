@@ -19,11 +19,6 @@ export function validateAIModelConfig(config: LLMConfig): string | null {
     return "Context length must be a positive number.";
   }
 
-  // Validate engine: ensure it's either "openai" or "llamacpp"
-  if (config.engine !== "openai" && config.engine !== "anthropic") {
-    return "Engine must be either 'openai' or 'llamacpp'.";
-  }
-
   // Optional field validation for errorMsg: ensure it's not empty if provided
   if (config.errorMsg && !config.errorMsg.trim()) {
     return "Error message should not be empty if provided.";
@@ -32,11 +27,11 @@ export function validateAIModelConfig(config: LLMConfig): string | null {
   return null;
 }
 
-export async function addOrUpdateLLMSchemaInStore(
+export function addOrUpdateLLMSchemaInStore(
   store: Store<StoreSchema>,
   modelConfig: LLMConfig
-): Promise<void> {
-  const existingModelsInStore = await store.get(StoreKeys.LLMs);
+): void {
+  const existingModelsInStore = store.get(StoreKeys.LLMs);
   console.log("existingModels: ", existingModelsInStore);
   const isNotValid = validateAIModelConfig(modelConfig);
   if (isNotValid) {
@@ -67,7 +62,7 @@ export async function removeLLM(
   ollamaService: OllamaService,
   modelName: string
 ): Promise<void> {
-  const existingModels = (store.get(StoreKeys.LLMs) as LLMConfig[]) || [];
+  const existingModels = (store.get(StoreKeys.LLMs)) || [];
 
   const foundModel = await getLLMConfig(store, ollamaService, modelName);
 
@@ -87,7 +82,7 @@ export async function getAllLLMConfigs(
   store: Store<StoreSchema>,
   ollamaSession: OllamaService
 ): Promise<LLMConfig[]> {
-  const llmConfigsFromStore = store.get(StoreKeys.LLMs);
+  const llmConfigsFromStore = store.get(StoreKeys.LLMs) || [];
   const ollamaLLMConfigs = await ollamaSession.getAvailableModels();
 
   return [...llmConfigsFromStore, ...ollamaLLMConfigs];
@@ -99,8 +94,7 @@ export async function getLLMConfig(
   modelName: string
 ): Promise<LLMConfig | undefined> {
   const llmConfigs = await getAllLLMConfigs(store, ollamaSession);
-  console.log("llmConfigs: ", llmConfigs);
-  if (llmConfigs) {
+  if (llmConfigs.length > 0) {
     return llmConfigs.find((model: LLMConfig) => model.modelName === modelName);
   }
   return undefined;

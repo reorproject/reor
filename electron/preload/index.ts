@@ -132,7 +132,7 @@ const electronStore = {
     (config: HardwareConfig) => Promise<void>
   >("set-hardware-config"),
   getLLMGenerationParams: createIPCHandler<
-    () => Promise<LLMGenerationParameters>
+    () => Promise<LLMGenerationParameters | undefined>
   >("get-llm-generation-params"),
   setLLMGenerationParams: createIPCHandler<
     (params: LLMGenerationParameters) => Promise<void>
@@ -143,10 +143,10 @@ const electronStore = {
     createIPCHandler<(isAnalytics: boolean) => Promise<void>>(
       "set-analytics-mode"
     ),
-  getSpellCheckMode: createIPCHandler<() => Promise<string>>(
+  getSpellCheckMode: createIPCHandler<() => Promise<boolean>>(
     "get-spellcheck-mode"
   ),
-  setSpellCheckMode: createIPCHandler<(isSpellCheck: string) => Promise<void>>(
+  setSpellCheckMode: createIPCHandler<(isSpellCheck: boolean) => Promise<void>>(
     "set-spellcheck-mode"
   ),
   getHasUserOpenedAppBefore: createIPCHandler<() => Promise<boolean>>(
@@ -308,7 +308,7 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
     const subscription = (
       _event: Electron.IpcRendererEvent,
       ...args: unknown[]
-    ) => func(...args);
+    ) => { func(...args); };
     ipcRenderer.on(channel, subscription);
     return () => {
       ipcRenderer.removeListener(channel, subscription);

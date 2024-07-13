@@ -18,7 +18,7 @@ export interface GenSettingsProps {
 const CreateAppearanceSection: React.FC = () => {
   const [isIconSBCompact, setIsIconSBCompact] = useState<boolean>(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
+  // const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
   // const [editorAppearance, setEditorApperance] =
   //   useState<SettingsAppearance>("dark");
 
@@ -27,26 +27,24 @@ const CreateAppearanceSection: React.FC = () => {
     const fetchParams = async () => {
       const isIconSBCompact = await window.electronStore.getSBCompact();
 
-      if (isIconSBCompact !== undefined) {
-        setIsIconSBCompact(isIconSBCompact);
-      }
+      setIsIconSBCompact(isIconSBCompact);
     };
 
     fetchParams();
   }, []);
 
   // Check if we should display header markdown
-  useEffect(() => {
-    const fetchParams = async () => {
-      const displayMarkdown = await window.electronStore.getDisplayMarkdown();
+  // useEffect(() => {
+  //   const fetchParams = async () => {
+  //     const displayMarkdown = await window.electronStore.getDisplayMarkdown();
 
-      if (displayMarkdown !== undefined) {
-        setDisplayMarkdown(displayMarkdown);
-      }
-    };
+  //     if (displayMarkdown !== undefined) {
+  //       setDisplayMarkdown(displayMarkdown);
+  //     }
+  //   };
 
-    fetchParams();
-  }, []);
+  //   fetchParams();
+  // }, []);
 
   return (
     <div className="flex-col w-full">
@@ -64,9 +62,7 @@ const CreateAppearanceSection: React.FC = () => {
           checked={isIconSBCompact}
           onChange={() => {
             setIsIconSBCompact(!isIconSBCompact);
-            if (isIconSBCompact !== undefined) {
-              window.electronStore.setSBCompact(!isIconSBCompact);
-            }
+            window.electronStore.setSBCompact(!isIconSBCompact);
           }}
         />
       </div>

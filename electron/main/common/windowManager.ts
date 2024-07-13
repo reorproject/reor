@@ -5,11 +5,11 @@ import Store from "electron-store";
 import { StoreSchema, StoreKeys } from "../electron-store/storeConfig";
 import { LanceDBTableWrapper } from "../vector-database/lanceTableWrapper";
 
-type WindowInfo = {
+interface WindowInfo {
   windowID: number;
   dbTableClient: LanceDBTableWrapper;
   vaultDirectoryForWindow: string;
-};
+}
 
 class WindowsManager {
   activeWindows: WindowInfo[] = [];
@@ -17,7 +17,7 @@ class WindowsManager {
 
   watcher: chokidar.FSWatcher | undefined;
 
-  async createWindow(
+  createWindow(
     store: Store<StoreSchema>,
     preload: string,
     url: string | undefined,
@@ -82,7 +82,7 @@ class WindowsManager {
   ): string {
     const lastUsedVaultDirectory = store.get(
       StoreKeys.DirectoryFromPreviousSession
-    ) as string;
+    );
     if (!lastUsedVaultDirectory) {
       return "";
     }
@@ -141,9 +141,6 @@ class WindowsManager {
     directory: string,
     store: Store<StoreSchema>
   ): void {
-    if (!webContents) {
-      throw new Error("Invalid webContents provided.");
-    }
 
     const windowID = this.getBrowserWindowId(webContents);
     if (!windowID) {

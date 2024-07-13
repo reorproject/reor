@@ -32,7 +32,7 @@ enum LLMType {
   Anthropic = "anthropic",
 }
 
-export const LLMSessions: { [sessionId: string]: LLMSessionService } = {};
+export const LLMSessions: Record<string, LLMSessionService> = {};
 
 export const openAISession = new OpenAIModelSessionService();
 export const anthropicSession = new AnthropicModelSessionService();
@@ -103,9 +103,9 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
     return await getAllLLMConfigs(store, ollamaService);
   });
 
-  ipcMain.handle("add-or-update-llm", async (event, modelConfig: LLMConfig) => {
+  ipcMain.handle("add-or-update-llm",  (event, modelConfig: LLMConfig) => {
     console.log("setting up new local model", modelConfig);
-    await addOrUpdateLLMSchemaInStore(store, modelConfig);
+    addOrUpdateLLMSchemaInStore(store, modelConfig);
   });
 
   ipcMain.handle("remove-llm", async (event, modelNameToDelete: string) => {
