@@ -13,6 +13,7 @@ import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
 import IconsSidebar from "./Sidebars/IconsSidebar";
 import SidebarManager from "./Sidebars/MainSidebar";
 import SimilarFilesSidebarComponent from "./Sidebars/SimilarFilesSidebar";
+import WritingAssistant from "./Writing-Assistant/WritingAssistantFloatingMenu";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search" | "chats";
@@ -174,7 +175,12 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
                 showSimilarFiles={showSimilarFiles}
               />{" "}
             </div>
-
+            <WritingAssistant
+              editor={editor}
+              highlightData={highlightData}
+              currentChatHistory={currentChatHistory}
+              setCurrentChatHistory={setCurrentChatHistory}
+            />
             {showSimilarFiles && (
               <div className="flex-shrink-0 h-full overflow-y-auto overflow-x-hidden">
                 <SimilarFilesSidebarComponent
