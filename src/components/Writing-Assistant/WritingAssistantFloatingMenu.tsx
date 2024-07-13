@@ -72,14 +72,16 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       ? llmResponse.visibleContent
       : formatOpenAIMessageContentIntoString(llmResponse.content);
 
-    navigator.clipboard
-      .writeText(copiedText)
-      .then(() => {
-        console.log("Text copied to clipboard successfully!");
-      })
-      .catch((err) => {
-        console.error("Failed to copy text: ", err);
-      });
+    if (copiedText) {
+      navigator.clipboard
+        .writeText(copiedText)
+        .then(() => {
+          console.log("Text copied to clipboard successfully!");
+        })
+        .catch((err) => {
+          console.error("Failed to copy text: ", err);
+        });
+    }
   };
 
   const insertAfterHighlightedText = () => {
@@ -135,12 +137,14 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       ? llmResponse.visibleContent
       : formatOpenAIMessageContentIntoString(llmResponse.content);
 
-    editor
-      .chain()
-      .focus()
-      .deleteSelection()
-      .insertContent(replacementText)
-      .run();
+    if (replacementText) {
+      editor
+        .chain()
+        .focus()
+        .deleteSelection()
+        .insertContent(replacementText)
+        .run();
+    }
 
     setCurrentChatHistory(undefined);
   };
@@ -172,12 +176,12 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
         break;
       case "custom":
         prompt =
-          `prompt(in triple #): ` +
-            `### ` +
-            customPromptInput +
-            ` ###` +
-            ` ,apply the prompt to the text in triple quotes """ ${selectedText} """` ||
-          "default prompt";
+          `The user has given the following instructions(in triple #) for processing the text selected(in triple quotes): ` +
+          `### ` +
+          customPromptInput +
+          ` ###` +
+          "\n" +
+          `  """ ${selectedText} """`;
         break;
     }
     setPrevPrompt(prompt);
