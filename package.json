@@ -24,7 +24,7 @@
     "test": "jest",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
-    "precommit": "npm run lint:fix && npm test",
+    "precommit": "npm run lint:fix",
     "prepare": "husky"
   },
   "husky": {

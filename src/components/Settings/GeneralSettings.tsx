@@ -5,7 +5,7 @@ import Switch from "@mui/material/Switch";
 
 import { useFileByFilepath } from "../File/hooks/use-file-by-filepath";
 
-import CreateAppearanceSection, { GenSettingsProps } from "./GeneralSections";
+import CreateAppearanceSection from "./GeneralSections";
 
 /*
  *  General Page has the following format:
@@ -25,7 +25,7 @@ import CreateAppearanceSection, { GenSettingsProps } from "./GeneralSections";
  * SubHeader describe the part of the project you are changing (appearance, editor, sidebar, etc..). Option(s) is the name of the specific change.
  */
 
-const GeneralSettings: React.FC<GenSettingsProps> = () => {
+const GeneralSettings: React.FC = () => {
   const { spellCheckEnabled, setSpellCheckEnabled } = useFileByFilepath();
   const [userHasMadeUpdate, setUserHasMadeUpdate] = useState(false);
   const [tempSpellCheckEnabled, setTempSpellCheckEnabled] = useState(false);

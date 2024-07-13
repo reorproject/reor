@@ -87,7 +87,7 @@ function anonymizeChatFiltersForPosthog(
 
 interface ChatWithLLMProps {
   vaultDirectory: string;
-  openFileByPath: (path: string) => Promise<void>;
+  openFileByPath: (path: string) => void;
 
   currentChatHistory: ChatHistory | undefined;
   setCurrentChatHistory: React.Dispatch<

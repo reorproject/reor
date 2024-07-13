@@ -31,11 +31,16 @@ export function addOrUpdateLLMSchemaInStore(
   store: Store<StoreSchema>,
   modelConfig: LLMConfig
 ): void {
-  const existingModelsInStore = store.get(StoreKeys.LLMs);
-  console.log("existingModels: ", existingModelsInStore);
+  
   const isNotValid = validateAIModelConfig(modelConfig);
   if (isNotValid) {
     throw new Error(isNotValid);
+  }
+
+  const existingModelsInStore = store.get(StoreKeys.LLMs);
+  if (!existingModelsInStore) {
+    store.set(StoreKeys.LLMs, [modelConfig]);
+    return;
   }
 
   const foundModel = existingModelsInStore.find(
