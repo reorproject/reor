@@ -57,19 +57,19 @@ export interface StoreSchema {
     vaultDirectories: string[];
     directoryFromPreviousSession?: string;
   };
-  LLMs: LLMConfig[];
-  embeddingModels: Record<string, EmbeddingModelConfig>;
+  LLMs: LLMConfig[] | undefined;
+  embeddingModels: Record<string, EmbeddingModelConfig> | undefined;
   defaultLLM: string;
   defaultEmbedFuncRepo: string;
   RAG?: RAGConfig;
-  hardware: HardwareConfig;
+  hardware: HardwareConfig | undefined;
   llmGenerationParameters: LLMGenerationParameters;
   chatHistories: Record<string, ChatHistory[]> | undefined;
   analytics?: boolean;
   chunkSize: number;
   isSBCompact: boolean;
   DisplayMarkdown: boolean;
-  spellCheck: boolean;
+  spellCheck: boolean | undefined;
 }
 
 export enum StoreKeys {
