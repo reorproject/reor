@@ -308,7 +308,7 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
     const subscription = (
       _event: Electron.IpcRendererEvent,
       ...args: unknown[]
-    ) => func(...args);
+    ) => { func(...args); };
     ipcRenderer.on(channel, subscription);
     return () => {
       ipcRenderer.removeListener(channel, subscription);

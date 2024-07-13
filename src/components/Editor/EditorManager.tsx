@@ -60,7 +60,7 @@ const EditorManager: React.FC<EditorManagerProps> = ({
     editor.commands.setTextSelection(position);
     const { node } = editor.view.domAtPos(editor.state.selection.anchor);
     if (node instanceof Element) {
-      node.scrollIntoView?.(false);
+      node.scrollIntoView(false);
     }
   };
 
@@ -89,7 +89,7 @@ const EditorManager: React.FC<EditorManagerProps> = ({
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => { window.removeEventListener("keydown", handleKeyDown); };
   }, [showSearch, menuVisible, toggleSearch]);
 
   return (
@@ -105,7 +105,7 @@ const EditorManager: React.FC<EditorManagerProps> = ({
           type="text"
           value={searchTerm}
           onKeyDown={handleNextSearch}
-          onChange={(event) => handleSearchChange(event.target.value)}
+          onChange={(event) => { handleSearchChange(event.target.value); }}
           onBlur={() => {
             setShowSearch(false);
             handleSearchChange("");

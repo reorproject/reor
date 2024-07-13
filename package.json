@@ -23,7 +23,14 @@
     "e2e": "playwright test",
     "test": "jest",
     "lint": "eslint . --ext .ts,.tsx",
-    "lint:fix": "eslint . --ext .ts,.tsx --fix"
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "precommit": "npm run lint:fix && npm test",
+    "prepare": "husky"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run precommit"
+    }
   },
   "dependencies": {
     "@aarkue/tiptap-math-extension": "^1.2.2",
@@ -112,7 +119,9 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-unused-imports": "^4.0.0",
+    "husky": "^9.0.11",
     "jest": "^29.7.0",
+    "lint-staged": "^15.2.7",
     "postcss": "^8.4.31",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

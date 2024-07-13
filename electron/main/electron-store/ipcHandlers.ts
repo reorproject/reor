@@ -196,7 +196,7 @@ export const registerStoreHandlers = (
     }
 
     const allHistories = store.get(StoreKeys.ChatHistories);
-    const chatHistoriesCorrespondingToVault = allHistories?.[vaultDir] ?? [];
+    const chatHistoriesCorrespondingToVault = allHistories[vaultDir] ?? [];
     return chatHistoriesCorrespondingToVault;
   });
 
@@ -209,7 +209,7 @@ export const registerStoreHandlers = (
       return;
     }
     const chatHistoriesCorrespondingToVault =
-      allChatHistories?.[vaultDir] ?? [];
+      allChatHistories[vaultDir] ?? [];
     // check if chat history already exists. if it does, update it. if it doesn't append it
     const existingChatIndex = chatHistoriesCorrespondingToVault.findIndex(
       (chat) => chat.id === newChat.id
@@ -267,7 +267,7 @@ export function getDefaultEmbeddingModelConfig(
 ): EmbeddingModelConfig {
   const defaultEmbeddingModelAlias = store.get(
     StoreKeys.DefaultEmbeddingModelAlias
-  ) as string | undefined;
+  );
 
   // Check if the default model alias is defined and not empty
   if (!defaultEmbeddingModelAlias) {

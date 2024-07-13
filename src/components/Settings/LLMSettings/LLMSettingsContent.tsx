@@ -69,7 +69,7 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = ({
         title="Local LLM"
         buttonText="Add New Local LLM"
         description="Attach a local LLM. Reor will download the model for you."
-        onClick={() => openModal("newLocalModel")}
+        onClick={() => { openModal("newLocalModel"); }}
       />
       <LLMOptionRow
         title="Setup OpenAI/Anthropic"
@@ -78,7 +78,7 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = ({
         <CustomSelect
           options={modalOptions}
           selectedValue="Attach Cloud LLM"
-          onChange={(value) => openModal(value as "openai" | "anthropic")}
+          onChange={(value) => { openModal(value as "openai" | "anthropic"); }}
           centerText={true}
         />
       </LLMOptionRow>
@@ -86,7 +86,7 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = ({
         title="Setup remote LLMs"
         description="Non-OpenAI/Anthropic LLMs"
         buttonText="Remote LLM Setup"
-        onClick={() => openModal("remoteLLM")}
+        onClick={() => { openModal("remoteLLM"); }}
       />
       {!isInitialSetup && userMadeChanges && (
         <p className="text-xs text-slate-100 mt-1">

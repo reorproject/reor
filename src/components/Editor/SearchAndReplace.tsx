@@ -109,7 +109,7 @@ function processSearches(
     };
   }
 
-  doc?.descendants((node, pos) => {
+  doc.descendants((node, pos) => {
     if (node.isText) {
       if (textNodesWithPosition[index]) {
         textNodesWithPosition[index] = {

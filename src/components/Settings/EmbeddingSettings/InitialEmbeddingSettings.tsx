@@ -103,7 +103,7 @@ const InitialEmbeddingModelSettings: React.FC<
           onChange={handleChangeOnModelSelect}
           addButton={{
             label: "Attach a Custom Embedding Model",
-            onClick: () => setShowNewEmbeddingModelModal(true),
+            onClick: () => { setShowNewEmbeddingModelModal(true); },
           }}
         />
       </div>

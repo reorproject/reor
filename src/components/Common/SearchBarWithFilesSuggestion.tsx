@@ -37,7 +37,7 @@ export const SearchBarWithFilesSuggestion = ({
         left: inputCoords.x,
       },
       textWithinBrackets: searchText,
-      onSelect: (suggestion) => onSelectSuggestion(suggestion + ".md"),
+      onSelect: (suggestion) => { onSelectSuggestion(suggestion + ".md"); },
     });
   };
 
@@ -59,7 +59,7 @@ export const SearchBarWithFilesSuggestion = ({
     window.addEventListener("resize", calculateWidth);
 
     // Cleanup event listener
-    return () => window.removeEventListener("resize", calculateWidth);
+    return () => { window.removeEventListener("resize", calculateWidth); };
   });
 
   return (
@@ -72,7 +72,7 @@ export const SearchBarWithFilesSuggestion = ({
           focus:outline-none focus:shadow-outline-blue focus:border-blue-300
           transition duration-150 ease-in-out"
           value={searchText}
-          onSelect={() => initializeSuggestionsStateOnFocus()}
+          onSelect={() => { initializeSuggestionsStateOnFocus(); }}
           onChange={(e) => {
             setSearchText(e.target.value);
             if (e.target.value.length == 0) {

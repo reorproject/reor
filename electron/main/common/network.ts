@@ -50,7 +50,7 @@ export const customFetchUsingElectronNet = async (
 
     request.on("response", (response) => {
       const chunks: Buffer[] = [];
-      response.on("data", (chunk) => chunks.push(chunk as Buffer));
+      response.on("data", (chunk) => chunks.push(chunk));
       response.on("end", () => {
         const buffer = Buffer.concat(chunks);
         resolve(
@@ -64,7 +64,7 @@ export const customFetchUsingElectronNet = async (
       });
     });
 
-    request.on("error", (error) => reject(error));
+    request.on("error", (error) => { reject(error); });
     request.end();
   });
 };

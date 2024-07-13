@@ -19,7 +19,7 @@ export const DBResultPreview: React.FC<DBResultPreview> = ({
   return (
     <div
       className="pr-2 pb-1 mt-0 text-slate-300 pt-1 rounded border-solid border-gray-600 bg-neutral-800 border-[0.1px] pl-2 shadow-md cursor-pointer hover:scale-104 hover:shadow-lg hover:bg-neutral-700 transition-transform duration-300 max-w-full overflow-hidden"
-      onClick={() => onSelect(entry.notepath)}
+      onClick={() => { onSelect(entry.notepath); }}
     >
       <div className="max-h-60 overflow-y-auto scrollbar-hide">
         <ReactMarkdown
@@ -61,7 +61,7 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({
   return (
     <div
       className="bg-neutral-800 border border-gray-600 rounded shadow-md hover:shadow-lg transition-transform duration-300 cursor-pointer hover:scale-104 hover:bg-neutral-500 mt-0 mb-4 p-2 max-w-full overflow-hidden"
-      onClick={() => onSelect(entry.notepath)}
+      onClick={() => { onSelect(entry.notepath); }}
     >
       <div className="max-h-60 overflow-y-auto scrollbar-hide">
         <ReactMarkdown

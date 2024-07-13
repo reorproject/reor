@@ -71,7 +71,7 @@ const CloudLLMSetupModal: React.FC<CloudLLMSetupModalProps> = ({
           type="text"
           className="block w-full px-3 py-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
           value={openKey}
-          onChange={(e) => setOpenKey(e.target.value)}
+          onChange={(e) => { setOpenKey(e.target.value); }}
           onKeyDown={handleKeyPress}
           placeholder={`${LLMDisplayName} API Key`}
         />

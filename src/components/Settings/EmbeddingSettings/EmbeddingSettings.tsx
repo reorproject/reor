@@ -114,7 +114,7 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
           <div className="flex">
             <Button
               className="flex justify-between items-center w-[80px] py-2 border border-gray-300 rounded-md border-none cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten font-normal"
-              onClick={() => setIsNewLocalEmbeddingModelModalOpen(true)}
+              onClick={() => { setIsNewLocalEmbeddingModelModalOpen(true); }}
               placeholder=""
             >
               Attach
@@ -133,7 +133,7 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
           <div className="flex">
             <Button
               className="flex justify-between items-center w-[80px] py-2 border border-gray-300 rounded-md border-none cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten font-normal"
-              onClick={() => setIsContextLengthModalOpen(true)}
+              onClick={() => { setIsContextLengthModalOpen(true); }}
               placeholder=""
             >
               Attach

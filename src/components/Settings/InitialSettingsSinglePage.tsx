@@ -30,7 +30,7 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({
   return (
     <ReorModal
       isOpen={true}
-      onClose={() => console.log("Not allowing a close for now")}
+      onClose={() => { console.log("Not allowing a close for now"); }}
       hideCloseButton={true}
     >
       <div className="w-[620px] mr-4 ml-2 py-3">

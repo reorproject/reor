@@ -124,8 +124,8 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
           <input
             type="text"
             className="w-[80px] p-2 bg-dark-gray-c-eight hover:bg-dark-gray-c-ten border-none rounded-md text-gray-100"
-            value={textGenerationParams?.maxTokens}
-            onChange={(e) => handleTokenInput(e)}
+            value={textGenerationParams.maxTokens}
+            onChange={(e) => { handleTokenInput(e); }}
             ref={inputRef}
             placeholder="None"
           />

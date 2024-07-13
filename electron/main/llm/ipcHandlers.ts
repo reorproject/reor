@@ -32,7 +32,7 @@ enum LLMType {
   Anthropic = "anthropic",
 }
 
-export const LLMSessions: { [sessionId: string]: LLMSessionService } = {};
+export const LLMSessions: Record<string, LLMSessionService> = {};
 
 export const openAISession = new OpenAIModelSessionService();
 export const anthropicSession = new AnthropicModelSessionService();

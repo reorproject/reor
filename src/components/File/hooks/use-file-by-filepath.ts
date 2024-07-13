@@ -62,7 +62,7 @@ export const useFileByFilepath = () => {
     position: null,
   });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
+  // const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
 
   const setFileNodeToBeRenamed = async (filePath: string) => {
     const isDirectory = await window.fileSystem.isDirectory(filePath);
@@ -135,23 +135,23 @@ export const useFileByFilepath = () => {
   };
 
   // Check if we should display markdown or not
-  useEffect(() => {
-    const handleInitialStartup = async () => {
-      const isMarkdownSet = await window.electronStore.getDisplayMarkdown();
-      setDisplayMarkdown(isMarkdownSet);
-    };
+  // useEffect(() => {
+  //   const handleInitialStartup = async () => {
+  //     const isMarkdownSet = await window.electronStore.getDisplayMarkdown();
+  //     setDisplayMarkdown(isMarkdownSet);
+  //   };
 
-    // Even listener
-    const handleChangeMarkdown = (isMarkdownSet: boolean) => {
-      setDisplayMarkdown(isMarkdownSet);
-    };
+  //   // Even listener
+  //   const handleChangeMarkdown = (isMarkdownSet: boolean) => {
+  //     setDisplayMarkdown(isMarkdownSet);
+  //   };
 
-    handleInitialStartup();
-    window.ipcRenderer.receive(
-      "display-markdown-changed",
-      handleChangeMarkdown
-    );
-  }, []);
+  //   handleInitialStartup();
+  //   window.ipcRenderer.receive(
+  //     "display-markdown-changed",
+  //     handleChangeMarkdown
+  //   );
+  // }, []);
 
   const editor = useEditor({
     autofocus: true,

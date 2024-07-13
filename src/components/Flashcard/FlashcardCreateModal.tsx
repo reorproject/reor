@@ -117,7 +117,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
             focus:outline-none focus:shadow-outline-blue focus:border-blue-300
             transition duration-150 ease-in-out"
             value={searchText}
-            onSelect={() => initializeSuggestionsStateOnFocus()}
+            onSelect={() => { initializeSuggestionsStateOnFocus(); }}
             onChange={(e) => {
               setSearchText(e.target.value);
               if (e.target.value.length == 0) {

@@ -67,7 +67,7 @@ export async function removeLLM(
   ollamaService: OllamaService,
   modelName: string
 ): Promise<void> {
-  const existingModels = (store.get(StoreKeys.LLMs) as LLMConfig[]) || [];
+  const existingModels = (store.get(StoreKeys.LLMs)) || [];
 
   const foundModel = await getLLMConfig(store, ollamaService, modelName);
 

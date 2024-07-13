@@ -145,7 +145,7 @@ export class LanceDBTableWrapper {
     return mapped as DBQueryResult[];
   }
 
-  async filter(filterString: string, limit: number = 10): Promise<DBEntry[]> {
+  async filter(filterString: string, limit = 10): Promise<DBEntry[]> {
     const rawResults = await this.lanceTable
       .filter(filterString)
       .limit(limit)

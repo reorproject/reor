@@ -5,11 +5,11 @@ import Store from "electron-store";
 import { StoreSchema, StoreKeys } from "../electron-store/storeConfig";
 import { LanceDBTableWrapper } from "../vector-database/lanceTableWrapper";
 
-type WindowInfo = {
+interface WindowInfo {
   windowID: number;
   dbTableClient: LanceDBTableWrapper;
   vaultDirectoryForWindow: string;
-};
+}
 
 class WindowsManager {
   activeWindows: WindowInfo[] = [];
@@ -82,7 +82,7 @@ class WindowsManager {
   ): string {
     const lastUsedVaultDirectory = store.get(
       StoreKeys.DirectoryFromPreviousSession
-    ) as string;
+    );
     if (!lastUsedVaultDirectory) {
       return "";
     }

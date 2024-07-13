@@ -22,10 +22,10 @@ export interface AnthropicLLMConfig extends BaseLLMConfig {
 
 export type LLMConfig = OpenAILLMConfig | AnthropicLLMConfig;
 
-export type LLMGenerationParameters = {
+export interface LLMGenerationParameters {
   maxTokens?: number;
   temperature?: number;
-};
+}
 
 export type EmbeddingModelConfig =
   | EmbeddingModelWithRepo
@@ -40,15 +40,15 @@ export interface EmbeddingModelWithLocalPath {
   type: "local";
   localPath: string;
 }
-export type RAGConfig = {
+export interface RAGConfig {
   maxRAGExamples: number;
-};
+}
 
-export type HardwareConfig = {
+export interface HardwareConfig {
   useGPU: boolean;
   useCUDA: boolean;
   useVulkan: boolean;
-};
+}
 
 export interface StoreSchema {
   hasUserOpenedAppBefore: boolean;
@@ -58,17 +58,13 @@ export interface StoreSchema {
     directoryFromPreviousSession?: string;
   };
   LLMs: LLMConfig[];
-  embeddingModels: {
-    [modelAlias: string]: EmbeddingModelConfig;
-  };
+  embeddingModels: Record<string, EmbeddingModelConfig>;
   defaultLLM: string;
   defaultEmbedFuncRepo: string;
   RAG?: RAGConfig;
   hardware: HardwareConfig;
   llmGenerationParameters: LLMGenerationParameters;
-  chatHistories: {
-    [vaultDir: string]: ChatHistory[];
-  };
+  chatHistories: Record<string, ChatHistory[]>;
   analytics?: boolean;
   chunkSize: number;
   isSBCompact: boolean;

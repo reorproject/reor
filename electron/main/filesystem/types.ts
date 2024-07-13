@@ -1,10 +1,10 @@
-export type FileInfo = {
+export interface FileInfo {
   name: string;
   path: string;
   relativePath: string;
   dateModified: Date;
   dateCreated: Date;
-};
+}
 
 export type FileInfoNode = FileInfo & {
   children?: FileInfoNode[];
@@ -22,12 +22,12 @@ export interface AugmentPromptWithFileProps {
   filePath: string;
 }
 
-export type WriteFileProps = {
+export interface WriteFileProps {
   filePath: string;
   content: string;
-};
+}
 
-export type RenameFileProps = {
+export interface RenameFileProps {
   oldFilePath: string;
   newFilePath: string;
-};
+}

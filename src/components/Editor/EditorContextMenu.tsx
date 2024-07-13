@@ -129,7 +129,7 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({
           <span className="text">Copy</span>
         </li>
         <li
-          onClick={() => handleCommand("cut")}
+          onClick={() => { handleCommand("cut"); }}
           className={`bubble-menu-item ${
             !isTextCurrentlySelected() ? "disabled opacity-50" : ""
           }`}
@@ -148,7 +148,7 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({
           <span className="text">Paste</span>
         </li>
         <li
-          onClick={() => handleCommand("delete")}
+          onClick={() => { handleCommand("delete"); }}
           className={`bubble-menu-item ${
             !isTextCurrentlySelected() ? "disabled opacity-50" : ""
           }`}
@@ -159,7 +159,7 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({
         <div className="w-full h-px bg-gray-500"></div>
         <li
           ref={tableButtonRef}
-          onMouseEnter={() => setShowTableSelector(true)}
+          onMouseEnter={() => { setShowTableSelector(true); }}
           className={`bubble-menu-item`}
         >
           <CiViewTable className="icon" />
@@ -190,9 +190,9 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({
  *
  * @returns number of rows and cols selected
  */
-type TableSizeSelectorProps = {
+interface TableSizeSelectorProps {
   onSelect: (rows: number, cols: number) => void;
-};
+}
 
 const TableSizeSelector: React.FC<TableSizeSelectorProps> = ({ onSelect }) => {
   const maxRows = 10;
@@ -215,7 +215,7 @@ const TableSizeSelector: React.FC<TableSizeSelectorProps> = ({ onSelect }) => {
               setHoveredRows(i);
               setHoveredCols(j);
             }}
-            onClick={() => onSelect(i, j)}
+            onClick={() => { onSelect(i, j); }}
           />
         );
       }

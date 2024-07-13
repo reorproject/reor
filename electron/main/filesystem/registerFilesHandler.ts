@@ -150,7 +150,7 @@ export const registerFileHandlers = (
         throw new Error("Window info not found.");
       }
 
-      windowsManager.watcher?.unwatch(windowInfo?.vaultDirectoryForWindow);
+      windowsManager.watcher?.unwatch(windowInfo.vaultDirectoryForWindow);
 
       if (process.platform == "win32") {
         windowsManager.watcher?.close().then(() => {
@@ -187,7 +187,7 @@ export const registerFileHandlers = (
               throw err;
             }
             // Re-watch the vault directory after renaming
-            windowsManager.watcher?.add(windowInfo?.vaultDirectoryForWindow);
+            windowsManager.watcher?.add(windowInfo.vaultDirectoryForWindow);
           }
         );
       }

@@ -2,12 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { FaTrash } from "react-icons/fa";
 
-type OptionType = {
+interface OptionType {
   label: string;
   value: string;
-};
+}
 
-type CustomSelectProps = {
+interface CustomSelectProps {
   options: OptionType[];
   selectedValue: string;
   onChange: (value: string) => void;
@@ -17,7 +17,7 @@ type CustomSelectProps = {
   };
   onDelete?: (value: string) => void;
   centerText?: boolean;
-};
+}
 
 const CustomSelect: React.FC<CustomSelectProps> = ({
   options,
@@ -46,7 +46,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
     };
   }, [wrapperRef]);
 
-  const toggleDropdown = () => setIsOpen(!isOpen);
+  const toggleDropdown = () => { setIsOpen(!isOpen); };
   const handleOptionClick = (optionValue: string) => {
     onChange(optionValue);
     setIsOpen(false);
@@ -90,7 +90,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
             <div
               key={index}
               className="flex justify-between items-center py-2 pl-6 pr-2 bg-dark-gray-c-eight cursor-pointer text-white hover:bg-dark-gray-c-ten "
-              onClick={() => handleOptionClick(option.value)}
+              onClick={() => { handleOptionClick(option.value); }}
             >
               <span className="w-full">{option.label}</span>
               {selectedValue === option.value ? (

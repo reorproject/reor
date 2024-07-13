@@ -30,7 +30,7 @@ export interface LLMSessionService {
     modelName: string,
     modelConfig: LLMConfig,
     isJSONMode: boolean,
-    messageHistory: Array<ChatCompletionMessageParam>,
+    messageHistory: ChatCompletionMessageParam[],
     chunkResponse: (chunk: ChatCompletionChunk | MessageStreamEvent) => void,
     generationParams?: LLMGenerationParameters
   ): Promise<void>;

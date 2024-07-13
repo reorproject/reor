@@ -45,13 +45,13 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
         {isReviewFlashcardMode && (
           <FlashcardReviewModal
             isOpen={isReviewFlashcardMode}
-            onClose={() => setIsReviewFlashcardMode(false)}
+            onClose={() => { setIsReviewFlashcardMode(false); }}
           />
         )}
         {isCreateFlashcardMode && (
           <FlashcardCreateModal
             isOpen={isCreateFlashcardMode}
-            onClose={() => setIsCreateFlashcardMode(false)}
+            onClose={() => { setIsCreateFlashcardMode(false); }}
             initialFlashcardFile={initialFileToCreateFlashcard}
           />
         )}

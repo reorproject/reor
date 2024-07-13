@@ -78,7 +78,7 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
               posthog.capture("select_backlink_suggestion", {
                 rank: index + 1,
               });
-              suggestionsState.onSelect?.(suggestion);
+              suggestionsState.onSelect(suggestion);
             }}
           >
             {suggestion}
