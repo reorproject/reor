@@ -15,10 +15,9 @@ import SidebarManager from "./Sidebars/MainSidebar";
 import SimilarFilesSidebarComponent from "./Sidebars/SimilarFilesSidebar";
 import WritingAssistant from "./Writing-Assistant/WritingAssistantFloatingMenu";
 
-interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search" | "chats";
 
-const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
+const MainPageComponent: React.FC = () => {
   const [showChatbot, setShowChatbot] = useState<boolean>(false);
   const [showSimilarFiles, setShowSimilarFiles] = useState(true);
   const [sidebarShowing, setSidebarShowing] =
@@ -218,4 +217,4 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
   );
 };
 
-export default FileEditorContainer;
+export default MainPageComponent;
