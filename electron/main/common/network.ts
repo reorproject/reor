@@ -21,11 +21,11 @@ export const customFetchUsingElectronNet = async (
   } else {
     throw new Error('Invalid input type');
   }
-  const options = init || {};
+  const options = init ?? {};
 
   return new Promise((resolve, reject) => {
     const requestOptions: ClientRequestConstructorOptions = {
-      method: options.method || "GET",
+      method: options.method ?? "GET",
       url: url,
     };
 
@@ -103,11 +103,11 @@ export const customFetchUsingElectronNetStreaming = async (
   } else {
     throw new Error('Invalid input type');
   }
-  const options = init || {};
+  const options = init ?? {};
 
   return new Promise((resolve, reject) => {
     const requestOptions: ClientRequestConstructorOptions = {
-      method: options.method || "GET",
+      method: options.method ?? "GET",
       url: url,
     };
 
@@ -150,6 +150,7 @@ export const customFetchUsingElectronNetStreaming = async (
 
     request.on("response", (response: IncomingMessage) => {
       const nodeStream = new Readable({
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         read() {},
       });
     

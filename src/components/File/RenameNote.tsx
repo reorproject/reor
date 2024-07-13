@@ -41,7 +41,7 @@ const RenameNoteModal: React.FC<RenameNoteModalProps> = ({
     setDirectoryUponNoteChange();
   }, [fullNoteName]);
 
-  const fileExtension = fullNoteName.split(".").pop() || "md";
+  const fileExtension = fullNoteName.split(".").pop() ?? "md";
   const [dirPrefix, setDirPrefix] = useState<string>("");
   const [noteName, setNoteName] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

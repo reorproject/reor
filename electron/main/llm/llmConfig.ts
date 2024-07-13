@@ -62,7 +62,7 @@ export async function removeLLM(
   ollamaService: OllamaService,
   modelName: string
 ): Promise<void> {
-  const existingModels = (store.get(StoreKeys.LLMs)) || [];
+  const existingModels = (store.get(StoreKeys.LLMs)) ?? [];
 
   const foundModel = await getLLMConfig(store, ollamaService, modelName);
 
@@ -82,7 +82,7 @@ export async function getAllLLMConfigs(
   store: Store<StoreSchema>,
   ollamaSession: OllamaService
 ): Promise<LLMConfig[]> {
-  const llmConfigsFromStore = store.get(StoreKeys.LLMs) || [];
+  const llmConfigsFromStore = store.get(StoreKeys.LLMs) ?? [];
   const ollamaLLMConfigs = await ollamaSession.getAvailableModels();
 
   return [...llmConfigsFromStore, ...ollamaLLMConfigs];

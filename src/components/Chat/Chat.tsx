@@ -410,8 +410,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             return Promise.resolve();
           }}
           isLoadingSimilarEntries={false}
-          setIsRefined={() => {}} // to allow future toggling
-          isRefined={true} // always refined for now
         />
       )}
     </div>

@@ -9,9 +9,8 @@ import IndexingProgress from "./components/Common/IndexingProgress";
 import MainPageComponent from "./components/MainPage";
 import InitialSetupSinglePage from "./components/Settings/InitialSettingsSinglePage";
 
-interface AppProps {}
 
-const App: React.FC<AppProps> = () => {
+const App: React.FC = () => {
   const [
     userHasConfiguredSettingsForIndexing,
     setUserHasConfiguredSettingsForIndexing,

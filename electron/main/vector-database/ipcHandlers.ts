@@ -289,7 +289,7 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
         "Create useful FLASHCARDS that can be used for students to study using ONLY the context. Format is Q: <insert question> A: <insert answer>.";
       const { prompt: promptToCreateFlashcardsWithAtomicFacts } =
         createPromptWithContextLimitFromContent(
-          llmGeneratedFacts.choices[0].message.content || "",
+          llmGeneratedFacts.choices[0].message.content ?? "",
           basePrompt,
           flashcardQuery,
           llmSession.getTokenizer(llmName),
