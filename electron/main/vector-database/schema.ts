@@ -11,14 +11,13 @@ import {
 
 export interface DBEntry {
   notepath: string;
-  vector: Float32Array;
+  vector?: Float32Array;
   content: string;
   subnoteindex: number;
   timeadded: Date;
   filemodified: Date;
   filecreated: Date;
 }
-
 export interface DBQueryResult extends DBEntry {
   _distance: number;
 }
@@ -36,18 +35,8 @@ export enum DatabaseFields {
   DISTANCE = "_distance",
 }
 
-type DatabaseSchema = Schema<{
-  [DatabaseFields.NOTE_PATH]: Utf8;
-  [DatabaseFields.VECTOR]: FixedSizeList;
-  [DatabaseFields.CONTENT]: Utf8;
-  [DatabaseFields.SUB_NOTE_INDEX]: Float64;
-  [DatabaseFields.TIME_ADDED]: ArrowDate;
-  [DatabaseFields.FILE_MODIFIED]: ArrowDate;
-  [DatabaseFields.FILE_CREATED]: ArrowDate;
-}>;
-
-const CreateDatabaseSchema = (vectorDim: number): DatabaseSchema => {
-  const schemaFields: Field[] = [
+const CreateDatabaseSchema = (vectorDim: number): Schema => {
+  const schemaFields = [
     new Field(DatabaseFields.NOTE_PATH, new Utf8(), false),
     new Field(
       DatabaseFields.VECTOR,
@@ -72,13 +61,15 @@ const CreateDatabaseSchema = (vectorDim: number): DatabaseSchema => {
       false
     ),
   ];
-  return new Schema(schemaFields) as DatabaseSchema;
+  const schema = new Schema(schemaFields);
+  return schema;
 };
 
-const serializeSchema = (schema: DatabaseSchema): string => {
+const serializeSchema = (schema: Schema): string => {
   return JSON.stringify(
     schema.fields.map((field) => ({
       name: field.name,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       type: field.type.toString(),
       nullable: field.nullable,
     }))
@@ -86,12 +77,14 @@ const serializeSchema = (schema: DatabaseSchema): string => {
 };
 
 export const isStringifiedSchemaEqual = (
-  schema1: DatabaseSchema,
-  schema2: DatabaseSchema
+  schema1: Schema,
+  schema2: Schema
 ): boolean => {
   const serializedSchema1 = serializeSchema(schema1);
   const serializedSchema2 = serializeSchema(schema2);
-  return serializedSchema1 === serializedSchema2;
+
+  const areEqual = serializedSchema1 === serializedSchema2;
+  return areEqual;
 };
 
 export default CreateDatabaseSchema;
