@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-return */
 import path from "path";
 
 import { Pipeline, PreTrainedTokenizer } from "@xenova/transformers";
@@ -80,7 +84,7 @@ export async function createEmbeddingFunctionForLocalModel(
     );
   }
   const tokenize = setupTokenizeFunction(pipe.tokenizer);
-  const embed = await setupEmbedFunction(pipe);
+  const embed = setupEmbedFunction(pipe);
 
   return {
     name: functionName,
@@ -127,7 +131,7 @@ export async function createEmbeddingFunctionForRepo(
     );
   }
   const tokenize = setupTokenizeFunction(pipe.tokenizer);
-  const embed = await setupEmbedFunction(pipe);
+  const embed = setupEmbedFunction(pipe);
 
   // sanitize the embedding text to remove markdown content
 
@@ -144,9 +148,6 @@ function setupTokenizeFunction(
   tokenizer: PreTrainedTokenizer
 ): (data: (string | number[])[]) => string[] {
   return (data: (string | number[])[]): string[] => {
-    if (!tokenizer) {
-      throw new Error("Tokenizer not initialized");
-    }
 
     return data.map((text) => {
       try {
@@ -163,22 +164,16 @@ function setupTokenizeFunction(
   };
 }
 
-async function setupEmbedFunction(
+function setupEmbedFunction(
   pipe: Pipeline
-): Promise<(batch: (string | number[])[]) => Promise<number[][]>> {
+): (batch: (string | number[])[]) => Promise<number[][]> {
   return async (batch: (string | number[])[]): Promise<number[][]> => {
     if (batch.length === 0 || batch[0].length === 0) {
       return [];
     }
-
     if (typeof batch[0][0] === "number") {
       return batch as number[][];
     }
-
-    if (!pipe) {
-      throw new Error("Pipeline not initialized");
-    }
-
     const result: number[][] = await Promise.all(
       batch.map(async (text) => {
         try {
@@ -196,7 +191,6 @@ async function setupEmbedFunction(
         }
       })
     );
-
     return result;
   };
 }

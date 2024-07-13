@@ -219,7 +219,6 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
         messageType: "success",
         context: [],
       });
-      if (!chatHistory) return;
 
       await window.llm.streamingLLMResponse(
         defaultLLMName,
@@ -240,7 +239,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
   ) => {
     setCurrentChatHistory((prev) => {
       if (chatID !== prev?.id) return prev;
-      const newDisplayableHistory = prev.displayableChatHistory || [];
+      const newDisplayableHistory = prev.displayableChatHistory;
       if (newDisplayableHistory.length > 0) {
         const lastMessage =
           newDisplayableHistory[newDisplayableHistory.length - 1];
@@ -278,7 +277,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
   };
 
   useEffect(() => {
-    const handleOpenAIChunk = async (
+    const handleOpenAIChunk = (
       receivedChatID: string,
       chunk: ChatCompletionChunk
     ) => {
@@ -288,12 +287,12 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
       }
     };
 
-    const handleAnthropicChunk = async (
+    const handleAnthropicChunk = (
       receivedChatID: string,
       chunk: MessageStreamEvent
     ) => {
       const newContent =
-        chunk.type === "content_block_delta" ? chunk.delta.text ?? "" : "";
+        chunk.type === "content_block_delta" ? chunk.delta.text : "";
       if (newContent) {
         appendNewContentToMessageHistory(receivedChatID, newContent, "success");
       }
@@ -327,7 +326,9 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
         }}
         className="absolute w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer text-gray-600 border-none shadow-md hover:bg-gray-300"
         aria-label="Writing Assistant button"
-        onClick={() => { setIsOptionsVisible(true); }}
+        onClick={() => {
+          setIsOptionsVisible(true);
+        }}
       >
         <FaMagic />
       </button>
@@ -345,7 +346,9 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
             variant="outlined"
             size="small"
             value={customPrompt}
-            onChange={(e) => { setCustomPrompt(e.target.value); }}
+            onChange={(e) => {
+              setCustomPrompt(e.target.value);
+            }}
             placeholder="Ask AI anything..."
             className="mb-2.5 p-1 w-full" // TailwindCSS classes for styling
             onKeyPress={(e) => {

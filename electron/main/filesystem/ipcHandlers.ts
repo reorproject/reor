@@ -43,7 +43,7 @@ export const registerFileHandlers = (
 ) => {
   ipcMain.handle(
     "get-files-tree-for-window",
-    async (event): Promise<FileInfoTree> => {
+    (event): FileInfoTree => {
       const directoryPath = windowsManager.getVaultDirectoryForWinContents(
         event.sender
       );
@@ -56,26 +56,23 @@ export const registerFileHandlers = (
 
   ipcMain.handle(
     "read-file",
-    async (event, filePath: string): Promise<string> => {
+    (event, filePath: string): string => {
       return fs.readFileSync(filePath, "utf-8");
     }
   );
 
-  ipcMain.handle("check-file-exists", async (event, filePath) => {
+  ipcMain.handle("check-file-exists", async (event, filePath: string) => {
     try {
-      // Attempt to access the file to check existence
       await fs.promises.access(filePath, fs.constants.F_OK);
-      // If access is successful, return true
       return true;
     } catch (error) {
-      // If an error occurs (e.g., file doesn't exist), return false
       return false;
     }
   });
 
   ipcMain.handle(
     "delete-file",
-    async (event, filePath: string): Promise<void> => {
+    (event, filePath: string): void => {
       console.log("Deleting file", filePath);
       fs.stat(filePath, async (err, stats) => {
         if (err) {
@@ -123,7 +120,7 @@ export const registerFileHandlers = (
 
   ipcMain.handle(
     "write-file",
-    async (event, writeFileProps: WriteFileProps) => {
+    (event, writeFileProps: WriteFileProps) => {
       if (!fs.existsSync(path.dirname(writeFileProps.filePath))) {
         fs.mkdirSync(path.dirname(writeFileProps.filePath), {
           recursive: true,
@@ -143,7 +140,7 @@ export const registerFileHandlers = (
 
   ipcMain.handle(
     "rename-file-recursive",
-    async (event, renameFileProps: RenameFileProps) => {
+    (event, renameFileProps: RenameFileProps) => {
       const windowInfo = windowsManager.getWindowInfoForContents(event.sender);
 
       if (!windowInfo) {
@@ -211,14 +208,14 @@ export const registerFileHandlers = (
 
   ipcMain.handle(
     "create-file",
-    async (event, filePath: string, content: string): Promise<void> => {
+    (event, filePath: string, content: string): void => {
       createFileRecursive(filePath, content, "utf-8");
     }
   );
 
   ipcMain.handle(
     "create-directory",
-    async (event, dirPath: string): Promise<void> => {
+    (event, dirPath: string): void => {
       console.log("Creating directory", dirPath);
 
       const mkdirRecursiveSync = (dirPath: string) => {
@@ -241,7 +238,7 @@ export const registerFileHandlers = (
 
   ipcMain.handle(
     "move-file-or-dir",
-    async (event, sourcePath: string, destinationPath: string) => {
+    (event, sourcePath: string, destinationPath: string) => {
       const windowInfo = windowsManager.getWindowInfoForContents(event.sender);
       if (!windowInfo) {
         throw new Error("Window info not found.");
@@ -424,7 +421,7 @@ export const registerFileHandlers = (
     }
   });
 
-  ipcMain.handle("open-file-dialog", async (event, extensions) => {
+  ipcMain.handle("open-file-dialog", async (event, extensions?: string[]) => {
     const filters =
       extensions && extensions.length > 0
         ? [{ name: "Files", extensions }]

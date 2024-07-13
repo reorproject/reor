@@ -41,7 +41,7 @@ export const useFileByFilepath = () => {
     useState<boolean>(false);
   const [needToIndexEditorContent, setNeedToIndexEditorContent] =
     useState<boolean>(false);
-  const [spellCheckEnabled, setSpellCheckEnabled] = useState<string>("false");
+  const [spellCheckEnabled, setSpellCheckEnabled] = useState(false);
 
   useEffect(() => {
     const fetchSpellCheckMode = async () => {
@@ -87,8 +87,7 @@ export const useFileByFilepath = () => {
       window.fileSystem.indexFileInDatabase(currentlyOpenedFilePath);
       setNeedToIndexEditorContent(false);
     }
-    const newFileContent =
-      (await window.fileSystem.readFile(newFilePath)) ?? "";
+    const newFileContent = await window.fileSystem.readFile(newFilePath);
     editor?.commands.setContent(newFileContent);
     setCurrentlyOpenedFilePath(newFilePath);
     setCurrentlyChangingFilePath(false);
@@ -211,7 +210,7 @@ export const useFileByFilepath = () => {
       editor.setOptions({
         editorProps: {
           attributes: {
-            spellcheck: spellCheckEnabled,
+            spellcheck: spellCheckEnabled ? "true" : "false",
           },
         },
       });
@@ -241,17 +240,15 @@ export const useFileByFilepath = () => {
   ) => {
     if (filePath !== null && needToWriteEditorContentToDisk && editor) {
       const markdownContent = getMarkdown(editor);
-      if (markdownContent !== null) {
-        await window.fileSystem.writeFile({
-          filePath: filePath,
-          content: markdownContent,
-        });
+      await window.fileSystem.writeFile({
+        filePath: filePath,
+        content: markdownContent,
+      });
 
-        console.log(
-          "setting is file content modified to false in actual save function"
-        );
-        setNeedToWriteEditorContentToDisk(false);
-      }
+      console.log(
+        "setting is file content modified to false in actual save function"
+      );
+      setNeedToWriteEditorContentToDisk(false);
     }
   };
 
@@ -340,11 +337,7 @@ export const useFileByFilepath = () => {
         fileContent: editor?.getHTML() || "",
         editor: editor,
       });
-      if (
-        currentlyOpenedFilePath !== null &&
-        editor &&
-        editor.getHTML() !== null
-      ) {
+      if (currentlyOpenedFilePath !== null && editor) {
         const markdown = getMarkdown(editor);
         await window.fileSystem.writeFile({
           filePath: currentlyOpenedFilePath,
@@ -387,7 +380,9 @@ export const useFileByFilepath = () => {
 
 function getMarkdown(editor: Editor) {
   // Fetch the current markdown content from the editor
-  const originalMarkdown = editor.storage.markdown.getMarkdown();
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+  const originalMarkdown: string = editor.storage.markdown.getMarkdown();
   // Replace the escaped square brackets with unescaped ones
   const modifiedMarkdown = originalMarkdown
     .replace(/\\\[/g, "[") // Replaces \[ with [

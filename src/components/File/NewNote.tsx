@@ -45,7 +45,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
     });
   };
 
-  const sendNewNoteMsg = async () => {
+  const sendNewNoteMsg = () => {
     if (!fileName || errorMessage) {
       return;
     }
