@@ -55,9 +55,7 @@ const InitialEmbeddingModelSettings: React.FC<
     console.log("updating embedding models");
     const embeddingModels = await window.electronStore.getEmbeddingModels();
     console.log("embedding models", embeddingModels);
-    if (embeddingModels) {
-      setEmbeddingModels(embeddingModels);
-    }
+    setEmbeddingModels(embeddingModels);
     console.log("getting default model");
     const defaultModel = await window.electronStore.getDefaultEmbeddingModel();
     console.log("default model", defaultModel);
@@ -103,7 +101,9 @@ const InitialEmbeddingModelSettings: React.FC<
           onChange={handleChangeOnModelSelect}
           addButton={{
             label: "Attach a Custom Embedding Model",
-            onClick: () => { setShowNewEmbeddingModelModal(true); },
+            onClick: () => {
+              setShowNewEmbeddingModelModal(true);
+            },
           }}
         />
       </div>

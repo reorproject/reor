@@ -75,16 +75,21 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
       setIsNewDirectoryModalOpen(true);
     };
 
-    window.ipcRenderer.receive("add-new-directory-listener", (dirPath) => {
-      handleNewDirectory(dirPath);
-    });
+    window.ipcRenderer.receive(
+      "add-new-directory-listener",
+      (dirPath: string) => {
+        handleNewDirectory(dirPath);
+      }
+    );
   }, []);
 
   return (
     <div className="w-full h-full bg-neutral-800 flex flex-col items-center justify-between gap-1">
       <div
         className=" flex items-center justify-center w-full h-8 cursor-pointer"
-        onClick={() => { makeSidebarShow("files"); }}
+        onClick={() => {
+          makeSidebarShow("files");
+        }}
       >
         <IconContext.Provider
           value={{ color: sidebarShowing === "files" ? "salmon" : "" }}
@@ -100,7 +105,9 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
       </div>
       <div
         className=" flex items-center justify-center w-full h-8 cursor-pointer"
-        onClick={() => { makeSidebarShow("chats"); }}
+        onClick={() => {
+          makeSidebarShow("chats");
+        }}
       >
         <IconContext.Provider
           value={{ color: sidebarShowing === "chats" ? "salmon" : "" }}
@@ -118,7 +125,9 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
       </div>
       <div
         className="flex items-center justify-center w-full h-8 cursor-pointer"
-        onClick={() => { makeSidebarShow("search"); }}
+        onClick={() => {
+          makeSidebarShow("search");
+        }}
       >
         <IconContext.Provider
           value={{ color: sidebarShowing === "search" ? "salmon" : "" }}
@@ -134,7 +143,9 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
       </div>
       <div
         className="bg-transparent border-none cursor-pointer flex items-center justify-center w-full h-8 "
-        onClick={() => { setIsNewNoteModalOpen(true); }}
+        onClick={() => {
+          setIsNewNoteModalOpen(true);
+        }}
       >
         <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
           <VscNewFile className="text-gray-200" size={22} title="New Note" />
@@ -142,7 +153,9 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
       </div>
       <div
         className="bg-transparent mt-[2px] border-none cursor-pointer flex items-center justify-center w-full h-8 "
-        onClick={() => { setIsNewDirectoryModalOpen(true); }}
+        onClick={() => {
+          setIsNewDirectoryModalOpen(true);
+        }}
       >
         <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
           <VscNewFolder
@@ -155,7 +168,9 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
       </div>
       <div
         className="bg-transparent border-none cursor-pointer flex items-center justify-center w-full h-8 "
-        onClick={() => { setIsFlashcardModeOpen(true); }}
+        onClick={() => {
+          setIsFlashcardModeOpen(true);
+        }}
       >
         <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
           <MdOutlineQuiz
@@ -169,13 +184,17 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
 
       <NewNoteComponent
         isOpen={isNewNoteModalOpen}
-        onClose={() => { setIsNewNoteModalOpen(false); }}
+        onClose={() => {
+          setIsNewNoteModalOpen(false);
+        }}
         openRelativePath={openRelativePath}
         customFilePath={customFilePath}
       />
       <NewDirectoryComponent
         isOpen={isNewDirectoryModalOpen}
-        onClose={() => { setIsNewDirectoryModalOpen(false); }}
+        onClose={() => {
+          setIsNewDirectoryModalOpen(false);
+        }}
         onDirectoryCreate={customDirectoryPath}
       />
       {isFlashcardModeOpen && (
@@ -194,7 +213,9 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
       <div className="flex-grow border-1 border-yellow-300"></div>
       <SettingsModal
         isOpen={isSettingsModalOpen}
-        onClose={() => { setIsSettingsModalOpen(false); }}
+        onClose={() => {
+          setIsSettingsModalOpen(false);
+        }}
       />
       <div
         className="bg-transparent border-none pb-2 mb-[2px] cursor-pointer flex items-center justify-center w-full"
@@ -208,7 +229,9 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
       </div>
       <button
         className="bg-transparent border-none pb-2 cursor-pointer flex items-center justify-center w-full"
-        onClick={() => { setIsSettingsModalOpen(!isSettingsModalOpen); }}
+        onClick={() => {
+          setIsSettingsModalOpen(!isSettingsModalOpen);
+        }}
       >
         <MdSettings className="h-6 w-6 text-gray-100" title="Settings" />
       </button>

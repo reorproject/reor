@@ -51,20 +51,19 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({
   const tableSelectorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Checks if we hover outside the table. In that case, do not display table selector
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const checkIfOutside = (event: any) => {
+    const checkIfOutside = (event: MouseEvent) => {
       if (
         tableButtonRef.current &&
         tableSelectorRef.current &&
-        !tableButtonRef.current.contains(event.target) &&
-        !tableSelectorRef.current.contains(event.target)
+        !tableButtonRef.current.contains(event.target as Node) &&
+        !tableSelectorRef.current.contains(event.target as Node)
       ) {
         setShowTableSelector(false);
       }
     };
 
     document.addEventListener("mouseover", checkIfOutside);
+
     return () => {
       document.removeEventListener("mouseover", checkIfOutside);
     };
@@ -129,7 +128,9 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({
           <span className="text">Copy</span>
         </li>
         <li
-          onClick={() => { handleCommand("cut"); }}
+          onClick={() => {
+            handleCommand("cut");
+          }}
           className={`bubble-menu-item ${
             !isTextCurrentlySelected() ? "disabled opacity-50" : ""
           }`}
@@ -148,7 +149,9 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({
           <span className="text">Paste</span>
         </li>
         <li
-          onClick={() => { handleCommand("delete"); }}
+          onClick={() => {
+            handleCommand("delete");
+          }}
           className={`bubble-menu-item ${
             !isTextCurrentlySelected() ? "disabled opacity-50" : ""
           }`}
@@ -159,7 +162,9 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({
         <div className="w-full h-px bg-gray-500"></div>
         <li
           ref={tableButtonRef}
-          onMouseEnter={() => { setShowTableSelector(true); }}
+          onMouseEnter={() => {
+            setShowTableSelector(true);
+          }}
           className={`bubble-menu-item`}
         >
           <CiViewTable className="icon" />
@@ -215,7 +220,9 @@ const TableSizeSelector: React.FC<TableSizeSelectorProps> = ({ onSelect }) => {
               setHoveredRows(i);
               setHoveredCols(j);
             }}
-            onClick={() => { onSelect(i, j); }}
+            onClick={() => {
+              onSelect(i, j);
+            }}
           />
         );
       }

@@ -35,10 +35,8 @@ const GeneralSettings: React.FC<GenSettingsProps> = () => {
       const isSpellCheckEnabled =
         await window.electronStore.getSpellCheckMode();
 
-      if (isSpellCheckEnabled !== undefined) {
-        setSpellCheckEnabled(isSpellCheckEnabled);
-        setTempSpellCheckEnabled(isSpellCheckEnabled);
-      }
+      setSpellCheckEnabled(isSpellCheckEnabled);
+      setTempSpellCheckEnabled(isSpellCheckEnabled);
     };
 
     fetchParams();

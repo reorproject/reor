@@ -45,13 +45,17 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
         {isReviewFlashcardMode && (
           <FlashcardReviewModal
             isOpen={isReviewFlashcardMode}
-            onClose={() => { setIsReviewFlashcardMode(false); }}
+            onClose={() => {
+              setIsReviewFlashcardMode(false);
+            }}
           />
         )}
         {isCreateFlashcardMode && (
           <FlashcardCreateModal
             isOpen={isCreateFlashcardMode}
-            onClose={() => { setIsCreateFlashcardMode(false); }}
+            onClose={() => {
+              setIsCreateFlashcardMode(false);
+            }}
             initialFlashcardFile={initialFileToCreateFlashcard}
           />
         )}
@@ -89,7 +93,7 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
               disabled:pointer-events-none
               disabled:opacity-25"
             // Write to the flashcards directory if the flashcards generated are valid
-            onClick={async () => {
+            onClick={() => {
               posthog.capture("open_review_flashcard_mode");
 
               setIsReviewFlashcardMode(true);

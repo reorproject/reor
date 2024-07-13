@@ -102,13 +102,6 @@ function processSearches(
   let textNodesWithPosition: TextNodesWithPosition[] = [];
   let index = 0;
 
-  if (!searchTerm) {
-    return {
-      decorationsToReturn: DecorationSet.empty,
-      results: [],
-    };
-  }
-
   doc.descendants((node, pos) => {
     if (node.isText) {
       if (textNodesWithPosition[index]) {
@@ -172,8 +165,6 @@ const replace = (
   { state, dispatch }: { state: EditorState; dispatch: Dispatch }
 ) => {
   const firstResult = results[0];
-
-  if (!firstResult) return;
 
   const { from, to } = results[0];
 

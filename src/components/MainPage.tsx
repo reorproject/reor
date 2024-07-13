@@ -49,7 +49,7 @@ const MainPageComponent: React.FC = () => {
     setShowSimilarFiles(!showSimilarFiles);
   };
 
-  const openFileAndOpenEditor = async (path: string) => {
+  const openFileAndOpenEditor = (path: string) => {
     setShowChatbot(false);
     openFileByPath(path);
   };

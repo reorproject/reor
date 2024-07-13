@@ -24,7 +24,7 @@ const NewEmbeddingModelModalBothTypes: React.FC<
 
   const handleModelDirectorySelection = async () => {
     const paths = await window.fileSystem.openDirectoryDialog();
-    if (paths && paths.length > 0) {
+    if (paths.length > 0) {
       // setNewModelPath(paths[0]);
       const modelObject: EmbeddingModelWithLocalPath = {
         type: "local",
@@ -121,7 +121,9 @@ const NewEmbeddingModelModalBothTypes: React.FC<
               type="text"
               className="block w-full px-3 py-2 mt-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
               value={huggingfaceRepo}
-              onChange={(e) => { setHuggingfaceRepo(e.target.value); }}
+              onChange={(e) => {
+                setHuggingfaceRepo(e.target.value);
+              }}
               onKeyDown={handleKeyPress}
               placeholder="Xenova/roberta-base-squad2"
             />

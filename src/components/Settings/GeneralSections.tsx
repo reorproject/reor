@@ -27,9 +27,7 @@ const CreateAppearanceSection: React.FC = () => {
     const fetchParams = async () => {
       const isIconSBCompact = await window.electronStore.getSBCompact();
 
-      if (isIconSBCompact !== undefined) {
-        setIsIconSBCompact(isIconSBCompact);
-      }
+      setIsIconSBCompact(isIconSBCompact);
     };
 
     fetchParams();
@@ -64,9 +62,7 @@ const CreateAppearanceSection: React.FC = () => {
           checked={isIconSBCompact}
           onChange={() => {
             setIsIconSBCompact(!isIconSBCompact);
-            if (isIconSBCompact !== undefined) {
-              window.electronStore.setSBCompact(!isIconSBCompact);
-            }
+            window.electronStore.setSBCompact(!isIconSBCompact);
           }}
         />
       </div>
