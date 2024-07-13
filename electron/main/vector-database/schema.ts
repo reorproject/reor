@@ -11,13 +11,14 @@ import {
 
 export interface DBEntry {
   notepath: string;
-  vector?: Float32Array;
+  vector: Float32Array;
   content: string;
   subnoteindex: number;
   timeadded: Date;
   filemodified: Date;
   filecreated: Date;
 }
+
 export interface DBQueryResult extends DBEntry {
   _distance: number;
 }
@@ -35,8 +36,18 @@ export enum DatabaseFields {
   DISTANCE = "_distance",
 }
 
-const CreateDatabaseSchema = (vectorDim: number): Schema => {
-  const schemaFields = [
+type DatabaseSchema = Schema<{
+  [DatabaseFields.NOTE_PATH]: Utf8;
+  [DatabaseFields.VECTOR]: FixedSizeList;
+  [DatabaseFields.CONTENT]: Utf8;
+  [DatabaseFields.SUB_NOTE_INDEX]: Float64;
+  [DatabaseFields.TIME_ADDED]: ArrowDate;
+  [DatabaseFields.FILE_MODIFIED]: ArrowDate;
+  [DatabaseFields.FILE_CREATED]: ArrowDate;
+}>;
+
+const CreateDatabaseSchema = (vectorDim: number): DatabaseSchema => {
+  const schemaFields: Field[] = [
     new Field(DatabaseFields.NOTE_PATH, new Utf8(), false),
     new Field(
       DatabaseFields.VECTOR,
@@ -61,11 +72,10 @@ const CreateDatabaseSchema = (vectorDim: number): Schema => {
       false
     ),
   ];
-  const schema = new Schema(schemaFields);
-  return schema;
+  return new Schema(schemaFields) as DatabaseSchema;
 };
 
-const serializeSchema = (schema: Schema): string => {
+const serializeSchema = (schema: DatabaseSchema): string => {
   return JSON.stringify(
     schema.fields.map((field) => ({
       name: field.name,
@@ -76,14 +86,12 @@ const serializeSchema = (schema: Schema): string => {
 };
 
 export const isStringifiedSchemaEqual = (
-  schema1: Schema,
-  schema2: Schema
+  schema1: DatabaseSchema,
+  schema2: DatabaseSchema
 ): boolean => {
   const serializedSchema1 = serializeSchema(schema1);
   const serializedSchema2 = serializeSchema(schema2);
-
-  const areEqual = serializedSchema1 === serializedSchema2;
-  return areEqual;
+  return serializedSchema1 === serializedSchema2;
 };
 
 export default CreateDatabaseSchema;

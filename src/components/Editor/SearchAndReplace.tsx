@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 // MIT License
 
 // Copyright (c) 2023 - 2024 Jeet Mandaliya (Github Username: sereneinserenade)
@@ -164,7 +167,6 @@ const replace = (
   results: Range[],
   { state, dispatch }: { state: EditorState; dispatch: Dispatch }
 ) => {
-  const firstResult = results[0];
 
   const { from, to } = results[0];
 

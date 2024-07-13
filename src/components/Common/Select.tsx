@@ -52,7 +52,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
     setIsOpen(false);
   };
 
-  const handleDeleteModelInDropdown = async (selectedModel: string) => {
+  const handleDeleteModelInDropdown = (selectedModel: string) => {
     if (onDelete) {
       onDelete(selectedModel);
       setIsOpen(false);
@@ -97,7 +97,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
                 <span className="text-blue-500">&#10003;</span>
               ) : onDelete ? (
                 <span
-                  onClick={() => handleDeleteModelInDropdown(option.value)}
+                  onClick={() => { handleDeleteModelInDropdown(option.value); }}
                   className="ml-2 text-[13px] text-red-700"
                 >
                   <FaTrash />
