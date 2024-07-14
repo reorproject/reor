@@ -65,9 +65,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
     if (copiedText) {
       navigator.clipboard
         .writeText(copiedText)
-        .then(() => {
-          console.log('Text copied to clipboard successfully!')
-        })
+        .then(() => {})
         .catch((err) => {
           console.error('Failed to copy text: ', err)
         })

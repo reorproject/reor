@@ -29,9 +29,7 @@ const EditorManager: React.FC<EditorManagerProps> = ({
     setShowSearch((prevShowSearch) => !prevShowSearch)
   }, [])
 
-  useEffect(() => {
-    console.log('showSimilarFiles', showSimilarFiles)
-  }, [showSimilarFiles])
+  useEffect(() => {}, [showSimilarFiles])
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value)

@@ -77,7 +77,6 @@ export const electronUtilsHandlers = (
             })
             .then((confirm) => {
               if (confirm.response === 0) {
-                console.log(file.path)
                 event.sender.send('delete-file-listener', file.path)
               }
             }),
@@ -87,7 +86,6 @@ export const electronUtilsHandlers = (
       new MenuItem({
         label: 'Rename',
         click: () => {
-          console.log(file.path)
           event.sender.send('rename-file-listener', file.path)
         },
       }),
@@ -97,7 +95,6 @@ export const electronUtilsHandlers = (
       new MenuItem({
         label: 'Create a flashcard set',
         click: () => {
-          console.log('creating: ', file.path)
           event.sender.send('create-flashcard-file-listener', file.path)
         },
       }),
@@ -107,13 +104,10 @@ export const electronUtilsHandlers = (
       new MenuItem({
         label: 'Add file to chat context',
         click: () => {
-          console.log('creating: ', file.path)
           event.sender.send('add-file-to-chat-listener', file.path)
         },
       }),
     )
-
-    console.log('menu key: ', file)
 
     const browserWindow = BrowserWindow.fromWebContents(event.sender)
     if (browserWindow) {

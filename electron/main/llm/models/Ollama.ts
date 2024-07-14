@@ -33,16 +33,15 @@ export class OllamaService implements LLMSessionService {
   }
 
   public init = async () => {
-    console.log('Initializing Ollama client...')
     await this.serve()
 
     const ollamaLib = await import('ollama')
     this.client = new ollamaLib.Ollama()
-    console.log('Ollama client: ', this.client)
+
     // const models = await this.client.default.list();
-    // console.log("Ollama models: ", models);
+    // ;
     // const lists = await this.client.
-    // console.log("Ollama models: ", lists);
+    // ;
   }
 
   async ping() {
@@ -70,11 +69,10 @@ export class OllamaService implements LLMSessionService {
     try {
       // See if 'ollama serve' command is available on the system
       await this.execServe('ollama')
-      console.log('Ollama is installed on the system')
+
       return OllamaServeType.SYSTEM
     } catch (err) {
       // ollama is not installed, run the binary directly
-      console.log('Ollama is not installed on the system: ', err)
       // logInfo(`/ is not installed on the system: ${err}`);
     }
 
@@ -109,7 +107,6 @@ export class OllamaService implements LLMSessionService {
       await this.execServe(exePath)
       return OllamaServeType.PACKAGED
     } catch (err) {
-      console.log('Failed to start Ollama: ', err)
       throw new Error(`Failed to start Ollama: ${err}`)
     }
   }
@@ -167,13 +164,12 @@ export class OllamaService implements LLMSessionService {
     if (os.platform() === 'win32') {
       exec(`taskkill /pid ${this.childProcess.pid} /f /t`, (err) => {
         if (err) {
-          console.log('Failed to kill Ollama process: ', err)
         }
       })
     } else {
       this.childProcess.kill()
     }
-    console.log('Ollama process killed')
+
     this.childProcess = null
   }
 
@@ -194,7 +190,6 @@ export class OllamaService implements LLMSessionService {
   }
 
   public pullModel = async (modelName: string, handleProgress: (chunk: ProgressResponse) => void): Promise<void> => {
-    console.log('Pulling model: ', modelName)
     const stream = await this.client.pull({
       model: modelName,
       stream: true,

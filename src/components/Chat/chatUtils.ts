@@ -68,7 +68,6 @@ export const resolveRAGContext = async (query: string, chatFilters: ChatFilters)
 
   let results: DBEntry[] = []
   if (chatFilters.files.length > 0) {
-    console.log('chatFilters.files', chatFilters.files)
     results = await window.fileSystem.getFilesystemPathsAsDBItems(chatFilters.files)
   } else if (chatFilters.numberOfChunksToFetch > 0) {
     const timeStampFilter = generateTimeStampFilter(chatFilters.minDate, chatFilters.maxDate)

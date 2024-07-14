@@ -92,7 +92,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
           newChat={() => {
             posthog.capture('create_new_chat')
             setCurrentChatHistory(undefined)
-            console.log('resetting chat filters')
+
             setChatFilters({
               files: [],
               numberOfChunksToFetch: 15,

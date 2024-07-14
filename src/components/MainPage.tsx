@@ -193,7 +193,6 @@ const MainPageComponent: React.FC = () => {
               showSimilarFiles={showSimilarFiles} // This might need to be managed differently now
               chatFilters={chatFilters}
               setChatFilters={(chatFilters: ChatFilters) => {
-                console.log('CALLING ADD FILE TO CHAT')
                 posthog.capture('add_file_to_chat', {
                   chatFilesLength: chatFilters.files.length,
                 })

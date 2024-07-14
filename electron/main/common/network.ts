@@ -4,8 +4,6 @@ import { net } from 'electron'
 import { ClientRequestConstructorOptions } from 'electron/main'
 
 export const customFetchUsingElectronNet = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
-  console.log('input: ', input)
-  console.log('init: ', init)
   const url = input instanceof URL ? input.href : input.toString()
   const options = init || {}
 

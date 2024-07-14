@@ -98,9 +98,7 @@ const AddContextFiltersModal: React.FC<Props> = ({ vaultDirectory, isOpen, onClo
     label: i % 5 === 0 ? i.toString() : '', // Show label every 5 steps
   }))
 
-  useEffect(() => {
-    console.log('chatFilters updated:', chatFilters)
-  }, [chatFilters])
+  useEffect(() => {}, [chatFilters])
 
   return (
     <ReorModal isOpen={isOpen} onClose={onClose}>

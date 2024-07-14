@@ -27,8 +27,6 @@ export const DownloadModelFilesFromHFRepo = async (repo: string, saveDirectory: 
     }
   }
 
-  console.log('files: ', files)
-
   // Create an array of promises for each file download:
   const downloadPromises = files.map((file) => downloadAndSaveFile(repo, file.path, path.join(saveDirectory, repo)))
 
@@ -62,5 +60,4 @@ async function downloadAndSaveFile(repo: string, HFFilePath: string, systemFileP
   }
   // Save the Buffer to the full path
   fs.writeFileSync(fullPath, buffer)
-  console.log(`Saved file to ${fullPath}`)
 }

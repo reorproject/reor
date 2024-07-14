@@ -26,7 +26,7 @@ describe('GetFilesInfoTree', () => {
     const filePath = path.join(tempDir, filename)
     fs.writeFileSync(filePath, 'Test content')
     const result = GetFilesInfoTree(tempDir)
-    console.log('result', result)
+
     expect(result).toEqual([
       {
         name: filename,

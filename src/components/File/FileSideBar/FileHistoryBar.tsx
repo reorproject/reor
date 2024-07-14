@@ -29,9 +29,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
     currentPath !== '' && currentPath !== history[currentIndex] && handleFileSelect(currentPath)
   }, [currentPath])
 
-  useEffect(() => {
-    console.log(`currentIndex: ${currentIndex}`, { history })
-  }, [currentIndex])
+  useEffect(() => {}, [currentIndex])
 
   const handleFileSelect = (path: string) => {
     const updatedHistory = [...history.filter((val) => val !== path).slice(0, currentIndex + 1), path]
@@ -72,7 +70,6 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
 
   const handleLongPressStart = (direction: 'back' | 'forward') => {
     longPressTimer.current = setTimeout(() => {
-      console.log(`${direction} holded 1 seconds.`)
       setShowMenu(direction)
     }, 400)
   }

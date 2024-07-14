@@ -5,7 +5,7 @@ import { DBQueryResult } from 'electron/main/vector-database/schema'
 import { FiRefreshCw } from 'react-icons/fi'
 import { PiGraph } from 'react-icons/pi'
 
-import '../../styles/global.css'
+import '../../../styles/global.css'
 import ResizableComponent from '@/components/Common/ResizableComponent'
 import { DBResultPreview } from '@/components/File/DBResultPreview'
 

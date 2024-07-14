@@ -50,7 +50,6 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
   })
 
   ipcMain.handle('delete-file', async (event, filePath: string): Promise<void> => {
-    console.log('Deleting file', filePath)
     fs.stat(filePath, async (err, stats) => {
       if (err) {
         console.error('An error occurred:', err)
@@ -62,9 +61,7 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
         fs.rm(filePath, { recursive: true }, (err) => {
           if (err) {
             console.error('An error occurred:', err)
-            return
           }
-          console.log(`Directory at ${filePath} was deleted successfully.`)
         })
 
         const windowInfo = windowsManager.getWindowInfoForContents(event.sender)
@@ -76,9 +73,7 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
         fs.unlink(filePath, (err) => {
           if (err) {
             console.error('An error occurred:', err)
-            return
           }
-          console.log(`File at ${filePath} was deleted successfully.`)
         })
 
         const windowInfo = windowsManager.getWindowInfoForContents(event.sender)
@@ -136,7 +131,6 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
       })
     }
 
-    console.log('reindexing folder')
     // then need to trigger reindexing of folder
     windowInfo.dbTableClient.updateDBItemsWithNewFilePath(renameFileProps.oldFilePath, renameFileProps.newFilePath)
   })
@@ -154,8 +148,6 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
   })
 
   ipcMain.handle('create-directory', async (event, dirPath: string): Promise<void> => {
-    console.log('Creating directory', dirPath)
-
     const mkdirRecursiveSync = (dirPath: string) => {
       const parentDir = path.dirname(dirPath)
       if (!fs.existsSync(parentDir)) {
@@ -169,7 +161,6 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
     if (!fs.existsSync(dirPath)) {
       mkdirRecursiveSync(dirPath)
     } else {
-      console.log('Directory already exists:', dirPath)
     }
   })
 
@@ -211,9 +202,9 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
   ipcMain.handle('get-filesystem-paths-as-db-items', async (_event, filePaths: string[]): Promise<DBEntry[]> => {
     try {
       const fileItems = GetFilesInfoListForListOfPaths(filePaths)
-      console.log('fileItems', fileItems)
+
       const dbItems = await convertFileInfoListToDBItems(fileItems)
-      console.log('dbItems', dbItems)
+
       return dbItems.flat()
     } catch (error) {
       console.error('Error searching database:', error)
@@ -226,9 +217,9 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
     async (event, { prompt, llmName, filePath }: AugmentPromptWithFileProps): Promise<string> => {
       // actual response required { question: string, answer: string} []
       const llmSession = openAISession
-      console.log('llmName:   ', llmName)
+
       const llmConfig = await getLLMConfig(store, ollamaService, llmName)
-      console.log('llmConfig', llmConfig)
+
       if (!llmConfig) {
         throw new Error(`LLM ${llmName} not configured.`)
       }
@@ -271,7 +262,6 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
         llmSession.getTokenizer(llmName),
         llmConfig.contextLength,
       )
-      console.log('promptToCreateFlashcardsWithAtomicFacts: ', promptToCreateFlashcardsWithAtomicFacts)
 
       // call the query to respond
       const llmGeneratedFlashcards = await llmSession.response(

@@ -20,17 +20,15 @@ const CloudLLMSetupModal: React.FC<CloudLLMSetupModalProps> = ({ isOpen, onClose
   const LLMDisplayName = LLMType === 'openai' ? 'OpenAI' : 'Anthropic'
 
   const handleSave = async () => {
-    console.log('openKey:', openKey)
     if (openKey) {
       for (const modelConfig of defaultModels) {
-        console.log('modelConfig:', modelConfig)
         posthog.capture('save_cloud_llm', {
           modelName: modelConfig.modelName,
           llmType: LLMType,
           contextLength: modelConfig.contextLength,
         })
         modelConfig.apiKey = openKey
-        console.log('saving modelConfig:', modelConfig)
+
         await window.llm.addOrUpdateLLM(modelConfig)
       }
       if (defaultModels.length > 0) {

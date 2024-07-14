@@ -19,7 +19,6 @@ import { ChatHistory } from '@/components/Chat/Chat'
 export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager: WindowsManager) => {
   initializeAndMaybeMigrateStore(store)
   ipcMain.handle('set-vault-directory-for-window', async (event, userDirectory: string): Promise<void> => {
-    console.log('setting user directory', userDirectory)
     windowsManager.setVaultDirectoryForContents(event.sender, userDirectory, store)
   })
 
@@ -95,12 +94,10 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
   })
 
   ipcMain.handle('set-llm-generation-params', (event, generationParams) => {
-    console.log('setting generation params', generationParams)
     store.set(StoreKeys.LLMGenerationParameters, generationParams)
   })
 
   ipcMain.handle('get-llm-generation-params', () => {
-    console.log('getting generation params', store.get(StoreKeys.LLMGenerationParameters))
     return store.get(StoreKeys.LLMGenerationParameters)
   })
 
@@ -119,22 +116,18 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
   ipcMain.handle('get-sb-compact', () => store.get(StoreKeys.IsSBCompact))
 
   ipcMain.handle('set-analytics-mode', (event, isAnalytics) => {
-    console.log('setting analytics mode', isAnalytics)
     store.set(StoreKeys.Analytics, isAnalytics)
   })
 
   ipcMain.handle('get-analytics-mode', () => {
-    console.log('getting analytics params', store.get(StoreKeys.Analytics))
     return store.get(StoreKeys.Analytics)
   })
 
   ipcMain.handle('set-spellcheck-mode', (event, isSpellCheck) => {
-    console.log('setting spellcheck params', isSpellCheck)
     store.set(StoreKeys.SpellCheck, isSpellCheck)
   })
 
   ipcMain.handle('get-spellcheck-mode', () => {
-    console.log('getting spellcheck params', store.get(StoreKeys.SpellCheck))
     return store.get(StoreKeys.SpellCheck)
   })
 

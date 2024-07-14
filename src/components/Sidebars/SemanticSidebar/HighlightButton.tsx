@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { FaArrowRight } from 'react-icons/fa'
 import { PiGraph } from 'react-icons/pi'
 
-import '../../styles/global.css'
+import '../../../styles/global.css'
 import { HighlightData } from '@/components/Editor/HighlightExtension'
 
 interface HighlightButtonProps {

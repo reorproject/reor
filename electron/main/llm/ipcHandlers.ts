@@ -88,12 +88,10 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
   ipcMain.handle('get-llm-configs', async () => getAllLLMConfigs(store, ollamaService))
 
   ipcMain.handle('add-or-update-llm', async (event, modelConfig: LLMConfig) => {
-    console.log('setting up new local model', modelConfig)
     await addOrUpdateLLMSchemaInStore(store, modelConfig)
   })
 
   ipcMain.handle('remove-llm', async (event, modelNameToDelete: string) => {
-    console.log('deleting local model', modelNameToDelete)
     await removeLLM(store, ollamaService, modelNameToDelete)
   })
 
@@ -102,7 +100,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
     async (event, strings: string[], llmName: string): Promise<string[]> => {
       const llmSession = openAISession
       const llmConfig = await getLLMConfig(store, ollamaService, llmName)
-      console.log('llmConfig', llmConfig)
+
       if (!llmConfig) {
         throw new Error(`LLM ${llmName} not configured.`)
       }
@@ -116,7 +114,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
     async (event, inputString: string, llmName: string): Promise<string> => {
       const llmSession = openAISession
       const llmConfig = await getLLMConfig(store, ollamaService, llmName)
-      console.log('llmConfig', llmConfig)
+
       if (!llmConfig) {
         throw new Error(`LLM ${llmName} not configured.`)
       }

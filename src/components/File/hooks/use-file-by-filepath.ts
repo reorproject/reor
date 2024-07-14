@@ -210,7 +210,6 @@ export const useFileByFilepath = () => {
           content: markdownContent,
         })
 
-        console.log('setting is file content modified to false in actual save function')
         setNeedToWriteEditorContentToDisk(false)
       }
     }
@@ -239,9 +238,8 @@ export const useFileByFilepath = () => {
     async function checkAppUsage() {
       if (!editor || currentlyOpenedFilePath) return
       const hasOpened = await window.electronStore.getHasUserOpenedAppBefore()
-      console.log('has opened', hasOpened)
+
       if (!hasOpened) {
-        console.log('opening welcome note')
         await window.electronStore.setHasUserOpenedAppBefore()
         openRelativePath('Welcome to Reor', welcomeNote)
       }

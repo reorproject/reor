@@ -148,7 +148,6 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ openRelativePath, sidebarSh
         <FlashcardMenuModal
           isOpen={isFlashcardModeOpen}
           onClose={() => {
-            console.log('clicked')
             setIsFlashcardModeOpen(false)
             setInitialFileToCreateFlashcard('')
             setInitialFileToReviewFlashcard('')

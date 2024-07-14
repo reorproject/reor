@@ -48,7 +48,6 @@ export const registerDBSessionHandlers = (store: Store<StoreSchema>, windowManag
 
   ipcMain.handle('index-files-in-directory', async (event) => {
     try {
-      console.log('Indexing files in directory')
       const windowInfo = windowManager.getWindowInfoForContents(event.sender)
       if (!windowInfo) {
         throw new Error('No window info found')
@@ -113,7 +112,7 @@ export const registerDBSessionHandlers = (store: Store<StoreSchema>, windowManag
     async (event, { query, llmName }: BasePromptRequirements): Promise<PromptWithRagResults> => {
       const llmSession = openAISession
       const llmConfig = await getLLMConfig(store, ollamaService, llmName)
-      console.log('llmConfig', llmConfig)
+
       if (!llmConfig) {
         throw new Error(`LLM ${llmName} not configured.`)
       }
@@ -179,7 +178,7 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
           llmSession.getTokenizer(llmName),
           llmConfig.contextLength,
         )
-        console.log('ragPrompt', ragPrompt)
+
         const uniqueFilesReferenced = [...new Set(searchResults.map((entry) => entry.notepath))]
 
         return {
@@ -200,9 +199,9 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
       { query, llmName, filePathToBeUsedAsContext }: BasePromptRequirements,
     ): Promise<PromptWithRagResults> => {
       const llmSession = openAISession
-      console.log('llmName:   ', llmName)
+
       const llmConfig = await getLLMConfig(store, ollamaService, llmName)
-      console.log('llmConfig', llmConfig)
+
       if (!llmConfig) {
         throw new Error(`LLM ${llmName} not configured.`)
       }
@@ -235,7 +234,6 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
         store.get(StoreKeys.LLMGenerationParameters),
       )
 
-      console.log(llmGeneratedFacts)
       const basePrompt = 'Given the following atomic facts:\n'
       const flashcardQuery =
         'Create useful FLASHCARDS that can be used for students to study using ONLY the context. Format is Q: <insert question> A: <insert answer>.'
@@ -246,7 +244,7 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
         llmSession.getTokenizer(llmName),
         llmConfig.contextLength,
       )
-      console.log('promptToCreateFlashcardsWithAtomicFacts: ', promptToCreateFlashcardsWithAtomicFacts)
+
       const uniqueFilesReferenced = [filePathToBeUsedAsContext]
 
       return {

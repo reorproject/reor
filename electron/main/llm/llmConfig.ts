@@ -30,7 +30,7 @@ export function validateAIModelConfig(config: LLMConfig): string | null {
 
 export async function addOrUpdateLLMSchemaInStore(store: Store<StoreSchema>, modelConfig: LLMConfig): Promise<void> {
   const existingModelsInStore = await store.get(StoreKeys.LLMs)
-  console.log('existingModels: ', existingModelsInStore)
+
   const isNotValid = validateAIModelConfig(modelConfig)
   if (isNotValid) {
     throw new Error(isNotValid)
@@ -38,16 +38,12 @@ export async function addOrUpdateLLMSchemaInStore(store: Store<StoreSchema>, mod
 
   const foundModel = existingModelsInStore.find((model) => model.modelName === modelConfig.modelName)
 
-  console.log('foundModel: ', foundModel)
-
   if (foundModel) {
-    console.log('updating model')
     const updatedModels = existingModelsInStore.map((model) =>
       model.modelName === modelConfig.modelName ? modelConfig : model,
     )
     store.set(StoreKeys.LLMs, updatedModels)
   } else {
-    console.log('adding model')
     const updatedModels = [...existingModelsInStore, modelConfig]
     store.set(StoreKeys.LLMs, updatedModels)
   }
@@ -85,7 +81,7 @@ export async function getLLMConfig(
   modelName: string,
 ): Promise<LLMConfig | undefined> {
   const llmConfigs = await getAllLLMConfigs(store, ollamaSession)
-  console.log('llmConfigs: ', llmConfigs)
+
   if (llmConfigs) {
     return llmConfigs.find((model: LLMConfig) => model.modelName === modelName)
   }

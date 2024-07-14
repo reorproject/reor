@@ -26,7 +26,7 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({ readyForInd
   }
 
   return (
-    <ReorModal isOpen onClose={() => console.log('Not allowing a close for now')} hideCloseButton>
+    <ReorModal isOpen onClose={() => {}} hideCloseButton>
       <div className="ml-2 mr-4 w-[620px] py-3">
         <div className="ml-2 mt-0 h-[450px]  ">
           <h2 className="mb-0 text-center text-2xl font-semibold text-white">Welcome to the Reor Project.</h2>

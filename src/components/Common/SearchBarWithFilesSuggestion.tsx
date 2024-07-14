@@ -39,8 +39,6 @@ export const SearchBarWithFilesSuggestion = ({
     })
   }
 
-  console.log(inputRef.current?.offsetWidth)
-
   const [sidebarWidth, setSidebarWidth] = useState(0)
 
   useEffect(() => {
@@ -49,7 +47,6 @@ export const SearchBarWithFilesSuggestion = ({
       if (inputRef.current) {
         setSidebarWidth(inputRef.current.offsetWidth)
       }
-      console.log('sidebar width : ', inputRef.current?.offsetWidth)
     }
 
     // Update width on mount and window resize

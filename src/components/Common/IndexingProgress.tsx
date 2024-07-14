@@ -29,7 +29,7 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({ indexingProgress })
   }, [indexingProgress, startTime])
 
   return (
-    <ReorModal isOpen onClose={() => console.log('Not allowing a close for now')} hideCloseButton>
+    <ReorModal isOpen onClose={() => {}} hideCloseButton>
       <div className="mx-3 mb-3 mt-2 h-[100px] w-[500px]">
         <h6 className="my-2 text-2xl font-semibold text-white">
           {indexingProgress === 0 ? 'Initializing vector database...' : 'Indexing files...'}
