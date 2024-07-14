@@ -26,7 +26,9 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
   // const [newModelPath, setNewModelPath] = useState<string>("");
   const [modelName, setModelName] = useState("");
   const [modelNameerror, setModelNameError] = useState("");
-  const [downloadProgress, setDownloadProgress] = useState<Record<string, ModelDownloadStatus>>({});
+  const [downloadProgress, setDownloadProgress] = useState<{
+    [modelName: string]: ModelDownloadStatus;
+  }>({});
 
   const downloadSelectedModel = async () => {
     if (!modelName) {
@@ -94,7 +96,7 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
           type="text"
           className="block w-full mt-1 px-3 py-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
           value={modelName}
-          onChange={(e) => { setModelName(e.target.value); }}
+          onChange={(e) => setModelName(e.target.value)}
           placeholder="mistral"
         />
         <p className="text-white text-xs mb-2 mt-2 italic">

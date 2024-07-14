@@ -31,7 +31,7 @@ enum AskOptions {
 }
 // const ASK_OPTIONS = Object.values(AskOptions);
 
-const EXAMPLE_PROMPTS: Record<string, string[]> = {
+const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
   [AskOptions.Ask]: [
     // "What are my thoughts on AGI?",
     // "Tell me about my notes on Nietzsche",
@@ -49,10 +49,10 @@ const EXAMPLE_PROMPTS: Record<string, string[]> = {
   // ],
 };
 
-export interface ChatHistory {
+export type ChatHistory = {
   id: string;
   displayableChatHistory: ChatMessageToDisplay[];
-}
+};
 export type ChatMessageToDisplay = ChatCompletionMessageParam & {
   messageType: "success" | "error";
   context: DBEntry[];
@@ -157,7 +157,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       if (!userTextFieldInput.trim()) return;
       const defaultLLMName = await window.llm.getDefaultLLMName();
 
-      if (!chatHistory?.id) {
+      if (!chatHistory || !chatHistory.id) {
         const chatID = Date.now().toString();
         chatHistory = {
           id: chatID,
@@ -165,6 +165,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         };
       }
       if (chatHistory.displayableChatHistory.length === 0) {
+        if (chatFilters) {
           // chatHistory.displayableChatHistory.push({
           //   role: "system",
           //   content:
@@ -176,6 +177,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           chatHistory.displayableChatHistory.push(
             await resolveRAGContext(userTextFieldInput, chatFilters)
           );
+        }
       } else {
         chatHistory.displayableChatHistory.push({
           role: "user",
@@ -189,6 +191,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
       setCurrentChatHistory(chatHistory);
 
+      if (!chatHistory) return;
 
       await window.electronStore.updateChatHistory(chatHistory);
 
@@ -228,7 +231,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   ) => {
     setCurrentChatHistory((prev) => {
       if (chatID !== prev?.id) return prev;
-      const newDisplayableHistory = prev.displayableChatHistory;
+      const newDisplayableHistory = prev?.displayableChatHistory || [];
       if (newDisplayableHistory.length > 0) {
         const lastMessage =
           newDisplayableHistory[newDisplayableHistory.length - 1];
@@ -254,7 +257,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       }
 
       return {
-        id: prev.id,
+        id: prev!.id,
         displayableChatHistory: newDisplayableHistory,
         openAIChatHistory: newDisplayableHistory.map((message) => {
           return {
@@ -267,7 +270,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   };
 
   useEffect(() => {
-    const handleOpenAIChunk = (
+    const handleOpenAIChunk = async (
       receivedChatID: string,
       chunk: ChatCompletionChunk
     ) => {
@@ -277,12 +280,12 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       }
     };
 
-    const handleAnthropicChunk = (
+    const handleAnthropicChunk = async (
       receivedChatID: string,
       chunk: MessageStreamEvent
     ) => {
       const newContent =
-        chunk.type === "content_block_delta" ? chunk.delta.text : "";
+        chunk.type === "content_block_delta" ? chunk.delta.text ?? "" : "";
       if (newContent) {
         appendNewContentToMessageHistory(receivedChatID, newContent, "success");
       }
@@ -330,7 +333,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
               ))}
           </div>
           {(!currentChatHistory ||
-            currentChatHistory.displayableChatHistory.length == 0) && (
+            currentChatHistory?.displayableChatHistory.length == 0) && (
             <>
               <div className="flex items-center justify-center text-gray-300 text-sm">
                 Start a conversation with your notes by typing a message below.
@@ -354,7 +357,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             <AddContextFiltersModal
               vaultDirectory={vaultDirectory}
               isOpen={isAddContextFiltersModalOpen}
-              onClose={() => { setIsAddContextFiltersModalOpen(false); }}
+              onClose={() => setIsAddContextFiltersModalOpen(false)}
               chatFilters={chatFilters}
               setChatFilters={setChatFilters}
             />
@@ -372,7 +375,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           })} */}
           {userTextFieldInput === "" &&
           (!currentChatHistory ||
-            currentChatHistory.displayableChatHistory.length == 0) ? (
+            currentChatHistory?.displayableChatHistory.length == 0) ? (
             <>
               {EXAMPLE_PROMPTS[askText].map((option, index) => {
                 return (

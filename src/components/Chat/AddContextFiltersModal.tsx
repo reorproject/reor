@@ -31,7 +31,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
   setChatFilters,
 }) => {
   const [internalFilesSelected, setInternalFilesSelected] = useState<string[]>(
-    chatFilters.files
+    chatFilters?.files || []
   );
   const [searchText, setSearchText] = useState<string>("");
   const [suggestionsState, setSuggestionsState] =
@@ -237,7 +237,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
                     <p className="mb-1">Min Date:</p>
                     <DayPicker
                       selected={minDate}
-                      onSelect={(date) => { setMinDate(date || undefined); }}
+                      onSelect={(date) => setMinDate(date || undefined)}
                       mode="single"
                       className="my-day-picker w-full"
                     />
@@ -246,7 +246,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
                     <p className="mb-1">Max Date:</p>
                     <DayPicker
                       selected={maxDate}
-                      onSelect={(date) => { setMaxDate(date || undefined); }}
+                      onSelect={(date) => setMaxDate(date || undefined)}
                       mode="single"
                       className="my-day-picker w-full"
                     />

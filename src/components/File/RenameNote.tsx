@@ -77,7 +77,7 @@ const RenameNoteModal: React.FC<RenameNoteModalProps> = ({
 
       // get full path of note
       await renameNote({
-        path: fullNoteName,
+        path: `${fullNoteName}`,
         newNoteName: `${dirPrefix}${noteName}.${fileExtension}`,
       });
       onClose();

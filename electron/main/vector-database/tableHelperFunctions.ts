@@ -37,7 +37,7 @@ export const RepopulateTableWithMissingItems = async (
   }
   let itemsToRemove;
   try {
-    itemsToRemove = computeDBItemsToRemoveFromTable(
+    itemsToRemove = await computeDBItemsToRemoveFromTable(
       filesInfoTree,
       tableArray
     );
@@ -130,10 +130,10 @@ export const convertFileInfoListToDBItems = async (
   return filesAsChunksToAddToDB;
 };
 
-const computeDBItemsToRemoveFromTable = (
+const computeDBItemsToRemoveFromTable = async (
   filesInfoList: FileInfo[],
   tableArray: { notepath: string; filemodified: Date }[]
-): { notepath: string; filemodified: Date }[] => {
+): Promise<{ notepath: string; filemodified: Date }[]> => {
   const itemsInTableAndNotInFilesInfoList = tableArray.filter(
     (item) => !filesInfoList.some((file) => file.path == item.notepath)
   );

@@ -41,7 +41,7 @@ export const FileItem: React.FC<FileInfoProps> = ({
     setIsDragOver(false);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragOver(false); // Reset drag over state

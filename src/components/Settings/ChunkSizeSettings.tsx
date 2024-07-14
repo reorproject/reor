@@ -49,7 +49,7 @@ const ChunkSizeSettings: React.FC<ChunkSizeSettingsProps> = ({ children }) => {
               label: num.toString(),
               value: num.toString(),
             }))}
-            selectedValue={chunkSize.toString()}
+            selectedValue={chunkSize?.toString()}
             onChange={handleChangeOnChunkSizeSelect}
           />
         </div>

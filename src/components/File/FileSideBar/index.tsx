@@ -41,7 +41,7 @@ export const FileSidebar: React.FC<FileListProps> = ({
       {noteToBeRenamed && (
         <RenameNoteModal
           isOpen={!!noteToBeRenamed}
-          onClose={() => { setNoteToBeRenamed(""); }}
+          onClose={() => setNoteToBeRenamed("")}
           fullNoteName={noteToBeRenamed}
           renameNote={async ({ path, newNoteName }) => {
             await renameFile(path, newNoteName);
@@ -51,7 +51,7 @@ export const FileSidebar: React.FC<FileListProps> = ({
       {fileDirToBeRenamed && (
         <RenameDirModal
           isOpen={!!fileDirToBeRenamed}
-          onClose={() => { setFileDirToBeRenamed(""); }}
+          onClose={() => setFileDirToBeRenamed("")}
           fullDirName={fileDirToBeRenamed}
           renameDir={async ({ path, newDirName: newNoteName }) => {
             await renameFile(path, newNoteName);

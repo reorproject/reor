@@ -66,34 +66,32 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
   };
 
   // handle the creation process
-  interface GeneratedFlashcardsResult {
-    flashcards: { Q: string; A: string }[];
-  }
-
   const createFlashcardsFromFile = async (): Promise<void> => {
     posthog.capture("create_flashcard_from_file");
-
+    // send the file as context to the backend
     const llmName = await window.llm.getDefaultLLMName();
     setIsLoadingFlashcards(true);
-
     const result = await window.fileSystem.generateFlashcardsWithFile({
       prompt: "Generate flashcards as json from this file",
       llmName,
       filePath: selectedFile,
     });
 
-    const parsedResult = JSON.parse(result) as GeneratedFlashcardsResult;
-
-    const flashcardUIPairs: FlashcardQAPairUI[] = parsedResult.flashcards.map(
-      (card) => ({
+    // receive the output as JSON from the backend
+    // store the flashcards in memory so that we can render it in flashcardQA pairs
+    // and set UI as flipped = false
+    const flashcardUIPairs: FlashcardQAPairUI[] = (
+      JSON.parse(result).flashcards as { Q: string; A: string }[]
+    ).map((card) => {
+      return {
         question: card.Q,
         answer: card.A,
         isFlipped: false,
-      })
-    );
-
+      };
+    });
     setFlashcardQAPairs(flashcardUIPairs);
     setIsLoadingFlashcards(false);
+
     storeFlashcardPairsAsJSON(flashcardUIPairs, selectedFile);
   };
 
@@ -119,9 +117,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({
             focus:outline-none focus:shadow-outline-blue focus:border-blue-300
             transition duration-150 ease-in-out"
             value={searchText}
-            onSelect={() => {
-              initializeSuggestionsStateOnFocus();
-            }}
+            onSelect={() => initializeSuggestionsStateOnFocus()}
             onChange={(e) => {
               setSearchText(e.target.value);
               if (e.target.value.length == 0) {

@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 // MIT License
 
 // Copyright (c) 2023 - 2024 Jeet Mandaliya (Github Username: sereneinserenade)
@@ -105,7 +102,14 @@ function processSearches(
   let textNodesWithPosition: TextNodesWithPosition[] = [];
   let index = 0;
 
-  doc.descendants((node, pos) => {
+  if (!searchTerm) {
+    return {
+      decorationsToReturn: DecorationSet.empty,
+      results: [],
+    };
+  }
+
+  doc?.descendants((node, pos) => {
     if (node.isText) {
       if (textNodesWithPosition[index]) {
         textNodesWithPosition[index] = {
@@ -167,6 +171,9 @@ const replace = (
   results: Range[],
   { state, dispatch }: { state: EditorState; dispatch: Dispatch }
 ) => {
+  const firstResult = results[0];
+
+  if (!firstResult) return;
 
   const { from, to } = results[0];
 

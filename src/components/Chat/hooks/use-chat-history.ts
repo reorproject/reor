@@ -16,7 +16,10 @@ export const useChatHistory = () => {
   // const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
 
   const fetchChatHistories = async () => {
-    const allChatHistories = await window.electronStore.getAllChatHistories();
+    let allChatHistories = await window.electronStore.getAllChatHistories();
+    if (!allChatHistories) {
+      allChatHistories = [];
+    }
     // setAllChatHistories(allChatHistories);
     setChatHistoriesMetadata(
       allChatHistories.map((chat) => ({

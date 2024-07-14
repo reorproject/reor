@@ -74,7 +74,7 @@ const RenameDirModal: React.FC<RenameDirModalProps> = ({
       //get full path of new directory
       console.log(dirName);
       await renameDir({
-        path: fullDirName,
+        path: `${fullDirName}`,
         newDirName: `${dirPrefix}${dirName}`,
       });
       onClose();

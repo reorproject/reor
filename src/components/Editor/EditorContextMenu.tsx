@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { EditorState, Transaction } from "@tiptap/pm/state";
+import { EditorState } from "@tiptap/pm/state";
 import { Dispatch, Editor } from "@tiptap/react";
 import { AiOutlineDelete } from "react-icons/ai";
 import { CiViewTable } from "react-icons/ci";
@@ -51,19 +51,20 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({
   const tableSelectorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const checkIfOutside = (event: MouseEvent) => {
+    // Checks if we hover outside the table. In that case, do not display table selector
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const checkIfOutside = (event: any) => {
       if (
         tableButtonRef.current &&
         tableSelectorRef.current &&
-        !tableButtonRef.current.contains(event.target as Node) &&
-        !tableSelectorRef.current.contains(event.target as Node)
+        !tableButtonRef.current.contains(event.target) &&
+        !tableSelectorRef.current.contains(event.target)
       ) {
         setShowTableSelector(false);
       }
     };
 
     document.addEventListener("mouseover", checkIfOutside);
-
     return () => {
       document.removeEventListener("mouseover", checkIfOutside);
     };
@@ -89,22 +90,17 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({
 
     switch (command) {
       case "cut":
-        cutCommand(editor.state, (tr: Transaction) => {
-          editor.view.dispatch(tr);
-        });
+        cutCommand(editor.state, editor.view.dispatch);
         break;
       case "copy":
         copyCommand(editor.state);
         break;
       case "delete":
-        deleteCommand(editor.state, (tr: Transaction) => {
-          editor.view.dispatch(tr);
-        });
+        deleteCommand(editor.state, editor.view.dispatch);
         break;
       default:
         break;
     }
-
     setMenuVisible(false);
   };
 
@@ -133,9 +129,7 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({
           <span className="text">Copy</span>
         </li>
         <li
-          onClick={() => {
-            handleCommand("cut");
-          }}
+          onClick={() => handleCommand("cut")}
           className={`bubble-menu-item ${
             !isTextCurrentlySelected() ? "disabled opacity-50" : ""
           }`}
@@ -154,9 +148,7 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({
           <span className="text">Paste</span>
         </li>
         <li
-          onClick={() => {
-            handleCommand("delete");
-          }}
+          onClick={() => handleCommand("delete")}
           className={`bubble-menu-item ${
             !isTextCurrentlySelected() ? "disabled opacity-50" : ""
           }`}
@@ -167,9 +159,7 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({
         <div className="w-full h-px bg-gray-500"></div>
         <li
           ref={tableButtonRef}
-          onMouseEnter={() => {
-            setShowTableSelector(true);
-          }}
+          onMouseEnter={() => setShowTableSelector(true)}
           className={`bubble-menu-item`}
         >
           <CiViewTable className="icon" />
@@ -200,22 +190,8 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({
  *
  * @returns number of rows and cols selected
  */
-interface TableSizeSelectorProps {
+type TableSizeSelectorProps = {
   onSelect: (rows: number, cols: number) => void;
-}
-
-/**
- *
- * Copies text that is selected
- */
-const copyCommand = (state: EditorState) => {
-  if (state.selection.empty) return false;
-
-  const { from, to } = state.selection;
-  const text = state.doc.textBetween(from, to, "");
-
-  navigator.clipboard.writeText(text);
-  return true;
 };
 
 const TableSizeSelector: React.FC<TableSizeSelectorProps> = ({ onSelect }) => {
@@ -239,9 +215,7 @@ const TableSizeSelector: React.FC<TableSizeSelectorProps> = ({ onSelect }) => {
               setHoveredRows(i);
               setHoveredCols(j);
             }}
-            onClick={() => {
-              onSelect(i, j);
-            }}
+            onClick={() => onSelect(i, j)}
           />
         );
       }
@@ -268,6 +242,20 @@ const TableSizeSelector: React.FC<TableSizeSelectorProps> = ({ onSelect }) => {
 
 /**
  *
+ * Copies text that is selected
+ */
+const copyCommand = (state: EditorState) => {
+  if (state.selection.empty) return false;
+
+  const { from, to } = state.selection;
+  const text = state.doc.textBetween(from, to, "");
+
+  navigator.clipboard.writeText(text);
+  return true;
+};
+
+/**
+ *
  * Cuts text that is selected
  */
 const cutCommand = (state: EditorState, dispatch: Dispatch | null) => {
@@ -286,12 +274,14 @@ const cutCommand = (state: EditorState, dispatch: Dispatch | null) => {
  * Pastes text that currently exists in clipboard
  */
 const pasteCommand = async (editor: Editor) => {
+  if (navigator.clipboard) {
     try {
       const text = await navigator.clipboard.readText();
       editor.commands.insertContent(text);
     } catch (err) {
       console.error(`Failed to read from clipboard:`, err);
     }
+  }
 };
 
 /**

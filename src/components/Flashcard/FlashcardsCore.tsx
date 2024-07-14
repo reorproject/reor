@@ -46,11 +46,11 @@ export const FlashcardCore = ({
             cursor-pointer w-full h-full
             text-center text-lg normal-case"
               onClick={() =>
-                { updateFlashcardUnderReview(currentSelectedFlashcard, {
+                updateFlashcardUnderReview(currentSelectedFlashcard, {
                   ...flashcardQAPairs[currentSelectedFlashcard],
                   isFlipped:
                     !flashcardQAPairs[currentSelectedFlashcard].isFlipped,
-                }); }
+                })
               }
               placeholder=""
             >
@@ -64,11 +64,11 @@ export const FlashcardCore = ({
               hover:bg-slate-900 cursor-pointer w-full h-full
               text-center text-lg normal-case"
                 onClick={() =>
-                  { updateFlashcardUnderReview(currentSelectedFlashcard, {
+                  updateFlashcardUnderReview(currentSelectedFlashcard, {
                     ...flashcardQAPairs[currentSelectedFlashcard],
                     isFlipped:
                       !flashcardQAPairs[currentSelectedFlashcard].isFlipped,
-                  }); }
+                  })
                 }
                 placeholder=""
               >

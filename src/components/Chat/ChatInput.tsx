@@ -27,7 +27,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
               handleSubmitNewMessage();
             }
           }}
-          onChange={(e) => { setUserTextFieldInput(e.target.value); }}
+          onChange={(e) => setUserTextFieldInput(e.target.value)}
           value={userTextFieldInput}
           className="w-full mr-2 bg-gray-300"
           name="Outlined"
@@ -57,7 +57,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
                   active:shadow-none bg-neutral-700 border-none h-full hover:bg-neutral-900 cursor-pointer text-center
                   pt-0 pb-0 pr-2 pl-2`}
               type="button"
-              onClick={() => { handleSubmitNewMessage(); }}
+              onClick={() => handleSubmitNewMessage()}
             >
               {askText}
             </button>

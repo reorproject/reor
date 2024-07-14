@@ -21,7 +21,9 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
   useEffect(() => {
     const fetchParams = async () => {
       const params = await window.electronStore.getLLMGenerationParams();
-      if (params) setTextGenerationParams(params);
+      if (params) {
+        setTextGenerationParams(params);
+      }
     };
 
     fetchParams();
@@ -29,8 +31,10 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
 
   const handleSave = () => {
     // Execute the save function here
-    window.electronStore.setLLMGenerationParams(textGenerationParams);
-    setUserHasMadeUpdate(false);
+    if (textGenerationParams) {
+      window.electronStore.setLLMGenerationParams(textGenerationParams);
+      setUserHasMadeUpdate(false);
+    }
   };
 
   const handleTokenInput = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,10 +124,8 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
           <input
             type="text"
             className="w-[80px] p-2 bg-dark-gray-c-eight hover:bg-dark-gray-c-ten border-none rounded-md text-gray-100"
-            value={textGenerationParams.maxTokens}
-            onChange={(e) => {
-              handleTokenInput(e);
-            }}
+            value={textGenerationParams?.maxTokens}
+            onChange={(e) => handleTokenInput(e)}
             ref={inputRef}
             placeholder="None"
           />

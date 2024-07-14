@@ -28,15 +28,17 @@ import CreateAppearanceSection, { GenSettingsProps } from "./GeneralSections";
 const GeneralSettings: React.FC<GenSettingsProps> = () => {
   const { spellCheckEnabled, setSpellCheckEnabled } = useFileByFilepath();
   const [userHasMadeUpdate, setUserHasMadeUpdate] = useState(false);
-  const [tempSpellCheckEnabled, setTempSpellCheckEnabled] = useState(false);
+  const [tempSpellCheckEnabled, setTempSpellCheckEnabled] = useState("false");
 
   useEffect(() => {
     const fetchParams = async () => {
       const isSpellCheckEnabled =
         await window.electronStore.getSpellCheckMode();
 
-      setSpellCheckEnabled(isSpellCheckEnabled);
-      setTempSpellCheckEnabled(isSpellCheckEnabled);
+      if (isSpellCheckEnabled !== undefined) {
+        setSpellCheckEnabled(isSpellCheckEnabled);
+        setTempSpellCheckEnabled(isSpellCheckEnabled);
+      }
     };
 
     fetchParams();
@@ -54,12 +56,12 @@ const GeneralSettings: React.FC<GenSettingsProps> = () => {
       <CreateAppearanceSection />
       <p className="text-gray-300 text-sm mb-2 mt-1">Spell Check</p>
       <Switch
-        checked={tempSpellCheckEnabled}
+        checked={tempSpellCheckEnabled == "true" ? true : false}
         onChange={() => {
           setUserHasMadeUpdate(true);
-          if (tempSpellCheckEnabled)
-            setTempSpellCheckEnabled(false);
-          else setTempSpellCheckEnabled(true);
+          if (tempSpellCheckEnabled == "true")
+            setTempSpellCheckEnabled("false");
+          else setTempSpellCheckEnabled("true");
         }}
         inputProps={{ "aria-label": "controlled" }}
       />
