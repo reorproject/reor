@@ -66,24 +66,24 @@ const NewEmbeddingModelModalBothTypes: React.FC<
 
   return (
     <ReorModal isOpen={isOpen} onClose={onClose}>
-      <div className="w-[400px] ml-2 mr-2 mb-2 pl-3">
-        <h2 className="text-white  font-semibold mb-0">
+      <div className="mx-2 mb-2 w-[400px] pl-3">
+        <h2 className="mb-0  font-semibold text-white">
           Attach a custom embedding model
         </h2>
-        <p className="text-white text-sm mb-2 mt-2">
+        <p className="my-2 text-sm text-white">
           You can either attach a local embedding model or provide a Hugging
           Face repo name to be downloaded:
         </p>
         <div className="flex">
           <Button
-            className="bg-blue-600 border-none h-8 hover:bg-blue-600 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1 mr-2"
+            className="mr-2 mt-1 h-8 w-[180px] cursor-pointer border-none bg-blue-600 px-2 py-0 text-center hover:bg-blue-600"
             onClick={handleModelDirectorySelection}
             placeholder=""
           >
             Attach Local Model
           </Button>
           <Button
-            className="bg-blue-600 border-none h-8 hover:bg-blue-600 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1"
+            className="mt-1 h-8 w-[180px] cursor-pointer border-none bg-blue-600 px-2 py-0 text-center hover:bg-blue-600"
             onClick={() => {
               setIsRepoModalOpen(true);
             }}
@@ -92,7 +92,7 @@ const NewEmbeddingModelModalBothTypes: React.FC<
             Download by Repo name
           </Button>
         </div>
-        <p className="text-white text-xs mb-2 mt-2 italic">
+        <p className="my-2 text-xs italic text-white">
           <ExternalLink href="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=downloads&search=xenova">
             This page on Hugging Face
           </ExternalLink>{" "}
@@ -110,8 +110,8 @@ const NewEmbeddingModelModalBothTypes: React.FC<
             handleSaveHuggingFaceRepo();
           }}
         >
-          <div className="w-[300px] ml-2 mr-2 mb-2 pl-3 pt-1">
-            <h3 className="font-semibold mb-3 text-white">
+          <div className="mx-2 mb-2 w-[300px] pl-3 pt-1">
+            <h3 className="mb-3 font-semibold text-white">
               Download by Repo name
             </h3>
             {/* <p className="text-gray-100 mb-3 mt-2 text-sm">
@@ -119,7 +119,7 @@ const NewEmbeddingModelModalBothTypes: React.FC<
             </p> */}
             <input
               type="text"
-              className="block w-full px-3 py-2 mt-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
+              className="mt-2 box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
               value={huggingfaceRepo}
               onChange={(e) => {
                 setHuggingfaceRepo(e.target.value);
@@ -136,7 +136,7 @@ const NewEmbeddingModelModalBothTypes: React.FC<
               embedding model.
             </p> */}
             <Button
-              className="bg-blue-500 border-none h-8 hover:bg-blue-600 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
+              className="mt-3 h-8 w-[80px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
               onClick={() => {
                 if (huggingfaceRepo) handleSaveHuggingFaceRepo();
               }}

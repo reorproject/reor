@@ -10,7 +10,7 @@ import ReactMarkdown from "react-markdown";
 import rehypeRaw from "rehype-raw";
 
 import { ChatHistory } from "../Chat/Chat";
-import { formatOpenAIMessageContentIntoString } from "../Chat/chatUtils";
+import { formatOpenAIMessageContentIntoString } from "../Chat/utils";
 import { useOutsideClick } from "../Chat/hooks/use-outside-click";
 import { HighlightData } from "../Editor/HighlightExtension";
 interface WritingAssistantProps {
@@ -324,7 +324,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           left: `${highlightData.position.left + 30}px`,
           zIndex: 50,
         }}
-        className="absolute w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer text-gray-600 border-none shadow-md hover:bg-gray-300"
+        className="absolute flex size-7 cursor-pointer items-center justify-center rounded-full border-none bg-gray-200 text-gray-600 shadow-md hover:bg-gray-300"
         aria-label="Writing Assistant button"
         onClick={() => {
           setIsOptionsVisible(true);
@@ -339,7 +339,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
             top: highlightData.position.top,
             left: highlightData.position.left,
           }}
-          className="absolute bg-white border border-gray-300 p-2.5 z-50 w-96 rounded-md"
+          className="absolute z-50 w-96 rounded-md border border-gray-300 bg-white p-2.5"
         >
           <TextField
             type="text"
@@ -350,7 +350,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
               setCustomPrompt(e.target.value);
             }}
             placeholder="Ask AI anything..."
-            className="mb-2.5 p-1 w-full" // TailwindCSS classes for styling
+            className="mb-2.5 w-full p-1" // TailwindCSS classes for styling
             onKeyPress={(e) => {
               if (e.key === "Enter") {
                 handleOption("custom", customPrompt);
@@ -360,21 +360,21 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           <div className="max-h-36 overflow-y-auto">
             <Button
               onClick={() => handleOption("simplify")}
-              className="block w-full mb-1"
+              className="mb-1 block w-full"
               style={{ textTransform: "none" }}
             >
               Simplify and condense the writing
             </Button>
             <Button
               onClick={() => handleOption("copy-editor")}
-              className="block w-full mb-1"
+              className="mb-1 block w-full"
               style={{ textTransform: "none" }}
             >
               Fix spelling and grammar
             </Button>
             <Button
               onClick={() => handleOption("takeaways")}
-              className="block w-full mb-1"
+              className="mb-1 block w-full"
               style={{ textTransform: "none" }}
             >
               List key Takeaways
@@ -385,7 +385,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
       {hasValidMessages && (
         <div
           ref={markdownContainerRef}
-          className="absolute bg-white border border-gray-300 rounded-lg shadow-md p-2.5 z-50"
+          className="absolute z-50 rounded-lg border border-gray-300 bg-white p-2.5 shadow-md"
           style={{
             top: highlightData.position.top,
             left: highlightData.position.left,
@@ -395,12 +395,12 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           {lastAssistantMessage && (
             <ReactMarkdown
               rehypePlugins={[rehypeRaw]}
-              className={`p-1 markdown-content break-words rounded-md ${
+              className={`markdown-content break-words rounded-md p-1 ${
                 lastAssistantMessage.messageType === "error"
                   ? "bg-red-100 text-red-800"
                   : lastAssistantMessage.role === "assistant"
-                  ? "bg-neutral-200 text-black"
-                  : "bg-blue-100 text-blue-800"
+                    ? "bg-neutral-200 text-black"
+                    : "bg-blue-100 text-blue-800"
               }`}
             >
               {lastAssistantMessage.visibleContent
@@ -410,9 +410,9 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
                   )}
             </ReactMarkdown>
           )}
-          <div className="flex justify-between mt-2">
+          <div className="mt-2 flex justify-between">
             <button
-              className="bg-blue-100 border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center mr-1"
+              className="mr-1 flex cursor-pointer items-center rounded-md border-0 bg-blue-100 px-2.5 py-1"
               onClick={() => {
                 getLLMResponse(prevPrompt, currentChatHistory);
               }}
@@ -420,7 +420,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
               Re-run
             </button>
             <button
-              className="bg-blue-100 border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center mr-1"
+              className="mr-1 flex cursor-pointer items-center rounded-md border-0 bg-blue-100 px-2.5 py-1"
               onClick={() => {
                 insertAfterHighlightedText();
               }}
@@ -428,7 +428,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
               Insert
             </button>
             <button
-              className="bg-blue-100 border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center mr-1"
+              className="mr-1 flex cursor-pointer items-center rounded-md border-0 bg-blue-100 px-2.5 py-1"
               onClick={() => {
                 copyToClipboard();
               }}
@@ -436,7 +436,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
               Copy
             </button>
             <button
-              className="bg-indigo-700 text-white border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center"
+              className="flex cursor-pointer items-center rounded-md border-0 bg-indigo-700 px-2.5 py-1 text-white"
               onClick={() => {
                 replaceHighlightedText();
               }}

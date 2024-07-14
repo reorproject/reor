@@ -1,7 +1,4 @@
-export function errorToStringMainProcess(
-  error: unknown,
-  depth = 0
-): string {
+export function errorToStringMainProcess(error: unknown, depth = 0): string {
   if (error instanceof Error) {
     let errorString = `${error.name}: ${error.message}`;
     if (error.cause) {

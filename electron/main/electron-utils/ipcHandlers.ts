@@ -47,89 +47,92 @@ export const electronUtilsHandlers = (
     if (browserWindow) menu.popup({ window: browserWindow });
   });
 
-  ipcMain.handle("show-context-menu-file-item", async (event, file: FileInfoNode) => {
-    const menu = new Menu();
+  ipcMain.handle(
+    "show-context-menu-file-item",
+    async (event, file: FileInfoNode) => {
+      const menu = new Menu();
 
-    const stats = await fs.stat(file.path);
-    const isDirectory = stats.isDirectory();
+      const stats = await fs.stat(file.path);
+      const isDirectory = stats.isDirectory();
 
-    if (isDirectory) {
+      if (isDirectory) {
+        menu.append(
+          new MenuItem({
+            label: "New Note",
+            click: () => {
+              event.sender.send("add-new-note-listener", file.relativePath);
+            },
+          })
+        );
+
+        menu.append(
+          new MenuItem({
+            label: "New Directory",
+            click: () => {
+              event.sender.send("add-new-directory-listener", file.path);
+            },
+          })
+        );
+      }
+
       menu.append(
         new MenuItem({
-          label: "New Note",
+          label: "Delete",
           click: () => {
-            event.sender.send("add-new-note-listener", file.relativePath);
+            return dialog
+              .showMessageBox({
+                type: "question",
+                title: "Delete File",
+                message: `Are you sure you want to delete "${file.name}"?`,
+                buttons: ["Yes", "No"],
+              })
+              .then((confirm) => {
+                if (confirm.response === 0) {
+                  console.log(file.path);
+                  event.sender.send("delete-file-listener", file.path);
+                }
+              });
+          },
+        })
+      );
+      menu.append(
+        new MenuItem({
+          label: "Rename",
+          click: () => {
+            console.log(file.path);
+            event.sender.send("rename-file-listener", file.path);
           },
         })
       );
 
       menu.append(
         new MenuItem({
-          label: "New Directory",
+          label: "Create a flashcard set",
           click: () => {
-            event.sender.send("add-new-directory-listener", file.path);
+            console.log("creating: ", file.path);
+            event.sender.send("create-flashcard-file-listener", file.path);
           },
         })
       );
+
+      menu.append(
+        new MenuItem({
+          label: "Add file to chat context",
+          click: () => {
+            console.log("creating: ", file.path);
+            event.sender.send("add-file-to-chat-listener", file.path);
+          },
+        })
+      );
+
+      console.log("menu key: ", file);
+
+      const browserWindow = BrowserWindow.fromWebContents(event.sender);
+      if (browserWindow) {
+        menu.popup({ window: browserWindow });
+      }
     }
-
-    menu.append(
-      new MenuItem({
-        label: "Delete",
-        click: () => {
-          return dialog
-            .showMessageBox({
-              type: "question",
-              title: "Delete File",
-              message: `Are you sure you want to delete "${file.name}"?`,
-              buttons: ["Yes", "No"],
-            })
-            .then((confirm) => {
-              if (confirm.response === 0) {
-                console.log(file.path);
-                event.sender.send("delete-file-listener", file.path);
-              }
-            });
-        },
-      })
-    );
-    menu.append(
-      new MenuItem({
-        label: "Rename",
-        click: () => {
-          console.log(file.path);
-          event.sender.send("rename-file-listener", file.path);
-        },
-      })
-    );
-
-    menu.append(
-      new MenuItem({
-        label: "Create a flashcard set",
-        click: () => {
-          console.log("creating: ", file.path);
-          event.sender.send("create-flashcard-file-listener", file.path);
-        },
-      })
-    );
-
-    menu.append(
-      new MenuItem({
-        label: "Add file to chat context",
-        click: () => {
-          console.log("creating: ", file.path);
-          event.sender.send("add-file-to-chat-listener", file.path);
-        },
-      })
-    );
-
-    console.log("menu key: ", file);
-
-    const browserWindow = BrowserWindow.fromWebContents(event.sender);
-    if (browserWindow) {
-      menu.popup({ window: browserWindow });
-    }
-  });
+  );
 
   ipcMain.handle("show-chat-menu-item", (event, chatID) => {
     const menu = new Menu();

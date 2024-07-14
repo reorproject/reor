@@ -120,14 +120,14 @@ const AddContextFiltersModal: React.FC<Props> = ({
 
   return (
     <ReorModal isOpen={isOpen} onClose={onClose}>
-      <div className="ml-6 mt-2 mb-6 h-full w-[800px] max-h-[90vh] overflow-y-auto overflow-x-hidden p-4">
-        <h4 className="text-white text-2xl mb-4 text-center">
+      <div className="mb-6 ml-6 mt-2 h-full max-h-[90vh] w-[800px] overflow-y-auto overflow-x-hidden p-4">
+        <h4 className="mb-4 text-center text-2xl text-white">
           Choose specific context files or customise the RAG search
         </h4>
         <div className="flex">
           {/* Left side: File selection */}
           <div className="flex-1 pr-4">
-            <h3 className="text-white text-lg mb-2">
+            <h3 className="mb-2 text-lg text-white">
               Select files for context
             </h3>
             <SearchBarWithFilesSuggestion
@@ -143,7 +143,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
               suggestionsState={suggestionsState}
               setSuggestionsState={setSuggestionsState}
             />
-            <div className="text-white w-full mt-2 max-h-[300px] overflow-y-auto">
+            <div className="mt-2 max-h-[300px] w-full overflow-y-auto text-white">
               <List placeholder="">
                 {internalFilesSelected.map((fileItem, index) => (
                   <ListItem key={index} placeholder="">
@@ -158,12 +158,12 @@ const AddContextFiltersModal: React.FC<Props> = ({
           </div>
 
           {/* Vertical divider */}
-          <div className="flex flex-col items-center justify-center mx-4">
-            <div className="w-px bg-gray-600 flex-grow"></div>
-            <div className="bg-gray-800 text-white text-sm font-bold rounded-full w-8 h-8 flex items-center justify-center my-2">
+          <div className="mx-4 flex flex-col items-center justify-center">
+            <div className="w-px grow bg-gray-600"></div>
+            <div className="my-2 flex size-8 items-center justify-center rounded-full bg-gray-800 text-sm font-bold text-white">
               Or
             </div>
-            <div className="w-px bg-gray-600 flex-grow"></div>
+            <div className="w-px grow bg-gray-600"></div>
           </div>
           {/* Right side: Context settings */}
           <div
@@ -176,10 +176,10 @@ const AddContextFiltersModal: React.FC<Props> = ({
                 ? "opacity-30	 pointer-events-none"
                 : ""
             } */}
-            <h3 className="text-white text-lg mb-2">Context settings</h3>
-            <div className="text-white mb-4">
+            <h3 className="mb-2 text-lg text-white">Context settings</h3>
+            <div className="mb-4 text-white">
               <p>Number of notes to add to context:</p>
-              <div className="w-full bg-neutral-800 rounded pb-3 mt-2 pr-2">
+              <div className="mt-2 w-full rounded bg-neutral-800 pb-3 pr-2">
                 <Slider
                   aria-label="Number of Notes"
                   value={numberOfChunksToFetch}
@@ -212,11 +212,11 @@ const AddContextFiltersModal: React.FC<Props> = ({
                   }}
                 />
               </div>
-              <div className="text-center mt-2">{numberOfChunksToFetch}</div>
+              <div className="mt-2 text-center">{numberOfChunksToFetch}</div>
             </div>
-            <div className="text-white mb-4">
+            <div className="mb-4 text-white">
               <p>Filter context notes by last modified date:</p>
-              <div className="w-full rounded pb-1 mt-2">
+              <div className="mt-2 w-full rounded pb-1">
                 <CustomSelect
                   options={dateRangeOptions}
                   selectedValue={selectedDateRange}
@@ -226,27 +226,31 @@ const AddContextFiltersModal: React.FC<Props> = ({
             </div>
             <div>
               <div
-                className="text-gray-500 text-xs underline cursor-pointer mb-2"
+                className="mb-2 cursor-pointer text-xs text-gray-500 underline"
                 onClick={handleAdvancedToggle}
               >
                 {showAdvanced ? "Hide Advanced" : "Show Advanced"}
               </div>
               {showAdvanced && (
-                <div className="flex space-x-4 mt-2">
-                  <div className="text-white flex-1 flex flex-col items-center">
+                <div className="mt-2 flex space-x-4">
+                  <div className="flex flex-1 flex-col items-center text-white">
                     <p className="mb-1">Min Date:</p>
                     <DayPicker
                       selected={minDate}
-                      onSelect={(date) => { setMinDate(date ?? undefined); }}
+                      onSelect={(date) => {
+                        setMinDate(date ?? undefined);
+                      }}
                       mode="single"
                       className="my-day-picker w-full"
                     />
                   </div>
-                  <div className="text-white flex-1 flex flex-col items-center">
+                  <div className="flex flex-1 flex-col items-center text-white">
                     <p className="mb-1">Max Date:</p>
                     <DayPicker
                       selected={maxDate}
-                      onSelect={(date) => { setMaxDate(date ?? undefined); }}
+                      onSelect={(date) => {
+                        setMaxDate(date ?? undefined);
+                      }}
                       mode="single"
                       className="my-day-picker w-full"
                     />

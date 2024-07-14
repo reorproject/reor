@@ -26,7 +26,9 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
   // const [newModelPath, setNewModelPath] = useState<string>("");
   const [modelName, setModelName] = useState("");
   const [modelNameerror, setModelNameError] = useState("");
-  const [downloadProgress, setDownloadProgress] = useState<Record<string, ModelDownloadStatus>>({});
+  const [downloadProgress, setDownloadProgress] = useState<
+    Record<string, ModelDownloadStatus>
+  >({});
 
   const downloadSelectedModel = async () => {
     if (!modelName) {
@@ -80,9 +82,9 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
 
   return (
     <ReorModal isOpen={isOpen} onClose={onClose}>
-      <div className="w-[400px] ml-2 mr-2 mb-2 pl-3">
-        <h2 className="text-white  font-semibold mb-0">New Local LLM</h2>
-        <p className="text-white text-xs mb-6 mt-1">
+      <div className="mx-2 mb-2 w-[400px] pl-3">
+        <h2 className="mb-0  font-semibold text-white">New Local LLM</h2>
+        <p className="mb-6 mt-1 text-xs text-white">
           Reor will automaticaly download an LLM. Please choose an LLM from the{" "}
           <ExternalLink href="https://ollama.com/library">
             Ollama Library
@@ -92,19 +94,21 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
 
         <input
           type="text"
-          className="block w-full mt-1 px-3 py-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
+          className=" mt-1 box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
           value={modelName}
-          onChange={(e) => { setModelName(e.target.value); }}
+          onChange={(e) => {
+            setModelName(e.target.value);
+          }}
           placeholder="mistral"
         />
-        <p className="text-white text-xs mb-2 mt-2 italic">
+        <p className="my-2 text-xs italic text-white">
           {" "}
           We recommended either mistral, llama3, or phi3.
         </p>
 
-        <div className="pb-2 flex justify-end">
+        <div className="flex justify-end pb-2">
           <Button
-            className="bg-blue-500 border-none h-8 hover:bg-blue-600 cursor-pointer w-[100px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
+            className="mt-3 h-8 w-[100px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
             onClick={downloadSelectedModel}
             placeholder=""
           >
@@ -112,26 +116,26 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
           </Button>
         </div>
         {modelNameerror && (
-          <p className="text-xs text-red-500 break-words">{modelNameerror}</p>
+          <p className="break-words text-xs text-red-500">{modelNameerror}</p>
         )}
         <div>
           {Object.entries(downloadProgress).map(
             ([modelName, { progress, error }]) => (
               <div key={modelName} className="mb-4">
                 {!error && progress.status === "success" ? (
-                  <p className="text-white text-sm">
+                  <p className="text-sm text-white">
                     {`${modelName}: Download complete! Refresh the chat window to use the new model.`}
                   </p>
                 ) : !error ? (
                   <>
-                    <p className="text-white text-sm">
+                    <p className="text-sm text-white">
                       {`${modelName}: Download progress - ${downloadPercentage(
                         progress
                       )}`}
                     </p>
                   </>
                 ) : (
-                  <p className="text-red-500 text-sm break-words">
+                  <p className="break-words text-sm text-red-500">
                     {`${modelName}: Error - ${error}`}
                   </p>
                 )}
@@ -139,7 +143,7 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({
             )
           )}
           {Object.entries(downloadProgress).length > 0 && (
-            <p className="text-white text-xs">
+            <p className="text-xs text-white">
               (Feel free to close this modal while the download completes)
             </p>
           )}

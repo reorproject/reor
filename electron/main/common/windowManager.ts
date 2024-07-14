@@ -141,7 +141,6 @@ class WindowsManager {
     directory: string,
     store: Store<StoreSchema>
   ): void {
-
     const windowID = this.getBrowserWindowId(webContents);
     if (!windowID) {
       throw new Error("Unable to find the browser window ID.");

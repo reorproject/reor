@@ -67,9 +67,9 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
   };
   return (
     <ReorModal isOpen={isOpen} onClose={handleClose}>
-      <div className="w-[400px] ml-3 mr-2 mb-2">
-        <h2 className="font-semibold mb-0 text-white">Remote LLM Setup</h2>
-        <p className="text-gray-100 mb-2 mt-2 text-sm">
+      <div className="mb-2 ml-3 mr-2 w-[400px]">
+        <h2 className="mb-0 font-semibold text-white">Remote LLM Setup</h2>
+        <p className="my-2 text-sm text-gray-100">
           Connect with a custom OpenAI-like API endpoint like{" "}
           <ExternalLink href="https://github.com/oobabooga/text-generation-webui/wiki/12-%E2%80%90-OpenAI-API">
             Oobabooga
@@ -81,44 +81,50 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
           .
         </p>
 
-        <h4 className="text-gray-100 mb-1">API URL</h4>
+        <h4 className="mb-1 text-gray-100">API URL</h4>
         {/* Forc */}
         <input
           type="text"
           placeholder="API URL"
           value={apiURL}
-          onChange={(e) => { setApiURL(e.target.value); }}
-          className="block w-full px-3 py-2 mb-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
+          onChange={(e) => {
+            setApiURL(e.target.value);
+          }}
+          className=" mb-2 box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
         />
-        <p className="mt-2 text-gray-100 text-xs">
+        <p className="mt-2 text-xs text-gray-100">
           (This must be an OpenAI compatible API endpoint. That typically is the
           part of the url before /chat/completions like for example
           http://127.0.0.1:1337/v1)
         </p>
-        <h4 className="text-gray-100 mb-1">Model Name</h4>
+        <h4 className="mb-1 text-gray-100">Model Name</h4>
         <input
           type="text"
           placeholder="Model Name"
           value={modelName}
-          onChange={(e) => { setModelName(e.target.value); }}
-          className="block w-full px-3 py-2 mb-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
+          onChange={(e) => {
+            setModelName(e.target.value);
+          }}
+          className=" mb-2 box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
         />
-        <p className="mt-2 text-gray-100 text-xs">
+        <p className="mt-2 text-xs text-gray-100">
           (Model alias like &quot;gpt-3.5-turbo-1106&quot;)
         </p>
 
-        <h4 className="text-gray-100 mb-1">Optional API Key</h4>
+        <h4 className="mb-1 text-gray-100">Optional API Key</h4>
         <input
           type="text"
           placeholder="API Key"
           value={apiKey}
-          onChange={(e) => { setApiKey(e.target.value); }}
-          className="block w-full px-3 py-2 mb-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
+          onChange={(e) => {
+            setApiKey(e.target.value);
+          }}
+          className=" mb-2 box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
         />
-        <p className="mt-2 text-gray-100 text-xs">
+        <p className="mt-2 text-xs text-gray-100">
           (If your endpoint requires an API key.)
         </p>
-        <h4 className="text-gray-100 mb-1">Context Length</h4>
+        <h4 className="mb-1 text-gray-100">Context Length</h4>
         <CustomSelect
           options={contextLengthOptions}
           selectedValue={selectedContextLength}
@@ -127,9 +133,9 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
           }}
         />
 
-        <div className="pb-2 flex justify-end">
+        <div className="flex justify-end pb-2">
           <Button
-            className="bg-blue-500 border-none h-8 hover:bg-blue-600 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mt-3 w-[80px]"
+            className="mt-3 h-8 w-[80px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
             onClick={handleSave}
             placeholder=""
           >
@@ -137,7 +143,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({
           </Button>
         </div>
         {currentError && (
-          <p className="text-xs text-red-500 mt-2">{currentError}</p>
+          <p className="mt-2 text-xs text-red-500">{currentError}</p>
         )}
       </div>
     </ReorModal>

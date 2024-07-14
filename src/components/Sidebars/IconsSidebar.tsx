@@ -84,9 +84,9 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
   }, []);
 
   return (
-    <div className="w-full h-full bg-neutral-800 flex flex-col items-center justify-between gap-1">
+    <div className="flex size-full flex-col items-center justify-between gap-1 bg-neutral-800">
       <div
-        className=" flex items-center justify-center w-full h-8 cursor-pointer"
+        className=" flex h-8 w-full cursor-pointer items-center justify-center"
         onClick={() => {
           makeSidebarShow("files");
         }}
@@ -94,7 +94,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         <IconContext.Provider
           value={{ color: sidebarShowing === "files" ? "salmon" : "" }}
         >
-          <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
+          <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
             <ImFilesEmpty
               className="mx-auto text-gray-200 "
               size={22}
@@ -104,7 +104,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         </IconContext.Provider>
       </div>
       <div
-        className=" flex items-center justify-center w-full h-8 cursor-pointer"
+        className=" flex h-8 w-full cursor-pointer items-center justify-center"
         onClick={() => {
           makeSidebarShow("chats");
         }}
@@ -112,9 +112,9 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         <IconContext.Provider
           value={{ color: sidebarShowing === "chats" ? "salmon" : "" }}
         >
-          <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
+          <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
             <IoChatbubbleEllipsesOutline
-              className="text-gray-100 cursor-pointer "
+              className="cursor-pointer text-gray-100 "
               size={22}
               title={
                 sidebarShowing === "chats" ? "Close Chatbot" : "Open Chatbot"
@@ -124,7 +124,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         </IconContext.Provider>
       </div>
       <div
-        className="flex items-center justify-center w-full h-8 cursor-pointer"
+        className="flex h-8 w-full cursor-pointer items-center justify-center"
         onClick={() => {
           makeSidebarShow("search");
         }}
@@ -132,7 +132,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         <IconContext.Provider
           value={{ color: sidebarShowing === "search" ? "salmon" : "" }}
         >
-          <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
+          <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
             <FaSearch
               size={18}
               className=" text-gray-200"
@@ -142,22 +142,22 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         </IconContext.Provider>
       </div>
       <div
-        className="bg-transparent border-none cursor-pointer flex items-center justify-center w-full h-8 "
+        className="flex h-8 w-full cursor-pointer items-center justify-center border-none bg-transparent "
         onClick={() => {
           setIsNewNoteModalOpen(true);
         }}
       >
-        <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
+        <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
           <VscNewFile className="text-gray-200" size={22} title="New Note" />
         </div>
       </div>
       <div
-        className="bg-transparent mt-[2px] border-none cursor-pointer flex items-center justify-center w-full h-8 "
+        className="mt-[2px] flex h-8 w-full cursor-pointer items-center justify-center border-none bg-transparent "
         onClick={() => {
           setIsNewDirectoryModalOpen(true);
         }}
       >
-        <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
+        <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
           <VscNewFolder
             className="text-gray-200"
             size={22}
@@ -167,12 +167,12 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         </div>
       </div>
       <div
-        className="bg-transparent border-none cursor-pointer flex items-center justify-center w-full h-8 "
+        className="flex h-8 w-full cursor-pointer items-center justify-center border-none bg-transparent "
         onClick={() => {
           setIsFlashcardModeOpen(true);
         }}
       >
-        <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
+        <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
           <MdOutlineQuiz
             className="text-gray-200"
             size={23}
@@ -210,7 +210,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
           initialFileToReviewFlashcard={initialFileToReviewFlashcard}
         />
       )}
-      <div className="flex-grow border-1 border-yellow-300"></div>
+      <div className="grow border-yellow-300"></div>
       <SettingsModal
         isOpen={isSettingsModalOpen}
         onClose={() => {
@@ -218,7 +218,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         }}
       />
       <div
-        className="bg-transparent border-none pb-2 mb-[2px] cursor-pointer flex items-center justify-center w-full"
+        className="mb-[2px] flex w-full cursor-pointer items-center justify-center border-none bg-transparent pb-2"
         onClick={() => window.electronUtils.openNewWindow()}
       >
         <GrNewWindow
@@ -228,12 +228,12 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         />
       </div>
       <button
-        className="bg-transparent border-none pb-2 cursor-pointer flex items-center justify-center w-full"
+        className="flex w-full cursor-pointer items-center justify-center border-none bg-transparent pb-2"
         onClick={() => {
           setIsSettingsModalOpen(!isSettingsModalOpen);
         }}
       >
-        <MdSettings className="h-6 w-6 text-gray-100" title="Settings" />
+        <MdSettings className="size-6 text-gray-100" title="Settings" />
       </button>
     </div>
   );

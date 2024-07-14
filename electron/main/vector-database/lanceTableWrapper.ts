@@ -29,11 +29,10 @@ export class LanceDBTableWrapper {
     userDirectory: string,
     embeddingModelConfig: EmbeddingModelConfig
   ) {
-      this.embedFun = await createEmbeddingFunction(
-        embeddingModelConfig,
-        "content"
-      );
-    
+    this.embedFun = await createEmbeddingFunction(
+      embeddingModelConfig,
+      "content"
+    );
 
     this.lanceTable = await GetOrCreateLanceTable(
       dbConnection,

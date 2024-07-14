@@ -54,12 +54,12 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
 
   return (
     <ReorModal isOpen={isOpen} onClose={onClose}>
-      <div className="ml-6 mt-2 mb-6 mr-6 w-[800px] h-full flex-col  ">
-        <h2 className="text-xl font-semibold mb-3 text-white">
+      <div className="mx-6 mb-6 mt-2 h-full w-[800px] flex-col  ">
+        <h2 className="mb-3 text-xl font-semibold text-white">
           Flashcard Review Mode
         </h2>
 
-        <div className="py-2 w-full mb-2">
+        <div className="mb-2 w-full py-2">
           <CustomSelect
             options={flashcardFiles.map((file) => {
               return { label: file, value: file };
@@ -74,7 +74,7 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
         </div>
 
         {flashcardQAPairs.length === 0 && (
-          <p className="text-red-500 text-xs">Choose a set of flashcards</p>
+          <p className="text-xs text-red-500">Choose a set of flashcards</p>
         )}
         <FlashcardCore
           flashcardQAPairs={flashcardQAPairs}

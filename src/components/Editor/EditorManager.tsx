@@ -92,12 +92,14 @@ const EditorManager: React.FC<EditorManagerProps> = ({
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => { window.removeEventListener("keydown", handleKeyDown); };
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [showSearch, menuVisible, toggleSearch]);
 
   return (
     <div
-      className="relative h-full w-full cursor-text text-slate-400 overflow-y-auto"
+      className="relative size-full cursor-text overflow-y-auto text-slate-400"
       onClick={() => editor?.commands.focus()}
       style={{
         backgroundColor: "rgb(30, 30, 30)",
@@ -108,14 +110,16 @@ const EditorManager: React.FC<EditorManagerProps> = ({
           type="text"
           value={searchTerm}
           onKeyDown={handleNextSearch}
-          onChange={(event) => { handleSearchChange(event.target.value); }}
+          onChange={(event) => {
+            handleSearchChange(event.target.value);
+          }}
           onBlur={() => {
             setShowSearch(false);
             handleSearchChange("");
           }}
-          placeholder="Search..."
+          placeholder="Search...geez"
           autoFocus
-          className="absolute top-4 right-0 mt-4 mr-14 z-50 border-none rounded-md p-2 bg-transparent bg-dark-gray-c-ten text-white"
+          className="absolute right-0 top-4 z-50 mr-14 mt-4 rounded-md border-none bg-transparent p-2 text-white"
         />
       )}
       {menuVisible && (

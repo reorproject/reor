@@ -25,7 +25,6 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
     const deleteChatRow = window.ipcRenderer.receive(
       "remove-chat-at-id",
       (chatID: string) => {
-
         if (chatID === currentSelectedChatID.current) {
           setShowChatbot(false);
         }
@@ -41,7 +40,7 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
   return (
     <div className="h-full overflow-y-auto bg-neutral-800">
       <div
-        className="mt-1 mb-1 mr-1 ml-1 flex items-center justify-center cursor-pointer px-4 py-[8px] bg-dark-gray-c-ten hover:bg-neutral-700 text-white border border-transparent hover:border-white rounded transition duration-150 ease-in-out"
+        className="m-1 flex cursor-pointer items-center justify-center rounded border border-transparent bg-dark-gray-c-ten px-4 py-[8px] text-white transition duration-150 ease-in-out hover:border-white hover:bg-neutral-700"
         onClick={newChat}
       >
         <span className="text-sm"> + New Chat</span>
@@ -98,7 +97,7 @@ export const ChatItem: React.FC<ChatItemProps> = ({
         className={itemClasses}
         onContextMenu={handleContextMenu}
       >
-        <span className={`text-[13px] flex-1 truncate mt-0`}>
+        <span className={`mt-0 flex-1 truncate text-[13px]`}>
           {chatMetadata.displayName}
         </span>
       </div>

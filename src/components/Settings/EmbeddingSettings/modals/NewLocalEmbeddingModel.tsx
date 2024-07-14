@@ -54,25 +54,25 @@ const NewLocalEmbeddingModelModal: React.FC<
 
   return (
     <ReorModal isOpen={isOpen} onClose={saveModelConfigToElectronStore}>
-      <div className="w-[400px] ml-2 mr-2 mb-2 pl-3">
-        <h3 className="text-white font-semibold mb-0">
+      <div className="mx-2 mb-2 w-[400px] pl-3">
+        <h3 className="mb-0 font-semibold text-white">
           Upload and attach local model
         </h3>
-        <p className="text-white text-xs mb-6 mt-2">
+        <p className="mb-6 mt-2 text-xs text-white">
           Download a ONNX embedding model and select its directory below:
         </p>
 
         <Button
-          className="bg-dark-gray-c-one h-[164px] hover:bg-dark-gray-c-two cursor-pointer w-full border-dotted text-center pt-0 pb-0 pr-2 pl-2 mt-1 mb-1 flex flex-col justify-center items-center"
+          className="my-1 flex h-[164px] w-full cursor-pointer flex-col items-center justify-center border-dotted bg-dark-gray-c-one px-2 py-0 text-center hover:bg-dark-gray-c-two"
           onClick={handleModelDirectorySelection}
           placeholder=""
         >
-          <div className="border-solid border-2 rounded-full p-3 border-black-100">
+          <div className="rounded-full border-2 border-solid p-3">
             <FaUpload size={20} />
           </div>
           <p className="font-bold text-blue-200">Click to Upload</p>
         </Button>
-        <p className="text-white text-xs my-4 italic">
+        <p className="my-4 text-xs italic text-white">
           <ExternalLink href="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=downloads&search=xenova">
             This page on Hugging Face{" "}
           </ExternalLink>
@@ -84,7 +84,7 @@ const NewLocalEmbeddingModelModal: React.FC<
           for more info.{" "}
         </p>
         {newModelPath && (
-          <div className="w-full p-1 border-solid border-1 border-dark-gray-c-one rounded-lg flex items-center">
+          <div className=" flex w-full items-center rounded-lg border-solid border-dark-gray-c-one p-1">
             <IconContext.Provider value={{ color: "salmon" }}>
               <CiFileOn size={30} className="mx-3" />
             </IconContext.Provider>
@@ -103,14 +103,14 @@ const NewLocalEmbeddingModelModal: React.FC<
         )}
         <div className="flex justify-between gap-3 pb-2">
           <Button
-            className="bg-transparent border-2 border-blue-300 h-8 hover:bg-blue-600 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-3 rounded"
+            className="mt-3 h-8 w-full cursor-pointer rounded border-2 border-blue-300 bg-transparent px-2 py-0 text-center hover:bg-blue-600"
             onClick={onClose}
             placeholder=""
           >
             Discard
           </Button>
           <Button
-            className="bg-blue-600 h-8 hover:bg-transparent border-2 border-blue-800 cursor-pointer w-full text-center pt-0 pb-0 pr-2 pl-2 mt-3 rounded"
+            className="mt-3 h-8 w-full cursor-pointer rounded border-2 border-blue-800 bg-blue-600 px-2 py-0 text-center hover:bg-transparent"
             onClick={saveModelConfigToElectronStore}
             placeholder=""
           >

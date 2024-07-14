@@ -193,48 +193,47 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
         store.get(StoreKeys.LLMGenerationParameters)
       );
 
-        let searchResults: DBEntry[] = [];
-        const maxRAGExamples: number = store.get(StoreKeys.MaxRAGExamples);
-        const windowInfo = windowManager.getWindowInfoForContents(event.sender);
-        if (!windowInfo) {
-          throw new Error("Window info not found.");
-        }
+      let searchResults: DBEntry[] = [];
+      const maxRAGExamples: number = store.get(StoreKeys.MaxRAGExamples);
+      const windowInfo = windowManager.getWindowInfoForContents(event.sender);
+      if (!windowInfo) {
+        throw new Error("Window info not found.");
+      }
 
-        const llmGeneratedFilterString =
-          llmFilter.choices[0].message.content ?? "";
+      const llmGeneratedFilterString =
+        llmFilter.choices[0].message.content ?? "";
 
-        try {
-          searchResults = await windowInfo.dbTableClient.search(
-            query,
-            maxRAGExamples,
-            llmGeneratedFilterString
-          );
-        } catch (error) {
-          searchResults = await windowInfo.dbTableClient.search(
-            query,
-            maxRAGExamples
-          );
-          searchResults = [];
-        }
-        const basePrompt =
-          "Answer the question below based on the following notes:\n";
-        const { prompt: ragPrompt } = createPromptWithContextLimitFromContent(
-          searchResults,
-          basePrompt,
+      try {
+        searchResults = await windowInfo.dbTableClient.search(
           query,
-          llmSession.getTokenizer(llmName),
-          llmConfig.contextLength
+          maxRAGExamples,
+          llmGeneratedFilterString
         );
-        console.log("ragPrompt", ragPrompt);
-        const uniqueFilesReferenced = [
-          ...new Set(searchResults.map((entry) => entry.notepath)),
-        ];
+      } catch (error) {
+        searchResults = await windowInfo.dbTableClient.search(
+          query,
+          maxRAGExamples
+        );
+        searchResults = [];
+      }
+      const basePrompt =
+        "Answer the question below based on the following notes:\n";
+      const { prompt: ragPrompt } = createPromptWithContextLimitFromContent(
+        searchResults,
+        basePrompt,
+        query,
+        llmSession.getTokenizer(llmName),
+        llmConfig.contextLength
+      );
+      console.log("ragPrompt", ragPrompt);
+      const uniqueFilesReferenced = [
+        ...new Set(searchResults.map((entry) => entry.notepath)),
+      ];
 
-        return {
-          ragPrompt,
-          uniqueFilesReferenced,
-        };
-      
+      return {
+        ragPrompt,
+        uniqueFilesReferenced,
+      };
     }
   );
 

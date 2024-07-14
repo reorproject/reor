@@ -48,9 +48,9 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = ({
 
   return (
     <div className="w-[500px] p-5">
-      <h2 className="font-semibold mb-4 text-white">LLM</h2>
+      <h2 className="mb-4 font-semibold text-white">LLM</h2>
       {llmConfigs.length > 0 && (
-        <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2">
+        <div className="flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2">
           {/* <h4 className="text-gray-200 text-center font-normal">Default LLM</h4> */}
           <div className="flex-col">
             <p className="mt-5 text-gray-100">Default LLM</p>
@@ -69,7 +69,9 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = ({
         title="Local LLM"
         buttonText="Add New Local LLM"
         description="Attach a local LLM. Reor will download the model for you."
-        onClick={() => { openModal("newLocalModel"); }}
+        onClick={() => {
+          openModal("newLocalModel");
+        }}
       />
       <LLMOptionRow
         title="Setup OpenAI/Anthropic"
@@ -78,7 +80,9 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = ({
         <CustomSelect
           options={modalOptions}
           selectedValue="Attach Cloud LLM"
-          onChange={(value) => { openModal(value as "openai" | "anthropic"); }}
+          onChange={(value) => {
+            openModal(value as "openai" | "anthropic");
+          }}
           centerText={true}
         />
       </LLMOptionRow>
@@ -86,16 +90,18 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = ({
         title="Setup remote LLMs"
         description="Non-OpenAI/Anthropic LLMs"
         buttonText="Remote LLM Setup"
-        onClick={() => { openModal("remoteLLM"); }}
+        onClick={() => {
+          openModal("remoteLLM");
+        }}
       />
       {!isInitialSetup && userMadeChanges && (
-        <p className="text-xs text-slate-100 mt-1">
+        <p className="mt-1 text-xs text-slate-100">
           Note: You&apos;ll need to refresh the chat window to apply these
           changes.
         </p>
       )}
       {userTriedToSubmit && !defaultLLM && (
-        <p className="text-red-500 text-sm mt-1">{currentError}</p>
+        <p className="mt-1 text-sm text-red-500">{currentError}</p>
       )}
       {/* Render modals */}
       {Object.entries(modals).map(([key, { isOpen, Component }]) => (
@@ -120,12 +126,12 @@ const LLMOptionRow: React.FC<{
   onClick?: () => void;
   children?: React.ReactNode;
 }> = ({ title, description, buttonText, onClick, children }) => (
-  <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2">
+  <div className="flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2">
     <div className="flex-col">
       <p className="mt-5 text-gray-100">
         {title}
         {description && (
-          <p className="text-xs text-gray-100 w-50 m-0 pt-1 opacity-40">
+          <p className="m-0 pt-1 text-xs text-gray-100 opacity-40">
             {description}
           </p>
         )}
@@ -134,7 +140,7 @@ const LLMOptionRow: React.FC<{
     <div className="flex">
       {buttonText && (
         <Button
-          className="flex justify-between items-center min-w-[192px] py-2 border border-gray-300 rounded-md border-none cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten font-normal"
+          className="flex min-w-[192px] cursor-pointer items-center justify-between rounded-md border border-none border-gray-300 bg-dark-gray-c-eight py-2 font-normal hover:bg-dark-gray-c-ten"
           onClick={onClick}
           placeholder=""
         >

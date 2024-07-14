@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { ChatHistory } from "../Chat";
-import { formatOpenAIMessageContentIntoString } from "../chatUtils";
+import { formatOpenAIMessageContentIntoString } from "../utils";
 
 export interface ChatHistoryMetadata {
   id: string;

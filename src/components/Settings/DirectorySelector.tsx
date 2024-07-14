@@ -40,14 +40,14 @@ const DirectorySelector: React.FC<DirectorySelectorProps> = ({
   return (
     <div className="flex flex-col items-end">
       <Button
-        className="bg-blue-500 border-none h-10 hover:bg-blue-600 cursor-pointer w-[140px] text-center pt-0 pb-0 pr-2 pl-2"
+        className="h-10 w-[140px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
         onClick={handleDirectorySelection}
         placeholder={""}
       >
         Select Directory
       </Button>
       {userDirectory && (
-        <p className="mt-2 text-xs text-gray-100 text-right w-full">
+        <p className="mt-2 w-full text-right text-xs text-gray-100">
           Selected: <strong>{userDirectory}</strong>
         </p>
       )}

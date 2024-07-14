@@ -9,7 +9,6 @@ import IndexingProgress from "./components/Common/IndexingProgress";
 import MainPageComponent from "./components/MainPage";
 import InitialSetupSinglePage from "./components/Settings/InitialSettingsSinglePage";
 
-
 const App: React.FC = () => {
   const [
     userHasConfiguredSettingsForIndexing,
@@ -78,7 +77,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="max-h-screen font-sans bg-neutral-800">
+    <div className="max-h-screen bg-neutral-800 font-sans">
       <Portal>
         <ToastContainer className="mt-4" />
       </Portal>

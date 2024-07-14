@@ -7,9 +7,7 @@ interface ExternalLinkProps {
 
 // Open link in browser:
 const ExternalLink: React.FC<ExternalLinkProps> = ({ href: url, children }) => {
-  const handleLinkClick = (
-    e: React.MouseEvent<HTMLAnchorElement>
-  ) => {
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     window.electronUtils.openExternal(url);
   };

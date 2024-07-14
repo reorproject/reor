@@ -33,22 +33,24 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({
   return (
     <ReorModal
       isOpen={true}
-      onClose={() => { console.log("Not allowing a close for now"); }}
+      onClose={() => {
+        console.log("Not allowing a close for now");
+      }}
       hideCloseButton={true}
     >
-      <div className="w-[500px] h-[100px] ml-3 mb-3 mt-2 mr-3">
-        <h6 className="mt-2 mb-2 text-2xl font-semibold text-white">
+      <div className="mx-3 mb-3 mt-2 h-[100px] w-[500px]">
+        <h6 className="my-2 text-2xl font-semibold text-white">
           {indexingProgress === 0
             ? "Initializing vector database..."
             : "Indexing files..."}
         </h6>
         <div
-          className={`w-full h-4 rounded-full overflow-hidden mb-2 border-2 border-gray-400 ${
+          className={`mb-2 h-4 w-full overflow-hidden rounded-full border-2 border-gray-400 ${
             indexingProgress !== 0 ? "bg-neutral-800" : ""
           }`}
         >
           <div
-            className="bg-blue-600 h-full transition-all duration-300 ease-out"
+            className="h-full bg-blue-600 transition-all duration-300 ease-out"
             style={{ width: `${indexingProgress * 100}%` }}
           ></div>
         </div>
@@ -62,7 +64,7 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({
             />
           )}
 
-          <span className="text-sm text-white font-semibold">
+          <span className="text-sm font-semibold text-white">
             {indexingProgress > 0 && (
               <>{Math.round(indexingProgress * 100)}% -</>
             )}{" "}

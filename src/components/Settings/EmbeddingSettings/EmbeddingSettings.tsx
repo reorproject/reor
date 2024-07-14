@@ -70,16 +70,16 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
   };
 
   return (
-    <div className="w-full h-full flex flex-col justify-between bg-dark-gray-c-three rounded">
+    <div className="flex size-full flex-col justify-between rounded bg-dark-gray-c-three">
       <div>
-        <h2 className="text-2xl font-semibold mb-0 text-white">
+        <h2 className="mb-0 text-2xl font-semibold text-white">
           Embedding Model
         </h2>{" "}
-        <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2 mt-2">
+        <div className="mt-2 flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2">
           <div className="flex-col">
             <p className="mt-5 text-gray-100">
               Select Model
-              <p className="text-gray-100 text-xs">
+              <p className="text-xs text-gray-100">
                 If you change this your files will be re-indexed
               </p>
             </p>{" "}
@@ -96,18 +96,18 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
             )}
           </div>
         </div>
-        <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2">
+        <div className="flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2">
           <div className="flex-col">
-            <h4 className="text-gray-200 font-normal mb-0">
+            <h4 className="mb-0 font-normal text-gray-200">
               Attach Local Model
             </h4>
-            <p className="text-gray-100 text-xs">
+            <p className="text-xs text-gray-100">
               Attach a local HuggingFace model.
             </p>
           </div>
           <div className="flex">
             <Button
-              className="flex justify-between items-center w-[80px] py-2 border border-gray-300 rounded-md border-none cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten font-normal"
+              className="flex w-[80px] cursor-pointer items-center justify-between rounded-md border border-none border-gray-300 bg-dark-gray-c-eight py-2 font-normal hover:bg-dark-gray-c-ten"
               onClick={() => {
                 setIsNewLocalEmbeddingModelModalOpen(true);
               }}
@@ -117,18 +117,18 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
             </Button>
           </div>
         </div>
-        <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2">
+        <div className="flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2">
           <div className="flex-col">
-            <h4 className="text-gray-200 font-normal mb-0">
+            <h4 className="mb-0 font-normal text-gray-200">
               Download Remote Model
             </h4>
-            <p className="text-gray-100 text-xs">
+            <p className="text-xs text-gray-100">
               Reor will download a HuggingFace embedding model for you.
             </p>
           </div>
           <div className="flex">
             <Button
-              className="flex justify-between items-center w-[80px] py-2 border border-gray-300 rounded-md border-none cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten font-normal"
+              className="flex w-[80px] cursor-pointer items-center justify-between rounded-md border border-none border-gray-300 bg-dark-gray-c-eight py-2 font-normal hover:bg-dark-gray-c-ten"
               onClick={() => {
                 setIsContextLengthModalOpen(true);
               }}
@@ -140,10 +140,10 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
         </div>
         <ChunkSizeSettings>
           <div className="flex-col">
-            <h4 className="text-gray-200 font-normal mb-0">
+            <h4 className="mb-0 font-normal text-gray-200">
               Change Chunk Size
             </h4>
-            <p className="text-gray-100 text-xs">
+            <p className="text-xs text-gray-100">
               A larger chunk size means more context is fed to the model at the
               cost of &quot;needle in a haystack&quot; effects.
             </p>
@@ -151,7 +151,7 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
         </ChunkSizeSettings>
       </div>
       {/* Warning message at the bottom */}
-      <p className=" text-gray-100 text-xs">
+      <p className=" text-xs text-gray-100">
         <i>
           Note: If you notice some lag in the editor it is likely because you
           chose too large of a model...
@@ -182,7 +182,7 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
         }}
       />
       {userTriedToSubmit && !selectedModel && (
-        <p className="text-red-500 text-sm mt-1">{currentError}</p>
+        <p className="mt-1 text-sm text-red-500">{currentError}</p>
       )}
     </div>
   );

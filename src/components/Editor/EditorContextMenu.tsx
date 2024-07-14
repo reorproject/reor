@@ -164,7 +164,7 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({
           <AiOutlineDelete className="icon" />
           <span className="text">Delete</span>
         </li>
-        <div className="w-full h-px bg-gray-500"></div>
+        <div className="h-px w-full bg-gray-500"></div>
         <li
           ref={tableButtonRef}
           onMouseEnter={() => {
@@ -255,9 +255,9 @@ const TableSizeSelector: React.FC<TableSizeSelectorProps> = ({ onSelect }) => {
   };
 
   return (
-    <div className="table-size-selector flex flex-col justify-center items-center">
+    <div className="table-size-selector flex flex-col items-center justify-center">
       {generateCells()}
-      <div className="flex justify-center w-full pt-2">
+      <div className="flex w-full justify-center pt-2">
         <div className="text-white">
           {hoveredRows} x {hoveredCols}
         </div>
@@ -286,12 +286,12 @@ const cutCommand = (state: EditorState, dispatch: Dispatch | null) => {
  * Pastes text that currently exists in clipboard
  */
 const pasteCommand = async (editor: Editor) => {
-    try {
-      const text = await navigator.clipboard.readText();
-      editor.commands.insertContent(text);
-    } catch (err) {
-      console.error(`Failed to read from clipboard:`, err);
-    }
+  try {
+    const text = await navigator.clipboard.readText();
+    editor.commands.insertContent(text);
+  } catch (err) {
+    console.error(`Failed to read from clipboard:`, err);
+  }
 };
 
 /**

@@ -148,7 +148,6 @@ function setupTokenizeFunction(
   tokenizer: PreTrainedTokenizer
 ): (data: (string | number[])[]) => string[] {
   return (data: (string | number[])[]): string[] => {
-
     return data.map((text) => {
       try {
         const res = tokenizer(text);

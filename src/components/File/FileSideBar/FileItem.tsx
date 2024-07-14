@@ -107,7 +107,7 @@ export const FileItem: React.FC<FileInfoProps> = ({
           </span>
         )}
         <span
-          className={`text-[13px] flex-1 truncate mt-0 ${
+          className={`mt-0 flex-1 truncate text-[13px] ${
             isDirectory ? "font-semibold" : ""
           }`}
         >

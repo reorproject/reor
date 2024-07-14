@@ -37,10 +37,7 @@ export const RepopulateTableWithMissingItems = async (
   }
   let itemsToRemove;
   try {
-    itemsToRemove = computeDBItemsToRemoveFromTable(
-      filesInfoTree,
-      tableArray
-    );
+    itemsToRemove = computeDBItemsToRemoveFromTable(filesInfoTree, tableArray);
   } catch (error) {
     throw new Error(
       `Error computing items to remove from table: ${errorToStringMainProcess(
@@ -225,9 +222,8 @@ export const updateFileInTable = async (
 ): Promise<void> => {
   await dbTable.deleteDBItemsByFilePaths([filePath]);
   const content = readFile(filePath);
-  const chunkedContentList = await chunkMarkdownByHeadingsAndByCharsIfBig(
-    content
-  );
+  const chunkedContentList =
+    await chunkMarkdownByHeadingsAndByCharsIfBig(content);
   const stats = fs.statSync(filePath);
   const dbEntries = chunkedContentList.map((content, index) => {
     return {

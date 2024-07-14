@@ -83,7 +83,7 @@ export const registerStoreHandlers = (
       modelName: string,
       updatedModel: EmbeddingModelWithLocalPath | EmbeddingModelWithRepo
     ) => {
-      const currentModels = store.get(StoreKeys.EmbeddingModels) ;
+      const currentModels = store.get(StoreKeys.EmbeddingModels);
       store.set(StoreKeys.EmbeddingModels, {
         ...currentModels,
         [modelName]: updatedModel,
@@ -93,7 +93,7 @@ export const registerStoreHandlers = (
 
   ipcMain.handle("remove-embedding-model", (event, modelName: string) => {
     const currentModels = store.get(StoreKeys.EmbeddingModels);
-    
+
     if (!currentModels) {
       return;
     }
@@ -222,8 +222,7 @@ export const registerStoreHandlers = (
       });
       return;
     }
-    const chatHistoriesCorrespondingToVault =
-      allChatHistories[vaultDir] ?? [];
+    const chatHistoriesCorrespondingToVault = allChatHistories[vaultDir] ?? [];
     // check if chat history already exists. if it does, update it. if it doesn't append it
     const existingChatIndex = chatHistoriesCorrespondingToVault.findIndex(
       (chat) => chat.id === newChat.id
@@ -302,12 +301,13 @@ export function getDefaultEmbeddingModelConfig(
   }
 
   if (!(defaultEmbeddingModelAlias in embeddingModels)) {
-    throw new Error(`No embedding model found for alias '${defaultEmbeddingModelAlias}'`);
+    throw new Error(
+      `No embedding model found for alias '${defaultEmbeddingModelAlias}'`
+    );
   }
 
   // Check if the model with the default alias exists
   const model = embeddingModels[defaultEmbeddingModelAlias];
-  
 
   return model;
 }

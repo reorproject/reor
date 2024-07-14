@@ -132,7 +132,12 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
           <ul>
             {menuChild.map((path, ind) => (
               <li key={ind}>
-                <div key={ind} onClick={() => { goSelected(path); }}>
+                <div
+                  key={ind}
+                  onClick={() => {
+                    goSelected(path);
+                  }}
+                >
                   {removeFileExtension(
                     path.replace(/\\/g, "/").split("/").pop() ?? ""
                   )}
@@ -150,7 +155,9 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
       <button
         id="back"
         ref={buttonRefBack}
-        onMouseDown={() => { handleLongPressStart("back"); }}
+        onMouseDown={() => {
+          handleLongPressStart("back");
+        }}
         onMouseUp={handleLongPressEnd}
         onMouseLeave={handleLongPressEnd}
         onClick={goBack}
@@ -166,7 +173,9 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
       <button
         id="forward"
         ref={buttonRefForward}
-        onMouseDown={() => { handleLongPressStart("forward"); }}
+        onMouseDown={() => {
+          handleLongPressStart("forward");
+        }}
         onMouseUp={handleLongPressEnd}
         onMouseLeave={handleLongPressEnd}
         onClick={goForward}

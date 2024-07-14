@@ -41,25 +41,19 @@ export const registerFileHandlers = (
   store: Store<StoreSchema>,
   windowsManager: WindowsManager
 ) => {
-  ipcMain.handle(
-    "get-files-tree-for-window",
-    (event): FileInfoTree => {
-      const directoryPath = windowsManager.getVaultDirectoryForWinContents(
-        event.sender
-      );
-      if (!directoryPath) return [];
+  ipcMain.handle("get-files-tree-for-window", (event): FileInfoTree => {
+    const directoryPath = windowsManager.getVaultDirectoryForWinContents(
+      event.sender
+    );
+    if (!directoryPath) return [];
 
-      const files: FileInfoTree = GetFilesInfoTree(directoryPath);
-      return files;
-    }
-  );
+    const files: FileInfoTree = GetFilesInfoTree(directoryPath);
+    return files;
+  });
 
-  ipcMain.handle(
-    "read-file",
-    (event, filePath: string): string => {
-      return fs.readFileSync(filePath, "utf-8");
-    }
-  );
+  ipcMain.handle("read-file", (event, filePath: string): string => {
+    return fs.readFileSync(filePath, "utf-8");
+  });
 
   ipcMain.handle("check-file-exists", async (event, filePath: string) => {
     try {
@@ -70,69 +64,59 @@ export const registerFileHandlers = (
     }
   });
 
-  ipcMain.handle(
-    "delete-file",
-    (event, filePath: string): void => {
-      console.log("Deleting file", filePath);
-      fs.stat(filePath, async (err, stats) => {
-        if (err) {
-          console.error("An error occurred:", err);
-          return;
-        }
+  ipcMain.handle("delete-file", (event, filePath: string): void => {
+    console.log("Deleting file", filePath);
+    fs.stat(filePath, async (err, stats) => {
+      if (err) {
+        console.error("An error occurred:", err);
+        return;
+      }
 
-        if (stats.isDirectory()) {
-          // For directories (Node.js v14.14.0 and later)
-          fs.rm(filePath, { recursive: true }, (err) => {
-            if (err) {
-              console.error("An error occurred:", err);
-              return;
-            }
-            console.log(`Directory at ${filePath} was deleted successfully.`);
-          });
-
-          const windowInfo = windowsManager.getWindowInfoForContents(
-            event.sender
-          );
-          if (!windowInfo) {
-            throw new Error("Window info not found.");
+      if (stats.isDirectory()) {
+        // For directories (Node.js v14.14.0 and later)
+        fs.rm(filePath, { recursive: true }, (err) => {
+          if (err) {
+            console.error("An error occurred:", err);
+            return;
           }
-          await windowInfo.dbTableClient.deleteDBItemsByFilePaths([filePath]);
-        } else {
-          fs.unlink(filePath, (err) => {
-            if (err) {
-              console.error("An error occurred:", err);
-              return;
-            }
-            console.log(`File at ${filePath} was deleted successfully.`);
-          });
+          console.log(`Directory at ${filePath} was deleted successfully.`);
+        });
 
-          const windowInfo = windowsManager.getWindowInfoForContents(
-            event.sender
-          );
-          if (!windowInfo) {
-            throw new Error("Window info not found.");
-          }
-          await windowInfo.dbTableClient.deleteDBItemsByFilePaths([filePath]);
+        const windowInfo = windowsManager.getWindowInfoForContents(
+          event.sender
+        );
+        if (!windowInfo) {
+          throw new Error("Window info not found.");
         }
+        await windowInfo.dbTableClient.deleteDBItemsByFilePaths([filePath]);
+      } else {
+        fs.unlink(filePath, (err) => {
+          if (err) {
+            console.error("An error occurred:", err);
+            return;
+          }
+          console.log(`File at ${filePath} was deleted successfully.`);
+        });
+
+        const windowInfo = windowsManager.getWindowInfoForContents(
+          event.sender
+        );
+        if (!windowInfo) {
+          throw new Error("Window info not found.");
+        }
+        await windowInfo.dbTableClient.deleteDBItemsByFilePaths([filePath]);
+      }
+    });
+  });
+
+  ipcMain.handle("write-file", (event, writeFileProps: WriteFileProps) => {
+    if (!fs.existsSync(path.dirname(writeFileProps.filePath))) {
+      fs.mkdirSync(path.dirname(writeFileProps.filePath), {
+        recursive: true,
       });
     }
-  );
-
-  ipcMain.handle(
-    "write-file",
-    (event, writeFileProps: WriteFileProps) => {
-      if (!fs.existsSync(path.dirname(writeFileProps.filePath))) {
-        fs.mkdirSync(path.dirname(writeFileProps.filePath), {
-          recursive: true,
-        });
-      }
-      fs.writeFileSync(
-        writeFileProps.filePath,
-        writeFileProps.content,
-        "utf-8"
-      );
-    }
-  );
+    fs.writeFileSync(writeFileProps.filePath, writeFileProps.content, "utf-8");
+  });
 
   ipcMain.handle("is-directory", (event, filepath: string) => {
     return fs.statSync(filepath).isDirectory();
@@ -213,28 +197,25 @@ export const registerFileHandlers = (
     }
   );
 
-  ipcMain.handle(
-    "create-directory",
-    (event, dirPath: string): void => {
-      console.log("Creating directory", dirPath);
+  ipcMain.handle("create-directory", (event, dirPath: string): void => {
+    console.log("Creating directory", dirPath);
 
-      const mkdirRecursiveSync = (dirPath: string) => {
-        const parentDir = path.dirname(dirPath);
-        if (!fs.existsSync(parentDir)) {
-          mkdirRecursiveSync(parentDir);
-        }
-        if (!fs.existsSync(dirPath)) {
-          fs.mkdirSync(dirPath);
-        }
-      };
-
-      if (!fs.existsSync(dirPath)) {
-        mkdirRecursiveSync(dirPath);
-      } else {
-        console.log("Directory already exists:", dirPath);
+    const mkdirRecursiveSync = (dirPath: string) => {
+      const parentDir = path.dirname(dirPath);
+      if (!fs.existsSync(parentDir)) {
+        mkdirRecursiveSync(parentDir);
       }
+      if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath);
+      }
+    };
+
+    if (!fs.existsSync(dirPath)) {
+      mkdirRecursiveSync(dirPath);
+    } else {
+      console.log("Directory already exists:", dirPath);
     }
-  );
+  });
 
   ipcMain.handle(
     "move-file-or-dir",

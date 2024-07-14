@@ -167,7 +167,6 @@ const replace = (
   results: Range[],
   { state, dispatch }: { state: EditorState; dispatch: Dispatch }
 ) => {
-
   const { from, to } = results[0];
 
   if (dispatch) dispatch(state.tr.insertText(replaceTerm, from, to));

@@ -1,5 +1,10 @@
 import { Extension } from "@tiptap/core";
-import { Plugin, PluginKey, TextSelection, Transaction } from "@tiptap/pm/state";
+import {
+  Plugin,
+  PluginKey,
+  TextSelection,
+  Transaction,
+} from "@tiptap/pm/state";
 import { Decoration, DecorationSet } from "@tiptap/pm/view";
 
 import { SuggestionsState } from "./BacklinkSuggestionsDisplay";
@@ -139,7 +144,9 @@ const backlinkPlugin = (
         keydown: (view, event) => {
           if (event.key === "[") {
             const { state } = view;
-            const dispatch = (tr: Transaction) => { view.dispatch(tr); };
+            const dispatch = (tr: Transaction) => {
+              view.dispatch(tr);
+            };
 
             const { selection } = state;
             const { from } = selection;

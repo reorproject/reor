@@ -42,46 +42,46 @@ export const FlashcardCore = ({
             flipDirection="vertical"
           >
             <Button
-              className="bg-blue-600  mt-3 mb-2 border-none rounded-md 
-            cursor-pointer w-full h-full
-            text-center text-lg normal-case"
-              onClick={() =>
-                { updateFlashcardUnderReview(currentSelectedFlashcard, {
+              className="mb-2  mt-3 size-full cursor-pointer rounded-md 
+            border-none bg-blue-600 text-center
+            text-lg normal-case"
+              onClick={() => {
+                updateFlashcardUnderReview(currentSelectedFlashcard, {
                   ...flashcardQAPairs[currentSelectedFlashcard],
                   isFlipped:
                     !flashcardQAPairs[currentSelectedFlashcard].isFlipped,
-                }); }
-              }
+                });
+              }}
               placeholder=""
             >
-              <div className="text-white opacity-75 resize-y w-full h-64 flex items-center justify-center break-words">
+              <div className="flex h-64 w-full resize-y items-center justify-center break-words text-white opacity-75">
                 <p>{flashcardQAPairs[currentSelectedFlashcard].question}</p>
               </div>
             </Button>
             {flashcardQAPairs[currentSelectedFlashcard].isFlipped && ( // this boolean is required to ensure that we check the flipped boolean to prevent the answer from leaking
               <Button
-                className="bg-slate-700 mt-3 mb-2 border-none rounded-md 
-              hover:bg-slate-900 cursor-pointer w-full h-full
-              text-center text-lg normal-case"
-                onClick={() =>
-                  { updateFlashcardUnderReview(currentSelectedFlashcard, {
+                className="mb-2 mt-3 size-full cursor-pointer rounded-md 
+              border-none bg-slate-700 text-center text-lg
+              normal-case hover:bg-slate-900"
+                onClick={() => {
+                  updateFlashcardUnderReview(currentSelectedFlashcard, {
                     ...flashcardQAPairs[currentSelectedFlashcard],
                     isFlipped:
                       !flashcardQAPairs[currentSelectedFlashcard].isFlipped,
-                  }); }
-                }
+                  });
+                }}
                 placeholder=""
               >
-                <div className="text-white resize-y w-full h-64 flex items-center justify-center break-words">
+                <div className="flex h-64 w-full resize-y items-center justify-center break-words text-white">
                   <p>{flashcardQAPairs[currentSelectedFlashcard].answer}</p>
                 </div>
               </Button>
             )}
           </ReactCardFlip>
-          <div className="flex items-center justify-around w-50 mt-6">
+          <div className="mt-6 flex items-center justify-around">
             <Button
-              className="bg-slate-700 border-none h-10 w-20 text-center
-          hover:bg-blue-600 cursor-pointer
+              className="h-10 w-20 cursor-pointer border-none bg-slate-700
+          text-center hover:bg-blue-600
 
           disabled:pointer-events-none
           disabled:opacity-25"
@@ -95,8 +95,8 @@ export const FlashcardCore = ({
             </Button>
 
             <Button
-              className="bg-slate-700 border-none h-10 w-20 text-center
-          hover:bg-blue-600 cursor-pointer
+              className="h-10 w-20 cursor-pointer border-none bg-slate-700
+          text-center hover:bg-blue-600
 
           disabled:pointer-events-none
           disabled:opacity-25"

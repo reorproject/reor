@@ -31,7 +31,6 @@ export function addOrUpdateLLMSchemaInStore(
   store: Store<StoreSchema>,
   modelConfig: LLMConfig
 ): void {
-  
   const isNotValid = validateAIModelConfig(modelConfig);
   if (isNotValid) {
     throw new Error(isNotValid);
@@ -67,7 +66,7 @@ export async function removeLLM(
   ollamaService: OllamaService,
   modelName: string
 ): Promise<void> {
-  const existingModels = (store.get(StoreKeys.LLMs)) ?? [];
+  const existingModels = store.get(StoreKeys.LLMs) ?? [];
 
   const foundModel = await getLLMConfig(store, ollamaService, modelName);
 

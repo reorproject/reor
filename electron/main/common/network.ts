@@ -1,4 +1,3 @@
-
 import { Readable } from "stream";
 
 import { IncomingMessage, net } from "electron";
@@ -14,12 +13,12 @@ export const customFetchUsingElectronNet = async (
   let url: string;
   if (input instanceof URL) {
     url = input.href;
-  } else if (typeof input === 'string') {
+  } else if (typeof input === "string") {
     url = input;
   } else if (input instanceof Request) {
     url = input.url;
   } else {
-    throw new Error('Invalid input type');
+    throw new Error("Invalid input type");
   }
   const options = init ?? {};
 
@@ -63,28 +62,32 @@ export const customFetchUsingElectronNet = async (
       response.on("data", (chunk: Buffer) => chunks.push(chunk));
       response.on("end", () => {
         const buffer = Buffer.concat(chunks);
-        
+
         // Convert IncomingHttpHeaders to Headers
         const headers = new Headers();
         Object.entries(response.headers).forEach(([key, value]) => {
-            if (Array.isArray(value)) {
-              value.forEach(v => { headers.append(key, v); });
-            } else {
-              headers.set(key, value);
-            }
+          if (Array.isArray(value)) {
+            value.forEach((v) => {
+              headers.append(key, v);
+            });
+          } else {
+            headers.set(key, value);
+          }
         });
-    
+
         resolve(
           new Response(buffer, {
             status: response.statusCode || 200,
-            statusText: response.statusMessage || '',
+            statusText: response.statusMessage || "",
             headers: headers,
           })
         );
       });
     });
 
-    request.on("error", (error) => { reject(error); });
+    request.on("error", (error) => {
+      reject(error);
+    });
     request.end();
   });
 };
@@ -96,12 +99,12 @@ export const customFetchUsingElectronNetStreaming = async (
   let url: string;
   if (input instanceof URL) {
     url = input.href;
-  } else if (typeof input === 'string') {
+  } else if (typeof input === "string") {
     url = input;
   } else if (input instanceof Request) {
     url = input.url;
   } else {
-    throw new Error('Invalid input type');
+    throw new Error("Invalid input type");
   }
   const options = init ?? {};
 
@@ -153,35 +156,37 @@ export const customFetchUsingElectronNetStreaming = async (
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         read() {},
       });
-    
+
       response.on("data", (chunk: Buffer) => {
         nodeStream.push(chunk);
       });
-    
+
       response.on("end", () => {
         nodeStream.push(null); // Signal end of stream
       });
-    
+
       response.on("error", (error: Error) => {
         nodeStream.destroy(error); // Handle stream errors
       });
-    
+
       const webStream = nodeToWebStream(nodeStream);
-    
+
       // Convert IncomingHttpHeaders to Headers
       const headers = new Headers();
       Object.entries(response.headers).forEach(([key, value]) => {
-          if (Array.isArray(value)) {
-            value.forEach(v => { headers.append(key, v); });
-          } else {
-            headers.set(key, value);
-          }
+        if (Array.isArray(value)) {
+          value.forEach((v) => {
+            headers.append(key, v);
+          });
+        } else {
+          headers.set(key, value);
+        }
       });
-    
+
       resolve(
         new Response(webStream, {
           status: response.statusCode || 200,
-          statusText: response.statusMessage || '',
+          statusText: response.statusMessage || "",
           headers: headers,
         })
       );
@@ -207,14 +212,14 @@ function nodeToWebStream(nodeStream: Readable): ReadableStream<Uint8Array> {
           );
         }
       });
-  
+
       nodeStream.on("end", () => {
         if (!isStreamEnded) {
           isStreamEnded = true;
           controller.close();
         }
       });
-  
+
       nodeStream.on("error", (err: Error) => {
         if (!isStreamEnded) {
           isStreamEnded = true;
@@ -224,10 +229,11 @@ function nodeToWebStream(nodeStream: Readable): ReadableStream<Uint8Array> {
     },
     cancel(reason?: unknown) {
       // Handle any cleanup or abort logic here
-      nodeStream.destroy(reason instanceof Error ? reason : new Error(String(reason)));
+      nodeStream.destroy(
+        reason instanceof Error ? reason : new Error(String(reason))
+      );
     },
   });
-  
 
   return webStream;
 }
