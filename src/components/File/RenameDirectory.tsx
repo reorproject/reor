@@ -21,6 +21,12 @@ interface RenameDirModalProps {
 }
 
 const RenameDirModal: React.FC<RenameDirModalProps> = ({ isOpen, fullDirName, onClose, renameDir }) => {
+  const [isUpdatingDirName, setIsUpdatingDirName] = useState<boolean>(false)
+
+  const [dirPrefix, setDirPrefix] = useState<string>('')
+  const [dirName, setDirName] = useState<string>('')
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
   useEffect(() => {
     const setDirectoryUponNoteChange = async () => {
       const initialDirPathPrefix = await window.path.dirname(fullDirName)
@@ -31,12 +37,6 @@ const RenameDirModal: React.FC<RenameDirModalProps> = ({ isOpen, fullDirName, on
 
     setDirectoryUponNoteChange()
   }, [fullDirName])
-
-  const [isUpdatingDirName, setIsUpdatingDirName] = useState<boolean>(false)
-
-  const [dirPrefix, setDirPrefix] = useState<string>('')
-  const [dirName, setDirName] = useState<string>('')
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value

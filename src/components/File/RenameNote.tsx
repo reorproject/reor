@@ -21,6 +21,11 @@ interface RenameNoteModalProps {
 }
 
 const RenameNoteModal: React.FC<RenameNoteModalProps> = ({ isOpen, fullNoteName, onClose, renameNote }) => {
+  const fileExtension = fullNoteName.split('.').pop() || 'md'
+  const [dirPrefix, setDirPrefix] = useState<string>('')
+  const [noteName, setNoteName] = useState<string>('')
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
   useEffect(() => {
     const setDirectoryUponNoteChange = async () => {
       const initialNotePathPrefix = await window.path.dirname(fullNoteName)
@@ -32,11 +37,6 @@ const RenameNoteModal: React.FC<RenameNoteModalProps> = ({ isOpen, fullNoteName,
 
     setDirectoryUponNoteChange()
   }, [fullNoteName])
-
-  const fileExtension = fullNoteName.split('.').pop() || 'md'
-  const [dirPrefix, setDirPrefix] = useState<string>('')
-  const [noteName, setNoteName] = useState<string>('')
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value

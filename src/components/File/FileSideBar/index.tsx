@@ -72,13 +72,33 @@ export const FileSidebar: React.FC<FileListProps> = ({
 const handleDragStartImpl = (e: React.DragEvent, file: FileInfoNode) => {
   e.dataTransfer.setData('text/plain', file.path)
   e.dataTransfer.effectAllowed = 'move'
+} // Assuming FileItem is in a separate file
+
+
+const Rows: React.FC<ListChildComponentProps> = ({ index, style, data }) => {
+  const { visibleItems, selectedFilePath, onFileSelect, handleDragStart, handleDirectoryToggle, expandedDirectories } =
+    data
+  const fileObject = visibleItems[index]
+  return (
+    <div style={style}>
+      <FileItem
+        file={fileObject.file}
+        selectedFilePath={selectedFilePath}
+        onFileSelect={onFileSelect}
+        handleDragStart={handleDragStart}
+        onDirectoryToggle={handleDirectoryToggle}
+        isExpanded={expandedDirectories.has(fileObject.file.path) && expandedDirectories.get(fileObject.file.path)}
+        indentMultiplyer={fileObject.indentMultiplyer}
+      />
+    </div>
+  )
 }
 
 interface FileExplorerProps {
   files: FileInfoTree
   selectedFilePath: string | null
   onFileSelect: (path: string) => void
-  handleDragStart: (e: React.DragEvent, file: FileInfoNode) => void
+  handleDragStart: (event: React.DragEvent, file: FileInfoNode) => void
   expandedDirectories: Map<string, boolean>
   handleDirectoryToggle: (path: string) => void
   lheight?: number
@@ -99,28 +119,26 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     const updateHeight = () => {
       setListHeight(lheight ?? window.innerHeight)
     }
-
     window.addEventListener('resize', updateHeight)
-
     return () => {
       window.removeEventListener('resize', updateHeight)
     }
-  }, [])
+  }, [lheight])
 
   const getVisibleFilesAndFlatten = (
-    files: FileInfoTree,
-    expandedDirectories: Map<string, boolean>,
+    _files: FileInfoTree,
+    _expandedDirectories: Map<string, boolean>,
     indentMultiplyer = 0,
   ): { file: FileInfoNode; indentMultiplyer: number }[] => {
     let visibleItems: { file: FileInfoNode; indentMultiplyer: number }[] = []
-    files.forEach((file) => {
+    _files.forEach((file) => {
       const a = { file, indentMultiplyer }
       visibleItems.push(a)
-      if (isFileNodeDirectory(file) && expandedDirectories.has(file.path) && expandedDirectories.get(file.path)) {
+      if (isFileNodeDirectory(file) && _expandedDirectories.has(file.path) && _expandedDirectories.get(file.path)) {
         if (file.children) {
           visibleItems = [
             ...visibleItems,
-            ...getVisibleFilesAndFlatten(file.children, expandedDirectories, indentMultiplyer + 1),
+            ...getVisibleFilesAndFlatten(file.children, _expandedDirectories, indentMultiplyer + 1),
           ]
         }
       }
@@ -137,34 +155,26 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   const visibleItems = getVisibleFilesAndFlatten(files, expandedDirectories)
   const itemCount = visibleItems.length
 
-  const Rows: React.FC<ListChildComponentProps> = ({ index, style }) => {
-    const fileObject = visibleItems[index]
-
-    return (
-      <div style={style}>
-        <FileItem
-          file={fileObject.file}
-          selectedFilePath={selectedFilePath}
-          onFileSelect={onFileSelect}
-          handleDragStart={handleDragStart}
-          onDirectoryToggle={handleDirectoryToggle}
-          isExpanded={expandedDirectories.has(fileObject.file.path) && expandedDirectories.get(fileObject.file.path)}
-          indentMultiplyer={fileObject.indentMultiplyer}
-        />
-      </div>
-    )
-  }
-
   return (
-    <div
-      onContextMenu={handleMenuContext}
-      className="overflow-y-none h-full grow"
-      // style={hideScrollbarStyle}
-    >
-      {/* <style>{webKitScrollBarStyles}</style> */}
-      <List height={listHeight} itemCount={itemCount} itemSize={30} width="100%" style={{ padding: 0, margin: 0 }}>
+    <div onContextMenu={handleMenuContext} className="h-full grow">
+      <List
+        height={listHeight}
+        itemCount={itemCount}
+        itemSize={30}
+        width="100%"
+        itemData={{
+          visibleItems,
+          selectedFilePath,
+          onFileSelect,
+          handleDragStart,
+          handleDirectoryToggle,
+          expandedDirectories,
+        }}
+      >
         {Rows}
       </List>
     </div>
   )
 }
+
+export default FileExplorer

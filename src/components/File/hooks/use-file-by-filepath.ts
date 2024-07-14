@@ -278,24 +278,8 @@ const useFileByFilepath = () => {
     }
   }, [])
 
-  // cleanup effect ran once, so there was only 1 re-render
-  // but for each query to the delete file-listener, you only want to run the listener once, not multiple times.
-  // the listener function is ran multiple times, mostly before the cleanup is done, so apparently there are eihther multiple listeners being added, or the event is fired multiple times
-  // if multiple listeners -> each of them are given the same active variable so if it mutates, it will all
-  // if the event is fired multiple times, each of the time it fires, it keeps going until the function is completed
-
-  // after the effect is re-rendered, it listens to the function properly with active = true.
-
-  // 1. Close window on the backend, trigger savefile
-  // 2. on the FE, receives win.webContents.send("prepare-for-window-close", files);
-  // 3. FE after saving, alerts backend that is ready for close
   useEffect(() => {
     const handleWindowClose = async () => {
-      console.log('saving file', {
-        filePath: currentlyOpenedFilePath,
-        fileContent: editor?.getHTML() || '',
-        editor,
-      })
       if (currentlyOpenedFilePath !== null && editor && editor.getHTML() !== null) {
         const markdown = getMarkdown(editor)
         await window.fileSystem.writeFile({

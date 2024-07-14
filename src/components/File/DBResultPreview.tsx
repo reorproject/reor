@@ -81,6 +81,7 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({ dbResult: entr
     </div>
   )
 }
+
 const cosineDistanceToPercentage = (similarity: number) => ((1 - similarity) * 100).toFixed(2)
 
 export function getFileName(filePath: string): string {
