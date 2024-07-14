@@ -28,16 +28,6 @@ module.exports = {
   ],
   rules: {
     "unused-imports/no-unused-imports": "error",
-    // eslint-disable import/extensions:
-    // "unused-imports/no-unused-vars": [
-    //   "warn",
-    //   {
-    //     vars: "all",
-    //     varsIgnorePattern: "^_",
-    //     args: "after-used",
-    //     argsIgnorePattern: "^_",
-    //   },
-    // ],
     "prettier/prettier": "error",
     "react/function-component-definition": [
       "error",
@@ -47,9 +37,10 @@ module.exports = {
       },
     ],
     "import/extensions": ["off", "ignorePackages"],
-    "jsx-a11y/no-static-element-interactions": "off", // Add this line to disable the rule
-    "jsx-a11y/click-events-have-key-events": "off", // Add this line to disable the rule
+    "jsx-a11y/no-static-element-interactions": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
     "react/require-default-props": "off",
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": ["**/electron/**", "**/preload/**"] }],
   },
   ignorePatterns: ["vite.config.ts", ".eslintrc.js"],
   settings: {

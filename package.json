@@ -23,7 +23,8 @@
     "e2e": "playwright test",
     "test": "jest",
     "lint": "eslint . --ext .ts,.tsx",
-    "lint:fix": "eslint . --ext .ts,.tsx --fix"
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "prepare": "husky"
   },
   "dependencies": {
     "@aarkue/tiptap-math-extension": "^1.2.2",
@@ -61,8 +62,7 @@
     "cm6-theme-basic-dark": "^0.2.0",
     "date-fns": "^3.3.1",
     "dotenv": "^16.4.5",
-    "electron": "28.2.1",
-    "electron-store": "^8.1.0",
+     "electron-store": "^8.1.0",
     "electron-updater": "^6.1.1",
     "install": "^0.13.0",
     "js-tiktoken": "^1.0.10",
@@ -112,6 +112,7 @@
     "autoprefixer": "^10.4.16",
     "electron-builder": "^24.6.3",
     "eslint": "^8.56.0",
+    "electron": "28.2.1",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^18.0.0",
     "eslint-config-airbnb-typescript-prettier": "^5.0.0",
@@ -128,6 +129,7 @@
     "eslint-plugin-tailwindcss": "^3.17.4",
     "eslint-plugin-unicorn": "^54.0.0",
     "eslint-plugin-unused-imports": "^4.0.0",
+    "husky": "^9.0.11",
     "jest": "^29.7.0",
     "postcss": "^8.4.31",
     "prettier": "^3.3.3",
