@@ -26,16 +26,15 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
   const buttonRefForward = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
-    currentPath !== '' && currentPath !== history[currentIndex] && handleFileSelect(currentPath)
-  }, [currentPath])
-
-  useEffect(() => {}, [currentIndex])
-
-  const handleFileSelect = (path: string) => {
-    const updatedHistory = [...history.filter((val) => val !== path).slice(0, currentIndex + 1), path]
-    setHistory(updatedHistory)
-    setCurrentIndex(updatedHistory.length - 1)
-  }
+    const handleFileSelect = (path: string) => {
+      const updatedHistory = [...history.filter((val) => val !== path).slice(0, currentIndex + 1), path]
+      setHistory(updatedHistory)
+      setCurrentIndex(updatedHistory.length - 1)
+    }
+    if (currentPath && currentPath !== history[currentIndex]) {
+      handleFileSelect(currentPath)
+    }
+  }, [currentPath, history, currentIndex, setHistory])
 
   const canGoBack = currentIndex > 0
   const canGoForward = currentIndex < history.length - 1
@@ -110,7 +109,9 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
       menuChild.length > 0 && (
         <div
           ref={ref}
+          // eslint-disable-next-line tailwindcss/no-custom-classname
           className="history-menu"
+          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
           tabIndex={0}
           style={{
             left: `${offsetLeft}px`,
@@ -118,9 +119,9 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
           }}
         >
           <ul>
-            {menuChild.map((path, ind) => (
-              <li key={ind}>
-                <div key={ind} onClick={() => goSelected(path)}>
+            {menuChild.map((path) => (
+              <li key={path}>
+                <div key={path} onClick={() => goSelected(path)}>
                   {removeFileExtension(path.replace(/\\/g, '/').split('/').pop() || '')}
                 </div>
               </li>
@@ -132,6 +133,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
   }
 
   return (
+    // eslint-disable-next-line tailwindcss/no-custom-classname
     <div className="history-container">
       <button
         id="back"
@@ -146,6 +148,8 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
           cursor: !canGoBack ? 'default' : 'pointer',
         }}
         title="Back"
+        type="button"
+        aria-label="Back"
       >
         <IoMdArrowRoundBack title="Back" />
       </button>
@@ -162,6 +166,8 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
           cursor: !canGoForward ? 'default' : 'pointer',
         }}
         title="Forward"
+        type="button"
+        aria-label="Forward"
       >
         <IoMdArrowRoundForward title="Forward" />
       </button>

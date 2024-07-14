@@ -7,7 +7,7 @@ import { TypeAnimation } from 'react-type-animation'
 
 import ReorModal from '../Common/Modal'
 import FilesSuggestionsDisplay from '../Editor/BacklinkSuggestionsDisplay'
-import { useFileInfoTree } from '../File/FileSideBar/hooks/use-file-info-tree'
+import useFileInfoTree from '../File/FileSideBar/hooks/use-file-info-tree'
 import useFileByFilepath from '../File/hooks/use-file-by-filepath'
 
 import FlashcardCore from './FlashcardsCore'
