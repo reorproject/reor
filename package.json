@@ -24,7 +24,8 @@
     "test": "jest",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
-    "prepare": "husky"
+    "prepare": "husky",
+    "type-check": "tsc && vite build"
   },
   "dependencies": {
     "@aarkue/tiptap-math-extension": "^1.2.2",
