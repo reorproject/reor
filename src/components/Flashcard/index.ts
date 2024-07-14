@@ -1,3 +1,4 @@
 export * from './types'
 export * from './utils'
-export * from './FlashcardReviewModal'
+
+export { default as FlashcardReviewModal } from './FlashcardReviewModal'

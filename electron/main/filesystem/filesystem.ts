@@ -39,7 +39,6 @@ export function GetFilesInfoTree(pathInput: string, parentRelativePath: string =
   const fileInfoTree: FileInfoTree = []
 
   if (!fs.existsSync(pathInput)) {
-    console.error('Path does not exist:', pathInput)
     return fileInfoTree
   }
 
@@ -79,9 +78,7 @@ export function GetFilesInfoTree(pathInput: string, parentRelativePath: string =
         })
       }
     }
-  } catch (error) {
-    console.error(`Error accessing ${pathInput}:`, error)
-  }
+  } catch (error) {}
 
   return fileInfoTree
 }
@@ -146,9 +143,7 @@ export function startWatchingDirectory(win: BrowserWindow, directoryToWatch: str
 
     // No 'ready' event handler is needed here, as we're ignoring initial scan
     return watcher
-  } catch (error) {
-    console.error('Error setting up file watcher:', error)
-  }
+  } catch (error) {}
 }
 
 function fileHasExtensionInList(filePath: string, extensions: string[]): boolean {
@@ -156,7 +151,6 @@ function fileHasExtensionInList(filePath: string, extensions: string[]): boolean
     const fileExtension = path.extname(filePath).toLowerCase()
     return extensions.includes(fileExtension)
   } catch (error) {
-    console.error('Error checking file extension for extensions:', extensions)
     return false
   }
 }
@@ -183,7 +177,6 @@ export function readFile(filePath: string): string {
     const data = fs.readFileSync(filePath, 'utf8')
     return data
   } catch (err) {
-    console.error('An error occurred:', err)
     return ''
   }
 }
@@ -211,7 +204,6 @@ export const moveFileOrDirectoryInFileSystem = async (sourcePath: string, destin
       destinationStats = await fsPromises.lstat(destinationPath)
     } catch (error) {
       // Error means destination path does not exist, which is fine
-      console.error('Error accessing destination path:', error)
     }
 
     if (destinationStats && destinationStats.isFile()) {
@@ -223,10 +215,8 @@ export const moveFileOrDirectoryInFileSystem = async (sourcePath: string, destin
     const newPath = path.join(destinationPath, path.basename(sourcePath))
     await fsPromises.rename(sourcePath, newPath)
 
-    console.log(`Moved ${sourcePath} to ${newPath}`)
     return newPath
   } catch (error) {
-    console.error('Error moving file or directory:', error)
     return ''
   }
 }

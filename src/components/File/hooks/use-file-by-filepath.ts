@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { MathExtension } from '@aarkue/tiptap-math-extension'
 import Document from '@tiptap/extension-document'
@@ -25,8 +25,9 @@ import SearchAndReplace from '@/components/Editor/SearchAndReplace'
 import { getInvalidCharacterInFilePath, removeFileExtension } from '@/utils/strings'
 import 'katex/dist/katex.min.css'
 import '../tiptap.scss'
+import welcomeNote from '../utils'
 
-export const useFileByFilepath = () => {
+const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<string | null>(null)
   const [suggestionsState, setSuggestionsState] = useState<SuggestionsState | null>()
   const [needToWriteEditorContentToDisk, setNeedToWriteEditorContentToDisk] = useState<boolean>(false)
@@ -61,48 +62,82 @@ export const useFileByFilepath = () => {
     }
   }
 
-  /**
-   * with this editor, we want to take the HTML on the following scenarios:
-    1. when the file path changes, causing a re-render
-    2. When the component unmounts
-    3. when the file is deleted
-   */
+  function getMarkdown(editor: Editor) {
+    // Fetch the current markdown content from the editor
+    const originalMarkdown = editor.storage.markdown.getMarkdown()
+    // Replace the escaped square brackets with unescaped ones
+    const modifiedMarkdown = originalMarkdown
+      .replace(/\\\[/g, '[') // Replaces \[ with [
+      .replace(/\\\]/g, ']') // Replaces \] with ]
 
-  const openFileByPath = async (newFilePath: string) => {
-    setCurrentlyChangingFilePath(true)
-    await writeEditorContentToDisk(editor, currentlyOpenedFilePath)
-    if (currentlyOpenedFilePath && needToIndexEditorContent) {
-      window.fileSystem.indexFileInDatabase(currentlyOpenedFilePath)
-      setNeedToIndexEditorContent(false)
-    }
-    const newFileContent = (await window.fileSystem.readFile(newFilePath)) ?? ''
-    editor?.commands.setContent(newFileContent)
-    setCurrentlyOpenedFilePath(newFilePath)
-    setCurrentlyChangingFilePath(false)
+    return modifiedMarkdown
   }
 
-  const openRelativePath = async (relativePath: string, optionalContentToWriteOnCreate?: string): Promise<void> => {
-    const invalidChars = await getInvalidCharacterInFilePath(relativePath)
-    if (invalidChars) {
-      toast.error(`Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`)
-      throw new Error(
-        `Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`,
+  const writeEditorContentToDisk = useCallback(
+    async (editor: Editor | null, filePath: string | null) => {
+      if (filePath !== null && needToWriteEditorContentToDisk && editor) {
+        const markdownContent = getMarkdown(editor)
+        if (markdownContent !== null) {
+          await window.fileSystem.writeFile({
+            filePath,
+            content: markdownContent,
+          })
+          setNeedToWriteEditorContentToDisk(false)
+        }
+      }
+    },
+    [needToWriteEditorContentToDisk, setNeedToWriteEditorContentToDisk],
+  )
+
+  const openFileByPath = useCallback(
+    async (newFilePath: string) => {
+      setCurrentlyChangingFilePath(true)
+      await writeEditorContentToDisk(editor, currentlyOpenedFilePath)
+      if (currentlyOpenedFilePath && needToIndexEditorContent) {
+        window.fileSystem.indexFileInDatabase(currentlyOpenedFilePath)
+        setNeedToIndexEditorContent(false)
+      }
+      const newFileContent = (await window.fileSystem.readFile(newFilePath)) ?? ''
+      editor?.commands.setContent(newFileContent)
+      setCurrentlyOpenedFilePath(newFilePath)
+      setCurrentlyChangingFilePath(false)
+    },
+    [
+      setCurrentlyChangingFilePath,
+      writeEditorContentToDisk,
+      editor,
+      currentlyOpenedFilePath,
+      needToIndexEditorContent,
+      setNeedToIndexEditorContent,
+      setCurrentlyOpenedFilePath,
+    ],
+  )
+
+  const openRelativePath = useCallback(
+    async (relativePath: string, optionalContentToWriteOnCreate?: string): Promise<void> => {
+      const invalidChars = await getInvalidCharacterInFilePath(relativePath)
+      if (invalidChars) {
+        toast.error(`Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`)
+        throw new Error(
+          `Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`,
+        )
+      }
+      const relativePathWithExtension = await window.path.addExtensionIfNoExtensionPresent(relativePath)
+      const absolutePath = await window.path.join(
+        await window.electronStore.getVaultDirectoryForWindow(),
+        relativePathWithExtension,
       )
-    }
-    const relativePathWithExtension = await window.path.addExtensionIfNoExtensionPresent(relativePath)
-    const absolutePath = await window.path.join(
-      await window.electronStore.getVaultDirectoryForWindow(),
-      relativePathWithExtension,
-    )
-    const fileExists = await window.fileSystem.checkFileExists(absolutePath)
-    if (!fileExists) {
-      const basename = await window.path.basename(absolutePath)
-      const content = optionalContentToWriteOnCreate || `## ${removeFileExtension(basename)}\n`
-      await window.fileSystem.createFile(absolutePath, content)
-      setNeedToIndexEditorContent(true)
-    }
-    openFileByPath(absolutePath)
-  }
+      const fileExists = await window.fileSystem.checkFileExists(absolutePath)
+      if (!fileExists) {
+        const basename = await window.path.basename(absolutePath)
+        const content = optionalContentToWriteOnCreate || `## ${removeFileExtension(basename)}\n`
+        await window.fileSystem.createFile(absolutePath, content)
+        setNeedToIndexEditorContent(true)
+      }
+      openFileByPath(absolutePath)
+    },
+    [setNeedToIndexEditorContent, openFileByPath],
+  )
 
   const openRelativePathRef = useRef<(newFilePath: string) => Promise<void>>()
   openRelativePathRef.current = openRelativePath
@@ -110,22 +145,6 @@ export const useFileByFilepath = () => {
   const handleSuggestionsStateWithEventCapture = (suggState: SuggestionsState | null): void => {
     setSuggestionsState(suggState)
   }
-
-  // Check if we should display markdown or not
-  useEffect(() => {
-    const handleInitialStartup = async () => {
-      const isMarkdownSet = await window.electronStore.getDisplayMarkdown()
-      setDisplayMarkdown(isMarkdownSet)
-    }
-
-    // Even listener
-    const handleChangeMarkdown = (isMarkdownSet: boolean) => {
-      setDisplayMarkdown(isMarkdownSet)
-    }
-
-    handleInitialStartup()
-    window.ipcRenderer.receive('display-markdown-changed', handleChangeMarkdown)
-  }, [])
 
   const editor = useEditor({
     autofocus: true,
@@ -177,6 +196,22 @@ export const useFileByFilepath = () => {
     ],
   })
 
+  // Check if we should display markdown or not
+  useEffect(() => {
+    const handleInitialStartup = async () => {
+      const isMarkdownSet = await window.electronStore.getDisplayMarkdown()
+      setDisplayMarkdown(isMarkdownSet)
+    }
+
+    // Even listener
+    const handleChangeMarkdown = (isMarkdownSet: boolean) => {
+      setDisplayMarkdown(isMarkdownSet)
+    }
+
+    handleInitialStartup()
+    window.ipcRenderer.receive('display-markdown-changed', handleChangeMarkdown)
+  }, [])
+
   useEffect(() => {
     if (editor) {
       editor.setOptions({
@@ -195,24 +230,10 @@ export const useFileByFilepath = () => {
     if (debouncedEditor && !currentlyChangingFilePath) {
       writeEditorContentToDisk(editor, currentlyOpenedFilePath)
     }
-  }, [debouncedEditor, currentlyOpenedFilePath, editor, currentlyChangingFilePath])
+  }, [debouncedEditor, currentlyOpenedFilePath, editor, currentlyChangingFilePath, writeEditorContentToDisk])
 
   const saveCurrentlyOpenedFile = async () => {
     await writeEditorContentToDisk(editor, currentlyOpenedFilePath)
-  }
-
-  const writeEditorContentToDisk = async (editor: Editor | null, filePath: string | null) => {
-    if (filePath !== null && needToWriteEditorContentToDisk && editor) {
-      const markdownContent = getMarkdown(editor)
-      if (markdownContent !== null) {
-        await window.fileSystem.writeFile({
-          filePath,
-          content: markdownContent,
-        })
-
-        setNeedToWriteEditorContentToDisk(false)
-      }
-    }
   }
 
   // delete file depending on file path returned by the listener
@@ -246,7 +267,7 @@ export const useFileByFilepath = () => {
     }
 
     checkAppUsage()
-  }, [editor, currentlyOpenedFilePath])
+  }, [editor, currentlyOpenedFilePath, openRelativePath])
 
   const renameFileNode = async (oldFilePath: string, newFilePath: string) => {
     await window.fileSystem.renameFileRecursive({
@@ -274,25 +295,8 @@ export const useFileByFilepath = () => {
       renameFileListener()
     }
   }, [])
-
-  // cleanup effect ran once, so there was only 1 re-render
-  // but for each query to the delete file-listener, you only want to run the listener once, not multiple times.
-  // the listener function is ran multiple times, mostly before the cleanup is done, so apparently there are eihther multiple listeners being added, or the event is fired multiple times
-  // if multiple listeners -> each of them are given the same active variable so if it mutates, it will all
-  // if the event is fired multiple times, each of the time it fires, it keeps going until the function is completed
-
-  // after the effect is re-rendered, it listens to the function properly with active = true.
-
-  // 1. Close window on the backend, trigger savefile
-  // 2. on the FE, receives win.webContents.send("prepare-for-window-close", files);
-  // 3. FE after saving, alerts backend that is ready for close
   useEffect(() => {
     const handleWindowClose = async () => {
-      console.log('saving file', {
-        filePath: currentlyOpenedFilePath,
-        fileContent: editor?.getHTML() || '',
-        editor,
-      })
       if (currentlyOpenedFilePath !== null && editor && editor.getHTML() !== null) {
         const markdown = getMarkdown(editor)
         await window.fileSystem.writeFile({
@@ -331,47 +335,4 @@ export const useFileByFilepath = () => {
   }
 }
 
-function getMarkdown(editor: Editor) {
-  // Fetch the current markdown content from the editor
-  const originalMarkdown = editor.storage.markdown.getMarkdown()
-  // Replace the escaped square brackets with unescaped ones
-  const modifiedMarkdown = originalMarkdown
-    .replace(/\\\[/g, '[') // Replaces \[ with [
-    .replace(/\\\]/g, ']') // Replaces \] with ]
-
-  return modifiedMarkdown
-}
-
-const welcomeNote = `## Welcome to Reor!
-
-Reor is a private AI personal knowledge management tool. Our philosophy is that AI should be a thought enhancer not a thought replacer: Reor helps you find & connect notes, discover new insights and enhance your reasoning.
-
-Some features you should be aware of:
-
-- **Links:**
-
-  - Reor automatically links your notes to other notes in the Related Notes sidebar.
-
-  - You can view the Related Notes to a particular chunk of text by highlighting it and hitting the button that appears.
-
-  - You can also create inline links by surrounding text with two square brackets (like in Obsidian). [[Like this]]
-
-- **Chat:**
-
-  - Ask your entire set of notes anything you want to know! Reor will automatically give the LLM relevant context.
-
-  - Ask things like “What are my thoughts on philosophy?” or “Summarize my notes on black holes"
-
-  - In settings, you can attach a local LLM or connect to OpenAI models with your API key.
-
-- **AI Flashcards:**
-
-  - Generate flashcards from any note by going to the chat window and hitting the toggle in the bottom right to "Flashcard Ask" mode.
-
-  - Then generate flashcards by running a prompt like "Generate flashcards for this note"
-
-  - Then hit the flashcard icon in the left sidebar to see your flashcards :)
-
-You can import notes from other apps by adding markdown files to your vault directory. Note that Reor will only read markdown files.
-
-Please join our [Discord community](https://discord.gg/QBhGUFJYuH) to ask questions, give feedback, and get help. We're excited to have you on board!`
+export default useFileByFilepath

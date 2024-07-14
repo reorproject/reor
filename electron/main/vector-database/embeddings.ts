@@ -16,20 +16,53 @@ import { splitDirectoryPathIntoBaseAndRepo } from '../filesystem/filesystem'
 import { DownloadModelFilesFromHFRepo } from './downloadModelsFromHF'
 import { DBEntry } from './schema'
 
-export interface EnhancedEmbeddingFunction<T> extends lancedb.EmbeddingFunction<T> {
-  name: string
-  contextLength: number
-  tokenize: (data: T[]) => string[]
+function setupTokenizeFunction(tokenizer: PreTrainedTokenizer): (data: (string | number[])[]) => string[] {
+  return (data: (string | number[])[]): string[] => {
+    if (!tokenizer) {
+      throw new Error('Tokenizer not initialized')
+    }
+
+    return data.map((text) => {
+      try {
+        const res = tokenizer(text)
+        return res
+      } catch (error) {
+        throw new Error(`Tokenization process failed for text: ${errorToStringMainProcess(error)}`)
+      }
+    })
+  }
 }
 
-export async function createEmbeddingFunction(
-  embeddingModelConfig: EmbeddingModelConfig,
-  sourceColumn: string,
-): Promise<EnhancedEmbeddingFunction<string | number[]>> {
-  if (embeddingModelConfig.type === 'local') {
-    return createEmbeddingFunctionForLocalModel(embeddingModelConfig, sourceColumn)
+async function setupEmbedFunction(pipe: Pipeline): Promise<(batch: (string | number[])[]) => Promise<number[][]>> {
+  return async (batch: (string | number[])[]): Promise<number[][]> => {
+    if (batch.length === 0 || batch[0].length === 0) {
+      return []
+    }
+
+    if (typeof batch[0][0] === 'number') {
+      return batch as number[][]
+    }
+
+    if (!pipe) {
+      throw new Error('Pipeline not initialized')
+    }
+
+    const result: number[][] = await Promise.all(
+      batch.map(async (text) => {
+        try {
+          const res = await pipe(removeMd(text as string), {
+            pooling: 'mean',
+            normalize: true,
+          })
+          return Array.from(res.data)
+        } catch (error) {
+          throw new Error(`Embedding process failed for text: ${errorToStringMainProcess(error)}`)
+        }
+      }),
+    )
+
+    return result
   }
-  return createEmbeddingFunctionForRepo(embeddingModelConfig, sourceColumn)
 }
 
 export async function createEmbeddingFunctionForLocalModel(
@@ -96,8 +129,8 @@ export async function createEmbeddingFunctionForRepo(
       try {
         await DownloadModelFilesFromHFRepo(repoName, env.cacheDir) // try to manual download to use system proxy
         pipe = (await pipeline('feature-extraction', repoName)) as Pipeline
-      } catch (error) {
-        throw new Error(`Pipeline initialization failed for repo ${errorToStringMainProcess(error)}`)
+      } catch (err) {
+        throw new Error(`Pipeline initialization failed for repo ${errorToStringMainProcess(err)}`)
       }
     }
   } catch (error) {
@@ -117,53 +150,19 @@ export async function createEmbeddingFunctionForRepo(
   }
 }
 
-function setupTokenizeFunction(tokenizer: PreTrainedTokenizer): (data: (string | number[])[]) => string[] {
-  return (data: (string | number[])[]): string[] => {
-    if (!tokenizer) {
-      throw new Error('Tokenizer not initialized')
-    }
-
-    return data.map((text) => {
-      try {
-        const res = tokenizer(text)
-        return res
-      } catch (error) {
-        throw new Error(`Tokenization process failed for text: ${errorToStringMainProcess(error)}`)
-      }
-    })
-  }
+export interface EnhancedEmbeddingFunction<T> extends lancedb.EmbeddingFunction<T> {
+  name: string
+  contextLength: number
+  tokenize: (data: T[]) => string[]
 }
-
-async function setupEmbedFunction(pipe: Pipeline): Promise<(batch: (string | number[])[]) => Promise<number[][]>> {
-  return async (batch: (string | number[])[]): Promise<number[][]> => {
-    if (batch.length === 0 || batch[0].length === 0) {
-      return []
-    }
-
-    if (typeof batch[0][0] === 'number') {
-      return batch as number[][]
-    }
-
-    if (!pipe) {
-      throw new Error('Pipeline not initialized')
-    }
-
-    const result: number[][] = await Promise.all(
-      batch.map(async (text) => {
-        try {
-          const res = await pipe(removeMd(text as string), {
-            pooling: 'mean',
-            normalize: true,
-          })
-          return Array.from(res.data)
-        } catch (error) {
-          throw new Error(`Embedding process failed for text: ${errorToStringMainProcess(error)}`)
-        }
-      }),
-    )
-
-    return result
+export async function createEmbeddingFunction(
+  embeddingModelConfig: EmbeddingModelConfig,
+  sourceColumn: string,
+): Promise<EnhancedEmbeddingFunction<string | number[]>> {
+  if (embeddingModelConfig.type === 'local') {
+    return createEmbeddingFunctionForLocalModel(embeddingModelConfig, sourceColumn)
   }
+  return createEmbeddingFunctionForRepo(embeddingModelConfig, sourceColumn)
 }
 
 export const rerankSearchedEmbeddings = async (query: string, searchResults: DBEntry[]) => {

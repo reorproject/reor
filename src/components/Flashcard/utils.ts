@@ -29,7 +29,7 @@ export const parseChatMessageIntoFlashcardPairs = (
   FILE_REFERENCE_DELIMITER: string,
 ): FlashcardQAPair[] => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [actualOutput, _fileReferences] = messageToBeParsed.split(FILE_REFERENCE_DELIMITER)
+  const [actualOutput, fileReferences] = messageToBeParsed.split(FILE_REFERENCE_DELIMITER)
   return actualOutput.split('<br/><br/>').map((line) => parseFlashcardQAPair(line))
 }
 

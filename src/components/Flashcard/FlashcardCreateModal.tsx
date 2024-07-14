@@ -107,7 +107,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({ isOpen, onC
             onSelect={() => initializeSuggestionsStateOnFocus()}
             onChange={(e) => {
               setSearchText(e.target.value)
-              if (e.target.value.length == 0) {
+              if (e.target.value.length === 0) {
                 setSelectedFile('')
               }
             }}
@@ -124,7 +124,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({ isOpen, onC
         {!selectedFile && (
           <p className="text-xs text-red-500">Choose a file by searching or by right clicking a file in directory</p>
         )}
-        {isLoadingFlashcards && flashcardQAPairs.length == 0 && (
+        {isLoadingFlashcards && flashcardQAPairs.length === 0 && (
           <div>
             <TypeAnimation
               className="mb-3 text-xl font-semibold text-white"
@@ -153,7 +153,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({ isOpen, onC
         <div className="flex justify-end">
           {selectedFile && (
             <Button
-              className="vertical-align mt-4 h-20 w-96 cursor-pointer border-none bg-slate-600
+              className="mt-4 h-20 w-96 cursor-pointer border-none bg-slate-600
             text-center
             text-white
             transition-transform duration-300
