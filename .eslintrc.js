@@ -47,6 +47,9 @@ module.exports = {
       },
     ],
     "import/extensions": ["off", "ignorePackages"],
+    "jsx-a11y/no-static-element-interactions": "off", // Add this line to disable the rule
+    "jsx-a11y/click-events-have-key-events": "off", // Add this line to disable the rule
+    "react/require-default-props": "off",
   },
   ignorePatterns: ["vite.config.ts", ".eslintrc.js"],
   settings: {

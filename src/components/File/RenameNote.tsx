@@ -93,7 +93,7 @@ const RenameNoteModal: React.FC<RenameNoteModalProps> = ({ isOpen, fullNoteName,
         <h2 className="mb-3 text-xl font-semibold text-white">Rename Note</h2>
         <input
           type="text"
-          className="focus:shadow-outline-blue block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
+          className=" block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
           value={noteName}
           onChange={handleNameChange}
           onKeyDown={handleKeyPress}

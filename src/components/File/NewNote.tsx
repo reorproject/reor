@@ -61,7 +61,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose, op
         <h2 className="mb-3 text-xl font-semibold text-white">New Note</h2>
         <input
           type="text"
-          className="focus:shadow-outline-blue block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
+          className=" block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
           value={fileName}
           onChange={handleNameChange}
           onKeyDown={handleKeyPress}

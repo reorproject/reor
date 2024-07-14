@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
 
 import { Button } from '@material-tailwind/react'
-import { OpenAILLMConfig, AnthropicLLMConfig } from 'electron/main/electron-store/storeConfig'
 import posthog from 'posthog-js'
 
 import ReorModal from '../../../Common/Modal'
+import { AnthropicDefaultModels, openAIDefaultModels } from './utils'
 
 export interface CloudLLMSetupModalProps {
   isOpen: boolean
@@ -21,24 +21,33 @@ const CloudLLMSetupModal: React.FC<CloudLLMSetupModalProps> = ({ isOpen, onClose
 
   const handleSave = async () => {
     if (openKey) {
-      for (const modelConfig of defaultModels) {
-        posthog.capture('save_cloud_llm', {
-          modelName: modelConfig.modelName,
-          llmType: LLMType,
-          contextLength: modelConfig.contextLength,
-        })
-        modelConfig.apiKey = openKey
+      const saveAndUpdateModels = async () => {
+        const updatePromises = defaultModels.map(async (modelConfig) => {
+          posthog.capture('save_cloud_llm', {
+            modelName: modelConfig.modelName,
+            llmType: LLMType,
+            contextLength: modelConfig.contextLength,
+          })
 
-        await window.llm.addOrUpdateLLM(modelConfig)
+          // Create a new object instead of modifying the parameter
+          const updatedConfig = { ...modelConfig, apiKey: openKey }
+
+          await window.llm.addOrUpdateLLM(updatedConfig)
+        })
+
+        await Promise.all(updatePromises)
       }
+
+      await saveAndUpdateModels()
+
       if (defaultModels.length > 0) {
         window.llm.setDefaultLLM(defaultModels[0].modelName)
       }
+
       if (refreshLLMs) {
         refreshLLMs()
       }
     }
-
     onClose()
   }
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -54,7 +63,7 @@ const CloudLLMSetupModal: React.FC<CloudLLMSetupModalProps> = ({ isOpen, onClose
         <p className="my-2 text-sm text-gray-100">Enter your {LLMDisplayName} API key below:</p>
         <input
           type="text"
-          className="focus:shadow-outline-blue box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
+          className=" box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
           value={openKey}
           onChange={(e) => setOpenKey(e.target.value)}
           onKeyDown={handleKeyPress}
@@ -75,43 +84,5 @@ const CloudLLMSetupModal: React.FC<CloudLLMSetupModalProps> = ({ isOpen, onClose
     </ReorModal>
   )
 }
-
-const openAIDefaultModels: OpenAILLMConfig[] = [
-  {
-    contextLength: 128000,
-    modelName: 'gpt-4o',
-    engine: 'openai',
-    type: 'openai',
-    apiKey: '',
-    apiURL: '',
-  },
-  {
-    contextLength: 16385,
-    modelName: 'gpt-3.5-turbo',
-    engine: 'openai',
-    type: 'openai',
-    apiKey: '',
-    apiURL: '',
-  },
-  {
-    contextLength: 128000,
-    modelName: 'gpt-4-turbo',
-    engine: 'openai',
-    type: 'openai',
-    apiKey: '',
-    apiURL: '',
-  },
-]
-
-const AnthropicDefaultModels: AnthropicLLMConfig[] = [
-  {
-    contextLength: 180000,
-    modelName: 'claude-3-5-sonnet-20240620',
-    engine: 'anthropic',
-    type: 'anthropic',
-    apiKey: '',
-    apiURL: '',
-  },
-]
 
 export default CloudLLMSetupModal

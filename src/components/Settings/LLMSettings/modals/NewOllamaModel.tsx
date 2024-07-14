@@ -8,6 +8,7 @@ import { toast } from 'react-toastify'
 import ExternalLink from '@/components/Common/ExternalLink'
 import ReorModal from '@/components/Common/Modal'
 import errorToStringRendererProcess from '@/utils/error'
+import downloadPercentage from './utils'
 
 interface NewOllamaModelModalProps {
   isOpen: boolean
@@ -21,18 +22,18 @@ interface ModelDownloadStatus {
 
 const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({ isOpen, onClose }) => {
   // const [newModelPath, setNewModelPath] = useState<string>("");
-  const [modelName, setModelName] = useState('')
+  const [modelNameBeingInputted, setModelNameBeingInputted] = useState('')
   const [modelNameerror, setModelNameError] = useState('')
   const [downloadProgress, setDownloadProgress] = useState<{
     [modelName: string]: ModelDownloadStatus
   }>({})
 
   const downloadSelectedModel = async () => {
-    if (!modelName) {
+    if (!modelNameBeingInputted) {
       setModelNameError('Please enter a model name')
       return
     }
-    let taggedModelName = modelName
+    let taggedModelName = modelNameBeingInputted
     if (!taggedModelName.includes(':')) {
       taggedModelName = `${taggedModelName}:latest`
     }
@@ -86,9 +87,9 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({ isOpen, onClo
 
         <input
           type="text"
-          className="focus:shadow-outline-blue mt-1 box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
-          value={modelName}
-          onChange={(e) => setModelName(e.target.value)}
+          className=" mt-1 box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
+          value={modelNameBeingInputted}
+          onChange={(e) => setModelNameBeingInputted(e.target.value)}
           placeholder="mistral"
         />
         <p className="my-2 text-xs italic text-white"> We recommended either mistral, llama3, or phi3.</p>
@@ -106,17 +107,23 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({ isOpen, onClo
         <div>
           {Object.entries(downloadProgress).map(([modelName, { progress, error }]) => (
             <div key={modelName} className="mb-4">
-              {!error && progress.status === 'success' ? (
-                <p className="text-sm text-white">
-                  {`${modelName}: Download complete! Refresh the chat window to use the new model.`}
-                </p>
-              ) : !error ? (
-                <p className="text-sm text-white">
-                  {`${modelName}: Download progress - ${downloadPercentage(progress)}`}
-                </p>
-              ) : (
-                <p className="break-words text-sm text-red-500">{`${modelName}: Error - ${error}`}</p>
-              )}
+              {(() => {
+                if (error) {
+                  return <p className="break-words text-sm text-red-500">{`${modelName}: Error - ${error}`}</p>
+                }
+                if (progress.status === 'success') {
+                  return (
+                    <p className="text-sm text-white">
+                      {`${modelName}: Download complete! Refresh the chat window to use the new model.`}
+                    </p>
+                  )
+                }
+                return (
+                  <p className="text-sm text-white">
+                    {`${modelName}: Download progress - ${downloadPercentage(progress)}`}
+                  </p>
+                )
+              })()}
             </div>
           ))}
           {Object.entries(downloadProgress).length > 0 && (
@@ -129,21 +136,3 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({ isOpen, onClo
 }
 
 export default NewOllamaModelModal
-
-const downloadPercentage = (progress: ProgressResponse): string => {
-  // Check if `total` is 0, undefined, or not a number to avoid division by zero or invalid operations
-  if (
-    !progress.total ||
-    isNaN(progress.total) ||
-    progress.total === 0 ||
-    !progress.completed ||
-    isNaN(progress.completed)
-  ) {
-    // Depending on your logic, you might want to return 0, or handle this case differently
-    return 'checking...'
-  }
-
-  const percentage = (100 * progress.completed) / progress.total
-
-  return `${percentage.toFixed(2)}%`
-}

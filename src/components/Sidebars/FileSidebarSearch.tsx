@@ -5,6 +5,7 @@ import posthog from 'posthog-js'
 import { FaSearch } from 'react-icons/fa'
 
 import { DBSearchPreview } from '../File/DBResultPreview'
+import debounce from './utils'
 
 interface SearchComponentProps {
   onFileSelect: (path: string) => void
@@ -37,7 +38,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
     if (searchQuery) {
       debouncedSearch(searchQuery)
     }
-  }, [searchQuery])
+  }, [searchQuery, debouncedSearch])
 
   const openFileSelectSearch = (path: string) => {
     onFileSelect(path)
@@ -62,26 +63,18 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
       <div className="mt-2 w-full">
         {searchResults.length > 0 && (
           <div className="w-full">
-            {searchResults.map((result, index) => (
-              <DBSearchPreview key={index} dbResult={result} onSelect={openFileSelectSearch} />
+            {searchResults.map((result) => (
+              <DBSearchPreview
+                key={`${result.notepath}-${result.subnoteindex}`}
+                dbResult={result}
+                onSelect={openFileSelectSearch}
+              />
             ))}
           </div>
         )}
       </div>
     </div>
   )
-}
-
-const debounce = <F extends (...args: string[]) => Promise<void>>(
-  func: F,
-  delay: number,
-): ((...args: Parameters<F>) => void) => {
-  let debounceTimer: NodeJS.Timeout
-
-  return (...args: Parameters<F>) => {
-    clearTimeout(debounceTimer)
-    debounceTimer = setTimeout(() => func(...args), delay)
-  }
 }
 
 export default SearchComponent

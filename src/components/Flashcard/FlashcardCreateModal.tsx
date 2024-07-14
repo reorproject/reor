@@ -100,7 +100,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({ isOpen, onC
           <input
             ref={inputRef}
             type="text"
-            className="focus:shadow-outline-blue mt-6 box-border block h-[40px] w-full rounded-md border border-gray-300 px-3
+            className=" mt-6 box-border block h-[40px] w-full rounded-md border border-gray-300 px-3
             py-2 transition duration-150
             ease-in-out focus:border-blue-300 focus:outline-none"
             value={searchText}

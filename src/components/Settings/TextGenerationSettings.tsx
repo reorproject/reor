@@ -47,7 +47,7 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
     } else {
       // Parse the input value to an integer and use it if it's a valid number
       const parsedValue = parseInt(inputVal, 10)
-      if (!isNaN(parsedValue)) {
+      if (!Number.isNaN(parsedValue)) {
         newMaxTokens = parsedValue
       } else {
         // Optional: handle the case for invalid input that's not empty, e.g., non-numeric characters.

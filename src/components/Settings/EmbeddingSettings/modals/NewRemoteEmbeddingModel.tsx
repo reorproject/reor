@@ -57,7 +57,7 @@ const NewRemoteEmbeddingModelModal: React.FC<NewRemoteEmbeddingModelModalProps> 
 
         <input
           type="text"
-          className="focus:shadow-outline-blue box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
+          className=" box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
           value={huggingfaceRepo}
           onChange={(e) => setHuggingfaceRepo(e.target.value)}
           onKeyDown={handleKeyPress}

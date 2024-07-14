@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 import { IconContext } from 'react-icons'
 import { FaSearch } from 'react-icons/fa'
@@ -69,14 +69,19 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ openRelativePath, sidebarSh
       handleNewDirectory(dirPath)
     })
   }, [])
-
+  const filesIconContextValue = useMemo(() => ({ color: sidebarShowing === 'files' ? 'salmon' : '' }), [sidebarShowing])
+  const chatsIconContextValue = useMemo(() => ({ color: sidebarShowing === 'chats' ? 'salmon' : '' }), [sidebarShowing])
+  const searchIconContextValue = useMemo(
+    () => ({ color: sidebarShowing === 'search' ? 'salmon' : '' }),
+    [sidebarShowing],
+  )
   return (
     <div className="flex size-full flex-col items-center justify-between gap-1 bg-neutral-800">
       <div
         className=" flex h-8 w-full cursor-pointer items-center justify-center"
         onClick={() => makeSidebarShow('files')}
       >
-        <IconContext.Provider value={{ color: sidebarShowing === 'files' ? 'salmon' : '' }}>
+        <IconContext.Provider value={filesIconContextValue}>
           <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
             <ImFilesEmpty className="mx-auto text-gray-200 " size={22} title="Files" />
           </div>
@@ -86,7 +91,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ openRelativePath, sidebarSh
         className=" flex h-8 w-full cursor-pointer items-center justify-center"
         onClick={() => makeSidebarShow('chats')}
       >
-        <IconContext.Provider value={{ color: sidebarShowing === 'chats' ? 'salmon' : '' }}>
+        <IconContext.Provider value={chatsIconContextValue}>
           <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
             <IoChatbubbleEllipsesOutline
               className="cursor-pointer text-gray-100 "
@@ -100,7 +105,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ openRelativePath, sidebarSh
         className="flex h-8 w-full cursor-pointer items-center justify-center"
         onClick={() => makeSidebarShow('search')}
       >
-        <IconContext.Provider value={{ color: sidebarShowing === 'search' ? 'salmon' : '' }}>
+        <IconContext.Provider value={searchIconContextValue}>
           <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
             <FaSearch size={18} className=" text-gray-200" title="Semantic Search" />
           </div>
@@ -156,7 +161,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ openRelativePath, sidebarSh
           initialFileToReviewFlashcard={initialFileToReviewFlashcard}
         />
       )}
-      <div className="border-1 grow border-yellow-300" />
+      <div className="grow border-yellow-300" />
       <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} />
       <div
         className="mb-[2px] flex w-full cursor-pointer items-center justify-center border-none bg-transparent pb-2"
@@ -168,6 +173,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ openRelativePath, sidebarSh
         className="flex w-full cursor-pointer items-center justify-center border-none bg-transparent pb-2"
         onClick={() => setIsSettingsModalOpen(!isSettingsModalOpen)}
         type="button"
+        aria-label="Open Settings"
       >
         <MdSettings className="size-6 text-gray-100" title="Settings" />
       </button>

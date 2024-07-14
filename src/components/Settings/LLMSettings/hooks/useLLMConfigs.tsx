@@ -7,17 +7,15 @@ const useLLMConfigs = () => {
   const [defaultLLM, setDefaultLLM] = useState<string>('')
 
   const fetchAndUpdateModelConfigs = async () => {
-    try {
-      const fetchedLLMConfigs = await window.llm.getLLMConfigs()
-      setLLMConfigs(fetchedLLMConfigs)
-      const defaultLLM = await window.llm.getDefaultLLMName()
-      if (!defaultLLM && fetchedLLMConfigs.length > 0) {
-        await window.llm.setDefaultLLM(fetchedLLMConfigs[0].modelName)
-        setDefaultLLM(fetchedLLMConfigs[0].modelName)
-      } else {
-        setDefaultLLM(defaultLLM)
-      }
-    } catch (error) {}
+    const fetchedLLMConfigs = await window.llm.getLLMConfigs()
+    setLLMConfigs(fetchedLLMConfigs)
+    const storedDefaultLLM = await window.llm.getDefaultLLMName()
+    if (!storedDefaultLLM && fetchedLLMConfigs.length > 0) {
+      await window.llm.setDefaultLLM(fetchedLLMConfigs[0].modelName)
+      setDefaultLLM(fetchedLLMConfigs[0].modelName)
+    } else {
+      setDefaultLLM(storedDefaultLLM)
+    }
   }
 
   useEffect(() => {

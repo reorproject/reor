@@ -35,7 +35,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose: p
     const modelConfig: LLMConfig = {
       type: 'openai',
       modelName,
-      contextLength: parseInt(selectedContextLength),
+      contextLength: parseInt(selectedContextLength, 10),
       apiURL,
       apiKey,
       engine: 'openai',
@@ -79,7 +79,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose: p
           placeholder="API URL"
           value={apiURL}
           onChange={(e) => setApiURL(e.target.value)}
-          className="focus:shadow-outline-blue mb-2 box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
+          className=" mb-2 box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
         />
         <p className="mt-2 text-xs text-gray-100">
           (This must be an OpenAI compatible API endpoint. That typically is the part of the url before
@@ -91,7 +91,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose: p
           placeholder="Model Name"
           value={modelName}
           onChange={(e) => setModelName(e.target.value)}
-          className="focus:shadow-outline-blue mb-2 box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
+          className=" mb-2 box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
         />
         <p className="mt-2 text-xs text-gray-100">(Model alias like &quot;gpt-3.5-turbo-1106&quot;)</p>
 
@@ -101,7 +101,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose: p
           placeholder="API Key"
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
-          className="focus:shadow-outline-blue mb-2 box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
+          className=" mb-2 box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
         />
         <p className="mt-2 text-xs text-gray-100">(If your endpoint requires an API key.)</p>
         <h4 className="mb-1 text-gray-100">Context Length</h4>
