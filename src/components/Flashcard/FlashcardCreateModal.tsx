@@ -94,15 +94,15 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({ isOpen, onC
 
   return (
     <ReorModal isOpen={isOpen} onClose={onClose}>
-      <div className="ml-6 mt-2 mb-6 mr-6 w-[800px] h-full">
-        <h2 className="text-xl font-semibold mb-3 text-white">
+      <div className="mx-6 mb-6 mt-2 h-full w-[800px]">
+        <h2 className="mb-3 text-xl font-semibold text-white">
           Select a file to generate flashcards for:
           <input
             ref={inputRef}
             type="text"
-            className="block w-full px-3 py-2 mt-6 h-[40px] border border-gray-300 box-border rounded-md
-            focus:outline-none focus:shadow-outline-blue focus:border-blue-300
-            transition duration-150 ease-in-out"
+            className="focus:shadow-outline-blue mt-6 box-border block h-[40px] w-full rounded-md border border-gray-300 px-3
+            py-2 transition duration-150
+            ease-in-out focus:border-blue-300 focus:outline-none"
             value={searchText}
             onSelect={() => initializeSuggestionsStateOnFocus()}
             onChange={(e) => {
@@ -122,12 +122,12 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({ isOpen, onC
           )}
         </h2>
         {!selectedFile && (
-          <p className="text-red-500 text-xs">Choose a file by searching or by right clicking a file in directory</p>
+          <p className="text-xs text-red-500">Choose a file by searching or by right clicking a file in directory</p>
         )}
         {isLoadingFlashcards && flashcardQAPairs.length == 0 && (
           <div>
             <TypeAnimation
-              className="text-xl font-semibold mb-3 text-white"
+              className="mb-3 text-xl font-semibold text-white"
               sequence={[
                 // Same substring at the start will only be typed out once, initially
                 'We are working hard to generate questions',
@@ -153,9 +153,9 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({ isOpen, onC
         <div className="flex justify-end">
           {selectedFile && (
             <Button
-              className="bg-slate-600 border-none h-20 w-96 text-center vertical-align text-white
-            mt-4
-            cursor-pointer
+              className="vertical-align mt-4 h-20 w-96 cursor-pointer border-none bg-slate-600
+            text-center
+            text-white
             transition-transform duration-300
             hover:-translate-y-2
             disabled:pointer-events-none
@@ -166,7 +166,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({ isOpen, onC
               placeholder=""
               disabled={isLoadingFlashcards}
             >
-              <div className="flex items-center justify-around h-full space-x-2 ">
+              <div className="flex h-full items-center justify-around space-x-2 ">
                 Generate cards {isLoadingFlashcards && <CircularProgress />}
               </div>
             </Button>

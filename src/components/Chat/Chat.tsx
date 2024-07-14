@@ -264,17 +264,17 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   }, [])
 
   return (
-    <div className="flex items-center justify-center w-full h-full">
-      <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid">
-        <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
-          <div className="space-y-2 mt-2 ml-4 mr-4 flex-grow">
+    <div className="flex size-full items-center justify-center">
+      <div className="mx-auto flex size-full flex-col overflow-hidden border-y-0 border-l-[0.001px] border-r-0 border-solid border-neutral-700 bg-neutral-800">
+        <div className="flex h-full flex-col overflow-auto bg-transparent p-3 pt-0">
+          <div className="mx-4 mt-2 grow space-y-2">
             {currentChatHistory?.displayableChatHistory
               .filter((msg) => msg.role !== 'system')
               .map((message, index) => (
                 <ReactMarkdown
                   key={index}
                   rehypePlugins={[rehypeRaw]}
-                  className={`p-1 pl-1 markdown-content rounded-lg break-words ${
+                  className={`markdown-content break-words rounded-lg p-1 ${
                     message.messageType === 'error'
                       ? 'bg-red-100 text-red-800'
                       : message.role === 'assistant'
@@ -290,13 +290,13 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           </div>
           {(!currentChatHistory || currentChatHistory?.displayableChatHistory.length == 0) && (
             <>
-              <div className="flex items-center justify-center text-gray-300 text-sm">
+              <div className="flex items-center justify-center text-sm text-gray-300">
                 Start a conversation with your notes by typing a message below.
               </div>
-              <div className="flex items-center justify-center text-gray-300 text-sm">
+              <div className="flex items-center justify-center text-sm text-gray-300">
                 <button
-                  className="bg-slate-600 m-2 rounded-lg border-none
-                  h-6 w-40 text-center cursor-pointer vertical-align text-white"
+                  className="vertical-align m-2 h-6 w-40
+                  cursor-pointer rounded-lg border-none bg-slate-600 text-center text-white"
                   onClick={() => {
                     setIsAddContextFiltersModalOpen(true)
                   }}

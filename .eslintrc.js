@@ -8,7 +8,8 @@ module.exports = {
     "airbnb",
     "airbnb/hooks",
     "airbnb-typescript",
-    "plugin:prettier/recommended", // Add this line
+    "plugin:prettier/recommended",
+    "plugin:tailwindcss/recommended", // Add this line
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
@@ -22,7 +23,8 @@ module.exports = {
     "import",
     "jsx-a11y",
     "unused-imports",
-    "prettier", // Add this line
+    "prettier",
+    "tailwindcss", // Add this line
   ],
   rules: {
     "unused-imports/no-unused-imports": "error",
@@ -35,6 +37,6 @@ module.exports = {
         argsIgnorePattern: "^_",
       },
     ],
-    "prettier/prettier": "error", // Add this line
+    "prettier/prettier": "error",
   },
 };

@@ -45,15 +45,15 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   }
 
   return (
-    <div className="p-1 h-below-titlebar overflow-y-auto overflow-x-hidden">
-      <div className="relative p-2 bg-neutral-800 rounded mr-1">
-        <span className="absolute inset-y-0 left-0 flex items-center pl-3 mt-[2px]">
-          <FaSearch className="text-gray-200 text-lg" size={14} />
+    <div className="h-below-titlebar overflow-y-auto overflow-x-hidden p-1">
+      <div className="relative mr-1 rounded bg-neutral-800 p-2">
+        <span className="absolute inset-y-0 left-0 mt-[2px] flex items-center pl-3">
+          <FaSearch className="text-lg text-gray-200" size={14} />
         </span>
         <input
           ref={searchInputRef}
           type="text"
-          className="mt-1 w-full pl-7 mr-1 pr-5 h-8 bg-neutral-700 text-white rounded-md border border-transparent focus:outline-none focus:border-white focus:ring-1 focus:ring-white"
+          className="mr-1 mt-1 h-8 w-full rounded-md border border-transparent bg-neutral-700 pl-7 pr-5 text-white focus:border-white focus:outline-none focus:ring-1 focus:ring-white"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Semantic search..."

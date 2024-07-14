@@ -69,24 +69,24 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
 
   return (
     <ReorModal isOpen={isOpen} onClose={onClose}>
-      <div className="ml-3 mr-6 mt-2 mb-2 h-full min-w-[400px]">
-        <h2 className="text-xl font-semibold mb-3 text-white">New Directory</h2>
+      <div className="my-2 ml-3 mr-6 h-full min-w-[400px]">
+        <h2 className="mb-3 text-xl font-semibold text-white">New Directory</h2>
         <input
           type="text"
-          className="block w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
+          className="focus:shadow-outline-blue block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
           value={directoryName}
           onChange={handleNameChange}
           onKeyDown={handleKeyPress}
           placeholder="Directory Name"
         />
         <Button
-          className="bg-blue-500 mt-3 mb-2 border-none h-10 hover:bg-blue-600 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2"
+          className="mb-2 mt-3 h-10 w-[80px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
           onClick={sendNewDirectoryMsg}
           placeholder=""
         >
           Create
         </Button>
-        {errorMessage && <p className="text-red-500 text-xs">{errorMessage}</p>}
+        {errorMessage && <p className="text-xs text-red-500">{errorMessage}</p>}
       </div>
     </ReorModal>
   )

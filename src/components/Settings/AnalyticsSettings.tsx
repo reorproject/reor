@@ -31,9 +31,9 @@ const AnalyticsSettings: React.FC<AnalyticsSettingsProps> = () => {
   }
 
   return (
-    <div className="w-full bg-dark-gray-c-three rounded pb-7 ">
-      <h2 className="text-2xl font-semibold mb-0 text-white">Analytics</h2>{' '}
-      <p className="text-gray-200 text-sm mb-2 mt-5">
+    <div className="w-full rounded bg-dark-gray-c-three pb-7 ">
+      <h2 className="mb-0 text-2xl font-semibold text-white">Analytics</h2>{' '}
+      <p className="mb-2 mt-5 text-sm text-gray-200">
         Reor tracks anonymous usage data to help improve the app. We never share this personal data. This is solely to
         track which features are popular. You can disable this at any time:
       </p>
@@ -54,13 +54,13 @@ const AnalyticsSettings: React.FC<AnalyticsSettingsProps> = () => {
             // variant="contained"
             placeholder=""
             onClick={handleSave}
-            className="bg-blue-500 w-[150px] border-none h-8 hover:bg-blue-600 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mb-0 mr-4 mt-2"
+            className="mb-0 mr-4 mt-2 h-8 w-[150px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
           >
             Save
           </Button>
         </div>
       )}
-      {!isAnalyticsEnabled && <p className="text-yellow-500 text-xs">Quit and restart the app for it to take effect</p>}
+      {!isAnalyticsEnabled && <p className="text-xs text-yellow-500">Quit and restart the app for it to take effect</p>}
     </div>
   )
 }

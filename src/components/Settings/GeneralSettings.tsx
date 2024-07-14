@@ -50,10 +50,10 @@ const GeneralSettings: React.FC<GenSettingsProps> = () => {
     setUserHasMadeUpdate(false)
   }
   return (
-    <div className="w-full flex-col justify-between bg-dark-gray-c-three rounded">
-      <h2 className="text-2xl font-semibold mb-0 text-white">General</h2>
+    <div className="w-full flex-col justify-between rounded bg-dark-gray-c-three">
+      <h2 className="mb-0 text-2xl font-semibold text-white">General</h2>
       <CreateAppearanceSection />
-      <p className="text-gray-300 text-sm mb-2 mt-1">Spell Check</p>
+      <p className="mb-2 mt-1 text-sm text-gray-300">Spell Check</p>
       <Switch
         checked={tempSpellCheckEnabled == 'true'}
         onChange={() => {
@@ -69,13 +69,13 @@ const GeneralSettings: React.FC<GenSettingsProps> = () => {
             // variant="contained"
             placeholder=""
             onClick={handleSave}
-            className="bg-blue-500 w-[150px] border-none h-8 hover:bg-blue-600 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mb-0 mr-4 mt-2"
+            className="mb-0 mr-4 mt-2 h-8 w-[150px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
           >
             Save
           </Button>
         </div>
       )}
-      <p className="text-yellow-500 text-xs">Quit and restart the app for it to take effect</p>
+      <p className="text-xs text-yellow-500">Quit and restart the app for it to take effect</p>
       {/* =======
 import { Button } from "@material-tailwind/react";
 import Switch from "@mui/material/Switch";

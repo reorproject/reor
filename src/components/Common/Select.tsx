@@ -57,20 +57,20 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   }
 
   return (
-    <div className="flex flex-end w-full" ref={wrapperRef}>
+    <div className="flex-end flex w-full" ref={wrapperRef}>
       <div
-        className="flex justify-between w-full items-center  py-2 border border-gray-300 rounded-md cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten"
+        className="flex w-full cursor-pointer items-center  justify-between rounded-md border border-gray-300 bg-dark-gray-c-eight py-2 hover:bg-dark-gray-c-ten"
         onClick={toggleDropdown}
       >
         {centerText ? <span /> : null}
-        <span className="pl-2 pr-2 text-[13px] text-gray-100">{selectedValue}</span>
-        <span className="transform transition-transform mr-2" style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }}>
+        <span className="px-2 text-[13px] text-gray-100">{selectedValue}</span>
+        <span className="mr-2 transition-transform" style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }}>
           &#9660;
         </span>
       </div>
       {isOpen && (
         <div
-          className="absolute  text-[13px] border text-gray-600 border-gray-300 rounded-md shadow-lg z-10 bg-white max-h-60 overflow-auto"
+          className="absolute  z-10 max-h-60 overflow-auto rounded-md border border-gray-300 bg-white text-[13px] text-gray-600 shadow-lg"
           style={{
             position: 'fixed',
             top: 'auto',
@@ -81,7 +81,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
           {options.map((option, index) => (
             <div
               key={index}
-              className="flex justify-between items-center py-2 pl-6 pr-2 bg-dark-gray-c-eight cursor-pointer text-white hover:bg-dark-gray-c-ten "
+              className="flex cursor-pointer items-center justify-between bg-dark-gray-c-eight py-2 pl-6 pr-2 text-white hover:bg-dark-gray-c-ten "
               onClick={() => handleOptionClick(option.value)}
             >
               <span className="w-full">{option.label}</span>
@@ -100,7 +100,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 
           {addButton && (
             <div
-              className="py-2 pl-2 pr-2 mt-1 bg-neutral-200 text-gray-700 text-center cursor-pointer rounded-md hover:bg-neutral-300 shadow-sm transition-colors"
+              className="mt-1 cursor-pointer rounded-md bg-neutral-200 p-2 text-center text-gray-700 shadow-sm transition-colors hover:bg-neutral-300"
               onClick={addButton.onClick}
             >
               {addButton.label}

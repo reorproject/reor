@@ -43,19 +43,19 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose: onCloseFromParen
         handleSave()
       }}
     >
-      <div className="flex w-[850px] h-[600px]">
-        <div className="flex flex-col w-[150px] h-full bg-dark-gray-c-seven text-white border-r-[0.1px] border-gray-700 border-solid border-b-0 border-t-0 border-l-0 p-2">
+      <div className="flex h-[600px] w-[850px]">
+        <div className="flex h-full w-[150px] flex-col border-y-0 border-l-0 border-r-[0.1px] border-solid border-gray-700 bg-dark-gray-c-seven p-2 text-white">
           <div
-            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
-              activeTab === SettingsTab.LLMSettings ? 'bg-neutral-700 text-white font-semibold' : 'text-gray-200'
+            className={`flex cursor-pointer items-center rounded border-b border-gray-200 p-2 text-sm hover:bg-neutral-600 ${
+              activeTab === SettingsTab.LLMSettings ? 'bg-neutral-700 font-semibold text-white' : 'text-gray-200'
             }`}
             onClick={() => setActiveTab(SettingsTab.LLMSettings)}
           >
             LLM
           </div>
           <div
-            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
-              activeTab === SettingsTab.EmbeddingModel ? 'bg-neutral-700 text-white font-semibold' : 'text-gray-200'
+            className={`flex cursor-pointer items-center rounded border-b border-gray-200 p-2 text-sm hover:bg-neutral-600 ${
+              activeTab === SettingsTab.EmbeddingModel ? 'bg-neutral-700 font-semibold text-white' : 'text-gray-200'
             }`}
             onClick={() => setActiveTab(SettingsTab.EmbeddingModel)}
           >
@@ -63,8 +63,8 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose: onCloseFromParen
           </div>
 
           <div
-            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
-              activeTab === SettingsTab.TextGeneration ? 'bg-neutral-700 text-white font-semibold' : 'text-gray-200'
+            className={`flex cursor-pointer items-center rounded border-b border-gray-200 p-2 text-sm hover:bg-neutral-600 ${
+              activeTab === SettingsTab.TextGeneration ? 'bg-neutral-700 font-semibold text-white' : 'text-gray-200'
             }`}
             onClick={() => setActiveTab(SettingsTab.TextGeneration)}
           >
@@ -81,16 +81,16 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose: onCloseFromParen
             RAG{" "}
           </div> */}
           <div
-            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
-              activeTab === SettingsTab.ANALYTICS ? 'bg-neutral-700 text-white font-semibold' : 'text-gray-200'
+            className={`flex cursor-pointer items-center rounded border-b border-gray-200 p-2 text-sm hover:bg-neutral-600 ${
+              activeTab === SettingsTab.ANALYTICS ? 'bg-neutral-700 font-semibold text-white' : 'text-gray-200'
             }`}
             onClick={() => setActiveTab(SettingsTab.ANALYTICS)}
           >
             Analytics{' '}
           </div>
           <div
-            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
-              activeTab === SettingsTab.GeneralSettings ? 'bg-neutral-700 text-white font-semibold' : 'text-gray-200'
+            className={`flex cursor-pointer items-center rounded border-b border-gray-200 p-2 text-sm hover:bg-neutral-600 ${
+              activeTab === SettingsTab.GeneralSettings ? 'bg-neutral-700 font-semibold text-white' : 'text-gray-200'
             }`}
             onClick={() => setActiveTab(SettingsTab.GeneralSettings)}
           >
@@ -99,20 +99,20 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose: onCloseFromParen
         </div>
 
         {/* Right Content Area */}
-        <div className="w-full h-full flex-1 ml-2 pl-16 pr-16">
+        <div className="ml-2 size-full flex-1 px-16">
           {/* <h2 className="text-2xl font-semibold mb-4 text-white">Settings</h2> */}
           {activeTab === SettingsTab.GeneralSettings && (
-            <div className="w-full h-full">
+            <div className="size-full">
               <GeneralSettings />
             </div>
           )}
           {activeTab === SettingsTab.LLMSettings && (
-            <div className="w-full h-full">
+            <div className="size-full">
               <LLMSettings />
             </div>
           )}
           {activeTab === SettingsTab.EmbeddingModel && (
-            <div className="w-full h-full">
+            <div className="size-full">
               <EmbeddingModelSettings handleUserHasChangedModel={() => setWillNeedToReIndex(true)} />
             </div>
           )}

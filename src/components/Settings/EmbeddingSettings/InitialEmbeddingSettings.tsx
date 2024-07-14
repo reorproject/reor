@@ -82,7 +82,7 @@ const InitialEmbeddingModelSettings: React.FC<InitialEmbeddingModelSettingsProps
   }
 
   return (
-    <div className="w-full bg-dark-gray-c-three rounded flex justify-between items-center">
+    <div className="flex w-full items-center justify-between rounded bg-dark-gray-c-three">
       <p className="mb-2 pb-3 text-gray-100">Embedding Model</p>{' '}
       {/* <CustomSelect
         options={modelRepos}

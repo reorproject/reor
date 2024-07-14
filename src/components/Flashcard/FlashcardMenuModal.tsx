@@ -33,8 +33,8 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
       onClose={onClose}
       // tailwindStylesOnBackground="bg-gradient-to-r from-orange-900 to-yellow-900"
     >
-      <div className="ml-6 mr-6 mt-2 mb-6 w-full h-full flex-col align-center justify-center">
-        <h2 className="text-xl font-semibold mb-3 text-white text-center">Flashcard Mode</h2>
+      <div className="align-center mx-6 mb-6 mt-2 size-full flex-col justify-center">
+        <h2 className="mb-3 text-center text-xl font-semibold text-white">Flashcard Mode</h2>
         {isReviewFlashcardMode && (
           <FlashcardReviewModal isOpen={isReviewFlashcardMode} onClose={() => setIsReviewFlashcardMode(false)} />
         )}
@@ -46,11 +46,11 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
           />
         )}
 
-        <div className="flex align-center justify-center">
+        <div className="align-center flex justify-center">
           <Button
-            className="bg-distinct-dark-purple border-none h-60 w-80 items-center flex-col
-              mt-4 mr-4
-              cursor-pointer
+            className="mr-4 mt-4 h-60 w-80 cursor-pointer flex-col
+              items-center border-none
+              bg-distinct-dark-purple
               transition-transform duration-300
               hover:-translate-y-2
               disabled:pointer-events-none
@@ -64,14 +64,14 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
             placeholder=""
           >
             <BsPencilSquare className="mt-6" size={55} />
-            <div className="text-white font-bold mb-3 mt-3 text-lg">Create new flashcards</div>
+            <div className="my-3 text-lg font-bold text-white">Create new flashcards</div>
             <FaArrowAltCircleRight size={35} />
           </Button>
 
           <Button
-            className="bg-moodly-blue border-none h-60 w-80 items-center flex-col
-              mt-4 ml-4
-              cursor-pointer
+            className="ml-4 mt-4 h-60 w-80 cursor-pointer flex-col
+              items-center border-none
+              bg-moodly-blue
               transition-transform duration-300
               hover:-translate-y-2
               disabled:pointer-events-none
@@ -85,7 +85,7 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
             placeholder=""
           >
             <VscFeedback className="mt-6" size={55} />
-            <div className="text-white font-bold mb-3 mt-3 text-lg">Review my existing cards</div>
+            <div className="my-3 text-lg font-bold text-white">Review my existing cards</div>
             <FaRegArrowAltCircleRight size={35} />
           </Button>
         </div>

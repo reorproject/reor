@@ -169,14 +169,14 @@ export const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = (
 }) => (
   <div className="h-full">
     <ResizableComponent resizeSide="left" initialWidth={300}>
-      <div className="flex flex-col h-full border-l-[0.1px] border-t-0 border-b-0 border-r-0 border-neutral-700 border-solid">
+      <div className="flex h-full flex-col border-y-0 border-l-[0.1px] border-r-0 border-solid border-neutral-700">
         <div className="flex items-center bg-neutral-800 p-0">
           <div className="flex-1" />
           <div className="flex items-center justify-center px-4">
-            <PiGraph className="text-gray-300 mt-1" />
-            <p className="text-gray-300 text-sm pl-1 mb-0 mt-1">{titleText}</p>
+            <PiGraph className="mt-1 text-gray-300" />
+            <p className="mb-0 mt-1 pl-1 text-sm text-gray-300">{titleText}</p>
           </div>
-          <div className="flex-1 flex justify-end pr-3 pt-1 cursor-pointer">
+          <div className="flex flex-1 cursor-pointer justify-end pr-3 pt-1">
             {updateSimilarEntries && setSimilarEntries && (
               <div
                 onClick={async () => {
@@ -191,13 +191,13 @@ export const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = (
             )}
           </div>
         </div>
-        <div className="flex-grow overflow-y-auto overflow-x-hidden">
+        <div className="grow overflow-y-auto overflow-x-hidden">
           {similarEntries.length > 0 ? (
-            <div className="h-full w-full">
+            <div className="size-full">
               {similarEntries
                 .filter((dbResult) => dbResult)
                 .map((dbResult, index) => (
-                  <div className="pb-2 pr-2 pl-2 pt-1" key={index}>
+                  <div className="px-2 pb-2 pt-1" key={index}>
                     <DBResultPreview
                       key={index}
                       dbResult={dbResult}
@@ -209,8 +209,8 @@ export const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = (
                 ))}
             </div>
           ) : !isLoadingSimilarEntries ? (
-            <div className="flex flex-col items-center justify-center h-full w-full">
-              <p className="flex justify-center items-center text-gray-500 text-lg mx-auto text-center">
+            <div className="flex size-full flex-col items-center justify-center">
+              <p className="mx-auto flex items-center justify-center text-center text-lg text-gray-500">
                 No items found
               </p>
             </div>
@@ -251,7 +251,7 @@ const HighlightButton: React.FC<HighlightButtonProps> = ({ highlightData, onClic
     <button
       onClick={handleClick}
       style={{ top: `${top}px`, left: `${left}px` }}
-      className="absolute w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer text-white border-none shadow-md hover:bg-gray-300"
+      className="absolute flex size-7 cursor-pointer items-center justify-center rounded-full border-none bg-gray-200 text-white shadow-md hover:bg-gray-300"
       aria-label="Highlight button"
     >
       {showArrow ? <FaArrowRight className="text-gray-800" /> : <PiGraph className="text-gray-800" />}

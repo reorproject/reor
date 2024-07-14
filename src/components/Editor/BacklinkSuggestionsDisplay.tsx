@@ -58,18 +58,18 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
   return (
     <div
       ref={suggestionsRef}
-      className={`absolute rounded bg-white text-black ${maxWidth} border border-black  z-50 break-words whitespace-normal`}
+      className={`absolute rounded bg-white text-black ${maxWidth} z-50 whitespace-normal  break-words border border-black`}
       style={{
         left: `${layout.left}px`,
         top: `${layout.top}px`,
         display: layout.display,
       }}
     >
-      <ul className="m-0 p-0 list-none">
+      <ul className="m-0 list-none p-0">
         {filteredSuggestions.map((suggestion, index) => (
           <li
             key={suggestion} // Use a unique id property from the suggestion
-            className="p-1.25 cursor-pointer hover:bg-gray-100 p-1 text-sm rounded"
+            className="p-1.25 cursor-pointer rounded p-1 text-sm hover:bg-gray-100"
             onClick={() => {
               posthog.capture('select_backlink_suggestion', {
                 rank: index + 1,

@@ -62,13 +62,13 @@ export function SearchBarWithFilesSuggestion({
 
   return (
     <>
-      <div className="text-xl font-semibold mb-3 text-white">
+      <div className="mb-3 text-xl font-semibold text-white">
         <input
           ref={inputRef}
           type="text"
-          className="block w-full px-3 py-2 mt-6 h-[40px] border border-gray-300 box-border rounded-md
-          focus:outline-none focus:shadow-outline-blue focus:border-blue-300
-          transition duration-150 ease-in-out"
+          className="focus:shadow-outline-blue mt-6 box-border block h-[40px] w-full rounded-md border border-gray-300 px-3
+          py-2 transition duration-150
+          ease-in-out focus:border-blue-300 focus:outline-none"
           value={searchText}
           onSelect={() => initializeSuggestionsStateOnFocus()}
           onChange={(e) => {
@@ -88,7 +88,7 @@ export function SearchBarWithFilesSuggestion({
         )}
       </div>
       {!searchText && (
-        <p className="text-red-500 text-xs">Choose a file by searching or by right clicking a file in directory</p>
+        <p className="text-xs text-red-500">Choose a file by searching or by right clicking a file in directory</p>
       )}
     </>
   )

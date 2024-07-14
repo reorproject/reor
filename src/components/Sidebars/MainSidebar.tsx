@@ -53,7 +53,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
   const [searchResults, setSearchResults] = useState<DBQueryResult[]>([])
 
   return (
-    <div className="w-full h-full overflow-y-hidden">
+    <div className="size-full overflow-y-hidden">
       {sidebarShowing === 'files' && (
         <FileSidebar
           files={files}

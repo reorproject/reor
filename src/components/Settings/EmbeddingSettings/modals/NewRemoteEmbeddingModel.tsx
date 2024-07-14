@@ -49,21 +49,21 @@ const NewRemoteEmbeddingModelModal: React.FC<NewRemoteEmbeddingModelModalProps> 
 
   return (
     <ReorModal isOpen={isOpen} onClose={saveModelConfigToElectronStore}>
-      <div className="w-[400px] ml-2 mr-2 mb-2 pl-3">
-        <h2 className="text-white  font-semibold mb-0">Set up remote model</h2>
-        <p className="text-white text-sm mb-6 mt-2 text-xs">
+      <div className="mx-2 mb-2 w-[400px] pl-3">
+        <h2 className="mb-0  font-semibold text-white">Set up remote model</h2>
+        <p className="mb-6 mt-2 text-sm text-xs text-white">
           Provide the repo name from Hugging Face like &quot;Xenova/roberta-base-squad2&quot;.
         </p>
 
         <input
           type="text"
-          className="block w-full px-3 py-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
+          className="focus:shadow-outline-blue box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
           value={huggingfaceRepo}
           onChange={(e) => setHuggingfaceRepo(e.target.value)}
           onKeyDown={handleKeyPress}
           placeholder="Embedding Model Repo"
         />
-        <p className="text-white text-xs mb-2 mt-2 italic">
+        <p className="my-2 text-xs italic text-white">
           <ExternalLink href="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=downloads&search=xenova">
             {' '}
             This page on Hugging Face
@@ -73,9 +73,9 @@ const NewRemoteEmbeddingModelModal: React.FC<NewRemoteEmbeddingModelModalProps> 
           more info.{' '}
         </p>
 
-        <div className="w-full flex justify-end pb-2">
+        <div className="flex w-full justify-end pb-2">
           <Button
-            className="bg-blue-500 border-none h-8 hover:bg-blue-600 cursor-pointer w-[120px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
+            className="mt-3 h-8 w-[120px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
             onClick={saveModelConfigToElectronStore}
             placeholder=""
           >

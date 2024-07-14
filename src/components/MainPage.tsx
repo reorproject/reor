@@ -122,7 +122,7 @@ const MainPageComponent: React.FC = () => {
 
       <div className="flex h-below-titlebar">
         <div
-          className="border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid pt-2.5"
+          className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5"
           style={{ width: `${sidebarWidth}px` }}
         >
           <IconsSidebar
@@ -134,7 +134,7 @@ const MainPageComponent: React.FC = () => {
         </div>
 
         <ResizableComponent resizeSide="right">
-          <div className="h-full border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid w-full">
+          <div className="size-full border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700">
             <SidebarManager
               files={files}
               expandedDirectories={expandedDirectories}
@@ -157,8 +157,8 @@ const MainPageComponent: React.FC = () => {
         </ResizableComponent>
 
         {!showChatbot && filePath && (
-          <div className="relative w-full h-full flex overflow-hidden">
-            <div className="flex-grow h-full overflow-hidden">
+          <div className="relative flex size-full overflow-hidden">
+            <div className="h-full grow overflow-hidden">
               <EditorManager
                 editor={editor}
                 filePath={filePath}
@@ -174,7 +174,7 @@ const MainPageComponent: React.FC = () => {
               setCurrentChatHistory={setCurrentChatHistory}
             />
             {showSimilarFiles && (
-              <div className="flex-shrink-0 h-full overflow-y-auto overflow-x-hidden">
+              <div className="h-full shrink-0 overflow-y-auto overflow-x-hidden">
                 <SimilarFilesSidebarComponent
                   filePath={filePath}
                   highlightData={highlightData}
@@ -187,7 +187,7 @@ const MainPageComponent: React.FC = () => {
         )}
 
         {showChatbot && (
-          <div className="w-full h-below-titlebar">
+          <div className="h-below-titlebar w-full">
             <ChatWithLLM
               vaultDirectory={vaultDirectory}
               openFileByPath={openFileAndOpenEditor}

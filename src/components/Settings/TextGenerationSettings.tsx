@@ -64,11 +64,11 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
   }
 
   return (
-    <div className="w-full h-full flex flex-col justify-between bg-dark-gray-c-three rounded pb-7">
-      <h2 className="text-2xl font-semibold mb-0 text-white">Text Generation</h2>{' '}
-      <div className="justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2 mt-5">
-        <p className="mt-2 text-gray-100 mb-1">Temperature:</p>
-        <div className="pl-1 mt-2 ">
+    <div className="flex size-full flex-col justify-between rounded bg-dark-gray-c-three pb-7">
+      <h2 className="mb-0 text-2xl font-semibold text-white">Text Generation</h2>{' '}
+      <div className="mt-5 w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2">
+        <p className="mb-1 mt-2 text-gray-100">Temperature:</p>
+        <div className="mt-2 pl-1 ">
           <Slider
             aria-label="Temperature"
             value={textGenerationParams.temperature}
@@ -105,21 +105,21 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
             }}
           />
         </div>
-        <p className="mt-0 text-xs text-gray-100 mb-3 ">
+        <p className="mb-3 mt-0 text-xs text-gray-100 ">
           Note: Higher temperature means more randomess in generated text.
         </p>
       </div>
-      <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pt-3 pb-4">
+      <div className="flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-4 pt-3">
         <div className="flex flex-col">
-          <p className="mt-2 text-gray-100 mb-1">Max Tokens</p>
-          <p className="mt-1 text-xs text-gray-100 mb-0">
+          <p className="mb-1 mt-2 text-gray-100">Max Tokens</p>
+          <p className="mb-0 mt-1 text-xs text-gray-100">
             Maximum number of tokens to generate per output. Recommend to keep as is and let the model decide.
           </p>
         </div>
         <div className="flex flex-col">
           <input
             type="text"
-            className="w-[80px] p-2 bg-dark-gray-c-eight hover:bg-dark-gray-c-ten border-none rounded-md text-gray-100"
+            className="w-[80px] rounded-md border-none bg-dark-gray-c-eight p-2 text-gray-100 hover:bg-dark-gray-c-ten"
             value={textGenerationParams?.maxTokens}
             onChange={(e) => handleTokenInput(e)}
             ref={inputRef}
@@ -133,7 +133,7 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
             // variant="contained"
             placeholder=""
             onClick={handleSave}
-            className="bg-blue-500 w-[150px] border-none h-8 hover:bg-blue-600 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mb-0 mr-4 mt-2"
+            className="mb-0 mr-4 mt-2 h-8 w-[150px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
           >
             Save
           </Button>

@@ -34,8 +34,8 @@ const TitleBar: React.FC<TitleBarProps> = ({
   }, [])
 
   return (
-    <div id="customTitleBar" className="h-titlebar  flex justify-between" style={{ backgroundColor: '#303030' }}>
-      <div className="flex mt-[1px]" style={platform === 'darwin' ? { marginLeft: '65px' } : { marginLeft: '2px' }}>
+    <div id="customTitleBar" className="flex  h-titlebar justify-between" style={{ backgroundColor: '#303030' }}>
+      <div className="mt-px flex" style={platform === 'darwin' ? { marginLeft: '65px' } : { marginLeft: '2px' }}>
         <FileHistoryNavigator
           history={history}
           setHistory={setHistory}
@@ -44,19 +44,19 @@ const TitleBar: React.FC<TitleBarProps> = ({
         />
       </div>
       <div
-        className="flex justify-end align-items-right mt-[0.5px]"
+        className="align-items-right mt-[0.5px] flex justify-end"
         style={platform === 'win32' ? { marginRight: '8.5rem' } : { marginRight: '0.3rem' }}
       >
         {similarFilesOpen ? (
           <PiSidebarFill
-            className="text-gray-100 cursor-pointer mt-[0.2rem] transform scale-x-[-1]"
+            className="mt-[0.2rem] -scale-x-100 cursor-pointer text-gray-100"
             size={22}
             onClick={toggleSimilarFiles}
             title="Hide Similar Files"
           />
         ) : (
           <PiSidebar
-            className="text-gray-100 cursor-pointer mt-[0.2rem] transform scale-x-[-1]"
+            className="mt-[0.2rem] -scale-x-100 cursor-pointer text-gray-100"
             size={22}
             onClick={toggleSimilarFiles}
             title="Show Similar Files"

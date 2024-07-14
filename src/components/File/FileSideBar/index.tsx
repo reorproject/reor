@@ -36,7 +36,7 @@ export const FileSidebar: React.FC<FileListProps> = ({
   setFileDirToBeRenamed,
   listHeight,
 }) => (
-  <div className="flex flex-col h-full text-white overflow-y-hidden overflow-x-hidden">
+  <div className="flex h-full flex-col overflow-hidden text-white">
     {noteToBeRenamed && (
       <RenameNoteModal
         isOpen={!!noteToBeRenamed}
@@ -158,7 +158,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   return (
     <div
       onContextMenu={handleMenuContext}
-      className="h-full flex-grow overflow-y-none"
+      className="overflow-y-none h-full grow"
       // style={hideScrollbarStyle}
     >
       {/* <style>{webKitScrollBarStyles}</style> */}

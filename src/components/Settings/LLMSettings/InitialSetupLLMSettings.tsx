@@ -26,13 +26,13 @@ const InitialSetupLLMSettings: React.FC<InitialSetupLLMSettingsProps> = ({ userH
   const isSetupComplete = llmConfigs.length > 0
 
   return (
-    <div className="w-full flex flex-col justify-between bg-dark-gray-c-three rounded">
-      <div className="flex justify-between items-center border-b-2 border-solid border-neutral-700 border-0 py-1">
+    <div className="flex w-full flex-col justify-between rounded bg-dark-gray-c-three">
+      <div className="flex items-center justify-between border-0 border-b-2 border-solid border-neutral-700 py-1">
         <p className="mb-2 pb-3 text-gray-100">LLM</p>
         <Button
-          className={`flex justify-between items-center py-2 px-3 border border-gray-300 rounded-md border-none cursor-pointer ${
+          className={`flex cursor-pointer items-center justify-between rounded-md border border-none border-gray-300 px-3 py-2 ${
             isSetupComplete
-              ? 'bg-green-700 hover:bg-green-800 text-white'
+              ? 'bg-green-700 text-white hover:bg-green-800'
               : 'bg-dark-gray-c-eight hover:bg-dark-gray-c-ten'
           } font-normal transition-colors duration-200`}
           onClick={() => setIsSetupModalOpen(true)}
@@ -40,12 +40,12 @@ const InitialSetupLLMSettings: React.FC<InitialSetupLLMSettingsProps> = ({ userH
         >
           {isSetupComplete ? (
             <>
-              <CheckCircleIcon className="w-5 h-5 mr-2" />
+              <CheckCircleIcon className="mr-2 size-5" />
               <span>Setup</span>
             </>
           ) : (
             <>
-              <CogIcon className="w-5 h-5 mr-2" />
+              <CogIcon className="mr-2 size-5" />
               <span>Setup</span>
             </>
           )}
@@ -65,7 +65,7 @@ const InitialSetupLLMSettings: React.FC<InitialSetupLLMSettingsProps> = ({ userH
         </ReorModal>
       </div>
       {userTriedToSubmit && llmConfigs.length === 0 && (
-        <p className="text-red-500 text-sm mt-1">Please set up at least one LLM.</p>
+        <p className="mt-1 text-sm text-red-500">Please set up at least one LLM.</p>
       )}
     </div>
   )

@@ -49,14 +49,14 @@ const CreateAppearanceSection: React.FC = () => {
   }, [])
 
   return (
-    <div className="flex-col w-full">
-      <h4 className="text-white flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-4 mt-6">
+    <div className="w-full flex-col">
+      <h4 className="mt-6 flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-4 text-white">
         Appearance
       </h4>
-      <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-3 h-[64px]">
+      <div className="flex h-[64px] w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-3">
         <div className="flex flex-col justify-center">
           <p className="text-gray-100">IconSidebar Compact</p>
-          <p className="text-gray-100 text-xs">If on, decreases padding on IconSidebar</p>
+          <p className="text-xs text-gray-100">If on, decreases padding on IconSidebar</p>
         </div>
         <Switch
           checked={isIconSBCompact}

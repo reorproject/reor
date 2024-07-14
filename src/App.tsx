@@ -73,7 +73,7 @@ const App: React.FC<AppProps> = () => {
   }
 
   return (
-    <div className="max-h-screen font-sans bg-neutral-800">
+    <div className="max-h-screen bg-neutral-800 font-sans">
       <Portal>
         <ToastContainer className="mt-4" />
       </Portal>

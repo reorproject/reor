@@ -140,7 +140,7 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({ editor, menuPosition, 
           <AiOutlineDelete className="icon" />
           <span className="text">Delete</span>
         </li>
-        <div className="w-full h-px bg-gray-500" />
+        <div className="h-px w-full bg-gray-500" />
         <li ref={tableButtonRef} onMouseEnter={() => setShowTableSelector(true)} className="bubble-menu-item">
           <CiViewTable className="icon" />
           <span className="text">Table</span>
@@ -207,9 +207,9 @@ const TableSizeSelector: React.FC<TableSizeSelectorProps> = ({ onSelect }) => {
   }
 
   return (
-    <div className="table-size-selector flex flex-col justify-center items-center">
+    <div className="table-size-selector flex flex-col items-center justify-center">
       {generateCells()}
-      <div className="flex justify-center w-full pt-2">
+      <div className="flex w-full justify-center pt-2">
         <div className="text-white">
           {hoveredRows} x{hoveredCols}
         </div>
