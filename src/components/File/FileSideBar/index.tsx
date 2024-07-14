@@ -5,75 +5,13 @@ import { FixedSizeList as List, ListChildComponentProps } from 'react-window'
 
 import RenameDirModal from '../RenameDirectory'
 import RenameNoteModal from '../RenameNote'
-
-import { FileItem } from './FileItem'
-import { isFileNodeDirectory } from './fileOperations'
-
-interface FileListProps {
-  files: FileInfoTree
-  expandedDirectories: Map<string, boolean>
-  handleDirectoryToggle: (path: string) => void
-  selectedFilePath: string | null
-  onFileSelect: (path: string) => void
-  renameFile: (oldFilePath: string, newFilePath: string) => Promise<void>
-  noteToBeRenamed: string
-  setNoteToBeRenamed: (note: string) => void
-  fileDirToBeRenamed: string
-  setFileDirToBeRenamed: (dir: string) => void
-  listHeight?: number
-}
-
-export const FileSidebar: React.FC<FileListProps> = ({
-  files,
-  expandedDirectories,
-  handleDirectoryToggle,
-  selectedFilePath,
-  onFileSelect,
-  renameFile,
-  noteToBeRenamed,
-  setNoteToBeRenamed,
-  fileDirToBeRenamed,
-  setFileDirToBeRenamed,
-  listHeight,
-}) => (
-  <div className="flex h-full flex-col overflow-hidden text-white">
-    {noteToBeRenamed && (
-      <RenameNoteModal
-        isOpen={!!noteToBeRenamed}
-        onClose={() => setNoteToBeRenamed('')}
-        fullNoteName={noteToBeRenamed}
-        renameNote={async ({ path, newNoteName }) => {
-          await renameFile(path, newNoteName)
-        }}
-      />
-    )}
-    {fileDirToBeRenamed && (
-      <RenameDirModal
-        isOpen={!!fileDirToBeRenamed}
-        onClose={() => setFileDirToBeRenamed('')}
-        fullDirName={fileDirToBeRenamed}
-        renameDir={async ({ path, newDirName: newNoteName }) => {
-          await renameFile(path, newNoteName)
-        }}
-      />
-    )}
-    <FileExplorer
-      files={files}
-      selectedFilePath={selectedFilePath}
-      onFileSelect={onFileSelect}
-      handleDragStart={handleDragStartImpl}
-      expandedDirectories={expandedDirectories}
-      handleDirectoryToggle={handleDirectoryToggle}
-      lheight={listHeight}
-    />
-  </div>
-)
+import FileItem from './FileItem'
+import { isFileNodeDirectory } from './utils'
 
 const handleDragStartImpl = (e: React.DragEvent, file: FileInfoNode) => {
   e.dataTransfer.setData('text/plain', file.path)
   e.dataTransfer.effectAllowed = 'move'
 } // Assuming FileItem is in a separate file
-
 
 const Rows: React.FC<ListChildComponentProps> = ({ index, style, data }) => {
   const { visibleItems, selectedFilePath, onFileSelect, handleDragStart, handleDirectoryToggle, expandedDirectories } =
@@ -176,5 +114,65 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     </div>
   )
 }
+
+interface FileListProps {
+  files: FileInfoTree
+  expandedDirectories: Map<string, boolean>
+  handleDirectoryToggle: (path: string) => void
+  selectedFilePath: string | null
+  onFileSelect: (path: string) => void
+  renameFile: (oldFilePath: string, newFilePath: string) => Promise<void>
+  noteToBeRenamed: string
+  setNoteToBeRenamed: (note: string) => void
+  fileDirToBeRenamed: string
+  setFileDirToBeRenamed: (dir: string) => void
+  listHeight?: number
+}
+
+export const FileSidebar: React.FC<FileListProps> = ({
+  files,
+  expandedDirectories,
+  handleDirectoryToggle,
+  selectedFilePath,
+  onFileSelect,
+  renameFile,
+  noteToBeRenamed,
+  setNoteToBeRenamed,
+  fileDirToBeRenamed,
+  setFileDirToBeRenamed,
+  listHeight,
+}) => (
+  <div className="flex h-full flex-col overflow-hidden text-white">
+    {noteToBeRenamed && (
+      <RenameNoteModal
+        isOpen={!!noteToBeRenamed}
+        onClose={() => setNoteToBeRenamed('')}
+        fullNoteName={noteToBeRenamed}
+        renameNote={async ({ path, newNoteName }) => {
+          await renameFile(path, newNoteName)
+        }}
+      />
+    )}
+    {fileDirToBeRenamed && (
+      <RenameDirModal
+        isOpen={!!fileDirToBeRenamed}
+        onClose={() => setFileDirToBeRenamed('')}
+        fullDirName={fileDirToBeRenamed}
+        renameDir={async ({ path, newDirName: newNoteName }) => {
+          await renameFile(path, newNoteName)
+        }}
+      />
+    )}
+    <FileExplorer
+      files={files}
+      selectedFilePath={selectedFilePath}
+      onFileSelect={onFileSelect}
+      handleDragStart={handleDragStartImpl}
+      expandedDirectories={expandedDirectories}
+      handleDirectoryToggle={handleDirectoryToggle}
+      lheight={listHeight}
+    />
+  </div>
+)
 
 export default FileExplorer

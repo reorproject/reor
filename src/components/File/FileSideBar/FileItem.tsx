@@ -4,7 +4,7 @@ import { FileInfoNode } from 'electron/main/filesystem/types'
 import posthog from 'posthog-js'
 import { FaChevronDown, FaChevronRight } from 'react-icons/fa'
 
-import { isFileNodeDirectory, moveFile } from './fileOperations'
+import { isFileNodeDirectory, moveFile } from './utils'
 
 import { removeFileExtension } from '@/utils/strings'
 
@@ -18,7 +18,7 @@ interface FileInfoProps {
   indentMultiplyer?: number
 }
 
-export const FileItem: React.FC<FileInfoProps> = ({
+const FileItem: React.FC<FileInfoProps> = ({
   file,
   selectedFilePath,
   onFileSelect,
@@ -108,3 +108,5 @@ export const FileItem: React.FC<FileInfoProps> = ({
     </div>
   )
 }
+
+export default FileItem

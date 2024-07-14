@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import InEditorBacklinkSuggestionsDisplay, { SuggestionsState } from '../Editor/BacklinkSuggestionsDisplay'
-import { useFileInfoTree } from '../File/FileSideBar/hooks/use-file-info-tree'
+import useFileInfoTree from '../File/FileSideBar/hooks/use-file-info-tree'
 
 interface Props {
   vaultDirectory: string
@@ -12,7 +12,7 @@ interface Props {
   setSuggestionsState: (state: SuggestionsState | null) => void
 }
 
-export const SearchBarWithFilesSuggestion = ({
+const SearchBarWithFilesSuggestion = ({
   vaultDirectory,
   searchText,
   setSearchText,
@@ -70,7 +70,7 @@ export const SearchBarWithFilesSuggestion = ({
           onSelect={() => initializeSuggestionsStateOnFocus()}
           onChange={(e) => {
             setSearchText(e.target.value)
-            if (e.target.value.length == 0) {
+            if (e.target.value.length === 0) {
               onSelectSuggestion('')
             }
           }}
@@ -90,3 +90,5 @@ export const SearchBarWithFilesSuggestion = ({
     </>
   )
 }
+
+export default SearchBarWithFilesSuggestion

@@ -1,31 +1,15 @@
 import { useEffect, useState } from 'react'
 
-import { FileInfo, FileInfoNode, FileInfoTree } from 'electron/main/filesystem/types'
+import { FileInfo, FileInfoTree } from 'electron/main/filesystem/types'
 
-import { sortFilesAndDirectories } from '../fileOperations'
+import flattenFileInfoTree, { sortFilesAndDirectories } from '../utils'
 
-export const useFileInfoTree = (currentFilePath: string | null) => {
+const useFileInfoTree = (currentFilePath: string | null) => {
   const [fileInfoTree, setFileInfoTree] = useState<FileInfoTree>([])
   const [flattenedFiles, setFlattenedFiles] = useState<FileInfo[]>([])
   const [expandedDirectories, setExpandedDirectories] = useState<Map<string, boolean>>(new Map())
 
   // find relevant directories that are opened, progressively building for each directory but removing last line
-  const findRelevantDirectoriesToBeOpened = () => {
-    if (currentFilePath === null) {
-      return expandedDirectories
-    }
-    const pathSegments = currentFilePath.split('/').filter((segment) => segment !== '')
-    pathSegments.pop() // Remove the file name from the path
-
-    let currentPath = ''
-    const newExpandedDirectories = new Map(expandedDirectories)
-    pathSegments.forEach((segment) => {
-      currentPath += `/${segment}`
-      newExpandedDirectories.set(currentPath, true)
-    })
-
-    return newExpandedDirectories
-  }
 
   const handleDirectoryToggle = (path: string) => {
     const isExpanded = expandedDirectories.get(path)
@@ -36,11 +20,28 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
 
   // upon indexing, update the file info tree and expand relevant directories
   useEffect(() => {
+    const findRelevantDirectoriesToBeOpened = () => {
+      if (currentFilePath === null) {
+        return expandedDirectories
+      }
+      const pathSegments = currentFilePath.split('/').filter((segment) => segment !== '')
+      pathSegments.pop() // Remove the file name from the path
+
+      let currentPath = ''
+      const newExpandedDirectories = new Map(expandedDirectories)
+      pathSegments.forEach((segment) => {
+        currentPath += `/${segment}`
+        newExpandedDirectories.set(currentPath, true)
+      })
+
+      return newExpandedDirectories
+    }
+
     const handleFileUpdate = (updatedFiles: FileInfoTree) => {
       const sortedFiles = sortFilesAndDirectories(updatedFiles, null)
       setFileInfoTree(sortedFiles)
-      const flattenedFiles = flattenFileInfoTree(sortedFiles)
-      setFlattenedFiles(flattenedFiles)
+      const updatedFlattenedFiles = flattenFileInfoTree(sortedFiles)
+      setFlattenedFiles(updatedFlattenedFiles)
       const directoriesToBeExpanded = findRelevantDirectoriesToBeOpened()
       setExpandedDirectories(directoriesToBeExpanded)
     }
@@ -50,7 +51,7 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
     return () => {
       removeFilesListListener()
     }
-  }, [currentFilePath])
+  }, [currentFilePath, expandedDirectories])
 
   // initial load of files
   useEffect(() => {
@@ -59,9 +60,11 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
         const fetchedFiles = await window.fileSystem.getFilesTreeForWindow()
         const sortedFiles = sortFilesAndDirectories(fetchedFiles, null)
         setFileInfoTree(sortedFiles)
-        const flattenedFiles = flattenFileInfoTree(sortedFiles)
-        setFlattenedFiles(flattenedFiles)
-      } catch (error) {}
+        const updatedFlattenedFiles = flattenFileInfoTree(sortedFiles)
+        setFlattenedFiles(updatedFlattenedFiles)
+      } catch (error) {
+        // no need to do anything
+      }
     }
 
     fetchAndSetFiles()
@@ -75,27 +78,4 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
   }
 }
 
-// Duplicate function in the main process. It'll be faster to call this function here rahter than sending an IPC message to the main process.
-export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
-  let flatList: FileInfo[] = []
-
-  for (const node of tree) {
-    if (!isFileNodeDirectory(node)) {
-      flatList.push({
-        name: node.name,
-        path: node.path,
-        relativePath: node.relativePath,
-        dateModified: node.dateModified,
-        dateCreated: node.dateCreated,
-      })
-    }
-
-    if (isFileNodeDirectory(node) && node.children) {
-      flatList = flatList.concat(flattenFileInfoTree(node.children))
-    }
-  }
-
-  return flatList
-}
-
-export const isFileNodeDirectory = (fileInfo: FileInfoNode): boolean => fileInfo.children !== undefined
+export default useFileInfoTree
