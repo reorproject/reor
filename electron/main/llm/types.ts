@@ -1,13 +1,7 @@
-import { MessageStreamEvent } from '@anthropic-ai/sdk/resources';
-import {
-  ChatCompletionChunk,
-  ChatCompletionMessageParam,
-} from 'openai/resources/chat/completions';
+import { MessageStreamEvent } from '@anthropic-ai/sdk/resources'
+import { ChatCompletionChunk, ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 
-import {
-  LLMGenerationParameters,
-  LLMConfig,
-} from '../electron-store/storeConfig';
+import { LLMGenerationParameters, LLMConfig } from '../electron-store/storeConfig'
 
 // Any LLM engine should implement this interface:
 export interface LLMSessionService {
@@ -33,10 +27,10 @@ export interface LLMSessionService {
     messageHistory: Array<ChatCompletionMessageParam>,
     chunkResponse: (chunk: ChatCompletionChunk | MessageStreamEvent) => void,
     generationParams?: LLMGenerationParameters,
-  ): Promise<void>;
+  ): Promise<void>
 
-  getTokenizer: (llmName: string) => (text: string) => number[];
-  abort(): void;
+  getTokenizer: (llmName: string) => (text: string) => number[]
+  abort(): void
 }
 
 export interface ISendFunctionImplementer {
@@ -45,5 +39,5 @@ export interface ISendFunctionImplementer {
    * @param channel The channel to send the message to.
    * @param args Additional arguments for the message.
    */
-  send(channel: string, ...args: unknown[]): void;
+  send(channel: string, ...args: unknown[]): void
 }

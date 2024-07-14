@@ -1,80 +1,77 @@
-import Store from 'electron-store';
+import Store from 'electron-store'
 
-import { StoreKeys, StoreSchema } from './storeConfig';
+import { StoreKeys, StoreSchema } from './storeConfig'
 
-const currentSchemaVersion = 1;
+const currentSchemaVersion = 1
 
 export const initializeAndMaybeMigrateStore = (store: Store<StoreSchema>) => {
-  const storeSchemaVersion = store.get(StoreKeys.SchemaVersion);
+  const storeSchemaVersion = store.get(StoreKeys.SchemaVersion)
   if (storeSchemaVersion !== currentSchemaVersion) {
-    store.set(StoreKeys.SchemaVersion, currentSchemaVersion);
-    store.set(StoreKeys.LLMs, []);
-    store.set(StoreKeys.DefaultLLM, '');
+    store.set(StoreKeys.SchemaVersion, currentSchemaVersion)
+    store.set(StoreKeys.LLMs, [])
+    store.set(StoreKeys.DefaultLLM, '')
   }
-  setupDefaultStoreValues(store);
-};
+  setupDefaultStoreValues(store)
+}
 
 export function setupDefaultStoreValues(store: Store<StoreSchema>) {
   if (!store.get(StoreKeys.MaxRAGExamples)) {
-    store.set(StoreKeys.MaxRAGExamples, 15);
+    store.set(StoreKeys.MaxRAGExamples, 15)
   }
 
   if (!store.get(StoreKeys.ChunkSize)) {
-    store.set(StoreKeys.ChunkSize, 500);
+    store.set(StoreKeys.ChunkSize, 500)
   }
 
-  setupDefaultAnalyticsValue(store);
+  setupDefaultAnalyticsValue(store)
 
-  setupDefaultSpellCheckValue(store);
+  setupDefaultSpellCheckValue(store)
 
-  setupDefaultEmbeddingModels(store);
+  setupDefaultEmbeddingModels(store)
 
-  setupDefaultHardwareConfig(store);
+  setupDefaultHardwareConfig(store)
 }
 
 const setupDefaultAnalyticsValue = (store: Store<StoreSchema>) => {
   if (store.get(StoreKeys.Analytics) === undefined) {
-    store.set(StoreKeys.Analytics, true);
+    store.set(StoreKeys.Analytics, true)
   }
-};
+}
 
 const setupDefaultSpellCheckValue = (store: Store<StoreSchema>) => {
   if (store.get(StoreKeys.SpellCheck) === undefined) {
-    store.set(StoreKeys.SpellCheck, 'false');
+    store.set(StoreKeys.SpellCheck, 'false')
   }
-};
+}
 
 const setupDefaultHardwareConfig = (store: Store<StoreSchema>) => {
-  const hardwareConfig = store.get(StoreKeys.Hardware);
+  const hardwareConfig = store.get(StoreKeys.Hardware)
 
   if (!hardwareConfig) {
     store.set(StoreKeys.Hardware, {
       useGPU: process.platform === 'darwin' && process.arch === 'arm64',
       useCUDA: false,
       useVulkan: false,
-    });
+    })
   }
-};
+}
 
 const setupDefaultEmbeddingModels = (store: Store<StoreSchema>) => {
-  const embeddingModels = store.get(StoreKeys.EmbeddingModels);
+  const embeddingModels = store.get(StoreKeys.EmbeddingModels)
 
   if (!embeddingModels) {
-    store.set(StoreKeys.EmbeddingModels, defaultEmbeddingModelRepos);
+    store.set(StoreKeys.EmbeddingModels, defaultEmbeddingModelRepos)
   }
 
-  const defaultModel = store.get(StoreKeys.DefaultEmbeddingModelAlias);
+  const defaultModel = store.get(StoreKeys.DefaultEmbeddingModelAlias)
   if (!defaultModel) {
-    const embeddingModels = store.get(StoreKeys.EmbeddingModels) || {};
+    const embeddingModels = store.get(StoreKeys.EmbeddingModels) || {}
     if (Object.keys(embeddingModels).length === 0) {
-      throw new Error('No embedding models found');
+      throw new Error('No embedding models found')
     }
-    store.set(
-      StoreKeys.DefaultEmbeddingModelAlias,
-      Object.keys(embeddingModels)[0],
-    );
+    store.set(StoreKeys.DefaultEmbeddingModelAlias, Object.keys(embeddingModels)[0])
   }
-};
+}
 
 const defaultEmbeddingModelRepos = {
   'Xenova/bge-base-en-v1.5': {
@@ -86,4 +83,4 @@ const defaultEmbeddingModelRepos = {
     type: 'repo',
     repoName: 'Xenova/bge-small-en-v1.5',
   },
-};
+}

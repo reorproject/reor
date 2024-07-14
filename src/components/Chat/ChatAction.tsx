@@ -1,9 +1,9 @@
-import React from 'react';
-import type { FC } from 'react';
+import React from 'react'
+import type { FC } from 'react'
 
 interface Props {
-  actionText: string;
-  onClick?: () => void;
+  actionText: string
+  onClick?: () => void
 }
 
 export const ChatAction: FC<Props> = ({ actionText, onClick }: Props) => (
@@ -17,4 +17,4 @@ export const ChatAction: FC<Props> = ({ actionText, onClick }: Props) => (
   >
     {actionText}
   </button>
-);
+)

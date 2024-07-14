@@ -1,23 +1,18 @@
-import {
-  InputRule,
-  markInputRule,
-  markPasteRule,
-  PasteRule,
-} from '@tiptap/core';
-import { Link } from '@tiptap/extension-link';
-import type { LinkOptions } from '@tiptap/extension-link';
+import { InputRule, markInputRule, markPasteRule, PasteRule } from '@tiptap/core'
+import { Link } from '@tiptap/extension-link'
+import type { LinkOptions } from '@tiptap/extension-link'
 
 /**
  * The input regex for Markdown links with title support, and multiple quotation marks (required
  * in case the `Typography` extension is being included).
  */
-const inputRegex = /(?:^|\s)\[([^\]]*)?\]\((\S+)(?: ["“](.+)["”])?\)$/i;
+const inputRegex = /(?:^|\s)\[([^\]]*)?\]\((\S+)(?: ["“](.+)["”])?\)$/i
 
 /**
  * The paste regex for Markdown links with title support, and multiple quotation marks (required
  * in case the `Typography` extension is being included).
  */
-const pasteRegex = /(?:^|\s)\[([^\]]*)?\]\((\S+)(?: ["“](.+)["”])?\)/gi;
+const pasteRegex = /(?:^|\s)\[([^\]]*)?\]\((\S+)(?: ["“](.+)["”])?\)/gi
 
 /**
  * Input rule built specifically for the `Link` extension, which ignores the auto-linked URL in
@@ -26,17 +21,17 @@ const pasteRegex = /(?:^|\s)\[([^\]]*)?\]\((\S+)(?: ["“](.+)["”])?\)/gi;
  * @see https://github.com/ueberdosis/tiptap/discussions/1865
  */
 function linkInputRule(config: Parameters<typeof markInputRule>[0]) {
-  const defaultMarkInputRule = markInputRule(config);
+  const defaultMarkInputRule = markInputRule(config)
 
   return new InputRule({
     find: config.find,
     handler(props) {
-      const { tr } = props.state;
+      const { tr } = props.state
 
-      defaultMarkInputRule.handler(props);
-      tr.setMeta('preventAutolink', true);
+      defaultMarkInputRule.handler(props)
+      tr.setMeta('preventAutolink', true)
     },
-  });
+  })
 }
 
 /**
@@ -47,17 +42,17 @@ function linkInputRule(config: Parameters<typeof markInputRule>[0]) {
  * @see https://github.com/ueberdosis/tiptap/discussions/1865
  */
 function linkPasteRule(config: Parameters<typeof markPasteRule>[0]) {
-  const defaultMarkPasteRule = markPasteRule(config);
+  const defaultMarkPasteRule = markPasteRule(config)
 
   return new PasteRule({
     find: config.find,
     handler(props) {
-      const { tr } = props.state;
+      const { tr } = props.state
 
-      defaultMarkPasteRule.handler(props);
-      tr.setMeta('preventAutolink', true);
+      defaultMarkPasteRule.handler(props)
+      tr.setMeta('preventAutolink', true)
     },
-  });
+  })
 }
 
 /**
@@ -73,7 +68,7 @@ const RichTextLink = Link.extend({
       title: {
         default: null,
       },
-    };
+    }
   },
   addInputRules() {
     return [
@@ -88,10 +83,10 @@ const RichTextLink = Link.extend({
           return {
             title: match.pop()?.trim(),
             href: match.pop()?.trim(),
-          };
+          }
         },
       }),
-    ];
+    ]
   },
   addPasteRules() {
     return [
@@ -106,13 +101,13 @@ const RichTextLink = Link.extend({
           return {
             title: match.pop()?.trim(),
             href: match.pop()?.trim(),
-          };
+          }
         },
       }),
-    ];
+    ]
   },
-});
+})
 
-export { RichTextLink };
+export { RichTextLink }
 
-export type { LinkOptions as RichTextLinkOptions };
+export type { LinkOptions as RichTextLinkOptions }

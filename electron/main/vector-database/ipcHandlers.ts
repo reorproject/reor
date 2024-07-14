@@ -1,159 +1,121 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'fs'
+import * as path from 'path'
 
-import { app, BrowserWindow, ipcMain } from 'electron';
-import Store from 'electron-store';
-import * as lancedb from 'vectordb';
+import { app, BrowserWindow, ipcMain } from 'electron'
+import Store from 'electron-store'
+import * as lancedb from 'vectordb'
 
-import { errorToStringMainProcess } from '../common/error';
-import WindowsManager from '../common/windowManager';
-import { getDefaultEmbeddingModelConfig } from '../electron-store/ipcHandlers';
-import { StoreKeys, StoreSchema } from '../electron-store/storeConfig';
-import {
-  startWatchingDirectory,
-  updateFileListForRenderer,
-} from '../filesystem/filesystem';
-import { createPromptWithContextLimitFromContent } from '../llm/contextLimit';
-import { ollamaService, openAISession } from '../llm/ipcHandlers';
-import { getLLMConfig } from '../llm/llmConfig';
+import { errorToStringMainProcess } from '../common/error'
+import WindowsManager from '../common/windowManager'
+import { getDefaultEmbeddingModelConfig } from '../electron-store/ipcHandlers'
+import { StoreKeys, StoreSchema } from '../electron-store/storeConfig'
+import { startWatchingDirectory, updateFileListForRenderer } from '../filesystem/filesystem'
+import { createPromptWithContextLimitFromContent } from '../llm/contextLimit'
+import { ollamaService, openAISession } from '../llm/ipcHandlers'
+import { getLLMConfig } from '../llm/llmConfig'
 
-import { rerankSearchedEmbeddings } from './embeddings';
-import { DBEntry, DatabaseFields } from './schema';
-import { RepopulateTableWithMissingItems } from './tableHelperFunctions';
+import { rerankSearchedEmbeddings } from './embeddings'
+import { DBEntry, DatabaseFields } from './schema'
+import { RepopulateTableWithMissingItems } from './tableHelperFunctions'
 
 export interface PromptWithRagResults {
-  ragPrompt: string;
-  uniqueFilesReferenced: string[];
+  ragPrompt: string
+  uniqueFilesReferenced: string[]
 }
 
 export interface BasePromptRequirements {
-  query: string;
-  llmName: string;
-  filePathToBeUsedAsContext?: string;
+  query: string
+  llmName: string
+  filePathToBeUsedAsContext?: string
 }
 
-export const registerDBSessionHandlers = (
-  store: Store<StoreSchema>,
-  windowManager: WindowsManager,
-) => {
-  let dbConnection: lancedb.Connection;
+export const registerDBSessionHandlers = (store: Store<StoreSchema>, windowManager: WindowsManager) => {
+  let dbConnection: lancedb.Connection
 
-  ipcMain.handle(
-    'search',
-    async (
-      event,
-      query: string,
-      limit: number,
-      filter?: string,
-    ): Promise<DBEntry[]> => {
-      try {
-        const windowInfo = windowManager.getWindowInfoForContents(event.sender);
-        if (!windowInfo) {
-          throw new Error('Window info not found.');
-        }
-        const searchResults = await windowInfo.dbTableClient.search(
-          query,
-          limit,
-          filter,
-        );
-        return searchResults;
-      } catch (error) {
-        console.error('Error searching database:', error);
-        throw error;
+  ipcMain.handle('search', async (event, query: string, limit: number, filter?: string): Promise<DBEntry[]> => {
+    try {
+      const windowInfo = windowManager.getWindowInfoForContents(event.sender)
+      if (!windowInfo) {
+        throw new Error('Window info not found.')
       }
-    },
-  );
+      const searchResults = await windowInfo.dbTableClient.search(query, limit, filter)
+      return searchResults
+    } catch (error) {
+      console.error('Error searching database:', error)
+      throw error
+    }
+  })
 
   ipcMain.handle('index-files-in-directory', async (event) => {
     try {
-      console.log('Indexing files in directory');
-      const windowInfo = windowManager.getWindowInfoForContents(event.sender);
+      console.log('Indexing files in directory')
+      const windowInfo = windowManager.getWindowInfoForContents(event.sender)
       if (!windowInfo) {
-        throw new Error('No window info found');
+        throw new Error('No window info found')
       }
-      const defaultEmbeddingModelConfig = getDefaultEmbeddingModelConfig(store);
-      const dbPath = path.join(app.getPath('userData'), 'vectordb');
-      dbConnection = await lancedb.connect(dbPath);
+      const defaultEmbeddingModelConfig = getDefaultEmbeddingModelConfig(store)
+      const dbPath = path.join(app.getPath('userData'), 'vectordb')
+      dbConnection = await lancedb.connect(dbPath)
 
       await windowInfo.dbTableClient.initialize(
         dbConnection,
         windowInfo.vaultDirectoryForWindow,
         defaultEmbeddingModelConfig,
-      );
+      )
       await RepopulateTableWithMissingItems(
         windowInfo.dbTableClient,
         windowInfo.vaultDirectoryForWindow,
         (progress) => {
-          event.sender.send('indexing-progress', progress);
+          event.sender.send('indexing-progress', progress)
         },
-      );
-      const win = BrowserWindow.fromWebContents(event.sender);
+      )
+      const win = BrowserWindow.fromWebContents(event.sender)
 
       if (win) {
-        windowManager.watcher = startWatchingDirectory(
-          win,
-          windowInfo.vaultDirectoryForWindow,
-        );
-        updateFileListForRenderer(win, windowInfo.vaultDirectoryForWindow);
+        windowManager.watcher = startWatchingDirectory(win, windowInfo.vaultDirectoryForWindow)
+        updateFileListForRenderer(win, windowInfo.vaultDirectoryForWindow)
       }
-      event.sender.send('indexing-progress', 1);
+      event.sender.send('indexing-progress', 1)
     } catch (error) {
-      let errorStr = '';
+      let errorStr = ''
 
-      if (
-        errorToStringMainProcess(error).includes('Embedding function error')
-      ) {
-        errorStr = `${error}. Please try downloading an embedding model from Hugging Face and attaching it in settings. More information can be found in settings.`;
+      if (errorToStringMainProcess(error).includes('Embedding function error')) {
+        errorStr = `${error}. Please try downloading an embedding model from Hugging Face and attaching it in settings. More information can be found in settings.`
       } else {
-        errorStr = `${error}. Please try restarting or open a Github issue.`;
+        errorStr = `${error}. Please try restarting or open a Github issue.`
       }
-      event.sender.send('error-to-display-in-window', errorStr);
-      console.error('Error during file indexing:', error);
+      event.sender.send('error-to-display-in-window', errorStr)
+      console.error('Error during file indexing:', error)
     }
-  });
+  })
 
   ipcMain.handle(
     'search-with-reranking',
-    async (
-      event,
-      query: string,
-      limit: number,
-      filter?: string,
-    ): Promise<DBEntry[]> => {
+    async (event, query: string, limit: number, filter?: string): Promise<DBEntry[]> => {
       try {
-        const windowInfo = windowManager.getWindowInfoForContents(event.sender);
+        const windowInfo = windowManager.getWindowInfoForContents(event.sender)
         if (!windowInfo) {
-          throw new Error('Window info not found.');
+          throw new Error('Window info not found.')
         }
-        const searchResults = await windowInfo.dbTableClient.search(
-          query,
-          limit,
-          filter,
-        );
+        const searchResults = await windowInfo.dbTableClient.search(query, limit, filter)
 
-        const rankedResults = await rerankSearchedEmbeddings(
-          query,
-          searchResults,
-        );
-        return rankedResults;
+        const rankedResults = await rerankSearchedEmbeddings(query, searchResults)
+        return rankedResults
       } catch (error) {
-        console.error('Error searching database:', error);
-        throw error;
+        console.error('Error searching database:', error)
+        throw error
       }
     },
-  );
+  )
 
   ipcMain.handle(
     'augment-prompt-with-temporal-agent',
-    async (
-      event,
-      { query, llmName }: BasePromptRequirements,
-    ): Promise<PromptWithRagResults> => {
-      const llmSession = openAISession;
-      const llmConfig = await getLLMConfig(store, ollamaService, llmName);
-      console.log('llmConfig', llmConfig);
+    async (event, { query, llmName }: BasePromptRequirements): Promise<PromptWithRagResults> => {
+      const llmSession = openAISession
+      const llmConfig = await getLLMConfig(store, ollamaService, llmName)
+      console.log('llmConfig', llmConfig)
       if (!llmConfig) {
-        throw new Error(`LLM ${llmName} not configured.`);
+        throw new Error(`LLM ${llmName} not configured.`)
       }
 
       const llmFilter = await llmSession.response(
@@ -191,56 +153,45 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
         ],
         false,
         store.get(StoreKeys.LLMGenerationParameters),
-      );
+      )
 
       try {
-        let searchResults: DBEntry[] = [];
-        const maxRAGExamples: number = store.get(StoreKeys.MaxRAGExamples);
-        const windowInfo = windowManager.getWindowInfoForContents(event.sender);
+        let searchResults: DBEntry[] = []
+        const maxRAGExamples: number = store.get(StoreKeys.MaxRAGExamples)
+        const windowInfo = windowManager.getWindowInfoForContents(event.sender)
         if (!windowInfo) {
-          throw new Error('Window info not found.');
+          throw new Error('Window info not found.')
         }
 
-        const llmGeneratedFilterString =
-          llmFilter.choices[0].message.content ?? '';
+        const llmGeneratedFilterString = llmFilter.choices[0].message.content ?? ''
 
         try {
-          searchResults = await windowInfo.dbTableClient.search(
-            query,
-            maxRAGExamples,
-            llmGeneratedFilterString,
-          );
+          searchResults = await windowInfo.dbTableClient.search(query, maxRAGExamples, llmGeneratedFilterString)
         } catch (error) {
-          searchResults = await windowInfo.dbTableClient.search(
-            query,
-            maxRAGExamples,
-          );
-          searchResults = [];
+          searchResults = await windowInfo.dbTableClient.search(query, maxRAGExamples)
+          searchResults = []
         }
-        const basePrompt =
-          'Answer the question below based on the following notes:\n';
+        const basePrompt = 'Answer the question below based on the following notes:\n'
         const { prompt: ragPrompt } = createPromptWithContextLimitFromContent(
           searchResults,
           basePrompt,
           query,
           llmSession.getTokenizer(llmName),
           llmConfig.contextLength,
-        );
-        console.log('ragPrompt', ragPrompt);
-        const uniqueFilesReferenced = [
-          ...new Set(searchResults.map((entry) => entry.notepath)),
-        ];
+        )
+        console.log('ragPrompt', ragPrompt)
+        const uniqueFilesReferenced = [...new Set(searchResults.map((entry) => entry.notepath))]
 
         return {
           ragPrompt,
           uniqueFilesReferenced,
-        };
+        }
       } catch (error) {
-        console.error('Error searching database:', error);
-        throw errorToStringMainProcess(error);
+        console.error('Error searching database:', error)
+        throw errorToStringMainProcess(error)
       }
     },
-  );
+  )
 
   ipcMain.handle(
     'augment-prompt-with-flashcard-agent',
@@ -248,27 +199,24 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
       event,
       { query, llmName, filePathToBeUsedAsContext }: BasePromptRequirements,
     ): Promise<PromptWithRagResults> => {
-      const llmSession = openAISession;
-      console.log('llmName:   ', llmName);
-      const llmConfig = await getLLMConfig(store, ollamaService, llmName);
-      console.log('llmConfig', llmConfig);
+      const llmSession = openAISession
+      console.log('llmName:   ', llmName)
+      const llmConfig = await getLLMConfig(store, ollamaService, llmName)
+      console.log('llmConfig', llmConfig)
       if (!llmConfig) {
-        throw new Error(`LLM ${llmName} not configured.`);
+        throw new Error(`LLM ${llmName} not configured.`)
       }
       if (!filePathToBeUsedAsContext) {
-        throw new Error(
-          'Current file path is not provided for flashcard agent.',
-        );
+        throw new Error('Current file path is not provided for flashcard agent.')
       }
-      const fileResults = fs.readFileSync(filePathToBeUsedAsContext, 'utf-8');
-      const { prompt: promptToCreateAtomicFacts } =
-        createPromptWithContextLimitFromContent(
-          fileResults,
-          '',
-          `Extract atomic facts that can be used for students to study, based on this query: ${query}`,
-          llmSession.getTokenizer(llmName),
-          llmConfig.contextLength,
-        );
+      const fileResults = fs.readFileSync(filePathToBeUsedAsContext, 'utf-8')
+      const { prompt: promptToCreateAtomicFacts } = createPromptWithContextLimitFromContent(
+        fileResults,
+        '',
+        `Extract atomic facts that can be used for students to study, based on this query: ${query}`,
+        llmSession.getTokenizer(llmName),
+        llmConfig.contextLength,
+      )
       const llmGeneratedFacts = await llmSession.response(
         llmName,
         llmConfig,
@@ -285,50 +233,46 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
         ],
         false,
         store.get(StoreKeys.LLMGenerationParameters),
-      );
+      )
 
-      console.log(llmGeneratedFacts);
-      const basePrompt = 'Given the following atomic facts:\n';
+      console.log(llmGeneratedFacts)
+      const basePrompt = 'Given the following atomic facts:\n'
       const flashcardQuery =
-        'Create useful FLASHCARDS that can be used for students to study using ONLY the context. Format is Q: <insert question> A: <insert answer>.';
-      const { prompt: promptToCreateFlashcardsWithAtomicFacts } =
-        createPromptWithContextLimitFromContent(
-          llmGeneratedFacts.choices[0].message.content || '',
-          basePrompt,
-          flashcardQuery,
-          llmSession.getTokenizer(llmName),
-          llmConfig.contextLength,
-        );
-      console.log(
-        'promptToCreateFlashcardsWithAtomicFacts: ',
-        promptToCreateFlashcardsWithAtomicFacts,
-      );
-      const uniqueFilesReferenced = [filePathToBeUsedAsContext];
+        'Create useful FLASHCARDS that can be used for students to study using ONLY the context. Format is Q: <insert question> A: <insert answer>.'
+      const { prompt: promptToCreateFlashcardsWithAtomicFacts } = createPromptWithContextLimitFromContent(
+        llmGeneratedFacts.choices[0].message.content || '',
+        basePrompt,
+        flashcardQuery,
+        llmSession.getTokenizer(llmName),
+        llmConfig.contextLength,
+      )
+      console.log('promptToCreateFlashcardsWithAtomicFacts: ', promptToCreateFlashcardsWithAtomicFacts)
+      const uniqueFilesReferenced = [filePathToBeUsedAsContext]
 
       return {
         ragPrompt: promptToCreateFlashcardsWithAtomicFacts,
         uniqueFilesReferenced,
-      };
+      }
     },
-  );
+  )
 
-  ipcMain.handle('get-database-fields', () => DatabaseFields);
-};
+  ipcMain.handle('get-database-fields', () => DatabaseFields)
+}
 
 function formatTimestampForLanceDB(date: Date): string {
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1; // getMonth() is zero-based
-  const day = date.getDate();
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
-  const seconds = date.getSeconds();
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1 // getMonth() is zero-based
+  const day = date.getDate()
+  const hours = date.getHours()
+  const minutes = date.getMinutes()
+  const seconds = date.getSeconds()
 
   // Pad single digits with leading zeros
-  const monthPadded = month.toString().padStart(2, '0');
-  const dayPadded = day.toString().padStart(2, '0');
-  const hoursPadded = hours.toString().padStart(2, '0');
-  const minutesPadded = minutes.toString().padStart(2, '0');
-  const secondsPadded = seconds.toString().padStart(2, '0');
+  const monthPadded = month.toString().padStart(2, '0')
+  const dayPadded = day.toString().padStart(2, '0')
+  const hoursPadded = hours.toString().padStart(2, '0')
+  const minutesPadded = minutes.toString().padStart(2, '0')
+  const secondsPadded = seconds.toString().padStart(2, '0')
 
-  return `timestamp '${year}-${monthPadded}-${dayPadded} ${hoursPadded}:${minutesPadded}:${secondsPadded}'`;
+  return `timestamp '${year}-${monthPadded}-${dayPadded} ${hoursPadded}:${minutesPadded}:${secondsPadded}'`
 }

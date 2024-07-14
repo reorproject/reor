@@ -1,26 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 
-import { MessageStreamEvent } from '@anthropic-ai/sdk/resources';
-import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema';
-import {
-  ChatCompletionChunk,
-  ChatCompletionMessageParam,
-} from 'openai/resources/chat/completions';
-import posthog from 'posthog-js';
-import ReactMarkdown from 'react-markdown';
-import rehypeRaw from 'rehype-raw';
+import { MessageStreamEvent } from '@anthropic-ai/sdk/resources'
+import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema'
+import { ChatCompletionChunk, ChatCompletionMessageParam } from 'openai/resources/chat/completions'
+import posthog from 'posthog-js'
+import ReactMarkdown from 'react-markdown'
+import rehypeRaw from 'rehype-raw'
 
-import { SimilarEntriesComponent } from '../Sidebars/SimilarFilesSidebar';
+import { SimilarEntriesComponent } from '../Sidebars/SimilarFilesSidebar'
 
-import AddContextFiltersModal from './AddContextFiltersModal';
-import { PromptSuggestion } from './Chat-Prompts';
-import ChatInput from './ChatInput';
-import {
-  formatOpenAIMessageContentIntoString,
-  resolveRAGContext,
-} from './chatUtils';
+import AddContextFiltersModal from './AddContextFiltersModal'
+import { PromptSuggestion } from './Chat-Prompts'
+import ChatInput from './ChatInput'
+import { formatOpenAIMessageContentIntoString, resolveRAGContext } from './chatUtils'
 
-import { errorToStringRendererProcess } from '@/utils/error';
+import { errorToStringRendererProcess } from '@/utils/error'
 
 // convert ask options to enum
 enum AskOptions {
@@ -47,55 +41,51 @@ const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
   // [AskOptions.FlashcardAsk]: [
   //   "Create some flashcards based on the current note",
   // ],
-};
+}
 
 export type ChatHistory = {
-  id: string;
-  displayableChatHistory: ChatMessageToDisplay[];
-};
+  id: string
+  displayableChatHistory: ChatMessageToDisplay[]
+}
 export type ChatMessageToDisplay = ChatCompletionMessageParam & {
-  messageType: 'success' | 'error';
-  context: DBEntry[];
-  visibleContent?: string;
-};
+  messageType: 'success' | 'error'
+  context: DBEntry[]
+  visibleContent?: string
+}
 
 export interface ChatFilters {
-  numberOfChunksToFetch: number;
-  files: string[];
-  minDate?: Date;
-  maxDate?: Date;
+  numberOfChunksToFetch: number
+  files: string[]
+  minDate?: Date
+  maxDate?: Date
 }
 
 interface AnonymizedChatFilters {
-  numberOfChunksToFetch: number;
-  filesLength: number;
-  minDate?: Date;
-  maxDate?: Date;
+  numberOfChunksToFetch: number
+  filesLength: number
+  minDate?: Date
+  maxDate?: Date
 }
 
-function anonymizeChatFiltersForPosthog(
-  chatFilters: ChatFilters,
-): AnonymizedChatFilters {
-  const { numberOfChunksToFetch, files, minDate, maxDate } = chatFilters;
+function anonymizeChatFiltersForPosthog(chatFilters: ChatFilters): AnonymizedChatFilters {
+  const { numberOfChunksToFetch, files, minDate, maxDate } = chatFilters
   return {
     numberOfChunksToFetch,
     filesLength: files.length,
     minDate,
     maxDate,
-  };
+  }
 }
 
 interface ChatWithLLMProps {
-  vaultDirectory: string;
-  openFileByPath: (path: string) => Promise<void>;
+  vaultDirectory: string
+  openFileByPath: (path: string) => Promise<void>
 
-  currentChatHistory: ChatHistory | undefined;
-  setCurrentChatHistory: React.Dispatch<
-    React.SetStateAction<ChatHistory | undefined>
-  >;
-  showSimilarFiles: boolean;
-  chatFilters: ChatFilters;
-  setChatFilters: React.Dispatch<ChatFilters>;
+  currentChatHistory: ChatHistory | undefined
+  setCurrentChatHistory: React.Dispatch<React.SetStateAction<ChatHistory | undefined>>
+  showSimilarFiles: boolean
+  chatFilters: ChatFilters
+  setChatFilters: React.Dispatch<ChatFilters>
 }
 
 const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
@@ -107,62 +97,57 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   chatFilters,
   setChatFilters,
 }) => {
-  const [userTextFieldInput, setUserTextFieldInput] = useState<string>('');
-  const [askText] = useState<AskOptions>(AskOptions.Ask);
-  const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
-  const [readyToSave, setReadyToSave] = useState<boolean>(false);
-  const [currentContext, setCurrentContext] = useState<DBQueryResult[]>([]);
-  const [isAddContextFiltersModalOpen, setIsAddContextFiltersModalOpen] =
-    useState<boolean>(false);
+  const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
+  const [askText] = useState<AskOptions>(AskOptions.Ask)
+  const [loadingResponse, setLoadingResponse] = useState<boolean>(false)
+  const [readyToSave, setReadyToSave] = useState<boolean>(false)
+  const [currentContext, setCurrentContext] = useState<DBQueryResult[]>([])
+  const [isAddContextFiltersModalOpen, setIsAddContextFiltersModalOpen] = useState<boolean>(false)
 
   useEffect(() => {
-    const context = getChatHistoryContext(currentChatHistory);
-    setCurrentContext(context);
-  }, [currentChatHistory]);
+    const context = getChatHistoryContext(currentChatHistory)
+    setCurrentContext(context)
+  }, [currentChatHistory])
 
   // update chat context when files are added
   useEffect(() => {
     const setContextOnFileAdded = async () => {
       if (chatFilters.files.length > 0) {
-        const results = await window.fileSystem.getFilesystemPathsAsDBItems(
-          chatFilters.files,
-        );
-        setCurrentContext(results as DBQueryResult[]);
+        const results = await window.fileSystem.getFilesystemPathsAsDBItems(chatFilters.files)
+        setCurrentContext(results as DBQueryResult[])
       } else if (!currentChatHistory?.id) {
         // if there is no prior history, set current context to empty
-        setCurrentContext([]);
+        setCurrentContext([])
       }
-    };
-    setContextOnFileAdded();
-  }, [chatFilters.files]);
+    }
+    setContextOnFileAdded()
+  }, [chatFilters.files])
 
   useEffect(() => {
     if (readyToSave && currentChatHistory) {
-      window.electronStore.updateChatHistory(currentChatHistory);
-      setReadyToSave(false);
+      window.electronStore.updateChatHistory(currentChatHistory)
+      setReadyToSave(false)
     }
-  }, [readyToSave, currentChatHistory]);
+  }, [readyToSave, currentChatHistory])
 
-  const handleSubmitNewMessage = async (
-    chatHistory: ChatHistory | undefined,
-  ) => {
+  const handleSubmitNewMessage = async (chatHistory: ChatHistory | undefined) => {
     posthog.capture('chat_message_submitted', {
       chatId: chatHistory?.id,
       chatLength: chatHistory?.displayableChatHistory.length,
       chatFilters: anonymizeChatFiltersForPosthog(chatFilters),
-    });
+    })
     try {
-      if (loadingResponse) return;
-      setLoadingResponse(true);
-      if (!userTextFieldInput.trim()) return;
-      const defaultLLMName = await window.llm.getDefaultLLMName();
+      if (loadingResponse) return
+      setLoadingResponse(true)
+      if (!userTextFieldInput.trim()) return
+      const defaultLLMName = await window.llm.getDefaultLLMName()
 
       if (!chatHistory || !chatHistory.id) {
-        const chatID = Date.now().toString();
+        const chatID = Date.now().toString()
         chatHistory = {
           id: chatID,
           displayableChatHistory: [],
-        };
+        }
       }
       if (chatHistory.displayableChatHistory.length === 0) {
         if (chatFilters) {
@@ -174,9 +159,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
           //   context: [],
           // });
-          chatHistory.displayableChatHistory.push(
-            await resolveRAGContext(userTextFieldInput, chatFilters),
-          );
+          chatHistory.displayableChatHistory.push(await resolveRAGContext(userTextFieldInput, chatFilters))
         }
       } else {
         chatHistory.displayableChatHistory.push({
@@ -184,45 +167,34 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           content: userTextFieldInput,
           messageType: 'success',
           context: [],
-        });
+        })
       }
 
-      setUserTextFieldInput('');
+      setUserTextFieldInput('')
 
-      setCurrentChatHistory(chatHistory);
+      setCurrentChatHistory(chatHistory)
 
-      if (!chatHistory) return;
+      if (!chatHistory) return
 
-      await window.electronStore.updateChatHistory(chatHistory);
+      await window.electronStore.updateChatHistory(chatHistory)
 
-      const llmConfigs = await window.llm.getLLMConfigs();
+      const llmConfigs = await window.llm.getLLMConfigs()
 
-      const currentModelConfig = llmConfigs.find(
-        (config) => config.modelName === defaultLLMName,
-      );
+      const currentModelConfig = llmConfigs.find((config) => config.modelName === defaultLLMName)
       if (!currentModelConfig) {
-        throw new Error(`No model config found for model: ${defaultLLMName}`);
+        throw new Error(`No model config found for model: ${defaultLLMName}`)
       }
 
-      await window.llm.streamingLLMResponse(
-        defaultLLMName,
-        currentModelConfig,
-        false,
-        chatHistory,
-      );
-      setReadyToSave(true);
+      await window.llm.streamingLLMResponse(defaultLLMName, currentModelConfig, false, chatHistory)
+      setReadyToSave(true)
     } catch (error) {
       if (chatHistory) {
-        appendNewContentToMessageHistory(
-          chatHistory.id,
-          errorToStringRendererProcess(error),
-          'error',
-        );
+        appendNewContentToMessageHistory(chatHistory.id, errorToStringRendererProcess(error), 'error')
       }
     }
     // so here we could save the chat history
-    setLoadingResponse(false);
-  };
+    setLoadingResponse(false)
+  }
 
   const appendNewContentToMessageHistory = (
     chatID: string,
@@ -230,22 +202,21 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     newMessageType: 'success' | 'error',
   ) => {
     setCurrentChatHistory((prev) => {
-      if (chatID !== prev?.id) return prev;
-      const newDisplayableHistory = prev?.displayableChatHistory || [];
+      if (chatID !== prev?.id) return prev
+      const newDisplayableHistory = prev?.displayableChatHistory || []
       if (newDisplayableHistory.length > 0) {
-        const lastMessage =
-          newDisplayableHistory[newDisplayableHistory.length - 1];
+        const lastMessage = newDisplayableHistory[newDisplayableHistory.length - 1]
 
         if (lastMessage.role === 'assistant') {
-          lastMessage.content += newContent; // Append new content with a space
-          lastMessage.messageType = newMessageType;
+          lastMessage.content += newContent // Append new content with a space
+          lastMessage.messageType = newMessageType
         } else {
           newDisplayableHistory.push({
             role: 'assistant',
             content: newContent,
             messageType: newMessageType,
             context: [],
-          });
+          })
         }
       } else {
         newDisplayableHistory.push({
@@ -253,7 +224,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           content: newContent,
           messageType: newMessageType,
           context: [],
-        });
+        })
       }
 
       return {
@@ -263,53 +234,40 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           role: message.role,
           content: message.content,
         })),
-      };
-    });
-  };
+      }
+    })
+  }
 
   useEffect(() => {
-    const handleOpenAIChunk = async (
-      receivedChatID: string,
-      chunk: ChatCompletionChunk,
-    ) => {
-      const newContent = chunk.choices[0].delta.content ?? '';
+    const handleOpenAIChunk = async (receivedChatID: string, chunk: ChatCompletionChunk) => {
+      const newContent = chunk.choices[0].delta.content ?? ''
       if (newContent) {
-        appendNewContentToMessageHistory(receivedChatID, newContent, 'success');
+        appendNewContentToMessageHistory(receivedChatID, newContent, 'success')
       }
-    };
+    }
 
-    const handleAnthropicChunk = async (
-      receivedChatID: string,
-      chunk: MessageStreamEvent,
-    ) => {
-      const newContent =
-        chunk.type === 'content_block_delta' ? (chunk.delta.text ?? '') : '';
+    const handleAnthropicChunk = async (receivedChatID: string, chunk: MessageStreamEvent) => {
+      const newContent = chunk.type === 'content_block_delta' ? (chunk.delta.text ?? '') : ''
       if (newContent) {
-        appendNewContentToMessageHistory(receivedChatID, newContent, 'success');
+        appendNewContentToMessageHistory(receivedChatID, newContent, 'success')
       }
-    };
+    }
 
-    const removeOpenAITokenStreamListener = window.ipcRenderer.receive(
-      'openAITokenStream',
-      handleOpenAIChunk,
-    );
+    const removeOpenAITokenStreamListener = window.ipcRenderer.receive('openAITokenStream', handleOpenAIChunk)
 
-    const removeAnthropicTokenStreamListener = window.ipcRenderer.receive(
-      'anthropicTokenStream',
-      handleAnthropicChunk,
-    );
+    const removeAnthropicTokenStreamListener = window.ipcRenderer.receive('anthropicTokenStream', handleAnthropicChunk)
 
     return () => {
-      removeOpenAITokenStreamListener();
-      removeAnthropicTokenStreamListener();
-    };
-  }, []);
+      removeOpenAITokenStreamListener()
+      removeAnthropicTokenStreamListener()
+    }
+  }, [])
 
   return (
-    <div className='flex items-center justify-center w-full h-full'>
-      <div className='flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid'>
-        <div className='flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full'>
-          <div className='space-y-2 mt-2 ml-4 mr-4 flex-grow'>
+    <div className="flex items-center justify-center w-full h-full">
+      <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid">
+        <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
+          <div className="space-y-2 mt-2 ml-4 mr-4 flex-grow">
             {currentChatHistory?.displayableChatHistory
               .filter((msg) => msg.role !== 'system')
               .map((message, index) => (
@@ -330,23 +288,20 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                 </ReactMarkdown>
               ))}
           </div>
-          {(!currentChatHistory ||
-            currentChatHistory?.displayableChatHistory.length == 0) && (
+          {(!currentChatHistory || currentChatHistory?.displayableChatHistory.length == 0) && (
             <>
-              <div className='flex items-center justify-center text-gray-300 text-sm'>
+              <div className="flex items-center justify-center text-gray-300 text-sm">
                 Start a conversation with your notes by typing a message below.
               </div>
-              <div className='flex items-center justify-center text-gray-300 text-sm'>
+              <div className="flex items-center justify-center text-gray-300 text-sm">
                 <button
-                  className='bg-slate-600 m-2 rounded-lg border-none
-                  h-6 w-40 text-center cursor-pointer vertical-align text-white'
+                  className="bg-slate-600 m-2 rounded-lg border-none
+                  h-6 w-40 text-center cursor-pointer vertical-align text-white"
                   onClick={() => {
-                    setIsAddContextFiltersModalOpen(true);
+                    setIsAddContextFiltersModalOpen(true)
                   }}
                 >
-                  {chatFilters.files.length > 0
-                    ? 'Update RAG filters'
-                    : 'Customise context'}
+                  {chatFilters.files.length > 0 ? 'Update RAG filters' : 'Customise context'}
                 </button>
               </div>
             </>
@@ -372,15 +327,14 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             );
           })} */}
           {userTextFieldInput === '' &&
-          (!currentChatHistory ||
-            currentChatHistory?.displayableChatHistory.length == 0) ? (
+          (!currentChatHistory || currentChatHistory?.displayableChatHistory.length == 0) ? (
             <>
               {EXAMPLE_PROMPTS[askText].map((option, index) => (
                 <PromptSuggestion
                   key={index}
                   promptText={option}
                   onClick={() => {
-                    setUserTextFieldInput(option);
+                    setUserTextFieldInput(option)
                   }}
                 />
               ))}
@@ -390,9 +344,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         <ChatInput
           userTextFieldInput={userTextFieldInput}
           setUserTextFieldInput={setUserTextFieldInput}
-          handleSubmitNewMessage={() =>
-            handleSubmitNewMessage(currentChatHistory)
-          }
+          handleSubmitNewMessage={() => handleSubmitNewMessage(currentChatHistory)}
           loadingResponse={loadingResponse}
           askText={askText}
         />
@@ -400,10 +352,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       {showSimilarFiles && (
         <SimilarEntriesComponent
           similarEntries={currentContext}
-          titleText='Context used in chat'
+          titleText="Context used in chat"
           onFileSelect={(path: string) => {
-            openFileByPath(path);
-            posthog.capture('open_file_from_chat_context');
+            openFileByPath(path)
+            posthog.capture('open_file_from_chat_context')
           }}
           saveCurrentFile={() => Promise.resolve()}
           isLoadingSimilarEntries={false}
@@ -412,17 +364,13 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         />
       )}
     </div>
-  );
-};
+  )
+}
 
-const getChatHistoryContext = (
-  chatHistory: ChatHistory | undefined,
-): DBQueryResult[] => {
-  if (!chatHistory) return [];
-  const contextForChat = chatHistory.displayableChatHistory
-    .map((message) => message.context)
-    .flat();
-  return contextForChat as DBQueryResult[];
-};
+const getChatHistoryContext = (chatHistory: ChatHistory | undefined): DBQueryResult[] => {
+  if (!chatHistory) return []
+  const contextForChat = chatHistory.displayableChatHistory.map((message) => message.context).flat()
+  return contextForChat as DBQueryResult[]
+}
 
-export default ChatWithLLM;
+export default ChatWithLLM

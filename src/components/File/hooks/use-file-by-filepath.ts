@@ -1,77 +1,65 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react'
 
-import { MathExtension } from '@aarkue/tiptap-math-extension';
-import Document from '@tiptap/extension-document';
-import Paragraph from '@tiptap/extension-paragraph';
-import Table from '@tiptap/extension-table';
-import TableCell from '@tiptap/extension-table-cell';
-import TableHeader from '@tiptap/extension-table-header';
-import TableRow from '@tiptap/extension-table-row';
-import TaskItem from '@tiptap/extension-task-item';
-import TaskList from '@tiptap/extension-task-list';
-import Text from '@tiptap/extension-text';
-import TextStyle from '@tiptap/extension-text-style';
-import { Editor, useEditor } from '@tiptap/react';
-import StarterKit from '@tiptap/starter-kit';
-import { toast } from 'react-toastify';
-import { Markdown } from 'tiptap-markdown';
-import { useDebounce } from 'use-debounce';
+import { MathExtension } from '@aarkue/tiptap-math-extension'
+import Document from '@tiptap/extension-document'
+import Paragraph from '@tiptap/extension-paragraph'
+import Table from '@tiptap/extension-table'
+import TableCell from '@tiptap/extension-table-cell'
+import TableHeader from '@tiptap/extension-table-header'
+import TableRow from '@tiptap/extension-table-row'
+import TaskItem from '@tiptap/extension-task-item'
+import TaskList from '@tiptap/extension-task-list'
+import Text from '@tiptap/extension-text'
+import TextStyle from '@tiptap/extension-text-style'
+import { Editor, useEditor } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import { toast } from 'react-toastify'
+import { Markdown } from 'tiptap-markdown'
+import { useDebounce } from 'use-debounce'
 
-import { BacklinkExtension } from '@/components/Editor/BacklinkExtension';
-import { SuggestionsState } from '@/components/Editor/BacklinkSuggestionsDisplay';
-import HighlightExtension, {
-  HighlightData,
-} from '@/components/Editor/HighlightExtension';
-import { RichTextLink } from '@/components/Editor/RichTextLink';
-import SearchAndReplace from '@/components/Editor/SearchAndReplace';
-import {
-  getInvalidCharacterInFilePath,
-  removeFileExtension,
-} from '@/utils/strings';
-import 'katex/dist/katex.min.css';
-import '../tiptap.scss';
+import { BacklinkExtension } from '@/components/Editor/BacklinkExtension'
+import { SuggestionsState } from '@/components/Editor/BacklinkSuggestionsDisplay'
+import HighlightExtension, { HighlightData } from '@/components/Editor/HighlightExtension'
+import { RichTextLink } from '@/components/Editor/RichTextLink'
+import SearchAndReplace from '@/components/Editor/SearchAndReplace'
+import { getInvalidCharacterInFilePath, removeFileExtension } from '@/utils/strings'
+import 'katex/dist/katex.min.css'
+import '../tiptap.scss'
 
 export const useFileByFilepath = () => {
-  const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
-    string | null
-  >(null);
-  const [suggestionsState, setSuggestionsState] =
-    useState<SuggestionsState | null>();
-  const [needToWriteEditorContentToDisk, setNeedToWriteEditorContentToDisk] =
-    useState<boolean>(false);
-  const [needToIndexEditorContent, setNeedToIndexEditorContent] =
-    useState<boolean>(false);
-  const [spellCheckEnabled, setSpellCheckEnabled] = useState<string>('false');
+  const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<string | null>(null)
+  const [suggestionsState, setSuggestionsState] = useState<SuggestionsState | null>()
+  const [needToWriteEditorContentToDisk, setNeedToWriteEditorContentToDisk] = useState<boolean>(false)
+  const [needToIndexEditorContent, setNeedToIndexEditorContent] = useState<boolean>(false)
+  const [spellCheckEnabled, setSpellCheckEnabled] = useState<string>('false')
 
   useEffect(() => {
     const fetchSpellCheckMode = async () => {
-      const storedSpellCheckEnabled =
-        await window.electronStore.getSpellCheckMode();
-      setSpellCheckEnabled(storedSpellCheckEnabled);
-    };
-    fetchSpellCheckMode();
-  }, [spellCheckEnabled]);
+      const storedSpellCheckEnabled = await window.electronStore.getSpellCheckMode()
+      setSpellCheckEnabled(storedSpellCheckEnabled)
+    }
+    fetchSpellCheckMode()
+  }, [spellCheckEnabled])
 
-  const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>('');
-  const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>('');
-  const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
-  const [currentlyChangingFilePath, setCurrentlyChangingFilePath] =
-    useState(false);
+  const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>('')
+  const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>('')
+  const [navigationHistory, setNavigationHistory] = useState<string[]>([])
+  const [currentlyChangingFilePath, setCurrentlyChangingFilePath] = useState(false)
   const [highlightData, setHighlightData] = useState<HighlightData>({
     text: '',
     position: null,
-  });
+  })
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
+  const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false)
 
   const setFileNodeToBeRenamed = async (filePath: string) => {
-    const isDirectory = await window.fileSystem.isDirectory(filePath);
+    const isDirectory = await window.fileSystem.isDirectory(filePath)
     if (isDirectory) {
-      setFileDirToBeRenamed(filePath);
+      setFileDirToBeRenamed(filePath)
     } else {
-      setNoteToBeRenamed(filePath);
+      setNoteToBeRenamed(filePath)
     }
-  };
+  }
 
   /**
    * with this editor, we want to take the HTML on the following scenarios:
@@ -81,84 +69,70 @@ export const useFileByFilepath = () => {
    */
 
   const openFileByPath = async (newFilePath: string) => {
-    setCurrentlyChangingFilePath(true);
-    await writeEditorContentToDisk(editor, currentlyOpenedFilePath);
+    setCurrentlyChangingFilePath(true)
+    await writeEditorContentToDisk(editor, currentlyOpenedFilePath)
     if (currentlyOpenedFilePath && needToIndexEditorContent) {
-      window.fileSystem.indexFileInDatabase(currentlyOpenedFilePath);
-      setNeedToIndexEditorContent(false);
+      window.fileSystem.indexFileInDatabase(currentlyOpenedFilePath)
+      setNeedToIndexEditorContent(false)
     }
-    const newFileContent =
-      (await window.fileSystem.readFile(newFilePath)) ?? '';
-    editor?.commands.setContent(newFileContent);
-    setCurrentlyOpenedFilePath(newFilePath);
-    setCurrentlyChangingFilePath(false);
-  };
+    const newFileContent = (await window.fileSystem.readFile(newFilePath)) ?? ''
+    editor?.commands.setContent(newFileContent)
+    setCurrentlyOpenedFilePath(newFilePath)
+    setCurrentlyChangingFilePath(false)
+  }
 
-  const openRelativePath = async (
-    relativePath: string,
-    optionalContentToWriteOnCreate?: string,
-  ): Promise<void> => {
-    const invalidChars = await getInvalidCharacterInFilePath(relativePath);
+  const openRelativePath = async (relativePath: string, optionalContentToWriteOnCreate?: string): Promise<void> => {
+    const invalidChars = await getInvalidCharacterInFilePath(relativePath)
     if (invalidChars) {
-      toast.error(
-        `Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`,
-      );
+      toast.error(`Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`)
       throw new Error(
         `Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`,
-      );
+      )
     }
-    const relativePathWithExtension =
-      await window.path.addExtensionIfNoExtensionPresent(relativePath);
+    const relativePathWithExtension = await window.path.addExtensionIfNoExtensionPresent(relativePath)
     const absolutePath = await window.path.join(
       await window.electronStore.getVaultDirectoryForWindow(),
       relativePathWithExtension,
-    );
-    const fileExists = await window.fileSystem.checkFileExists(absolutePath);
+    )
+    const fileExists = await window.fileSystem.checkFileExists(absolutePath)
     if (!fileExists) {
-      const basename = await window.path.basename(absolutePath);
-      const content =
-        optionalContentToWriteOnCreate ||
-        `## ${removeFileExtension(basename)}\n`;
-      await window.fileSystem.createFile(absolutePath, content);
-      setNeedToIndexEditorContent(true);
+      const basename = await window.path.basename(absolutePath)
+      const content = optionalContentToWriteOnCreate || `## ${removeFileExtension(basename)}\n`
+      await window.fileSystem.createFile(absolutePath, content)
+      setNeedToIndexEditorContent(true)
     }
-    openFileByPath(absolutePath);
-  };
+    openFileByPath(absolutePath)
+  }
 
-  const openRelativePathRef = useRef<(newFilePath: string) => Promise<void>>();
-  openRelativePathRef.current = openRelativePath;
+  const openRelativePathRef = useRef<(newFilePath: string) => Promise<void>>()
+  openRelativePathRef.current = openRelativePath
 
-  const handleSuggestionsStateWithEventCapture = (
-    suggState: SuggestionsState | null,
-  ): void => {
-    setSuggestionsState(suggState);
-  };
+  const handleSuggestionsStateWithEventCapture = (suggState: SuggestionsState | null): void => {
+    setSuggestionsState(suggState)
+  }
 
   // Check if we should display markdown or not
   useEffect(() => {
     const handleInitialStartup = async () => {
-      const isMarkdownSet = await window.electronStore.getDisplayMarkdown();
-      setDisplayMarkdown(isMarkdownSet);
-    };
+      const isMarkdownSet = await window.electronStore.getDisplayMarkdown()
+      setDisplayMarkdown(isMarkdownSet)
+    }
 
     // Even listener
     const handleChangeMarkdown = (isMarkdownSet: boolean) => {
-      setDisplayMarkdown(isMarkdownSet);
-    };
+      setDisplayMarkdown(isMarkdownSet)
+    }
 
-    handleInitialStartup();
-    window.ipcRenderer.receive(
-      'display-markdown-changed',
-      handleChangeMarkdown,
-    );
-  }, []);
+    handleInitialStartup()
+    window.ipcRenderer.receive('display-markdown-changed', handleChangeMarkdown)
+  }, [])
 
   const editor = useEditor({
     autofocus: true,
 
     onUpdate() {
-      setNeedToWriteEditorContentToDisk(true);
-      setNeedToIndexEditorContent(true);
+      setNeedToWriteEditorContentToDisk(true)
+      setNeedToIndexEditorContent(true)
     },
     editorProps: {},
     extensions: [
@@ -199,12 +173,9 @@ export const useFileByFilepath = () => {
         linkOnPaste: true,
         openOnClick: true,
       }),
-      BacklinkExtension(
-        openRelativePathRef,
-        handleSuggestionsStateWithEventCapture,
-      ),
+      BacklinkExtension(openRelativePathRef, handleSuggestionsStateWithEventCapture),
     ],
-  });
+  })
 
   useEffect(() => {
     if (editor) {
@@ -214,113 +185,97 @@ export const useFileByFilepath = () => {
             spellcheck: spellCheckEnabled,
           },
         },
-      });
+      })
     }
-  }, [spellCheckEnabled, editor]);
+  }, [spellCheckEnabled, editor])
 
-  const [debouncedEditor] = useDebounce(editor?.state.doc.content, 4000);
+  const [debouncedEditor] = useDebounce(editor?.state.doc.content, 4000)
 
   useEffect(() => {
     if (debouncedEditor && !currentlyChangingFilePath) {
-      writeEditorContentToDisk(editor, currentlyOpenedFilePath);
+      writeEditorContentToDisk(editor, currentlyOpenedFilePath)
     }
-  }, [
-    debouncedEditor,
-    currentlyOpenedFilePath,
-    editor,
-    currentlyChangingFilePath,
-  ]);
+  }, [debouncedEditor, currentlyOpenedFilePath, editor, currentlyChangingFilePath])
 
   const saveCurrentlyOpenedFile = async () => {
-    await writeEditorContentToDisk(editor, currentlyOpenedFilePath);
-  };
+    await writeEditorContentToDisk(editor, currentlyOpenedFilePath)
+  }
 
-  const writeEditorContentToDisk = async (
-    editor: Editor | null,
-    filePath: string | null,
-  ) => {
+  const writeEditorContentToDisk = async (editor: Editor | null, filePath: string | null) => {
     if (filePath !== null && needToWriteEditorContentToDisk && editor) {
-      const markdownContent = getMarkdown(editor);
+      const markdownContent = getMarkdown(editor)
       if (markdownContent !== null) {
         await window.fileSystem.writeFile({
           filePath,
           content: markdownContent,
-        });
+        })
 
-        console.log(
-          'setting is file content modified to false in actual save function',
-        );
-        setNeedToWriteEditorContentToDisk(false);
+        console.log('setting is file content modified to false in actual save function')
+        setNeedToWriteEditorContentToDisk(false)
       }
     }
-  };
+  }
 
   // delete file depending on file path returned by the listener
   useEffect(() => {
     const deleteFile = async (path: string) => {
-      await window.fileSystem.deleteFile(path);
+      await window.fileSystem.deleteFile(path)
 
       // if it is the current file, clear the content and set filepath to null so that it won't save anything else
       if (currentlyOpenedFilePath === path) {
-        editor?.commands.setContent('');
-        setCurrentlyOpenedFilePath(null);
-      }
-    };
-
-    const removeDeleteFileListener = window.ipcRenderer.receive(
-      'delete-file-listener',
-      deleteFile,
-    );
-
-    return () => {
-      removeDeleteFileListener();
-    };
-  }, [currentlyOpenedFilePath, editor]);
-
-  useEffect(() => {
-    async function checkAppUsage() {
-      if (!editor || currentlyOpenedFilePath) return;
-      const hasOpened = await window.electronStore.getHasUserOpenedAppBefore();
-      console.log('has opened', hasOpened);
-      if (!hasOpened) {
-        console.log('opening welcome note');
-        await window.electronStore.setHasUserOpenedAppBefore();
-        openRelativePath('Welcome to Reor', welcomeNote);
+        editor?.commands.setContent('')
+        setCurrentlyOpenedFilePath(null)
       }
     }
 
-    checkAppUsage();
-  }, [editor, currentlyOpenedFilePath]);
+    const removeDeleteFileListener = window.ipcRenderer.receive('delete-file-listener', deleteFile)
+
+    return () => {
+      removeDeleteFileListener()
+    }
+  }, [currentlyOpenedFilePath, editor])
+
+  useEffect(() => {
+    async function checkAppUsage() {
+      if (!editor || currentlyOpenedFilePath) return
+      const hasOpened = await window.electronStore.getHasUserOpenedAppBefore()
+      console.log('has opened', hasOpened)
+      if (!hasOpened) {
+        console.log('opening welcome note')
+        await window.electronStore.setHasUserOpenedAppBefore()
+        openRelativePath('Welcome to Reor', welcomeNote)
+      }
+    }
+
+    checkAppUsage()
+  }, [editor, currentlyOpenedFilePath])
 
   const renameFileNode = async (oldFilePath: string, newFilePath: string) => {
     await window.fileSystem.renameFileRecursive({
       oldFilePath,
       newFilePath,
-    });
+    })
     // set the file history array to use the new absolute file path if there is anything matching
-    const navigationHistoryUpdated = [...navigationHistory].map((path) =>
-      path.replace(oldFilePath, newFilePath),
-    );
+    const navigationHistoryUpdated = [...navigationHistory].map((path) => path.replace(oldFilePath, newFilePath))
 
-    setNavigationHistory(navigationHistoryUpdated);
+    setNavigationHistory(navigationHistoryUpdated)
 
     // reset the editor to the new file path
     if (currentlyOpenedFilePath === oldFilePath) {
-      setCurrentlyOpenedFilePath(newFilePath);
+      setCurrentlyOpenedFilePath(newFilePath)
     }
-  };
+  }
 
   // open a new file rename dialog
   useEffect(() => {
-    const renameFileListener = window.ipcRenderer.receive(
-      'rename-file-listener',
-      (noteName: string) => setFileNodeToBeRenamed(noteName),
-    );
+    const renameFileListener = window.ipcRenderer.receive('rename-file-listener', (noteName: string) =>
+      setFileNodeToBeRenamed(noteName),
+    )
 
     return () => {
-      renameFileListener();
-    };
-  }, []);
+      renameFileListener()
+    }
+  }, [])
 
   // cleanup effect ran once, so there was only 1 re-render
   // but for each query to the delete file-listener, you only want to run the listener once, not multiple times.
@@ -339,30 +294,23 @@ export const useFileByFilepath = () => {
         filePath: currentlyOpenedFilePath,
         fileContent: editor?.getHTML() || '',
         editor,
-      });
-      if (
-        currentlyOpenedFilePath !== null &&
-        editor &&
-        editor.getHTML() !== null
-      ) {
-        const markdown = getMarkdown(editor);
+      })
+      if (currentlyOpenedFilePath !== null && editor && editor.getHTML() !== null) {
+        const markdown = getMarkdown(editor)
         await window.fileSystem.writeFile({
           filePath: currentlyOpenedFilePath,
           content: markdown,
-        });
-        await window.fileSystem.indexFileInDatabase(currentlyOpenedFilePath);
+        })
+        await window.fileSystem.indexFileInDatabase(currentlyOpenedFilePath)
       }
-    };
+    }
 
-    const removeWindowCloseListener = window.ipcRenderer.receive(
-      'prepare-for-window-close',
-      handleWindowClose,
-    );
+    const removeWindowCloseListener = window.ipcRenderer.receive('prepare-for-window-close', handleWindowClose)
 
     return () => {
-      removeWindowCloseListener();
-    };
-  }, [currentlyOpenedFilePath, editor]);
+      removeWindowCloseListener()
+    }
+  }, [currentlyOpenedFilePath, editor])
 
   return {
     filePath: currentlyOpenedFilePath,
@@ -382,18 +330,18 @@ export const useFileByFilepath = () => {
     renameFile: renameFileNode,
     setSuggestionsState,
     setSpellCheckEnabled,
-  };
-};
+  }
+}
 
 function getMarkdown(editor: Editor) {
   // Fetch the current markdown content from the editor
-  const originalMarkdown = editor.storage.markdown.getMarkdown();
+  const originalMarkdown = editor.storage.markdown.getMarkdown()
   // Replace the escaped square brackets with unescaped ones
   const modifiedMarkdown = originalMarkdown
     .replace(/\\\[/g, '[') // Replaces \[ with [
-    .replace(/\\\]/g, ']'); // Replaces \] with ]
+    .replace(/\\\]/g, ']') // Replaces \] with ]
 
-  return modifiedMarkdown;
+  return modifiedMarkdown
 }
 
 const welcomeNote = `## Welcome to Reor!
@@ -428,4 +376,4 @@ Some features you should be aware of:
 
 You can import notes from other apps by adding markdown files to your vault directory. Note that Reor will only read markdown files.
 
-Please join our [Discord community](https://discord.gg/QBhGUFJYuH) to ask questions, give feedback, and get help. We're excited to have you on board!`;
+Please join our [Discord community](https://discord.gg/QBhGUFJYuH) to ask questions, give feedback, and get help. We're excited to have you on board!`

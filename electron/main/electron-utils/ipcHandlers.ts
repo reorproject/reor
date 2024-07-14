@@ -1,18 +1,10 @@
-import * as fs from 'fs/promises';
+import * as fs from 'fs/promises'
 
-import {
-  app,
-  BrowserWindow,
-  dialog,
-  ipcMain,
-  Menu,
-  MenuItem,
-  shell,
-} from 'electron';
-import Store from 'electron-store';
+import { app, BrowserWindow, dialog, ipcMain, Menu, MenuItem, shell } from 'electron'
+import Store from 'electron-store'
 
-import WindowsManager from '../common/windowManager';
-import { StoreKeys, StoreSchema } from '../electron-store/storeConfig';
+import WindowsManager from '../common/windowManager'
+import { StoreKeys, StoreSchema } from '../electron-store/storeConfig'
 
 export const electronUtilsHandlers = (
   store: Store<StoreSchema>,
@@ -22,54 +14,54 @@ export const electronUtilsHandlers = (
   indexHtml: string,
 ) => {
   ipcMain.handle('show-context-menu-item', (event) => {
-    const menu = new Menu();
+    const menu = new Menu()
 
     menu.append(
       new MenuItem({
         label: 'New Note',
         click: () => {
-          event.sender.send('add-new-note-listener');
+          event.sender.send('add-new-note-listener')
         },
       }),
-    );
+    )
 
     menu.append(
       new MenuItem({
         label: 'New Directory',
         click: () => {
-          event.sender.send('add-new-directory-listener');
+          event.sender.send('add-new-directory-listener')
         },
       }),
-    );
+    )
 
-    const browserWindow = BrowserWindow.fromWebContents(event.sender);
-    if (browserWindow) menu.popup({ window: browserWindow });
-  });
+    const browserWindow = BrowserWindow.fromWebContents(event.sender)
+    if (browserWindow) menu.popup({ window: browserWindow })
+  })
 
   ipcMain.handle('show-context-menu-file-item', async (event, file) => {
-    const menu = new Menu();
+    const menu = new Menu()
 
-    const stats = await fs.stat(file.path);
-    const isDirectory = stats.isDirectory();
+    const stats = await fs.stat(file.path)
+    const isDirectory = stats.isDirectory()
 
     if (isDirectory) {
       menu.append(
         new MenuItem({
           label: 'New Note',
           click: () => {
-            event.sender.send('add-new-note-listener', file.relativePath);
+            event.sender.send('add-new-note-listener', file.relativePath)
           },
         }),
-      );
+      )
 
       menu.append(
         new MenuItem({
           label: 'New Directory',
           click: () => {
-            event.sender.send('add-new-directory-listener', file.path);
+            event.sender.send('add-new-directory-listener', file.path)
           },
         }),
-      );
+      )
     }
 
     menu.append(
@@ -85,93 +77,86 @@ export const electronUtilsHandlers = (
             })
             .then((confirm) => {
               if (confirm.response === 0) {
-                console.log(file.path);
-                event.sender.send('delete-file-listener', file.path);
+                console.log(file.path)
+                event.sender.send('delete-file-listener', file.path)
               }
             }),
       }),
-    );
+    )
     menu.append(
       new MenuItem({
         label: 'Rename',
         click: () => {
-          console.log(file.path);
-          event.sender.send('rename-file-listener', file.path);
+          console.log(file.path)
+          event.sender.send('rename-file-listener', file.path)
         },
       }),
-    );
+    )
 
     menu.append(
       new MenuItem({
         label: 'Create a flashcard set',
         click: () => {
-          console.log('creating: ', file.path);
-          event.sender.send('create-flashcard-file-listener', file.path);
+          console.log('creating: ', file.path)
+          event.sender.send('create-flashcard-file-listener', file.path)
         },
       }),
-    );
+    )
 
     menu.append(
       new MenuItem({
         label: 'Add file to chat context',
         click: () => {
-          console.log('creating: ', file.path);
-          event.sender.send('add-file-to-chat-listener', file.path);
+          console.log('creating: ', file.path)
+          event.sender.send('add-file-to-chat-listener', file.path)
         },
       }),
-    );
+    )
 
-    console.log('menu key: ', file);
+    console.log('menu key: ', file)
 
-    const browserWindow = BrowserWindow.fromWebContents(event.sender);
+    const browserWindow = BrowserWindow.fromWebContents(event.sender)
     if (browserWindow) {
-      menu.popup({ window: browserWindow });
+      menu.popup({ window: browserWindow })
     }
-  });
+  })
 
   ipcMain.handle('show-chat-menu-item', (event, chatID) => {
-    const menu = new Menu();
+    const menu = new Menu()
 
     menu.append(
       new MenuItem({
         label: 'Delete Chat',
         click: () => {
-          const vaultDir = windowsManager.getVaultDirectoryForWinContents(
-            event.sender,
-          );
+          const vaultDir = windowsManager.getVaultDirectoryForWinContents(event.sender)
 
           if (!vaultDir) {
-            return;
+            return
           }
 
-          const chatHistoriesMap = store.get(StoreKeys.ChatHistories);
-          const allChatHistories = chatHistoriesMap[vaultDir] || [];
-          const filteredChatHistories = allChatHistories.filter(
-            (item) => item.id !== chatID,
-          );
-          chatHistoriesMap[vaultDir] = filteredChatHistories;
-          store.set(StoreKeys.ChatHistories, chatHistoriesMap);
-          event.sender.send(
-            'update-chat-histories',
-            chatHistoriesMap[vaultDir] || [],
-          );
+          const chatHistoriesMap = store.get(StoreKeys.ChatHistories)
+          const allChatHistories = chatHistoriesMap[vaultDir] || []
+          const filteredChatHistories = allChatHistories.filter((item) => item.id !== chatID)
+          chatHistoriesMap[vaultDir] = filteredChatHistories
+          store.set(StoreKeys.ChatHistories, chatHistoriesMap)
+          event.sender.send('update-chat-histories', chatHistoriesMap[vaultDir] || [])
         },
       }),
-    );
+    )
 
-    const browserWindow = BrowserWindow.fromWebContents(event.sender);
-    if (browserWindow) menu.popup({ window: browserWindow });
-  });
+    const browserWindow = BrowserWindow.fromWebContents(event.sender)
+    if (browserWindow) menu.popup({ window: browserWindow })
+  })
 
   ipcMain.handle('open-external', (event, url) => {
-    shell.openExternal(url);
-  });
+    shell.openExternal(url)
+  })
 
-  ipcMain.handle('get-platform', async () => process.platform);
+  ipcMain.handle('get-platform', async () => process.platform)
 
   ipcMain.handle('open-new-window', () => {
-    windowsManager.createWindow(store, preload, url, indexHtml);
-  });
+    windowsManager.createWindow(store, preload, url, indexHtml)
+  })
 
-  ipcMain.handle('get-reor-app-version', async () => app.getVersion());
-};
+  ipcMain.handle('get-reor-app-version', async () => app.getVersion())
+}

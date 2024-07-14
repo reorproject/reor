@@ -1,57 +1,53 @@
 export function removeFileExtension(filename: string): string {
   if (!filename || filename.indexOf('.') === -1) {
-    return filename;
+    return filename
   }
 
   if (filename.startsWith('.') && filename.lastIndexOf('.') === 0) {
-    return filename;
+    return filename
   }
 
-  return filename.substring(0, filename.lastIndexOf('.'));
+  return filename.substring(0, filename.lastIndexOf('.'))
 }
 
-export const getInvalidCharacterInFilePath = async (
-  filename: string,
-): Promise<string | null> => {
-  let invalidCharacters: RegExp;
-  const platform = await window.electronUtils.getPlatform();
+export const getInvalidCharacterInFilePath = async (filename: string): Promise<string | null> => {
+  let invalidCharacters: RegExp
+  const platform = await window.electronUtils.getPlatform()
 
   switch (platform) {
     case 'win32':
-      invalidCharacters = /["*:<>?|]/;
-      break;
+      invalidCharacters = /["*:<>?|]/
+      break
     case 'darwin':
-      invalidCharacters = /[:]/;
-      break;
+      invalidCharacters = /[:]/
+      break
     default:
-      invalidCharacters = /$^/;
-      break;
+      invalidCharacters = /$^/
+      break
   }
 
-  const idx = filename.search(invalidCharacters);
+  const idx = filename.search(invalidCharacters)
 
-  return idx === -1 ? null : filename[idx];
-};
+  return idx === -1 ? null : filename[idx]
+}
 
-export const getInvalidCharacterInFileName = async (
-  filename: string,
-): Promise<string | null> => {
-  let invalidCharacters: RegExp;
-  const platform = await window.electronUtils.getPlatform();
+export const getInvalidCharacterInFileName = async (filename: string): Promise<string | null> => {
+  let invalidCharacters: RegExp
+  const platform = await window.electronUtils.getPlatform()
 
   switch (platform) {
     case 'win32':
-      invalidCharacters = /["*/:<>?\\|]/;
-      break;
+      invalidCharacters = /["*/:<>?\\|]/
+      break
     case 'darwin':
-      invalidCharacters = /[/:]/;
-      break;
+      invalidCharacters = /[/:]/
+      break
     default:
-      invalidCharacters = /[/]/;
-      break;
+      invalidCharacters = /[/]/
+      break
   }
 
-  const idx = filename.search(invalidCharacters);
+  const idx = filename.search(invalidCharacters)
 
-  return idx === -1 ? null : filename[idx];
-};
+  return idx === -1 ? null : filename[idx]
+}

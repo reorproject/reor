@@ -1,9 +1,9 @@
-import React from 'react';
-import type { FC } from 'react';
+import React from 'react'
+import type { FC } from 'react'
 
 interface Props {
-  promptText: string;
-  onClick?: () => void;
+  promptText: string
+  onClick?: () => void
 }
 
 export const PromptSuggestion: FC<Props> = ({ promptText, onClick }: Props) => (
@@ -17,4 +17,4 @@ export const PromptSuggestion: FC<Props> = ({ promptText, onClick }: Props) => (
   >
     {promptText}
   </button>
-);
+)

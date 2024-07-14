@@ -1,9 +1,9 @@
-import React from 'react';
+import React from 'react'
 
 export interface ProgressBarProps {
-  completed: number;
-  total: number;
-  height: string;
+  completed: number
+  total: number
+  height: string
 }
 
 function ProgressBar({ completed, total, height }: ProgressBarProps) {
@@ -30,7 +30,7 @@ function ProgressBar({ completed, total, height }: ProgressBarProps) {
         </span>
       </div>
     </div>
-  );
+  )
 }
 
-export default ProgressBar;
+export default ProgressBar
