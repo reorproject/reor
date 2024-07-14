@@ -29,15 +29,15 @@ module.exports = {
   rules: {
     "unused-imports/no-unused-imports": "error",
     // eslint-disable import/extensions:
-    "unused-imports/no-unused-vars": [
-      "warn",
-      {
-        vars: "all",
-        varsIgnorePattern: "^_",
-        args: "after-used",
-        argsIgnorePattern: "^_",
-      },
-    ],
+    // "unused-imports/no-unused-vars": [
+    //   "warn",
+    //   {
+    //     vars: "all",
+    //     varsIgnorePattern: "^_",
+    //     args: "after-used",
+    //     argsIgnorePattern: "^_",
+    //   },
+    // ],
     "prettier/prettier": "error",
     "react/function-component-definition": [
       "error",
@@ -48,6 +48,7 @@ module.exports = {
     ],
     "import/extensions": ["off", "ignorePackages"],
   },
+  ignorePatterns: ["vite.config.ts", ".eslintrc.js"],
   settings: {
     "import/resolver": {
       node: {

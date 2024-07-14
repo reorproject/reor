@@ -67,19 +67,17 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponentProps> 
 
   useEffect(() => {
     const handleNewFileOpen = async (path: string) => {
-      try {
-        const sanitizedText = await getChunkForInitialSearchFromFile(path)
-        if (!sanitizedText) {
-          return
-        }
-        const searchResults = await performSearchOnChunk(sanitizedText, path, false)
+      const sanitizedText = await getChunkForInitialSearchFromFile(path)
+      if (!sanitizedText) {
+        return
+      }
+      const searchResults = await performSearchOnChunk(sanitizedText, path, false)
 
-        if (searchResults.length > 0) {
-          setSimilarEntries(searchResults)
-        } else {
-          setSimilarEntries([])
-        }
-      } catch (error) {}
+      if (searchResults.length > 0) {
+        setSimilarEntries(searchResults)
+      } else {
+        setSimilarEntries([])
+      }
     }
     if (filePath) {
       handleNewFileOpen(filePath)

@@ -167,6 +167,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ openRelativePath, sidebarSh
       <button
         className="flex w-full cursor-pointer items-center justify-center border-none bg-transparent pb-2"
         onClick={() => setIsSettingsModalOpen(!isSettingsModalOpen)}
+        type="button"
       >
         <MdSettings className="size-6 text-gray-100" title="Settings" />
       </button>
