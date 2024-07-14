@@ -7,10 +7,7 @@
     {
       "name": "Debug App",
       "preLaunchTask": "Before Debug",
-      "configurations": [
-        "Debug Main Process",
-        "Debug Renderer Process"
-      ],
+      "configurations": ["Debug Main Process", "Debug Renderer Process"],
       "presentation": {
         "hidden": false,
         "group": "",
@@ -28,11 +25,7 @@
       "windows": {
         "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
       },
-      "runtimeArgs": [
-        "--no-sandbox",
-        "--remote-debugging-port=9229",
-        "."
-      ],
+      "runtimeArgs": ["--no-sandbox", "--remote-debugging-port=9229", "."],
       "envFile": "${workspaceFolder}/.vscode/.debug.env",
       "console": "integratedTerminal"
     },
@@ -49,6 +42,6 @@
         // Skip files in host(VITE_DEV_SERVER_URL)
         "http://127.0.0.1:7777/**"
       ]
-    },
+    }
   ]
 }

@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable */
+
 const fs = require("fs"); // Import the filesystem module
 const os = require("os");
 const path = require("path");

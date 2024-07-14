@@ -32,6 +32,9 @@ class WindowsManager {
       y: y,
       webPreferences: {
         preload,
+        contextIsolation: false,
+        nodeIntegration: false,
+        webviewTag: false,
       },
       frame: false,
       titleBarStyle: "hidden",

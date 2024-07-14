@@ -36,7 +36,7 @@ module.exports = {
         transform: "transform",
       },
       transitionDuration: {
-        "400": "400ms",
+        400: "400ms",
       },
     },
   },
