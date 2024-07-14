@@ -18,13 +18,12 @@ const ReorModal: React.FC<ModalProps> = ({
   const modalRef = useRef<HTMLDivElement>(null)
   // const widthClass = getDimension(widthType as ModalWidthType);
 
-  const handleOffClick = (event: MouseEvent) => {
-    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-      onClose()
-    }
-  }
-
   useEffect(() => {
+    const handleOffClick = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        onClose()
+      }
+    }
     document.addEventListener('mousedown', handleOffClick)
     return () => {
       document.removeEventListener('mousedown', handleOffClick)
@@ -37,18 +36,19 @@ const ReorModal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex h-full items-center justify-center bg-black bg-opacity-40 ${tailwindStylesOnBackground}`}
+      className={`fixed inset-0 z-50 flex h-full items-center justify-center bg-black/40 ${tailwindStylesOnBackground}`}
     >
       <div
         ref={modalRef}
-        className="max-h-3xl flex max-w-4xl  flex-col items-center justify-center rounded-lg border border-solid border-gray-600 bg-dark-gray-c-three shadow-xl"
+        className="flex max-w-4xl  flex-col items-center justify-center rounded-lg border border-solid border-gray-600 bg-dark-gray-c-three shadow-xl"
       >
         <div className="z-50 h-0 w-full items-end border-b border-gray-700 px-4">
           {!hideCloseButton && (
             <div className="m-2 flex justify-end">
               <button
                 onClick={onClose}
-                className="flex size-5 cursor-pointer items-center justify-center border-none bg-transparent text-gray-600 hover:bg-slate-700 hover:bg-opacity-40"
+                className="flex size-5 cursor-pointer items-center justify-center border-none bg-transparent text-gray-600 hover:bg-slate-700/40"
+                type="button"
               >
                 <span className="text-3xl leading-none">&times;</span>
               </button>

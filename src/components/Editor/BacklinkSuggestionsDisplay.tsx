@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import React, { useRef, useEffect, useState, useMemo } from 'react'
 
 import posthog from 'posthog-js'
@@ -69,7 +70,7 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
         {filteredSuggestions.map((suggestion, index) => (
           <li
             key={suggestion} // Use a unique id property from the suggestion
-            className="p-1.25 cursor-pointer rounded p-1 text-sm hover:bg-gray-100"
+            className="cursor-pointer rounded p-1 text-sm hover:bg-gray-100"
             onClick={() => {
               posthog.capture('select_backlink_suggestion', {
                 rank: index + 1,

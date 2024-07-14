@@ -89,8 +89,9 @@ const backlinkPlugin = (
 
         doc.descendants((node, pos) => {
           if (node.isText) {
-            let match
-            while (node.text && (match = regex.exec(node.text)) !== null) {
+            while (node.text) {
+              const match = regex.exec(node.text)
+              if (match === null) break
               const start = pos + match.index
               const end = start + match[0].length
               const backlinkStart = start + match[1].length
@@ -167,3 +168,5 @@ export const BacklinkExtension = (
       return [backlinkPlugin(openRelativePathRef, updateSuggestionsState)]
     },
   })
+
+export default BacklinkExtension

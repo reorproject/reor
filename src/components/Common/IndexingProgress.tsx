@@ -45,7 +45,7 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({ indexingProgress })
           />
         </div>
         <div className="flex">
-          {indexingProgress == 0 && (
+          {indexingProgress === 0 && (
             <CircularProgress size={20} thickness={7} style={{ color: 'white' }} className="mr-2" />
           )}
 

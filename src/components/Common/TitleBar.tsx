@@ -44,7 +44,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
         />
       </div>
       <div
-        className="align-items-right mt-[0.5px] flex justify-end"
+        className="mt-[0.5px] flex justify-end"
         style={platform === 'win32' ? { marginRight: '8.5rem' } : { marginRight: '0.3rem' }}
       >
         {similarFilesOpen ? (

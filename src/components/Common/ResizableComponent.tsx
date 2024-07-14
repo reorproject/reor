@@ -42,6 +42,7 @@ const ResizableComponent: React.FC<ResizableComponentProps> = ({
         window.removeEventListener('mouseup', stopDragging)
       }
     }
+    return undefined
   }, [isDragging, onDrag, stopDragging])
 
   const getResizeHandleStyle = (): CSSProperties => ({

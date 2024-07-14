@@ -1,7 +1,18 @@
 import { DBEntry } from 'electron/main/vector-database/schema'
 import { ChatCompletionContentPart, ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 
-import { ChatFilters, ChatMessageToDisplay } from './Chat'
+export type ChatMessageToDisplay = ChatCompletionMessageParam & {
+  messageType: 'success' | 'error'
+  context: DBEntry[]
+  visibleContent?: string
+}
+
+export interface ChatFilters {
+  numberOfChunksToFetch: number
+  files: string[]
+  minDate?: Date
+  maxDate?: Date
+}
 
 export function formatOpenAIMessageContentIntoString(
   content: string | ChatCompletionContentPart[] | null | undefined,
@@ -62,28 +73,6 @@ export type ChatTemplate = {
 //   },
 // ];
 
-export const resolveRAGContext = async (query: string, chatFilters: ChatFilters): Promise<ChatMessageToDisplay> => {
-  // I mean like the only real places to get context from are like particular files or semantic search or full text search.
-  // and like it could be like that if a file is here
-
-  let results: DBEntry[] = []
-  if (chatFilters.files.length > 0) {
-    results = await window.fileSystem.getFilesystemPathsAsDBItems(chatFilters.files)
-  } else if (chatFilters.numberOfChunksToFetch > 0) {
-    const timeStampFilter = generateTimeStampFilter(chatFilters.minDate, chatFilters.maxDate)
-    results = await window.database.search(query, chatFilters.numberOfChunksToFetch, timeStampFilter)
-  }
-  return {
-    messageType: 'success',
-    role: 'user',
-    context: results,
-    content: `Based on the following context answer the question down below. \n\n\nContext: \n${results
-      .map((dbItem) => dbItem.content)
-      .join('\n\n')}\n\n\nQuery:\n${query}`,
-    visibleContent: query,
-  }
-}
-
 export const generateTimeStampFilter = (minDate?: Date, maxDate?: Date): string => {
   let filter = ''
 
@@ -101,4 +90,23 @@ export const generateTimeStampFilter = (minDate?: Date, maxDate?: Date): string 
   }
 
   return filter
+}
+
+export const resolveRAGContext = async (query: string, chatFilters: ChatFilters): Promise<ChatMessageToDisplay> => {
+  let results: DBEntry[] = []
+  if (chatFilters.files.length > 0) {
+    results = await window.fileSystem.getFilesystemPathsAsDBItems(chatFilters.files)
+  } else if (chatFilters.numberOfChunksToFetch > 0) {
+    const timeStampFilter = generateTimeStampFilter(chatFilters.minDate, chatFilters.maxDate)
+    results = await window.database.search(query, chatFilters.numberOfChunksToFetch, timeStampFilter)
+  }
+  return {
+    messageType: 'success',
+    role: 'user',
+    context: results,
+    content: `Based on the following context answer the question down below. \n\n\nContext: \n${results
+      .map((dbItem) => dbItem.content)
+      .join('\n\n')}\n\n\nQuery:\n${query}`,
+    visibleContent: query,
+  }
 }

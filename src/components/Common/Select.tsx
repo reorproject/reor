@@ -57,7 +57,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   }
 
   return (
-    <div className="flex-end flex w-full" ref={wrapperRef}>
+    <div className="flex w-full" ref={wrapperRef}>
       <div
         className="flex w-full cursor-pointer items-center  justify-between rounded-md border border-gray-300 bg-dark-gray-c-eight py-2 hover:bg-dark-gray-c-ten"
         onClick={toggleDropdown}
@@ -78,23 +78,22 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
             width: wrapperRef.current?.getBoundingClientRect().width,
           }}
         >
-          {options.map((option, index) => (
+          {options.map((option) => (
             <div
-              key={index}
+              key={option.value}
               className="flex cursor-pointer items-center justify-between bg-dark-gray-c-eight py-2 pl-6 pr-2 text-white hover:bg-dark-gray-c-ten "
               onClick={() => handleOptionClick(option.value)}
             >
               <span className="w-full">{option.label}</span>
-              {selectedValue === option.value ? (
-                <span className="text-blue-500">&#10003;</span>
-              ) : onDelete ? (
+              {selectedValue === option.value && <span className="text-blue-500">&#10003;</span>}
+              {selectedValue !== option.value && onDelete && (
                 <span
                   onClick={() => handleDeleteModelInDropdown(option.value)}
                   className="ml-2 text-[13px] text-red-700"
                 >
                   <FaTrash />
                 </span>
-              ) : null}
+              )}
             </div>
           ))}
 
