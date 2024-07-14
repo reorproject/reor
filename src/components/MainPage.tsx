@@ -157,7 +157,6 @@ const MainPageComponent: React.FC = () => {
             <div className="h-full grow overflow-hidden">
               <EditorManager
                 editor={editor}
-                filePath={filePath}
                 suggestionsState={suggestionsState}
                 flattenedFiles={flattenedFiles}
                 showSimilarFiles={showSimilarFiles}

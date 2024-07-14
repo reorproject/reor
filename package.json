@@ -39,6 +39,7 @@
     "@mui/material": "^5.15.11",
     "@radix-ui/colors": "^3.0.0",
     "@tailwindcss/typography": "^0.5.10",
+    "@tiptap/core": "^2.5.0",
     "@tiptap/extension-bubble-menu": "^2.4.0",
     "@tiptap/extension-document": "^2.5.0",
     "@tiptap/extension-link": "^2.2.4",

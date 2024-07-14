@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 // MIT License
 
 // Copyright (c) 2023 - 2024 Jeet Mandaliya (Github Username: sereneinserenade)
@@ -84,7 +85,7 @@ function processSearches(
   resultIndex: number,
 ): ProcessedSearches {
   const decorations: Decoration[] = []
-  const results: Range[] = []
+  let results: Range[] = []
 
   let textNodesWithPosition: TextNodesWithPosition[] = []
   let index = 0
@@ -116,21 +117,16 @@ function processSearches(
 
   textNodesWithPosition = textNodesWithPosition.filter(Boolean)
 
-  for (const element of textNodesWithPosition) {
-    const { text, pos } = element
-    const matches = Array.from(text.matchAll(searchTerm)).filter(([matchText]) => matchText.trim())
+  results = textNodesWithPosition.flatMap(({ text, pos }) => {
+    const matches = Array.from(text.matchAll(searchTerm))
+      .filter(([matchText]) => matchText.trim())
+      .filter((m) => m[0] !== '' && m.index !== undefined)
 
-    for (const m of matches) {
-      if (m[0] === '') break
-
-      if (m.index !== undefined) {
-        results.push({
-          from: pos + m.index,
-          to: pos + m.index + m[0].length,
-        })
-      }
-    }
-  }
+    return matches.map((m) => ({
+      from: pos + m.index!,
+      to: pos + m.index! + m[0].length,
+    }))
+  })
 
   for (let i = 0; i < results.length; i += 1) {
     const r = results[i]
@@ -203,11 +199,9 @@ const replaceAll = (
     tr.insertText(replaceTerm, from, to)
 
     const rebaseNextResultResponse = rebaseNextResult(replaceTerm, i, offset, resultsCopy)
-
-    if (!rebaseNextResultResponse) continue
-
-    offset = rebaseNextResultResponse[0]
-    resultsCopy = rebaseNextResultResponse[1]
+    if (rebaseNextResultResponse) {
+      ;[offset, resultsCopy] = rebaseNextResultResponse
+    }
   }
 
   if (dispatch) dispatch(tr)
@@ -339,9 +333,17 @@ export const SearchAndReplace = Extension.create<SearchAndReplaceOptions, Search
     const { editor } = this
     const { searchResultClass, disableRegex } = this.options
 
-    const setLastSearchTerm = (t: string) => (editor.storage.searchAndReplace.lastSearchTerm = t)
-    const setLastCaseSensitive = (t: boolean) => (editor.storage.searchAndReplace.lastCaseSensitive = t)
-    const setLastResultIndex = (t: number) => (editor.storage.searchAndReplace.lastResultIndex = t)
+    const setLastSearchTerm = (t: string) => {
+      editor.storage.searchAndReplace.lastSearchTerm = t
+    }
+
+    const setLastCaseSensitive = (t: boolean) => {
+      editor.storage.searchAndReplace.lastCaseSensitive = t
+    }
+
+    const setLastResultIndex = (t: number) => {
+      editor.storage.searchAndReplace.lastResultIndex = t
+    }
 
     return [
       new Plugin({

@@ -15,7 +15,56 @@ interface MenuPosition {
   y: number
 }
 
-interface EditorContextMenu {
+const copyCommand = (state: EditorState) => {
+  if (state.selection.empty) return false
+
+  const { from, to } = state.selection
+  const text = state.doc.textBetween(from, to, '')
+
+  navigator.clipboard.writeText(text)
+  return true
+}
+
+const cutCommand = (state: EditorState, dispatch: Dispatch | null) => {
+  if (state.selection.empty) return false
+
+  copyCommand(state)
+
+  // Remove text from the document
+  if (dispatch) dispatch(state.tr.deleteSelection().scrollIntoView())
+
+  return true
+}
+
+/**
+ *
+ * Pastes text that currently exists in clipboard
+ */
+const pasteCommand = async (editor: Editor) => {
+  if (navigator.clipboard) {
+    try {
+      const text = await navigator.clipboard.readText()
+      editor.commands.insertContent(text)
+    } catch (err) {
+      // don't throw error
+    }
+  }
+}
+
+/**
+ * Deletes the text that is selected.
+ */
+const deleteCommand = (state: EditorState, dispatch: Dispatch | null) => {
+  const transaction = state.tr.deleteSelection()
+
+  if (dispatch) {
+    dispatch(transaction)
+  }
+
+  return true
+}
+
+interface EditorContextMenuProps {
   editor: Editor | null
   menuPosition: MenuPosition
   setMenuVisible: (visible: boolean) => void
@@ -36,12 +85,11 @@ interface EditorContextMenu {
  * @returns Dropdown menu to perform actions on selected text
  *
  */
-const EditorContextMenu: React.FC<EditorContextMenu> = ({ editor, menuPosition, setMenuVisible }) => {
-  if (!editor) return
+const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosition, setMenuVisible }) => {
   const [showTableSelector, setShowTableSelector] = useState(false)
   /**
    * We use useRef instead of state's because we are changing the style of our DOM but DO NOT
-   * want to re-render. This style gets applied once and does not change, so no re-render is needed.
+   * want to re-render. This style gets applied once and does not change so no re-render is needed.
    */
   const tableButtonRef = useRef<HTMLLIElement>(null)
   const tableSelectorRef = useRef<HTMLDivElement>(null)
@@ -65,6 +113,8 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({ editor, menuPosition, 
       document.removeEventListener('mouseover', checkIfOutside)
     }
   }, [])
+
+  if (!editor) return
 
   const handleTableSelect = (rows: number, cols: number) => {
     editor.chain().focus().insertTable({ rows, cols, withHeaderRow: true }).run()
@@ -182,9 +232,9 @@ const TableSizeSelector: React.FC<TableSizeSelectorProps> = ({ onSelect }) => {
 
   const generateCells = () => {
     const rows = []
-    for (let i = 1; i <= maxRows; i++) {
+    for (let i = 1; i <= maxRows; i += 1) {
       const cols = []
-      for (let j = 1; j <= maxCols; j++) {
+      for (let j = 1; j <= maxCols; j += 1) {
         cols.push(
           <div
             key={j}
@@ -222,55 +272,10 @@ const TableSizeSelector: React.FC<TableSizeSelectorProps> = ({ onSelect }) => {
  *
  * Copies text that is selected
  */
-const copyCommand = (state: EditorState) => {
-  if (state.selection.empty) return false
-
-  const { from, to } = state.selection
-  const text = state.doc.textBetween(from, to, '')
-
-  navigator.clipboard.writeText(text)
-  return true
-}
 
 /**
  *
  * Cuts text that is selected
  */
-const cutCommand = (state: EditorState, dispatch: Dispatch | null) => {
-  if (state.selection.empty) return false
-
-  copyCommand(state)
-
-  // Remove text from the document
-  if (dispatch) dispatch(state.tr.deleteSelection().scrollIntoView())
-
-  return true
-}
-
-/**
- *
- * Pastes text that currently exists in clipboard
- */
-const pasteCommand = async (editor: Editor) => {
-  if (navigator.clipboard) {
-    try {
-      const text = await navigator.clipboard.readText()
-      editor.commands.insertContent(text)
-    } catch (err) {}
-  }
-}
-
-/**
- * Deletes the text that is selected.
- */
-const deleteCommand = (state: EditorState, dispatch: Dispatch | null) => {
-  const transaction = state.tr.deleteSelection()
-
-  if (dispatch) {
-    dispatch(transaction)
-  }
-
-  return true
-}
 
 export default EditorContextMenu

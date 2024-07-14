@@ -7,7 +7,6 @@ import EditorContextMenu from './EditorContextMenu'
 
 interface EditorManagerProps {
   editor: Editor | null
-  filePath: string
   suggestionsState: SuggestionsState | null | undefined
   flattenedFiles: { relativePath: string }[]
   showSimilarFiles: boolean
@@ -35,19 +34,6 @@ const EditorManager: React.FC<EditorManagerProps> = ({
     setSearchTerm(value)
     editor?.commands.setSearchTerm(value)
   }
-
-  const handleNextSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      editor?.commands.nextSearchResult()
-      goToSelection()
-      ;(event.target as HTMLInputElement).focus()
-    } else if (event.key === 'Escape') {
-      toggleSearch()
-      handleSearchChange('')
-    }
-  }
-
   const goToSelection = () => {
     if (!editor) return
     const { results, resultIndex } = editor.storage.searchAndReplace
@@ -57,6 +43,17 @@ const EditorManager: React.FC<EditorManagerProps> = ({
     const { node } = editor.view.domAtPos(editor.state.selection.anchor)
     if (node instanceof Element) {
       node.scrollIntoView?.(false)
+    }
+  }
+  const handleNextSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      editor?.commands.nextSearchResult()
+      goToSelection()
+      ;(event.target as HTMLInputElement).focus()
+    } else if (event.key === 'Escape') {
+      toggleSearch()
+      handleSearchChange('')
     }
   }
 
@@ -107,8 +104,9 @@ const EditorManager: React.FC<EditorManagerProps> = ({
             handleSearchChange('')
           }}
           placeholder="Search..."
+          // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus
-          className="absolute right-0 top-4 z-50 mr-14 mt-4 rounded-md border-none bg-dark-gray-c-ten bg-transparent p-2 text-white"
+          className="absolute right-0 top-4 z-50 mr-14 mt-4 rounded-md border-none  bg-transparent p-2 text-white"
         />
       )}
       {menuVisible && <EditorContextMenu editor={editor} menuPosition={menuPosition} setMenuVisible={setMenuVisible} />}
