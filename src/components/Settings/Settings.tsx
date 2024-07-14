@@ -56,7 +56,7 @@ const SettingsModal: React.FC<ModalProps> = ({
                 ? "bg-neutral-700 text-white font-semibold"
                 : "text-gray-200"
             }`}
-            onClick={() => { setActiveTab(SettingsTab.LLMSettings); }}
+            onClick={() => setActiveTab(SettingsTab.LLMSettings)}
           >
             LLM
           </div>
@@ -66,7 +66,7 @@ const SettingsModal: React.FC<ModalProps> = ({
                 ? "bg-neutral-700 text-white font-semibold"
                 : "text-gray-200"
             }`}
-            onClick={() => { setActiveTab(SettingsTab.EmbeddingModel); }}
+            onClick={() => setActiveTab(SettingsTab.EmbeddingModel)}
           >
             Embedding Model
           </div>
@@ -77,7 +77,7 @@ const SettingsModal: React.FC<ModalProps> = ({
                 ? "bg-neutral-700 text-white font-semibold"
                 : "text-gray-200"
             }`}
-            onClick={() => { setActiveTab(SettingsTab.TextGeneration); }}
+            onClick={() => setActiveTab(SettingsTab.TextGeneration)}
           >
             Text Generation{" "}
           </div>
@@ -97,7 +97,7 @@ const SettingsModal: React.FC<ModalProps> = ({
                 ? "bg-neutral-700 text-white font-semibold"
                 : "text-gray-200"
             }`}
-            onClick={() => { setActiveTab(SettingsTab.ANALYTICS); }}
+            onClick={() => setActiveTab(SettingsTab.ANALYTICS)}
           >
             Analytics{" "}
           </div>
@@ -107,7 +107,7 @@ const SettingsModal: React.FC<ModalProps> = ({
                 ? "bg-neutral-700 text-white font-semibold"
                 : "text-gray-200"
             }`}
-            onClick={() => { setActiveTab(SettingsTab.GeneralSettings); }}
+            onClick={() => setActiveTab(SettingsTab.GeneralSettings)}
           >
             General{" "}
           </div>
@@ -129,7 +129,7 @@ const SettingsModal: React.FC<ModalProps> = ({
           {activeTab === SettingsTab.EmbeddingModel && (
             <div className="w-full h-full">
               <EmbeddingModelSettings
-                handleUserHasChangedModel={() => { setWillNeedToReIndex(true); }}
+                handleUserHasChangedModel={() => setWillNeedToReIndex(true)}
               />
             </div>
           )}

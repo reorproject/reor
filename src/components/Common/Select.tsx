@@ -2,12 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 
 import { FaTrash } from "react-icons/fa";
 
-interface OptionType {
+type OptionType = {
   label: string;
   value: string;
-}
+};
 
-interface CustomSelectProps {
+type CustomSelectProps = {
   options: OptionType[];
   selectedValue: string;
   onChange: (value: string) => void;
@@ -17,7 +17,7 @@ interface CustomSelectProps {
   };
   onDelete?: (value: string) => void;
   centerText?: boolean;
-}
+};
 
 const CustomSelect: React.FC<CustomSelectProps> = ({
   options,
@@ -46,13 +46,13 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
     };
   }, [wrapperRef]);
 
-  const toggleDropdown = () => { setIsOpen(!isOpen); };
+  const toggleDropdown = () => setIsOpen(!isOpen);
   const handleOptionClick = (optionValue: string) => {
     onChange(optionValue);
     setIsOpen(false);
   };
 
-  const handleDeleteModelInDropdown = (selectedModel: string) => {
+  const handleDeleteModelInDropdown = async (selectedModel: string) => {
     if (onDelete) {
       onDelete(selectedModel);
       setIsOpen(false);
@@ -90,14 +90,14 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
             <div
               key={index}
               className="flex justify-between items-center py-2 pl-6 pr-2 bg-dark-gray-c-eight cursor-pointer text-white hover:bg-dark-gray-c-ten "
-              onClick={() => { handleOptionClick(option.value); }}
+              onClick={() => handleOptionClick(option.value)}
             >
               <span className="w-full">{option.label}</span>
               {selectedValue === option.value ? (
                 <span className="text-blue-500">&#10003;</span>
               ) : onDelete ? (
                 <span
-                  onClick={() => { handleDeleteModelInDropdown(option.value); }}
+                  onClick={() => handleDeleteModelInDropdown(option.value)}
                   className="ml-2 text-[13px] text-red-700"
                 >
                   <FaTrash />

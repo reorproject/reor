@@ -103,9 +103,9 @@ export const registerDBSessionHandlers = (
       if (
         errorToStringMainProcess(error).includes("Embedding function error")
       ) {
-        errorStr = `${errorToStringMainProcess(error)}. Please try downloading an embedding model from Hugging Face and attaching it in settings. More information can be found in settings.`;
+        errorStr = `${error}. Please try downloading an embedding model from Hugging Face and attaching it in settings. More information can be found in settings.`;
       } else {
-        errorStr = `${errorToStringMainProcess(error)}. Please try restarting or open a Github issue.`;
+        errorStr = `${error}. Please try restarting or open a Github issue.`;
       }
       event.sender.send("error-to-display-in-window", errorStr);
       console.error("Error during file indexing:", error);
@@ -193,6 +193,7 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
         store.get(StoreKeys.LLMGenerationParameters)
       );
 
+      try {
         let searchResults: DBEntry[] = [];
         const maxRAGExamples: number = store.get(StoreKeys.MaxRAGExamples);
         const windowInfo = windowManager.getWindowInfoForContents(event.sender);
@@ -234,7 +235,10 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
           ragPrompt,
           uniqueFilesReferenced,
         };
-      
+      } catch (error) {
+        console.error("Error searching database:", error);
+        throw errorToStringMainProcess(error);
+      }
     }
   );
 

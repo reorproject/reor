@@ -14,7 +14,7 @@ export function createPromptWithContextLimitFromContent(
   let tokenCount = tokenize(query + basePrompt).length;
 
   const contentArray: string[] = [];
-  let cutOffLine = "";
+  let cutOffLine: string = "";
   const contents =
     typeof content === "string"
       ? content.split("\n")

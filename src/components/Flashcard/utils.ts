@@ -81,30 +81,25 @@ export const getFlashcardVaultDirectory = async (): Promise<string> => {
   return vaultDirectoryWithFlashcards;
 };
 
-interface ParsedFlashcardData {
-  qnaPairs: FlashcardQAPair[];
-}
-
 export const getFlashcardQnaPairsFromJsonFile = async (
   selectedFlashcardFile: string
 ): Promise<FlashcardQAPairUI[]> => {
   if (!selectedFlashcardFile) {
     return [];
   }
-
   const flashcardFullFilePath = await window.path.join(
     await getFlashcardVaultDirectory(),
     selectedFlashcardFile
   );
 
   const fileData = await window.fileSystem.readFile(flashcardFullFilePath);
-
-  const parsedData = JSON.parse(fileData) as ParsedFlashcardData;
-
-  const qnaPairs: FlashcardQAPairUI[] = parsedData.qnaPairs.map((pair) => ({
-    ...pair,
-    isFlipped: false,
-  }));
-
+  const qnaPairs: FlashcardQAPairUI[] = (
+    JSON.parse(fileData).qnaPairs as FlashcardQAPair[]
+  ).map((pair) => {
+    return {
+      ...pair,
+      isFlipped: false,
+    };
+  });
   return qnaPairs;
 };

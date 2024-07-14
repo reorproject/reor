@@ -15,7 +15,7 @@ export const pathHandlers = () => {
     return path.sep;
   });
 
-  ipcMain.handle("join-path", (event, ...args: string[]) => {
+  ipcMain.handle("join-path", (event, ...args) => {
     return path.join(...args);
   });
 

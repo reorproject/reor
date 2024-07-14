@@ -20,12 +20,14 @@ export function formatOpenAIMessageContentIntoString(
   return content || undefined;
 }
 
-type ChatProperties = Record<string, string>;
+interface ChatProperties {
+  [key: string]: string; // Values must be strings
+}
 
-export interface ChatTemplate {
+export type ChatTemplate = {
   messageHistory: ChatCompletionMessageParam[];
   properties: ChatProperties;
-}
+};
 
 // function replaceContentInMessages(
 //   messages: ChatMessageToDisplay[],

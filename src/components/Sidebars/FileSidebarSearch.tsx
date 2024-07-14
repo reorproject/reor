@@ -55,7 +55,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
           type="text"
           className="mt-1 w-full pl-7 mr-1 pr-5 h-8 bg-neutral-700 text-white rounded-md border border-transparent focus:outline-none focus:border-white focus:ring-1 focus:ring-white"
           value={searchQuery}
-          onChange={(e) => { setSearchQuery(e.target.value); }}
+          onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Semantic search..."
         />
       </div>

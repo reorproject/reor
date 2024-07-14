@@ -14,7 +14,9 @@ const AnalyticsSettings: React.FC<AnalyticsSettingsProps> = () => {
     const fetchParams = async () => {
       const isAnalyticsEnabled = await window.electronStore.getAnalyticsMode();
 
-      setIsAnalyticsEnabled(isAnalyticsEnabled);
+      if (isAnalyticsEnabled !== undefined) {
+        setIsAnalyticsEnabled(isAnalyticsEnabled);
+      }
     };
 
     fetchParams();
@@ -22,8 +24,10 @@ const AnalyticsSettings: React.FC<AnalyticsSettingsProps> = () => {
 
   const handleSave = () => {
     // Execute the save function here
-    window.electronStore.setAnalyticsMode(isAnalyticsEnabled);
-    setUserHasMadeUpdate(false);
+    if (isAnalyticsEnabled !== undefined) {
+      window.electronStore.setAnalyticsMode(isAnalyticsEnabled);
+      setUserHasMadeUpdate(false);
+    }
   };
 
   return (

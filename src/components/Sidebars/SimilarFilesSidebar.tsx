@@ -219,17 +219,19 @@ export const SimilarEntriesComponent: React.FC<
           <div className="flex-grow overflow-y-auto overflow-x-hidden">
             {similarEntries.length > 0 ? (
               <div className="h-full w-full">
-                {similarEntries.map((dbResult, index) => (
-                  <div className="pb-2 pr-2 pl-2 pt-1" key={index}>
-                    <DBResultPreview
-                      key={index}
-                      dbResult={dbResult}
-                      onSelect={(path: string) => {
-                        onFileSelect(path);
-                      }}
-                    />
-                  </div>
-                ))}
+                {similarEntries
+                  .filter((dbResult) => dbResult)
+                  .map((dbResult, index) => (
+                    <div className="pb-2 pr-2 pl-2 pt-1" key={index}>
+                      <DBResultPreview
+                        key={index}
+                        dbResult={dbResult}
+                        onSelect={(path: string) => {
+                          onFileSelect(path);
+                        }}
+                      />
+                    </div>
+                  ))}
               </div>
             ) : !isLoadingSimilarEntries ? (
               <div className="flex flex-col items-center justify-center h-full w-full">

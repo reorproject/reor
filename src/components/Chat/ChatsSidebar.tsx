@@ -20,12 +20,17 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
   setShowChatbot,
 }) => {
   const currentSelectedChatID = useRef<string | undefined>();
-
+  useEffect(() => {
+    console.log("chatHistoriesMetadata", chatHistoriesMetadata);
+  }, [chatHistoriesMetadata]);
   useEffect(() => {
     const deleteChatRow = window.ipcRenderer.receive(
       "remove-chat-at-id",
-      (chatID: string) => {
-
+      (chatID) => {
+        // const filteredData = chatHistoriesMetadata.filter(
+        //   (item) => item.id !== chatID
+        // );
+        // setChatHistoriesMetadata(filteredData.reverse());
         if (chatID === currentSelectedChatID.current) {
           setShowChatbot(false);
         }

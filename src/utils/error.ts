@@ -1,6 +1,6 @@
 export function errorToStringRendererProcess(
   error: unknown,
-  depth = 0
+  depth: number = 0
 ): string {
   if (error instanceof Error) {
     let errorString = `${error.name}: ${error.message}`;

@@ -41,7 +41,7 @@ export const useFileByFilepath = () => {
     useState<boolean>(false);
   const [needToIndexEditorContent, setNeedToIndexEditorContent] =
     useState<boolean>(false);
-  const [spellCheckEnabled, setSpellCheckEnabled] = useState(false);
+  const [spellCheckEnabled, setSpellCheckEnabled] = useState<string>("false");
 
   useEffect(() => {
     const fetchSpellCheckMode = async () => {
@@ -62,7 +62,7 @@ export const useFileByFilepath = () => {
     position: null,
   });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
+  const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
 
   const setFileNodeToBeRenamed = async (filePath: string) => {
     const isDirectory = await window.fileSystem.isDirectory(filePath);
@@ -87,7 +87,8 @@ export const useFileByFilepath = () => {
       window.fileSystem.indexFileInDatabase(currentlyOpenedFilePath);
       setNeedToIndexEditorContent(false);
     }
-    const newFileContent = await window.fileSystem.readFile(newFilePath);
+    const newFileContent =
+      (await window.fileSystem.readFile(newFilePath)) ?? "";
     editor?.commands.setContent(newFileContent);
     setCurrentlyOpenedFilePath(newFilePath);
     setCurrentlyChangingFilePath(false);
@@ -134,23 +135,23 @@ export const useFileByFilepath = () => {
   };
 
   // Check if we should display markdown or not
-  // useEffect(() => {
-  //   const handleInitialStartup = async () => {
-  //     const isMarkdownSet = await window.electronStore.getDisplayMarkdown();
-  //     setDisplayMarkdown(isMarkdownSet);
-  //   };
+  useEffect(() => {
+    const handleInitialStartup = async () => {
+      const isMarkdownSet = await window.electronStore.getDisplayMarkdown();
+      setDisplayMarkdown(isMarkdownSet);
+    };
 
-  //   // Even listener
-  //   const handleChangeMarkdown = (isMarkdownSet: boolean) => {
-  //     setDisplayMarkdown(isMarkdownSet);
-  //   };
+    // Even listener
+    const handleChangeMarkdown = (isMarkdownSet: boolean) => {
+      setDisplayMarkdown(isMarkdownSet);
+    };
 
-  //   handleInitialStartup();
-  //   window.ipcRenderer.receive(
-  //     "display-markdown-changed",
-  //     handleChangeMarkdown
-  //   );
-  // }, []);
+    handleInitialStartup();
+    window.ipcRenderer.receive(
+      "display-markdown-changed",
+      handleChangeMarkdown
+    );
+  }, []);
 
   const editor = useEditor({
     autofocus: true,
@@ -210,7 +211,7 @@ export const useFileByFilepath = () => {
       editor.setOptions({
         editorProps: {
           attributes: {
-            spellcheck: spellCheckEnabled ? "true" : "false",
+            spellcheck: spellCheckEnabled,
           },
         },
       });
@@ -240,15 +241,17 @@ export const useFileByFilepath = () => {
   ) => {
     if (filePath !== null && needToWriteEditorContentToDisk && editor) {
       const markdownContent = getMarkdown(editor);
-      await window.fileSystem.writeFile({
-        filePath: filePath,
-        content: markdownContent,
-      });
+      if (markdownContent !== null) {
+        await window.fileSystem.writeFile({
+          filePath: filePath,
+          content: markdownContent,
+        });
 
-      console.log(
-        "setting is file content modified to false in actual save function"
-      );
-      setNeedToWriteEditorContentToDisk(false);
+        console.log(
+          "setting is file content modified to false in actual save function"
+        );
+        setNeedToWriteEditorContentToDisk(false);
+      }
     }
   };
 
@@ -337,7 +340,11 @@ export const useFileByFilepath = () => {
         fileContent: editor?.getHTML() || "",
         editor: editor,
       });
-      if (currentlyOpenedFilePath !== null && editor) {
+      if (
+        currentlyOpenedFilePath !== null &&
+        editor &&
+        editor.getHTML() !== null
+      ) {
         const markdown = getMarkdown(editor);
         await window.fileSystem.writeFile({
           filePath: currentlyOpenedFilePath,
@@ -380,9 +387,7 @@ export const useFileByFilepath = () => {
 
 function getMarkdown(editor: Editor) {
   // Fetch the current markdown content from the editor
-
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-  const originalMarkdown: string = editor.storage.markdown.getMarkdown();
+  const originalMarkdown = editor.storage.markdown.getMarkdown();
   // Replace the escaped square brackets with unescaped ones
   const modifiedMarkdown = originalMarkdown
     .replace(/\\\[/g, "[") // Replaces \[ with [

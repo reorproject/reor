@@ -36,7 +36,9 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
     console.log("updating embedding models");
     const embeddingModels = await window.electronStore.getEmbeddingModels();
     console.log("embedding models", embeddingModels);
-    setEmbeddingModels(embeddingModels);
+    if (embeddingModels) {
+      setEmbeddingModels(embeddingModels);
+    }
     console.log("getting default model");
     const defaultModel = await window.electronStore.getDefaultEmbeddingModel();
     console.log("default model", defaultModel);
@@ -52,9 +54,13 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
   // TODO: perhaps this can be removed as well...
   useEffect(() => {
     if (selectedModel) {
-      setCurrentError("");
+      if (setCurrentError) {
+        setCurrentError("");
+      }
     } else {
-      setCurrentError("No model selected");
+      if (setCurrentError) {
+        setCurrentError("No model selected");
+      }
     }
   }, [selectedModel]);
 
@@ -108,9 +114,7 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
           <div className="flex">
             <Button
               className="flex justify-between items-center w-[80px] py-2 border border-gray-300 rounded-md border-none cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten font-normal"
-              onClick={() => {
-                setIsNewLocalEmbeddingModelModalOpen(true);
-              }}
+              onClick={() => setIsNewLocalEmbeddingModelModalOpen(true)}
               placeholder=""
             >
               Attach
@@ -129,9 +133,7 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
           <div className="flex">
             <Button
               className="flex justify-between items-center w-[80px] py-2 border border-gray-300 rounded-md border-none cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten font-normal"
-              onClick={() => {
-                setIsContextLengthModalOpen(true);
-              }}
+              onClick={() => setIsContextLengthModalOpen(true)}
               placeholder=""
             >
               Attach
