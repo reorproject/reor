@@ -20,6 +20,7 @@ const MainPageComponent: React.FC = () => {
   const [showChatbot, setShowChatbot] = useState<boolean>(false)
   const [showSimilarFiles, setShowSimilarFiles] = useState(true)
   const [sidebarShowing, setSidebarShowing] = useState<SidebarAbleToShow>('files')
+
   const {
     filePath,
     editor,
