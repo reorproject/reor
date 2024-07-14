@@ -1,10 +1,15 @@
-import { DBEntry } from 'electron/main/vector-database/schema'
+import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema'
 import { ChatCompletionContentPart, ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 
 export type ChatMessageToDisplay = ChatCompletionMessageParam & {
   messageType: 'success' | 'error'
   context: DBEntry[]
   visibleContent?: string
+}
+
+export type ChatHistory = {
+  id: string
+  displayableChatHistory: ChatMessageToDisplay[]
 }
 
 export interface ChatFilters {
@@ -109,4 +114,30 @@ export const resolveRAGContext = async (query: string, chatFilters: ChatFilters)
       .join('\n\n')}\n\n\nQuery:\n${query}`,
     visibleContent: query,
   }
+}
+
+export const getChatHistoryContext = (chatHistory: ChatHistory | undefined): DBQueryResult[] => {
+  if (!chatHistory) return []
+  const contextForChat = chatHistory.displayableChatHistory.map((message) => message.context).flat()
+  return contextForChat as DBQueryResult[]
+}
+
+export const getDisplayableChatName = (chat: ChatHistory): string => {
+  const actualHistory = chat.displayableChatHistory
+
+  if (actualHistory.length === 0 || !actualHistory[actualHistory.length - 1].content) {
+    return 'Empty Chat'
+  }
+
+  const lastMsg = actualHistory[0]
+
+  if (lastMsg.visibleContent) {
+    return lastMsg.visibleContent.slice(0, 30)
+  }
+
+  const lastMessage = formatOpenAIMessageContentIntoString(lastMsg.content)
+  if (!lastMessage || lastMessage === '') {
+    return 'Empty Chat'
+  }
+  return lastMessage.slice(0, 30)
 }

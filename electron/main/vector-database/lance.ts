@@ -1,9 +1,18 @@
 import * as lancedb from 'vectordb'
 
-import { errorToStringMainProcess } from '../common/error'
+import errorToStringMainProcess from '../common/error'
 
 import { EnhancedEmbeddingFunction } from './embeddings'
 import CreateDatabaseSchema, { isStringifiedSchemaEqual } from './schema'
+
+export const generateTableName = (embeddingFuncName: string, userDirectory: string): string => {
+  const sanitizeForFileSystem = (str: string) => str.replace(/[<>:"/\\|?*]/g, '_')
+
+  const directoryPathAlias = sanitizeForFileSystem(userDirectory)
+  const sanitizedEmbeddingFuncName = sanitizeForFileSystem(embeddingFuncName)
+
+  return `ragnote_table_${sanitizedEmbeddingFuncName}_${directoryPathAlias}`
+}
 
 const GetOrCreateLanceTable = async (
   db: lancedb.Connection,
@@ -43,15 +52,6 @@ const GetOrCreateLanceTable = async (
 
     throw new Error(errorMessage)
   }
-}
-
-export const generateTableName = (embeddingFuncName: string, userDirectory: string): string => {
-  const sanitizeForFileSystem = (str: string) => str.replace(/[<>:"/\\|?*]/g, '_')
-
-  const directoryPathAlias = sanitizeForFileSystem(userDirectory)
-  const sanitizedEmbeddingFuncName = sanitizeForFileSystem(embeddingFuncName)
-
-  return `ragnote_table_${sanitizedEmbeddingFuncName}_${directoryPathAlias}`
 }
 
 export default GetOrCreateLanceTable

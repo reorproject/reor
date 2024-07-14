@@ -2,7 +2,7 @@ import Store from 'electron-store'
 
 import { LLMConfig, StoreKeys, StoreSchema } from '../electron-store/storeConfig'
 
-import { OllamaService } from './models/Ollama'
+import OllamaService from './models/Ollama'
 
 export function validateAIModelConfig(config: LLMConfig): string | null {
   // Validate localPath: ensure it's not empty
@@ -49,25 +49,6 @@ export async function addOrUpdateLLMSchemaInStore(store: Store<StoreSchema>, mod
   }
 }
 
-export async function removeLLM(
-  store: Store<StoreSchema>,
-  ollamaService: OllamaService,
-  modelName: string,
-): Promise<void> {
-  const existingModels = (store.get(StoreKeys.LLMs) as LLMConfig[]) || []
-
-  const foundModel = await getLLMConfig(store, ollamaService, modelName)
-
-  if (!foundModel) {
-    return
-  }
-
-  const updatedModels = existingModels.filter((model) => model.modelName !== modelName)
-  store.set(StoreKeys.LLMs, updatedModels)
-
-  ollamaService.deleteModel(modelName)
-}
-
 export async function getAllLLMConfigs(store: Store<StoreSchema>, ollamaSession: OllamaService): Promise<LLMConfig[]> {
   const llmConfigsFromStore = store.get(StoreKeys.LLMs)
   const ollamaLLMConfigs = await ollamaSession.getAvailableModels()
@@ -86,4 +67,23 @@ export async function getLLMConfig(
     return llmConfigs.find((model: LLMConfig) => model.modelName === modelName)
   }
   return undefined
+}
+
+export async function removeLLM(
+  store: Store<StoreSchema>,
+  ollamaService: OllamaService,
+  modelName: string,
+): Promise<void> {
+  const existingModels = (store.get(StoreKeys.LLMs) as LLMConfig[]) || []
+
+  const foundModel = await getLLMConfig(store, ollamaService, modelName)
+
+  if (!foundModel) {
+    return
+  }
+
+  const updatedModels = existingModels.filter((model) => model.modelName !== modelName)
+  store.set(StoreKeys.LLMs, updatedModels)
+
+  ollamaService.deleteModel(modelName)
 }

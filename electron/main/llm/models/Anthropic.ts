@@ -1,3 +1,5 @@
+/* eslint-disable class-methods-use-this */
+/* eslint-disable no-restricted-syntax */
 import Anthropic from '@anthropic-ai/sdk'
 import { Message, MessageParam, MessageStreamEvent } from '@anthropic-ai/sdk/resources'
 import { LLMGenerationParameters, LLMConfig } from 'electron/main/electron-store/storeConfig'
@@ -6,8 +8,9 @@ import { ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 
 import { customFetchUsingElectronNetStreaming } from '../../common/network'
 import { LLMSessionService } from '../types'
+import cleanMessageForAnthropic from '../utils'
 
-export class AnthropicModelSessionService implements LLMSessionService {
+class AnthropicModelSessionService implements LLMSessionService {
   public getTokenizer = (llmName: string): ((text: string) => number[]) => {
     let tokenEncoding: Tiktoken
     try {
@@ -61,7 +64,7 @@ export class AnthropicModelSessionService implements LLMSessionService {
 
     const stream = await anthropic.messages.create({
       model: modelName,
-      messages: messageHistory.map(cleanMessage),
+      messages: messageHistory.map(cleanMessageForAnthropic),
       stream: true,
       temperature: generationParams?.temperature,
       max_tokens: generationParams?.maxTokens || 1024,
@@ -72,15 +75,4 @@ export class AnthropicModelSessionService implements LLMSessionService {
   }
 }
 
-function cleanMessage(message: ChatCompletionMessageParam): MessageParam {
-  if (typeof message.content !== 'string') {
-    throw new Error('Message content is not a string')
-  }
-  if (message.role === 'system') {
-    return { role: 'user', content: message.content }
-  }
-  if (message.role === 'user' || message.role === 'assistant') {
-    return { role: message.role, content: message.content }
-  }
-  throw new Error('Message role is not valid')
-}
+export default AnthropicModelSessionService

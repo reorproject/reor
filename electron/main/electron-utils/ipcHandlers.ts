@@ -6,7 +6,7 @@ import Store from 'electron-store'
 import WindowsManager from '../common/windowManager'
 import { StoreKeys, StoreSchema } from '../electron-store/storeConfig'
 
-export const electronUtilsHandlers = (
+const electronUtilsHandlers = (
   store: Store<StoreSchema>,
   windowsManager: WindowsManager,
   preload: string,
@@ -142,8 +142,8 @@ export const electronUtilsHandlers = (
     if (browserWindow) menu.popup({ window: browserWindow })
   })
 
-  ipcMain.handle('open-external', (event, url) => {
-    shell.openExternal(url)
+  ipcMain.handle('open-external', (event, _url) => {
+    shell.openExternal(_url)
   })
 
   ipcMain.handle('get-platform', async () => process.platform)
@@ -154,3 +154,5 @@ export const electronUtilsHandlers = (
 
   ipcMain.handle('get-reor-app-version', async () => app.getVersion())
 }
+
+export default electronUtilsHandlers

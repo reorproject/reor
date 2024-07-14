@@ -9,9 +9,8 @@ import { FaMagic } from 'react-icons/fa'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 
-import { ChatHistory, ChatMessageToDisplay } from '../Chat/Chat'
-import { formatOpenAIMessageContentIntoString } from '../Chat/chatUtils'
-import { useOutsideClick } from '../Chat/hooks/use-outside-click'
+import { ChatHistory, ChatMessageToDisplay, formatOpenAIMessageContentIntoString } from '../Chat/chatUtils'
+import useOutsideClick from '../Chat/hooks/use-outside-click'
 import { HighlightData } from '../Editor/HighlightExtension'
 
 interface WritingAssistantProps {
@@ -178,7 +177,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
       newContent: string,
       newMessageType: 'success' | 'error',
     ) => {
-      setCurrentChatHistory((prev) => {
+      setCurrentChatHistory((prev: ChatHistory | undefined) => {
         if (chatID !== prev?.id) return prev
         const newDisplayableHistory = prev?.displayableChatHistory || []
         if (newDisplayableHistory.length > 0) {

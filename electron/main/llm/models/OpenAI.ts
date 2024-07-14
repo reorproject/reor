@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import { LLMGenerationParameters, LLMConfig } from 'electron/main/electron-store/storeConfig'
 import { Tiktoken, TiktokenModel, encodingForModel } from 'js-tiktoken'
 import OpenAI from 'openai'
@@ -6,7 +7,7 @@ import { ChatCompletion, ChatCompletionChunk, ChatCompletionMessageParam } from 
 import { customFetchUsingElectronNetStreaming } from '../../common/network'
 import { LLMSessionService } from '../types'
 
-export class OpenAIModelSessionService implements LLMSessionService {
+class OpenAIModelSessionService implements LLMSessionService {
   public getTokenizer = (llmName: string): ((text: string) => number[]) => {
     let tokenEncoding: Tiktoken
     try {
@@ -71,8 +72,11 @@ export class OpenAIModelSessionService implements LLMSessionService {
       },
     })
 
+    // eslint-disable-next-line no-restricted-syntax
     for await (const chunk of stream) {
       handleChunk(chunk)
     }
   }
 }
+
+export default OpenAIModelSessionService

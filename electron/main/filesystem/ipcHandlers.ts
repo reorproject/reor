@@ -9,13 +9,16 @@ import { StoreKeys, StoreSchema } from '../electron-store/storeConfig'
 import { createPromptWithContextLimitFromContent, PromptWithContextLimit } from '../llm/contextLimit'
 import { ollamaService, openAISession } from '../llm/ipcHandlers'
 import { getLLMConfig } from '../llm/llmConfig'
-import { addExtensionToFilenameIfNoExtensionPresent } from '../path/path'
+import addExtensionToFilenameIfNoExtensionPresent from '../path/path'
 import { DBEntry } from '../vector-database/schema'
-import { convertFileInfoListToDBItems, updateFileInTable } from '../vector-database/tableHelperFunctions'
+import {
+  convertFileInfoListToDBItems,
+  orchestrateEntryMove,
+  updateFileInTable,
+} from '../vector-database/tableHelperFunctions'
 
 import {
   GetFilesInfoTree,
-  orchestrateEntryMove,
   createFileRecursive,
   isHidden,
   GetFilesInfoListForListOfPaths,
@@ -26,7 +29,8 @@ import {
 } from './filesystem'
 import { FileInfoTree, AugmentPromptWithFileProps, WriteFileProps, RenameFileProps } from './types'
 
-export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: WindowsManager) => {
+const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: WindowsManager) => {
+  const windowsManager = _windowsManager
   ipcMain.handle('get-files-tree-for-window', async (event): Promise<FileInfoTree> => {
     const directoryPath = windowsManager.getVaultDirectoryForWinContents(event.sender)
     if (!directoryPath) return []
@@ -57,9 +61,8 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
 
       if (stats.isDirectory()) {
         // For directories (Node.js v14.14.0 and later)
-        fs.rm(filePath, { recursive: true }, (err) => {
-          if (err) {
-          }
+        fs.rm(filePath, { recursive: true }, () => {
+          // hi
         })
 
         const windowInfo = windowsManager.getWindowInfoForContents(event.sender)
@@ -68,9 +71,8 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
         }
         await windowInfo.dbTableClient.deleteDBItemsByFilePaths([filePath])
       } else {
-        fs.unlink(filePath, (err) => {
-          if (err) {
-          }
+        fs.unlink(filePath, () => {
+          // hi
         })
 
         const windowInfo = windowsManager.getWindowInfoForContents(event.sender)
@@ -102,7 +104,7 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
 
     windowsManager.watcher?.unwatch(windowInfo?.vaultDirectoryForWindow)
 
-    if (process.platform == 'win32') {
+    if (process.platform === 'win32') {
       windowsManager.watcher?.close().then(() => {
         fs.rename(renameFileProps.oldFilePath, renameFileProps.newFilePath, (err) => {
           if (err) {
@@ -145,19 +147,18 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
   })
 
   ipcMain.handle('create-directory', async (event, dirPath: string): Promise<void> => {
-    const mkdirRecursiveSync = (dirPath: string) => {
-      const parentDir = path.dirname(dirPath)
+    const mkdirRecursiveSync = (_dirPath: string) => {
+      const parentDir = path.dirname(_dirPath)
       if (!fs.existsSync(parentDir)) {
         mkdirRecursiveSync(parentDir)
       }
-      if (!fs.existsSync(dirPath)) {
-        fs.mkdirSync(dirPath)
+      if (!fs.existsSync(_dirPath)) {
+        fs.mkdirSync(_dirPath)
       }
     }
 
     if (!fs.existsSync(dirPath)) {
       mkdirRecursiveSync(dirPath)
-    } else {
     }
   })
 
@@ -172,39 +173,31 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
   ipcMain.handle(
     'augment-prompt-with-file',
     async (_event, { prompt, llmName, filePath }: AugmentPromptWithFileProps): Promise<PromptWithContextLimit> => {
-      try {
-        const content = fs.readFileSync(filePath, 'utf-8')
+      const content = fs.readFileSync(filePath, 'utf-8')
 
-        const llmSession = openAISession
-        const llmConfig = await getLLMConfig(store, ollamaService, llmName)
-        if (!llmConfig) {
-          throw new Error(`LLM ${llmName} not configured.`)
-        }
-        const systemPrompt = 'Based on the following information:\n'
-        const { prompt: filePrompt, contextCutoffAt } = createPromptWithContextLimitFromContent(
-          content,
-          systemPrompt,
-          prompt,
-          llmSession.getTokenizer(llmName),
-          llmConfig.contextLength,
-        )
-        return { prompt: filePrompt, contextCutoffAt }
-      } catch (error) {
-        throw error
+      const llmSession = openAISession
+      const llmConfig = await getLLMConfig(store, ollamaService, llmName)
+      if (!llmConfig) {
+        throw new Error(`LLM ${llmName} not configured.`)
       }
+      const systemPrompt = 'Based on the following information:\n'
+      const { prompt: filePrompt, contextCutoffAt } = createPromptWithContextLimitFromContent(
+        content,
+        systemPrompt,
+        prompt,
+        llmSession.getTokenizer(llmName),
+        llmConfig.contextLength,
+      )
+      return { prompt: filePrompt, contextCutoffAt }
     },
   )
 
   ipcMain.handle('get-filesystem-paths-as-db-items', async (_event, filePaths: string[]): Promise<DBEntry[]> => {
-    try {
-      const fileItems = GetFilesInfoListForListOfPaths(filePaths)
+    const fileItems = GetFilesInfoListForListOfPaths(filePaths)
 
-      const dbItems = await convertFileInfoListToDBItems(fileItems)
+    const dbItems = await convertFileInfoListToDBItems(fileItems)
 
-      return dbItems.flat()
-    } catch (error) {
-      throw error
-    }
+    return dbItems.flat()
   })
 
   ipcMain.handle(
@@ -321,3 +314,5 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
     return []
   })
 }
+
+export default registerFileHandlers

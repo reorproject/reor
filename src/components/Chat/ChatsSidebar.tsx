@@ -1,10 +1,49 @@
 import React, { useEffect, useRef } from 'react'
 
-import { ChatHistory } from './Chat'
 import { ChatHistoryMetadata } from './hooks/use-chat-history'
+import { ChatHistory } from './chatUtils'
+
+export interface ChatItemProps {
+  chatMetadata: ChatHistoryMetadata
+  selectedChatID: string | null
+  onChatSelect: (path: string) => void
+  // currentSelectedChatID: React.MutableRefObject<string | undefined>
+}
+
+export const ChatItem: React.FC<ChatItemProps> = ({
+  chatMetadata,
+  selectedChatID,
+  onChatSelect,
+  // currentSelectedChatID,
+}) => {
+  const isSelected = chatMetadata.id === selectedChatID
+
+  const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-neutral-700 h-full mt-0 mb-0 ${
+    isSelected ? 'bg-neutral-700 text-white font-semibold' : 'text-gray-200'
+  }`
+
+  const handleContextMenu = (e: React.MouseEvent) => {
+    e.preventDefault()
+    window.electronUtils.showChatItemContext(chatMetadata)
+  }
+
+  return (
+    <div>
+      <div
+        onClick={() => {
+          onChatSelect(chatMetadata.id)
+          // currentSelectedChatID.current = chatMetadata.id
+        }}
+        className={itemClasses}
+        onContextMenu={handleContextMenu}
+      >
+        <span className="mt-0 flex-1 truncate text-[13px]">{chatMetadata.displayName}</span>
+      </div>
+    </div>
+  )
+}
 
 interface ChatListProps {
-  // chatHistories: ChatHistory[];
   chatHistoriesMetadata: ChatHistoryMetadata[]
   currentChatHistory: ChatHistory | undefined
   onSelect: (chatID: string) => void
@@ -36,7 +75,7 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
     return () => {
       deleteChatRow()
     }
-  }, [chatHistoriesMetadata])
+  }, [chatHistoriesMetadata, setShowChatbot])
 
   return (
     <div className="h-full overflow-y-auto bg-neutral-800">
@@ -57,49 +96,9 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
             chatMetadata={chatMetadata}
             selectedChatID={currentChatHistory?.id || ''}
             onChatSelect={onSelect}
-            currentSelectedChatID={currentSelectedChatID}
+            // currentSelectedChatID={currentSelectedChatID}
           />
         ))}
-    </div>
-  )
-}
-
-export interface ChatItemProps {
-  chatMetadata: ChatHistoryMetadata
-  selectedChatID: string | null
-  onChatSelect: (path: string) => void
-  currentSelectedChatID: React.MutableRefObject<string | undefined>
-}
-
-export const ChatItem: React.FC<ChatItemProps> = ({
-  chatMetadata,
-  selectedChatID,
-  onChatSelect,
-  currentSelectedChatID,
-}) => {
-  const isSelected = chatMetadata.id === selectedChatID
-
-  const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-neutral-700 h-full mt-0 mb-0 ${
-    isSelected ? 'bg-neutral-700 text-white font-semibold' : 'text-gray-200'
-  }`
-
-  const handleContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault()
-    window.electronUtils.showChatItemContext(chatMetadata)
-  }
-
-  return (
-    <div>
-      <div
-        onClick={() => {
-          onChatSelect(chatMetadata.id)
-          currentSelectedChatID.current = chatMetadata.id
-        }}
-        className={itemClasses}
-        onContextMenu={handleContextMenu}
-      >
-        <span className="mt-0 flex-1 truncate text-[13px]">{chatMetadata.displayName}</span>
-      </div>
     </div>
   )
 }

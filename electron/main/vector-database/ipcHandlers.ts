@@ -5,7 +5,7 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import Store from 'electron-store'
 import * as lancedb from 'vectordb'
 
-import { errorToStringMainProcess } from '../common/error'
+import errorToStringMainProcess from '../common/error'
 import WindowsManager from '../common/windowManager'
 import { getDefaultEmbeddingModelConfig } from '../electron-store/ipcHandlers'
 import { StoreKeys, StoreSchema } from '../electron-store/storeConfig'
@@ -16,7 +16,7 @@ import { getLLMConfig } from '../llm/llmConfig'
 
 import { rerankSearchedEmbeddings } from './embeddings'
 import { DBEntry, DatabaseFields } from './schema'
-import { RepopulateTableWithMissingItems } from './tableHelperFunctions'
+import { formatTimestampForLanceDB, RepopulateTableWithMissingItems } from './tableHelperFunctions'
 
 export interface PromptWithRagResults {
   ragPrompt: string
@@ -29,20 +29,17 @@ export interface BasePromptRequirements {
   filePathToBeUsedAsContext?: string
 }
 
-export const registerDBSessionHandlers = (store: Store<StoreSchema>, windowManager: WindowsManager) => {
+export const registerDBSessionHandlers = (store: Store<StoreSchema>, _windowManager: WindowsManager) => {
   let dbConnection: lancedb.Connection
+  const windowManager = _windowManager
 
   ipcMain.handle('search', async (event, query: string, limit: number, filter?: string): Promise<DBEntry[]> => {
-    try {
-      const windowInfo = windowManager.getWindowInfoForContents(event.sender)
-      if (!windowInfo) {
-        throw new Error('Window info not found.')
-      }
-      const searchResults = await windowInfo.dbTableClient.search(query, limit, filter)
-      return searchResults
-    } catch (error) {
-      throw error
+    const windowInfo = windowManager.getWindowInfoForContents(event.sender)
+    if (!windowInfo) {
+      throw new Error('Window info not found.')
     }
+    const searchResults = await windowInfo.dbTableClient.search(query, limit, filter)
+    return searchResults
   })
 
   ipcMain.handle('index-files-in-directory', async (event) => {
@@ -89,18 +86,14 @@ export const registerDBSessionHandlers = (store: Store<StoreSchema>, windowManag
   ipcMain.handle(
     'search-with-reranking',
     async (event, query: string, limit: number, filter?: string): Promise<DBEntry[]> => {
-      try {
-        const windowInfo = windowManager.getWindowInfoForContents(event.sender)
-        if (!windowInfo) {
-          throw new Error('Window info not found.')
-        }
-        const searchResults = await windowInfo.dbTableClient.search(query, limit, filter)
-
-        const rankedResults = await rerankSearchedEmbeddings(query, searchResults)
-        return rankedResults
-      } catch (error) {
-        throw error
+      const windowInfo = windowManager.getWindowInfoForContents(event.sender)
+      if (!windowInfo) {
+        throw new Error('Window info not found.')
       }
+      const searchResults = await windowInfo.dbTableClient.search(query, limit, filter)
+
+      const rankedResults = await rerankSearchedEmbeddings(query, searchResults)
+      return rankedResults
     },
   )
 
@@ -183,7 +176,7 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
           uniqueFilesReferenced,
         }
       } catch (error) {
-        throw errorToStringMainProcess(error)
+        throw new Error(errorToStringMainProcess(error))
       }
     },
   )
@@ -251,22 +244,4 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
   )
 
   ipcMain.handle('get-database-fields', () => DatabaseFields)
-}
-
-function formatTimestampForLanceDB(date: Date): string {
-  const year = date.getFullYear()
-  const month = date.getMonth() + 1 // getMonth() is zero-based
-  const day = date.getDate()
-  const hours = date.getHours()
-  const minutes = date.getMinutes()
-  const seconds = date.getSeconds()
-
-  // Pad single digits with leading zeros
-  const monthPadded = month.toString().padStart(2, '0')
-  const dayPadded = day.toString().padStart(2, '0')
-  const hoursPadded = hours.toString().padStart(2, '0')
-  const minutesPadded = minutes.toString().padStart(2, '0')
-  const secondsPadded = seconds.toString().padStart(2, '0')
-
-  return `timestamp '${year}-${monthPadded}-${dayPadded} ${hoursPadded}:${minutesPadded}:${secondsPadded}'`
 }

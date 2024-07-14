@@ -5,7 +5,20 @@ import { EmbeddingModelConfig } from '../electron-store/storeConfig'
 import { EnhancedEmbeddingFunction, createEmbeddingFunction } from './embeddings'
 import GetOrCreateLanceTable from './lance'
 import { DBEntry, DBQueryResult, DatabaseFields } from './schema'
-import { sanitizePathForDatabase, convertRecordToDBType } from './tableHelperFunctions'
+
+export function unsanitizePathForFileSystem(dbPath: string): string {
+  return dbPath.replace(/''/g, "'")
+}
+
+export function convertRecordToDBType<T extends DBEntry | DBQueryResult>(record: Record<string, unknown>): T | null {
+  const recordWithType = record as T
+  recordWithType.notepath = unsanitizePathForFileSystem(recordWithType.notepath)
+  return recordWithType
+}
+
+export function sanitizePathForDatabase(filePath: string): string {
+  return filePath.replace(/'/g, "''")
+}
 
 class LanceDBTableWrapper {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -23,10 +36,11 @@ class LanceDBTableWrapper {
     this.lanceTable = await GetOrCreateLanceTable(dbConnection, this.embedFun, userDirectory)
   }
 
-  async add(data: DBEntry[], onProgress?: (progress: number) => void): Promise<void> {
-    data = data
+  async add(_data: DBEntry[], onProgress?: (progress: number) => void): Promise<void> {
+    const data = _data
       .filter((x) => x.content !== '')
-      .map((x) => {
+      .map((_x) => {
+        const x = _x
         x.notepath = sanitizePathForDatabase(x.notepath)
         return x
       })
@@ -41,20 +55,18 @@ class LanceDBTableWrapper {
       chunks.push(recordEntry.slice(i, i + numberOfChunksToIndexAtOnce))
     }
 
-    if (chunks.length == 0) return
+    if (chunks.length === 0) return
 
-    let index = 0
     const totalChunks = chunks.length
-    for (const chunk of chunks) {
+    chunks.forEach(async (chunk, index) => {
       const arrowTableOfChunk = makeArrowTable(chunk)
       await this.lanceTable.add(arrowTableOfChunk)
 
-      index++
-      const progress = index / totalChunks
+      const progress = (index + 1) / totalChunks
       if (onProgress) {
         onProgress(progress)
       }
-    }
+    })
   }
 
   async deleteDBItemsByFilePaths(filePaths: string[]): Promise<void> {
@@ -112,11 +124,6 @@ class LanceDBTableWrapper {
     const rawResults = await this.lanceTable.filter(filterString).limit(limit).execute()
     const mapped = rawResults.map(convertRecordToDBType<DBEntry>)
     return mapped as DBEntry[]
-  }
-
-  async countRows(): Promise<number> {
-    this.lanceTable.countRows
-    return this.lanceTable.countRows()
   }
 }
 

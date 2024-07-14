@@ -8,25 +8,6 @@ const store = new Store<StoreSchema>()
 
 const chunkSize = store.get(StoreKeys.ChunkSize)
 
-export const chunkMarkdownByHeadingsAndByCharsIfBig = async (markdownContent: string): Promise<string[]> => {
-  const chunkOverlap = 20
-  const chunksByHeading = chunkMarkdownByHeadings(markdownContent)
-
-  const chunksWithBigChunksSplit: string[] = []
-  const chunksWithSmallChunksSplit: string[] = []
-  chunksByHeading.forEach((chunk) => {
-    if (chunk.length > chunkSize) {
-      chunksWithBigChunksSplit.push(chunk)
-    } else {
-      chunksWithSmallChunksSplit.push(chunk)
-    }
-  })
-
-  const chunkedRecursively = await chunkStringsRecursively(chunksWithBigChunksSplit, chunkSize, chunkOverlap)
-
-  return chunksWithSmallChunksSplit.concat(chunkedRecursively)
-}
-
 export function chunkMarkdownByHeadings(markdownContent: string): string[] {
   const lines = markdownContent.split('\n')
   const chunks: string[] = []
@@ -50,15 +31,34 @@ export function chunkMarkdownByHeadings(markdownContent: string): string[] {
 
 export const chunkStringsRecursively = async (
   strings: string[],
-  chunkSize: number,
+  _chunkSize: number,
   chunkOverlap: number,
 ): Promise<string[]> => {
   const splitter = new RecursiveCharacterTextSplitter({
-    chunkSize,
+    chunkSize: _chunkSize,
     chunkOverlap,
   })
 
   const chunks = await splitter.createDocuments(strings)
   const mappedChunks = chunks.map((chunk) => chunk.pageContent)
   return mappedChunks
+}
+
+export const chunkMarkdownByHeadingsAndByCharsIfBig = async (markdownContent: string): Promise<string[]> => {
+  const chunkOverlap = 20
+  const chunksByHeading = chunkMarkdownByHeadings(markdownContent)
+
+  const chunksWithBigChunksSplit: string[] = []
+  const chunksWithSmallChunksSplit: string[] = []
+  chunksByHeading.forEach((chunk) => {
+    if (chunk.length > chunkSize) {
+      chunksWithBigChunksSplit.push(chunk)
+    } else {
+      chunksWithSmallChunksSplit.push(chunk)
+    }
+  })
+
+  const chunkedRecursively = await chunkStringsRecursively(chunksWithBigChunksSplit, chunkSize, chunkOverlap)
+
+  return chunksWithSmallChunksSplit.concat(chunkedRecursively)
 }

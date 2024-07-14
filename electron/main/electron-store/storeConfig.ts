@@ -1,4 +1,4 @@
-import { ChatHistory } from '@/components/Chat/Chat'
+import { ChatHistory } from '@/components/Chat/chatUtils'
 
 export interface BaseLLMConfig {
   modelName: string

@@ -60,6 +60,40 @@ export const customFetchUsingElectronNet = async (input: RequestInfo | URL, init
   })
 }
 
+function nodeToWebStream(nodeStream: Readable): ReadableStream<Uint8Array> {
+  let isStreamEnded = false
+
+  const webStream = new ReadableStream<Uint8Array>({
+    start(controller) {
+      nodeStream.on('data', (chunk) => {
+        if (!isStreamEnded) {
+          controller.enqueue(chunk instanceof Buffer ? new Uint8Array(chunk) : chunk)
+        }
+      })
+
+      nodeStream.on('end', () => {
+        if (!isStreamEnded) {
+          isStreamEnded = true
+          controller.close()
+        }
+      })
+
+      nodeStream.on('error', (err) => {
+        if (!isStreamEnded) {
+          isStreamEnded = true
+          controller.error(err)
+        }
+      })
+    },
+    cancel(reason) {
+      // Handle any cleanup or abort logic here
+      nodeStream.destroy(reason)
+    },
+  })
+
+  return webStream
+}
+
 export const customFetchUsingElectronNetStreaming = async (
   input: RequestInfo | URL,
   init?: RequestInit,
@@ -143,38 +177,4 @@ export const customFetchUsingElectronNetStreaming = async (
 
     request.end()
   })
-}
-
-function nodeToWebStream(nodeStream: Readable): ReadableStream<Uint8Array> {
-  let isStreamEnded = false
-
-  const webStream = new ReadableStream<Uint8Array>({
-    start(controller) {
-      nodeStream.on('data', (chunk) => {
-        if (!isStreamEnded) {
-          controller.enqueue(chunk instanceof Buffer ? new Uint8Array(chunk) : chunk)
-        }
-      })
-
-      nodeStream.on('end', () => {
-        if (!isStreamEnded) {
-          isStreamEnded = true
-          controller.close()
-        }
-      })
-
-      nodeStream.on('error', (err) => {
-        if (!isStreamEnded) {
-          isStreamEnded = true
-          controller.error(err)
-        }
-      })
-    },
-    cancel(reason) {
-      // Handle any cleanup or abort logic here
-      nodeStream.destroy(reason)
-    },
-  })
-
-  return webStream
 }

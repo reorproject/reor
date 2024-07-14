@@ -5,34 +5,21 @@ import * as path from 'path'
 import chokidar from 'chokidar'
 import { BrowserWindow } from 'electron'
 
-import { LanceDBTableWrapper } from '../vector-database/lanceTableWrapper'
-import { addFileTreeToDBTable, removeFileTreeFromDBTable } from '../vector-database/tableHelperFunctions'
-
 import { FileInfo, FileInfoTree, isFileNodeDirectory } from './types'
 
 export const markdownExtensions = ['.md', '.markdown', '.mdown', '.mkdn', '.mkd']
 
-export function GetFilesInfoList(directory: string): FileInfo[] {
-  const fileInfoTree = GetFilesInfoTree(directory)
-  const fileInfoList = flattenFileInfoTree(fileInfoTree)
-  return fileInfoList
+export function isHidden(fileName: string): boolean {
+  return fileName.startsWith('.')
 }
 
-export function GetFilesInfoListForListOfPaths(paths: string[]): FileInfo[] {
-  // so perhaps for this function, all we maybe need to do is remove
-  const fileInfoTree = paths.map((path) => GetFilesInfoTree(path)).flat()
-  const fileInfoList = flattenFileInfoTree(fileInfoTree)
-
-  // remove duplicates:
-  const uniquePaths = new Set()
-  const fileInfoListWithoutDuplicates = fileInfoList.filter((fileInfo) => {
-    if (uniquePaths.has(fileInfo.path)) {
-      return false
-    }
-    uniquePaths.add(fileInfo.path)
-    return true
-  })
-  return fileInfoListWithoutDuplicates
+function fileHasExtensionInList(filePath: string, extensions: string[]): boolean {
+  try {
+    const fileExtension = path.extname(filePath).toLowerCase()
+    return extensions.includes(fileExtension)
+  } catch (error) {
+    return false
+  }
 }
 
 export function GetFilesInfoTree(pathInput: string, parentRelativePath: string = ''): FileInfoTree {
@@ -78,17 +65,15 @@ export function GetFilesInfoTree(pathInput: string, parentRelativePath: string =
         })
       }
     }
-  } catch (error) {}
+  } catch (error) {
+    // no need to throw error
+  }
 
   return fileInfoTree
 }
-export function isHidden(fileName: string): boolean {
-  return fileName.startsWith('.')
-}
-export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
-  let flatList: FileInfo[] = []
 
-  for (const node of tree) {
+export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
+  return tree.reduce((flatList: FileInfo[], node) => {
     if (!isFileNodeDirectory(node)) {
       flatList.push({
         name: node.name,
@@ -98,13 +83,34 @@ export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
         dateCreated: node.dateCreated,
       })
     }
-
     if (isFileNodeDirectory(node) && node.children) {
-      flatList = flatList.concat(flattenFileInfoTree(node.children))
+      flatList.push(...flattenFileInfoTree(node.children))
     }
-  }
+    return flatList
+  }, [])
+}
 
-  return flatList
+export function GetFilesInfoList(directory: string): FileInfo[] {
+  const fileInfoTree = GetFilesInfoTree(directory)
+  const fileInfoList = flattenFileInfoTree(fileInfoTree)
+  return fileInfoList
+}
+
+export function GetFilesInfoListForListOfPaths(paths: string[]): FileInfo[] {
+  // so perhaps for this function, all we maybe need to do is remove
+  const fileInfoTree = paths.map((_path) => GetFilesInfoTree(_path)).flat()
+  const fileInfoList = flattenFileInfoTree(fileInfoTree)
+
+  // remove duplicates:
+  const uniquePaths = new Set()
+  const fileInfoListWithoutDuplicates = fileInfoList.filter((fileInfo) => {
+    if (uniquePaths.has(fileInfo.path)) {
+      return false
+    }
+    uniquePaths.add(fileInfo.path)
+    return true
+  })
+  return fileInfoListWithoutDuplicates
 }
 
 export function createFileRecursive(filePath: string, content: string, charset?: BufferEncoding): void {
@@ -121,6 +127,13 @@ export function createFileRecursive(filePath: string, content: string, charset?:
   fs.writeFileSync(filePath, content, charset)
 }
 
+export function updateFileListForRenderer(win: BrowserWindow, directory: string): void {
+  const files = GetFilesInfoTree(directory)
+  if (win) {
+    win.webContents.send('files-list', files)
+  }
+}
+
 export function startWatchingDirectory(win: BrowserWindow, directoryToWatch: string): chokidar.FSWatcher | undefined {
   try {
     const watcher = chokidar.watch(directoryToWatch, {
@@ -135,23 +148,17 @@ export function startWatchingDirectory(win: BrowserWindow, directoryToWatch: str
     }
 
     watcher
-      .on('add', (path) => handleFileEvent('added', path))
-      .on('change', (path) => handleFileEvent('changed', path))
-      .on('unlink', (path) => handleFileEvent('removed', path))
-      .on('addDir', (path) => handleFileEvent('directory added', path))
-      .on('unlinkDir', (path) => handleFileEvent('directory removed', path))
+      .on('add', (_path) => handleFileEvent('added', _path))
+      .on('change', (_path) => handleFileEvent('changed', _path))
+      .on('unlink', (_path) => handleFileEvent('removed', _path))
+      .on('addDir', (_path) => handleFileEvent('directory added', _path))
+      .on('unlinkDir', (_path) => handleFileEvent('directory removed', _path))
 
     // No 'ready' event handler is needed here, as we're ignoring initial scan
     return watcher
-  } catch (error) {}
-}
-
-function fileHasExtensionInList(filePath: string, extensions: string[]): boolean {
-  try {
-    const fileExtension = path.extname(filePath).toLowerCase()
-    return extensions.includes(fileExtension)
   } catch (error) {
-    return false
+    // no error
+    return undefined
   }
 }
 
@@ -165,13 +172,6 @@ export function appendExtensionIfMissing(filename: string, extensions: string[])
   return filename + extensions[0]
 }
 
-export function updateFileListForRenderer(win: BrowserWindow, directory: string): void {
-  const files = GetFilesInfoTree(directory)
-  if (win) {
-    win.webContents.send('files-list', files)
-  }
-}
-
 export function readFile(filePath: string): string {
   try {
     const data = fs.readFileSync(filePath, 'utf8')
@@ -179,16 +179,6 @@ export function readFile(filePath: string): string {
   } catch (err) {
     return ''
   }
-}
-
-export const orchestrateEntryMove = async (table: LanceDBTableWrapper, sourcePath: string, destinationPath: string) => {
-  const fileSystemTree = GetFilesInfoTree(sourcePath)
-  await removeFileTreeFromDBTable(table, fileSystemTree)
-  moveFileOrDirectoryInFileSystem(sourcePath, destinationPath).then((newDestinationPath) => {
-    if (newDestinationPath) {
-      addFileTreeToDBTable(table, GetFilesInfoTree(newDestinationPath))
-    }
-  })
 }
 
 export const moveFileOrDirectoryInFileSystem = async (sourcePath: string, destinationPath: string): Promise<string> => {
@@ -205,14 +195,14 @@ export const moveFileOrDirectoryInFileSystem = async (sourcePath: string, destin
     } catch (error) {
       // Error means destination path does not exist, which is fine
     }
-
+    let resolvedDestinationPath = destinationPath
     if (destinationStats && destinationStats.isFile()) {
-      destinationPath = path.dirname(destinationPath)
+      resolvedDestinationPath = path.dirname(destinationPath)
     }
 
-    await fsPromises.mkdir(destinationPath, { recursive: true })
+    await fsPromises.mkdir(resolvedDestinationPath, { recursive: true })
 
-    const newPath = path.join(destinationPath, path.basename(sourcePath))
+    const newPath = path.join(resolvedDestinationPath, path.basename(sourcePath))
     await fsPromises.rename(sourcePath, newPath)
 
     return newPath

@@ -8,12 +8,11 @@ import { LLMConfig, StoreKeys, StoreSchema } from '../electron-store/storeConfig
 
 import { sliceListOfStringsToContextLength, sliceStringToContextLength } from './contextLimit'
 import { addOrUpdateLLMSchemaInStore, removeLLM, getAllLLMConfigs, getLLMConfig } from './llmConfig'
-import { AnthropicModelSessionService } from './models/Anthropic'
-import { OllamaService } from './models/Ollama'
-import { OpenAIModelSessionService } from './models/OpenAI'
+import AnthropicModelSessionService from './models/Anthropic'
+import OllamaService from './models/Ollama'
+import OpenAIModelSessionService from './models/OpenAI'
 import { LLMSessionService } from './types'
-
-import { ChatHistory } from '@/components/Chat/Chat'
+import { ChatHistory } from '@/components/Chat/chatUtils'
 
 enum LLMType {
   OpenAI = 'openai',

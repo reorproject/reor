@@ -13,8 +13,7 @@ import {
   StoreSchema,
 } from './storeConfig'
 import { initializeAndMaybeMigrateStore } from './storeSchemaMigrator'
-
-import { ChatHistory } from '@/components/Chat/Chat'
+import { ChatHistory } from '@/components/Chat/chatUtils'
 
 export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager: WindowsManager) => {
   initializeAndMaybeMigrateStore(store)
@@ -23,11 +22,11 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
   })
 
   ipcMain.handle('get-vault-directory-for-window', (event) => {
-    let path = windowsManager.getVaultDirectoryForWinContents(event.sender)
-    if (!path) {
-      path = windowsManager.getAndSetupDirectoryForWindowFromPreviousAppSession(event.sender, store)
+    let vaultPathForWindow = windowsManager.getVaultDirectoryForWinContents(event.sender)
+    if (!vaultPathForWindow) {
+      vaultPathForWindow = windowsManager.getAndSetupDirectoryForWindowFromPreviousAppSession(event.sender, store)
     }
-    return path
+    return vaultPathForWindow
   })
   ipcMain.handle('set-default-embedding-model', (event, repoName: string) => {
     store.set(StoreKeys.DefaultEmbeddingModelAlias, repoName)
@@ -68,7 +67,7 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
   ipcMain.handle('remove-embedding-model', (event, modelName: string) => {
     const currentModels = store.get(StoreKeys.EmbeddingModels) || {}
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { [modelName]: _, ...updatedModels } = currentModels
+    const { [modelName]: unused, ...updatedModels } = currentModels
 
     store.set(StoreKeys.EmbeddingModels, updatedModels)
   })
@@ -175,7 +174,7 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
   ipcMain.handle('get-chat-history', (event, chatId: string) => {
     const vaultDir = windowsManager.getVaultDirectoryForWinContents(event.sender)
     if (!vaultDir) {
-      return
+      return null
     }
     const allChatHistories = store.get(StoreKeys.ChatHistories)
     const vaultChatHistories = allChatHistories[vaultDir] || []

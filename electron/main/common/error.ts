@@ -1,4 +1,4 @@
-export function errorToStringMainProcess(error: unknown, depth: number = 0): string {
+function errorToStringMainProcess(error: unknown, depth: number = 0): string {
   if (error instanceof Error) {
     let errorString = `${error.name}: ${error.message}`
     if (error.cause) {
@@ -12,3 +12,6 @@ export function errorToStringMainProcess(error: unknown, depth: number = 0): str
   }
   return String(error)
 }
+
+export default errorToStringMainProcess
+//

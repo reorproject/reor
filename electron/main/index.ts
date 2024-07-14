@@ -4,14 +4,14 @@ import { join } from 'node:path'
 import { app, BrowserWindow } from 'electron'
 import Store from 'electron-store'
 
-import { errorToStringMainProcess } from './common/error'
+import errorToStringMainProcess from './common/error'
 import WindowsManager from './common/windowManager'
 import { registerStoreHandlers } from './electron-store/ipcHandlers'
 import { StoreSchema } from './electron-store/storeConfig'
-import { electronUtilsHandlers } from './electron-utils/ipcHandlers'
-import { registerFileHandlers } from './filesystem/ipcHandlers'
+import electronUtilsHandlers from './electron-utils/ipcHandlers'
+import registerFileHandlers from './filesystem/ipcHandlers'
 import { ollamaService, registerLLMSessionHandlers } from './llm/ipcHandlers'
-import { pathHandlers } from './path/ipcHandlers'
+import pathHandlers from './path/ipcHandlers'
 import { registerDBSessionHandlers } from './vector-database/ipcHandlers'
 
 const store = new Store<StoreSchema>()

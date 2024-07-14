@@ -1,6 +1,6 @@
 import path from 'path'
 
-export function addExtensionToFilenameIfNoExtensionPresent(
+function addExtensionToFilenameIfNoExtensionPresent(
   filename: string,
   acceptableExtensions: string[],
   defaultExtension: string,
@@ -12,3 +12,5 @@ export function addExtensionToFilenameIfNoExtensionPresent(
   }
   return `${filename}${defaultExtension}`
 }
+
+export default addExtensionToFilenameIfNoExtensionPresent

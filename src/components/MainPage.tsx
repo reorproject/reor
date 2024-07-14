@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import posthog from 'posthog-js'
 
 import '../styles/global.css'
-import ChatWithLLM, { ChatFilters, ChatHistory } from './Chat/Chat'
+import ChatWithLLM from './Chat/Chat'
 import { useChatHistory } from './Chat/hooks/use-chat-history'
 import ResizableComponent from './Common/ResizableComponent'
 import TitleBar from './Common/TitleBar'
@@ -14,6 +14,7 @@ import IconsSidebar from './Sidebars/IconsSidebar'
 import SidebarManager, { SidebarAbleToShow } from './Sidebars/MainSidebar'
 import SimilarFilesSidebarComponent from './Sidebars/SimilarFilesSidebar'
 import WritingAssistant from './Writing-Assistant/WritingAssistantFloatingMenu'
+import { ChatFilters, ChatHistory } from './Chat/chatUtils'
 
 const MainPageComponent: React.FC = () => {
   const [showChatbot, setShowChatbot] = useState<boolean>(false)

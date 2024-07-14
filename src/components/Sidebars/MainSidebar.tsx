@@ -4,12 +4,12 @@ import { FileInfoTree } from 'electron/main/filesystem/types'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 import posthog from 'posthog-js'
 
-import { ChatFilters, ChatHistory } from '../Chat/Chat'
 import { ChatsSidebar } from '../Chat/ChatsSidebar'
 import { ChatHistoryMetadata } from '../Chat/hooks/use-chat-history'
 import { FileSidebar } from '../File/FileSideBar'
 
 import SearchComponent from './FileSidebarSearch'
+import { ChatFilters, ChatHistory } from '../Chat/chatUtils'
 
 export type SidebarAbleToShow = 'files' | 'search' | 'chats'
 interface SidebarManagerProps {

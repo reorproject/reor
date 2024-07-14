@@ -4,9 +4,9 @@ import { ipcMain } from 'electron'
 
 import { markdownExtensions } from '../filesystem/filesystem'
 
-import { addExtensionToFilenameIfNoExtensionPresent } from './path'
+import addExtensionToFilenameIfNoExtensionPresent from './path'
 
-export const pathHandlers = () => {
+const pathHandlers = () => {
   ipcMain.handle('path-basename', (event, pathString: string) => path.basename(pathString))
 
   ipcMain.handle('path-sep', () => path.sep)
@@ -21,3 +21,5 @@ export const pathHandlers = () => {
     addExtensionToFilenameIfNoExtensionPresent(pathString, markdownExtensions, '.md'),
   )
 }
+
+export default pathHandlers

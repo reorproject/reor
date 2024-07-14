@@ -5,7 +5,7 @@ import { app } from 'electron'
 import removeMd from 'remove-markdown'
 import * as lancedb from 'vectordb'
 
-import { errorToStringMainProcess } from '../common/error'
+import errorToStringMainProcess from '../common/error'
 import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
@@ -13,8 +13,20 @@ import {
 } from '../electron-store/storeConfig'
 import { splitDirectoryPathIntoBaseAndRepo } from '../filesystem/filesystem'
 
-import { DownloadModelFilesFromHFRepo } from './downloadModelsFromHF'
+import DownloadModelFilesFromHFRepo from './downloadModelsFromHF'
 import { DBEntry } from './schema'
+
+export const defaultEmbeddingModelRepos = {
+  'Xenova/bge-base-en-v1.5': {
+    type: 'repo',
+    repoName: 'Xenova/bge-base-en-v1.5',
+  },
+  'Xenova/UAE-Large-V1': { type: 'repo', repoName: 'Xenova/UAE-Large-V1' },
+  'Xenova/bge-small-en-v1.5': {
+    type: 'repo',
+    repoName: 'Xenova/bge-small-en-v1.5',
+  },
+}
 
 function setupTokenizeFunction(tokenizer: PreTrainedTokenizer): (data: (string | number[])[]) => string[] {
   return (data: (string | number[])[]): string[] => {

@@ -41,18 +41,13 @@ const ChatInput: React.FC<ChatInputProps> = ({
       />
       <div className="flex h-full items-center justify-center">
         {loadingResponse ? (
-          <CircularProgress
-            size={32}
-            thickness={20}
-            style={{ color: 'rgb(209 213 219 / var(--tw-bg-opacity))' }}
-            className="color-gray-500"
-          />
+          <CircularProgress size={32} thickness={20} style={{ color: 'rgb(209 213 219 / var(--tw-bg-opacity))' }} />
         ) : (
           <button
             aria-expanded="false"
             aria-haspopup="menu"
             className={`h-full w-[85px] cursor-pointer select-none rounded border-none
-                  bg-neutral-700 px-2 px-6 py-0 py-3 text-center align-middle
+                  bg-neutral-700 px-2  py-0  text-center align-middle
                   font-sans text-xs font-bold text-white shadow-md
                   shadow-gray-900/10 transition-all hover:bg-neutral-900 hover:shadow-lg hover:shadow-gray-900/20 focus:opacity-85 focus:shadow-none
                   active:opacity-85 active:shadow-none`}

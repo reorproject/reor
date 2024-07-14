@@ -76,15 +76,13 @@ const App: React.FC<AppProps> = () => {
       <Portal>
         <ToastContainer className="mt-4" />
       </Portal>
-      {userHasConfiguredSettingsForIndexing ? (
-        indexingProgress < 1 ? (
-          <IndexingProgress indexingProgress={indexingProgress} />
-        ) : (
-          <MainPageComponent />
-        )
-      ) : (
+      {!userHasConfiguredSettingsForIndexing && (
         <InitialSetupSinglePage readyForIndexing={handleAllInitialSettingsAreReady} />
       )}
+      {userHasConfiguredSettingsForIndexing && indexingProgress < 1 && (
+        <IndexingProgress indexingProgress={indexingProgress} />
+      )}
+      {userHasConfiguredSettingsForIndexing && indexingProgress >= 1 && <MainPageComponent />}
     </div>
   )
 }

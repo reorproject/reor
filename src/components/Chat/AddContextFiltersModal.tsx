@@ -12,8 +12,7 @@ import ReorModal from '../Common/Modal'
 import SearchBarWithFilesSuggestion from '../Common/SearchBarWithFilesSuggestion'
 import CustomSelect from '../Common/Select'
 import { SuggestionsState } from '../Editor/BacklinkSuggestionsDisplay'
-
-import { ChatFilters } from './Chat'
+import { ChatFilters } from './chatUtils'
 
 interface Props {
   isOpen: boolean
@@ -51,7 +50,7 @@ const AddContextFiltersModal: React.FC<Props> = ({ vaultDirectory, isOpen, onClo
       maxDate: maxDate || undefined,
     }
     setChatFilters(updatedChatFilters)
-  }, [internalFilesSelected, numberOfChunksToFetch, minDate, maxDate])
+  }, [internalFilesSelected, numberOfChunksToFetch, minDate, maxDate, chatFilters, setChatFilters])
 
   const handleNumberOfChunksChange = (event: Event, value: number | number[]) => {
     const newValue = Array.isArray(value) ? value[0] : value
@@ -125,12 +124,12 @@ const AddContextFiltersModal: React.FC<Props> = ({ vaultDirectory, isOpen, onClo
             />
             <div className="mt-2 max-h-[300px] w-full overflow-y-auto text-white">
               <List placeholder="">
-                {internalFilesSelected.map((fileItem, index) => (
-                  <ListItem key={index} placeholder="">
+                {internalFilesSelected.map((filePath) => (
+                  <ListItem key={filePath} placeholder="">
                     <ListItemIcon>
                       <FolderIcon color="primary" />
                     </ListItemIcon>
-                    <ListItemText primary={fileItem} />
+                    <ListItemText primary={filePath} />
                   </ListItem>
                 ))}
               </List>

@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { ChatHistory } from '../Chat'
-import { formatOpenAIMessageContentIntoString } from '../chatUtils'
+import { ChatHistory, getDisplayableChatName } from '../chatUtils'
 
 export interface ChatHistoryMetadata {
   id: string
@@ -32,9 +31,9 @@ export const useChatHistory = () => {
   useEffect(() => {
     const updateChatHistoriesMetadata = window.ipcRenderer.receive(
       'update-chat-histories',
-      (chatHistoriesMetadata: ChatHistory[]) => {
+      (retrievedChatHistoriesMetadata: ChatHistory[]) => {
         setChatHistoriesMetadata(
-          chatHistoriesMetadata.map((chat: ChatHistory) => ({
+          retrievedChatHistoriesMetadata.map((chat: ChatHistory) => ({
             id: chat.id,
             displayName: getDisplayableChatName(chat),
           })),
@@ -56,24 +55,4 @@ export const useChatHistory = () => {
     setCurrentChatHistory,
     chatHistoriesMetadata,
   }
-}
-
-export const getDisplayableChatName = (chat: ChatHistory): string => {
-  const actualHistory = chat.displayableChatHistory
-
-  if (actualHistory.length === 0 || !actualHistory[actualHistory.length - 1].content) {
-    return 'Empty Chat'
-  }
-
-  const lastMsg = actualHistory[0]
-
-  if (lastMsg.visibleContent) {
-    return lastMsg.visibleContent.slice(0, 30)
-  }
-
-  const lastMessage = formatOpenAIMessageContentIntoString(lastMsg.content)
-  if (!lastMessage || lastMessage === '') {
-    return 'Empty Chat'
-  }
-  return lastMessage.slice(0, 30)
 }

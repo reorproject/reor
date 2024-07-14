@@ -1,3 +1,4 @@
+/* eslint-disable class-methods-use-this */
 import chokidar from 'chokidar'
 import { BrowserWindow, WebContents, screen, shell } from 'electron'
 import Store from 'electron-store'
@@ -50,8 +51,8 @@ class WindowsManager {
     }
 
     // Make all links open with the browser, not with the application
-    win.webContents.setWindowOpenHandler(({ url }) => {
-      if (url.startsWith('https:')) shell.openExternal(url)
+    win.webContents.setWindowOpenHandler(({ url: _url }) => {
+      if (_url.startsWith('https:')) shell.openExternal(_url)
       return { action: 'deny' }
     })
 

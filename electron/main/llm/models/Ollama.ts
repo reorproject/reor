@@ -1,3 +1,6 @@
+/* eslint-disable no-restricted-syntax */
+/* eslint-disable class-methods-use-this */
+/* eslint-disable prefer-promise-reject-errors */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { exec } from 'child_process'
 import * as os from 'os'
@@ -18,19 +21,13 @@ const OllamaServeType = {
   PACKAGED: 'packaged', // ollama is packaged with the app
 }
 
-export class OllamaService implements LLMSessionService {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+class OllamaService implements LLMSessionService {
   private client!: Ollama
 
   private host = 'http://127.0.0.1:11434'
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private childProcess: any
-
-  constructor() {
-    // this.client = await import("ollama");
-    // this.client = new ollama.Client();
-  }
 
   public init = async () => {
     await this.serve()
@@ -111,10 +108,10 @@ export class OllamaService implements LLMSessionService {
     }
   }
 
-  async execServe(path: string) {
+  async execServe(_path: string) {
     return new Promise((resolve, reject) => {
       const env = { ...process.env }
-      const command = `"${path}" serve`
+      const command = `"${_path}" serve`
 
       this.childProcess = exec(command, { env }, (err, stdout, stderr) => {
         if (err) {
@@ -133,7 +130,7 @@ export class OllamaService implements LLMSessionService {
       // Once the process is started, try to ping Ollama server.
       this.waitForPing()
         .then(() => {
-          resolve(void 0)
+          resolve(undefined)
         })
         .catch((pingError) => {
           if (this.childProcess && !this.childProcess.killed) {
@@ -145,12 +142,16 @@ export class OllamaService implements LLMSessionService {
   }
 
   async waitForPing(delay = 1000, retries = 20) {
-    for (let i = 0; i < retries; i++) {
+    for (let i = 0; i < retries; i += 1) {
       try {
+        // eslint-disable-next-line no-await-in-loop
         await this.ping()
         return
       } catch (err) {
-        await new Promise((resolve) => setTimeout(resolve, delay))
+        // eslint-disable-next-line no-await-in-loop
+        await new Promise((resolve) => {
+          setTimeout(resolve, delay)
+        })
       }
     }
     throw new Error("Max retries reached. Ollama server didn't respond.")
@@ -162,10 +163,7 @@ export class OllamaService implements LLMSessionService {
     }
 
     if (os.platform() === 'win32') {
-      exec(`taskkill /pid ${this.childProcess.pid} /f /t`, (err) => {
-        if (err) {
-        }
-      })
+      exec(`taskkill /pid ${this.childProcess.pid} /f /t`)
     } else {
       this.childProcess.kill()
     }
@@ -229,3 +227,5 @@ export class OllamaService implements LLMSessionService {
     throw new Error('Method not implemented.')
   }
 }
+
+export default OllamaService

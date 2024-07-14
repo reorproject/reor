@@ -18,8 +18,8 @@ import { PromptWithContextLimit } from 'electron/main/llm/contextLimit'
 import { BasePromptRequirements, PromptWithRagResults } from 'electron/main/vector-database/ipcHandlers'
 import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema'
 
-import { ChatHistory } from '@/components/Chat/Chat'
 import { ChatHistoryMetadata } from '@/components/Chat/hooks/use-chat-history'
+import { ChatHistory } from '@/components/Chat/chatUtils'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type IPCHandler<T extends (...args: any[]) => any> = (...args: Parameters<T>) => Promise<ReturnType<T>>
