@@ -334,7 +334,7 @@ export const useFileByFilepath = () => {
     const handleWindowClose = async () => {
       console.log("saving file", {
         filePath: currentlyOpenedFilePath,
-        fileContent: editor?.getHTML() ?? "",
+        fileContent: editor?.getHTML() || "",
         editor: editor,
       });
       if (currentlyOpenedFilePath !== null && editor) {

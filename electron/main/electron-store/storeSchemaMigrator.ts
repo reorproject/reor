@@ -70,7 +70,7 @@ const setupDefaultEmbeddingModels = (store: Store<StoreSchema>) => {
 
   const defaultModel = store.get(StoreKeys.DefaultEmbeddingModelAlias);
   if (!defaultModel) {
-    const embeddingModels = store.get(StoreKeys.EmbeddingModels) ?? {};
+    const embeddingModels = store.get(StoreKeys.EmbeddingModels) || {};
     if (Object.keys(embeddingModels).length === 0) {
       throw new Error("No embedding models found");
     }
