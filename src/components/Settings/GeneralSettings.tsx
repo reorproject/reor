@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { Button } from '@material-tailwind/react'
 import Switch from '@mui/material/Switch'
 
-import { useFileByFilepath } from '../File/hooks/use-file-by-filepath'
+import useFileByFilepath from '../File/hooks/use-file-by-filepath'
 
 import CreateAppearanceSection, { GenSettingsProps } from './GeneralSections'
 
@@ -80,7 +80,7 @@ const GeneralSettings: React.FC<GenSettingsProps> = () => {
 import { Button } from "@material-tailwind/react";
 import Switch from "@mui/material/Switch";
 import React, { useEffect, useState } from "react";
-import { useFileByFilepath } from "../File/hooks/use-file-by-filepath";
+import useFileByFilepath from "../File/hooks/use-file-by-filepath";
 
 interface GeneralSettingsProps {}
 const GeneralSettings: React.FC<GeneralSettingsProps> = () => {

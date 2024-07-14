@@ -3,7 +3,7 @@ import { BrowserWindow, WebContents, screen, shell } from 'electron'
 import Store from 'electron-store'
 
 import { StoreSchema, StoreKeys } from '../electron-store/storeConfig'
-import { LanceDBTableWrapper } from '../vector-database/lanceTableWrapper'
+import LanceDBTableWrapper from '../vector-database/lanceTableWrapper'
 
 type WindowInfo = {
   windowID: number

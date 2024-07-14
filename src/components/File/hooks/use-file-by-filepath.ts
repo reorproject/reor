@@ -89,58 +89,7 @@ const useFileByFilepath = () => {
     [needToWriteEditorContentToDisk, setNeedToWriteEditorContentToDisk],
   )
 
-  const openFileByPath = useCallback(
-    async (newFilePath: string) => {
-      setCurrentlyChangingFilePath(true)
-      await writeEditorContentToDisk(editor, currentlyOpenedFilePath)
-      if (currentlyOpenedFilePath && needToIndexEditorContent) {
-        window.fileSystem.indexFileInDatabase(currentlyOpenedFilePath)
-        setNeedToIndexEditorContent(false)
-      }
-      const newFileContent = (await window.fileSystem.readFile(newFilePath)) ?? ''
-      editor?.commands.setContent(newFileContent)
-      setCurrentlyOpenedFilePath(newFilePath)
-      setCurrentlyChangingFilePath(false)
-    },
-    [
-      setCurrentlyChangingFilePath,
-      writeEditorContentToDisk,
-      editor,
-      currentlyOpenedFilePath,
-      needToIndexEditorContent,
-      setNeedToIndexEditorContent,
-      setCurrentlyOpenedFilePath,
-    ],
-  )
-
-  const openRelativePath = useCallback(
-    async (relativePath: string, optionalContentToWriteOnCreate?: string): Promise<void> => {
-      const invalidChars = await getInvalidCharacterInFilePath(relativePath)
-      if (invalidChars) {
-        toast.error(`Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`)
-        throw new Error(
-          `Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`,
-        )
-      }
-      const relativePathWithExtension = await window.path.addExtensionIfNoExtensionPresent(relativePath)
-      const absolutePath = await window.path.join(
-        await window.electronStore.getVaultDirectoryForWindow(),
-        relativePathWithExtension,
-      )
-      const fileExists = await window.fileSystem.checkFileExists(absolutePath)
-      if (!fileExists) {
-        const basename = await window.path.basename(absolutePath)
-        const content = optionalContentToWriteOnCreate || `## ${removeFileExtension(basename)}\n`
-        await window.fileSystem.createFile(absolutePath, content)
-        setNeedToIndexEditorContent(true)
-      }
-      openFileByPath(absolutePath)
-    },
-    [setNeedToIndexEditorContent, openFileByPath],
-  )
-
   const openRelativePathRef = useRef<(newFilePath: string) => Promise<void>>()
-  openRelativePathRef.current = openRelativePath
 
   const handleSuggestionsStateWithEventCapture = (suggState: SuggestionsState | null): void => {
     setSuggestionsState(suggState)
@@ -195,6 +144,58 @@ const useFileByFilepath = () => {
       BacklinkExtension(openRelativePathRef, handleSuggestionsStateWithEventCapture),
     ],
   })
+
+  const openFileByPath = useCallback(
+    async (newFilePath: string) => {
+      setCurrentlyChangingFilePath(true)
+      await writeEditorContentToDisk(editor, currentlyOpenedFilePath)
+      if (currentlyOpenedFilePath && needToIndexEditorContent) {
+        window.fileSystem.indexFileInDatabase(currentlyOpenedFilePath)
+        setNeedToIndexEditorContent(false)
+      }
+      const newFileContent = (await window.fileSystem.readFile(newFilePath)) ?? ''
+      editor?.commands.setContent(newFileContent)
+      setCurrentlyOpenedFilePath(newFilePath)
+      setCurrentlyChangingFilePath(false)
+    },
+    [
+      setCurrentlyChangingFilePath,
+      writeEditorContentToDisk,
+      editor,
+      currentlyOpenedFilePath,
+      needToIndexEditorContent,
+      setNeedToIndexEditorContent,
+      setCurrentlyOpenedFilePath,
+    ],
+  )
+
+  const openRelativePath = useCallback(
+    async (relativePath: string, optionalContentToWriteOnCreate?: string): Promise<void> => {
+      const invalidChars = await getInvalidCharacterInFilePath(relativePath)
+      if (invalidChars) {
+        toast.error(`Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`)
+        throw new Error(
+          `Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`,
+        )
+      }
+      const relativePathWithExtension = await window.path.addExtensionIfNoExtensionPresent(relativePath)
+      const absolutePath = await window.path.join(
+        await window.electronStore.getVaultDirectoryForWindow(),
+        relativePathWithExtension,
+      )
+      const fileExists = await window.fileSystem.checkFileExists(absolutePath)
+      if (!fileExists) {
+        const basename = await window.path.basename(absolutePath)
+        const content = optionalContentToWriteOnCreate || `## ${removeFileExtension(basename)}\n`
+        await window.fileSystem.createFile(absolutePath, content)
+        setNeedToIndexEditorContent(true)
+      }
+      openFileByPath(absolutePath)
+    },
+    [setNeedToIndexEditorContent, openFileByPath],
+  )
+
+  openRelativePathRef.current = openRelativePath
 
   // Check if we should display markdown or not
   useEffect(() => {

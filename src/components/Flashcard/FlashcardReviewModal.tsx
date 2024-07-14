@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import ReorModal from '../Common/Modal'
 import CustomSelect from '../Common/Select'
 
-import { FlashcardCore } from './FlashcardsCore'
+import FlashcardCore from './FlashcardsCore'
 import { FlashcardQAPairUI } from './types'
 import { getFlashcardQnaPairsFromJsonFile, getFlashcardVaultDirectory } from './utils'
 
