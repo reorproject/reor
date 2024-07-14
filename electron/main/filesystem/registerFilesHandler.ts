@@ -52,7 +52,6 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
   ipcMain.handle('delete-file', async (event, filePath: string): Promise<void> => {
     fs.stat(filePath, async (err, stats) => {
       if (err) {
-        console.error('An error occurred:', err)
         return
       }
 
@@ -60,7 +59,6 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
         // For directories (Node.js v14.14.0 and later)
         fs.rm(filePath, { recursive: true }, (err) => {
           if (err) {
-            console.error('An error occurred:', err)
           }
         })
 
@@ -72,7 +70,6 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
       } else {
         fs.unlink(filePath, (err) => {
           if (err) {
-            console.error('An error occurred:', err)
           }
         })
 
@@ -193,7 +190,6 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
         )
         return { prompt: filePrompt, contextCutoffAt }
       } catch (error) {
-        console.error('Error searching database:', error)
         throw error
       }
     },
@@ -207,7 +203,6 @@ export const registerFileHandlers = (store: Store<StoreSchema>, windowsManager: 
 
       return dbItems.flat()
     } catch (error) {
-      console.error('Error searching database:', error)
       throw error
     }
   })

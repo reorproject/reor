@@ -61,9 +61,7 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
         setFileInfoTree(sortedFiles)
         const flattenedFiles = flattenFileInfoTree(sortedFiles)
         setFlattenedFiles(flattenedFiles)
-      } catch (error) {
-        console.error('Error fetching and setting files:', error)
-      }
+      } catch (error) {}
     }
 
     fetchAndSetFiles()

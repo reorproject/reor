@@ -256,9 +256,7 @@ const pasteCommand = async (editor: Editor) => {
     try {
       const text = await navigator.clipboard.readText()
       editor.commands.insertContent(text)
-    } catch (err) {
-      console.error('Failed to read from clipboard:', err)
-    }
+    } catch (err) {}
   }
 }
 

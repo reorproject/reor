@@ -17,9 +17,7 @@ const useLLMConfigs = () => {
       } else {
         setDefaultLLM(defaultLLM)
       }
-    } catch (error) {
-      console.error('Failed to fetch model configurations:', error)
-    }
+    } catch (error) {}
   }
 
   useEffect(() => {

@@ -55,7 +55,6 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponentProps> 
       setIsLoadingSimilarEntries(false)
       return searchResults
     } catch (error) {
-      console.error('Error:', error)
       toast.error(errorToStringRendererProcess(error), {
         className: 'mt-5',
         autoClose: false,
@@ -80,9 +79,7 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponentProps> 
         } else {
           setSimilarEntries([])
         }
-      } catch (error) {
-        console.error('Error:', error)
-      }
+      } catch (error) {}
     }
     if (filePath) {
       handleNewFileOpen(filePath)

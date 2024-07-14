@@ -58,7 +58,6 @@ export const FileItem: React.FC<FileInfoProps> = ({
       moveFile(sourcePath, destinationPath)
       // Refresh file list here or in moveFile function
     } catch (error) {
-      console.error('Failed to move file:', error)
       // Handle error (e.g., show an error message)
     }
   }

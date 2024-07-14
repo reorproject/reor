@@ -48,7 +48,6 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose: p
       await window.llm.addOrUpdateLLM(modelConfig)
       parentOnClose()
     } catch (error) {
-      console.error('Failed to save remote model configuration:', error)
       setCurrentError(errorToStringRendererProcess(error))
     }
   }

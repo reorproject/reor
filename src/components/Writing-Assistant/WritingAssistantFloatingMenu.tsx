@@ -53,7 +53,6 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
 
   const copyToClipboard = () => {
     if (!editor || !currentChatHistory || currentChatHistory.displayableChatHistory.length === 0) {
-      console.error('No chat history available for copying.')
       return
     }
     const llmResponse = currentChatHistory.displayableChatHistory[currentChatHistory.displayableChatHistory.length - 1]
@@ -62,19 +61,10 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       ? llmResponse.visibleContent
       : formatOpenAIMessageContentIntoString(llmResponse.content)
 
-    if (copiedText) {
-      navigator.clipboard
-        .writeText(copiedText)
-        .then(() => {})
-        .catch((err) => {
-          console.error('Failed to copy text: ', err)
-        })
-    }
+    if (copiedText) navigator.clipboard.writeText(copiedText)
   }
-
   const insertAfterHighlightedText = () => {
     if (!editor || !currentChatHistory || currentChatHistory.displayableChatHistory.length === 0) {
-      console.error('No chat history available for insertion.')
       return
     }
 
@@ -96,7 +86,6 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
 
   const replaceHighlightedText = () => {
     if (!editor || !currentChatHistory || currentChatHistory.displayableChatHistory.length === 0) {
-      console.error('No chat history available for replacement.')
       return
     }
 
@@ -122,31 +111,27 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       throw new Error(`No model config found for model: ${defaultLLMName}`)
     }
 
-    try {
-      if (loadingResponse) return
-      setLoadingResponse(true)
-      // make a new variable for chat history to not use the function parameter:
-      let newChatHistory = chatHistory
-      if (!newChatHistory || !newChatHistory.id) {
-        const chatID = Date.now().toString()
-        newChatHistory = {
-          id: chatID,
-          displayableChatHistory: [],
-        }
+    if (loadingResponse) return
+    setLoadingResponse(true)
+    // make a new variable for chat history to not use the function parameter:
+    let newChatHistory = chatHistory
+    if (!newChatHistory || !newChatHistory.id) {
+      const chatID = Date.now().toString()
+      newChatHistory = {
+        id: chatID,
+        displayableChatHistory: [],
       }
-      setCurrentChatHistory(newChatHistory)
-      newChatHistory.displayableChatHistory.push({
-        role: 'user',
-        content: prompt,
-        messageType: 'success',
-        context: [],
-      })
-      if (!newChatHistory) return
-
-      await window.llm.streamingLLMResponse(defaultLLMName, currentModelConfig, false, newChatHistory)
-    } catch (error) {
-      console.error(error)
     }
+    setCurrentChatHistory(newChatHistory)
+    newChatHistory.displayableChatHistory.push({
+      role: 'user',
+      content: prompt,
+      messageType: 'success',
+      context: [],
+    })
+    if (!newChatHistory) return
+
+    await window.llm.streamingLLMResponse(defaultLLMName, currentModelConfig, false, newChatHistory)
     setLoadingResponse(false)
   }
 

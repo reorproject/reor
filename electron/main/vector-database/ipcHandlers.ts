@@ -41,7 +41,6 @@ export const registerDBSessionHandlers = (store: Store<StoreSchema>, windowManag
       const searchResults = await windowInfo.dbTableClient.search(query, limit, filter)
       return searchResults
     } catch (error) {
-      console.error('Error searching database:', error)
       throw error
     }
   })
@@ -84,7 +83,6 @@ export const registerDBSessionHandlers = (store: Store<StoreSchema>, windowManag
         errorStr = `${error}. Please try restarting or open a Github issue.`
       }
       event.sender.send('error-to-display-in-window', errorStr)
-      console.error('Error during file indexing:', error)
     }
   })
 
@@ -101,7 +99,6 @@ export const registerDBSessionHandlers = (store: Store<StoreSchema>, windowManag
         const rankedResults = await rerankSearchedEmbeddings(query, searchResults)
         return rankedResults
       } catch (error) {
-        console.error('Error searching database:', error)
         throw error
       }
     },
@@ -186,7 +183,6 @@ For your reference, the timestamp right now is ${formatTimestampForLanceDB(
           uniqueFilesReferenced,
         }
       } catch (error) {
-        console.error('Error searching database:', error)
         throw errorToStringMainProcess(error)
       }
     },

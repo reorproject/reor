@@ -56,7 +56,7 @@ async function notarizeApp() {
       });
       ;
     } else {
-      console.error(`Error: ${productName}.app does not exist at ${appPath}`);
+      ;
       // Print the tree of files starting from the release directory
       const releasePath = path.join(__dirname, "..", "release");
       ;
@@ -68,6 +68,6 @@ async function notarizeApp() {
 }
 
 notarizeApp().catch((error) => {
-  console.error(error);
+  ;
   process.exit(1);
 });
