@@ -41,7 +41,7 @@ const GeneralSettings: React.FC<GenSettingsProps> = () => {
     }
 
     fetchParams()
-  }, [spellCheckEnabled])
+  }, [spellCheckEnabled, setSpellCheckEnabled])
 
   const handleSave = () => {
     // Execute the save function here
@@ -55,10 +55,10 @@ const GeneralSettings: React.FC<GenSettingsProps> = () => {
       <CreateAppearanceSection />
       <p className="mb-2 mt-1 text-sm text-gray-300">Spell Check</p>
       <Switch
-        checked={tempSpellCheckEnabled == 'true'}
+        checked={tempSpellCheckEnabled === 'true'}
         onChange={() => {
           setUserHasMadeUpdate(true)
-          if (tempSpellCheckEnabled == 'true') setTempSpellCheckEnabled('false')
+          if (tempSpellCheckEnabled === 'true') setTempSpellCheckEnabled('false')
           else setTempSpellCheckEnabled('true')
         }}
         inputProps={{ 'aria-label': 'controlled' }}

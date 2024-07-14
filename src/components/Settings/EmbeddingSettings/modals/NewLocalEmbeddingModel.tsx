@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 
 import { Button } from '@material-tailwind/react'
 import { EmbeddingModelWithLocalPath } from 'electron/main/electron-store/storeConfig'
@@ -54,6 +54,8 @@ const NewLocalEmbeddingModelModal: React.FC<NewLocalEmbeddingModelModalProps> = 
     setNewModelPath('')
   }
 
+  const whiteIconContextValue: { color: string } = useMemo(() => ({ color: 'white' }), [])
+  const salmonIconContextValue: { color: string } = useMemo(() => ({ color: 'salmon' }), [])
   return (
     <ReorModal isOpen={isOpen} onClose={saveModelConfigToElectronStore}>
       <div className="mx-2 mb-2 w-[400px] pl-3">
@@ -65,7 +67,7 @@ const NewLocalEmbeddingModelModal: React.FC<NewLocalEmbeddingModelModalProps> = 
           onClick={handleModelDirectorySelection}
           placeholder=""
         >
-          <div className="border-black-100 rounded-full border-2 border-solid p-3">
+          <div className=" rounded-full border-2 border-solid p-3">
             <FaUpload size={20} />
           </div>
           <p className="font-bold text-blue-200">Click to Upload</p>
@@ -79,15 +81,15 @@ const NewLocalEmbeddingModelModal: React.FC<NewLocalEmbeddingModelModalProps> = 
           more info.{' '}
         </p>
         {newModelPath && (
-          <div className="border-1 flex w-full items-center rounded-lg border-solid border-dark-gray-c-one p-1">
-            <IconContext.Provider value={{ color: 'salmon' }}>
+          <div className="flex w-full items-center rounded-lg border-solid border-dark-gray-c-one p-1">
+            <IconContext.Provider value={salmonIconContextValue}>
               <CiFileOn size={30} className="mx-3" />
             </IconContext.Provider>
 
             <p className="mt-2 text-xs text-gray-100">
               Selected: <strong>{newModelPath}</strong>
             </p>
-            <IconContext.Provider value={{ color: 'white' }}>
+            <IconContext.Provider value={whiteIconContextValue}>
               <FaRegTrashAlt size={20} className="mr-4 hover:cursor-pointer" onClick={handleSelectionDelete} />
             </IconContext.Provider>
           </div>

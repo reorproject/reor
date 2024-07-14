@@ -18,30 +18,16 @@ export interface GenSettingsProps {
 const CreateAppearanceSection: React.FC = () => {
   const [isIconSBCompact, setIsIconSBCompact] = useState<boolean>(false)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false)
   // const [editorAppearance, setEditorApperance] =
   //   useState<SettingsAppearance>("dark");
 
   // Check if SidebarCompact is on or not
   useEffect(() => {
     const fetchParams = async () => {
-      const isIconSBCompact = await window.electronStore.getSBCompact()
+      const storedIsIconSBCompact = await window.electronStore.getSBCompact()
 
-      if (isIconSBCompact !== undefined) {
-        setIsIconSBCompact(isIconSBCompact)
-      }
-    }
-
-    fetchParams()
-  }, [])
-
-  // Check if we should display header markdown
-  useEffect(() => {
-    const fetchParams = async () => {
-      const displayMarkdown = await window.electronStore.getDisplayMarkdown()
-
-      if (displayMarkdown !== undefined) {
-        setDisplayMarkdown(displayMarkdown)
+      if (storedIsIconSBCompact !== undefined) {
+        setIsIconSBCompact(storedIsIconSBCompact)
       }
     }
 

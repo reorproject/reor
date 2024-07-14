@@ -27,10 +27,10 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
   const [embeddingModels, setEmbeddingModels] = useState<Record<string, EmbeddingModelConfig>>({})
 
   const updateEmbeddingModels = async () => {
-    const embeddingModels = await window.electronStore.getEmbeddingModels()
+    const storedEmbeddingModels = await window.electronStore.getEmbeddingModels()
 
-    if (embeddingModels) {
-      setEmbeddingModels(embeddingModels)
+    if (storedEmbeddingModels) {
+      setEmbeddingModels(storedEmbeddingModels)
     }
 
     const defaultModel = await window.electronStore.getDefaultEmbeddingModel()

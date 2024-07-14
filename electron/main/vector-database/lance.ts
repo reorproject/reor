@@ -40,7 +40,7 @@ const GetOrCreateLanceTable = async (
     return newTable
   } catch (error) {
     const errorMessage = `Error in GetOrCreateLanceTable: ${errorToStringMainProcess(error)}`
-    console.error(errorMessage)
+
     throw new Error(errorMessage)
   }
 }

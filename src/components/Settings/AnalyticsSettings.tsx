@@ -12,10 +12,10 @@ const AnalyticsSettings: React.FC<AnalyticsSettingsProps> = () => {
 
   useEffect(() => {
     const fetchParams = async () => {
-      const isAnalyticsEnabled = await window.electronStore.getAnalyticsMode()
+      const storedIsAnalyticsEnabled = await window.electronStore.getAnalyticsMode()
 
-      if (isAnalyticsEnabled !== undefined) {
-        setIsAnalyticsEnabled(isAnalyticsEnabled)
+      if (storedIsAnalyticsEnabled !== undefined) {
+        setIsAnalyticsEnabled(storedIsAnalyticsEnabled)
       }
     }
 

@@ -37,7 +37,7 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({ readyForInd
           <div className="mt-10 flex items-center justify-between border-0 border-b-2 border-solid border-neutral-700 pb-4">
             <div className="w-80 flex-col">
               <p className="m-0 text-gray-100">Vault Directory</p>
-              <p className="w-50 m-0 pt-1 text-xs text-gray-100 opacity-40">
+              <p className="m-0 pt-1 text-xs text-gray-100 opacity-40">
                 Your vault directory doesn&apos;t need to be empty. Only markdown files will be indexed.
               </p>
             </div>

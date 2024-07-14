@@ -51,7 +51,7 @@ const NewRemoteEmbeddingModelModal: React.FC<NewRemoteEmbeddingModelModalProps> 
     <ReorModal isOpen={isOpen} onClose={saveModelConfigToElectronStore}>
       <div className="mx-2 mb-2 w-[400px] pl-3">
         <h2 className="mb-0  font-semibold text-white">Set up remote model</h2>
-        <p className="mb-6 mt-2 text-sm text-xs text-white">
+        <p className="mb-6 mt-2 text-xs text-white">
           Provide the repo name from Hugging Face like &quot;Xenova/roberta-base-squad2&quot;.
         </p>
 

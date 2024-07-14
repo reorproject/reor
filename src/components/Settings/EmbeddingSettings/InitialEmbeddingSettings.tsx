@@ -47,10 +47,10 @@ const InitialEmbeddingModelSettings: React.FC<InitialEmbeddingModelSettingsProps
   //   // }
   // }, []);
   const updateEmbeddingModels = async () => {
-    const embeddingModels = await window.electronStore.getEmbeddingModels()
+    const storedEmbeddingModels = await window.electronStore.getEmbeddingModels()
 
-    if (embeddingModels) {
-      setEmbeddingModels(embeddingModels)
+    if (storedEmbeddingModels) {
+      setEmbeddingModels(storedEmbeddingModels)
     }
 
     const defaultModel = await window.electronStore.getDefaultEmbeddingModel()
@@ -70,7 +70,7 @@ const InitialEmbeddingModelSettings: React.FC<InitialEmbeddingModelSettingsProps
     } else {
       setErrorMsg('No embedding model selected')
     }
-  }, [selectedModel])
+  }, [selectedModel, setErrorMsg])
 
   const handleChangeOnModelSelect = (newSelectedModel: string) => {
     setSelectedModel(newSelectedModel)

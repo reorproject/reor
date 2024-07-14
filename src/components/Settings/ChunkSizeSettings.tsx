@@ -26,7 +26,7 @@ const ChunkSizeSettings: React.FC<ChunkSizeSettingsProps> = ({ children }) => {
   }, [])
 
   const handleChangeOnChunkSizeSelect = (size: string) => {
-    const numberVersion = parseInt(size)
+    const numberVersion = parseInt(size, 10)
     setChunkSize(numberVersion)
     window.electronStore.setChunkSize(numberVersion)
     posthog.capture('change_chunk_size', {

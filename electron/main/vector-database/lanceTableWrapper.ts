@@ -7,7 +7,7 @@ import GetOrCreateLanceTable from './lance'
 import { DBEntry, DBQueryResult, DatabaseFields } from './schema'
 import { sanitizePathForDatabase, convertRecordToDBType } from './tableHelperFunctions'
 
-export class LanceDBTableWrapper {
+class LanceDBTableWrapper {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public lanceTable!: LanceDBTable<any>
 
@@ -69,7 +69,7 @@ export class LanceDBTableWrapper {
     try {
       await this.lanceTable.delete(filterString)
     } catch (error) {
-      console.error(`Error deleting items from DB: ${error} using filter string: ${filterString}`)
+      //  no need to throw error
     }
   }
 
@@ -87,7 +87,7 @@ export class LanceDBTableWrapper {
         },
       })
     } catch (error) {
-      console.error(`Error updating items from DB: ${error} using filter string: ${filterString}`)
+      // no need to throw error
     }
   }
 
@@ -119,3 +119,5 @@ export class LanceDBTableWrapper {
     return this.lanceTable.countRows()
   }
 }
+
+export default LanceDBTableWrapper

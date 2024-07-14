@@ -42,7 +42,6 @@ export async function createEmbeddingFunctionForLocalModel(
   try {
     const { pipeline, env } = await import('@xenova/transformers')
     env.cacheDir = path.join(app.getPath('userData'), 'models', 'embeddings') // set for all. Just to deal with library and remote inconsistencies
-    console.log('config is: ', embeddingModelConfig)
 
     const pathParts = splitDirectoryPathIntoBaseAndRepo(embeddingModelConfig.localPath)
 
@@ -62,7 +61,6 @@ export async function createEmbeddingFunctionForLocalModel(
       throw new Error(`Pipeline initialization failed for repo ${errorToStringMainProcess(error)}`)
     }
   } catch (error) {
-    console.error(`Resource initialization failed: ${errorToStringMainProcess(error)}`)
     throw new Error(`Resource initialization failed: ${errorToStringMainProcess(error)}`)
   }
   const tokenize = setupTokenizeFunction(pipe.tokenizer)
@@ -92,7 +90,6 @@ export async function createEmbeddingFunctionForRepo(
     env.allowRemoteModels = true
     functionName = embeddingModelConfig.repoName
 
-    console.log(repoName, env.cacheDir)
     try {
       pipe = (await pipeline('feature-extraction', repoName)) as Pipeline
     } catch (error) {

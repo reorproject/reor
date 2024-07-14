@@ -64,17 +64,6 @@ const MainPageComponent: React.FC = () => {
 
   const [sidebarWidth, setSidebarWidth] = useState(40)
 
-  const handleAddFileToChatFilters = (file: string) => {
-    setSidebarShowing('chats')
-    setShowChatbot(true)
-    // setFileIsOpen(false);
-    setCurrentChatHistory(undefined)
-    setChatFilters((prevChatFilters) => ({
-      ...prevChatFilters,
-      files: [...prevChatFilters.files, file],
-    }))
-  }
-
   // find all available files
   useEffect(() => {
     const updateWidth = async () => {
@@ -98,6 +87,16 @@ const MainPageComponent: React.FC = () => {
   }, [])
 
   useEffect(() => {
+    const handleAddFileToChatFilters = (file: string) => {
+      setSidebarShowing('chats')
+      setShowChatbot(true)
+      // setFileIsOpen(false);
+      setCurrentChatHistory(undefined)
+      setChatFilters((prevChatFilters) => ({
+        ...prevChatFilters,
+        files: [...prevChatFilters.files, file],
+      }))
+    }
     const removeAddChatToFileListener = window.ipcRenderer.receive('add-file-to-chat-listener', (noteName: string) => {
       handleAddFileToChatFilters(noteName)
     })
@@ -105,7 +104,7 @@ const MainPageComponent: React.FC = () => {
     return () => {
       removeAddChatToFileListener()
     }
-  }, [])
+  }, [setCurrentChatHistory, setChatFilters])
 
   return (
     <div>
@@ -192,11 +191,11 @@ const MainPageComponent: React.FC = () => {
               setCurrentChatHistory={setCurrentChatHistory}
               showSimilarFiles={showSimilarFiles} // This might need to be managed differently now
               chatFilters={chatFilters}
-              setChatFilters={(chatFilters: ChatFilters) => {
+              setChatFilters={(updatedChatFilters: ChatFilters) => {
                 posthog.capture('add_file_to_chat', {
-                  chatFilesLength: chatFilters.files.length,
+                  chatFilesLength: updatedChatFilters.files.length,
                 })
-                setChatFilters(chatFilters)
+                setChatFilters(updatedChatFilters)
               }}
             />
           </div>
