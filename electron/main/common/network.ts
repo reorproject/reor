@@ -1,26 +1,16 @@
 
 import { Readable } from "stream";
 
-import { IncomingMessage, net } from "electron";
+import { net } from "electron";
 import { ClientRequestConstructorOptions } from "electron/main";
-
-// We need to override the fetch function to use electron's net module. This is because fetch doesn't use user system proxy settings.
-// We then feed these functions into our OpenAI interfaces.
 
 export const customFetchUsingElectronNet = async (
   input: RequestInfo | URL,
   init?: RequestInit
 ): Promise<Response> => {
-  let url: string;
-  if (input instanceof URL) {
-    url = input.href;
-  } else if (typeof input === 'string') {
-    url = input;
-  } else if (input instanceof Request) {
-    url = input.url;
-  } else {
-    throw new Error('Invalid input type');
-  }
+  console.log("input: ", input);
+  console.log("init: ", init);
+  const url = input instanceof URL ? input.href : input.toString();
   const options = init || {};
 
   return new Promise((resolve, reject) => {
@@ -58,27 +48,17 @@ export const customFetchUsingElectronNet = async (
       request.write(bodyData);
     }
 
-    request.on("response", (response: IncomingMessage) => {
+    request.on("response", (response) => {
       const chunks: Buffer[] = [];
-      response.on("data", (chunk: Buffer) => chunks.push(chunk));
+      response.on("data", (chunk) => chunks.push(chunk));
       response.on("end", () => {
         const buffer = Buffer.concat(chunks);
-        
-        // Convert IncomingHttpHeaders to Headers
-        const headers = new Headers();
-        Object.entries(response.headers).forEach(([key, value]) => {
-            if (Array.isArray(value)) {
-              value.forEach(v => { headers.append(key, v); });
-            } else {
-              headers.set(key, value);
-            }
-        });
-    
         resolve(
           new Response(buffer, {
-            status: response.statusCode || 200,
-            statusText: response.statusMessage || '',
-            headers: headers,
+            status: response.statusCode,
+            statusText: response.statusMessage,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            headers: new Headers(response.headers as any),
           })
         );
       });
@@ -93,16 +73,7 @@ export const customFetchUsingElectronNetStreaming = async (
   input: RequestInfo | URL,
   init?: RequestInit
 ): Promise<Response> => {
-  let url: string;
-  if (input instanceof URL) {
-    url = input.href;
-  } else if (typeof input === 'string') {
-    url = input;
-  } else if (input instanceof Request) {
-    url = input.url;
-  } else {
-    throw new Error('Invalid input type');
-  }
+  const url = input instanceof URL ? input.href : input.toString();
   const options = init || {};
 
   return new Promise((resolve, reject) => {
@@ -148,40 +119,32 @@ export const customFetchUsingElectronNetStreaming = async (
       request.write(bodyData);
     }
 
-    request.on("response", (response: IncomingMessage) => {
+    request.on("response", (response) => {
       const nodeStream = new Readable({
         read() {},
       });
-    
-      response.on("data", (chunk: Buffer) => {
+
+      response.on("data", (chunk) => {
         nodeStream.push(chunk);
       });
-    
+
       response.on("end", () => {
         nodeStream.push(null); // Signal end of stream
       });
-    
-      response.on("error", (error: Error) => {
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      response.on("error", (error: any) => {
         nodeStream.destroy(error); // Handle stream errors
       });
-    
+
       const webStream = nodeToWebStream(nodeStream);
-    
-      // Convert IncomingHttpHeaders to Headers
-      const headers = new Headers();
-      Object.entries(response.headers).forEach(([key, value]) => {
-          if (Array.isArray(value)) {
-            value.forEach(v => { headers.append(key, v); });
-          } else {
-            headers.set(key, value);
-          }
-      });
-    
+
       resolve(
         new Response(webStream, {
-          status: response.statusCode || 200,
-          statusText: response.statusMessage || '',
-          headers: headers,
+          status: response.statusCode,
+          statusText: response.statusMessage,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          headers: new Headers(response.headers as any),
         })
       );
     });
@@ -199,34 +162,33 @@ function nodeToWebStream(nodeStream: Readable): ReadableStream<Uint8Array> {
 
   const webStream = new ReadableStream<Uint8Array>({
     start(controller) {
-      nodeStream.on("data", (chunk: Buffer | Uint8Array) => {
+      nodeStream.on("data", (chunk) => {
         if (!isStreamEnded) {
           controller.enqueue(
-            Buffer.isBuffer(chunk) ? new Uint8Array(chunk) : chunk
+            chunk instanceof Buffer ? new Uint8Array(chunk) : chunk
           );
         }
       });
-  
+
       nodeStream.on("end", () => {
         if (!isStreamEnded) {
           isStreamEnded = true;
           controller.close();
         }
       });
-  
-      nodeStream.on("error", (err: Error) => {
+
+      nodeStream.on("error", (err) => {
         if (!isStreamEnded) {
           isStreamEnded = true;
           controller.error(err);
         }
       });
     },
-    cancel(reason?: unknown) {
+    cancel(reason) {
       // Handle any cleanup or abort logic here
-      nodeStream.destroy(reason instanceof Error ? reason : new Error(String(reason)));
+      nodeStream.destroy(reason);
     },
   });
-  
 
   return webStream;
 }

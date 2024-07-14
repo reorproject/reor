@@ -17,7 +17,6 @@ import {
   sanitizePathForDatabase,
   convertRecordToDBType,
 } from "./tableHelperFunctions";
-import { errorToStringMainProcess } from "../common/error";
 
 export class LanceDBTableWrapper {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,11 +28,14 @@ export class LanceDBTableWrapper {
     userDirectory: string,
     embeddingModelConfig: EmbeddingModelConfig
   ) {
+    try {
       this.embedFun = await createEmbeddingFunction(
         embeddingModelConfig,
         "content"
       );
-    
+    } catch (error) {
+      throw new Error("Embedding function error: " + error);
+    }
 
     this.lanceTable = await GetOrCreateLanceTable(
       dbConnection,
@@ -95,7 +97,7 @@ export class LanceDBTableWrapper {
       await this.lanceTable.delete(filterString);
     } catch (error) {
       console.error(
-        `Error deleting items from DB: ${errorToStringMainProcess(error)} using filter string: ${filterString}`
+        `Error deleting items from DB: ${error} using filter string: ${filterString}`
       );
     }
   }
@@ -118,7 +120,7 @@ export class LanceDBTableWrapper {
       });
     } catch (error) {
       console.error(
-        `Error updating items from DB: ${errorToStringMainProcess(error)} using filter string: ${filterString}`
+        `Error updating items from DB: ${error} using filter string: ${filterString}`
       );
     }
   }
@@ -129,7 +131,7 @@ export class LanceDBTableWrapper {
     limit: number,
     filter?: string
   ): Promise<DBQueryResult[]> {
-    const lanceQuery = this.lanceTable
+    const lanceQuery = await this.lanceTable
       .search(query)
       .metricType(MetricType.Cosine)
       .limit(limit);

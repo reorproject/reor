@@ -39,6 +39,7 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
 
   useEffect(() => {
     if (
+      !suggestionsState.position ||
       filteredSuggestions.length === 0 ||
       !suggestionsRef.current
     ) {

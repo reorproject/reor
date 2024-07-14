@@ -132,7 +132,7 @@ const electronStore = {
     (config: HardwareConfig) => Promise<void>
   >("set-hardware-config"),
   getLLMGenerationParams: createIPCHandler<
-    () => Promise<LLMGenerationParameters | undefined>
+    () => Promise<LLMGenerationParameters>
   >("get-llm-generation-params"),
   setLLMGenerationParams: createIPCHandler<
     (params: LLMGenerationParameters) => Promise<void>
@@ -143,10 +143,10 @@ const electronStore = {
     createIPCHandler<(isAnalytics: boolean) => Promise<void>>(
       "set-analytics-mode"
     ),
-  getSpellCheckMode: createIPCHandler<() => Promise<boolean>>(
+  getSpellCheckMode: createIPCHandler<() => Promise<string>>(
     "get-spellcheck-mode"
   ),
-  setSpellCheckMode: createIPCHandler<(isSpellCheck: boolean) => Promise<void>>(
+  setSpellCheckMode: createIPCHandler<(isSpellCheck: string) => Promise<void>>(
     "set-spellcheck-mode"
   ),
   getHasUserOpenedAppBefore: createIPCHandler<() => Promise<boolean>>(

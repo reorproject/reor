@@ -54,12 +54,9 @@ const EditorManager: React.FC<EditorManagerProps> = ({
 
   const goToSelection = () => {
     if (!editor) return;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const { results, resultIndex } = editor.storage.searchAndReplace;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     const position = results[resultIndex];
     if (!position) return;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     editor.commands.setTextSelection(position);
     const { node } = editor.view.domAtPos(editor.state.selection.anchor);
     if (node instanceof Element) {

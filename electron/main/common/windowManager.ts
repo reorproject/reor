@@ -17,7 +17,7 @@ class WindowsManager {
 
   watcher: chokidar.FSWatcher | undefined;
 
-  createWindow(
+  async createWindow(
     store: Store<StoreSchema>,
     preload: string,
     url: string | undefined,
@@ -141,6 +141,9 @@ class WindowsManager {
     directory: string,
     store: Store<StoreSchema>
   ): void {
+    if (!webContents) {
+      throw new Error("Invalid webContents provided.");
+    }
 
     const windowID = this.getBrowserWindowId(webContents);
     if (!windowID) {

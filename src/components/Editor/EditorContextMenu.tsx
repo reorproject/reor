@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-import { EditorState, Transaction } from "@tiptap/pm/state";
+import { EditorState } from "@tiptap/pm/state";
 import { Dispatch, Editor } from "@tiptap/react";
 import { AiOutlineDelete } from "react-icons/ai";
 import { CiViewTable } from "react-icons/ci";
@@ -89,22 +89,17 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({
 
     switch (command) {
       case "cut":
-        cutCommand(editor.state, (tr: Transaction) => {
-          editor.view.dispatch(tr);
-        });
+        cutCommand(editor.state, editor.view.dispatch);
         break;
       case "copy":
         copyCommand(editor.state);
         break;
       case "delete":
-        deleteCommand(editor.state, (tr: Transaction) => {
-          editor.view.dispatch(tr);
-        });
+        deleteCommand(editor.state, editor.view.dispatch);
         break;
       default:
         break;
     }
-
     setMenuVisible(false);
   };
 
@@ -204,20 +199,6 @@ interface TableSizeSelectorProps {
   onSelect: (rows: number, cols: number) => void;
 }
 
-/**
- *
- * Copies text that is selected
- */
-const copyCommand = (state: EditorState) => {
-  if (state.selection.empty) return false;
-
-  const { from, to } = state.selection;
-  const text = state.doc.textBetween(from, to, "");
-
-  navigator.clipboard.writeText(text);
-  return true;
-};
-
 const TableSizeSelector: React.FC<TableSizeSelectorProps> = ({ onSelect }) => {
   const maxRows = 10;
   const maxCols = 10;
@@ -268,6 +249,20 @@ const TableSizeSelector: React.FC<TableSizeSelectorProps> = ({ onSelect }) => {
 
 /**
  *
+ * Copies text that is selected
+ */
+const copyCommand = (state: EditorState) => {
+  if (state.selection.empty) return false;
+
+  const { from, to } = state.selection;
+  const text = state.doc.textBetween(from, to, "");
+
+  navigator.clipboard.writeText(text);
+  return true;
+};
+
+/**
+ *
  * Cuts text that is selected
  */
 const cutCommand = (state: EditorState, dispatch: Dispatch | null) => {
@@ -286,12 +281,14 @@ const cutCommand = (state: EditorState, dispatch: Dispatch | null) => {
  * Pastes text that currently exists in clipboard
  */
 const pasteCommand = async (editor: Editor) => {
+  if (navigator.clipboard) {
     try {
       const text = await navigator.clipboard.readText();
       editor.commands.insertContent(text);
     } catch (err) {
       console.error(`Failed to read from clipboard:`, err);
     }
+  }
 };
 
 /**

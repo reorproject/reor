@@ -23,7 +23,7 @@ export const registerStoreHandlers = (
   initializeAndMaybeMigrateStore(store);
   ipcMain.handle(
     "set-vault-directory-for-window",
-    (event, userDirectory: string): void => {
+    async (event, userDirectory: string): Promise<void> => {
       console.log("setting user directory", userDirectory);
       windowsManager.setVaultDirectoryForContents(
         event.sender,
@@ -50,7 +50,7 @@ export const registerStoreHandlers = (
   ipcMain.handle(
     "add-new-local-embedding-model",
     (event, model: EmbeddingModelWithLocalPath) => {
-      const currentModels = store.get(StoreKeys.EmbeddingModels);
+      const currentModels = store.get(StoreKeys.EmbeddingModels) || {};
       const modelAlias = path.basename(model.localPath);
       store.set(StoreKeys.EmbeddingModels, {
         ...currentModels,
@@ -63,7 +63,7 @@ export const registerStoreHandlers = (
   ipcMain.handle(
     "add-new-repo-embedding-model",
     (event, model: EmbeddingModelWithRepo) => {
-      const currentModels = store.get(StoreKeys.EmbeddingModels);
+      const currentModels = store.get(StoreKeys.EmbeddingModels) || {};
       store.set(StoreKeys.EmbeddingModels, {
         ...currentModels,
         [model.repoName]: model,
@@ -83,7 +83,7 @@ export const registerStoreHandlers = (
       modelName: string,
       updatedModel: EmbeddingModelWithLocalPath | EmbeddingModelWithRepo
     ) => {
-      const currentModels = store.get(StoreKeys.EmbeddingModels) ;
+      const currentModels = store.get(StoreKeys.EmbeddingModels) || {};
       store.set(StoreKeys.EmbeddingModels, {
         ...currentModels,
         [modelName]: updatedModel,
@@ -92,7 +92,7 @@ export const registerStoreHandlers = (
   );
 
   ipcMain.handle("remove-embedding-model", (event, modelName: string) => {
-    const currentModels = store.get(StoreKeys.EmbeddingModels);
+    const currentModels = store.get(StoreKeys.EmbeddingModels) || {};
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { [modelName]: _, ...updatedModels } = currentModels;
 
@@ -103,7 +103,7 @@ export const registerStoreHandlers = (
     store.set(StoreKeys.MaxRAGExamples, noOfExamples);
   });
 
-  ipcMain.handle("get-no-of-rag-examples", (): number => {
+  ipcMain.handle("get-no-of-rag-examples", () => {
     return store.get(StoreKeys.MaxRAGExamples);
   });
 
@@ -115,7 +115,7 @@ export const registerStoreHandlers = (
     return store.get(StoreKeys.ChunkSize);
   });
 
-  ipcMain.handle("get-default-embedding-model", (): string => {
+  ipcMain.handle("get-default-embedding-model", () => {
     return store.get(StoreKeys.DefaultEmbeddingModelAlias);
   });
 
@@ -137,8 +137,7 @@ export const registerStoreHandlers = (
       "getting generation params",
       store.get(StoreKeys.LLMGenerationParameters)
     );
-    const out = store.get(StoreKeys.LLMGenerationParameters);
-    return out;
+    return store.get(StoreKeys.LLMGenerationParameters);
   });
 
   ipcMain.handle("set-display-markdown", (event, displayMarkdown) => {
@@ -155,7 +154,7 @@ export const registerStoreHandlers = (
     event.sender.send("sb-compact-changed", isSBCompact);
   });
 
-  ipcMain.handle("get-sb-compact", (): boolean => {
+  ipcMain.handle("get-sb-compact", () => {
     return store.get(StoreKeys.IsSBCompact);
   });
 
@@ -170,6 +169,7 @@ export const registerStoreHandlers = (
   });
 
   ipcMain.handle("set-spellcheck-mode", (event, isSpellCheck) => {
+    console.log("setting spellcheck params", isSpellCheck);
     store.set(StoreKeys.SpellCheck, isSpellCheck);
   });
 
@@ -196,9 +196,6 @@ export const registerStoreHandlers = (
     }
 
     const allHistories = store.get(StoreKeys.ChatHistories);
-    if (!allHistories) {
-      return [];
-    }
     const chatHistoriesCorrespondingToVault = allHistories[vaultDir] ?? [];
     return chatHistoriesCorrespondingToVault;
   });
@@ -209,12 +206,6 @@ export const registerStoreHandlers = (
     );
     const allChatHistories = store.get(StoreKeys.ChatHistories);
     if (!vaultDir) {
-      return;
-    }
-    if (!allChatHistories) {
-      store.set(StoreKeys.ChatHistories, {
-        [vaultDir]: [newChat],
-      });
       return;
     }
     const chatHistoriesCorrespondingToVault =
@@ -248,10 +239,7 @@ export const registerStoreHandlers = (
       return;
     }
     const allChatHistories = store.get(StoreKeys.ChatHistories);
-    if (!allChatHistories) {
-      return;
-    }
-    const vaultChatHistories = allChatHistories[vaultDir];
+    const vaultChatHistories = allChatHistories[vaultDir] || [];
     return vaultChatHistories.find((chat) => chat.id === chatId);
   });
 
@@ -265,10 +253,7 @@ export const registerStoreHandlers = (
     }
 
     const chatHistoriesMap = store.get(StoreKeys.ChatHistories);
-    if (!chatHistoriesMap) {
-      return;
-    }
-    const allChatHistories = chatHistoriesMap[vaultDir];
+    const allChatHistories = chatHistoriesMap[vaultDir] || [];
     const filteredChatHistories = allChatHistories.filter(
       (item) => item.id !== chatID
     );
@@ -280,7 +265,7 @@ export const registerStoreHandlers = (
 export function getDefaultEmbeddingModelConfig(
   store: Store<StoreSchema>
 ): EmbeddingModelConfig {
-  const defaultEmbeddingModelAlias: string = store.get(
+  const defaultEmbeddingModelAlias = store.get(
     StoreKeys.DefaultEmbeddingModelAlias
   );
 
@@ -289,14 +274,15 @@ export function getDefaultEmbeddingModelConfig(
     throw new Error("No default embedding model is specified");
   }
 
-  const embeddingModels = store.get(StoreKeys.EmbeddingModels);
-  if (!(defaultEmbeddingModelAlias in embeddingModels)) {
-    throw new Error(`No embedding model found for alias '${defaultEmbeddingModelAlias}'`);
-  }
+  const embeddingModels = store.get(StoreKeys.EmbeddingModels) || {};
 
   // Check if the model with the default alias exists
   const model = embeddingModels[defaultEmbeddingModelAlias];
-  
+  if (!model) {
+    throw new Error(
+      `No embedding model found for alias '${defaultEmbeddingModelAlias}'`
+    );
+  }
 
   return model;
 }

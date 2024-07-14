@@ -31,7 +31,7 @@ const AddContextFiltersModal: React.FC<Props> = ({
   setChatFilters,
 }) => {
   const [internalFilesSelected, setInternalFilesSelected] = useState<string[]>(
-    chatFilters.files
+    chatFilters.files || []
   );
   const [searchText, setSearchText] = useState<string>("");
   const [suggestionsState, setSuggestionsState] =

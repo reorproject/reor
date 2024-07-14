@@ -54,7 +54,6 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({
       const basePath =
         onDirectoryCreate ||
         (await window.electronStore.getVaultDirectoryForWindow());
-      console.log("normalizedDirectoryName", normalizedDirectoryName);
       const fullPath = await window.path.join(
         basePath,
         normalizedDirectoryName
