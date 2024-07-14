@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
-import CircularProgress from "@mui/material/CircularProgress";
+import CircularProgress from '@mui/material/CircularProgress';
 
-import ReorModal from "./Modal";
+import ReorModal from './Modal';
 
 interface IndexingProgressProps {
   indexingProgress: number;
@@ -12,7 +12,7 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({
   indexingProgress,
 }) => {
   const [startTime, setStartTime] = useState<number>(Date.now());
-  const [eta, setEta] = useState<string>("Initializing...");
+  const [eta, setEta] = useState<string>('Initializing...');
 
   useEffect(() => {
     setStartTime(Date.now());
@@ -32,40 +32,40 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({
 
   return (
     <ReorModal
-      isOpen={true}
-      onClose={() => console.log("Not allowing a close for now")}
-      hideCloseButton={true}
+      isOpen
+      onClose={() => console.log('Not allowing a close for now')}
+      hideCloseButton
     >
-      <div className="w-[500px] h-[100px] ml-3 mb-3 mt-2 mr-3">
-        <h6 className="mt-2 mb-2 text-2xl font-semibold text-white">
+      <div className='w-[500px] h-[100px] ml-3 mb-3 mt-2 mr-3'>
+        <h6 className='mt-2 mb-2 text-2xl font-semibold text-white'>
           {indexingProgress === 0
-            ? "Initializing vector database..."
-            : "Indexing files..."}
+            ? 'Initializing vector database...'
+            : 'Indexing files...'}
         </h6>
         <div
           className={`w-full h-4 rounded-full overflow-hidden mb-2 border-2 border-gray-400 ${
-            indexingProgress !== 0 ? "bg-neutral-800" : ""
+            indexingProgress !== 0 ? 'bg-neutral-800' : ''
           }`}
         >
           <div
-            className="bg-blue-600 h-full transition-all duration-300 ease-out"
+            className='bg-blue-600 h-full transition-all duration-300 ease-out'
             style={{ width: `${indexingProgress * 100}%` }}
-          ></div>
+          />
         </div>
-        <div className="flex">
+        <div className='flex'>
           {indexingProgress == 0 && (
             <CircularProgress
               size={20}
               thickness={7}
-              style={{ color: "white" }}
-              className="mr-2"
+              style={{ color: 'white' }}
+              className='mr-2'
             />
           )}
 
-          <span className="text-sm text-white font-semibold">
+          <span className='text-sm text-white font-semibold'>
             {indexingProgress > 0 && (
               <>{Math.round(indexingProgress * 100)}% -</>
-            )}{" "}
+            )}{' '}
             {eta}
           </span>
         </div>

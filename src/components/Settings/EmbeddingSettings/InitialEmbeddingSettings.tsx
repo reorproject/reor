@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 
-import { EmbeddingModelConfig } from "electron/main/electron-store/storeConfig";
+import { EmbeddingModelConfig } from 'electron/main/electron-store/storeConfig';
 
-import NewEmbeddingModelModalBothTypes from "./modals/NewEmbeddingModelBothTypes";
+import NewEmbeddingModelModalBothTypes from './modals/NewEmbeddingModelBothTypes';
 
-import CustomSelect from "@/components/Common/Select";
+import CustomSelect from '@/components/Common/Select';
 
 // import { modelRepos } from "./EmbeddingSettings";
 
@@ -32,7 +32,7 @@ const InitialEmbeddingModelSettings: React.FC<
 }) => {
   // const [currentError, setCurrentError] = useState<string>("");
 
-  const [selectedModel, setSelectedModel] = useState<string>("");
+  const [selectedModel, setSelectedModel] = useState<string>('');
   const [embeddingModels, setEmbeddingModels] = useState<
     Record<string, EmbeddingModelConfig>
   >({});
@@ -52,15 +52,15 @@ const InitialEmbeddingModelSettings: React.FC<
   //   // }
   // }, []);
   const updateEmbeddingModels = async () => {
-    console.log("updating embedding models");
+    console.log('updating embedding models');
     const embeddingModels = await window.electronStore.getEmbeddingModels();
-    console.log("embedding models", embeddingModels);
+    console.log('embedding models', embeddingModels);
     if (embeddingModels) {
       setEmbeddingModels(embeddingModels);
     }
-    console.log("getting default model");
+    console.log('getting default model');
     const defaultModel = await window.electronStore.getDefaultEmbeddingModel();
-    console.log("default model", defaultModel);
+    console.log('default model', defaultModel);
     if (defaultModel) {
       setSelectedModel(defaultModel);
     }
@@ -72,9 +72,9 @@ const InitialEmbeddingModelSettings: React.FC<
 
   useEffect(() => {
     if (selectedModel) {
-      setErrorMsg("");
+      setErrorMsg('');
     } else {
-      setErrorMsg("No embedding model selected");
+      setErrorMsg('No embedding model selected');
     }
   }, [selectedModel]);
 
@@ -87,22 +87,23 @@ const InitialEmbeddingModelSettings: React.FC<
   };
 
   return (
-    <div className="w-full bg-dark-gray-c-three rounded flex justify-between items-center">
-      <p className="mb-2 pb-3 text-gray-100">Embedding Model</p>{" "}
+    <div className='w-full bg-dark-gray-c-three rounded flex justify-between items-center'>
+      <p className='mb-2 pb-3 text-gray-100'>Embedding Model</p>{' '}
       {/* <CustomSelect
         options={modelRepos}
         value={selectedModel}
         onChange={handleChangeOnModelSelect}
       /> */}
-      <div className="w-[200px]">
+      <div className='w-[200px]'>
         <CustomSelect
-          options={Object.keys(embeddingModels).map((model) => {
-            return { label: model, value: model };
-          })}
+          options={Object.keys(embeddingModels).map((model) => ({
+            label: model,
+            value: model,
+          }))}
           selectedValue={selectedModel}
           onChange={handleChangeOnModelSelect}
           addButton={{
-            label: "Attach a Custom Embedding Model",
+            label: 'Attach a Custom Embedding Model',
             onClick: () => setShowNewEmbeddingModelModal(true),
           }}
         />

@@ -1,24 +1,24 @@
-import * as fs from "fs";
-import * as fsPromises from "fs/promises";
-import * as path from "path";
+import * as fs from 'fs';
+import * as fsPromises from 'fs/promises';
+import * as path from 'path';
 
-import chokidar from "chokidar";
-import { BrowserWindow } from "electron";
+import chokidar from 'chokidar';
+import { BrowserWindow } from 'electron';
 
-import { LanceDBTableWrapper } from "../vector-database/lanceTableWrapper";
+import { LanceDBTableWrapper } from '../vector-database/lanceTableWrapper';
 import {
   addFileTreeToDBTable,
   removeFileTreeFromDBTable,
-} from "../vector-database/tableHelperFunctions";
+} from '../vector-database/tableHelperFunctions';
 
-import { FileInfo, FileInfoTree, isFileNodeDirectory } from "./types";
+import { FileInfo, FileInfoTree, isFileNodeDirectory } from './types';
 
 export const markdownExtensions = [
-  ".md",
-  ".markdown",
-  ".mdown",
-  ".mkdn",
-  ".mkd",
+  '.md',
+  '.markdown',
+  '.mdown',
+  '.mkdn',
+  '.mkd',
 ];
 
 export function GetFilesInfoList(directory: string): FileInfo[] {
@@ -46,12 +46,12 @@ export function GetFilesInfoListForListOfPaths(paths: string[]): FileInfo[] {
 
 export function GetFilesInfoTree(
   pathInput: string,
-  parentRelativePath: string = ""
+  parentRelativePath: string = '',
 ): FileInfoTree {
   const fileInfoTree: FileInfoTree = [];
 
   if (!fs.existsSync(pathInput)) {
-    console.error("Path does not exist:", pathInput);
+    console.error('Path does not exist:', pathInput);
     return fileInfoTree;
   }
 
@@ -80,12 +80,12 @@ export function GetFilesInfoTree(
           const itemPath = path.join(pathInput, item);
           return GetFilesInfoTree(
             itemPath,
-            path.join(parentRelativePath, item)
+            path.join(parentRelativePath, item),
           );
         })
         .flat();
 
-      if (parentRelativePath === "") {
+      if (parentRelativePath === '') {
         return childNodes;
       }
       if (!isHidden(path.basename(pathInput))) {
@@ -106,7 +106,7 @@ export function GetFilesInfoTree(
   return fileInfoTree;
 }
 export function isHidden(fileName: string): boolean {
-  return fileName.startsWith(".");
+  return fileName.startsWith('.');
 }
 export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
   let flatList: FileInfo[] = [];
@@ -133,7 +133,7 @@ export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
 export function createFileRecursive(
   filePath: string,
   content: string,
-  charset?: BufferEncoding
+  charset?: BufferEncoding,
 ): void {
   const dirname = path.dirname(filePath);
 
@@ -150,7 +150,7 @@ export function createFileRecursive(
 
 export function startWatchingDirectory(
   win: BrowserWindow,
-  directoryToWatch: string
+  directoryToWatch: string,
 ): chokidar.FSWatcher | undefined {
   try {
     const watcher = chokidar.watch(directoryToWatch, {
@@ -160,7 +160,7 @@ export function startWatchingDirectory(
     const handleFileEvent = (eventType: string, filePath: string) => {
       if (
         fileHasExtensionInList(filePath, markdownExtensions) ||
-        eventType.includes("directory")
+        eventType.includes('directory')
       ) {
         // TODO: add logic to update vector db
         updateFileListForRenderer(win, directoryToWatch);
@@ -168,35 +168,35 @@ export function startWatchingDirectory(
     };
 
     watcher
-      .on("add", (path) => handleFileEvent("added", path))
-      .on("change", (path) => handleFileEvent("changed", path))
-      .on("unlink", (path) => handleFileEvent("removed", path))
-      .on("addDir", (path) => handleFileEvent("directory added", path))
-      .on("unlinkDir", (path) => handleFileEvent("directory removed", path));
+      .on('add', (path) => handleFileEvent('added', path))
+      .on('change', (path) => handleFileEvent('changed', path))
+      .on('unlink', (path) => handleFileEvent('removed', path))
+      .on('addDir', (path) => handleFileEvent('directory added', path))
+      .on('unlinkDir', (path) => handleFileEvent('directory removed', path));
 
     // No 'ready' event handler is needed here, as we're ignoring initial scan
     return watcher;
   } catch (error) {
-    console.error("Error setting up file watcher:", error);
+    console.error('Error setting up file watcher:', error);
   }
 }
 
 function fileHasExtensionInList(
   filePath: string,
-  extensions: string[]
+  extensions: string[],
 ): boolean {
   try {
     const fileExtension = path.extname(filePath).toLowerCase();
     return extensions.includes(fileExtension);
   } catch (error) {
-    console.error("Error checking file extension for extensions:", extensions);
+    console.error('Error checking file extension for extensions:', extensions);
     return false;
   }
 }
 
 export function appendExtensionIfMissing(
   filename: string,
-  extensions: string[]
+  extensions: string[],
 ): string {
   const hasExtension = extensions.some((ext) => filename.endsWith(ext));
 
@@ -209,28 +209,28 @@ export function appendExtensionIfMissing(
 
 export function updateFileListForRenderer(
   win: BrowserWindow,
-  directory: string
+  directory: string,
 ): void {
   const files = GetFilesInfoTree(directory);
   if (win) {
-    win.webContents.send("files-list", files);
+    win.webContents.send('files-list', files);
   }
 }
 
 export function readFile(filePath: string): string {
   try {
-    const data = fs.readFileSync(filePath, "utf8");
+    const data = fs.readFileSync(filePath, 'utf8');
     return data;
   } catch (err) {
-    console.error("An error occurred:", err);
-    return "";
+    console.error('An error occurred:', err);
+    return '';
   }
 }
 
 export const orchestrateEntryMove = async (
   table: LanceDBTableWrapper,
   sourcePath: string,
-  destinationPath: string
+  destinationPath: string,
 ) => {
   const fileSystemTree = GetFilesInfoTree(sourcePath);
   await removeFileTreeFromDBTable(table, fileSystemTree);
@@ -239,19 +239,19 @@ export const orchestrateEntryMove = async (
       if (newDestinationPath) {
         addFileTreeToDBTable(table, GetFilesInfoTree(newDestinationPath));
       }
-    }
+    },
   );
 };
 
 export const moveFileOrDirectoryInFileSystem = async (
   sourcePath: string,
-  destinationPath: string
+  destinationPath: string,
 ): Promise<string> => {
   try {
     try {
       await fsPromises.access(sourcePath);
     } catch (error) {
-      throw new Error("Source path does not exist.");
+      throw new Error('Source path does not exist.');
     }
 
     let destinationStats;
@@ -259,7 +259,7 @@ export const moveFileOrDirectoryInFileSystem = async (
       destinationStats = await fsPromises.lstat(destinationPath);
     } catch (error) {
       // Error means destination path does not exist, which is fine
-      console.error("Error accessing destination path:", error);
+      console.error('Error accessing destination path:', error);
     }
 
     if (destinationStats && destinationStats.isFile()) {
@@ -274,8 +274,8 @@ export const moveFileOrDirectoryInFileSystem = async (
     console.log(`Moved ${sourcePath} to ${newPath}`);
     return newPath;
   } catch (error) {
-    console.error("Error moving file or directory:", error);
-    return "";
+    console.error('Error moving file or directory:', error);
+    return '';
   }
 };
 
@@ -291,7 +291,7 @@ export function splitDirectoryPathIntoBaseAndRepo(fullPath: string) {
     pathWithSeparator.slice(0, -1)
   ) {
     return {
-      localModelPath: "", // No directory path before the root
+      localModelPath: '', // No directory path before the root
       repoName: path.basename(pathWithSeparator.slice(0, -1)), // Root directory name
     };
   }

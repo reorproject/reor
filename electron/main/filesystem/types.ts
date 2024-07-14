@@ -12,9 +12,8 @@ export type FileInfoNode = FileInfo & {
 
 export type FileInfoTree = FileInfoNode[];
 
-export const isFileNodeDirectory = (fileInfo: FileInfoNode): boolean => {
-  return fileInfo.children !== undefined;
-};
+export const isFileNodeDirectory = (fileInfo: FileInfoNode): boolean =>
+  fileInfo.children !== undefined;
 
 export interface AugmentPromptWithFileProps {
   prompt: string;

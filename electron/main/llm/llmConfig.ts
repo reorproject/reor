@@ -1,32 +1,32 @@
-import Store from "electron-store";
+import Store from 'electron-store';
 
 import {
   LLMConfig,
   StoreKeys,
   StoreSchema,
-} from "../electron-store/storeConfig";
+} from '../electron-store/storeConfig';
 
-import { OllamaService } from "./models/Ollama";
+import { OllamaService } from './models/Ollama';
 
 export function validateAIModelConfig(config: LLMConfig): string | null {
   // Validate localPath: ensure it's not empty
   if (!config.modelName.trim()) {
-    return "Model name is required.";
+    return 'Model name is required.';
   }
 
   // Validate contextLength: ensure it's a positive number
   if (config.contextLength && config.contextLength <= 0) {
-    return "Context length must be a positive number.";
+    return 'Context length must be a positive number.';
   }
 
   // Validate engine: ensure it's either "openai" or "llamacpp"
-  if (config.engine !== "openai" && config.engine !== "anthropic") {
+  if (config.engine !== 'openai' && config.engine !== 'anthropic') {
     return "Engine must be either 'openai' or 'llamacpp'.";
   }
 
   // Optional field validation for errorMsg: ensure it's not empty if provided
   if (config.errorMsg && !config.errorMsg.trim()) {
-    return "Error message should not be empty if provided.";
+    return 'Error message should not be empty if provided.';
   }
 
   return null;
@@ -34,29 +34,29 @@ export function validateAIModelConfig(config: LLMConfig): string | null {
 
 export async function addOrUpdateLLMSchemaInStore(
   store: Store<StoreSchema>,
-  modelConfig: LLMConfig
+  modelConfig: LLMConfig,
 ): Promise<void> {
   const existingModelsInStore = await store.get(StoreKeys.LLMs);
-  console.log("existingModels: ", existingModelsInStore);
+  console.log('existingModels: ', existingModelsInStore);
   const isNotValid = validateAIModelConfig(modelConfig);
   if (isNotValid) {
     throw new Error(isNotValid);
   }
 
   const foundModel = existingModelsInStore.find(
-    (model) => model.modelName === modelConfig.modelName
+    (model) => model.modelName === modelConfig.modelName,
   );
 
-  console.log("foundModel: ", foundModel);
+  console.log('foundModel: ', foundModel);
 
   if (foundModel) {
-    console.log("updating model");
+    console.log('updating model');
     const updatedModels = existingModelsInStore.map((model) =>
-      model.modelName === modelConfig.modelName ? modelConfig : model
+      model.modelName === modelConfig.modelName ? modelConfig : model,
     );
     store.set(StoreKeys.LLMs, updatedModels);
   } else {
-    console.log("adding model");
+    console.log('adding model');
     const updatedModels = [...existingModelsInStore, modelConfig];
     store.set(StoreKeys.LLMs, updatedModels);
   }
@@ -65,7 +65,7 @@ export async function addOrUpdateLLMSchemaInStore(
 export async function removeLLM(
   store: Store<StoreSchema>,
   ollamaService: OllamaService,
-  modelName: string
+  modelName: string,
 ): Promise<void> {
   const existingModels = (store.get(StoreKeys.LLMs) as LLMConfig[]) || [];
 
@@ -76,7 +76,7 @@ export async function removeLLM(
   }
 
   const updatedModels = existingModels.filter(
-    (model) => model.modelName !== modelName
+    (model) => model.modelName !== modelName,
   );
   store.set(StoreKeys.LLMs, updatedModels);
 
@@ -85,7 +85,7 @@ export async function removeLLM(
 
 export async function getAllLLMConfigs(
   store: Store<StoreSchema>,
-  ollamaSession: OllamaService
+  ollamaSession: OllamaService,
 ): Promise<LLMConfig[]> {
   const llmConfigsFromStore = store.get(StoreKeys.LLMs);
   const ollamaLLMConfigs = await ollamaSession.getAvailableModels();
@@ -96,10 +96,10 @@ export async function getAllLLMConfigs(
 export async function getLLMConfig(
   store: Store<StoreSchema>,
   ollamaSession: OllamaService,
-  modelName: string
+  modelName: string,
 ): Promise<LLMConfig | undefined> {
   const llmConfigs = await getAllLLMConfigs(store, ollamaSession);
-  console.log("llmConfigs: ", llmConfigs);
+  console.log('llmConfigs: ', llmConfigs);
   if (llmConfigs) {
     return llmConfigs.find((model: LLMConfig) => model.modelName === modelName);
   }

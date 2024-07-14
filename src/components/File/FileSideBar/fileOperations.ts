@@ -1,8 +1,8 @@
-import { FileInfoNode, FileInfoTree } from "electron/main/filesystem/types";
+import { FileInfoNode, FileInfoTree } from 'electron/main/filesystem/types';
 
 export const sortFilesAndDirectories = (
   fileList: FileInfoTree,
-  currentFilePath: string | null
+  currentFilePath: string | null,
 ): FileInfoTree => {
   fileList.sort((a, b) => {
     const aIsDirectory = isFileNodeDirectory(a);
@@ -45,9 +45,8 @@ export const sortFilesAndDirectories = (
   return fileList;
 };
 
-export const isFileNodeDirectory = (fileInfo: FileInfoNode): boolean => {
-  return fileInfo.children !== undefined;
-};
+export const isFileNodeDirectory = (fileInfo: FileInfoNode): boolean =>
+  fileInfo.children !== undefined;
 
 export const moveFile = async (sourcePath: string, destinationPath: string) => {
   await window.fileSystem.moveFileOrDir(sourcePath, destinationPath);

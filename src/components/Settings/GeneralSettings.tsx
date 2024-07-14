@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
-import { Button } from "@material-tailwind/react";
-import Switch from "@mui/material/Switch";
+import { Button } from '@material-tailwind/react';
+import Switch from '@mui/material/Switch';
 
-import { useFileByFilepath } from "../File/hooks/use-file-by-filepath";
+import { useFileByFilepath } from '../File/hooks/use-file-by-filepath';
 
-import CreateAppearanceSection, { GenSettingsProps } from "./GeneralSections";
+import CreateAppearanceSection, { GenSettingsProps } from './GeneralSections';
 
 /*
  *  General Page has the following format:
@@ -28,7 +28,7 @@ import CreateAppearanceSection, { GenSettingsProps } from "./GeneralSections";
 const GeneralSettings: React.FC<GenSettingsProps> = () => {
   const { spellCheckEnabled, setSpellCheckEnabled } = useFileByFilepath();
   const [userHasMadeUpdate, setUserHasMadeUpdate] = useState(false);
-  const [tempSpellCheckEnabled, setTempSpellCheckEnabled] = useState("false");
+  const [tempSpellCheckEnabled, setTempSpellCheckEnabled] = useState('false');
 
   useEffect(() => {
     const fetchParams = async () => {
@@ -51,37 +51,35 @@ const GeneralSettings: React.FC<GenSettingsProps> = () => {
     setUserHasMadeUpdate(false);
   };
   return (
-    <div className="w-full flex-col justify-between bg-dark-gray-c-three rounded">
-      <h2 className="text-2xl font-semibold mb-0 text-white">General</h2>
+    <div className='w-full flex-col justify-between bg-dark-gray-c-three rounded'>
+      <h2 className='text-2xl font-semibold mb-0 text-white'>General</h2>
       <CreateAppearanceSection />
-      <p className="text-gray-300 text-sm mb-2 mt-1">Spell Check</p>
+      <p className='text-gray-300 text-sm mb-2 mt-1'>Spell Check</p>
       <Switch
-        checked={tempSpellCheckEnabled == "true" ? true : false}
+        checked={tempSpellCheckEnabled == 'true'}
         onChange={() => {
           setUserHasMadeUpdate(true);
-          if (tempSpellCheckEnabled == "true")
-            setTempSpellCheckEnabled("false");
-          else setTempSpellCheckEnabled("true");
+          if (tempSpellCheckEnabled == 'true')
+            setTempSpellCheckEnabled('false');
+          else setTempSpellCheckEnabled('true');
         }}
-        inputProps={{ "aria-label": "controlled" }}
+        inputProps={{ 'aria-label': 'controlled' }}
       />
       {userHasMadeUpdate && (
-        <div className="flex">
+        <div className='flex'>
           <Button
             // variant="contained"
-            placeholder={""}
+            placeholder=''
             onClick={handleSave}
-            className="bg-blue-500 w-[150px] border-none h-8 hover:bg-blue-600 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mb-0 mr-4 mt-2"
+            className='bg-blue-500 w-[150px] border-none h-8 hover:bg-blue-600 cursor-pointer text-center pt-0 pb-0 pr-2 pl-2 mb-0 mr-4 mt-2'
           >
             Save
           </Button>
         </div>
       )}
-      {
-        <p className="text-yellow-500 text-xs">
-          Quit and restart the app for it to take effect
-        </p>
-      }
+      <p className='text-yellow-500 text-xs'>
+        Quit and restart the app for it to take effect
+      </p>
       {/* =======
 import { Button } from "@material-tailwind/react";
 import Switch from "@mui/material/Switch";

@@ -1,12 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 import {
   FileInfo,
   FileInfoNode,
   FileInfoTree,
-} from "electron/main/filesystem/types";
+} from 'electron/main/filesystem/types';
 
-import { sortFilesAndDirectories } from "../fileOperations";
+import { sortFilesAndDirectories } from '../fileOperations';
 
 export const useFileInfoTree = (currentFilePath: string | null) => {
   const [fileInfoTree, setFileInfoTree] = useState<FileInfoTree>([]);
@@ -21,11 +21,11 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
       return expandedDirectories;
     }
     const pathSegments = currentFilePath
-      .split("/")
-      .filter((segment) => segment !== "");
+      .split('/')
+      .filter((segment) => segment !== '');
     pathSegments.pop(); // Remove the file name from the path
 
-    let currentPath = "";
+    let currentPath = '';
     const newExpandedDirectories = new Map(expandedDirectories);
     pathSegments.forEach((segment) => {
       currentPath += `/${segment}`;
@@ -42,7 +42,7 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
     setExpandedDirectories(newExpandedDirectories);
   };
 
-  //upon indexing, update the file info tree and expand relevant directories
+  // upon indexing, update the file info tree and expand relevant directories
   useEffect(() => {
     const handleFileUpdate = (updatedFiles: FileInfoTree) => {
       const sortedFiles = sortFilesAndDirectories(updatedFiles, null);
@@ -54,8 +54,8 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
     };
 
     const removeFilesListListener = window.ipcRenderer.receive(
-      "files-list",
-      handleFileUpdate
+      'files-list',
+      handleFileUpdate,
     );
 
     return () => {
@@ -63,7 +63,7 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
     };
   }, [currentFilePath]);
 
-  //initial load of files
+  // initial load of files
   useEffect(() => {
     const fetchAndSetFiles = async () => {
       try {
@@ -73,7 +73,7 @@ export const useFileInfoTree = (currentFilePath: string | null) => {
         const flattenedFiles = flattenFileInfoTree(sortedFiles);
         setFlattenedFiles(flattenedFiles);
       } catch (error) {
-        console.error("Error fetching and setting files:", error);
+        console.error('Error fetching and setting files:', error);
       }
     };
 
@@ -111,6 +111,5 @@ export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
   return flatList;
 }
 
-export const isFileNodeDirectory = (fileInfo: FileInfoNode): boolean => {
-  return fileInfo.children !== undefined;
-};
+export const isFileNodeDirectory = (fileInfo: FileInfoNode): boolean =>
+  fileInfo.children !== undefined;

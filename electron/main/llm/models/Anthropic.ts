@@ -1,18 +1,18 @@
-import Anthropic from "@anthropic-ai/sdk";
+import Anthropic from '@anthropic-ai/sdk';
 import {
   Message,
   MessageParam,
   MessageStreamEvent,
-} from "@anthropic-ai/sdk/resources";
+} from '@anthropic-ai/sdk/resources';
 import {
   LLMGenerationParameters,
   LLMConfig,
-} from "electron/main/electron-store/storeConfig";
-import { Tiktoken, TiktokenModel, encodingForModel } from "js-tiktoken";
-import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
+} from 'electron/main/electron-store/storeConfig';
+import { Tiktoken, TiktokenModel, encodingForModel } from 'js-tiktoken';
+import { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 
-import { customFetchUsingElectronNetStreaming } from "../../common/network";
-import { LLMSessionService } from "../types";
+import { customFetchUsingElectronNetStreaming } from '../../common/network';
+import { LLMSessionService } from '../types';
 
 export class AnthropicModelSessionService implements LLMSessionService {
   public getTokenizer = (llmName: string): ((text: string) => number[]) => {
@@ -20,16 +20,14 @@ export class AnthropicModelSessionService implements LLMSessionService {
     try {
       tokenEncoding = encodingForModel(llmName as TiktokenModel);
     } catch (e) {
-      tokenEncoding = encodingForModel("gpt-3.5-turbo-1106"); // hack while we think about what to do with custom remote models' tokenizers
+      tokenEncoding = encodingForModel('gpt-3.5-turbo-1106'); // hack while we think about what to do with custom remote models' tokenizers
     }
-    const tokenize = (text: string): number[] => {
-      return tokenEncoding.encode(text);
-    };
+    const tokenize = (text: string): number[] => tokenEncoding.encode(text);
     return tokenize;
   };
 
   public abort(): void {
-    throw new Error("Abort not yet implemented.");
+    throw new Error('Abort not yet implemented.');
   }
 
   async response(
@@ -37,7 +35,7 @@ export class AnthropicModelSessionService implements LLMSessionService {
     modelConfig: LLMConfig,
     messageHistory: ChatCompletionMessageParam[],
     isJSONMode: boolean,
-    generationParams?: LLMGenerationParameters
+    generationParams?: LLMGenerationParameters,
   ): Promise<Message> {
     const anthropic = new Anthropic({
       apiKey: modelConfig.apiKey,
@@ -60,7 +58,7 @@ export class AnthropicModelSessionService implements LLMSessionService {
     isJSONMode: boolean,
     messageHistory: ChatCompletionMessageParam[],
     handleChunk: (chunk: MessageStreamEvent) => void,
-    generationParams?: LLMGenerationParameters
+    generationParams?: LLMGenerationParameters,
   ): Promise<void> {
     const anthropic = new Anthropic({
       apiKey: modelConfig.apiKey,
@@ -82,13 +80,14 @@ export class AnthropicModelSessionService implements LLMSessionService {
 }
 
 function cleanMessage(message: ChatCompletionMessageParam): MessageParam {
-  if (typeof message.content !== "string") {
-    throw new Error("Message content is not a string");
+  if (typeof message.content !== 'string') {
+    throw new Error('Message content is not a string');
   }
-  if (message.role === "system") {
-    return { role: "user", content: message.content };
-  } else if (message.role === "user" || message.role === "assistant") {
+  if (message.role === 'system') {
+    return { role: 'user', content: message.content };
+  }
+  if (message.role === 'user' || message.role === 'assistant') {
     return { role: message.role, content: message.content };
   }
-  throw new Error("Message role is not valid");
+  throw new Error('Message role is not valid');
 }

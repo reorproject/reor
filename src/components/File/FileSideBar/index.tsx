@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
-import { FileInfoNode, FileInfoTree } from "electron/main/filesystem/types";
-import { FixedSizeList as List, ListChildComponentProps } from "react-window";
+import { FileInfoNode, FileInfoTree } from 'electron/main/filesystem/types';
+import { FixedSizeList as List, ListChildComponentProps } from 'react-window';
 
-import RenameDirModal from "../RenameDirectory";
-import RenameNoteModal from "../RenameNote";
+import RenameDirModal from '../RenameDirectory';
+import RenameNoteModal from '../RenameNote';
 
-import { FileItem } from "./FileItem";
-import { isFileNodeDirectory } from "./fileOperations";
+import { FileItem } from './FileItem';
+import { isFileNodeDirectory } from './fileOperations';
 
 interface FileListProps {
   files: FileInfoTree;
@@ -35,45 +35,43 @@ export const FileSidebar: React.FC<FileListProps> = ({
   fileDirToBeRenamed,
   setFileDirToBeRenamed,
   listHeight,
-}) => {
-  return (
-    <div className="flex flex-col h-full text-white overflow-y-hidden overflow-x-hidden">
-      {noteToBeRenamed && (
-        <RenameNoteModal
-          isOpen={!!noteToBeRenamed}
-          onClose={() => setNoteToBeRenamed("")}
-          fullNoteName={noteToBeRenamed}
-          renameNote={async ({ path, newNoteName }) => {
-            await renameFile(path, newNoteName);
-          }}
-        />
-      )}
-      {fileDirToBeRenamed && (
-        <RenameDirModal
-          isOpen={!!fileDirToBeRenamed}
-          onClose={() => setFileDirToBeRenamed("")}
-          fullDirName={fileDirToBeRenamed}
-          renameDir={async ({ path, newDirName: newNoteName }) => {
-            await renameFile(path, newNoteName);
-          }}
-        />
-      )}
-      <FileExplorer
-        files={files}
-        selectedFilePath={selectedFilePath}
-        onFileSelect={onFileSelect}
-        handleDragStart={handleDragStartImpl}
-        expandedDirectories={expandedDirectories}
-        handleDirectoryToggle={handleDirectoryToggle}
-        lheight={listHeight}
+}) => (
+  <div className='flex flex-col h-full text-white overflow-y-hidden overflow-x-hidden'>
+    {noteToBeRenamed && (
+      <RenameNoteModal
+        isOpen={!!noteToBeRenamed}
+        onClose={() => setNoteToBeRenamed('')}
+        fullNoteName={noteToBeRenamed}
+        renameNote={async ({ path, newNoteName }) => {
+          await renameFile(path, newNoteName);
+        }}
       />
-    </div>
-  );
-};
+    )}
+    {fileDirToBeRenamed && (
+      <RenameDirModal
+        isOpen={!!fileDirToBeRenamed}
+        onClose={() => setFileDirToBeRenamed('')}
+        fullDirName={fileDirToBeRenamed}
+        renameDir={async ({ path, newDirName: newNoteName }) => {
+          await renameFile(path, newNoteName);
+        }}
+      />
+    )}
+    <FileExplorer
+      files={files}
+      selectedFilePath={selectedFilePath}
+      onFileSelect={onFileSelect}
+      handleDragStart={handleDragStartImpl}
+      expandedDirectories={expandedDirectories}
+      handleDirectoryToggle={handleDirectoryToggle}
+      lheight={listHeight}
+    />
+  </div>
+);
 
 const handleDragStartImpl = (e: React.DragEvent, file: FileInfoNode) => {
-  e.dataTransfer.setData("text/plain", file.path);
-  e.dataTransfer.effectAllowed = "move";
+  e.dataTransfer.setData('text/plain', file.path);
+  e.dataTransfer.effectAllowed = 'move';
 };
 
 interface FileExplorerProps {
@@ -102,17 +100,17 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
       setListHeight(lheight ?? window.innerHeight);
     };
 
-    window.addEventListener("resize", updateHeight);
+    window.addEventListener('resize', updateHeight);
 
     return () => {
-      window.removeEventListener("resize", updateHeight);
+      window.removeEventListener('resize', updateHeight);
     };
   }, []);
 
   const getVisibleFilesAndFlatten = (
     files: FileInfoTree,
     expandedDirectories: Map<string, boolean>,
-    indentMultiplyer = 0
+    indentMultiplyer = 0,
   ): { file: FileInfoNode; indentMultiplyer: number }[] => {
     let visibleItems: { file: FileInfoNode; indentMultiplyer: number }[] = [];
     files.forEach((file) => {
@@ -129,7 +127,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
             ...getVisibleFilesAndFlatten(
               file.children,
               expandedDirectories,
-              indentMultiplyer + 1
+              indentMultiplyer + 1,
             ),
           ];
         }
@@ -171,7 +169,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   return (
     <div
       onContextMenu={handleMenuContext}
-      className="h-full flex-grow overflow-y-none"
+      className='h-full flex-grow overflow-y-none'
       // style={hideScrollbarStyle}
     >
       {/* <style>{webKitScrollBarStyles}</style> */}
@@ -179,7 +177,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
         height={listHeight}
         itemCount={itemCount}
         itemSize={30}
-        width={"100%"}
+        width='100%'
         style={{ padding: 0, margin: 0 }}
       >
         {Rows}

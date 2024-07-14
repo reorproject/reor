@@ -1,30 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
-import { MessageStreamEvent } from "@anthropic-ai/sdk/resources";
-import { DBEntry, DBQueryResult } from "electron/main/vector-database/schema";
+import { MessageStreamEvent } from '@anthropic-ai/sdk/resources';
+import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema';
 import {
   ChatCompletionChunk,
   ChatCompletionMessageParam,
-} from "openai/resources/chat/completions";
-import posthog from "posthog-js";
-import ReactMarkdown from "react-markdown";
-import rehypeRaw from "rehype-raw";
+} from 'openai/resources/chat/completions';
+import posthog from 'posthog-js';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 
-import { SimilarEntriesComponent } from "../Sidebars/SimilarFilesSidebar";
+import { SimilarEntriesComponent } from '../Sidebars/SimilarFilesSidebar';
 
-import AddContextFiltersModal from "./AddContextFiltersModal";
-import { PromptSuggestion } from "./Chat-Prompts";
-import ChatInput from "./ChatInput";
+import AddContextFiltersModal from './AddContextFiltersModal';
+import { PromptSuggestion } from './Chat-Prompts';
+import ChatInput from './ChatInput';
 import {
   formatOpenAIMessageContentIntoString,
   resolveRAGContext,
-} from "./chatUtils";
+} from './chatUtils';
 
-import { errorToStringRendererProcess } from "@/utils/error";
+import { errorToStringRendererProcess } from '@/utils/error';
 
 // convert ask options to enum
 enum AskOptions {
-  Ask = "Ask",
+  Ask = 'Ask',
   // AskFile = "Ask File",
   // TemporalAsk = "Temporal Ask",
   // FlashcardAsk = "Flashcard Ask",
@@ -54,7 +54,7 @@ export type ChatHistory = {
   displayableChatHistory: ChatMessageToDisplay[];
 };
 export type ChatMessageToDisplay = ChatCompletionMessageParam & {
-  messageType: "success" | "error";
+  messageType: 'success' | 'error';
   context: DBEntry[];
   visibleContent?: string;
 };
@@ -74,7 +74,7 @@ interface AnonymizedChatFilters {
 }
 
 function anonymizeChatFiltersForPosthog(
-  chatFilters: ChatFilters
+  chatFilters: ChatFilters,
 ): AnonymizedChatFilters {
   const { numberOfChunksToFetch, files, minDate, maxDate } = chatFilters;
   return {
@@ -107,7 +107,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   chatFilters,
   setChatFilters,
 }) => {
-  const [userTextFieldInput, setUserTextFieldInput] = useState<string>("");
+  const [userTextFieldInput, setUserTextFieldInput] = useState<string>('');
   const [askText] = useState<AskOptions>(AskOptions.Ask);
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
   const [readyToSave, setReadyToSave] = useState<boolean>(false);
@@ -125,7 +125,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     const setContextOnFileAdded = async () => {
       if (chatFilters.files.length > 0) {
         const results = await window.fileSystem.getFilesystemPathsAsDBItems(
-          chatFilters.files
+          chatFilters.files,
         );
         setCurrentContext(results as DBQueryResult[]);
       } else if (!currentChatHistory?.id) {
@@ -144,9 +144,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   }, [readyToSave, currentChatHistory]);
 
   const handleSubmitNewMessage = async (
-    chatHistory: ChatHistory | undefined
+    chatHistory: ChatHistory | undefined,
   ) => {
-    posthog.capture("chat_message_submitted", {
+    posthog.capture('chat_message_submitted', {
       chatId: chatHistory?.id,
       chatLength: chatHistory?.displayableChatHistory.length,
       chatFilters: anonymizeChatFiltersForPosthog(chatFilters),
@@ -175,19 +175,19 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           //   context: [],
           // });
           chatHistory.displayableChatHistory.push(
-            await resolveRAGContext(userTextFieldInput, chatFilters)
+            await resolveRAGContext(userTextFieldInput, chatFilters),
           );
         }
       } else {
         chatHistory.displayableChatHistory.push({
-          role: "user",
+          role: 'user',
           content: userTextFieldInput,
-          messageType: "success",
+          messageType: 'success',
           context: [],
         });
       }
 
-      setUserTextFieldInput("");
+      setUserTextFieldInput('');
 
       setCurrentChatHistory(chatHistory);
 
@@ -198,7 +198,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       const llmConfigs = await window.llm.getLLMConfigs();
 
       const currentModelConfig = llmConfigs.find(
-        (config) => config.modelName === defaultLLMName
+        (config) => config.modelName === defaultLLMName,
       );
       if (!currentModelConfig) {
         throw new Error(`No model config found for model: ${defaultLLMName}`);
@@ -208,7 +208,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         defaultLLMName,
         currentModelConfig,
         false,
-        chatHistory
+        chatHistory,
       );
       setReadyToSave(true);
     } catch (error) {
@@ -216,7 +216,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         appendNewContentToMessageHistory(
           chatHistory.id,
           errorToStringRendererProcess(error),
-          "error"
+          'error',
         );
       }
     }
@@ -227,7 +227,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const appendNewContentToMessageHistory = (
     chatID: string,
     newContent: string,
-    newMessageType: "success" | "error"
+    newMessageType: 'success' | 'error',
   ) => {
     setCurrentChatHistory((prev) => {
       if (chatID !== prev?.id) return prev;
@@ -236,12 +236,12 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         const lastMessage =
           newDisplayableHistory[newDisplayableHistory.length - 1];
 
-        if (lastMessage.role === "assistant") {
+        if (lastMessage.role === 'assistant') {
           lastMessage.content += newContent; // Append new content with a space
           lastMessage.messageType = newMessageType;
         } else {
           newDisplayableHistory.push({
-            role: "assistant",
+            role: 'assistant',
             content: newContent,
             messageType: newMessageType,
             context: [],
@@ -249,7 +249,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         }
       } else {
         newDisplayableHistory.push({
-          role: "assistant",
+          role: 'assistant',
           content: newContent,
           messageType: newMessageType,
           context: [],
@@ -259,12 +259,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       return {
         id: prev!.id,
         displayableChatHistory: newDisplayableHistory,
-        openAIChatHistory: newDisplayableHistory.map((message) => {
-          return {
-            role: message.role,
-            content: message.content,
-          };
-        }),
+        openAIChatHistory: newDisplayableHistory.map((message) => ({
+          role: message.role,
+          content: message.content,
+        })),
       };
     });
   };
@@ -272,33 +270,33 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   useEffect(() => {
     const handleOpenAIChunk = async (
       receivedChatID: string,
-      chunk: ChatCompletionChunk
+      chunk: ChatCompletionChunk,
     ) => {
-      const newContent = chunk.choices[0].delta.content ?? "";
+      const newContent = chunk.choices[0].delta.content ?? '';
       if (newContent) {
-        appendNewContentToMessageHistory(receivedChatID, newContent, "success");
+        appendNewContentToMessageHistory(receivedChatID, newContent, 'success');
       }
     };
 
     const handleAnthropicChunk = async (
       receivedChatID: string,
-      chunk: MessageStreamEvent
+      chunk: MessageStreamEvent,
     ) => {
       const newContent =
-        chunk.type === "content_block_delta" ? chunk.delta.text ?? "" : "";
+        chunk.type === 'content_block_delta' ? (chunk.delta.text ?? '') : '';
       if (newContent) {
-        appendNewContentToMessageHistory(receivedChatID, newContent, "success");
+        appendNewContentToMessageHistory(receivedChatID, newContent, 'success');
       }
     };
 
     const removeOpenAITokenStreamListener = window.ipcRenderer.receive(
-      "openAITokenStream",
-      handleOpenAIChunk
+      'openAITokenStream',
+      handleOpenAIChunk,
     );
 
     const removeAnthropicTokenStreamListener = window.ipcRenderer.receive(
-      "anthropicTokenStream",
-      handleAnthropicChunk
+      'anthropicTokenStream',
+      handleAnthropicChunk,
     );
 
     return () => {
@@ -308,22 +306,22 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   }, []);
 
   return (
-    <div className="flex items-center justify-center w-full h-full">
-      <div className="flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid">
-        <div className="flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full">
-          <div className="space-y-2 mt-2 ml-4 mr-4 flex-grow">
+    <div className='flex items-center justify-center w-full h-full'>
+      <div className='flex flex-col w-full h-full mx-auto overflow-hidden bg-neutral-800 border-l-[0.001px] border-b-0 border-t-0 border-r-0 border-neutral-700 border-solid'>
+        <div className='flex flex-col overflow-auto p-3 pt-0 bg-transparent h-full'>
+          <div className='space-y-2 mt-2 ml-4 mr-4 flex-grow'>
             {currentChatHistory?.displayableChatHistory
-              .filter((msg) => msg.role !== "system")
+              .filter((msg) => msg.role !== 'system')
               .map((message, index) => (
                 <ReactMarkdown
                   key={index}
                   rehypePlugins={[rehypeRaw]}
                   className={`p-1 pl-1 markdown-content rounded-lg break-words ${
-                    message.messageType === "error"
-                      ? "bg-red-100 text-red-800"
-                      : message.role === "assistant"
-                      ? "bg-neutral-600	text-gray-200"
-                      : "bg-blue-100	text-blue-800"
+                    message.messageType === 'error'
+                      ? 'bg-red-100 text-red-800'
+                      : message.role === 'assistant'
+                        ? 'bg-neutral-600	text-gray-200'
+                        : 'bg-blue-100	text-blue-800'
                   } `}
                 >
                   {message.visibleContent
@@ -335,20 +333,20 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           {(!currentChatHistory ||
             currentChatHistory?.displayableChatHistory.length == 0) && (
             <>
-              <div className="flex items-center justify-center text-gray-300 text-sm">
+              <div className='flex items-center justify-center text-gray-300 text-sm'>
                 Start a conversation with your notes by typing a message below.
               </div>
-              <div className="flex items-center justify-center text-gray-300 text-sm">
+              <div className='flex items-center justify-center text-gray-300 text-sm'>
                 <button
-                  className="bg-slate-600 m-2 rounded-lg border-none 
-                  h-6 w-40 text-center cursor-pointer vertical-align text-white"
+                  className='bg-slate-600 m-2 rounded-lg border-none
+                  h-6 w-40 text-center cursor-pointer vertical-align text-white'
                   onClick={() => {
                     setIsAddContextFiltersModalOpen(true);
                   }}
                 >
                   {chatFilters.files.length > 0
-                    ? "Update RAG filters"
-                    : "Customise context"}
+                    ? 'Update RAG filters'
+                    : 'Customise context'}
                 </button>
               </div>
             </>
@@ -373,21 +371,19 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
               />
             );
           })} */}
-          {userTextFieldInput === "" &&
+          {userTextFieldInput === '' &&
           (!currentChatHistory ||
             currentChatHistory?.displayableChatHistory.length == 0) ? (
             <>
-              {EXAMPLE_PROMPTS[askText].map((option, index) => {
-                return (
-                  <PromptSuggestion
-                    key={index}
-                    promptText={option}
-                    onClick={() => {
-                      setUserTextFieldInput(option);
-                    }}
-                  />
-                );
-              })}
+              {EXAMPLE_PROMPTS[askText].map((option, index) => (
+                <PromptSuggestion
+                  key={index}
+                  promptText={option}
+                  onClick={() => {
+                    setUserTextFieldInput(option);
+                  }}
+                />
+              ))}
             </>
           ) : undefined}
         </div>
@@ -404,17 +400,15 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       {showSimilarFiles && (
         <SimilarEntriesComponent
           similarEntries={currentContext}
-          titleText="Context used in chat"
+          titleText='Context used in chat'
           onFileSelect={(path: string) => {
             openFileByPath(path);
-            posthog.capture("open_file_from_chat_context");
+            posthog.capture('open_file_from_chat_context');
           }}
-          saveCurrentFile={() => {
-            return Promise.resolve();
-          }}
+          saveCurrentFile={() => Promise.resolve()}
           isLoadingSimilarEntries={false}
           setIsRefined={() => {}} // to allow future toggling
-          isRefined={true} // always refined for now
+          isRefined // always refined for now
         />
       )}
     </div>
@@ -422,13 +416,11 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 };
 
 const getChatHistoryContext = (
-  chatHistory: ChatHistory | undefined
+  chatHistory: ChatHistory | undefined,
 ): DBQueryResult[] => {
   if (!chatHistory) return [];
   const contextForChat = chatHistory.displayableChatHistory
-    .map((message) => {
-      return message.context;
-    })
+    .map((message) => message.context)
     .flat();
   return contextForChat as DBQueryResult[];
 };

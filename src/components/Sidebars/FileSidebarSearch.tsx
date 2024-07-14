@@ -1,10 +1,10 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from 'react';
 
-import { DBQueryResult } from "electron/main/vector-database/schema";
-import posthog from "posthog-js";
-import { FaSearch } from "react-icons/fa";
+import { DBQueryResult } from 'electron/main/vector-database/schema';
+import posthog from 'posthog-js';
+import { FaSearch } from 'react-icons/fa';
 
-import { DBSearchPreview } from "../File/DBResultPreview";
+import { DBSearchPreview } from '../File/DBResultPreview';
 
 interface SearchComponentProps {
   onFileSelect: (path: string) => void;
@@ -41,27 +41,27 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
 
   const openFileSelectSearch = (path: string) => {
     onFileSelect(path);
-    posthog.capture("open_file_from_search");
+    posthog.capture('open_file_from_search');
   };
 
   return (
-    <div className="p-1 h-below-titlebar overflow-y-auto overflow-x-hidden">
-      <div className="relative p-2 bg-neutral-800 rounded mr-1">
-        <span className="absolute inset-y-0 left-0 flex items-center pl-3 mt-[2px]">
-          <FaSearch className="text-gray-200 text-lg" size={14} />
+    <div className='p-1 h-below-titlebar overflow-y-auto overflow-x-hidden'>
+      <div className='relative p-2 bg-neutral-800 rounded mr-1'>
+        <span className='absolute inset-y-0 left-0 flex items-center pl-3 mt-[2px]'>
+          <FaSearch className='text-gray-200 text-lg' size={14} />
         </span>
         <input
           ref={searchInputRef}
-          type="text"
-          className="mt-1 w-full pl-7 mr-1 pr-5 h-8 bg-neutral-700 text-white rounded-md border border-transparent focus:outline-none focus:border-white focus:ring-1 focus:ring-white"
+          type='text'
+          className='mt-1 w-full pl-7 mr-1 pr-5 h-8 bg-neutral-700 text-white rounded-md border border-transparent focus:outline-none focus:border-white focus:ring-1 focus:ring-white'
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Semantic search..."
+          placeholder='Semantic search...'
         />
       </div>
-      <div className="mt-2 w-full">
+      <div className='mt-2 w-full'>
         {searchResults.length > 0 && (
-          <div className="w-full">
+          <div className='w-full'>
             {searchResults.map((result, index) => (
               <DBSearchPreview
                 key={index}
@@ -78,7 +78,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
 
 const debounce = <F extends (...args: string[]) => Promise<void>>(
   func: F,
-  delay: number
+  delay: number,
 ): ((...args: Parameters<F>) => void) => {
   let debounceTimer: NodeJS.Timeout;
 

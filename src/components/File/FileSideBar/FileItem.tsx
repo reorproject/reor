@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
-import { FileInfoNode } from "electron/main/filesystem/types";
-import posthog from "posthog-js";
-import { FaChevronDown, FaChevronRight } from "react-icons/fa";
+import { FileInfoNode } from 'electron/main/filesystem/types';
+import posthog from 'posthog-js';
+import { FaChevronDown, FaChevronRight } from 'react-icons/fa';
 
-import { isFileNodeDirectory, moveFile } from "./fileOperations";
+import { isFileNodeDirectory, moveFile } from './fileOperations';
 
-import { removeFileExtension } from "@/utils/strings";
+import { removeFileExtension } from '@/utils/strings';
 
 interface FileInfoProps {
   file: FileInfoNode;
@@ -45,20 +45,20 @@ export const FileItem: React.FC<FileInfoProps> = ({
     e.preventDefault();
     e.stopPropagation();
     setIsDragOver(false); // Reset drag over state
-    const sourcePath = e.dataTransfer.getData("text/plain");
+    const sourcePath = e.dataTransfer.getData('text/plain');
     let destinationPath = file.path; // Default destination path is the path of the file item itself
 
     if (!isFileNodeDirectory(file)) {
-      const pathSegments = file.path.split("/");
+      const pathSegments = file.path.split('/');
       pathSegments.pop(); // Remove the file name from the path
-      destinationPath = pathSegments.join("/");
+      destinationPath = pathSegments.join('/');
     }
 
     try {
       moveFile(sourcePath, destinationPath);
       // Refresh file list here or in moveFile function
     } catch (error) {
-      console.error("Failed to move file:", error);
+      console.error('Failed to move file:', error);
       // Handle error (e.g., show an error message)
     }
   };
@@ -67,7 +67,7 @@ export const FileItem: React.FC<FileInfoProps> = ({
       onDirectoryToggle(file.path);
     } else {
       onFileSelect(file.path);
-      posthog.capture("open_file_from_sidebar");
+      posthog.capture('open_file_from_sidebar');
     }
   };
 
@@ -83,8 +83,8 @@ export const FileItem: React.FC<FileInfoProps> = ({
   };
 
   const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-neutral-700 h-full mt-0 mb-0 ${
-    isSelected ? "bg-neutral-700 text-white font-semibold" : "text-gray-200"
-  } ${isDragOver ? "bg-neutral-500" : ""}`;
+    isSelected ? 'bg-neutral-700 text-white font-semibold' : 'text-gray-200'
+  } ${isDragOver ? 'bg-neutral-500' : ''}`;
 
   return (
     <div
@@ -98,17 +98,17 @@ export const FileItem: React.FC<FileInfoProps> = ({
     >
       <div onClick={toggle} className={itemClasses}>
         {isDirectory && (
-          <span className={`mr-2 mt-1 text-[13px] `}>
+          <span className='mr-2 mt-1 text-[13px] '>
             {isExpanded ? (
-              <FaChevronDown title="Collapse Directory" />
+              <FaChevronDown title='Collapse Directory' />
             ) : (
-              <FaChevronRight title="Open Directory" />
+              <FaChevronRight title='Open Directory' />
             )}
           </span>
         )}
         <span
           className={`text-[13px] flex-1 truncate mt-0 ${
-            isDirectory ? "font-semibold" : ""
+            isDirectory ? 'font-semibold' : ''
           }`}
         >
           {isDirectory ? file.name : removeFileExtension(file.name)}

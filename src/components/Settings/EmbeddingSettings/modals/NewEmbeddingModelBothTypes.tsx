@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
-import { Button } from "@material-tailwind/react";
+import { Button } from '@material-tailwind/react';
 import {
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
-} from "electron/main/electron-store/storeConfig";
+} from 'electron/main/electron-store/storeConfig';
 
-import ExternalLink from "../../../Common/ExternalLink";
-import ReorModal from "../../../Common/Modal";
+import ExternalLink from '../../../Common/ExternalLink';
+import ReorModal from '../../../Common/Modal';
 
 interface NewLocalEmbeddingModelModalBothTypesProps {
   isOpen: boolean;
@@ -19,7 +19,7 @@ const NewEmbeddingModelModalBothTypes: React.FC<
   NewLocalEmbeddingModelModalBothTypesProps
 > = ({ isOpen, onClose, handleUserHasChangedModel }) => {
   // const [newModelPath, setNewModelPath] = useState<string>("");
-  const [huggingfaceRepo, setHuggingfaceRepo] = useState("");
+  const [huggingfaceRepo, setHuggingfaceRepo] = useState('');
   const [isRepoModalOpen, setIsRepoModalOpen] = useState(false);
 
   const handleModelDirectorySelection = async () => {
@@ -27,7 +27,7 @@ const NewEmbeddingModelModalBothTypes: React.FC<
     if (paths && paths.length > 0) {
       // setNewModelPath(paths[0]);
       const modelObject: EmbeddingModelWithLocalPath = {
-        type: "local",
+        type: 'local',
         localPath: paths[0],
       };
 
@@ -40,7 +40,7 @@ const NewEmbeddingModelModalBothTypes: React.FC<
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       // saveModelConfigToElectronStore();
     }
   };
@@ -52,7 +52,7 @@ const NewEmbeddingModelModalBothTypes: React.FC<
     }
 
     const modelObject: EmbeddingModelWithRepo = {
-      type: "repo",
+      type: 'repo',
       repoName: huggingfaceRepo,
     };
 
@@ -66,42 +66,42 @@ const NewEmbeddingModelModalBothTypes: React.FC<
 
   return (
     <ReorModal isOpen={isOpen} onClose={onClose}>
-      <div className="w-[400px] ml-2 mr-2 mb-2 pl-3">
-        <h2 className="text-white  font-semibold mb-0">
+      <div className='w-[400px] ml-2 mr-2 mb-2 pl-3'>
+        <h2 className='text-white  font-semibold mb-0'>
           Attach a custom embedding model
         </h2>
-        <p className="text-white text-sm mb-2 mt-2">
+        <p className='text-white text-sm mb-2 mt-2'>
           You can either attach a local embedding model or provide a Hugging
           Face repo name to be downloaded:
         </p>
-        <div className="flex">
+        <div className='flex'>
           <Button
-            className="bg-blue-600 border-none h-8 hover:bg-blue-600 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1 mr-2"
+            className='bg-blue-600 border-none h-8 hover:bg-blue-600 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1 mr-2'
             onClick={handleModelDirectorySelection}
-            placeholder=""
+            placeholder=''
           >
             Attach Local Model
           </Button>
           <Button
-            className="bg-blue-600 border-none h-8 hover:bg-blue-600 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1"
+            className='bg-blue-600 border-none h-8 hover:bg-blue-600 cursor-pointer w-[180px] text-center pt-0 pb-0 pr-2 pl-2 mt-1'
             onClick={() => {
               setIsRepoModalOpen(true);
             }}
-            placeholder=""
+            placeholder=''
           >
             Download by Repo name
           </Button>
         </div>
-        <p className="text-white text-xs mb-2 mt-2 italic">
-          <ExternalLink href="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=downloads&search=xenova">
+        <p className='text-white text-xs mb-2 mt-2 italic'>
+          <ExternalLink href='https://huggingface.co/models?pipeline_tag=feature-extraction&sort=downloads&search=xenova'>
             This page on Hugging Face
-          </ExternalLink>{" "}
+          </ExternalLink>{' '}
           has most available models. It must be a &quot;Xenova&quot; ONNX
-          embedding model. Check out{" "}
-          <ExternalLink href="https://www.reorproject.org/docs/documentation/embedding">
+          embedding model. Check out{' '}
+          <ExternalLink href='https://www.reorproject.org/docs/documentation/embedding'>
             this guide
-          </ExternalLink>{" "}
-          for more info.{" "}
+          </ExternalLink>{' '}
+          for more info.{' '}
         </p>
 
         <ReorModal
@@ -110,20 +110,20 @@ const NewEmbeddingModelModalBothTypes: React.FC<
             handleSaveHuggingFaceRepo();
           }}
         >
-          <div className="w-[300px] ml-2 mr-2 mb-2 pl-3 pt-1">
-            <h3 className="font-semibold mb-3 text-white">
+          <div className='w-[300px] ml-2 mr-2 mb-2 pl-3 pt-1'>
+            <h3 className='font-semibold mb-3 text-white'>
               Download by Repo name
             </h3>
             {/* <p className="text-gray-100 mb-3 mt-2 text-sm">
               This will download the embedding model from Hugging Face.
             </p> */}
             <input
-              type="text"
-              className="block w-full px-3 py-2 mt-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out"
+              type='text'
+              className='block w-full px-3 py-2 mt-2 border border-gray-300 box-border rounded-md focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out'
               value={huggingfaceRepo}
               onChange={(e) => setHuggingfaceRepo(e.target.value)}
               onKeyDown={handleKeyPress}
-              placeholder="Xenova/roberta-base-squad2"
+              placeholder='Xenova/roberta-base-squad2'
             />
             {/* <p className="text-gray-100 text-xs mb-2 mt-2 italic">
               <ExternalLink
@@ -134,11 +134,11 @@ const NewEmbeddingModelModalBothTypes: React.FC<
               embedding model.
             </p> */}
             <Button
-              className="bg-blue-500 border-none h-8 hover:bg-blue-600 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2 mt-3"
+              className='bg-blue-500 border-none h-8 hover:bg-blue-600 cursor-pointer w-[80px] text-center pt-0 pb-0 pr-2 pl-2 mt-3'
               onClick={() => {
                 if (huggingfaceRepo) handleSaveHuggingFaceRepo();
               }}
-              placeholder=""
+              placeholder=''
             >
               Download
             </Button>

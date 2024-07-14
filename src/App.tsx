@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
-import { Portal } from "@headlessui/react";
-import posthog from "posthog-js";
-import { ToastContainer, toast } from "react-toastify";
+import { Portal } from '@headlessui/react';
+import posthog from 'posthog-js';
+import { ToastContainer, toast } from 'react-toastify';
 
-import "react-toastify/dist/ReactToastify.css";
-import IndexingProgress from "./components/Common/IndexingProgress";
-import MainPageComponent from "./components/MainPage";
-import InitialSetupSinglePage from "./components/Settings/InitialSettingsSinglePage";
+import 'react-toastify/dist/ReactToastify.css';
+import IndexingProgress from './components/Common/IndexingProgress';
+import MainPageComponent from './components/MainPage';
+import InitialSetupSinglePage from './components/Settings/InitialSettingsSinglePage';
 
 interface AppProps {}
 
@@ -23,14 +23,14 @@ const App: React.FC<AppProps> = () => {
     const handleProgressUpdate = (newProgress: number) => {
       setIndexingProgress(newProgress);
     };
-    window.ipcRenderer.receive("indexing-progress", handleProgressUpdate);
+    window.ipcRenderer.receive('indexing-progress', handleProgressUpdate);
   }, []);
 
   useEffect(() => {
     const initialisePosthog = async () => {
       if (await window.electronStore.getAnalyticsMode()) {
-        posthog.init("phc_xi4hFToX1cZU657yzge1VW0XImaaRzuvnFUdbAKI8fu", {
-          api_host: "https://us.i.posthog.com",
+        posthog.init('phc_xi4hFToX1cZU657yzge1VW0XImaaRzuvnFUdbAKI8fu', {
+          api_host: 'https://us.i.posthog.com',
           autocapture: false,
         });
         posthog.register({
@@ -43,9 +43,9 @@ const App: React.FC<AppProps> = () => {
 
   useEffect(() => {
     const handleIndexingError = (error: string) => {
-      console.log("Indexing error:", error);
+      console.log('Indexing error:', error);
       toast.error(error, {
-        className: "mt-5",
+        className: 'mt-5',
         autoClose: false,
         closeOnClick: false,
         draggable: false,
@@ -53,8 +53,8 @@ const App: React.FC<AppProps> = () => {
       setIndexingProgress(1);
     };
     window.ipcRenderer.receive(
-      "error-to-display-in-window",
-      handleIndexingError
+      'error-to-display-in-window',
+      handleIndexingError,
     );
   }, []);
 
@@ -79,9 +79,9 @@ const App: React.FC<AppProps> = () => {
   };
 
   return (
-    <div className="max-h-screen font-sans bg-neutral-800">
+    <div className='max-h-screen font-sans bg-neutral-800'>
       <Portal>
-        <ToastContainer className="mt-4" />
+        <ToastContainer className='mt-4' />
       </Portal>
       {userHasConfiguredSettingsForIndexing ? (
         indexingProgress < 1 ? (

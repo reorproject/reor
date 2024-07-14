@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
-import Switch from "@mui/material/Switch";
+import Switch from '@mui/material/Switch';
 
 // enum SettingsAppearance {
 //   light = "lightMode",
@@ -49,14 +49,14 @@ const CreateAppearanceSection: React.FC = () => {
   }, []);
 
   return (
-    <div className="flex-col w-full">
-      <h4 className="text-white flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-4 mt-6">
+    <div className='flex-col w-full'>
+      <h4 className='text-white flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-4 mt-6'>
         Appearance
       </h4>
-      <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-3 h-[64px]">
-        <div className="flex flex-col justify-center">
-          <p className="text-gray-100">IconSidebar Compact</p>
-          <p className="text-gray-100 text-xs">
+      <div className='flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-3 h-[64px]'>
+        <div className='flex flex-col justify-center'>
+          <p className='text-gray-100'>IconSidebar Compact</p>
+          <p className='text-gray-100 text-xs'>
             If on, decreases padding on IconSidebar
           </p>
         </div>

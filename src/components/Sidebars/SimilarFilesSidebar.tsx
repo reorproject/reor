@@ -1,25 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
-import { CircularProgress } from "@mui/material";
-import { DBQueryResult } from "electron/main/vector-database/schema";
-import posthog from "posthog-js";
-import { FaArrowRight } from "react-icons/fa";
-import { FiRefreshCw } from "react-icons/fi";
-import { PiGraph } from "react-icons/pi";
-import { toast } from "react-toastify";
-import removeMd from "remove-markdown";
+import { CircularProgress } from '@mui/material';
+import { DBQueryResult } from 'electron/main/vector-database/schema';
+import posthog from 'posthog-js';
+import { FaArrowRight } from 'react-icons/fa';
+import { FiRefreshCw } from 'react-icons/fi';
+import { PiGraph } from 'react-icons/pi';
+import { toast } from 'react-toastify';
+import removeMd from 'remove-markdown';
 
-import "../../styles/global.css";
-import ResizableComponent from "../Common/ResizableComponent";
-import { HighlightData } from "../Editor/HighlightExtension";
-import { DBResultPreview } from "../File/DBResultPreview";
+import '../../styles/global.css';
+import ResizableComponent from '../Common/ResizableComponent';
+import { HighlightData } from '../Editor/HighlightExtension';
+import { DBResultPreview } from '../File/DBResultPreview';
 
-import { errorToStringRendererProcess } from "@/utils/error";
+import { errorToStringRendererProcess } from '@/utils/error';
 
 interface SimilarFilesSidebarComponent {
   filePath: string;
   highlightData: HighlightData;
   openFileByPath: (filePath: string) => void;
+
   saveCurrentlyOpenedFile: () => Promise<void>;
 }
 
@@ -49,7 +50,7 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponent> = ({
       const searchResults = await performSearchOnChunk(
         sanitizedText,
         path,
-        false
+        false,
       );
 
       if (searchResults.length > 0) {
@@ -58,7 +59,7 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponent> = ({
         setSimilarEntries([]);
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
     }
   };
 
@@ -75,7 +76,7 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponent> = ({
   const performSearchOnChunk = async (
     sanitizedText: string,
     fileToBeExcluded: string,
-    withReranking = false
+    withReranking = false,
   ): Promise<DBQueryResult[]> => {
     try {
       const databaseFields = await window.database.getDatabaseFields();
@@ -86,16 +87,16 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponent> = ({
         ? await window.database.searchWithReranking(
             sanitizedText,
             20,
-            filterString
+            filterString,
           )
         : await window.database.search(sanitizedText, 20, filterString);
 
       setIsLoadingSimilarEntries(false);
       return searchResults;
     } catch (error) {
-      console.error("Error:", error);
+      console.error('Error:', error);
       toast.error(errorToStringRendererProcess(error), {
-        className: "mt-5",
+        className: 'mt-5',
         autoClose: false,
         closeOnClick: false,
         draggable: false,
@@ -115,7 +116,7 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponent> = ({
     const searchResults = await performSearchOnChunk(
       sanitizedText,
       filePath,
-      isRefined
+      isRefined,
     );
     setSimilarEntries(searchResults);
   };
@@ -131,11 +132,11 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponent> = ({
           const searchResults: DBQueryResult[] = await window.database.search(
             highlightData.text,
             20,
-            filterString
+            filterString,
           );
           setSimilarEntries(searchResults);
         }}
-      />{" "}
+      />{' '}
       <SimilarEntriesComponent
         // filePath={filePath}
         isRefined={isRefined}
@@ -144,14 +145,14 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponent> = ({
         setSimilarEntries={setSimilarEntries}
         onFileSelect={(path: string) => {
           openFileByPath(path);
-          posthog.capture("open_file_from_related_notes");
+          posthog.capture('open_file_from_related_notes');
         }}
         saveCurrentFile={async () => {
           await saveCurrentlyOpenedFile();
         }}
         updateSimilarEntries={updateSimilarEntries}
         isLoadingSimilarEntries={isLoadingSimilarEntries}
-        titleText="Related notes"
+        titleText='Related notes'
       />
       {/* </ResizableComponent> */}
     </>
@@ -183,69 +184,65 @@ export const SimilarEntriesComponent: React.FC<
   updateSimilarEntries,
   titleText,
   isLoadingSimilarEntries,
-}) => {
-  return (
-    <div className="h-full">
-      <ResizableComponent resizeSide="left" initialWidth={300}>
-        <div className="flex flex-col h-full border-l-[0.1px] border-t-0 border-b-0 border-r-0 border-neutral-700 border-solid">
-          <div className="flex items-center bg-neutral-800 p-0">
-            <div className="flex-1"></div>
-            <div className="flex items-center justify-center px-4">
-              <PiGraph className="text-gray-300 mt-1" />
-              <p className="text-gray-300 text-sm pl-1 mb-0 mt-1">
-                {titleText}
-              </p>
-            </div>
-            <div className="flex-1 flex justify-end pr-3 pt-1 cursor-pointer">
-              {updateSimilarEntries && setSimilarEntries && (
-                <div
-                  onClick={async () => {
-                    setSimilarEntries([]); // simulate refresh
-                    await saveCurrentFile();
-                    updateSimilarEntries();
-                  }}
-                >
-                  {!isLoadingSimilarEntries && (
-                    <FiRefreshCw
-                      className="text-gray-300"
-                      title="Refresh Related Notes"
-                    />
-                  )}
-                  {isLoadingSimilarEntries && <CircularProgress size={24} />}
-                </div>
-              )}
-            </div>
+}) => (
+  <div className='h-full'>
+    <ResizableComponent resizeSide='left' initialWidth={300}>
+      <div className='flex flex-col h-full border-l-[0.1px] border-t-0 border-b-0 border-r-0 border-neutral-700 border-solid'>
+        <div className='flex items-center bg-neutral-800 p-0'>
+          <div className='flex-1' />
+          <div className='flex items-center justify-center px-4'>
+            <PiGraph className='text-gray-300 mt-1' />
+            <p className='text-gray-300 text-sm pl-1 mb-0 mt-1'>{titleText}</p>
           </div>
-          <div className="flex-grow overflow-y-auto overflow-x-hidden">
-            {similarEntries.length > 0 ? (
-              <div className="h-full w-full">
-                {similarEntries
-                  .filter((dbResult) => dbResult)
-                  .map((dbResult, index) => (
-                    <div className="pb-2 pr-2 pl-2 pt-1" key={index}>
-                      <DBResultPreview
-                        key={index}
-                        dbResult={dbResult}
-                        onSelect={(path: string) => {
-                          onFileSelect(path);
-                        }}
-                      />
-                    </div>
-                  ))}
+          <div className='flex-1 flex justify-end pr-3 pt-1 cursor-pointer'>
+            {updateSimilarEntries && setSimilarEntries && (
+              <div
+                onClick={async () => {
+                  setSimilarEntries([]); // simulate refresh
+                  await saveCurrentFile();
+                  updateSimilarEntries();
+                }}
+              >
+                {!isLoadingSimilarEntries && (
+                  <FiRefreshCw
+                    className='text-gray-300'
+                    title='Refresh Related Notes'
+                  />
+                )}
+                {isLoadingSimilarEntries && <CircularProgress size={24} />}
               </div>
-            ) : !isLoadingSimilarEntries ? (
-              <div className="flex flex-col items-center justify-center h-full w-full">
-                <p className="flex justify-center items-center text-gray-500 text-lg mx-auto text-center">
-                  No items found
-                </p>
-              </div>
-            ) : null}
+            )}
           </div>
         </div>
-      </ResizableComponent>
-    </div>
-  );
-};
+        <div className='flex-grow overflow-y-auto overflow-x-hidden'>
+          {similarEntries.length > 0 ? (
+            <div className='h-full w-full'>
+              {similarEntries
+                .filter((dbResult) => dbResult)
+                .map((dbResult, index) => (
+                  <div className='pb-2 pr-2 pl-2 pt-1' key={index}>
+                    <DBResultPreview
+                      key={index}
+                      dbResult={dbResult}
+                      onSelect={(path: string) => {
+                        onFileSelect(path);
+                      }}
+                    />
+                  </div>
+                ))}
+            </div>
+          ) : !isLoadingSimilarEntries ? (
+            <div className='flex flex-col items-center justify-center h-full w-full'>
+              <p className='flex justify-center items-center text-gray-500 text-lg mx-auto text-center'>
+                No items found
+              </p>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </ResizableComponent>
+  </div>
+);
 interface HighlightButtonProps {
   highlightData: HighlightData;
   onClick: () => void;
@@ -280,13 +277,13 @@ const HighlightButton: React.FC<HighlightButtonProps> = ({
     <button
       onClick={handleClick}
       style={{ top: `${top}px`, left: `${left}px` }}
-      className="absolute w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer text-white border-none shadow-md hover:bg-gray-300"
-      aria-label="Highlight button"
+      className='absolute w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer text-white border-none shadow-md hover:bg-gray-300'
+      aria-label='Highlight button'
     >
       {showArrow ? (
-        <FaArrowRight className="text-gray-800" />
+        <FaArrowRight className='text-gray-800' />
       ) : (
-        <PiGraph className="text-gray-800" />
+        <PiGraph className='text-gray-800' />
       )}
     </button>
   );

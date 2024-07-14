@@ -1,4 +1,5 @@
-import { DBEntry } from "../vector-database/schema";
+import { DBEntry } from '../vector-database/schema';
+
 export interface PromptWithContextLimit {
   prompt: string;
   contextCutoffAt?: string;
@@ -9,19 +10,19 @@ export function createPromptWithContextLimitFromContent(
   basePrompt: string,
   query: string,
   tokenize: (text: string) => number[],
-  contextLimit: number
+  contextLimit: number,
 ): PromptWithContextLimit {
   let tokenCount = tokenize(query + basePrompt).length;
 
   const contentArray: string[] = [];
-  let cutOffLine: string = "";
+  let cutOffLine: string = '';
   const contents =
-    typeof content === "string"
-      ? content.split("\n")
+    typeof content === 'string'
+      ? content.split('\n')
       : content.map((entry) => entry.content);
 
   for (const line of contents) {
-    const lineWithNewLine = line + "\n";
+    const lineWithNewLine = `${line}\n`;
     if (tokenize(lineWithNewLine).length + tokenCount < contextLimit * 0.9) {
       tokenCount += tokenize(lineWithNewLine).length;
       contentArray.push(lineWithNewLine);
@@ -30,7 +31,7 @@ export function createPromptWithContextLimitFromContent(
     }
   }
 
-  const outputPrompt = basePrompt + contentArray.join("") + query;
+  const outputPrompt = basePrompt + contentArray.join('') + query;
 
   return {
     prompt: outputPrompt,
@@ -41,7 +42,7 @@ export function createPromptWithContextLimitFromContent(
 export function sliceListOfStringsToContextLength(
   strings: string[],
   tokenize: (text: string) => number[],
-  contextLimit: number
+  contextLimit: number,
 ): string[] {
   let tokenCount = 0;
   const result: string[] = [];
@@ -60,10 +61,10 @@ export function sliceListOfStringsToContextLength(
 export function sliceStringToContextLength(
   inputString: string,
   tokenize: (text: string) => number[],
-  contextLimit: number
+  contextLimit: number,
 ): string {
   let tokenCount = 0;
-  let result = "";
+  let result = '';
 
   // Split the input string into segments that are likely to be tokenized.
   // This assumes a whitespace tokenizer; adjust the split logic as needed for your tokenizer.

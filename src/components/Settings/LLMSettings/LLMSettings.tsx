@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 
-import InitialSetupLLMSettings from "./InitialSetupLLMSettings";
-import NormalLLMSettings from "./NormalLLMSettings";
+import InitialSetupLLMSettings from './InitialSetupLLMSettings';
+import NormalLLMSettings from './NormalLLMSettings';
 
 interface LLMSettingsProps {
   userHasCompleted?: (completed: boolean) => void;
@@ -13,8 +13,8 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
   userHasCompleted,
   userTriedToSubmit,
   isInitialSetup,
-}) => {
-  return isInitialSetup ? (
+}) =>
+  isInitialSetup ? (
     <InitialSetupLLMSettings
       userHasCompleted={userHasCompleted}
       userTriedToSubmit={userTriedToSubmit}
@@ -22,6 +22,5 @@ const LLMSettings: React.FC<LLMSettingsProps> = ({
   ) : (
     <NormalLLMSettings />
   );
-};
 
 export default LLMSettings;

@@ -1,27 +1,27 @@
-import fs from "fs";
-import * as path from "path";
+import fs from 'fs';
+import * as path from 'path';
 
-import { listFiles, downloadFile } from "@huggingface/hub";
+import { listFiles, downloadFile } from '@huggingface/hub';
 
-import { customFetchUsingElectronNet } from "../common/network";
+import { customFetchUsingElectronNet } from '../common/network';
 
 export const DownloadModelFilesFromHFRepo = async (
   repo: string,
   saveDirectory: string,
-  quantized = true
+  quantized = true,
 ) => {
   // List the files:
   const fileList = await listFiles({
-    repo: repo,
+    repo,
     recursive: true,
     fetch: customFetchUsingElectronNet,
   });
 
   const files = [];
   for await (const file of fileList) {
-    if (file.type === "file") {
-      if (file.path.endsWith("onnx")) {
-        const isQuantizedFile = file.path.includes("quantized");
+    if (file.type === 'file') {
+      if (file.path.endsWith('onnx')) {
+        const isQuantizedFile = file.path.includes('quantized');
         if (quantized === isQuantizedFile) {
           files.push(file);
         }
@@ -31,11 +31,11 @@ export const DownloadModelFilesFromHFRepo = async (
     }
   }
 
-  console.log("files: ", files);
+  console.log('files: ', files);
 
   // Create an array of promises for each file download:
   const downloadPromises = files.map((file) =>
-    downloadAndSaveFile(repo, file.path, path.join(saveDirectory, repo))
+    downloadAndSaveFile(repo, file.path, path.join(saveDirectory, repo)),
   );
 
   // Execute all download promises in parallel:
@@ -45,11 +45,11 @@ export const DownloadModelFilesFromHFRepo = async (
 async function downloadAndSaveFile(
   repo: string,
   HFFilePath: string,
-  systemFilePath: string
+  systemFilePath: string,
 ): Promise<void> {
   // Call the downloadFile function and await its result
   const res = await downloadFile({
-    repo: repo,
+    repo,
     path: HFFilePath,
     fetch: customFetchUsingElectronNet,
   });

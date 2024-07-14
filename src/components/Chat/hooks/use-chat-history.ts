@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
-import { ChatHistory } from "../Chat";
-import { formatOpenAIMessageContentIntoString } from "../chatUtils";
+import { ChatHistory } from '../Chat';
+import { formatOpenAIMessageContentIntoString } from '../chatUtils';
 
 export interface ChatHistoryMetadata {
   id: string;
@@ -25,7 +25,7 @@ export const useChatHistory = () => {
       allChatHistories.map((chat) => ({
         id: chat.id,
         displayName: getDisplayableChatName(chat),
-      }))
+      })),
     );
 
     setCurrentChatHistory(undefined);
@@ -33,15 +33,15 @@ export const useChatHistory = () => {
 
   useEffect(() => {
     const updateChatHistoriesMetadata = window.ipcRenderer.receive(
-      "update-chat-histories",
+      'update-chat-histories',
       (chatHistoriesMetadata: ChatHistory[]) => {
         setChatHistoriesMetadata(
           chatHistoriesMetadata.map((chat: ChatHistory) => ({
             id: chat.id,
             displayName: getDisplayableChatName(chat),
-          }))
+          })),
         );
-      }
+      },
     );
 
     return () => {
@@ -67,7 +67,7 @@ export const getDisplayableChatName = (chat: ChatHistory): string => {
     actualHistory.length === 0 ||
     !actualHistory[actualHistory.length - 1].content
   ) {
-    return "Empty Chat";
+    return 'Empty Chat';
   }
 
   const lastMsg = actualHistory[0];
@@ -77,8 +77,8 @@ export const getDisplayableChatName = (chat: ChatHistory): string => {
   }
 
   const lastMessage = formatOpenAIMessageContentIntoString(lastMsg.content);
-  if (!lastMessage || lastMessage === "") {
-    return "Empty Chat";
+  if (!lastMessage || lastMessage === '') {
+    return 'Empty Chat';
   }
   return lastMessage.slice(0, 30);
 };

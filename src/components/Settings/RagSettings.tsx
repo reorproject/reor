@@ -1,6 +1,6 @@
-import React, { useState, useEffect, ReactNode } from "react";
+import React, { useState, useEffect, ReactNode } from 'react';
 
-import CustomSelect from "../Common/Select";
+import CustomSelect from '../Common/Select';
 
 interface RagSettingsProps {
   children?: ReactNode; // Define children prop
@@ -32,7 +32,7 @@ const RagSettings: React.FC<RagSettingsProps> = ({ children }) => {
   const possibleNoOfExamples = Array.from({ length: 31 }, (_, i) => i);
 
   return (
-    <div className="pb-2 flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2">
+    <div className='pb-2 flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2'>
       {children}
       {noOfRAGExamples && (
         <CustomSelect

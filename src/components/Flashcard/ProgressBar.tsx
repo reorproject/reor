@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 export interface ProgressBarProps {
   completed: number;
@@ -6,29 +6,31 @@ export interface ProgressBarProps {
   height: string;
 }
 
-const ProgressBar = ({ completed, total, height }: ProgressBarProps) => {
+function ProgressBar({ completed, total, height }: ProgressBarProps) {
   return (
-    <div style={{ backgroundColor: "grey", borderRadius: 50 }}>
+    <div style={{ backgroundColor: 'grey', borderRadius: 50 }}>
       <div
         style={{
-          height: height,
+          height,
           width: `${(completed / total) * 100}%`,
-          backgroundColor: "#FFFDD0",
-          borderRadius: "inherit",
-          display: "flex",
-          justifyContent: "flex-end",
-          alignItems: "center",
+          backgroundColor: '#FFFDD0',
+          borderRadius: 'inherit',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
         }}
       >
         <span
           style={{
-            color: "black",
-            padding: "10px",
+            color: 'black',
+            padding: '10px',
           }}
-        >{`${completed}/${total}`}</span>
+        >
+          {`${completed}/${total}`}
+        </span>
       </div>
     </div>
   );
-};
+}
 
 export default ProgressBar;

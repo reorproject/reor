@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 
-import posthog from "posthog-js";
-import { IoMdArrowRoundBack, IoMdArrowRoundForward } from "react-icons/io";
+import posthog from 'posthog-js';
+import { IoMdArrowRoundBack, IoMdArrowRoundForward } from 'react-icons/io';
 
-import { removeFileExtension } from "@/utils/strings";
-import "./../../../styles/history.scss";
+import { removeFileExtension } from '@/utils/strings';
+import '../../../styles/history.scss';
 
 interface FileHistoryNavigatorProps {
   history: string[];
@@ -19,14 +19,14 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
   onFileSelect,
   currentPath,
 }) => {
-  const [showMenu, setShowMenu] = useState<string>("");
+  const [showMenu, setShowMenu] = useState<string>('');
   const [currentIndex, setCurrentIndex] = useState<number>(-1);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
   const buttonRefBack = useRef<HTMLButtonElement>(null);
   const buttonRefForward = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    currentPath !== "" &&
+    currentPath !== '' &&
       currentPath !== history[currentIndex] &&
       handleFileSelect(currentPath);
   }, [currentPath]);
@@ -48,20 +48,20 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
   const canGoForward = currentIndex < history.length - 1;
 
   const goBack = () => {
-    if (canGoBack && showMenu === "") {
+    if (canGoBack && showMenu === '') {
       const newIndex = currentIndex - 1;
       setCurrentIndex(newIndex);
       onFileSelect(history[newIndex]);
-      posthog.capture("file_history_navigator_back");
+      posthog.capture('file_history_navigator_back');
     }
   };
 
   const goForward = () => {
-    if (canGoForward && showMenu === "") {
+    if (canGoForward && showMenu === '') {
       const newIndex = currentIndex + 1;
       setCurrentIndex(newIndex);
       onFileSelect(history[newIndex]);
-      posthog.capture("file_history_navigator_forward");
+      posthog.capture('file_history_navigator_forward');
     }
   };
 
@@ -70,12 +70,12 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
       const newIndex = history.indexOf(path);
       setCurrentIndex(newIndex);
       onFileSelect(path);
-      posthog.capture("file_history_navigator_go_to_selected_file");
+      posthog.capture('file_history_navigator_go_to_selected_file');
     }
-    setShowMenu("");
+    setShowMenu('');
   };
 
-  const handleLongPressStart = (direction: "back" | "forward") => {
+  const handleLongPressStart = (direction: 'back' | 'forward') => {
     longPressTimer.current = setTimeout(() => {
       console.log(`${direction} holded 1 seconds.`);
       setShowMenu(direction);
@@ -94,35 +94,35 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
   useEffect(() => {
     function handleClickOutside(event: MouseEvent): void {
       if (ref.current && !ref.current.contains(event.target as Node)) {
-        setShowMenu("");
+        setShowMenu('');
       }
     }
     // Bind the event listener
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
     return () => {
       // Unbind the event listener
-      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   });
 
   const handleHistoryContext = (
-    currentRef: React.RefObject<HTMLButtonElement>
+    currentRef: React.RefObject<HTMLButtonElement>,
   ) => {
     const offsetTop = currentRef.current?.offsetTop || 0;
     const offsetLeft = currentRef.current?.offsetLeft || 0;
     const offsetHeight = currentRef.current?.offsetHeight || 0;
 
     const menuChild =
-      currentRef.current?.id === "back"
+      currentRef.current?.id === 'back'
         ? history.slice(0, currentIndex)
         : history.slice(currentIndex + 1);
 
     return (
-      showMenu !== "" &&
+      showMenu !== '' &&
       menuChild.length > 0 && (
         <div
           ref={ref}
-          className="history-menu"
+          className='history-menu'
           tabIndex={0}
           style={{
             left: `${offsetLeft}px`,
@@ -134,7 +134,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
               <li key={ind}>
                 <div key={ind} onClick={() => goSelected(path)}>
                   {removeFileExtension(
-                    path.replace(/\\/g, "/").split("/").pop() || ""
+                    path.replace(/\\/g, '/').split('/').pop() || '',
                   )}
                 </div>
               </li>
@@ -146,41 +146,41 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
   };
 
   return (
-    <div className="history-container">
+    <div className='history-container'>
       <button
-        id="back"
+        id='back'
         ref={buttonRefBack}
-        onMouseDown={() => handleLongPressStart("back")}
+        onMouseDown={() => handleLongPressStart('back')}
         onMouseUp={handleLongPressEnd}
         onMouseLeave={handleLongPressEnd}
         onClick={goBack}
         disabled={!canGoBack}
         style={{
-          color: !canGoBack ? "#727272" : "#dedede",
-          cursor: !canGoBack ? "default" : "pointer",
+          color: !canGoBack ? '#727272' : '#dedede',
+          cursor: !canGoBack ? 'default' : 'pointer',
         }}
-        title="Back"
+        title='Back'
       >
-        <IoMdArrowRoundBack title="Back" />
+        <IoMdArrowRoundBack title='Back' />
       </button>
       <button
-        id="forward"
+        id='forward'
         ref={buttonRefForward}
-        onMouseDown={() => handleLongPressStart("forward")}
+        onMouseDown={() => handleLongPressStart('forward')}
         onMouseUp={handleLongPressEnd}
         onMouseLeave={handleLongPressEnd}
         onClick={goForward}
         disabled={!canGoForward}
         style={{
-          color: !canGoForward ? "#727272" : "#dedede",
-          cursor: !canGoForward ? "default" : "pointer",
+          color: !canGoForward ? '#727272' : '#dedede',
+          cursor: !canGoForward ? 'default' : 'pointer',
         }}
-        title="Forward"
+        title='Forward'
       >
-        <IoMdArrowRoundForward title="Forward" />
+        <IoMdArrowRoundForward title='Forward' />
       </button>
       {handleHistoryContext(
-        showMenu === "back" ? buttonRefBack : buttonRefForward
+        showMenu === 'back' ? buttonRefBack : buttonRefForward,
       )}
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect } from 'react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -25,9 +25,9 @@ const ReorModal: React.FC<ModalProps> = ({
   };
 
   useEffect(() => {
-    document.addEventListener("mousedown", handleOffClick);
+    document.addEventListener('mousedown', handleOffClick);
     return () => {
-      document.removeEventListener("mousedown", handleOffClick);
+      document.removeEventListener('mousedown', handleOffClick);
     };
   }, [onClose]);
 
@@ -41,16 +41,16 @@ const ReorModal: React.FC<ModalProps> = ({
     >
       <div
         ref={modalRef}
-        className={`bg-dark-gray-c-three rounded-lg shadow-xl  max-w-4xl max-h-3xl flex flex-col justify-center items-center border-solid border-gray-600 border`}
+        className='bg-dark-gray-c-three rounded-lg shadow-xl  max-w-4xl max-h-3xl flex flex-col justify-center items-center border-solid border-gray-600 border'
       >
-        <div className="w-full items-end border-b border-gray-700 px-4 h-0 z-50">
+        <div className='w-full items-end border-b border-gray-700 px-4 h-0 z-50'>
           {!hideCloseButton && (
-            <div className="flex justify-end m-2">
+            <div className='flex justify-end m-2'>
               <button
                 onClick={onClose}
-                className="w-5 h-5 flex items-center justify-center text-gray-600 cursor-pointer bg-transparent border-none hover:bg-slate-700 hover:bg-opacity-40"
+                className='w-5 h-5 flex items-center justify-center text-gray-600 cursor-pointer bg-transparent border-none hover:bg-slate-700 hover:bg-opacity-40'
               >
-                <span className="text-3xl leading-none">&times;</span>
+                <span className='text-3xl leading-none'>&times;</span>
               </button>
             </div>
           )}

@@ -3,59 +3,60 @@ import {
   Table as LanceDBTable,
   MetricType,
   makeArrowTable,
-} from "vectordb";
+} from 'vectordb';
 
-import { EmbeddingModelConfig } from "../electron-store/storeConfig";
+import { EmbeddingModelConfig } from '../electron-store/storeConfig';
 
 import {
   EnhancedEmbeddingFunction,
   createEmbeddingFunction,
-} from "./embeddings";
-import GetOrCreateLanceTable from "./lance";
-import { DBEntry, DBQueryResult, DatabaseFields } from "./schema";
+} from './embeddings';
+import GetOrCreateLanceTable from './lance';
+import { DBEntry, DBQueryResult, DatabaseFields } from './schema';
 import {
   sanitizePathForDatabase,
   convertRecordToDBType,
-} from "./tableHelperFunctions";
+} from './tableHelperFunctions';
 
 export class LanceDBTableWrapper {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   public lanceTable!: LanceDBTable<any>;
+
   private embedFun!: EnhancedEmbeddingFunction<string | number[]>;
 
   async initialize(
     dbConnection: Connection,
     userDirectory: string,
-    embeddingModelConfig: EmbeddingModelConfig
+    embeddingModelConfig: EmbeddingModelConfig,
   ) {
     try {
       this.embedFun = await createEmbeddingFunction(
         embeddingModelConfig,
-        "content"
+        'content',
       );
     } catch (error) {
-      throw new Error("Embedding function error: " + error);
+      throw new Error(`Embedding function error: ${error}`);
     }
 
     this.lanceTable = await GetOrCreateLanceTable(
       dbConnection,
       this.embedFun,
-      userDirectory
+      userDirectory,
     );
   }
 
   async add(
     data: DBEntry[],
-    onProgress?: (progress: number) => void
+    onProgress?: (progress: number) => void,
   ): Promise<void> {
     data = data
-      .filter((x) => x.content !== "")
+      .filter((x) => x.content !== '')
       .map((x) => {
         x.notepath = sanitizePathForDatabase(x.notepath);
         return x;
       });
 
-    //clean up previously indexed entries and reindex the whole file
+    // clean up previously indexed entries and reindex the whole file
     await this.deleteDBItemsByFilePaths(data.map((x) => x.notepath));
 
     const recordEntry: Record<string, unknown>[] = data as unknown as Record<
@@ -88,8 +89,8 @@ export class LanceDBTableWrapper {
     const quotedFilePaths = filePaths
       .map((filePath) => sanitizePathForDatabase(filePath))
       .map((filePath) => `'${filePath}'`)
-      .join(", ");
-    if (quotedFilePaths === "") {
+      .join(', ');
+    if (quotedFilePaths === '') {
       return;
     }
     const filterString = `${DatabaseFields.NOTE_PATH} IN (${quotedFilePaths})`;
@@ -97,17 +98,17 @@ export class LanceDBTableWrapper {
       await this.lanceTable.delete(filterString);
     } catch (error) {
       console.error(
-        `Error deleting items from DB: ${error} using filter string: ${filterString}`
+        `Error deleting items from DB: ${error} using filter string: ${filterString}`,
       );
     }
   }
 
   async updateDBItemsWithNewFilePath(
     oldFilePath: string,
-    newFilePath: string
+    newFilePath: string,
   ): Promise<void> {
     const sanitizedFilePath = sanitizePathForDatabase(oldFilePath);
-    if (sanitizedFilePath === "") {
+    if (sanitizedFilePath === '') {
       return;
     }
     const filterString = `${DatabaseFields.NOTE_PATH} = '${sanitizedFilePath}'`;
@@ -120,7 +121,7 @@ export class LanceDBTableWrapper {
       });
     } catch (error) {
       console.error(
-        `Error updating items from DB: ${error} using filter string: ${filterString}`
+        `Error updating items from DB: ${error} using filter string: ${filterString}`,
       );
     }
   }
@@ -129,7 +130,7 @@ export class LanceDBTableWrapper {
     query: string,
     //   metricType: string,
     limit: number,
-    filter?: string
+    filter?: string,
   ): Promise<DBQueryResult[]> {
     const lanceQuery = await this.lanceTable
       .search(query)
@@ -156,6 +157,6 @@ export class LanceDBTableWrapper {
 
   async countRows(): Promise<number> {
     this.lanceTable.countRows;
-    return await this.lanceTable.countRows();
+    return this.lanceTable.countRows();
   }
 }

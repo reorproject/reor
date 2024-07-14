@@ -1,13 +1,13 @@
-import { MessageStreamEvent } from "@anthropic-ai/sdk/resources";
+import { MessageStreamEvent } from '@anthropic-ai/sdk/resources';
 import {
   ChatCompletionChunk,
   ChatCompletionMessageParam,
-} from "openai/resources/chat/completions";
+} from 'openai/resources/chat/completions';
 
 import {
   LLMGenerationParameters,
   LLMConfig,
-} from "../electron-store/storeConfig";
+} from '../electron-store/storeConfig';
 
 // Any LLM engine should implement this interface:
 export interface LLMSessionService {
@@ -32,7 +32,7 @@ export interface LLMSessionService {
     isJSONMode: boolean,
     messageHistory: Array<ChatCompletionMessageParam>,
     chunkResponse: (chunk: ChatCompletionChunk | MessageStreamEvent) => void,
-    generationParams?: LLMGenerationParameters
+    generationParams?: LLMGenerationParameters,
   ): Promise<void>;
 
   getTokenizer: (llmName: string) => (text: string) => number[];

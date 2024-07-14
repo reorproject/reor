@@ -1,27 +1,27 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
-import posthog from "posthog-js";
+import posthog from 'posthog-js';
 
-import "../styles/global.css";
-import ChatWithLLM, { ChatFilters, ChatHistory } from "./Chat/Chat";
-import { useChatHistory } from "./Chat/hooks/use-chat-history";
-import ResizableComponent from "./Common/ResizableComponent";
-import TitleBar from "./Common/TitleBar";
-import EditorManager from "./Editor/EditorManager";
-import { useFileInfoTree } from "./File/FileSideBar/hooks/use-file-info-tree";
-import { useFileByFilepath } from "./File/hooks/use-file-by-filepath";
-import IconsSidebar from "./Sidebars/IconsSidebar";
-import SidebarManager from "./Sidebars/MainSidebar";
-import SimilarFilesSidebarComponent from "./Sidebars/SimilarFilesSidebar";
-import WritingAssistant from "./Writing-Assistant/WritingAssistantFloatingMenu";
+import '../styles/global.css';
+import ChatWithLLM, { ChatFilters, ChatHistory } from './Chat/Chat';
+import { useChatHistory } from './Chat/hooks/use-chat-history';
+import ResizableComponent from './Common/ResizableComponent';
+import TitleBar from './Common/TitleBar';
+import EditorManager from './Editor/EditorManager';
+import { useFileInfoTree } from './File/FileSideBar/hooks/use-file-info-tree';
+import { useFileByFilepath } from './File/hooks/use-file-by-filepath';
+import IconsSidebar from './Sidebars/IconsSidebar';
+import SidebarManager from './Sidebars/MainSidebar';
+import SimilarFilesSidebarComponent from './Sidebars/SimilarFilesSidebar';
+import WritingAssistant from './Writing-Assistant/WritingAssistantFloatingMenu';
 
-export type SidebarAbleToShow = "files" | "search" | "chats";
+export type SidebarAbleToShow = 'files' | 'search' | 'chats';
 
 const MainPageComponent: React.FC = () => {
   const [showChatbot, setShowChatbot] = useState<boolean>(false);
   const [showSimilarFiles, setShowSimilarFiles] = useState(true);
   const [sidebarShowing, setSidebarShowing] =
-    useState<SidebarAbleToShow>("files");
+    useState<SidebarAbleToShow>('files');
   const {
     filePath,
     editor,
@@ -59,7 +59,7 @@ const MainPageComponent: React.FC = () => {
     setCurrentChatHistory(chatHistory);
   };
 
-  const [vaultDirectory, setVaultDirectory] = useState<string>("");
+  const [vaultDirectory, setVaultDirectory] = useState<string>('');
   const [chatFilters, setChatFilters] = useState<ChatFilters>({
     files: [],
     numberOfChunksToFetch: 15,
@@ -70,7 +70,7 @@ const MainPageComponent: React.FC = () => {
   const [sidebarWidth, setSidebarWidth] = useState(40);
 
   const handleAddFileToChatFilters = (file: string) => {
-    setSidebarShowing("chats");
+    setSidebarShowing('chats');
     setShowChatbot(true);
     // setFileIsOpen(false);
     setCurrentChatHistory(undefined);
@@ -100,15 +100,15 @@ const MainPageComponent: React.FC = () => {
     setFileDirectory();
     updateWidth();
 
-    window.ipcRenderer.receive("sb-compact-changed", handleSettingsChange);
+    window.ipcRenderer.receive('sb-compact-changed', handleSettingsChange);
   }, []);
 
   useEffect(() => {
     const removeAddChatToFileListener = window.ipcRenderer.receive(
-      "add-file-to-chat-listener",
+      'add-file-to-chat-listener',
       (noteName: string) => {
         handleAddFileToChatFilters(noteName);
-      }
+      },
     );
 
     return () => {
@@ -127,9 +127,9 @@ const MainPageComponent: React.FC = () => {
         toggleSimilarFiles={toggleSimilarFiles} // This might need to be managed differently now
       />
 
-      <div className="flex h-below-titlebar">
+      <div className='flex h-below-titlebar'>
         <div
-          className={`border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid pt-2.5`}
+          className='border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid pt-2.5'
           style={{ width: `${sidebarWidth}px` }}
         >
           <IconsSidebar
@@ -140,8 +140,8 @@ const MainPageComponent: React.FC = () => {
           />
         </div>
 
-        <ResizableComponent resizeSide="right">
-          <div className="h-full border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid w-full">
+        <ResizableComponent resizeSide='right'>
+          <div className='h-full border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid w-full'>
             <SidebarManager
               files={files}
               expandedDirectories={expandedDirectories}
@@ -164,15 +164,15 @@ const MainPageComponent: React.FC = () => {
         </ResizableComponent>
 
         {!showChatbot && filePath && (
-          <div className="relative w-full h-full flex overflow-hidden">
-            <div className="flex-grow h-full overflow-hidden">
+          <div className='relative w-full h-full flex overflow-hidden'>
+            <div className='flex-grow h-full overflow-hidden'>
               <EditorManager
                 editor={editor}
                 filePath={filePath}
                 suggestionsState={suggestionsState}
                 flattenedFiles={flattenedFiles}
                 showSimilarFiles={showSimilarFiles}
-              />{" "}
+              />{' '}
             </div>
             <WritingAssistant
               editor={editor}
@@ -181,7 +181,7 @@ const MainPageComponent: React.FC = () => {
               setCurrentChatHistory={setCurrentChatHistory}
             />
             {showSimilarFiles && (
-              <div className="flex-shrink-0 h-full overflow-y-auto overflow-x-hidden">
+              <div className='flex-shrink-0 h-full overflow-y-auto overflow-x-hidden'>
                 <SimilarFilesSidebarComponent
                   filePath={filePath}
                   highlightData={highlightData}
@@ -194,7 +194,7 @@ const MainPageComponent: React.FC = () => {
         )}
 
         {showChatbot && (
-          <div className={`w-full h-below-titlebar`}>
+          <div className='w-full h-below-titlebar'>
             <ChatWithLLM
               vaultDirectory={vaultDirectory}
               openFileByPath={openFileAndOpenEditor}
@@ -203,8 +203,8 @@ const MainPageComponent: React.FC = () => {
               showSimilarFiles={showSimilarFiles} // This might need to be managed differently now
               chatFilters={chatFilters}
               setChatFilters={(chatFilters: ChatFilters) => {
-                console.log("CALLING ADD FILE TO CHAT");
-                posthog.capture("add_file_to_chat", {
+                console.log('CALLING ADD FILE TO CHAT');
+                posthog.capture('add_file_to_chat', {
                   chatFilesLength: chatFilters.files.length,
                 });
                 setChatFilters(chatFilters);

@@ -1,4 +1,4 @@
-import { ChatHistory } from "@/components/Chat/Chat";
+import { ChatHistory } from '@/components/Chat/Chat';
 
 export interface BaseLLMConfig {
   modelName: string;
@@ -7,15 +7,15 @@ export interface BaseLLMConfig {
 }
 
 export interface OpenAILLMConfig extends BaseLLMConfig {
-  type: "openai";
-  engine: "openai";
+  type: 'openai';
+  engine: 'openai';
   apiURL: string;
   apiKey: string;
 }
 
 export interface AnthropicLLMConfig extends BaseLLMConfig {
-  type: "anthropic";
-  engine: "anthropic";
+  type: 'anthropic';
+  engine: 'anthropic';
   apiURL: string;
   apiKey: string;
 }
@@ -32,12 +32,12 @@ export type EmbeddingModelConfig =
   | EmbeddingModelWithLocalPath;
 
 export interface EmbeddingModelWithRepo {
-  type: "repo";
+  type: 'repo';
   repoName: string;
 }
 
 export interface EmbeddingModelWithLocalPath {
-  type: "local";
+  type: 'local';
   localPath: string;
 }
 export type RAGConfig = {
@@ -77,20 +77,20 @@ export interface StoreSchema {
 }
 
 export enum StoreKeys {
-  hasUserOpenedAppBefore = "hasUserOpenedAppBefore",
-  Analytics = "analytics",
-  SchemaVersion = "schemaVersion",
-  DirectoryFromPreviousSession = "user.directoryFromPreviousSession",
-  LLMs = "LLMs",
-  EmbeddingModels = "embeddingModels",
-  DefaultLLM = "defaultLLM",
-  DefaultEmbeddingModelAlias = "defaultEmbeddingModelAlias",
-  MaxRAGExamples = "RAG.maxRAGExamples",
-  Hardware = "hardware",
-  LLMGenerationParameters = "llmGenerationParameters",
-  ChatHistories = "chatHistories",
-  ChunkSize = "chunkSize",
-  IsSBCompact = "isSBCompact",
-  DisplayMarkdown = "DisplayMarkdown",
-  SpellCheck = "spellCheck",
+  hasUserOpenedAppBefore = 'hasUserOpenedAppBefore',
+  Analytics = 'analytics',
+  SchemaVersion = 'schemaVersion',
+  DirectoryFromPreviousSession = 'user.directoryFromPreviousSession',
+  LLMs = 'LLMs',
+  EmbeddingModels = 'embeddingModels',
+  DefaultLLM = 'defaultLLM',
+  DefaultEmbeddingModelAlias = 'defaultEmbeddingModelAlias',
+  MaxRAGExamples = 'RAG.maxRAGExamples',
+  Hardware = 'hardware',
+  LLMGenerationParameters = 'llmGenerationParameters',
+  ChatHistories = 'chatHistories',
+  ChunkSize = 'chunkSize',
+  IsSBCompact = 'isSBCompact',
+  DisplayMarkdown = 'DisplayMarkdown',
+  SpellCheck = 'spellCheck',
 }

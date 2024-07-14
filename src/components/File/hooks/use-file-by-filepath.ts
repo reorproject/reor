@@ -1,35 +1,35 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
-import { MathExtension } from "@aarkue/tiptap-math-extension";
-import Document from "@tiptap/extension-document";
-import Paragraph from "@tiptap/extension-paragraph";
-import Table from "@tiptap/extension-table";
-import TableCell from "@tiptap/extension-table-cell";
-import TableHeader from "@tiptap/extension-table-header";
-import TableRow from "@tiptap/extension-table-row";
-import TaskItem from "@tiptap/extension-task-item";
-import TaskList from "@tiptap/extension-task-list";
-import Text from "@tiptap/extension-text";
-import TextStyle from "@tiptap/extension-text-style";
-import { Editor, useEditor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import { toast } from "react-toastify";
-import { Markdown } from "tiptap-markdown";
-import { useDebounce } from "use-debounce";
+import { MathExtension } from '@aarkue/tiptap-math-extension';
+import Document from '@tiptap/extension-document';
+import Paragraph from '@tiptap/extension-paragraph';
+import Table from '@tiptap/extension-table';
+import TableCell from '@tiptap/extension-table-cell';
+import TableHeader from '@tiptap/extension-table-header';
+import TableRow from '@tiptap/extension-table-row';
+import TaskItem from '@tiptap/extension-task-item';
+import TaskList from '@tiptap/extension-task-list';
+import Text from '@tiptap/extension-text';
+import TextStyle from '@tiptap/extension-text-style';
+import { Editor, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import { toast } from 'react-toastify';
+import { Markdown } from 'tiptap-markdown';
+import { useDebounce } from 'use-debounce';
 
-import { BacklinkExtension } from "@/components/Editor/BacklinkExtension";
-import { SuggestionsState } from "@/components/Editor/BacklinkSuggestionsDisplay";
+import { BacklinkExtension } from '@/components/Editor/BacklinkExtension';
+import { SuggestionsState } from '@/components/Editor/BacklinkSuggestionsDisplay';
 import HighlightExtension, {
   HighlightData,
-} from "@/components/Editor/HighlightExtension";
-import { RichTextLink } from "@/components/Editor/RichTextLink";
-import SearchAndReplace from "@/components/Editor/SearchAndReplace";
+} from '@/components/Editor/HighlightExtension';
+import { RichTextLink } from '@/components/Editor/RichTextLink';
+import SearchAndReplace from '@/components/Editor/SearchAndReplace';
 import {
   getInvalidCharacterInFilePath,
   removeFileExtension,
-} from "@/utils/strings";
-import "katex/dist/katex.min.css";
-import "../tiptap.scss";
+} from '@/utils/strings';
+import 'katex/dist/katex.min.css';
+import '../tiptap.scss';
 
 export const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<
@@ -41,7 +41,7 @@ export const useFileByFilepath = () => {
     useState<boolean>(false);
   const [needToIndexEditorContent, setNeedToIndexEditorContent] =
     useState<boolean>(false);
-  const [spellCheckEnabled, setSpellCheckEnabled] = useState<string>("false");
+  const [spellCheckEnabled, setSpellCheckEnabled] = useState<string>('false');
 
   useEffect(() => {
     const fetchSpellCheckMode = async () => {
@@ -52,13 +52,13 @@ export const useFileByFilepath = () => {
     fetchSpellCheckMode();
   }, [spellCheckEnabled]);
 
-  const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>("");
-  const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>("");
+  const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>('');
+  const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>('');
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
   const [currentlyChangingFilePath, setCurrentlyChangingFilePath] =
     useState(false);
   const [highlightData, setHighlightData] = useState<HighlightData>({
-    text: "",
+    text: '',
     position: null,
   });
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -88,7 +88,7 @@ export const useFileByFilepath = () => {
       setNeedToIndexEditorContent(false);
     }
     const newFileContent =
-      (await window.fileSystem.readFile(newFilePath)) ?? "";
+      (await window.fileSystem.readFile(newFilePath)) ?? '';
     editor?.commands.setContent(newFileContent);
     setCurrentlyOpenedFilePath(newFilePath);
     setCurrentlyChangingFilePath(false);
@@ -96,29 +96,29 @@ export const useFileByFilepath = () => {
 
   const openRelativePath = async (
     relativePath: string,
-    optionalContentToWriteOnCreate?: string
+    optionalContentToWriteOnCreate?: string,
   ): Promise<void> => {
     const invalidChars = await getInvalidCharacterInFilePath(relativePath);
     if (invalidChars) {
       toast.error(
-        `Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`
+        `Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`,
       );
       throw new Error(
-        `Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`
+        `Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`,
       );
     }
     const relativePathWithExtension =
       await window.path.addExtensionIfNoExtensionPresent(relativePath);
     const absolutePath = await window.path.join(
       await window.electronStore.getVaultDirectoryForWindow(),
-      relativePathWithExtension
+      relativePathWithExtension,
     );
     const fileExists = await window.fileSystem.checkFileExists(absolutePath);
     if (!fileExists) {
       const basename = await window.path.basename(absolutePath);
-      const content = optionalContentToWriteOnCreate
-        ? optionalContentToWriteOnCreate
-        : "## " + removeFileExtension(basename) + "\n";
+      const content =
+        optionalContentToWriteOnCreate ||
+        `## ${removeFileExtension(basename)}\n`;
       await window.fileSystem.createFile(absolutePath, content);
       setNeedToIndexEditorContent(true);
     }
@@ -129,7 +129,7 @@ export const useFileByFilepath = () => {
   openRelativePathRef.current = openRelativePath;
 
   const handleSuggestionsStateWithEventCapture = (
-    suggState: SuggestionsState | null
+    suggState: SuggestionsState | null,
   ): void => {
     setSuggestionsState(suggState);
   };
@@ -148,8 +148,8 @@ export const useFileByFilepath = () => {
 
     handleInitialStartup();
     window.ipcRenderer.receive(
-      "display-markdown-changed",
-      handleChangeMarkdown
+      'display-markdown-changed',
+      handleChangeMarkdown,
     );
   }, []);
 
@@ -178,14 +178,14 @@ export const useFileByFilepath = () => {
       TableCell,
       TextStyle,
       SearchAndReplace.configure({
-        searchResultClass: "bg-yellow-400",
+        searchResultClass: 'bg-yellow-400',
         disableRegex: false,
       }),
       Markdown.configure({
         html: true, // Allow HTML input/output
         tightLists: true, // No <p> inside <li> in markdown output
-        tightListClass: "tight", // Add class to <ul> allowing you to remove <p> margins when tight
-        bulletListMarker: "-", // <li> prefix in markdown output
+        tightListClass: 'tight', // Add class to <ul> allowing you to remove <p> margins when tight
+        bulletListMarker: '-', // <li> prefix in markdown output
         linkify: true, // Create links from "https://..." text
         breaks: true, // New lines (\n) in markdown input are converted to <br>
         transformPastedText: true, // Allow to paste markdown text in the editor
@@ -201,7 +201,7 @@ export const useFileByFilepath = () => {
       }),
       BacklinkExtension(
         openRelativePathRef,
-        handleSuggestionsStateWithEventCapture
+        handleSuggestionsStateWithEventCapture,
       ),
     ],
   });
@@ -237,18 +237,18 @@ export const useFileByFilepath = () => {
 
   const writeEditorContentToDisk = async (
     editor: Editor | null,
-    filePath: string | null
+    filePath: string | null,
   ) => {
     if (filePath !== null && needToWriteEditorContentToDisk && editor) {
       const markdownContent = getMarkdown(editor);
       if (markdownContent !== null) {
         await window.fileSystem.writeFile({
-          filePath: filePath,
+          filePath,
           content: markdownContent,
         });
 
         console.log(
-          "setting is file content modified to false in actual save function"
+          'setting is file content modified to false in actual save function',
         );
         setNeedToWriteEditorContentToDisk(false);
       }
@@ -262,14 +262,14 @@ export const useFileByFilepath = () => {
 
       // if it is the current file, clear the content and set filepath to null so that it won't save anything else
       if (currentlyOpenedFilePath === path) {
-        editor?.commands.setContent("");
+        editor?.commands.setContent('');
         setCurrentlyOpenedFilePath(null);
       }
     };
 
     const removeDeleteFileListener = window.ipcRenderer.receive(
-      "delete-file-listener",
-      deleteFile
+      'delete-file-listener',
+      deleteFile,
     );
 
     return () => {
@@ -281,11 +281,11 @@ export const useFileByFilepath = () => {
     async function checkAppUsage() {
       if (!editor || currentlyOpenedFilePath) return;
       const hasOpened = await window.electronStore.getHasUserOpenedAppBefore();
-      console.log("has opened", hasOpened);
+      console.log('has opened', hasOpened);
       if (!hasOpened) {
-        console.log("opening welcome note");
+        console.log('opening welcome note');
         await window.electronStore.setHasUserOpenedAppBefore();
-        openRelativePath("Welcome to Reor", welcomeNote);
+        openRelativePath('Welcome to Reor', welcomeNote);
       }
     }
 
@@ -297,14 +297,14 @@ export const useFileByFilepath = () => {
       oldFilePath,
       newFilePath,
     });
-    //set the file history array to use the new absolute file path if there is anything matching
-    const navigationHistoryUpdated = [...navigationHistory].map((path) => {
-      return path.replace(oldFilePath, newFilePath);
-    });
+    // set the file history array to use the new absolute file path if there is anything matching
+    const navigationHistoryUpdated = [...navigationHistory].map((path) =>
+      path.replace(oldFilePath, newFilePath),
+    );
 
     setNavigationHistory(navigationHistoryUpdated);
 
-    //reset the editor to the new file path
+    // reset the editor to the new file path
     if (currentlyOpenedFilePath === oldFilePath) {
       setCurrentlyOpenedFilePath(newFilePath);
     }
@@ -313,8 +313,8 @@ export const useFileByFilepath = () => {
   // open a new file rename dialog
   useEffect(() => {
     const renameFileListener = window.ipcRenderer.receive(
-      "rename-file-listener",
-      (noteName: string) => setFileNodeToBeRenamed(noteName)
+      'rename-file-listener',
+      (noteName: string) => setFileNodeToBeRenamed(noteName),
     );
 
     return () => {
@@ -335,10 +335,10 @@ export const useFileByFilepath = () => {
   // 3. FE after saving, alerts backend that is ready for close
   useEffect(() => {
     const handleWindowClose = async () => {
-      console.log("saving file", {
+      console.log('saving file', {
         filePath: currentlyOpenedFilePath,
-        fileContent: editor?.getHTML() || "",
-        editor: editor,
+        fileContent: editor?.getHTML() || '',
+        editor,
       });
       if (
         currentlyOpenedFilePath !== null &&
@@ -355,8 +355,8 @@ export const useFileByFilepath = () => {
     };
 
     const removeWindowCloseListener = window.ipcRenderer.receive(
-      "prepare-for-window-close",
-      handleWindowClose
+      'prepare-for-window-close',
+      handleWindowClose,
     );
 
     return () => {
@@ -390,8 +390,8 @@ function getMarkdown(editor: Editor) {
   const originalMarkdown = editor.storage.markdown.getMarkdown();
   // Replace the escaped square brackets with unescaped ones
   const modifiedMarkdown = originalMarkdown
-    .replace(/\\\[/g, "[") // Replaces \[ with [
-    .replace(/\\\]/g, "]"); // Replaces \] with ]
+    .replace(/\\\[/g, '[') // Replaces \[ with [
+    .replace(/\\\]/g, ']'); // Replaces \] with ]
 
   return modifiedMarkdown;
 }

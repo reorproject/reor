@@ -1,33 +1,35 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { exec } from "child_process";
-import * as os from "os";
-import * as path from "path";
+import { exec } from 'child_process';
+import * as os from 'os';
+import * as path from 'path';
 
-import { app } from "electron";
+import { app } from 'electron';
 import {
   LLMGenerationParameters,
   OpenAILLMConfig,
-} from "electron/main/electron-store/storeConfig";
-import { Tiktoken, TiktokenModel, encodingForModel } from "js-tiktoken";
-import { ModelResponse, ProgressResponse, Ollama } from "ollama";
+} from 'electron/main/electron-store/storeConfig';
+import { Tiktoken, TiktokenModel, encodingForModel } from 'js-tiktoken';
+import { ModelResponse, ProgressResponse, Ollama } from 'ollama';
 import {
   ChatCompletionChunk,
   ChatCompletionMessageParam,
-} from "openai/resources/chat/completions";
+} from 'openai/resources/chat/completions';
 
 // import ollama,"ollama";
 
-import { LLMSessionService } from "../types";
+import { LLMSessionService } from '../types';
 
 const OllamaServeType = {
-  SYSTEM: "system", // ollama is installed on the system
-  PACKAGED: "packaged", // ollama is packaged with the app
+  SYSTEM: 'system', // ollama is installed on the system
+  PACKAGED: 'packaged', // ollama is packaged with the app
 };
 
 export class OllamaService implements LLMSessionService {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private client!: Ollama;
-  private host = "http://127.0.0.1:11434";
+
+  private host = 'http://127.0.0.1:11434';
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private childProcess: any;
 
@@ -37,12 +39,12 @@ export class OllamaService implements LLMSessionService {
   }
 
   public init = async () => {
-    console.log("Initializing Ollama client...");
+    console.log('Initializing Ollama client...');
     await this.serve();
 
-    const ollamaLib = await import("ollama");
+    const ollamaLib = await import('ollama');
     this.client = new ollamaLib.Ollama();
-    console.log("Ollama client: ", this.client);
+    console.log('Ollama client: ', this.client);
     // const models = await this.client.default.list();
     // console.log("Ollama models: ", models);
     // const lists = await this.client.
@@ -51,8 +53,8 @@ export class OllamaService implements LLMSessionService {
 
   async ping() {
     const response = await fetch(this.host, {
-      method: "GET",
-      cache: "no-store",
+      method: 'GET',
+      cache: 'no-store',
     });
 
     if (response.status !== 200) {
@@ -73,47 +75,47 @@ export class OllamaService implements LLMSessionService {
 
     try {
       // See if 'ollama serve' command is available on the system
-      await this.execServe("ollama");
-      console.log("Ollama is installed on the system");
+      await this.execServe('ollama');
+      console.log('Ollama is installed on the system');
       return OllamaServeType.SYSTEM;
     } catch (err) {
       // ollama is not installed, run the binary directly
-      console.log("Ollama is not installed on the system: ", err);
+      console.log('Ollama is not installed on the system: ', err);
       // logInfo(`/ is not installed on the system: ${err}`);
     }
 
-    let exeName = "";
-    let exeDir = "";
+    let exeName = '';
+    let exeDir = '';
     switch (process.platform) {
-      case "win32":
-        exeName = "ollama-windows-amd64.exe";
+      case 'win32':
+        exeName = 'ollama-windows-amd64.exe';
         exeDir = app.isPackaged
-          ? path.join(process.resourcesPath, "binaries")
-          : path.join(app.getAppPath(), "binaries", "win32");
+          ? path.join(process.resourcesPath, 'binaries')
+          : path.join(app.getAppPath(), 'binaries', 'win32');
 
         break;
-      case "darwin":
-        exeName = "ollama-darwin";
+      case 'darwin':
+        exeName = 'ollama-darwin';
         exeDir = app.isPackaged
-          ? path.join(process.resourcesPath, "binaries")
-          : path.join(app.getAppPath(), "binaries", "darwin");
+          ? path.join(process.resourcesPath, 'binaries')
+          : path.join(app.getAppPath(), 'binaries', 'darwin');
         break;
-      case "linux":
-        exeName = "ollama-linux-amd64";
+      case 'linux':
+        exeName = 'ollama-linux-amd64';
         exeDir = app.isPackaged
-          ? path.join(process.resourcesPath, "binaries")
-          : path.join(app.getAppPath(), "binaries", "linux");
+          ? path.join(process.resourcesPath, 'binaries')
+          : path.join(app.getAppPath(), 'binaries', 'linux');
 
         break;
       default:
-        throw new Error("Unsupported platform");
+        throw new Error('Unsupported platform');
     }
     const exePath = path.join(exeDir, exeName);
     try {
       await this.execServe(exePath);
       return OllamaServeType.PACKAGED;
     } catch (err) {
-      console.log("Failed to start Ollama: ", err);
+      console.log('Failed to start Ollama: ', err);
       throw new Error(`Failed to start Ollama: ${err}`);
     }
   }
@@ -168,16 +170,16 @@ export class OllamaService implements LLMSessionService {
       return;
     }
 
-    if (os.platform() === "win32") {
+    if (os.platform() === 'win32') {
       exec(`taskkill /pid ${this.childProcess.pid} /f /t`, (err) => {
         if (err) {
-          console.log("Failed to kill Ollama process: ", err);
+          console.log('Failed to kill Ollama process: ', err);
         }
       });
     } else {
       this.childProcess.kill();
     }
-    console.log("Ollama process killed");
+    console.log('Ollama process killed');
     this.childProcess = null;
   }
 
@@ -185,25 +187,23 @@ export class OllamaService implements LLMSessionService {
     const ollamaModelsResponse = await this.client.list();
 
     const output = ollamaModelsResponse.models.map(
-      (model: ModelResponse): OpenAILLMConfig => {
-        return {
-          modelName: model.name,
-          type: "openai",
-          apiKey: "",
-          contextLength: 4096,
-          engine: "openai",
-          apiURL: "http://localhost:11434/v1/",
-        };
-      }
+      (model: ModelResponse): OpenAILLMConfig => ({
+        modelName: model.name,
+        type: 'openai',
+        apiKey: '',
+        contextLength: 4096,
+        engine: 'openai',
+        apiURL: 'http://localhost:11434/v1/',
+      }),
     );
     return output;
   };
 
   public pullModel = async (
     modelName: string,
-    handleProgress: (chunk: ProgressResponse) => void
+    handleProgress: (chunk: ProgressResponse) => void,
   ): Promise<void> => {
-    console.log("Pulling model: ", modelName);
+    console.log('Pulling model: ', modelName);
     const stream = await this.client.pull({
       model: modelName,
       stream: true,
@@ -222,16 +222,14 @@ export class OllamaService implements LLMSessionService {
     try {
       tokenEncoding = encodingForModel(llmName as TiktokenModel);
     } catch (e) {
-      tokenEncoding = encodingForModel("gpt-3.5-turbo-1106"); // hack while we think about what to do with custom remote models' tokenizers
+      tokenEncoding = encodingForModel('gpt-3.5-turbo-1106'); // hack while we think about what to do with custom remote models' tokenizers
     }
-    const tokenize = (text: string): number[] => {
-      return tokenEncoding.encode(text);
-    };
+    const tokenize = (text: string): number[] => tokenEncoding.encode(text);
     return tokenize;
   };
 
   public abort(): void {
-    throw new Error("Abort not yet implemented.");
+    throw new Error('Abort not yet implemented.');
   }
 
   async streamingResponse(
@@ -240,8 +238,8 @@ export class OllamaService implements LLMSessionService {
     _isJSONMode: boolean,
     _messageHistory: ChatCompletionMessageParam[],
     _handleChunk: (chunk: ChatCompletionChunk) => void,
-    _generationParams?: LLMGenerationParameters
+    _generationParams?: LLMGenerationParameters,
   ): Promise<void> {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 }

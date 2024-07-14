@@ -1,5 +1,5 @@
-import { Plugin } from "@tiptap/pm/state";
-import { Extension } from "@tiptap/react";
+import { Plugin } from '@tiptap/pm/state';
+import { Extension } from '@tiptap/react';
 
 export interface HighlightData {
   text: string;
@@ -8,7 +8,7 @@ export interface HighlightData {
 
 const HighlightExtension = (setHighlightData: (data: HighlightData) => void) =>
   Extension.create({
-    name: "highlight",
+    name: 'highlight',
     addProseMirrorPlugins() {
       return [
         new Plugin({
@@ -32,7 +32,7 @@ const HighlightExtension = (setHighlightData: (data: HighlightData) => void) =>
                     position: { top: buttonTop, left: buttonLeft },
                   });
                 } else {
-                  setHighlightData({ text: "", position: null });
+                  setHighlightData({ text: '', position: null });
                 }
               },
             };

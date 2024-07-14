@@ -1,14 +1,14 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react';
 
-import { EditorState } from "@tiptap/pm/state";
-import { Dispatch, Editor } from "@tiptap/react";
-import { AiOutlineDelete } from "react-icons/ai";
-import { CiViewTable } from "react-icons/ci";
-import { FaRegCopy } from "react-icons/fa";
-import { IoMdCut } from "react-icons/io";
-import { MdContentPaste } from "react-icons/md";
+import { EditorState } from '@tiptap/pm/state';
+import { Dispatch, Editor } from '@tiptap/react';
+import { AiOutlineDelete } from 'react-icons/ai';
+import { CiViewTable } from 'react-icons/ci';
+import { FaRegCopy } from 'react-icons/fa';
+import { IoMdCut } from 'react-icons/io';
+import { MdContentPaste } from 'react-icons/md';
 
-import "../../styles/global.css";
+import '../../styles/global.css';
 
 interface MenuPosition {
   x: number;
@@ -64,9 +64,9 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({
       }
     };
 
-    document.addEventListener("mouseover", checkIfOutside);
+    document.addEventListener('mouseover', checkIfOutside);
     return () => {
-      document.removeEventListener("mouseover", checkIfOutside);
+      document.removeEventListener('mouseover', checkIfOutside);
     };
   }, []);
 
@@ -74,28 +74,26 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({
     editor
       .chain()
       .focus()
-      .insertTable({ rows: rows, cols: cols, withHeaderRow: true })
+      .insertTable({ rows, cols, withHeaderRow: true })
       .run();
     setShowTableSelector(false); // Hide selector after selection
     setMenuVisible(false);
   };
 
-  const isTextCurrentlySelected = () => {
-    return !editor.state.selection.empty;
-  };
+  const isTextCurrentlySelected = () => !editor.state.selection.empty;
 
   // If text is not selected, then do not perform action.
   const handleCommand = (command: string) => {
     if (!isTextCurrentlySelected()) return;
 
     switch (command) {
-      case "cut":
+      case 'cut':
         cutCommand(editor.state, editor.view.dispatch);
         break;
-      case "copy":
+      case 'copy':
         copyCommand(editor.state);
         break;
-      case "delete":
+      case 'delete':
         deleteCommand(editor.state, editor.view.dispatch);
         break;
       default:
@@ -107,70 +105,70 @@ const EditorContextMenu: React.FC<EditorContextMenu> = ({
   return (
     <div>
       <ul
-        className="bubble-menu"
+        className='bubble-menu'
         style={{
-          position: "absolute",
+          position: 'absolute',
           top: `${menuPosition.y - 30}px`,
           left: `${menuPosition.x - 190}px`,
           zIndex: 1000,
-          boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-          borderRadius: "4px",
+          boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+          borderRadius: '4px',
         }}
       >
         <li
           onClick={() => {
-            handleCommand("copy");
+            handleCommand('copy');
           }}
           className={`bubble-menu-item ${
-            !isTextCurrentlySelected() ? "disabled opacity-50" : ""
+            !isTextCurrentlySelected() ? 'disabled opacity-50' : ''
           }`}
         >
-          <FaRegCopy className="icon" />
-          <span className="text">Copy</span>
+          <FaRegCopy className='icon' />
+          <span className='text'>Copy</span>
         </li>
         <li
-          onClick={() => handleCommand("cut")}
+          onClick={() => handleCommand('cut')}
           className={`bubble-menu-item ${
-            !isTextCurrentlySelected() ? "disabled opacity-50" : ""
+            !isTextCurrentlySelected() ? 'disabled opacity-50' : ''
           }`}
         >
-          <IoMdCut className="icon" />
-          <span className="text">Cut</span>
+          <IoMdCut className='icon' />
+          <span className='text'>Cut</span>
         </li>
         <li
           onClick={() => {
             pasteCommand(editor);
             setMenuVisible(false);
           }}
-          className={`bubble-menu-item`}
+          className='bubble-menu-item'
         >
-          <MdContentPaste className="icon" />
-          <span className="text">Paste</span>
+          <MdContentPaste className='icon' />
+          <span className='text'>Paste</span>
         </li>
         <li
-          onClick={() => handleCommand("delete")}
+          onClick={() => handleCommand('delete')}
           className={`bubble-menu-item ${
-            !isTextCurrentlySelected() ? "disabled opacity-50" : ""
+            !isTextCurrentlySelected() ? 'disabled opacity-50' : ''
           }`}
         >
-          <AiOutlineDelete className="icon" />
-          <span className="text">Delete</span>
+          <AiOutlineDelete className='icon' />
+          <span className='text'>Delete</span>
         </li>
-        <div className="w-full h-px bg-gray-500"></div>
+        <div className='w-full h-px bg-gray-500' />
         <li
           ref={tableButtonRef}
           onMouseEnter={() => setShowTableSelector(true)}
-          className={`bubble-menu-item`}
+          className='bubble-menu-item'
         >
-          <CiViewTable className="icon" />
-          <span className="text">Table</span>
+          <CiViewTable className='icon' />
+          <span className='text'>Table</span>
         </li>
       </ul>
       {showTableSelector && (
         <div
           ref={tableSelectorRef}
           style={{
-            position: "absolute",
+            position: 'absolute',
             top: `${menuPosition.y + 120}px`,
             left: `${menuPosition.x}px`,
             zIndex: 1002,
@@ -209,31 +207,31 @@ const TableSizeSelector: React.FC<TableSizeSelectorProps> = ({ onSelect }) => {
           <div
             key={j}
             className={`cell ${
-              i <= hoveredRows && j <= hoveredCols ? "hovered" : ""
+              i <= hoveredRows && j <= hoveredCols ? 'hovered' : ''
             }`}
             onMouseEnter={() => {
               setHoveredRows(i);
               setHoveredCols(j);
             }}
             onClick={() => onSelect(i, j)}
-          />
+          />,
         );
       }
       rows.push(
-        <div key={i} className="row">
+        <div key={i} className='row'>
           {cols}
-        </div>
+        </div>,
       );
     }
     return rows;
   };
 
   return (
-    <div className="table-size-selector flex flex-col justify-center items-center">
+    <div className='table-size-selector flex flex-col justify-center items-center'>
       {generateCells()}
-      <div className="flex justify-center w-full pt-2">
-        <div className="text-white">
-          {hoveredRows} x {hoveredCols}
+      <div className='flex justify-center w-full pt-2'>
+        <div className='text-white'>
+          {hoveredRows} x{hoveredCols}
         </div>
       </div>
     </div>
@@ -248,7 +246,7 @@ const copyCommand = (state: EditorState) => {
   if (state.selection.empty) return false;
 
   const { from, to } = state.selection;
-  const text = state.doc.textBetween(from, to, "");
+  const text = state.doc.textBetween(from, to, '');
 
   navigator.clipboard.writeText(text);
   return true;
@@ -279,7 +277,7 @@ const pasteCommand = async (editor: Editor) => {
       const text = await navigator.clipboard.readText();
       editor.commands.insertContent(text);
     } catch (err) {
-      console.error(`Failed to read from clipboard:`, err);
+      console.error('Failed to read from clipboard:', err);
     }
   }
 };

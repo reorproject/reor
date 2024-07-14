@@ -1,18 +1,19 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from 'react';
 
-import { MessageStreamEvent } from "@anthropic-ai/sdk/resources";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import { Editor } from "@tiptap/react";
-import { ChatCompletionChunk } from "openai/resources/chat/completions";
-import { FaMagic } from "react-icons/fa";
-import ReactMarkdown from "react-markdown";
-import rehypeRaw from "rehype-raw";
+import { MessageStreamEvent } from '@anthropic-ai/sdk/resources';
+import Button from '@mui/material/Button';
+import TextField from '@mui/material/TextField';
+import { Editor } from '@tiptap/react';
+import { ChatCompletionChunk } from 'openai/resources/chat/completions';
+import { FaMagic } from 'react-icons/fa';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 
-import { ChatHistory } from "../Chat/Chat";
-import { formatOpenAIMessageContentIntoString } from "../Chat/chatUtils";
-import { useOutsideClick } from "../Chat/hooks/use-outside-click";
-import { HighlightData } from "../Editor/HighlightExtension";
+import { ChatHistory } from '../Chat/Chat';
+import { formatOpenAIMessageContentIntoString } from '../Chat/chatUtils';
+import { useOutsideClick } from '../Chat/hooks/use-outside-click';
+import { HighlightData } from '../Editor/HighlightExtension';
+
 interface WritingAssistantProps {
   editor: Editor | null;
   highlightData: HighlightData;
@@ -29,16 +30,16 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   setCurrentChatHistory,
 }) => {
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
-  const [customPrompt, setCustomPrompt] = useState<string>("");
+  const [customPrompt, setCustomPrompt] = useState<string>('');
   const [isOptionsVisible, setIsOptionsVisible] = useState<boolean>(false);
-  const [prevPrompt, setPrevPrompt] = useState<string>("");
+  const [prevPrompt, setPrevPrompt] = useState<string>('');
   const markdownContainerRef = useRef(null);
   const optionsContainerRef = useRef(null);
   const hasValidMessages = currentChatHistory?.displayableChatHistory.some(
-    (msg) => msg.role === "assistant"
+    (msg) => msg.role === 'assistant',
   );
   const lastAssistantMessage = currentChatHistory?.displayableChatHistory
-    .filter((msg) => msg.role === "assistant")
+    .filter((msg) => msg.role === 'assistant')
     .pop();
 
   useOutsideClick(markdownContainerRef, () => {
@@ -60,7 +61,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       !currentChatHistory ||
       currentChatHistory.displayableChatHistory.length === 0
     ) {
-      console.error("No chat history available for copying.");
+      console.error('No chat history available for copying.');
       return;
     }
     const llmResponse =
@@ -76,10 +77,10 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       navigator.clipboard
         .writeText(copiedText)
         .then(() => {
-          console.log("Text copied to clipboard successfully!");
+          console.log('Text copied to clipboard successfully!');
         })
         .catch((err) => {
-          console.error("Failed to copy text: ", err);
+          console.error('Failed to copy text: ', err);
         });
     }
   };
@@ -90,7 +91,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       !currentChatHistory ||
       currentChatHistory.displayableChatHistory.length === 0
     ) {
-      console.error("No chat history available for insertion.");
+      console.error('No chat history available for insertion.');
       return;
     }
 
@@ -112,7 +113,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       .chain()
       .focus()
       .setTextSelection(endOfSelection)
-      .insertContent("\n" + insertionText)
+      .insertContent(`\n${insertionText}`)
       .run();
 
     setCurrentChatHistory(undefined);
@@ -124,7 +125,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       !currentChatHistory ||
       currentChatHistory.displayableChatHistory.length === 0
     ) {
-      console.error("No chat history available for replacement.");
+      console.error('No chat history available for replacement.');
       return;
     }
 
@@ -153,34 +154,32 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
     const selectedText = highlightData.text;
     if (!selectedText.trim()) return;
 
-    let prompt = "";
+    let prompt = '';
 
     switch (option) {
-      case "simplify":
+      case 'simplify':
         prompt = `The following text in triple quotes below has already been written:
 """
 ${selectedText}
 """
 Simplify and condense the writing. Do not return anything other than the simplified writing. Do not wrap responses in quotes.`;
         break;
-      case "copy-editor":
+      case 'copy-editor':
         prompt = `Act as a copy editor. Go through the text in triple quotes below. Edit it for spelling mistakes, grammar issues, punctuation, and generally for readability and flow. Format the text into appropriately sized paragraphs. Make your best effort.
  
 """ ${selectedText} """
 Return only the edited text. Do not wrap your response in quotes. Do not offer anything else other than the edited text in the response. Do not translate the text. If in doubt, or you can't make edits, just return the original text.`;
         break;
-      case "takeaways":
+      case 'takeaways':
         prompt = `My notes are below in triple quotes:
 """ ${selectedText} """
 Write a markdown list (using dashes) of key takeaways from my notes. Write at least 3 items, but write more if the text requires it. Be very detailed and don't leave any information out. Do not wrap responses in quotes.`;
         break;
-      case "custom":
+      case 'custom':
         prompt =
-          `The user has given the following instructions(in triple #) for processing the text selected(in triple quotes): ` +
-          `### ` +
-          customPromptInput +
-          ` ###` +
-          "\n" +
+          'The user has given the following instructions(in triple #) for processing the text selected(in triple quotes): ' +
+          `### ${customPromptInput} ###` +
+          '\n' +
           `  """ ${selectedText} """`;
         break;
     }
@@ -190,13 +189,13 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
 
   const getLLMResponse = async (
     prompt: string,
-    chatHistory: ChatHistory | undefined
+    chatHistory: ChatHistory | undefined,
   ) => {
     const defaultLLMName = await window.llm.getDefaultLLMName();
     const llmConfigs = await window.llm.getLLMConfigs();
 
     const currentModelConfig = llmConfigs.find(
-      (config) => config.modelName === defaultLLMName
+      (config) => config.modelName === defaultLLMName,
     );
     if (!currentModelConfig) {
       throw new Error(`No model config found for model: ${defaultLLMName}`);
@@ -214,9 +213,9 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
       }
       setCurrentChatHistory(chatHistory);
       chatHistory.displayableChatHistory.push({
-        role: "user",
+        role: 'user',
         content: prompt,
-        messageType: "success",
+        messageType: 'success',
         context: [],
       });
       if (!chatHistory) return;
@@ -225,7 +224,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
         defaultLLMName,
         currentModelConfig,
         false,
-        chatHistory
+        chatHistory,
       );
     } catch (error) {
       console.error(error);
@@ -236,7 +235,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
   const appendNewContentToMessageHistory = (
     chatID: string,
     newContent: string,
-    newMessageType: "success" | "error"
+    newMessageType: 'success' | 'error',
   ) => {
     setCurrentChatHistory((prev) => {
       if (chatID !== prev?.id) return prev;
@@ -245,12 +244,12 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
         const lastMessage =
           newDisplayableHistory[newDisplayableHistory.length - 1];
 
-        if (lastMessage.role === "assistant") {
+        if (lastMessage.role === 'assistant') {
           lastMessage.content += newContent; // Append new content with a space
           lastMessage.messageType = newMessageType;
         } else {
           newDisplayableHistory.push({
-            role: "assistant",
+            role: 'assistant',
             content: newContent,
             messageType: newMessageType,
             context: [],
@@ -258,7 +257,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
         }
       } else {
         newDisplayableHistory.push({
-          role: "assistant",
+          role: 'assistant',
           content: newContent,
           messageType: newMessageType,
           context: [],
@@ -267,12 +266,10 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
       return {
         id: prev!.id,
         displayableChatHistory: newDisplayableHistory,
-        openAIChatHistory: newDisplayableHistory.map((message) => {
-          return {
-            role: message.role,
-            content: message.content,
-          };
-        }),
+        openAIChatHistory: newDisplayableHistory.map((message) => ({
+          role: message.role,
+          content: message.content,
+        })),
       };
     });
   };
@@ -280,33 +277,33 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
   useEffect(() => {
     const handleOpenAIChunk = async (
       receivedChatID: string,
-      chunk: ChatCompletionChunk
+      chunk: ChatCompletionChunk,
     ) => {
-      const newContent = chunk.choices[0].delta.content ?? "";
+      const newContent = chunk.choices[0].delta.content ?? '';
       if (newContent) {
-        appendNewContentToMessageHistory(receivedChatID, newContent, "success");
+        appendNewContentToMessageHistory(receivedChatID, newContent, 'success');
       }
     };
 
     const handleAnthropicChunk = async (
       receivedChatID: string,
-      chunk: MessageStreamEvent
+      chunk: MessageStreamEvent,
     ) => {
       const newContent =
-        chunk.type === "content_block_delta" ? chunk.delta.text ?? "" : "";
+        chunk.type === 'content_block_delta' ? (chunk.delta.text ?? '') : '';
       if (newContent) {
-        appendNewContentToMessageHistory(receivedChatID, newContent, "success");
+        appendNewContentToMessageHistory(receivedChatID, newContent, 'success');
       }
     };
 
     const removeOpenAITokenStreamListener = window.ipcRenderer.receive(
-      "openAITokenStream",
-      handleOpenAIChunk
+      'openAITokenStream',
+      handleOpenAIChunk,
     );
 
     const removeAnthropicTokenStreamListener = window.ipcRenderer.receive(
-      "anthropicTokenStream",
-      handleAnthropicChunk
+      'anthropicTokenStream',
+      handleAnthropicChunk,
     );
 
     return () => {
@@ -325,8 +322,8 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           left: `${highlightData.position.left + 30}px`,
           zIndex: 50,
         }}
-        className="absolute w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer text-gray-600 border-none shadow-md hover:bg-gray-300"
-        aria-label="Writing Assistant button"
+        className='absolute w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center cursor-pointer text-gray-600 border-none shadow-md hover:bg-gray-300'
+        aria-label='Writing Assistant button'
         onClick={() => setIsOptionsVisible(true)}
       >
         <FaMagic />
@@ -338,41 +335,41 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
             top: highlightData.position.top,
             left: highlightData.position.left,
           }}
-          className="absolute bg-white border border-gray-300 p-2.5 z-50 w-96 rounded-md"
+          className='absolute bg-white border border-gray-300 p-2.5 z-50 w-96 rounded-md'
         >
           <TextField
-            type="text"
-            variant="outlined"
-            size="small"
+            type='text'
+            variant='outlined'
+            size='small'
             value={customPrompt}
             onChange={(e) => setCustomPrompt(e.target.value)}
-            placeholder="Ask AI anything..."
-            className="mb-2.5 p-1 w-full" // TailwindCSS classes for styling
+            placeholder='Ask AI anything...'
+            className='mb-2.5 p-1 w-full' // TailwindCSS classes for styling
             onKeyPress={(e) => {
-              if (e.key === "Enter") {
-                handleOption("custom", customPrompt);
+              if (e.key === 'Enter') {
+                handleOption('custom', customPrompt);
               }
             }}
           />
-          <div className="max-h-36 overflow-y-auto">
+          <div className='max-h-36 overflow-y-auto'>
             <Button
-              onClick={() => handleOption("simplify")}
-              className="block w-full mb-1"
-              style={{ textTransform: "none" }}
+              onClick={() => handleOption('simplify')}
+              className='block w-full mb-1'
+              style={{ textTransform: 'none' }}
             >
               Simplify and condense the writing
             </Button>
             <Button
-              onClick={() => handleOption("copy-editor")}
-              className="block w-full mb-1"
-              style={{ textTransform: "none" }}
+              onClick={() => handleOption('copy-editor')}
+              className='block w-full mb-1'
+              style={{ textTransform: 'none' }}
             >
               Fix spelling and grammar
             </Button>
             <Button
-              onClick={() => handleOption("takeaways")}
-              className="block w-full mb-1"
-              style={{ textTransform: "none" }}
+              onClick={() => handleOption('takeaways')}
+              className='block w-full mb-1'
+              style={{ textTransform: 'none' }}
             >
               List key Takeaways
             </Button>
@@ -382,34 +379,34 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
       {hasValidMessages && (
         <div
           ref={markdownContainerRef}
-          className="absolute bg-white border border-gray-300 rounded-lg shadow-md p-2.5 z-50"
+          className='absolute bg-white border border-gray-300 rounded-lg shadow-md p-2.5 z-50'
           style={{
             top: highlightData.position.top,
             left: highlightData.position.left,
-            width: "385px",
+            width: '385px',
           }}
         >
           {lastAssistantMessage && (
             <ReactMarkdown
               rehypePlugins={[rehypeRaw]}
               className={`p-1 markdown-content break-words rounded-md ${
-                lastAssistantMessage.messageType === "error"
-                  ? "bg-red-100 text-red-800"
-                  : lastAssistantMessage.role === "assistant"
-                  ? "bg-neutral-200 text-black"
-                  : "bg-blue-100 text-blue-800"
+                lastAssistantMessage.messageType === 'error'
+                  ? 'bg-red-100 text-red-800'
+                  : lastAssistantMessage.role === 'assistant'
+                    ? 'bg-neutral-200 text-black'
+                    : 'bg-blue-100 text-blue-800'
               }`}
             >
               {lastAssistantMessage.visibleContent
                 ? lastAssistantMessage.visibleContent
                 : formatOpenAIMessageContentIntoString(
-                    lastAssistantMessage.content
+                    lastAssistantMessage.content,
                   )}
             </ReactMarkdown>
           )}
-          <div className="flex justify-between mt-2">
+          <div className='flex justify-between mt-2'>
             <button
-              className="bg-blue-100 border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center mr-1"
+              className='bg-blue-100 border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center mr-1'
               onClick={() => {
                 getLLMResponse(prevPrompt, currentChatHistory);
               }}
@@ -417,7 +414,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
               Re-run
             </button>
             <button
-              className="bg-blue-100 border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center mr-1"
+              className='bg-blue-100 border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center mr-1'
               onClick={() => {
                 insertAfterHighlightedText();
               }}
@@ -425,7 +422,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
               Insert
             </button>
             <button
-              className="bg-blue-100 border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center mr-1"
+              className='bg-blue-100 border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center mr-1'
               onClick={() => {
                 copyToClipboard();
               }}
@@ -433,10 +430,11 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
               Copy
             </button>
             <button
-              className="bg-indigo-700 text-white border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center"
+              className='bg-indigo-700 text-white border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center'
               onClick={() => {
                 replaceHighlightedText();
               }}
+              type='button'
             >
               Replace
             </button>

@@ -1,8 +1,8 @@
-import React, { useRef, useEffect, useState, useMemo } from "react";
+import React, { useRef, useEffect, useState, useMemo } from 'react';
 
-import posthog from "posthog-js";
+import posthog from 'posthog-js';
 
-import { removeFileExtension } from "@/utils/strings";
+import { removeFileExtension } from '@/utils/strings';
 
 export interface SuggestionsState {
   textWithinBrackets: string;
@@ -19,13 +19,13 @@ export interface SuggestionsDisplayProps {
 const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
   suggestionsState,
   suggestions,
-  maxWidth = "max-w-sm",
+  maxWidth = 'max-w-sm',
 }) => {
   const suggestionsRef = useRef<HTMLDivElement | null>(null);
   const [layout, setLayout] = useState({
     top: -9999,
     left: -9999,
-    display: "none",
+    display: 'none',
   });
 
   const filteredSuggestions = useMemo(() => {
@@ -52,8 +52,8 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
 
     setLayout({
       top: shouldDisplayAbove ? top - height : top,
-      left: left,
-      display: "block",
+      left,
+      display: 'block',
     });
   }, [suggestionsState.position, filteredSuggestions]);
 
@@ -69,13 +69,13 @@ const InEditorBacklinkSuggestionsDisplay: React.FC<SuggestionsDisplayProps> = ({
         display: layout.display,
       }}
     >
-      <ul className="m-0 p-0 list-none">
+      <ul className='m-0 p-0 list-none'>
         {filteredSuggestions.map((suggestion, index) => (
           <li
             key={suggestion} // Use a unique id property from the suggestion
-            className="p-1.25 cursor-pointer hover:bg-gray-100 p-1 text-sm rounded"
+            className='p-1.25 cursor-pointer hover:bg-gray-100 p-1 text-sm rounded'
             onClick={() => {
-              posthog.capture("select_backlink_suggestion", {
+              posthog.capture('select_backlink_suggestion', {
                 rank: index + 1,
               });
               suggestionsState.onSelect?.(suggestion);

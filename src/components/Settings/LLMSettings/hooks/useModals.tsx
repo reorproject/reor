@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
 import CloudLLMSetupModal, {
   CloudLLMSetupModalProps,
-} from "../modals/CloudLLMSetup";
-import NewOllamaModelModal from "../modals/NewOllamaModel";
-import RemoteLLMSetupModal from "../modals/RemoteLLMSetup";
+} from '../modals/CloudLLMSetup';
+import NewOllamaModelModal from '../modals/NewOllamaModel';
+import RemoteLLMSetupModal from '../modals/RemoteLLMSetup';
 
 const useModals = () => {
   const [modals, setModals] = useState({
@@ -12,14 +12,14 @@ const useModals = () => {
     remoteLLM: { isOpen: false, Component: RemoteLLMSetupModal },
     openai: {
       isOpen: false,
-      Component: (props: Omit<CloudLLMSetupModalProps, "LLMType">) => (
-        <CloudLLMSetupModal {...props} LLMType="openai" />
+      Component: (props: Omit<CloudLLMSetupModalProps, 'LLMType'>) => (
+        <CloudLLMSetupModal {...props} LLMType='openai' />
       ),
     },
     anthropic: {
       isOpen: false,
-      Component: (props: Omit<CloudLLMSetupModalProps, "LLMType">) => (
-        <CloudLLMSetupModal {...props} LLMType="anthropic" />
+      Component: (props: Omit<CloudLLMSetupModalProps, 'LLMType'>) => (
+        <CloudLLMSetupModal {...props} LLMType='anthropic' />
       ),
     },
   });

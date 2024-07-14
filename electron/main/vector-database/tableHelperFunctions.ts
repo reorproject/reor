@@ -1,29 +1,29 @@
-import * as fs from "fs";
+import * as fs from 'fs';
 
-import { chunkMarkdownByHeadingsAndByCharsIfBig } from "../common/chunking";
-import { errorToStringMainProcess } from "../common/error";
+import { chunkMarkdownByHeadingsAndByCharsIfBig } from '../common/chunking';
+import { errorToStringMainProcess } from '../common/error';
 import {
   GetFilesInfoList,
   flattenFileInfoTree,
   readFile,
-} from "../filesystem/filesystem";
-import { FileInfo, FileInfoTree } from "../filesystem/types";
+} from '../filesystem/filesystem';
+import { FileInfo, FileInfoTree } from '../filesystem/types';
 
-import { LanceDBTableWrapper } from "./lanceTableWrapper";
-import { DBEntry, DBQueryResult, DatabaseFields } from "./schema";
+import { LanceDBTableWrapper } from './lanceTableWrapper';
+import { DBEntry, DBQueryResult, DatabaseFields } from './schema';
 
 export const RepopulateTableWithMissingItems = async (
   table: LanceDBTableWrapper,
   directoryPath: string,
-  onProgress?: (progress: number) => void
+  onProgress?: (progress: number) => void,
 ) => {
   let filesInfoTree;
-  console.log("getting files info list");
+  console.log('getting files info list');
   try {
     filesInfoTree = GetFilesInfoList(directoryPath);
   } catch (error) {
     throw new Error(
-      `Error getting file info list: ${errorToStringMainProcess(error)}`
+      `Error getting file info list: ${errorToStringMainProcess(error)}`,
     );
   }
 
@@ -32,20 +32,20 @@ export const RepopulateTableWithMissingItems = async (
     tableArray = await getTableAsArray(table);
   } catch (error) {
     throw new Error(
-      `Error converting table to array: ${errorToStringMainProcess(error)}`
+      `Error converting table to array: ${errorToStringMainProcess(error)}`,
     );
   }
   let itemsToRemove;
   try {
     itemsToRemove = await computeDBItemsToRemoveFromTable(
       filesInfoTree,
-      tableArray
+      tableArray,
     );
   } catch (error) {
     throw new Error(
       `Error computing items to remove from table: ${errorToStringMainProcess(
-        error
-      )}`
+        error,
+      )}`,
     );
   }
 
@@ -54,7 +54,7 @@ export const RepopulateTableWithMissingItems = async (
     await table.deleteDBItemsByFilePaths(filePathsToRemove);
   } catch (error) {
     throw new Error(
-      `Error deleting items by file paths: ${errorToStringMainProcess(error)}`
+      `Error deleting items by file paths: ${errorToStringMainProcess(error)}`,
     );
   }
 
@@ -63,7 +63,7 @@ export const RepopulateTableWithMissingItems = async (
     dbItemsToAdd = await computeDbItemsToAddOrUpdate(filesInfoTree, tableArray);
   } catch (error) {
     throw new Error(
-      `Error computing DB items to add: ${errorToStringMainProcess(error)}`
+      `Error computing DB items to add: ${errorToStringMainProcess(error)}`,
     );
   }
 
@@ -78,8 +78,8 @@ export const RepopulateTableWithMissingItems = async (
   } catch (error) {
     throw new Error(
       `Error deleting DB items by file paths: ${errorToStringMainProcess(
-        error
-      )}`
+        error,
+      )}`,
     );
   }
 
@@ -88,7 +88,7 @@ export const RepopulateTableWithMissingItems = async (
     await table.add(flattenedItemsToAdd, onProgress);
   } catch (error) {
     throw new Error(
-      `Error adding items to table: ${errorToStringMainProcess(error)}`
+      `Error adding items to table: ${errorToStringMainProcess(error)}`,
     );
   }
 
@@ -96,7 +96,7 @@ export const RepopulateTableWithMissingItems = async (
 };
 
 const getTableAsArray = async (
-  table: LanceDBTableWrapper
+  table: LanceDBTableWrapper,
 ): Promise<{ notepath: string; filemodified: Date }[]> => {
   const nonEmptyResults = await table.lanceTable
     .filter(`${DatabaseFields.NOTE_PATH} != ''`)
@@ -110,20 +110,20 @@ const getTableAsArray = async (
 
 const computeDbItemsToAddOrUpdate = async (
   filesInfoList: FileInfo[],
-  tableArray: { notepath: string; filemodified: Date }[]
+  tableArray: { notepath: string; filemodified: Date }[],
 ): Promise<DBEntry[][]> => {
   const filesAsChunks = await convertFileInfoListToDBItems(filesInfoList);
 
   const fileChunksMissingFromTable = filesAsChunks.filter(
     (chunksBelongingToFile) =>
-      areChunksMissingFromTable(chunksBelongingToFile, tableArray)
+      areChunksMissingFromTable(chunksBelongingToFile, tableArray),
   );
 
   return fileChunksMissingFromTable;
 };
 
 export const convertFileInfoListToDBItems = async (
-  filesInfoList: FileInfo[]
+  filesInfoList: FileInfo[],
 ): Promise<DBEntry[][]> => {
   const promises = filesInfoList.map(convertFileTypeToDBType);
   const filesAsChunksToAddToDB = await Promise.all(promises);
@@ -132,17 +132,17 @@ export const convertFileInfoListToDBItems = async (
 
 const computeDBItemsToRemoveFromTable = async (
   filesInfoList: FileInfo[],
-  tableArray: { notepath: string; filemodified: Date }[]
+  tableArray: { notepath: string; filemodified: Date }[],
 ): Promise<{ notepath: string; filemodified: Date }[]> => {
   const itemsInTableAndNotInFilesInfoList = tableArray.filter(
-    (item) => !filesInfoList.some((file) => file.path == item.notepath)
+    (item) => !filesInfoList.some((file) => file.path == item.notepath),
   );
   return itemsInTableAndNotInFilesInfoList;
 };
 
 const areChunksMissingFromTable = (
   chunksToCheck: DBEntry[],
-  tableArray: { notepath: string; filemodified: Date }[]
+  tableArray: { notepath: string; filemodified: Date }[],
 ): boolean => {
   // checking whether th
   if (chunksToCheck.length == 0) {
@@ -150,13 +150,13 @@ const areChunksMissingFromTable = (
     return false;
   }
 
-  if (chunksToCheck[0].content === "") {
+  if (chunksToCheck[0].content === '') {
     return false;
   }
   // then we'd check if the filepaths are not present in the table at all:
-  const notepath = chunksToCheck[0].notepath;
+  const { notepath } = chunksToCheck[0];
   const itemsAlreadyInTable = tableArray.filter(
-    (item) => item.notepath == notepath
+    (item) => item.notepath == notepath,
   );
   if (itemsAlreadyInTable.length == 0) {
     // if we find no items in the table with the same notepath, then we should add the chunks to the table
@@ -167,7 +167,7 @@ const areChunksMissingFromTable = (
 };
 
 const convertFileTreeToDBEntries = async (
-  tree: FileInfoTree
+  tree: FileInfoTree,
 ): Promise<DBEntry[]> => {
   const flattened = flattenFileInfoTree(tree);
 
@@ -181,16 +181,14 @@ const convertFileTreeToDBEntries = async (
 const convertFileTypeToDBType = async (file: FileInfo): Promise<DBEntry[]> => {
   const fileContent = readFile(file.path);
   const chunks = await chunkMarkdownByHeadingsAndByCharsIfBig(fileContent);
-  const entries = chunks.map((content, index) => {
-    return {
-      notepath: file.path,
-      content: content,
-      subnoteindex: index,
-      timeadded: new Date(),
-      filemodified: file.dateModified,
-      filecreated: file.dateCreated,
-    };
-  });
+  const entries = chunks.map((content, index) => ({
+    notepath: file.path,
+    content,
+    subnoteindex: index,
+    timeadded: new Date(),
+    filemodified: file.dateModified,
+    filecreated: file.dateCreated,
+  }));
   return entries;
 };
 
@@ -204,7 +202,7 @@ export function unsanitizePathForFileSystem(dbPath: string): string {
 
 export const addFileTreeToDBTable = async (
   dbTable: LanceDBTableWrapper,
-  fileTree: FileInfoTree
+  fileTree: FileInfoTree,
 ): Promise<void> => {
   const dbEntries = await convertFileTreeToDBEntries(fileTree);
   await dbTable.add(dbEntries);
@@ -212,7 +210,7 @@ export const addFileTreeToDBTable = async (
 
 export const removeFileTreeFromDBTable = async (
   dbTable: LanceDBTableWrapper,
-  fileTree: FileInfoTree
+  fileTree: FileInfoTree,
 ): Promise<void> => {
   const flattened = flattenFileInfoTree(fileTree);
   const filePaths = flattened.map((x) => x.path);
@@ -221,33 +219,30 @@ export const removeFileTreeFromDBTable = async (
 
 export const updateFileInTable = async (
   dbTable: LanceDBTableWrapper,
-  filePath: string
+  filePath: string,
 ): Promise<void> => {
   await dbTable.deleteDBItemsByFilePaths([filePath]);
   const content = readFile(filePath);
-  const chunkedContentList = await chunkMarkdownByHeadingsAndByCharsIfBig(
-    content
-  );
+  const chunkedContentList =
+    await chunkMarkdownByHeadingsAndByCharsIfBig(content);
   const stats = fs.statSync(filePath);
-  const dbEntries = chunkedContentList.map((content, index) => {
-    return {
-      notepath: filePath,
-      content: content,
-      subnoteindex: index,
-      timeadded: new Date(), // time now
-      filemodified: stats.mtime,
-      filecreated: stats.birthtime,
-    };
-  });
+  const dbEntries = chunkedContentList.map((content, index) => ({
+    notepath: filePath,
+    content,
+    subnoteindex: index,
+    timeadded: new Date(), // time now
+    filemodified: stats.mtime,
+    filecreated: stats.birthtime,
+  }));
   await dbTable.add(dbEntries);
 };
 
 export function convertRecordToDBType<T extends DBEntry | DBQueryResult>(
-  record: Record<string, unknown>
+  record: Record<string, unknown>,
 ): T | null {
   const recordWithType = record as T;
   recordWithType.notepath = unsanitizePathForFileSystem(
-    recordWithType.notepath
+    recordWithType.notepath,
   );
   return recordWithType;
 }

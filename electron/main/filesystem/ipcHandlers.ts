@@ -1,23 +1,23 @@
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from 'fs';
+import * as path from 'path';
 
-import { ipcMain, BrowserWindow, dialog } from "electron";
-import Store from "electron-store";
+import { ipcMain, BrowserWindow, dialog } from 'electron';
+import Store from 'electron-store';
 
-import WindowsManager from "../common/windowManager";
-import { StoreKeys, StoreSchema } from "../electron-store/storeConfig";
+import WindowsManager from '../common/windowManager';
+import { StoreKeys, StoreSchema } from '../electron-store/storeConfig';
 import {
   createPromptWithContextLimitFromContent,
   PromptWithContextLimit,
-} from "../llm/contextLimit";
-import { ollamaService, openAISession } from "../llm/ipcHandlers";
-import { getLLMConfig } from "../llm/llmConfig";
-import { addExtensionToFilenameIfNoExtensionPresent } from "../path/path";
-import { DBEntry } from "../vector-database/schema";
+} from '../llm/contextLimit';
+import { ollamaService, openAISession } from '../llm/ipcHandlers';
+import { getLLMConfig } from '../llm/llmConfig';
+import { addExtensionToFilenameIfNoExtensionPresent } from '../path/path';
+import { DBEntry } from '../vector-database/schema';
 import {
   convertFileInfoListToDBItems,
   updateFileInTable,
-} from "../vector-database/tableHelperFunctions";
+} from '../vector-database/tableHelperFunctions';
 
 import {
   GetFilesInfoTree,
@@ -29,39 +29,38 @@ import {
   markdownExtensions,
   startWatchingDirectory,
   updateFileListForRenderer,
-} from "./filesystem";
+} from './filesystem';
 import {
   FileInfoTree,
   AugmentPromptWithFileProps,
   WriteFileProps,
   RenameFileProps,
-} from "./types";
+} from './types';
 
 export const registerFileHandlers = (
   store: Store<StoreSchema>,
-  windowsManager: WindowsManager
+  windowsManager: WindowsManager,
 ) => {
   ipcMain.handle(
-    "get-files-tree-for-window",
+    'get-files-tree-for-window',
     async (event): Promise<FileInfoTree> => {
       const directoryPath = windowsManager.getVaultDirectoryForWinContents(
-        event.sender
+        event.sender,
       );
       if (!directoryPath) return [];
 
       const files: FileInfoTree = GetFilesInfoTree(directoryPath);
       return files;
-    }
+    },
   );
 
   ipcMain.handle(
-    "read-file",
-    async (event, filePath: string): Promise<string> => {
-      return fs.readFileSync(filePath, "utf-8");
-    }
+    'read-file',
+    async (event, filePath: string): Promise<string> =>
+      fs.readFileSync(filePath, 'utf-8'),
   );
 
-  ipcMain.handle("check-file-exists", async (event, filePath) => {
+  ipcMain.handle('check-file-exists', async (event, filePath) => {
     try {
       // Attempt to access the file to check existence
       await fs.promises.access(filePath, fs.constants.F_OK);
@@ -74,12 +73,12 @@ export const registerFileHandlers = (
   });
 
   ipcMain.handle(
-    "delete-file",
+    'delete-file',
     async (event, filePath: string): Promise<void> => {
-      console.log("Deleting file", filePath);
+      console.log('Deleting file', filePath);
       fs.stat(filePath, async (err, stats) => {
         if (err) {
-          console.error("An error occurred:", err);
+          console.error('An error occurred:', err);
           return;
         }
 
@@ -87,42 +86,42 @@ export const registerFileHandlers = (
           // For directories (Node.js v14.14.0 and later)
           fs.rm(filePath, { recursive: true }, (err) => {
             if (err) {
-              console.error("An error occurred:", err);
+              console.error('An error occurred:', err);
               return;
             }
             console.log(`Directory at ${filePath} was deleted successfully.`);
           });
 
           const windowInfo = windowsManager.getWindowInfoForContents(
-            event.sender
+            event.sender,
           );
           if (!windowInfo) {
-            throw new Error("Window info not found.");
+            throw new Error('Window info not found.');
           }
           await windowInfo.dbTableClient.deleteDBItemsByFilePaths([filePath]);
         } else {
           fs.unlink(filePath, (err) => {
             if (err) {
-              console.error("An error occurred:", err);
+              console.error('An error occurred:', err);
               return;
             }
             console.log(`File at ${filePath} was deleted successfully.`);
           });
 
           const windowInfo = windowsManager.getWindowInfoForContents(
-            event.sender
+            event.sender,
           );
           if (!windowInfo) {
-            throw new Error("Window info not found.");
+            throw new Error('Window info not found.');
           }
           await windowInfo.dbTableClient.deleteDBItemsByFilePaths([filePath]);
         }
       });
-    }
+    },
   );
 
   ipcMain.handle(
-    "write-file",
+    'write-file',
     async (event, writeFileProps: WriteFileProps) => {
       if (!fs.existsSync(path.dirname(writeFileProps.filePath))) {
         fs.mkdirSync(path.dirname(writeFileProps.filePath), {
@@ -132,27 +131,27 @@ export const registerFileHandlers = (
       fs.writeFileSync(
         writeFileProps.filePath,
         writeFileProps.content,
-        "utf-8"
+        'utf-8',
       );
-    }
+    },
   );
 
-  ipcMain.handle("is-directory", (event, filepath: string) => {
-    return fs.statSync(filepath).isDirectory();
-  });
+  ipcMain.handle('is-directory', (event, filepath: string) =>
+    fs.statSync(filepath).isDirectory(),
+  );
 
   ipcMain.handle(
-    "rename-file-recursive",
+    'rename-file-recursive',
     async (event, renameFileProps: RenameFileProps) => {
       const windowInfo = windowsManager.getWindowInfoForContents(event.sender);
 
       if (!windowInfo) {
-        throw new Error("Window info not found.");
+        throw new Error('Window info not found.');
       }
 
       windowsManager.watcher?.unwatch(windowInfo?.vaultDirectoryForWindow);
 
-      if (process.platform == "win32") {
+      if (process.platform == 'win32') {
         windowsManager.watcher?.close().then(() => {
           fs.rename(
             renameFileProps.oldFilePath,
@@ -167,14 +166,14 @@ export const registerFileHandlers = (
               if (win) {
                 windowsManager.watcher = startWatchingDirectory(
                   win,
-                  windowInfo.vaultDirectoryForWindow
+                  windowInfo.vaultDirectoryForWindow,
                 );
                 updateFileListForRenderer(
                   win,
-                  windowInfo.vaultDirectoryForWindow
+                  windowInfo.vaultDirectoryForWindow,
                 );
               }
-            }
+            },
           );
         });
       } else {
@@ -188,38 +187,38 @@ export const registerFileHandlers = (
             }
             // Re-watch the vault directory after renaming
             windowsManager.watcher?.add(windowInfo?.vaultDirectoryForWindow);
-          }
+          },
         );
       }
 
-      console.log("reindexing folder");
+      console.log('reindexing folder');
       // then need to trigger reindexing of folder
       windowInfo.dbTableClient.updateDBItemsWithNewFilePath(
         renameFileProps.oldFilePath,
-        renameFileProps.newFilePath
+        renameFileProps.newFilePath,
       );
-    }
+    },
   );
 
-  ipcMain.handle("index-file-in-database", async (event, filePath: string) => {
+  ipcMain.handle('index-file-in-database', async (event, filePath: string) => {
     const windowInfo = windowsManager.getWindowInfoForContents(event.sender);
     if (!windowInfo) {
-      throw new Error("Window info not found.");
+      throw new Error('Window info not found.');
     }
     await updateFileInTable(windowInfo.dbTableClient, filePath);
   });
 
   ipcMain.handle(
-    "create-file",
+    'create-file',
     async (event, filePath: string, content: string): Promise<void> => {
-      createFileRecursive(filePath, content, "utf-8");
-    }
+      createFileRecursive(filePath, content, 'utf-8');
+    },
   );
 
   ipcMain.handle(
-    "create-directory",
+    'create-directory',
     async (event, dirPath: string): Promise<void> => {
-      console.log("Creating directory", dirPath);
+      console.log('Creating directory', dirPath);
 
       const mkdirRecursiveSync = (dirPath: string) => {
         const parentDir = path.dirname(dirPath);
@@ -234,133 +233,133 @@ export const registerFileHandlers = (
       if (!fs.existsSync(dirPath)) {
         mkdirRecursiveSync(dirPath);
       } else {
-        console.log("Directory already exists:", dirPath);
+        console.log('Directory already exists:', dirPath);
       }
-    }
+    },
   );
 
   ipcMain.handle(
-    "move-file-or-dir",
+    'move-file-or-dir',
     async (event, sourcePath: string, destinationPath: string) => {
       const windowInfo = windowsManager.getWindowInfoForContents(event.sender);
       if (!windowInfo) {
-        throw new Error("Window info not found.");
+        throw new Error('Window info not found.');
       }
       orchestrateEntryMove(
         windowInfo.dbTableClient,
         sourcePath,
-        destinationPath
+        destinationPath,
       );
-    }
+    },
   );
 
   ipcMain.handle(
-    "augment-prompt-with-file",
+    'augment-prompt-with-file',
     async (
       _event,
-      { prompt, llmName, filePath }: AugmentPromptWithFileProps
+      { prompt, llmName, filePath }: AugmentPromptWithFileProps,
     ): Promise<PromptWithContextLimit> => {
       try {
-        const content = fs.readFileSync(filePath, "utf-8");
+        const content = fs.readFileSync(filePath, 'utf-8');
 
         const llmSession = openAISession;
         const llmConfig = await getLLMConfig(store, ollamaService, llmName);
         if (!llmConfig) {
           throw new Error(`LLM ${llmName} not configured.`);
         }
-        const systemPrompt = "Based on the following information:\n";
+        const systemPrompt = 'Based on the following information:\n';
         const { prompt: filePrompt, contextCutoffAt } =
           createPromptWithContextLimitFromContent(
             content,
             systemPrompt,
             prompt,
             llmSession.getTokenizer(llmName),
-            llmConfig.contextLength
+            llmConfig.contextLength,
           );
         return { prompt: filePrompt, contextCutoffAt };
       } catch (error) {
-        console.error("Error searching database:", error);
+        console.error('Error searching database:', error);
         throw error;
       }
-    }
+    },
   );
 
   ipcMain.handle(
-    "get-filesystem-paths-as-db-items",
+    'get-filesystem-paths-as-db-items',
     async (_event, filePaths: string[]): Promise<DBEntry[]> => {
       try {
         const fileItems = GetFilesInfoListForListOfPaths(filePaths);
-        console.log("fileItems", fileItems);
+        console.log('fileItems', fileItems);
         const dbItems = await convertFileInfoListToDBItems(fileItems);
-        console.log("dbItems", dbItems);
+        console.log('dbItems', dbItems);
         return dbItems.flat();
       } catch (error) {
-        console.error("Error searching database:", error);
+        console.error('Error searching database:', error);
         throw error;
       }
-    }
+    },
   );
 
   ipcMain.handle(
-    "generate-flashcards-from-file",
+    'generate-flashcards-from-file',
     async (
       event,
-      { prompt, llmName, filePath }: AugmentPromptWithFileProps
+      { prompt, llmName, filePath }: AugmentPromptWithFileProps,
     ): Promise<string> => {
       // actual response required { question: string, answer: string} []
       const llmSession = openAISession;
-      console.log("llmName:   ", llmName);
+      console.log('llmName:   ', llmName);
       const llmConfig = await getLLMConfig(store, ollamaService, llmName);
-      console.log("llmConfig", llmConfig);
+      console.log('llmConfig', llmConfig);
       if (!llmConfig) {
         throw new Error(`LLM ${llmName} not configured.`);
       }
       if (!filePath) {
         throw new Error(
-          "Current file path is not provided for flashcard agent."
+          'Current file path is not provided for flashcard agent.',
         );
       }
-      const fileResults = fs.readFileSync(filePath, "utf-8");
+      const fileResults = fs.readFileSync(filePath, 'utf-8');
       const { prompt: promptToCreateAtomicFacts } =
         createPromptWithContextLimitFromContent(
           fileResults,
-          "",
+          '',
           `Extract atomic facts that can be used for students to study, based on this query: ${prompt}`,
           llmSession.getTokenizer(llmName),
-          llmConfig.contextLength
+          llmConfig.contextLength,
         );
       const llmGeneratedFacts = await llmSession.response(
         llmName,
         llmConfig,
         [
           {
-            role: "system",
+            role: 'system',
             content: `You are an experienced teacher reading through some notes a student has made and extracting atomic facts. You never come up with your own facts. You generate atomic facts directly from what you read.
             An atomic fact is a fact that relates to a single piece of knowledge and makes it easy to create a question for which the atomic fact is the answer"`,
           },
           {
-            role: "user",
+            role: 'user',
             content: promptToCreateAtomicFacts,
           },
         ],
         false,
-        store.get(StoreKeys.LLMGenerationParameters)
+        store.get(StoreKeys.LLMGenerationParameters),
       );
 
-      const basePrompt = "Given the following atomic facts:\n";
+      const basePrompt = 'Given the following atomic facts:\n';
       const flashcardQuery =
-        "Create useful FLASHCARDS that can be used for students to study using ONLY the context. Format is Q: <insert question> A: <insert answer>.";
+        'Create useful FLASHCARDS that can be used for students to study using ONLY the context. Format is Q: <insert question> A: <insert answer>.';
       const { prompt: promptToCreateFlashcardsWithAtomicFacts } =
         createPromptWithContextLimitFromContent(
-          llmGeneratedFacts.choices[0].message.content || "",
+          llmGeneratedFacts.choices[0].message.content || '',
           basePrompt,
           flashcardQuery,
           llmSession.getTokenizer(llmName),
-          llmConfig.contextLength
+          llmConfig.contextLength,
         );
       console.log(
-        "promptToCreateFlashcardsWithAtomicFacts: ",
-        promptToCreateFlashcardsWithAtomicFacts
+        'promptToCreateFlashcardsWithAtomicFacts: ',
+        promptToCreateFlashcardsWithAtomicFacts,
       );
 
       // call the query to respond
@@ -369,25 +368,25 @@ export const registerFileHandlers = (
         llmConfig,
         [
           {
-            role: "system",
+            role: 'system',
             content: `You are an experienced teacher that is reading some facts given to you so that you can generate flashcards as JSON for your student for review.
             You never come up with your own facts. You will generate flashcards using the atomic facts given.
             An atomic fact is a fact that relates to a single piece of knowledge and makes it easy to create a question for which the atomic fact is the answer"`,
           },
           {
-            role: "user",
+            role: 'user',
             content: promptToCreateFlashcardsWithAtomicFacts,
           },
         ],
         true,
-        store.get(StoreKeys.LLMGenerationParameters)
+        store.get(StoreKeys.LLMGenerationParameters),
       );
-      const content = llmGeneratedFlashcards.choices[0].message.content || "";
+      const content = llmGeneratedFlashcards.choices[0].message.content || '';
       return content;
-    }
+    },
   );
 
-  ipcMain.handle("get-files-in-directory", (event, dirName: string) => {
+  ipcMain.handle('get-files-in-directory', (event, dirName: string) => {
     const itemsInDir = fs
       .readdirSync(dirName)
       .filter((item) => !isHidden(item));
@@ -395,7 +394,7 @@ export const registerFileHandlers = (
   });
 
   ipcMain.handle(
-    "get-files-in-directory-recursive",
+    'get-files-in-directory-recursive',
     (event, dirName: string) => {
       const fileNameSet = new Set<string>();
 
@@ -405,40 +404,38 @@ export const registerFileHandlers = (
           addExtensionToFilenameIfNoExtensionPresent(
             file.path,
             markdownExtensions,
-            ".md"
-          )
+            '.md',
+          ),
         );
       });
       return Array.from(fileNameSet);
-    }
+    },
   );
 
-  ipcMain.handle("open-directory-dialog", async () => {
+  ipcMain.handle('open-directory-dialog', async () => {
     const result = await dialog.showOpenDialog({
-      properties: ["openDirectory", "createDirectory"],
+      properties: ['openDirectory', 'createDirectory'],
     });
     if (!result.canceled) {
       return result.filePaths;
-    } else {
-      return null;
     }
+    return null;
   });
 
-  ipcMain.handle("open-file-dialog", async (event, extensions) => {
+  ipcMain.handle('open-file-dialog', async (event, extensions) => {
     const filters =
       extensions && extensions.length > 0
-        ? [{ name: "Files", extensions }]
+        ? [{ name: 'Files', extensions }]
         : [];
 
     const result = await dialog.showOpenDialog({
-      properties: ["openFile", "multiSelections", "showHiddenFiles"], // Add 'showHiddenFiles' here
-      filters: filters,
+      properties: ['openFile', 'multiSelections', 'showHiddenFiles'], // Add 'showHiddenFiles' here
+      filters,
     });
 
     if (!result.canceled) {
       return result.filePaths;
-    } else {
-      return [];
     }
+    return [];
   });
 };

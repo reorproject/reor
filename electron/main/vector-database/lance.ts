@@ -1,14 +1,14 @@
-import * as lancedb from "vectordb";
+import * as lancedb from 'vectordb';
 
-import { errorToStringMainProcess } from "../common/error";
+import { errorToStringMainProcess } from '../common/error';
 
-import { EnhancedEmbeddingFunction } from "./embeddings";
-import CreateDatabaseSchema, { isStringifiedSchemaEqual } from "./schema";
+import { EnhancedEmbeddingFunction } from './embeddings';
+import CreateDatabaseSchema, { isStringifiedSchemaEqual } from './schema';
 
 const GetOrCreateLanceTable = async (
   db: lancedb.Connection,
   embedFunc: EnhancedEmbeddingFunction<string>,
-  userDirectory: string
+  userDirectory: string,
 ): Promise<lancedb.Table<string>> => {
   try {
     const allTableNames = await db.tableNames();
@@ -40,7 +40,7 @@ const GetOrCreateLanceTable = async (
     return newTable;
   } catch (error) {
     const errorMessage = `Error in GetOrCreateLanceTable: ${errorToStringMainProcess(
-      error
+      error,
     )}`;
     console.error(errorMessage);
     throw new Error(errorMessage);
@@ -49,11 +49,10 @@ const GetOrCreateLanceTable = async (
 
 export const generateTableName = (
   embeddingFuncName: string,
-  userDirectory: string
+  userDirectory: string,
 ): string => {
-  const sanitizeForFileSystem = (str: string) => {
-    return str.replace(/[<>:"/\\|?*]/g, "_");
-  };
+  const sanitizeForFileSystem = (str: string) =>
+    str.replace(/[<>:"/\\|?*]/g, '_');
 
   const directoryPathAlias = sanitizeForFileSystem(userDirectory);
   const sanitizedEmbeddingFuncName = sanitizeForFileSystem(embeddingFuncName);

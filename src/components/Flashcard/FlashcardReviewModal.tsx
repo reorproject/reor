@@ -1,14 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 
-import ReorModal from "../Common/Modal";
-import CustomSelect from "../Common/Select";
+import ReorModal from '../Common/Modal';
+import CustomSelect from '../Common/Select';
 
-import { FlashcardCore } from "./FlashcardsCore";
-import { FlashcardQAPairUI } from "./types";
+import { FlashcardCore } from './FlashcardsCore';
+import { FlashcardQAPairUI } from './types';
 import {
   getFlashcardQnaPairsFromJsonFile,
   getFlashcardVaultDirectory,
-} from "./utils";
+} from './utils';
 
 interface FlashcardReviewModalProps {
   isOpen: boolean;
@@ -21,9 +21,9 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
 }) => {
   const [flashcardFiles, setFlashcardFiles] = useState<string[]>([]);
   const [selectedFlashcardFile, setSelectedFlashcardFile] =
-    useState<string>("");
+    useState<string>('');
   const [flashcardQAPairs, setFlashcardQAPairs] = useState<FlashcardQAPairUI[]>(
-    []
+    [],
   );
   const [currentSelectedFlashcard, setCurrentSelectedFlashcard] =
     useState<number>(0);
@@ -32,7 +32,7 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
     const getFlashcardsFromDirectory = async () => {
       const vaultDirectoryWithFlashcards = await getFlashcardVaultDirectory();
       const files = await window.path.getAllFilenamesInDirectory(
-        vaultDirectoryWithFlashcards
+        vaultDirectoryWithFlashcards,
       );
       setFlashcardFiles(files);
       setCurrentSelectedFlashcard(0);
@@ -41,11 +41,11 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
     getFlashcardsFromDirectory();
   }, []);
 
-  //get flashcards to be reviewed when the file changes
+  // get flashcards to be reviewed when the file changes
   useEffect(() => {
     const readFlashcardJSONForQnAPairs = async () => {
       const qnaPairs = await getFlashcardQnaPairsFromJsonFile(
-        selectedFlashcardFile
+        selectedFlashcardFile,
       );
       setFlashcardQAPairs(qnaPairs);
     };
@@ -54,16 +54,17 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
 
   return (
     <ReorModal isOpen={isOpen} onClose={onClose}>
-      <div className="ml-6 mt-2 mb-6 mr-6 w-[800px] h-full flex-col  ">
-        <h2 className="text-xl font-semibold mb-3 text-white">
+      <div className='ml-6 mt-2 mb-6 mr-6 w-[800px] h-full flex-col  '>
+        <h2 className='text-xl font-semibold mb-3 text-white'>
           Flashcard Review Mode
         </h2>
 
-        <div className="py-2 w-full mb-2">
+        <div className='py-2 w-full mb-2'>
           <CustomSelect
-            options={flashcardFiles.map((file) => {
-              return { label: file, value: file };
-            })}
+            options={flashcardFiles.map((file) => ({
+              label: file,
+              value: file,
+            }))}
             selectedValue={selectedFlashcardFile}
             onChange={(value) => {
               setCurrentSelectedFlashcard(0);
@@ -74,7 +75,7 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({
         </div>
 
         {flashcardQAPairs.length === 0 && (
-          <p className="text-red-500 text-xs">Choose a set of flashcards</p>
+          <p className='text-red-500 text-xs'>Choose a set of flashcards</p>
         )}
         <FlashcardCore
           flashcardQAPairs={flashcardQAPairs}

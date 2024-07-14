@@ -1,13 +1,13 @@
-export function errorToStringRendererProcess(
+function errorToStringRendererProcess(
   error: unknown,
-  depth: number = 0
+  depth: number = 0,
 ): string {
   if (error instanceof Error) {
     let errorString = `${error.name}: ${error.message}`;
     if (error.cause) {
       errorString += `\nCaused by: ${errorToStringRendererProcess(
         error.cause,
-        depth + 1
+        depth + 1,
       )}`;
     }
     if (depth === 0) {
@@ -15,7 +15,7 @@ export function errorToStringRendererProcess(
       errorString += `\nStack Trace:\n${error.stack}`;
     }
     return errorString;
-  } else {
-    return String(error);
   }
+  return String(error);
 }
+export default errorToStringRendererProcess;

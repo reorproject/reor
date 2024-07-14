@@ -1,16 +1,16 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
-import { FileInfoTree } from "electron/main/filesystem/types";
-import { DBQueryResult } from "electron/main/vector-database/schema";
-import posthog from "posthog-js";
+import { FileInfoTree } from 'electron/main/filesystem/types';
+import { DBQueryResult } from 'electron/main/vector-database/schema';
+import posthog from 'posthog-js';
 
-import { ChatFilters, ChatHistory } from "../Chat/Chat";
-import { ChatsSidebar } from "../Chat/ChatsSidebar";
-import { ChatHistoryMetadata } from "../Chat/hooks/use-chat-history";
-import { FileSidebar } from "../File/FileSideBar";
-import { SidebarAbleToShow } from "../MainPage";
+import { ChatFilters, ChatHistory } from '../Chat/Chat';
+import { ChatsSidebar } from '../Chat/ChatsSidebar';
+import { ChatHistoryMetadata } from '../Chat/hooks/use-chat-history';
+import { FileSidebar } from '../File/FileSideBar';
+import { SidebarAbleToShow } from '../MainPage';
 
-import SearchComponent from "./FileSidebarSearch";
+import SearchComponent from './FileSidebarSearch';
 
 interface SidebarManagerProps {
   files: FileInfoTree;
@@ -49,12 +49,12 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
   setChatFilters,
   setShowChatbot,
 }) => {
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [searchResults, setSearchResults] = useState<DBQueryResult[]>([]);
 
   return (
-    <div className="w-full h-full overflow-y-hidden">
-      {sidebarShowing === "files" && (
+    <div className='w-full h-full overflow-y-hidden'>
+      {sidebarShowing === 'files' && (
         <FileSidebar
           files={files}
           expandedDirectories={expandedDirectories}
@@ -68,7 +68,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
           setFileDirToBeRenamed={setFileDirToBeRenamed}
         />
       )}
-      {sidebarShowing === "search" && (
+      {sidebarShowing === 'search' && (
         <SearchComponent
           onFileSelect={onFileSelect}
           searchQuery={searchQuery}
@@ -78,7 +78,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
         />
       )}
 
-      {sidebarShowing === "chats" && (
+      {sidebarShowing === 'chats' && (
         <ChatsSidebar
           chatHistoriesMetadata={chatHistoriesMetadata}
           currentChatHistory={currentChatHistory}
@@ -90,9 +90,9 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
             fetchChatHistory();
           }}
           newChat={() => {
-            posthog.capture("create_new_chat");
+            posthog.capture('create_new_chat');
             setCurrentChatHistory(undefined);
-            console.log("resetting chat filters");
+            console.log('resetting chat filters');
             setChatFilters({
               files: [],
               numberOfChunksToFetch: 15,

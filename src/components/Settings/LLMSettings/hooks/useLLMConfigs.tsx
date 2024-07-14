@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
-import { LLMConfig } from "electron/main/electron-store/storeConfig";
+import { LLMConfig } from 'electron/main/electron-store/storeConfig';
 
 const useLLMConfigs = () => {
   const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([]);
-  const [defaultLLM, setDefaultLLM] = useState<string>("");
+  const [defaultLLM, setDefaultLLM] = useState<string>('');
 
   const fetchAndUpdateModelConfigs = async () => {
     try {
@@ -18,7 +18,7 @@ const useLLMConfigs = () => {
         setDefaultLLM(defaultLLM);
       }
     } catch (error) {
-      console.error("Failed to fetch model configurations:", error);
+      console.error('Failed to fetch model configurations:', error);
     }
   };
 
@@ -26,7 +26,12 @@ const useLLMConfigs = () => {
     fetchAndUpdateModelConfigs();
   }, []);
 
-  return { llmConfigs, defaultLLM, setDefaultLLM, fetchAndUpdateModelConfigs };
+  return {
+    llmConfigs,
+    defaultLLM,
+    setDefaultLLM,
+    fetchAndUpdateModelConfigs,
+  };
 };
 
 export default useLLMConfigs;

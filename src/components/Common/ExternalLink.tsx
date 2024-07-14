@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 interface ExternalLinkProps {
   href: string;
@@ -8,14 +8,14 @@ interface ExternalLinkProps {
 // Open link in browser:
 const ExternalLink: React.FC<ExternalLinkProps> = ({ href: url, children }) => {
   const handleLinkClick = (
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
   ) => {
     e.preventDefault();
     window.electronUtils.openExternal(url);
   };
 
   return (
-    <a href={url} onClick={handleLinkClick} className="text-blue-300">
+    <a href={url} onClick={handleLinkClick} className='text-blue-300'>
       {children}
     </a>
   );

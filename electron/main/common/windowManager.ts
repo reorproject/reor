@@ -1,9 +1,9 @@
-import chokidar from "chokidar";
-import { BrowserWindow, WebContents, screen, shell } from "electron";
-import Store from "electron-store";
+import chokidar from 'chokidar';
+import { BrowserWindow, WebContents, screen, shell } from 'electron';
+import Store from 'electron-store';
 
-import { StoreSchema, StoreKeys } from "../electron-store/storeConfig";
-import { LanceDBTableWrapper } from "../vector-database/lanceTableWrapper";
+import { StoreSchema, StoreKeys } from '../electron-store/storeConfig';
+import { LanceDBTableWrapper } from '../vector-database/lanceTableWrapper';
 
 type WindowInfo = {
   windowID: number;
@@ -13,6 +13,7 @@ type WindowInfo = {
 
 class WindowsManager {
   activeWindows: WindowInfo[] = [];
+
   private errorStringsToSendWindow: string[] = [];
 
   watcher: chokidar.FSWatcher | undefined;
@@ -21,27 +22,27 @@ class WindowsManager {
     store: Store<StoreSchema>,
     preload: string,
     url: string | undefined,
-    indexHtml: string
+    indexHtml: string,
   ) {
     const { x, y } = this.getNextWindowPosition();
     const { width, height } = this.getWindowSize();
 
     const win = new BrowserWindow({
-      title: "Reor",
-      x: x,
-      y: y,
+      title: 'Reor',
+      x,
+      y,
       webPreferences: {
         preload,
       },
       frame: false,
-      titleBarStyle: "hidden",
+      titleBarStyle: 'hidden',
       titleBarOverlay: {
-        color: "#303030",
-        symbolColor: "#fff",
+        color: '#303030',
+        symbolColor: '#fff',
         height: 30,
       },
-      width: width,
-      height: height,
+      width,
+      height,
     });
 
     if (url) {
@@ -55,22 +56,22 @@ class WindowsManager {
 
     // Make all links open with the browser, not with the application
     win.webContents.setWindowOpenHandler(({ url }) => {
-      if (url.startsWith("https:")) shell.openExternal(url);
-      return { action: "deny" };
+      if (url.startsWith('https:')) shell.openExternal(url);
+      return { action: 'deny' };
     });
 
-    win.on("close", () => {
-      win.webContents.send("prepare-for-window-close");
+    win.on('close', () => {
+      win.webContents.send('prepare-for-window-close');
 
       this.prepareWindowForClose(store, win);
     });
 
-    win.webContents.on("did-finish-load", () => {
+    win.webContents.on('did-finish-load', () => {
       const errorsToSendWindow = this.getAndClearErrorStrings();
       errorsToSendWindow.forEach((errorStrToSendWindow) => {
         win.webContents.send(
-          "error-to-display-in-window",
-          errorStrToSendWindow
+          'error-to-display-in-window',
+          errorStrToSendWindow,
         );
       });
     });
@@ -78,26 +79,26 @@ class WindowsManager {
 
   getAndSetupDirectoryForWindowFromPreviousAppSession(
     webContents: Electron.WebContents,
-    store: Store<StoreSchema>
+    store: Store<StoreSchema>,
   ): string {
     const lastUsedVaultDirectory = store.get(
-      StoreKeys.DirectoryFromPreviousSession
+      StoreKeys.DirectoryFromPreviousSession,
     ) as string;
     if (!lastUsedVaultDirectory) {
-      return "";
+      return '';
     }
     const isUserDirectoryUsed = this.activeWindows.some(
-      (w) => w.vaultDirectoryForWindow === lastUsedVaultDirectory
+      (w) => w.vaultDirectoryForWindow === lastUsedVaultDirectory,
     );
     if (!isUserDirectoryUsed) {
       this.setVaultDirectoryForContents(
         webContents,
         lastUsedVaultDirectory,
-        store
+        store,
       );
       return lastUsedVaultDirectory;
     }
-    return "";
+    return '';
   }
 
   appendNewErrorToDisplayInWindow(errorString: string) {
@@ -117,11 +118,11 @@ class WindowsManager {
 
   getWindowInfoForContents(webContents: WebContents): WindowInfo | null {
     const windowID = this.getBrowserWindowId(webContents);
-    console.log("window id is: ", windowID);
+    console.log('window id is: ', windowID);
     if (windowID === null) {
       return null;
     }
-    console.log("active windows: ", this.activeWindows);
+    console.log('active windows: ', this.activeWindows);
     const windowInfo = this.activeWindows.find((w) => w.windowID === windowID);
     return windowInfo || null;
   }
@@ -139,26 +140,26 @@ class WindowsManager {
   setVaultDirectoryForContents(
     webContents: WebContents,
     directory: string,
-    store: Store<StoreSchema>
+    store: Store<StoreSchema>,
   ): void {
     if (!webContents) {
-      throw new Error("Invalid webContents provided.");
+      throw new Error('Invalid webContents provided.');
     }
 
     const windowID = this.getBrowserWindowId(webContents);
     if (!windowID) {
-      throw new Error("Unable to find the browser window ID.");
+      throw new Error('Unable to find the browser window ID.');
     }
 
-    if (!directory || typeof directory !== "string") {
-      throw new Error("Invalid directory provided.");
+    if (!directory || typeof directory !== 'string') {
+      throw new Error('Invalid directory provided.');
     }
 
     let windowInfo = this.activeWindows.find((w) => w.windowID === windowID);
 
     if (!windowInfo) {
       windowInfo = {
-        windowID: windowID,
+        windowID,
         dbTableClient: new LanceDBTableWrapper(), // Assuming default value as null, modify as needed
         vaultDirectoryForWindow: directory,
       };
@@ -172,7 +173,7 @@ class WindowsManager {
 
   prepareWindowForClose(store: Store<StoreSchema>, win: BrowserWindow) {
     const directoryToSave = this.getVaultDirectoryForWinContents(
-      win.webContents
+      win.webContents,
     );
 
     // Save the directory if found
@@ -184,7 +185,7 @@ class WindowsManager {
 
   removeActiveWindowByDirectory(directory: string): void {
     this.activeWindows = this.activeWindows.filter(
-      (w) => w.vaultDirectoryForWindow !== directory
+      (w) => w.vaultDirectoryForWindow !== directory,
     );
   }
 
@@ -195,9 +196,8 @@ class WindowsManager {
     if (focusedWin) {
       const [x, y] = focusedWin.getPosition();
       return { x: x + windowOffset, y: y + windowOffset };
-    } else {
-      return { x: undefined, y: undefined };
     }
+    return { x: undefined, y: undefined };
   }
 
   getWindowSize(): { width: number; height: number } {

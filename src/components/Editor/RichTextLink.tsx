@@ -3,9 +3,9 @@ import {
   markInputRule,
   markPasteRule,
   PasteRule,
-} from "@tiptap/core";
-import { Link } from "@tiptap/extension-link";
-import type { LinkOptions } from "@tiptap/extension-link";
+} from '@tiptap/core';
+import { Link } from '@tiptap/extension-link';
+import type { LinkOptions } from '@tiptap/extension-link';
 
 /**
  * The input regex for Markdown links with title support, and multiple quotation marks (required
@@ -34,7 +34,7 @@ function linkInputRule(config: Parameters<typeof markInputRule>[0]) {
       const { tr } = props.state;
 
       defaultMarkInputRule.handler(props);
-      tr.setMeta("preventAutolink", true);
+      tr.setMeta('preventAutolink', true);
     },
   });
 }
@@ -55,7 +55,7 @@ function linkPasteRule(config: Parameters<typeof markPasteRule>[0]) {
       const { tr } = props.state;
 
       defaultMarkPasteRule.handler(props);
-      tr.setMeta("preventAutolink", true);
+      tr.setMeta('preventAutolink', true);
     },
   });
 }

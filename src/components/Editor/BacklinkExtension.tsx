@@ -1,20 +1,20 @@
-import { Extension } from "@tiptap/core";
-import { Plugin, PluginKey, TextSelection } from "@tiptap/pm/state";
-import { Decoration, DecorationSet } from "@tiptap/pm/view";
+import { Extension } from '@tiptap/core';
+import { Plugin, PluginKey, TextSelection } from '@tiptap/pm/state';
+import { Decoration, DecorationSet } from '@tiptap/pm/view';
 
-import { SuggestionsState } from "./BacklinkSuggestionsDisplay";
+import { SuggestionsState } from './BacklinkSuggestionsDisplay';
 
 const backlinkPlugin = (
   openRelativePathRef: React.MutableRefObject<
     ((newFilePath: string) => Promise<void>) | undefined
   >,
-  updateSuggestionsState: (state: SuggestionsState | null) => void
+  updateSuggestionsState: (state: SuggestionsState | null) => void,
 ) => {
   // Timeout to hide the suggestions after a certain amount of time. This is needed so that blur or focusout events don't hide the suggestions immediately.
   let hideTimeout: NodeJS.Timeout | null = null;
 
   return new Plugin({
-    key: new PluginKey("backlinks"),
+    key: new PluginKey('backlinks'),
     state: {
       init(_, { doc }) {
         return DecorationSet.create(doc, []);
@@ -41,12 +41,12 @@ const backlinkPlugin = (
             return;
           }
 
-          const textBeforeCursor = doc.textBetween(0, from, "\n");
-          const lastOpeningBracketIndex = textBeforeCursor.lastIndexOf("[[");
+          const textBeforeCursor = doc.textBetween(0, from, '\n');
+          const lastOpeningBracketIndex = textBeforeCursor.lastIndexOf('[[');
 
           if (
             lastOpeningBracketIndex === -1 ||
-            textBeforeCursor.lastIndexOf("]]") > lastOpeningBracketIndex
+            textBeforeCursor.lastIndexOf(']]') > lastOpeningBracketIndex
           ) {
             updateSuggestionsState(null);
             return;
@@ -54,7 +54,7 @@ const backlinkPlugin = (
 
           const textToLeft = textBeforeCursor.slice(
             lastOpeningBracketIndex + 2,
-            from
+            from,
           );
 
           const coords = view.coordsAtPos(from);
@@ -63,19 +63,19 @@ const backlinkPlugin = (
             textWithinBrackets: textToLeft,
             position: coords,
             onSelect: (selectedSuggestion) => {
-              const tr = view.state.tr;
+              const { tr } = view.state;
               const textAfterCursor = doc.textBetween(
                 from,
                 doc.content.size,
-                "\n"
+                '\n',
               );
-              const closingBracketIndex = textAfterCursor.indexOf("]]");
+              const closingBracketIndex = textAfterCursor.indexOf(']]');
 
               if (closingBracketIndex !== -1) {
                 tr.replaceWith(
                   from - textToLeft.length,
                   from + closingBracketIndex + 2,
-                  view.state.schema.text(selectedSuggestion + "]]")
+                  view.state.schema.text(`${selectedSuggestion}]]`),
                 );
                 view.dispatch(tr);
                 updateSuggestionsState(null);
@@ -111,23 +111,23 @@ const backlinkPlugin = (
                 start <= selectionEnd && end >= selectionStart;
 
               const bracketsStyle = withinSelectedRange
-                ? "color: inherit;"
-                : "display: none;";
+                ? 'color: inherit;'
+                : 'display: none;';
               decorations.push(
                 Decoration.inline(start, backlinkStart, {
                   style: bracketsStyle,
-                })
+                }),
               );
               decorations.push(
-                Decoration.inline(backlinkEnd, end, { style: bracketsStyle })
+                Decoration.inline(backlinkEnd, end, { style: bracketsStyle }),
               );
 
               decorations.push(
                 Decoration.inline(backlinkStart, backlinkEnd, {
                   style:
-                    "color: #92c8fc; text-decoration: underline; cursor: pointer;",
-                  "data-backlink": "true",
-                })
+                    'color: #92c8fc; text-decoration: underline; cursor: pointer;',
+                  'data-backlink': 'true',
+                }),
               );
             }
           }
@@ -137,16 +137,16 @@ const backlinkPlugin = (
       },
       handleDOMEvents: {
         keydown: (view, event) => {
-          if (event.key === "[") {
+          if (event.key === '[') {
             const { state, dispatch } = view;
             const { selection } = state;
             const { from } = selection;
 
-            const transaction = state.tr.insertText("]", from);
+            const transaction = state.tr.insertText(']', from);
             const newSelection = TextSelection.create(
               transaction.doc,
               from,
-              from
+              from,
             );
 
             transaction.setSelection(newSelection);
@@ -162,7 +162,7 @@ const backlinkPlugin = (
           const { target } = event;
           if (
             target instanceof HTMLElement &&
-            target.getAttribute("data-backlink") === "true"
+            target.getAttribute('data-backlink') === 'true'
           ) {
             event.preventDefault();
             const backlinkPath = target.textContent;
@@ -185,10 +185,10 @@ export const BacklinkExtension = (
   openRelativePathRef: React.MutableRefObject<
     ((newFilePath: string) => Promise<void>) | undefined
   >,
-  updateSuggestionsState: (state: SuggestionsState | null) => void
+  updateSuggestionsState: (state: SuggestionsState | null) => void,
 ) =>
   Extension.create({
-    name: "backlink",
+    name: 'backlink',
 
     addProseMirrorPlugins() {
       return [backlinkPlugin(openRelativePathRef, updateSuggestionsState)];
