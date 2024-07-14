@@ -55,7 +55,7 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
             key={chatMetadata.id}
             // chat={chat}
             chatMetadata={chatMetadata}
-            selectedChatID={currentChatHistory?.id ?? ""}
+            selectedChatID={currentChatHistory?.id || ""}
             onChatSelect={onSelect}
             currentSelectedChatID={currentSelectedChatID}
           />

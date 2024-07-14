@@ -108,9 +108,9 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
   const handleHistoryContext = (
     currentRef: React.RefObject<HTMLButtonElement>
   ) => {
-    const offsetTop = currentRef.current?.offsetTop ?? 0;
-    const offsetLeft = currentRef.current?.offsetLeft ?? 0;
-    const offsetHeight = currentRef.current?.offsetHeight ?? 0;
+    const offsetTop = currentRef.current?.offsetTop || 0;
+    const offsetLeft = currentRef.current?.offsetLeft || 0;
+    const offsetHeight = currentRef.current?.offsetHeight || 0;
 
     const menuChild =
       currentRef.current?.id === "back"
@@ -134,7 +134,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
               <li key={ind}>
                 <div key={ind} onClick={() => { goSelected(path); }}>
                   {removeFileExtension(
-                    path.replace(/\\/g, "/").split("/").pop() ?? ""
+                    path.replace(/\\/g, "/").split("/").pop() || ""
                   )}
                 </div>
               </li>

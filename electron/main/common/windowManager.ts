@@ -123,7 +123,7 @@ class WindowsManager {
     }
     console.log("active windows: ", this.activeWindows);
     const windowInfo = this.activeWindows.find((w) => w.windowID === windowID);
-    return windowInfo ?? null;
+    return windowInfo || null;
   }
 
   getVaultDirectoryForWinContents(webContents: WebContents): string | null {

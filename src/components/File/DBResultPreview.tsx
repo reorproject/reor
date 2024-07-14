@@ -99,7 +99,7 @@ const cosineDistanceToPercentage = (similarity: number) => {
 
 export function getFileName(filePath: string): string {
   const parts = filePath.split(/[/\\]/);
-  return parts.pop() ?? "";
+  return parts.pop() || "";
 }
 
 const formatModifiedDate = (date: Date) => {

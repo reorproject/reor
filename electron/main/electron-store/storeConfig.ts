@@ -53,7 +53,10 @@ export interface HardwareConfig {
 export interface StoreSchema {
   hasUserOpenedAppBefore: boolean;
   schemaVersion: number;
-  directoryFromPreviousSession: string | undefined;
+  user: {
+    vaultDirectories: string[];
+    directoryFromPreviousSession?: string;
+  };
   LLMs: LLMConfig[] | undefined;
   embeddingModels: Record<string, EmbeddingModelConfig> | undefined;
   defaultLLM: string;
@@ -73,7 +76,7 @@ export enum StoreKeys {
   hasUserOpenedAppBefore = "hasUserOpenedAppBefore",
   Analytics = "analytics",
   SchemaVersion = "schemaVersion",
-  DirectoryFromPreviousSession = "directoryFromPreviousSession",
+  DirectoryFromPreviousSession = "user.directoryFromPreviousSession",
   LLMs = "LLMs",
   EmbeddingModels = "embeddingModels",
   DefaultLLM = "defaultLLM",

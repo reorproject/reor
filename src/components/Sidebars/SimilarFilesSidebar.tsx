@@ -31,6 +31,7 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponent> = ({
 }) => {
   const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([]);
   const [isLoadingSimilarEntries, setIsLoadingSimilarEntries] = useState(false);
+  const [isRefined, setIsRefined] = useState(false);
 
   useEffect(() => {
     if (filePath) {
@@ -39,6 +40,7 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponent> = ({
   }, [filePath]);
 
   const handleNewFileOpen = async (path: string) => {
+    setIsRefined(false);
     try {
       const sanitizedText = await getChunkForInitialSearchFromFile(path);
       if (!sanitizedText) {
@@ -135,6 +137,9 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponent> = ({
         }}
       />{" "}
       <SimilarEntriesComponent
+        // filePath={filePath}
+        isRefined={isRefined}
+        setIsRefined={setIsRefined}
         similarEntries={similarEntries}
         setSimilarEntries={setSimilarEntries}
         onFileSelect={(path: string) => {
@@ -156,8 +161,11 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponent> = ({
 export default SimilarFilesSidebarComponent;
 
 interface SimilarEntriesComponentProps {
+  // filePath: string;
   similarEntries: DBQueryResult[];
   setSimilarEntries?: (entries: DBQueryResult[]) => void;
+  isRefined: boolean;
+  setIsRefined: (isRefined: boolean) => void;
   onFileSelect: (path: string) => void;
   saveCurrentFile: () => Promise<void>;
   updateSimilarEntries?: (isRefined?: boolean) => Promise<void>;

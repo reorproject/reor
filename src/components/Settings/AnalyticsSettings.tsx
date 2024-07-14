@@ -4,7 +4,8 @@ import { Button } from "@material-tailwind/react";
 import Switch from "@mui/material/Switch";
 import posthog from "posthog-js";
 
-const AnalyticsSettings: React.FC = () => {
+interface AnalyticsSettingsProps {}
+const AnalyticsSettings: React.FC<AnalyticsSettingsProps> = () => {
   const [isAnalyticsEnabled, setIsAnalyticsEnabled] = useState<boolean>(false);
 
   const [userHasMadeUpdate, setUserHasMadeUpdate] = useState(false);
