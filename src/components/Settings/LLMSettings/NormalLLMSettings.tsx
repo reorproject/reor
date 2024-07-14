@@ -1,13 +1,11 @@
-import React from "react";
+import React from 'react'
 
-import LLMSettingsContent from "./LLMSettingsContent";
+import LLMSettingsContent from './LLMSettingsContent'
 
-const NormalLLMSettings: React.FC = () => {
-  return (
-    <div className="w-full flex flex-col justify-between bg-dark-gray-c-three rounded h-full">
-      <LLMSettingsContent isInitialSetup={false} />
-    </div>
-  );
-};
+const NormalLLMSettings: React.FC = () => (
+  <div className="flex size-full flex-col justify-between rounded bg-dark-gray-c-three">
+    <LLMSettingsContent isInitialSetup={false} />
+  </div>
+)
 
-export default NormalLLMSettings;
+export default NormalLLMSettings

@@ -32,7 +32,7 @@ function ensureDirectoryExistence(filePath) {
 function setExecutable(filePath) {
   fs.chmod(filePath, 0o755, (err) => {
     if (err) throw err;
-    console.log(`Set ${filePath} as executable.`);
+    ;
   });
 }
 
@@ -43,14 +43,14 @@ function downloadIfMissing(platformKey) {
 
   fs.access(filePath, fs.constants.F_OK, (err) => {
     if (err) {
-      console.log(`Downloading ${platformKey} Ollama binary...`);
+      ;
       const request = https.get(info.url, (response) => {
         if (response.statusCode === 200) {
           const file = fs.createWriteStream(filePath);
           response.pipe(file);
           file.on("finish", () => {
             file.close(() => {
-              console.log(`Downloaded ${platformKey} Ollama binary.`);
+              ;
               // Set as executable if not on Windows
               if (platformKey !== "win32") {
                 setExecutable(filePath);
@@ -59,7 +59,7 @@ function downloadIfMissing(platformKey) {
           });
         } else if (response.statusCode === 302 || response.statusCode === 301) {
           // Handle redirection (if any)
-          console.log(`Redirection to ${response.headers.location}`);
+          ;
           binariesInfo[platformKey].url = response.headers.location;
           downloadIfMissing(platformKey); // Retry with the new URL
         } else {
@@ -74,7 +74,7 @@ function downloadIfMissing(platformKey) {
         );
       });
     } else {
-      console.log(`${platformKey} Ollama binary already exists.`);
+      ;
       // Ensure it's executable if it already exists and not on Windows
       if (platformKey !== "win32") {
         setExecutable(filePath);
