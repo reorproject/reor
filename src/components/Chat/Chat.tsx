@@ -164,20 +164,21 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       chatLength: chatHistory?.displayableChatHistory.length,
       chatFilters: anonymizeChatFiltersForPosthog(chatFilters),
     })
+    let outputChatHistory = chatHistory
+
     try {
       if (loadingResponse) return
       setLoadingResponse(true)
       if (!userTextFieldInput.trim()) return
       const defaultLLMName = await window.llm.getDefaultLLMName()
-      let newChatHistory = chatHistory
-      if (!newChatHistory || !newChatHistory.id) {
+      if (!outputChatHistory || !outputChatHistory.id) {
         const chatID = Date.now().toString()
-        newChatHistory = {
+        outputChatHistory = {
           id: chatID,
           displayableChatHistory: [],
         }
       }
-      if (newChatHistory.displayableChatHistory.length === 0) {
+      if (outputChatHistory.displayableChatHistory.length === 0) {
         if (chatFilters) {
           // chatHistory.displayableChatHistory.push({
           //   role: "system",
@@ -187,10 +188,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
           //   context: [],
           // });
-          newChatHistory.displayableChatHistory.push(await resolveRAGContext(userTextFieldInput, chatFilters))
+          outputChatHistory.displayableChatHistory.push(await resolveRAGContext(userTextFieldInput, chatFilters))
         }
       } else {
-        newChatHistory.displayableChatHistory.push({
+        outputChatHistory.displayableChatHistory.push({
           role: 'user',
           content: userTextFieldInput,
           messageType: 'success',
@@ -200,11 +201,11 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
       setUserTextFieldInput('')
 
-      setCurrentChatHistory(chatHistory)
+      setCurrentChatHistory(outputChatHistory)
 
-      if (!chatHistory) return
+      if (!outputChatHistory) return
 
-      await window.electronStore.updateChatHistory(chatHistory)
+      await window.electronStore.updateChatHistory(outputChatHistory)
 
       const llmConfigs = await window.llm.getLLMConfigs()
 
@@ -213,11 +214,11 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         throw new Error(`No model config found for model: ${defaultLLMName}`)
       }
 
-      await window.llm.streamingLLMResponse(defaultLLMName, currentModelConfig, false, chatHistory)
+      await window.llm.streamingLLMResponse(defaultLLMName, currentModelConfig, false, outputChatHistory)
       setReadyToSave(true)
     } catch (error) {
-      if (chatHistory) {
-        appendNewContentToMessageHistory(chatHistory.id, errorToStringRendererProcess(error), 'error')
+      if (outputChatHistory) {
+        appendNewContentToMessageHistory(outputChatHistory.id, errorToStringRendererProcess(error), 'error')
       }
     }
     // so here we could save the chat history
