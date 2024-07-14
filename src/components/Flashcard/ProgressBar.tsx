@@ -6,7 +6,7 @@ export interface ProgressBarProps {
   height: string
 }
 
-function ProgressBar({ completed, total, height }: ProgressBarProps) {
+const ProgressBar = ({ completed, total, height }: ProgressBarProps) => {
   return (
     <div style={{ backgroundColor: 'grey', borderRadius: 50 }}>
       <div

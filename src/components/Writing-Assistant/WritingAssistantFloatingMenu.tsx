@@ -9,7 +9,7 @@ import { FaMagic } from 'react-icons/fa'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 
-import { ChatHistory } from '../Chat/Chat'
+import { ChatHistory, ChatMessageToDisplay } from '../Chat/Chat'
 import { formatOpenAIMessageContentIntoString } from '../Chat/chatUtils'
 import { useOutsideClick } from '../Chat/hooks/use-outside-click'
 import { HighlightData } from '../Editor/HighlightExtension'
@@ -115,6 +115,43 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
     setCurrentChatHistory(undefined)
   }
 
+  const getLLMResponse = async (prompt: string, chatHistory: ChatHistory | undefined) => {
+    const defaultLLMName = await window.llm.getDefaultLLMName()
+    const llmConfigs = await window.llm.getLLMConfigs()
+
+    const currentModelConfig = llmConfigs.find((config) => config.modelName === defaultLLMName)
+    if (!currentModelConfig) {
+      throw new Error(`No model config found for model: ${defaultLLMName}`)
+    }
+
+    try {
+      if (loadingResponse) return
+      setLoadingResponse(true)
+      // make a new variable for chat history to not use the function parameter:
+      let newChatHistory = chatHistory
+      if (!newChatHistory || !newChatHistory.id) {
+        const chatID = Date.now().toString()
+        newChatHistory = {
+          id: chatID,
+          displayableChatHistory: [],
+        }
+      }
+      setCurrentChatHistory(newChatHistory)
+      newChatHistory.displayableChatHistory.push({
+        role: 'user',
+        content: prompt,
+        messageType: 'success',
+        context: [],
+      })
+      if (!newChatHistory) return
+
+      await window.llm.streamingLLMResponse(defaultLLMName, currentModelConfig, false, newChatHistory)
+    } catch (error) {
+      console.error(error)
+    }
+    setLoadingResponse(false)
+  }
+
   const handleOption = async (option: string, customPromptInput?: string) => {
     const selectedText = highlightData.text
     if (!selectedText.trim()) return
@@ -140,7 +177,7 @@ Return only the edited text. Do not wrap your response in quotes. Do not offer a
 """ ${selectedText} """
 Write a markdown list (using dashes) of key takeaways from my notes. Write at least 3 items, but write more if the text requires it. Be very detailed and don't leave any information out. Do not wrap responses in quotes.`
         break
-      case 'custom':
+      default:
         prompt =
           'The user has given the following instructions(in triple #) for processing the text selected(in triple quotes): ' +
           `### ${customPromptInput} ###` +
@@ -152,55 +189,29 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
     await getLLMResponse(prompt, currentChatHistory)
   }
 
-  const getLLMResponse = async (prompt: string, chatHistory: ChatHistory | undefined) => {
-    const defaultLLMName = await window.llm.getDefaultLLMName()
-    const llmConfigs = await window.llm.getLLMConfigs()
+  useEffect(() => {
+    const appendNewContentToMessageHistory = (
+      chatID: string,
+      newContent: string,
+      newMessageType: 'success' | 'error',
+    ) => {
+      setCurrentChatHistory((prev) => {
+        if (chatID !== prev?.id) return prev
+        const newDisplayableHistory = prev?.displayableChatHistory || []
+        if (newDisplayableHistory.length > 0) {
+          const lastMessage = newDisplayableHistory[newDisplayableHistory.length - 1]
 
-    const currentModelConfig = llmConfigs.find((config) => config.modelName === defaultLLMName)
-    if (!currentModelConfig) {
-      throw new Error(`No model config found for model: ${defaultLLMName}`)
-    }
-
-    try {
-      if (loadingResponse) return
-      setLoadingResponse(true)
-      if (!chatHistory || !chatHistory.id) {
-        const chatID = Date.now().toString()
-        chatHistory = {
-          id: chatID,
-          displayableChatHistory: [],
-        }
-      }
-      setCurrentChatHistory(chatHistory)
-      chatHistory.displayableChatHistory.push({
-        role: 'user',
-        content: prompt,
-        messageType: 'success',
-        context: [],
-      })
-      if (!chatHistory) return
-
-      await window.llm.streamingLLMResponse(defaultLLMName, currentModelConfig, false, chatHistory)
-    } catch (error) {
-      console.error(error)
-    }
-    setLoadingResponse(false)
-  }
-
-  const appendNewContentToMessageHistory = (
-    chatID: string,
-    newContent: string,
-    newMessageType: 'success' | 'error',
-  ) => {
-    setCurrentChatHistory((prev) => {
-      if (chatID !== prev?.id) return prev
-      const newDisplayableHistory = prev?.displayableChatHistory || []
-      if (newDisplayableHistory.length > 0) {
-        const lastMessage = newDisplayableHistory[newDisplayableHistory.length - 1]
-
-        if (lastMessage.role === 'assistant') {
-          lastMessage.content += newContent // Append new content with a space
-          lastMessage.messageType = newMessageType
+          if (lastMessage.role === 'assistant') {
+            lastMessage.content += newContent // Append new content with a space
+            lastMessage.messageType = newMessageType
+          } else {
+            newDisplayableHistory.push({
+              role: 'assistant',
+              content: newContent,
+              messageType: newMessageType,
+              context: [],
+            })
+          }
         } else {
           newDisplayableHistory.push({
             role: 'assistant',
@@ -209,26 +220,16 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
             context: [],
           })
         }
-      } else {
-        newDisplayableHistory.push({
-          role: 'assistant',
-          content: newContent,
-          messageType: newMessageType,
-          context: [],
-        })
-      }
-      return {
-        id: prev!.id,
-        displayableChatHistory: newDisplayableHistory,
-        openAIChatHistory: newDisplayableHistory.map((message) => ({
-          role: message.role,
-          content: message.content,
-        })),
-      }
-    })
-  }
-
-  useEffect(() => {
+        return {
+          id: prev!.id,
+          displayableChatHistory: newDisplayableHistory,
+          openAIChatHistory: newDisplayableHistory.map((message) => ({
+            role: message.role,
+            content: message.content,
+          })),
+        }
+      })
+    }
     const handleOpenAIChunk = async (receivedChatID: string, chunk: ChatCompletionChunk) => {
       const newContent = chunk.choices[0].delta.content ?? ''
       if (newContent) {
@@ -251,8 +252,17 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
       removeOpenAITokenStreamListener()
       removeAnthropicTokenStreamListener()
     }
-  }, [])
+  }, [setCurrentChatHistory])
 
+  function getClassNames(message: ChatMessageToDisplay) {
+    if (message.messageType === 'error') {
+      return 'bg-red-100 text-red-800'
+    }
+    if (message.role === 'assistant') {
+      return 'bg-neutral-200 text-black'
+    }
+    return 'bg-blue-100 text-blue-800'
+  }
   if (!highlightData.position) return null
 
   return (
@@ -266,6 +276,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
         className="absolute flex size-7 cursor-pointer items-center justify-center rounded-full border-none bg-gray-200 text-gray-600 shadow-md hover:bg-gray-300"
         aria-label="Writing Assistant button"
         onClick={() => setIsOptionsVisible(true)}
+        type="button"
       >
         <FaMagic />
       </button>
@@ -330,13 +341,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           {lastAssistantMessage && (
             <ReactMarkdown
               rehypePlugins={[rehypeRaw]}
-              className={`markdown-content break-words rounded-md p-1 ${
-                lastAssistantMessage.messageType === 'error'
-                  ? 'bg-red-100 text-red-800'
-                  : lastAssistantMessage.role === 'assistant'
-                    ? 'bg-neutral-200 text-black'
-                    : 'bg-blue-100 text-blue-800'
-              }`}
+              className={`markdown-content break-words rounded-md p-1 ${getClassNames(lastAssistantMessage)}`}
             >
               {lastAssistantMessage.visibleContent
                 ? lastAssistantMessage.visibleContent

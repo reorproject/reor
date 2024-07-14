@@ -9,7 +9,7 @@ module.exports = {
     "airbnb/hooks",
     "airbnb-typescript",
     "plugin:prettier/recommended",
-    "plugin:tailwindcss/recommended", // Add this line
+    "plugin:tailwindcss/recommended",
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
@@ -24,10 +24,11 @@ module.exports = {
     "jsx-a11y",
     "unused-imports",
     "prettier",
-    "tailwindcss", // Add this line
+    "tailwindcss",
   ],
   rules: {
     "unused-imports/no-unused-imports": "error",
+    // eslint-disable import/extensions:
     "unused-imports/no-unused-vars": [
       "warn",
       {
@@ -38,5 +39,20 @@ module.exports = {
       },
     ],
     "prettier/prettier": "error",
+    "react/function-component-definition": [
+      "error",
+      {
+        namedComponents: "arrow-function",
+        unnamedComponents: "arrow-function",
+      },
+    ],
+    "import/extensions": ["off", "ignorePackages"],
+  },
+  settings: {
+    "import/resolver": {
+      node: {
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
+      },
+    },
   },
 };

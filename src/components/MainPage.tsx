@@ -11,11 +11,9 @@ import EditorManager from './Editor/EditorManager'
 import { useFileInfoTree } from './File/FileSideBar/hooks/use-file-info-tree'
 import { useFileByFilepath } from './File/hooks/use-file-by-filepath'
 import IconsSidebar from './Sidebars/IconsSidebar'
-import SidebarManager from './Sidebars/MainSidebar'
+import SidebarManager, { SidebarAbleToShow } from './Sidebars/MainSidebar'
 import SimilarFilesSidebarComponent from './Sidebars/SimilarFilesSidebar'
 import WritingAssistant from './Writing-Assistant/WritingAssistantFloatingMenu'
-
-export type SidebarAbleToShow = 'files' | 'search' | 'chats'
 
 const MainPageComponent: React.FC = () => {
   const [showChatbot, setShowChatbot] = useState<boolean>(false)
@@ -129,7 +127,6 @@ const MainPageComponent: React.FC = () => {
             openRelativePath={openRelativePath}
             sidebarShowing={sidebarShowing}
             makeSidebarShow={setSidebarShowing}
-            filePath={filePath}
           />
         </div>
 

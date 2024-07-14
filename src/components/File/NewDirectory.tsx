@@ -6,7 +6,7 @@ import { toast } from 'react-toastify'
 
 import ReorModal from '../Common/Modal'
 
-import { errorToStringRendererProcess } from '@/utils/error'
+import errorToStringRendererProcess from '@/utils/error'
 import { getInvalidCharacterInFilePath } from '@/utils/strings'
 
 interface NewDirectoryComponentProps {

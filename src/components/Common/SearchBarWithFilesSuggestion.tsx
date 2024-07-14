@@ -12,14 +12,14 @@ interface Props {
   setSuggestionsState: (state: SuggestionsState | null) => void
 }
 
-export function SearchBarWithFilesSuggestion({
+export const SearchBarWithFilesSuggestion = ({
   vaultDirectory,
   searchText,
   setSearchText,
   onSelectSuggestion,
   suggestionsState,
   setSuggestionsState,
-}: Props) {
+}: Props) => {
   const { flattenedFiles } = useFileInfoTree(vaultDirectory)
   const inputRef = useRef<HTMLInputElement>(null)
 

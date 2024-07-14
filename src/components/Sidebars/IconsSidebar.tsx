@@ -11,14 +11,13 @@ import { VscNewFile, VscNewFolder } from 'react-icons/vsc'
 import NewDirectoryComponent from '../File/NewDirectory'
 import NewNoteComponent from '../File/NewNote'
 import FlashcardMenuModal from '../Flashcard/FlashcardMenuModal'
-import { SidebarAbleToShow } from '../MainPage'
 import SettingsModal from '../Settings/Settings'
+import { SidebarAbleToShow } from './MainSidebar'
 
 interface IconsSidebarProps {
   openRelativePath: (path: string) => void
   sidebarShowing: SidebarAbleToShow
   makeSidebarShow: (show: SidebarAbleToShow) => void
-  filePath: string | null
 }
 
 const IconsSidebar: React.FC<IconsSidebarProps> = ({ openRelativePath, sidebarShowing, makeSidebarShow }) => {

@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 
 import ReorModal from '../Common/Modal'
 
-import { errorToStringRendererProcess } from '@/utils/error'
+import errorToStringRendererProcess from '@/utils/error'
 import { getInvalidCharacterInFileName, removeFileExtension } from '@/utils/strings'
 
 export interface RenameNoteFuncProps {

@@ -4,7 +4,7 @@ interface CustomLinkMarkdownProps {
   openFileByPath: (path: string) => void
   props: object
 }
-export function CustomLinkMarkdown({ openFileByPath, props }: CustomLinkMarkdownProps) {
+export const CustomLinkMarkdown = ({ openFileByPath, props }: CustomLinkMarkdownProps) => {
   const handleCustomLinkClick = async (event: React.MouseEvent) => {
     event.preventDefault() // Prevent default link behavior
     const link = (event.target as HTMLAnchorElement).innerText

@@ -13,12 +13,12 @@ interface FlashcardCoreProps {
   setCurrentSelectedFlashcard: (current: number) => void
 }
 
-export function FlashcardCore({
+export const FlashcardCore = ({
   flashcardQAPairs,
   setFlashcardQAPairs,
   currentSelectedFlashcard,
   setCurrentSelectedFlashcard,
-}: FlashcardCoreProps) {
+}: FlashcardCoreProps) => {
   const updateFlashcardUnderReview = (flashcardSelected: number, updatedFlashcard: FlashcardQAPairUI) => {
     const updatedPairs = [...flashcardQAPairs]
     updatedPairs[flashcardSelected] = updatedFlashcard

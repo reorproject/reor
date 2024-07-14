@@ -7,14 +7,13 @@ import posthog from 'posthog-js'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 
-import { SimilarEntriesComponent } from '../Sidebars/SimilarFilesSidebar'
-
 import AddContextFiltersModal from './AddContextFiltersModal'
 import { PromptSuggestion } from './Chat-Prompts'
 import ChatInput from './ChatInput'
 import { formatOpenAIMessageContentIntoString, resolveRAGContext } from './chatUtils'
 
-import { errorToStringRendererProcess } from '@/utils/error'
+import errorToStringRendererProcess from '@/utils/error'
+import SimilarEntriesComponent from '../Sidebars/SemanticSidebar/SimilarEntriesComponent'
 
 // convert ask options to enum
 enum AskOptions {
@@ -359,8 +358,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           }}
           saveCurrentFile={() => Promise.resolve()}
           isLoadingSimilarEntries={false}
-          setIsRefined={() => {}} // to allow future toggling
-          isRefined // always refined for now
         />
       )}
     </div>

@@ -8,7 +8,7 @@ import ExternalLink from '../../../Common/ExternalLink'
 import ReorModal from '../../../Common/Modal'
 import CustomSelect from '../../../Common/Select'
 
-import { errorToStringRendererProcess } from '@/utils/error'
+import errorToStringRendererProcess from '@/utils/error'
 
 interface RemoteLLMModalProps {
   isOpen: boolean

@@ -7,7 +7,7 @@ import { toast } from 'react-toastify'
 
 import ExternalLink from '@/components/Common/ExternalLink'
 import ReorModal from '@/components/Common/Modal'
-import { errorToStringRendererProcess } from '@/utils/error'
+import errorToStringRendererProcess from '@/utils/error'
 
 interface NewOllamaModelModalProps {
   isOpen: boolean

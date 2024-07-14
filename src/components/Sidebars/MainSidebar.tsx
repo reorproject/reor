@@ -8,10 +8,10 @@ import { ChatFilters, ChatHistory } from '../Chat/Chat'
 import { ChatsSidebar } from '../Chat/ChatsSidebar'
 import { ChatHistoryMetadata } from '../Chat/hooks/use-chat-history'
 import { FileSidebar } from '../File/FileSideBar'
-import { SidebarAbleToShow } from '../MainPage'
 
 import SearchComponent from './FileSidebarSearch'
 
+export type SidebarAbleToShow = 'files' | 'search' | 'chats'
 interface SidebarManagerProps {
   files: FileInfoTree
   expandedDirectories: Map<string, boolean>
