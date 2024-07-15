@@ -126,6 +126,10 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
 
   return (
     <div>
+      {/* Displays the dropdown tab when hovering. You cannot use z-index and position absolute inside 
+          TitleBar since one of the Parent components inadvertently creates a new stacking context that 
+          impacts the z-index. */}
+      <div id="tooltip-container"></div>
       <TabProvider
         openFileAndOpenEditor={openFileAndOpenEditor}
         setFilePath={setFilePath}

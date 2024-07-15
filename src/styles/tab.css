@@ -1,0 +1,24 @@
+/* CSS for dropdown animation onMouseEnter */
+.tab-tooltip {
+    position: absolute;
+    /* background-color: #fff; */
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    white-space: no-wrap;
+    z-index: 1010;
+    animation: fadeIn 0.3s ease-in-out;
+    height: 30px;
+    width: 150px;
+    font-size: 14px;
+    text-align: center;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
