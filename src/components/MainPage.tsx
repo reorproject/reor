@@ -15,6 +15,7 @@ import IconsSidebar from "./Sidebars/IconsSidebar";
 import SidebarManager from "./Sidebars/MainSidebar";
 import SimilarFilesSidebarComponent from "./Sidebars/SimilarFilesSidebar";
 import EmptyPage from "./EmptyPage";
+import { TabProvider } from "./Providers/TabProvider";
 
 interface FileEditorContainerProps {}
 export type SidebarAbleToShow = "files" | "search" | "chats";
@@ -28,8 +29,6 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     filePath,
     setFilePath,
     editor,
-    openTabs,
-    setOpenTabs,
     openFileByPath,
     openRelativePath,
     saveCurrentlyOpenedFile,
@@ -125,36 +124,25 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
     };
   }, []);
 
-  // On new launch of the app, sets the last previously accessed tab (if any) to be
-  // the current file
-  useEffect(() => {
-    const restoreFromLaunch = () => {
-      openTabs.forEach((tab) => {
-        console.log("Tab:", tab.lastAccessed);
-        if (tab.lastAccessed) {
-          openFileByPath(tab.filePath);
-        }
-      });
-    };
-
-    restoreFromLaunch();
-  }, []);
-
   return (
     <div>
-      <TitleBar
-        history={navigationHistory}
-        setHistory={setNavigationHistory}
-        currentFilePath={filePath}
-        onFileSelect={openFileAndOpenEditor}
-        setFilePath={setFilePath}
-        similarFilesOpen={showSimilarFiles} // This might need to be managed differently now
-        toggleSimilarFiles={toggleSimilarFiles} // This might need to be managed differently now
-        openTabs={openTabs}
-        setOpenTabs={setOpenTabs}
+      <TabProvider
         openFileAndOpenEditor={openFileAndOpenEditor}
-        sidebarWidth={resizableWidth}
-      />
+        setFilePath={setFilePath}
+        currentFilePath={filePath}
+      >
+        <TitleBar
+          history={navigationHistory}
+          setHistory={setNavigationHistory}
+          currentFilePath={filePath}
+          onFileSelect={openFileAndOpenEditor}
+          setFilePath={setFilePath}
+          similarFilesOpen={showSimilarFiles} // This might need to be managed differently now
+          toggleSimilarFiles={toggleSimilarFiles} // This might need to be managed differently now
+          openFileAndOpenEditor={openFileAndOpenEditor}
+          sidebarWidth={resizableWidth}
+        />
+      </TabProvider>
 
       <div className="flex h-below-titlebar">
         <div

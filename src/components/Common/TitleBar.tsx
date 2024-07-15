@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { PiSidebar, PiSidebarFill } from "react-icons/pi";
-import { DraggableTabs } from "../Sidebars/DraggableTabs";
+import { DraggableTabs } from "../Sidebars/TabSidebar";
 import FileHistoryNavigator from "../File/FileSideBar/FileHistoryBar";
-
+import { useTabs } from "../Providers/TabProvider";
 export const titleBarHeight = "30px";
 
 interface TitleBarProps {
@@ -14,8 +14,6 @@ interface TitleBarProps {
   toggleSimilarFiles: () => void;
   history: string[];
   setHistory: (string: string[]) => void;
-  openTabs: Tab[]; // Current opened tabs
-  setOpenTabs: (string: Tab[]) => void; // Setter for opened tabs
   openFileAndOpenEditor: (path: string) => void;
   sidebarWidth: number;
 }
@@ -28,24 +26,16 @@ const TitleBar: React.FC<TitleBarProps> = ({
   toggleSimilarFiles,
   history,
   setHistory,
-  openTabs,
-  setOpenTabs,
   openFileAndOpenEditor,
   sidebarWidth,
 }) => {
   const [platform, setPlatform] = useState("");
+  const { openTabs, addTab, selectTab, removeTab, updateTabOrder } = useTabs();
+  const [openedLastAccess, setOpenedLastAccess] = useState<boolean>(false);
 
   useEffect(() => {
     if (!currentFilePath) return;
-    const existingTab = openTabs.find(
-      (tab) => tab.filePath === currentFilePath
-    );
-
-    if (!existingTab) {
-      addNewTab(currentFilePath);
-      const newTab = createTabObjectFromPath(currentFilePath);
-      setOpenTabs((prevTabs) => [...prevTabs, newTab]);
-    }
+    addTab(currentFilePath);
   }, [currentFilePath]);
 
   useEffect(() => {
@@ -58,67 +48,27 @@ const TitleBar: React.FC<TitleBarProps> = ({
   }, []);
 
   useEffect(() => {
-    const fetchHistoryTabs = async () => {
-      const response = await window.electronStore.getCurrentOpenFiles();
-      setOpenTabs(response);
-    };
-
-    fetchHistoryTabs();
-  }, []);
-
-  const handleTabSelect = (path: string) => {
-    openFileAndOpenEditor(path);
-  };
-
-  const handleTabClose = async (event, tabId) => {
-    event.stopPropagation();
-    console.log("Closing tab!");
-    let closedFilePath = "";
-    let newIndex = -1;
-
-    setOpenTabs((prevTabs) => {
-      const index = prevTabs.findIndex((tab) => tab.id === tabId);
-      prevTabs[index].lastAccessed = false;
-      closedFilePath = index !== -1 ? prevTabs[index].filePath : "";
-      newIndex = index > 0 ? index - 1 : 1;
-      if (closedFilePath === currentFilePath) {
-        console.log("new Index:", newIndex);
-        if (newIndex < openTabs.length) {
-          openTabs[newIndex].lastAccessed = true;
-          openFileAndOpenEditor(openTabs[newIndex].filePath);
-        }
-        // Select the new index's file
-        else setFilePath(null);
+    const setUpLastAccess = () => {
+      if (!openedLastAccess) {
+        openTabs.forEach((tab) => {
+          if (tab.lastAccessed) {
+            setOpenedLastAccess(true);
+            openFileAndOpenEditor(tab.filePath);
+          }
+        });
       }
-      return prevTabs.filter((tab, idx) => idx !== index);
-    });
-
-    await window.electronStore.setCurrentOpenFiles("remove", {
-      tabId: tabId,
-    });
-  };
-
-  const addNewTab = async (path: string) => {
-    const tab = createTabObjectFromPath(path);
-    await window.electronStore.setCurrentOpenFiles("add", {
-      tab: tab,
-    });
-  };
-
-  const extractFileName = (path: string) => {
-    const parts = path.split(/[/\\]/); // Split on both forward slash and backslash
-    return parts.pop(); // Returns the last element, which is the file name
-  };
-
-  const createTabObjectFromPath = (path: string) => {
-    return {
-      id: uuidv4(),
-      filePath: path,
-      title: extractFileName(path),
-      lastAccessed: false,
-      // timeOpened: new Date(),
-      // isDirty: false,
     };
+
+    setUpLastAccess();
+  }, [openTabs]);
+
+  const handleTabSelect = (tab: Tab) => {
+    selectTab(tab);
+  };
+
+  const handleTabClose = (event, tabId) => {
+    event.stopPropagation();
+    removeTab(tabId);
   };
 
   return (
@@ -154,10 +104,10 @@ const TitleBar: React.FC<TitleBarProps> = ({
           <div className="flex whitespace-nowrap">
             <DraggableTabs
               openTabs={openTabs}
-              setOpenTabs={setOpenTabs}
               onTabSelect={handleTabSelect}
               onTabClose={handleTabClose}
               currentFilePath={currentFilePath}
+              updateTabOrder={updateTabOrder}
             />
           </div>
         </div>

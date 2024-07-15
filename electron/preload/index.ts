@@ -201,7 +201,7 @@ const electronStore = {
     "get-current-open-files"
   ),
   setCurrentOpenFiles: createIPCHandlerWithChannel<
-    (action: any, args: any) => Promise<void>
+    (action: Action, args: Args) => Promise<void>
   >("set-current-open-files"),
 };
 

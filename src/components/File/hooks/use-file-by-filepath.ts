@@ -55,7 +55,6 @@ export const useFileByFilepath = () => {
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>("");
   const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>("");
   const [navigationHistory, setNavigationHistory] = useState<string[]>([]);
-  const [openTabs, setOpenTabs] = useState<Tab[]>([]);
   const [currentlyChangingFilePath, setCurrentlyChangingFilePath] =
     useState(false);
   const [highlightData, setHighlightData] = useState<HighlightData>({
@@ -370,8 +369,6 @@ export const useFileByFilepath = () => {
     setFilePath: setCurrentlyOpenedFilePath,
     saveCurrentlyOpenedFile,
     editor,
-    openTabs,
-    setOpenTabs,
     navigationHistory,
     setNavigationHistory,
     openFileByPath,

@@ -308,7 +308,10 @@ export const registerStoreHandlers = (
       store.set(StoreKeys.OpenTabs, openTabs);
     };
 
-    console.log("action: ", action);
+    const selectTab = ({ tabs }) => {
+      store.set(StoreKeys.OpenTabs, tabs);
+    };
+
     switch (action) {
       case "add":
         addTab(args);
@@ -318,6 +321,9 @@ export const registerStoreHandlers = (
         break;
       case "update":
         updateTab(args);
+        break;
+      case "select":
+        selectTab(args);
         break;
       case "clear":
         clearAllTabs();

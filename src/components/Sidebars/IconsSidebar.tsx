@@ -221,7 +221,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         <IconContext.Provider value={{ color: "gray" }}>
           <MdSettings
             size={18}
-            className="h-6 w-6 text-gray-100"
+            className="h-6 w-6 text-gray-100 mb-3"
             title="Settings"
           />
         </IconContext.Provider>

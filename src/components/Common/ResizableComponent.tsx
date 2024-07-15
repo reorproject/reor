@@ -38,7 +38,6 @@ const ResizableComponent: React.FC<ResizableComponentProps> = ({
   );
 
   useEffect(() => {
-    console.log("Setting resize to:", width);
     if (onResize) onResize(width);
   }, [width]);
 
