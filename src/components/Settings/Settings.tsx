@@ -1,16 +1,16 @@
-import React, { useState } from "react";
+import React, { useState } from 'react'
 
-import ReorModal from "../Common/Modal";
+import ReorModal from '../Common/Modal'
 
-import AnalyticsSettings from "./AnalyticsSettings";
-import EmbeddingModelSettings from "./EmbeddingSettings/EmbeddingSettings";
-import GeneralSettings from "./GeneralSettings";
-import LLMSettings from "./LLMSettings/LLMSettings";
-import TextGenerationSettings from "./TextGenerationSettings";
+import AnalyticsSettings from './AnalyticsSettings'
+import EmbeddingModelSettings from './EmbeddingSettings/EmbeddingSettings'
+import GeneralSettings from './GeneralSettings'
+import LLMSettings from './LLMSettings/LLMSettings'
+import TextGenerationSettings from './TextGenerationSettings'
 
 interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  isOpen: boolean
+  onClose: () => void
 }
 
 enum SettingsTab {
@@ -32,19 +32,18 @@ const SettingsModal: React.FC<ModalProps> = ({
 
   const handleSave = () => {
     if (willNeedToReIndex) {
-      console.log("reindexing files");
-      window.database.indexFilesInDirectory();
+      window.database.indexFilesInDirectory()
     }
-    onCloseFromParent();
-  };
+    onCloseFromParent()
+  }
 
-  if (!isOpen) return null;
+  if (!isOpen) return null
 
   return (
     <ReorModal
       isOpen={isOpen}
       onClose={() => {
-        handleSave();
+        handleSave()
       }}
       widthType={"settingsContainer"}
     >
@@ -61,20 +60,16 @@ const SettingsModal: React.FC<ModalProps> = ({
             General
           </div>
           <div
-            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
-              activeTab === SettingsTab.LLMSettings
-                ? "bg-neutral-700 text-white font-semibold"
-                : "text-gray-200"
+            className={`flex cursor-pointer items-center rounded border-b border-gray-200 p-2 text-sm hover:bg-neutral-600 ${
+              activeTab === SettingsTab.LLM ? 'bg-neutral-700 font-semibold text-white' : 'text-gray-200'
             }`}
-            onClick={() => setActiveTab(SettingsTab.LLMSettings)}
+            onClick={() => setActiveTab(SettingsTab.LLM)}
           >
             LLM
           </div>
           <div
-            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
-              activeTab === SettingsTab.EmbeddingModel
-                ? "bg-neutral-700 text-white font-semibold"
-                : "text-gray-200"
+            className={`flex cursor-pointer items-center rounded border-b border-gray-200 p-2 text-sm hover:bg-neutral-600 ${
+              activeTab === SettingsTab.EmbeddingModel ? 'bg-neutral-700 font-semibold text-white' : 'text-gray-200'
             }`}
             onClick={() => setActiveTab(SettingsTab.EmbeddingModel)}
           >
@@ -82,45 +77,39 @@ const SettingsModal: React.FC<ModalProps> = ({
           </div>
 
           <div
-            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
-              activeTab === SettingsTab.TextGeneration
-                ? "bg-neutral-700 text-white font-semibold"
-                : "text-gray-200"
+            className={`flex cursor-pointer items-center rounded border-b border-gray-200 p-2 text-sm hover:bg-neutral-600 ${
+              activeTab === SettingsTab.TextGeneration ? 'bg-neutral-700 font-semibold text-white' : 'text-gray-200'
             }`}
             onClick={() => setActiveTab(SettingsTab.TextGeneration)}
           >
-            Text Generation{" "}
+            Text Generation{' '}
           </div>
           <div
-            className={`flex items-center rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${
-              activeTab === SettingsTab.ANALYTICS
-                ? "bg-neutral-700 text-white font-semibold"
-                : "text-gray-200"
+            className={`flex cursor-pointer items-center rounded border-b border-gray-200 p-2 text-sm hover:bg-neutral-600 ${
+              activeTab === SettingsTab.ANALYTICS ? 'bg-neutral-700 font-semibold text-white' : 'text-gray-200'
             }`}
             onClick={() => setActiveTab(SettingsTab.ANALYTICS)}
           >
-            Analytics{" "}
+            Analytics{' '}
           </div>
         </div>
 
         {/* Right Content Area */}
         <div className="w-full h-full flex-1 ml-2 pl-16 pr-16">
           {/* <h2 className="text-2xl font-semibold mb-4 text-white">Settings</h2> */}
-          {activeTab === SettingsTab.GeneralSettings && (
-            <div className="w-full h-full">
+          {activeTab === SettingsTab.General && (
+            <div className="size-full">
               <GeneralSettings />
             </div>
           )}
-          {activeTab === SettingsTab.LLMSettings && (
-            <div className="w-full h-full">
+          {activeTab === SettingsTab.LLM && (
+            <div className="size-full">
               <LLMSettings />
             </div>
           )}
           {activeTab === SettingsTab.EmbeddingModel && (
-            <div className="w-full h-full">
-              <EmbeddingModelSettings
-                handleUserHasChangedModel={() => setWillNeedToReIndex(true)}
-              />
+            <div className="size-full">
+              <EmbeddingModelSettings handleUserHasChangedModel={() => setWillNeedToReIndex(true)} />
             </div>
           )}
 
@@ -138,7 +127,7 @@ const SettingsModal: React.FC<ModalProps> = ({
         </div>
       </div>
     </ReorModal>
-  );
-};
+  )
+}
 
-export default SettingsModal;
+export default SettingsModal

@@ -1,68 +1,59 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from 'react'
 
-import { IconContext } from "react-icons";
-import { FaSearch } from "react-icons/fa";
-import { GrNewWindow } from "react-icons/gr";
-import { ImFilesEmpty } from "react-icons/im";
-import { IoChatbubbleEllipsesOutline } from "react-icons/io5";
-import { MdOutlineQuiz, MdSettings } from "react-icons/md";
-import { VscNewFile, VscNewFolder } from "react-icons/vsc";
+import { IconContext } from 'react-icons'
+import { FaSearch } from 'react-icons/fa'
+import { GrNewWindow } from 'react-icons/gr'
+import { ImFilesEmpty } from 'react-icons/im'
+import { IoChatbubbleEllipsesOutline } from 'react-icons/io5'
+import { MdOutlineQuiz, MdSettings } from 'react-icons/md'
+import { VscNewFile, VscNewFolder } from 'react-icons/vsc'
 
-import NewDirectoryComponent from "../File/NewDirectory";
-import NewNoteComponent from "../File/NewNote";
-import FlashcardMenuModal from "../Flashcard/FlashcardMenuModal";
-import { SidebarAbleToShow } from "../MainPage";
-import SettingsModal from "../Settings/Settings";
+import NewDirectoryComponent from '../File/NewDirectory'
+import NewNoteComponent from '../File/NewNote'
+import FlashcardMenuModal from '../Flashcard/FlashcardMenuModal'
+import SettingsModal from '../Settings/Settings'
+import { SidebarAbleToShow } from './MainSidebar'
 
 interface IconsSidebarProps {
-  openRelativePath: (path: string) => void;
-  sidebarShowing: SidebarAbleToShow;
-  makeSidebarShow: (show: SidebarAbleToShow) => void;
-  filePath: string | null;
+  openRelativePath: (path: string) => void
+  sidebarShowing: SidebarAbleToShow
+  makeSidebarShow: (show: SidebarAbleToShow) => void
 }
 
-const IconsSidebar: React.FC<IconsSidebarProps> = ({
-  openRelativePath,
-  sidebarShowing,
-  makeSidebarShow,
-}) => {
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
-  const [isNewNoteModalOpen, setIsNewNoteModalOpen] = useState(false);
-  const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false);
-  const [isFlashcardModeOpen, setIsFlashcardModeOpen] = useState(false);
-  const [customDirectoryPath, setCustomDirectoryPath] = useState("");
-  const [customFilePath, setCustomFilePath] = useState("");
+const IconsSidebar: React.FC<IconsSidebarProps> = ({ openRelativePath, sidebarShowing, makeSidebarShow }) => {
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
+  const [isNewNoteModalOpen, setIsNewNoteModalOpen] = useState(false)
+  const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false)
+  const [isFlashcardModeOpen, setIsFlashcardModeOpen] = useState(false)
+  const [customDirectoryPath, setCustomDirectoryPath] = useState('')
+  const [customFilePath, setCustomFilePath] = useState('')
 
-  const [initialFileToCreateFlashcard, setInitialFileToCreateFlashcard] =
-    useState("");
-  const [initialFileToReviewFlashcard, setInitialFileToReviewFlashcard] =
-    useState("");
+  const [initialFileToCreateFlashcard, setInitialFileToCreateFlashcard] = useState('')
+  const [initialFileToReviewFlashcard, setInitialFileToReviewFlashcard] = useState('')
 
   // open a new flashcard create mode
   useEffect(() => {
     const createFlashcardFileListener = window.ipcRenderer.receive(
-      "create-flashcard-file-listener",
+      'create-flashcard-file-listener',
       (noteName: string) => {
-        setIsFlashcardModeOpen(!!noteName);
-        setInitialFileToCreateFlashcard(noteName);
-      }
-    );
+        setIsFlashcardModeOpen(!!noteName)
+        setInitialFileToCreateFlashcard(noteName)
+      },
+    )
 
     return () => {
-      createFlashcardFileListener();
-    };
-  }, []);
+      createFlashcardFileListener()
+    }
+  }, [])
 
   // open a new note window
   useEffect(() => {
     const handleNewNote = (relativePath: string) => {
-      setCustomFilePath(relativePath);
-      setIsNewNoteModalOpen(true);
-    };
+      setCustomFilePath(relativePath)
+      setIsNewNoteModalOpen(true)
+    }
 
-    window.ipcRenderer.receive(
-      "add-new-note-response",
-      (relativePath: string) => {
+    window.ipcRenderer.receive("add-new-note-response", (relativePath: string) => {
         handleNewNote(relativePath);
       }
     );
@@ -74,24 +65,25 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
       setCustomDirectoryPath(dirPath);
       setIsNewDirectoryModalOpen(true);
     };
-
-    window.ipcRenderer.receive("add-new-directory-response", (dirPath) => {
-      handleNewDirectory(dirPath);
-    });
+    
+    window.ipcRenderer.receive('add-new-directory-listener', (dirPath) => {
+      handleNewDirectory(dirPath)
+    })
   }, []);
-
+  const filesIconContextValue = useMemo(() => ({ color: sidebarShowing === 'files' ? 'white' : 'gray' }), [sidebarShowing])
+  const chatsIconContextValue = useMemo(() => ({ color: sidebarShowing === 'chats' ? 'white' : 'gray' }), [sidebarShowing])
+  const searchIconContextValue = useMemo(
+    () => ({ color: sidebarShowing === 'search' ? 'salmon' : '' }),
+    [sidebarShowing],
+  )
   return (
-    <div className="w-full h-full bg-neutral-800 flex flex-col items-center justify-between gap-1">
+    <div className="flex size-full flex-col items-center justify-between gap-1 bg-neutral-800">
       <div
-        className=" flex items-center justify-center w-full h-8 cursor-pointer"
-        onClick={() => makeSidebarShow("files")}
+        className=" flex h-8 w-full cursor-pointer items-center justify-center"
+        onClick={() => makeSidebarShow('files')}
       >
-        <IconContext.Provider
-          value={{
-            color: sidebarShowing === "files" ? "white" : "gray",
-          }}
-        >
-          <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
+        <IconContext.Provider value={filesIconContextValue}>
+          <div className="rounded size-4/5 flex items-center justify-center hover:bg-neutral-700">
             <ImFilesEmpty
               className="mx-auto text-gray-200 "
               size={18}
@@ -101,13 +93,11 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         </IconContext.Provider>
       </div>
       <div
-        className=" flex items-center justify-center w-full h-8 cursor-pointer"
-        onClick={() => makeSidebarShow("chats")}
+        className=" flex h-8 w-full cursor-pointer items-center justify-center"
+        onClick={() => makeSidebarShow('chats')}
       >
-        <IconContext.Provider
-          value={{ color: sidebarShowing === "chats" ? "white" : "gray" }}
-        >
-          <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
+        <IconContext.Provider value={chatsIconContextValue}>
+          <div className="rounded size-4/5 flex items-center justify-center hover:bg-neutral-700">
             <IoChatbubbleEllipsesOutline
               className="text-gray-100 cursor-pointer "
               size={18}
@@ -119,13 +109,11 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         </IconContext.Provider>
       </div>
       <div
-        className="flex items-center justify-center w-full h-8 cursor-pointer"
-        onClick={() => makeSidebarShow("search")}
+        className="flex h-8 w-full cursor-pointer items-center justify-center"
+        onClick={() => makeSidebarShow('search')}
       >
-        <IconContext.Provider
-          value={{ color: sidebarShowing === "search" ? "white" : "gray" }}
-        >
-          <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
+        <IconContext.Provider value={searchIconContextValue}>
+          <div className="rounded size-4/5 flex items-center justify-center hover:bg-neutral-700">
             <FaSearch
               size={18}
               className=" text-gray-200"
@@ -135,20 +123,20 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         </IconContext.Provider>
       </div>
       <div
-        className="bg-transparent border-none cursor-pointer flex items-center justify-center w-full h-8 "
+        className="flex h-8 w-full cursor-pointer items-center justify-center border-none bg-transparent "
         onClick={() => setIsNewNoteModalOpen(true)}
       >
-        <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
+        <div className="rounded size-4/5 flex items-center justify-center hover:bg-neutral-700">
           <IconContext.Provider value={{ color: "gray" }}>
             <VscNewFile className="text-gray-200" size={22} title="New Note" />
           </IconContext.Provider>
         </div>
       </div>
       <div
-        className="bg-transparent mt-[2px] border-none cursor-pointer flex items-center justify-center w-full h-8 "
+        className="mt-[2px] flex h-8 w-full cursor-pointer items-center justify-center border-none bg-transparent "
         onClick={() => setIsNewDirectoryModalOpen(true)}
       >
-        <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
+        <div className="rounded size-4/5 flex items-center justify-center hover:bg-neutral-700">
           <IconContext.Provider value={{ color: "gray" }}>
             <VscNewFolder
               className="text-gray-200"
@@ -159,10 +147,10 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         </div>
       </div>
       <div
-        className="bg-transparent border-none cursor-pointer flex items-center justify-center w-full h-8 "
+        className="flex h-8 w-full cursor-pointer items-center justify-center border-none bg-transparent "
         onClick={() => setIsFlashcardModeOpen(true)}
       >
-        <div className="rounded w-[80%] h-[80%] flex items-center justify-center hover:bg-neutral-700">
+        <div className="rounded size-4/5 flex items-center justify-center hover:bg-neutral-700">
           <IconContext.Provider value={{ color: "gray" }}>
             <MdOutlineQuiz
               className="text-gray-200"
@@ -188,22 +176,18 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         <FlashcardMenuModal
           isOpen={isFlashcardModeOpen}
           onClose={() => {
-            console.log(`clicked`);
-            setIsFlashcardModeOpen(false);
-            setInitialFileToCreateFlashcard("");
-            setInitialFileToReviewFlashcard("");
+            setIsFlashcardModeOpen(false)
+            setInitialFileToCreateFlashcard('')
+            setInitialFileToReviewFlashcard('')
           }}
           initialFileToCreateFlashcard={initialFileToCreateFlashcard}
           initialFileToReviewFlashcard={initialFileToReviewFlashcard}
         />
       )}
-      <div className="flex-grow border-1 border-yellow-300"></div>
-      <SettingsModal
-        isOpen={isSettingsModalOpen}
-        onClose={() => setIsSettingsModalOpen(false)}
-      />
+      <div className="grow border-yellow-300" />
+      <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} />
       <div
-        className="bg-transparent border-none pb-2 mb-[2px] cursor-pointer flex items-center justify-center w-full"
+        className="mb-[2px] flex w-full cursor-pointer items-center justify-center border-none bg-transparent pb-2"
         onClick={() => window.electronUtils.openNewWindow()}
       >
         <IconContext.Provider value={{ color: "gray" }}>
@@ -215,8 +199,10 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         </IconContext.Provider>
       </div>
       <button
-        className="bg-transparent border-none pb-2 cursor-pointer flex items-center justify-center w-full"
+        className="flex w-full cursor-pointer items-center justify-center border-none bg-transparent pb-2"
         onClick={() => setIsSettingsModalOpen(!isSettingsModalOpen)}
+        type="button"
+        aria-label="Open Settings"
       >
         <IconContext.Provider value={{ color: "gray" }}>
           <MdSettings
@@ -227,7 +213,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         </IconContext.Provider>
       </button>
     </div>
-  );
-};
+  )
+}
 
-export default IconsSidebar;
+export default IconsSidebar

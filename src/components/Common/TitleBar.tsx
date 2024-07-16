@@ -40,12 +40,12 @@ const TitleBar: React.FC<TitleBarProps> = ({
 
   useEffect(() => {
     const fetchPlatform = async () => {
-      const response = await window.electronUtils.getPlatform();
-      setPlatform(response);
-    };
+      const response = await window.electronUtils.getPlatform()
+      setPlatform(response)
+    }
 
-    fetchPlatform();
-  }, []);
+    fetchPlatform()
+  }, [])
 
   useEffect(() => {
     const setUpLastAccess = () => {
@@ -114,17 +114,13 @@ const TitleBar: React.FC<TitleBarProps> = ({
       </div>
 
       <div
-        className="flex justify-end align-items-right mt-[0.5px]"
-        style={
-          platform === "win32"
-            ? { marginRight: "8.5rem" }
-            : { marginRight: "0.3rem" }
-        }
+        className="mt-[0.5px] flex justify-end"
+        style={platform === 'win32' ? { marginRight: '8.5rem' } : { marginRight: '0.3rem' }}
       >
         {similarFilesOpen ? (
           <PiSidebarFill
             id="titleBarSimilarFiles"
-            className="text-gray-100 cursor-pointer mt-[0.2rem] transform scale-x-[-1]"
+            className="mt-[0.2rem] -scale-x-100 cursor-pointer text-gray-100"
             size={22}
             onClick={toggleSimilarFiles}
             title="Hide Similar Files"
@@ -132,7 +128,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
         ) : (
           <PiSidebar
             id="titleBarSimilarFiles"
-            className="text-gray-100 cursor-pointer mt-[0.2rem] transform scale-x-[-1]"
+            className="mt-[0.2rem] -scale-x-100 cursor-pointer text-gray-100"
             size={22}
             onClick={toggleSimilarFiles}
             title="Show Similar Files"
@@ -140,7 +136,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default TitleBar;
+export default TitleBar

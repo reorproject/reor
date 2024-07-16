@@ -1,78 +1,61 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react'
 
-import CircularProgress from "@mui/material/CircularProgress";
+import CircularProgress from '@mui/material/CircularProgress'
 
-import ReorModal from "./Modal";
+import ReorModal from './Modal'
 
 interface IndexingProgressProps {
-  indexingProgress: number;
+  indexingProgress: number
 }
 
-const IndexingProgress: React.FC<IndexingProgressProps> = ({
-  indexingProgress,
-}) => {
-  const [startTime, setStartTime] = useState<number>(Date.now());
-  const [eta, setEta] = useState<string>("Initializing...");
+const IndexingProgress: React.FC<IndexingProgressProps> = ({ indexingProgress }) => {
+  const [startTime, setStartTime] = useState<number>(Date.now())
+  const [eta, setEta] = useState<string>('Initializing...')
 
   useEffect(() => {
-    setStartTime(Date.now());
-  }, []);
+    setStartTime(Date.now())
+  }, [])
 
   useEffect(() => {
     if (indexingProgress > 0) {
-      const elapsedTime = Date.now() - startTime;
-      const estimatedTotalTime = elapsedTime / indexingProgress;
-      const remainingTime = estimatedTotalTime - elapsedTime;
+      const elapsedTime = Date.now() - startTime
+      const estimatedTotalTime = elapsedTime / indexingProgress
+      const remainingTime = estimatedTotalTime - elapsedTime
 
-      const etaMinutes = Math.floor(remainingTime / 60000);
-      const etaSeconds = Math.floor((remainingTime % 60000) / 1000);
-      setEta(`${etaMinutes}m ${etaSeconds}s remaining`);
+      const etaMinutes = Math.floor(remainingTime / 60000)
+      const etaSeconds = Math.floor((remainingTime % 60000) / 1000)
+      setEta(`${etaMinutes}m ${etaSeconds}s remaining`)
     }
-  }, [indexingProgress, startTime]);
+  }, [indexingProgress, startTime])
 
   return (
-    <ReorModal
-      isOpen={true}
-      onClose={() => console.log("Not allowing a close for now")}
-      hideCloseButton={true}
-      widthType="indexingProgress"
-    >
-      <div className="w-[500px] h-[100px] ml-3 mb-3 mt-2 mr-3">
-        <h6 className="mt-2 mb-2 text-2xl font-semibold text-white">
-          {indexingProgress === 0
-            ? "Initializing vector database..."
-            : "Indexing files..."}
+    <ReorModal isOpen onClose={() => {}} hideCloseButton widthType={"indexingProgress"}>
+      <div className="mx-3 mb-3 mt-2 h-[100px] w-[500px]">
+        <h6 className="my-2 text-2xl font-semibold text-white">
+          {indexingProgress === 0 ? 'Initializing vector database...' : 'Indexing files...'}
         </h6>
         <div
-          className={`w-full h-4 rounded-full overflow-hidden mb-2 border-2 border-gray-400 ${
-            indexingProgress !== 0 ? "bg-neutral-800" : ""
+          className={`mb-2 h-4 w-full overflow-hidden rounded-full border-2 border-gray-400 ${
+            indexingProgress !== 0 ? 'bg-neutral-800' : ''
           }`}
         >
           <div
-            className="bg-blue-400 h-full transition-all duration-300 ease-out"
+            className="h-full bg-blue-600 transition-all duration-300 ease-out"
             style={{ width: `${indexingProgress * 100}%` }}
-          ></div>
+          />
         </div>
         <div className="flex">
-          {indexingProgress == 0 && (
-            <CircularProgress
-              size={20}
-              thickness={7}
-              style={{ color: "white" }}
-              className="mr-2"
-            />
+          {indexingProgress === 0 && (
+            <CircularProgress size={20} thickness={7} style={{ color: 'white' }} className="mr-2" />
           )}
 
-          <span className="text-sm text-white font-semibold">
-            {indexingProgress > 0 && (
-              <>{Math.round(indexingProgress * 100)}% -</>
-            )}{" "}
-            {eta}
+          <span className="text-sm font-semibold text-white">
+            {indexingProgress > 0 && <>{Math.round(indexingProgress * 100)}% -</>} {eta}
           </span>
         </div>
       </div>
     </ReorModal>
-  );
-};
+  )
+}
 
-export default IndexingProgress;
+export default IndexingProgress

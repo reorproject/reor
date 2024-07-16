@@ -5,79 +5,49 @@ module.exports = {
     node: true,
   },
   extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:react/recommended",
-    "plugin:import/typescript",
-  ],
-  overrides: [
-    {
-      env: {
-        node: true,
-      },
-      files: [".eslintrc.{js,cjs}"],
-      parserOptions: {
-        sourceType: "script",
-      },
-    },
-    {
-      files: ["*.ts", "*.tsx"],
-      rules: {
-        "react/prop-types": "off",
-      },
-    },
-    {
-      // Applies to all files
-      files: ["*"],
-      rules: {
-        // "@typescript-eslint/no-unused-vars": "warn",
-        // "react/no-unescaped-entities": "warn",
-        // ... add other specific rules you want as warnings here ...
-      },
-    },
+    "airbnb",
+    "airbnb/hooks",
+    "airbnb-typescript",
+    "plugin:prettier/recommended",
+    "plugin:tailwindcss/recommended",
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
     ecmaVersion: "latest",
     sourceType: "module",
+    project: "./tsconfig.json",
   },
-  plugins: ["@typescript-eslint", "react", "import", "unused-imports"],
+  plugins: [
+    "@typescript-eslint",
+    "react",
+    "import",
+    "jsx-a11y",
+    "unused-imports",
+    "prettier",
+    "tailwindcss",
+  ],
   rules: {
-    "import/order": [
+    "unused-imports/no-unused-imports": "error",
+    "prettier/prettier": "error",
+    "react/function-component-definition": [
       "error",
       {
-        groups: [
-          "builtin",
-          "external",
-          "internal",
-          "parent",
-          "sibling",
-          "index",
-        ],
-        pathGroups: [
-          {
-            pattern: "react",
-            group: "external",
-            position: "before",
-          },
-        ],
-        pathGroupsExcludedImportTypes: ["react"],
-        "newlines-between": "always",
-        alphabetize: {
-          order: "asc",
-          caseInsensitive: true,
-        },
+        namedComponents: "arrow-function",
+        unnamedComponents: "arrow-function",
       },
     ],
-    "unused-imports/no-unused-imports": "error",
-    "unused-imports/no-unused-vars": [
-      "warn",
-      {
-        vars: "all",
-        varsIgnorePattern: "^_",
-        args: "after-used",
-        argsIgnorePattern: "^_",
+    "import/extensions": ["off", "ignorePackages"],
+    "jsx-a11y/no-static-element-interactions": "off",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "react/require-default-props": "off",
+    "import/no-extraneous-dependencies": ["error", { "devDependencies": ["**/electron/**", "**/preload/**"] }],
+  },
+  ignorePatterns: ["vite.config.ts", ".eslintrc.js"],
+  settings: {
+    "import/resolver": {
+      node: {
+        extensions: [".js", ".jsx", ".ts", ".tsx"],
       },
-    ],
+    },
   },
 };

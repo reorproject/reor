@@ -1,23 +1,23 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from 'react'
 
-import { FaTrash } from "react-icons/fa";
+import { FaTrash } from 'react-icons/fa'
 
 type OptionType = {
-  label: string;
-  value: string;
-};
+  label: string
+  value: string
+}
 
 type CustomSelectProps = {
-  options: OptionType[];
-  selectedValue: string;
-  onChange: (value: string) => void;
+  options: OptionType[]
+  selectedValue: string
+  onChange: (value: string) => void
   addButton?: {
-    label: string;
-    onClick: () => void;
-  };
-  onDelete?: (value: string) => void;
-  centerText?: boolean;
-};
+    label: string
+    onClick: () => void
+  }
+  onDelete?: (value: string) => void
+  centerText?: boolean
+}
 
 const CustomSelect: React.FC<CustomSelectProps> = ({
   options,
@@ -27,86 +27,79 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   onDelete,
   centerText = false,
 }) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState<boolean>(false)
+  const wrapperRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
       }
-    };
+    }
 
-    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside)
     return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [wrapperRef]);
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [wrapperRef])
 
-  const toggleDropdown = () => setIsOpen(!isOpen);
+  const toggleDropdown = () => setIsOpen(!isOpen)
   const handleOptionClick = (optionValue: string) => {
-    onChange(optionValue);
-    setIsOpen(false);
-  };
+    onChange(optionValue)
+    setIsOpen(false)
+  }
 
   const handleDeleteModelInDropdown = async (selectedModel: string) => {
     if (onDelete) {
-      onDelete(selectedModel);
-      setIsOpen(false);
+      onDelete(selectedModel)
+      setIsOpen(false)
     }
-  };
+  }
 
   return (
-    <div className="flex flex-end" ref={wrapperRef}>
+    <div className="flex w-full" ref={wrapperRef}>
       <div
-        className="flex justify-between items-center w-[192px] py-2 border border-gray-300 rounded-md cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten"
+        className="flex w-full cursor-pointer items-center  justify-between rounded-md border border-gray-300 bg-dark-gray-c-eight py-2 hover:bg-dark-gray-c-ten"
         onClick={toggleDropdown}
       >
-        {centerText ? <span></span> : null}
-        <span className="pl-6 text-[13px] text-gray-100">{selectedValue}</span>
-        <span
-          className="transform transition-transform mr-2"
-          style={{ transform: isOpen ? "rotate(180deg)" : "none" }}
-        >
+        {centerText ? <span /> : null}
+        <span className="px-2 text-[13px] text-gray-100">{selectedValue}</span>
+        <span className="mr-2 transition-transform" style={{ transform: isOpen ? 'rotate(180deg)' : 'none' }}>
           &#9660;
         </span>
       </div>
       {isOpen && (
         <div
-          className="absolute w-[192px] text-[13px] border text-gray-600 border-gray-300 rounded-md shadow-lg z-10 bg-white max-h-60 overflow-auto"
+          className="absolute  z-10 max-h-60 overflow-auto rounded-md border border-gray-300 bg-white text-[13px] text-gray-600 shadow-lg"
           style={{
-            position: "fixed",
-            top: "auto",
+            position: 'fixed',
+            top: 'auto',
             left: wrapperRef.current?.getBoundingClientRect().left,
             width: wrapperRef.current?.getBoundingClientRect().width,
           }}
         >
-          {options.map((option, index) => (
+          {options.map((option) => (
             <div
-              key={index}
-              className="flex justify-between items-center py-2 pl-6 pr-2 bg-dark-gray-c-eight cursor-pointer text-white hover:bg-dark-gray-c-ten "
+              key={option.value}
+              className="flex cursor-pointer items-center justify-between bg-dark-gray-c-eight py-2 pl-6 pr-2 text-white hover:bg-dark-gray-c-ten "
               onClick={() => handleOptionClick(option.value)}
             >
               <span className="w-full">{option.label}</span>
-              {selectedValue === option.value ? (
-                <span className="text-blue-500">&#10003;</span>
-              ) : onDelete ? (
+              {selectedValue === option.value && <span className="text-blue-500">&#10003;</span>}
+              {selectedValue !== option.value && onDelete && (
                 <span
                   onClick={() => handleDeleteModelInDropdown(option.value)}
                   className="ml-2 text-[13px] text-red-700"
                 >
                   <FaTrash />
                 </span>
-              ) : null}
+              )}
             </div>
           ))}
 
           {addButton && (
             <div
-              className="py-2 pl-2 pr-2 mt-1 bg-neutral-200 text-gray-700 text-center cursor-pointer rounded-md hover:bg-neutral-300 shadow-sm transition-colors"
+              className="mt-1 cursor-pointer rounded-md bg-neutral-200 p-2 text-center text-gray-700 shadow-sm transition-colors hover:bg-neutral-300"
               onClick={addButton.onClick}
             >
               {addButton.label}
@@ -115,7 +108,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default CustomSelect;
+export default CustomSelect

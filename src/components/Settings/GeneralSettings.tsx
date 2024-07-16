@@ -1,15 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react'
 
-import { Button } from "@material-tailwind/react";
-import Switch from "@mui/material/Switch";
+import { Button } from '@material-tailwind/react'
+import Switch from '@mui/material/Switch'
 
-import { useFileByFilepath } from "../File/hooks/use-file-by-filepath";
+import useFileByFilepath from '../File/hooks/use-file-by-filepath'
 
-import {
-  CreateAppearanceSection,
-  CreateEditorSection,
-  GenSettingsProps,
-} from "./GeneralSections";
+import {  CreateAppearanceSection, GenSettingsProps, CreateEditorSection } from './GeneralSections'
 
 /*
  *  General Page has the following format:
@@ -29,14 +25,14 @@ import {
  * SubHeader describe the part of the project you are changing (appearance, editor, sidebar, etc..). Option(s) is the name of the specific change.
  */
 
-const GeneralSettings: React.FC<GenSettingsProps> = ({}) => {
+const GeneralSettings: React.FC<GenSettingsProps> = () => {
   return (
-    <div className="w-full flex-col justify-between bg-dark-gray-c-three rounded">
-      <h2 className="text-2xl font-semibold mb-0 text-white">General</h2>
+    <div className="w-full flex-col justify-between rounded bg-dark-gray-c-three">
+      <h2 className="mb-0 text-2xl font-semibold text-white">General</h2>
       <CreateAppearanceSection />
       <CreateEditorSection />
     </div>
-  );
-};
+  )
+}
 
-export default GeneralSettings;
+export default GeneralSettings

@@ -1,12 +1,12 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect } from 'react'
 
 interface ModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  children: React.ReactNode;
-  hideCloseButton?: boolean;
-  tailwindStylesOnBackground?: string;
-  widthType?: ModalWidthType;
+  isOpen: boolean
+  onClose: () => void
+  children: React.ReactNode
+  hideCloseButton?: boolean
+  tailwindStylesOnBackground?: string
+  widthType: number
 }
 
 /*
@@ -64,40 +64,40 @@ const ReorModal: React.FC<ModalProps> = ({
   tailwindStylesOnBackground,
   widthType,
 }) => {
-  const modalRef = useRef<HTMLDivElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null)
   const widthClass = getDimension(widthType as ModalWidthType);
 
-  const handleOffClick = (event: MouseEvent) => {
-    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-      onClose();
-    }
-  };
-
   useEffect(() => {
-    document.addEventListener("mousedown", handleOffClick);
+    const handleOffClick = (event: MouseEvent) => {
+      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+        onClose()
+      }
+    }
+    document.addEventListener('mousedown', handleOffClick)
     return () => {
-      document.removeEventListener("mousedown", handleOffClick);
-    };
-  }, [onClose]);
+      document.removeEventListener('mousedown', handleOffClick)
+    }
+  }, [onClose])
 
   if (!isOpen) {
-    return null;
+    return null
   }
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 ${tailwindStylesOnBackground}`}
+      className={`fixed inset-0 z-50 flex h-full items-center justify-center bg-black/40 ${tailwindStylesOnBackground}`}
     >
       <div
         ref={modalRef}
         className={`bg-dark-gray-c-three rounded-lg shadow-xl w-${widthClass} max-w-6xl  flex flex-col justify-center items-center border-solid border-gray-600 border`}
       >
-        <div className="w-full items-end border-b border-gray-700 px-4 h-0 z-50">
+        <div className="z-50 h-0 w-full items-end border-b border-gray-700 px-4">
           {!hideCloseButton && (
-            <div className="flex justify-end m-2">
+            <div className="m-2 flex justify-end">
               <button
                 onClick={onClose}
-                className="w-5 h-5 flex items-center justify-center text-gray-600 cursor-pointer bg-transparent border-none hover:bg-slate-700 hover:bg-opacity-40"
+                className="flex size-5 cursor-pointer items-center justify-center border-none bg-transparent text-gray-600 hover:bg-slate-700/40"
+                type="button"
               >
                 <span className="text-3xl leading-none">&times;</span>
               </button>
@@ -107,7 +107,7 @@ const ReorModal: React.FC<ModalProps> = ({
         {children}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ReorModal;
+export default ReorModal

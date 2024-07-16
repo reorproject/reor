@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react'
 
-import Switch from "@mui/material/Switch";
+import Switch from '@mui/material/Switch'
 
 // enum SettingsAppearance {
 //   light = "lightMode",
@@ -18,35 +18,24 @@ export interface GenSettingsProps {
 export const CreateAppearanceSection = ({}) => {
   const [isIconSBCompact, setIsIconSBCompact] = useState<boolean>(false);
   const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
-  const [editorAppearance, setEditorApperance] =
-    useState<SettingsAppearance>("dark");
+  // const [editorAppearance, setEditorApperance] =
+  //   useState<SettingsAppearance>("dark");
 
   // Check if SidebarCompact is on or not
   useEffect(() => {
     const fetchParams = async () => {
-      const isIconSBCompact = await window.electronStore.getSBCompact();
+      const storedIsIconSBCompact = await window.electronStore.getSBCompact()
 
-      if (isIconSBCompact !== undefined) {
-        setIsIconSBCompact(isIconSBCompact);
+      if (storedIsIconSBCompact !== undefined) {
+        setIsIconSBCompact(storedIsIconSBCompact)
       }
-    };
+    }
 
-    fetchParams();
-  }, []);
+    fetchParams()
+  }, [])
 
-  // Check if we should display header markdown
-  useEffect(() => {
-    const fetchParams = async () => {
-      const displayMarkdown = await window.electronStore.getDisplayMarkdown();
 
-      if (displayMarkdown !== undefined) {
-        setDisplayMarkdown(displayMarkdown);
-      }
-    };
-
-    fetchParams();
-  }, []);
-
+  console.log("in appearantn");
   return (
     <div className="flex-col w-full">
       <h4 className="text-white flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2 mb-1 mt-10">
@@ -64,9 +53,9 @@ export const CreateAppearanceSection = ({}) => {
         <Switch
           checked={isIconSBCompact}
           onChange={() => {
-            setIsIconSBCompact(!isIconSBCompact);
+            setIsIconSBCompact(!isIconSBCompact)
             if (isIconSBCompact !== undefined) {
-              window.electronStore.setSBCompact(!isIconSBCompact);
+              window.electronStore.setSBCompact(!isIconSBCompact)
             }
           }}
         />
@@ -97,11 +86,34 @@ export const CreateAppearanceSection = ({}) => {
         />
       </div>
     </div>
-  );
-};
+  )
+}
 
 export const CreateEditorSection = () => {
+  const { spellCheckEnabled, setSpellCheckEnabled } = useFileByFilepath()
+  const [userHasMadeUpdate, setUserHasMadeUpdate] = useState(false)
+  const [tempSpellCheckEnabled, setTempSpellCheckEnabled] = useState('false')
   const [editorFlexCenter, setEditorFlexCenter] = useState<boolean>(true);
+
+  useEffect(() => {
+    const fetchParams = async () => {
+      const isSpellCheckEnabled = await window.electronStore.getSpellCheckMode()
+
+      if (isSpellCheckEnabled !== undefined) {
+        setSpellCheckEnabled(isSpellCheckEnabled)
+        setTempSpellCheckEnabled(isSpellCheckEnabled)
+      }
+    }
+
+    fetchParams()
+  }, [spellCheckEnabled, setSpellCheckEnabled])
+
+  const handleSave = () => {
+    // Execute the save function here
+    window.electronStore.setSpellCheckMode(tempSpellCheckEnabled)
+    setSpellCheckEnabled(tempSpellCheckEnabled)
+    setUserHasMadeUpdate(false)
+  }
 
   // Check if we should have flex center for our editor
   useEffect(() => {
@@ -139,7 +151,31 @@ export const CreateEditorSection = () => {
             }
           }}
         />
+        <p className="mb-2 mt-1 text-sm text-gray-300">Spell Check</p>
+        <Switch
+          checked={tempSpellCheckEnabled === 'true'}
+          onChange={() => {
+            setUserHasMadeUpdate(true)
+            if (tempSpellCheckEnabled === 'true') setTempSpellCheckEnabled('false')
+            else setTempSpellCheckEnabled('true')
+          }}
+          inputProps={{ 'aria-label': 'controlled' }}
+        />
+        {userHasMadeUpdate && (
+          <div className="flex">
+            <Button
+              // variant="contained"
+              placeholder=""
+              onClick={handleSave}
+              className="mb-0 mr-4 mt-2 h-8 w-[150px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
+            >
+              Save
+            </Button>
+          </div>
+        )}
+        <p className="text-xs text-yellow-500">Quit and restart the app for it to take effect</p>
       </div>
     </div>
   );
 };
+

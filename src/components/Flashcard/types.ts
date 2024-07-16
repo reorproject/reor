@@ -1,9 +1,9 @@
 export interface FlashcardQAPairUI {
-  question: string;
-  answer: string;
-  isFlipped: boolean;
+  question: string
+  answer: string
+  isFlipped: boolean
 }
 export interface FlashcardQAPair {
-  question: string;
-  answer: string;
+  question: string
+  answer: string
 }

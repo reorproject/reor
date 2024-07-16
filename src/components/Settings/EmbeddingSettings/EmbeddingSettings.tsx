@@ -1,119 +1,103 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react'
 
-import { Button } from "@material-tailwind/react";
-import { EmbeddingModelConfig } from "electron/main/electron-store/storeConfig";
-import posthog from "posthog-js";
+import { Button } from '@material-tailwind/react'
+import { EmbeddingModelConfig } from 'electron/main/electron-store/storeConfig'
+import posthog from 'posthog-js'
 
-import CustomSelect from "../../Common/Select";
-import ChunkSizeSettings from "../ChunkSizeSettings";
+import CustomSelect from '../../Common/Select'
+import ChunkSizeSettings from '../ChunkSizeSettings'
 
-import NewLocalEmbeddingModelModal from "./modals/NewLocalEmbeddingModel";
-import NewRemoteEmbeddingModelModal from "./modals/NewRemoteEmbeddingModel";
+import NewLocalEmbeddingModelModal from './modals/NewLocalEmbeddingModel'
+import NewRemoteEmbeddingModelModal from './modals/NewRemoteEmbeddingModel'
 
 interface EmbeddingModelManagerProps {
   // userHasCompleted?: (completed: boolean) => void;
-  handleUserHasChangedModel?: () => void;
-  userTriedToSubmit?: boolean;
+  handleUserHasChangedModel?: () => void
+  userTriedToSubmit?: boolean
 }
 const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
   // userHasCompleted,
   handleUserHasChangedModel,
   userTriedToSubmit,
 }) => {
-  const [currentError, setCurrentError] = useState<string>("");
-  const [
-    isNewLocalEmbeddingModelModalOpen,
-    setIsNewLocalEmbeddingModelModalOpen,
-  ] = useState<boolean>(false);
-  const [isConextLengthModalOpen, setIsContextLengthModalOpen] =
-    useState<boolean>(false);
-  const [selectedModel, setSelectedModel] = useState<string>("");
-  const [embeddingModels, setEmbeddingModels] = useState<
-    Record<string, EmbeddingModelConfig>
-  >({});
+  const [currentError, setCurrentError] = useState<string>('')
+  const [isNewLocalEmbeddingModelModalOpen, setIsNewLocalEmbeddingModelModalOpen] = useState<boolean>(false)
+  const [isConextLengthModalOpen, setIsContextLengthModalOpen] = useState<boolean>(false)
+  const [selectedModel, setSelectedModel] = useState<string>('')
+  const [embeddingModels, setEmbeddingModels] = useState<Record<string, EmbeddingModelConfig>>({})
 
   const updateEmbeddingModels = async () => {
-    console.log("updating embedding models");
-    const embeddingModels = await window.electronStore.getEmbeddingModels();
-    console.log("embedding models", embeddingModels);
-    if (embeddingModels) {
-      setEmbeddingModels(embeddingModels);
+    const storedEmbeddingModels = await window.electronStore.getEmbeddingModels()
+
+    if (storedEmbeddingModels) {
+      setEmbeddingModels(storedEmbeddingModels)
     }
-    console.log("getting default model");
-    const defaultModel = await window.electronStore.getDefaultEmbeddingModel();
-    console.log("default model", defaultModel);
+
+    const defaultModel = await window.electronStore.getDefaultEmbeddingModel()
+
     if (defaultModel) {
-      setSelectedModel(defaultModel);
+      setSelectedModel(defaultModel)
     }
-  };
+  }
 
   useEffect(() => {
-    updateEmbeddingModels();
-  }, []);
+    updateEmbeddingModels()
+  }, [])
 
   // TODO: perhaps this can be removed as well...
   useEffect(() => {
     if (selectedModel) {
       if (setCurrentError) {
-        setCurrentError("");
+        setCurrentError('')
       }
-    } else {
-      if (setCurrentError) {
-        setCurrentError("No model selected");
-      }
+    } else if (setCurrentError) {
+      setCurrentError('No model selected')
     }
-  }, [selectedModel]);
+  }, [selectedModel])
 
   const handleChangeOnModelSelect = (newSelectedModel: string) => {
-    setSelectedModel(newSelectedModel);
-    window.electronStore.setDefaultEmbeddingModel(newSelectedModel);
-    posthog.capture("change_default_embedding_model", {
+    setSelectedModel(newSelectedModel)
+    window.electronStore.setDefaultEmbeddingModel(newSelectedModel)
+    posthog.capture('change_default_embedding_model', {
       defaultEmbeddingModel: newSelectedModel,
-    });
+    })
     if (handleUserHasChangedModel) {
-      handleUserHasChangedModel();
+      handleUserHasChangedModel()
     }
-  };
+  }
 
   return (
-    <div className="w-full h-full flex flex-col justify-between bg-dark-gray-c-three rounded">
+    <div className="flex size-full flex-col justify-between rounded bg-dark-gray-c-three">
       <div>
-        <h2 className="text-2xl font-semibold mb-0 text-white">
-          Embedding Model
-        </h2>{" "}
-        <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2 mt-2">
+        <h2 className="mb-0 text-2xl font-semibold text-white">Embedding Model</h2>{' '}
+        <div className="mt-2 flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2">
           <div className="flex-col">
             <p className="mt-5 text-gray-100">
               Select Model
-              <p className="text-gray-100 text-xs">
-                If you change this your files will be re-indexed
-              </p>
-            </p>{" "}
+              <p className="text-xs text-gray-100">If you change this your files will be re-indexed</p>
+            </p>{' '}
           </div>
           <div className="flex items-end">
             {Object.keys(embeddingModels).length > 0 && (
               <CustomSelect
-                options={Object.keys(embeddingModels).map((model) => {
-                  return { label: model, value: model };
-                })}
+                options={Object.keys(embeddingModels).map((model) => ({
+                  label: model,
+                  value: model,
+                }))}
                 selectedValue={selectedModel}
                 onChange={handleChangeOnModelSelect}
               />
             )}
           </div>
         </div>
-        <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2">
+        <div className="flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2">
           <div className="flex-col">
-            <h4 className="text-gray-200 font-normal mb-0">
-              Attach Local Model
-            </h4>
-            <p className="text-gray-100 text-xs">
-              Attach a local HuggingFace model.
-            </p>
+            <h4 className="mb-0 font-normal text-gray-200">Attach Local Model</h4>
+            <p className="text-xs text-gray-100">Attach a local HuggingFace model.</p>
           </div>
           <div className="flex">
             <Button
-              className="flex justify-between items-center w-[80px] py-2 border border-gray-300 rounded-md border-none cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten font-normal"
+              className="flex w-[80px] cursor-pointer items-center justify-between rounded-md border border-none border-gray-300 bg-dark-gray-c-eight py-2 font-normal hover:bg-dark-gray-c-ten"
               onClick={() => setIsNewLocalEmbeddingModelModalOpen(true)}
               placeholder=""
             >
@@ -121,18 +105,14 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
             </Button>
           </div>
         </div>
-        <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-2">
+        <div className="flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2">
           <div className="flex-col">
-            <h4 className="text-gray-200 font-normal mb-0">
-              Download Remote Model
-            </h4>
-            <p className="text-gray-100 text-xs">
-              Reor will download a HuggingFace embedding model for you.
-            </p>
+            <h4 className="mb-0 font-normal text-gray-200">Download Remote Model</h4>
+            <p className="text-xs text-gray-100">Reor will download a HuggingFace embedding model for you.</p>
           </div>
           <div className="flex">
             <Button
-              className="flex justify-between items-center w-[80px] py-2 border border-gray-300 rounded-md border-none cursor-pointer bg-dark-gray-c-eight hover:bg-dark-gray-c-ten font-normal"
+              className="flex w-[80px] cursor-pointer items-center justify-between rounded-md border border-none border-gray-300 bg-dark-gray-c-eight py-2 font-normal hover:bg-dark-gray-c-ten"
               onClick={() => setIsContextLengthModalOpen(true)}
               placeholder=""
             >
@@ -142,52 +122,45 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
         </div>
         <ChunkSizeSettings>
           <div className="flex-col">
-            <h4 className="text-gray-200 font-normal mb-0">
-              Change Chunk Size
-            </h4>
-            <p className="text-gray-100 text-xs">
-              A larger chunk size means more context is fed to the model at the
-              cost of &quot;needle in a haystack&quot; effects.
+            <h4 className="mb-0 font-normal text-gray-200">Change Chunk Size</h4>
+            <p className="text-xs text-gray-100">
+              A larger chunk size means more context is fed to the model at the cost of &quot;needle in a haystack&quot;
+              effects.
             </p>
           </div>
         </ChunkSizeSettings>
       </div>
       {/* Warning message at the bottom */}
-      <p className=" text-gray-100 text-xs">
-        <i>
-          Note: If you notice some lag in the editor it is likely because you
-          chose too large of a model...
-        </i>
-      </p>{" "}
+      <p className=" text-xs text-gray-100">
+        <i>Note: If you notice some lag in the editor it is likely because you chose too large of a model...</i>
+      </p>{' '}
       <NewLocalEmbeddingModelModal
         isOpen={isNewLocalEmbeddingModelModalOpen}
         onClose={() => {
-          setIsNewLocalEmbeddingModelModalOpen(false);
+          setIsNewLocalEmbeddingModelModalOpen(false)
         }}
         handleUserHasChangedModel={() => {
-          updateEmbeddingModels();
+          updateEmbeddingModels()
           if (handleUserHasChangedModel) {
-            handleUserHasChangedModel();
+            handleUserHasChangedModel()
           }
         }}
       />
       <NewRemoteEmbeddingModelModal
         isOpen={isConextLengthModalOpen}
         onClose={() => {
-          setIsContextLengthModalOpen(false);
+          setIsContextLengthModalOpen(false)
         }}
         handleUserHasChangedModel={() => {
-          updateEmbeddingModels();
+          updateEmbeddingModels()
           if (handleUserHasChangedModel) {
-            handleUserHasChangedModel();
+            handleUserHasChangedModel()
           }
         }}
       />
-      {userTriedToSubmit && !selectedModel && (
-        <p className="text-red-500 text-sm mt-1">{currentError}</p>
-      )}
+      {userTriedToSubmit && !selectedModel && <p className="mt-1 text-sm text-red-500">{currentError}</p>}
     </div>
-  );
-};
+  )
+}
 
-export default EmbeddingModelSettings;
+export default EmbeddingModelSettings
