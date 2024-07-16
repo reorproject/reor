@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 
 import { Button } from "@material-tailwind/react";
@@ -35,8 +34,9 @@ const AnalyticsSettings: React.FC<AnalyticsSettingsProps> = () => {
     <div className="w-full bg-dark-gray-c-three rounded pb-7 ">
       <h2 className="text-2xl font-semibold mb-0 text-white">Analytics</h2>{" "}
       <p className="text-gray-200 text-sm mb-2 mt-5">
-        Reor tracks anonymous usage data to help improve the app. We never share this personal data. This is solely to track which features are
-        popular. You can disable this at any time:
+        Reor tracks anonymous usage data to help improve the app. We never share
+        this personal data. This is solely to track which features are popular.
+        You can disable this at any time:
       </p>
       <Switch
         checked={isAnalyticsEnabled}

@@ -229,7 +229,7 @@ const TableSizeSelector: React.FC<TableSizeSelectorProps> = ({ onSelect }) => {
   };
 
   return (
-    <div className="table-size-selector flex flex-col justify-center items-center">
+    <div className="table-size-selector flex flex-col justify-center items-center cursor-pointer">
       {generateCells()}
       <div className="flex justify-center w-full pt-2">
         <div className="text-white">

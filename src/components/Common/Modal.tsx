@@ -24,9 +24,16 @@ type ModalWidthType =
   | "newEmbeddingModel"
   | "localLLMSetting"
   | "remoteLLMSetting"
-  | "indexingProgress";
+  | "indexingProgress"
+  | "settingsContainer";
 
-type Dimension = "[500px]" | "[750px]" | "[300px]" | "full" | "[850px]";
+type Dimension =
+  | "[500px]"
+  | "[750px]"
+  | "[300px]"
+  | "full"
+  | "[850px]"
+  | "[900px]";
 
 const customDimensionsMap: Record<ModalWidthType, Dimension> = {
   newNote: "[500px]",
@@ -39,6 +46,7 @@ const customDimensionsMap: Record<ModalWidthType, Dimension> = {
   localLLMSetting: "[500px]",
   remoteLLMSetting: "[500px]",
   indexingProgress: "[850px]",
+  settingsContainer: "[900px]",
 };
 
 const getDimension = (name: ModalWidthType | undefined): Dimension => {

@@ -208,9 +208,11 @@ const FileEditorContainer: React.FC<FileEditorContainerProps> = () => {
             )}
           </div>
         ) : (
-          <div className="relative w-full h-full flex overflow-hidden">
-            <EmptyPage vaultDirectory={vaultDirectory} />
-          </div>
+          !showChatbot && (
+            <div className="relative w-full h-full flex overflow-hidden">
+              <EmptyPage vaultDirectory={vaultDirectory} />
+            </div>
+          )
         )}
 
         {showChatbot && (
