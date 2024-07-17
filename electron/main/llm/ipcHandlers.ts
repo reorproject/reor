@@ -52,7 +52,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
             llmName,
             llmConfig,
             isJSONMode,
-            request.displayableChatHistory,
+            chatHistory,
             handleOpenAIChunk,
             store.get(StoreKeys.LLMGenerationParameters),
           )
@@ -62,7 +62,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
             llmName,
             llmConfig,
             isJSONMode,
-            request.displayableChatHistory,
+            chatHistory,
             handleAnthropicChunk,
             store.get(StoreKeys.LLMGenerationParameters),
           )

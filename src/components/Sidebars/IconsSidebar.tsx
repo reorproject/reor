@@ -73,7 +73,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ openRelativePath, sidebarSh
   const filesIconContextValue = useMemo(() => ({ color: sidebarShowing === 'files' ? 'white' : 'gray' }), [sidebarShowing])
   const chatsIconContextValue = useMemo(() => ({ color: sidebarShowing === 'chats' ? 'white' : 'gray' }), [sidebarShowing])
   const searchIconContextValue = useMemo(
-    () => ({ color: sidebarShowing === 'search' ? 'salmon' : '' }),
+    () => ({ color: sidebarShowing === 'search' ? 'white' : 'gray' }),
     [sidebarShowing],
   )
   return (

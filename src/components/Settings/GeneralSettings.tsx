@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from 'react'
-
-import { Button } from '@material-tailwind/react'
-import Switch from '@mui/material/Switch'
-
-import useFileByFilepath from '../File/hooks/use-file-by-filepath'
-
-import {  CreateAppearanceSection, GenSettingsProps, CreateEditorSection } from './GeneralSections'
+import { CreateAppearanceSection, GenSettingsProps, CreateEditorSection } from './GeneralSections'
 
 /*
  *  General Page has the following format:

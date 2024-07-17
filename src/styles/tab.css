@@ -1,15 +1,15 @@
 /* CSS for dropdown animation onMouseEnter */
 .tab-tooltip {
     position: absolute;
-    /* background-color: #fff; */
+    background-color: black;
     color: white;
     padding: 5px 10px;
-    border-radius: 4px;
+    border-radius: 8px;
     white-space: no-wrap;
     z-index: 1010;
     animation: fadeIn 0.3s ease-in-out;
     height: 30px;
-    width: 150px;
+    width: fit-content;
     font-size: 14px;
     text-align: center;
 }

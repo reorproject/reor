@@ -45,7 +45,7 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = ({
   ]
 
   return (
-    <div className="w-[500px] p-5">
+    <div className="">
       <h2 className="mb-4 font-semibold text-white">LLM</h2>
       {llmConfigs.length > 0 && (
         <div className="flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2">
