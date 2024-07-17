@@ -47,7 +47,7 @@ const SettingsModal: React.FC<ModalProps> = ({
       }}
       widthType={"settingsContainer"}
     >
-      <div className="flex w-[900px] h-[800px]">
+      <div className="flex w-[900px] xl:h-[800px] lg:h-[600px] md:h-[600px]">
         <div className="flex flex-col w-[200px] h-full bg-dark-gray-c-seven text-white border-r-[0.1px] border-gray-700 border-solid border-b-0 border-t-0 border-l-0 p-2">
           <div
             className={`flex items-center mt-2 rounded cursor-pointer p-2 border-b border-gray-200 hover:bg-neutral-600 text-sm ${

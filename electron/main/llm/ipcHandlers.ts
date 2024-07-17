@@ -44,8 +44,6 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
         event.sender.send('anthropicTokenStream', chatHistory.id, chunk)
       }
 
-      console.log("Registered LLM");
-
       switch (llmConfig.type) {
         case LLMType.OpenAI:
           await openAISession.streamingResponse(

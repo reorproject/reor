@@ -183,6 +183,6 @@ export const CreateEditorSection = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
