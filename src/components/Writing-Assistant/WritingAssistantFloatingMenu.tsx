@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
 
 import { MessageStreamEvent } from "@anthropic-ai/sdk/resources";
 import Button from "@mui/material/Button";
@@ -32,6 +32,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   const [customPrompt, setCustomPrompt] = useState<string>("");
   const [isOptionsVisible, setIsOptionsVisible] = useState<boolean>(false);
   const [prevPrompt, setPrevPrompt] = useState<string>("");
+  const [positionStyle, setPositionStyle] = useState({ top: 0, left: 0 });
   const markdownContainerRef = useRef(null);
   const optionsContainerRef = useRef(null);
   const hasValidMessages = currentChatHistory?.displayableChatHistory.some(
@@ -53,6 +54,43 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       setIsOptionsVisible(false);
     }
   }, [hasValidMessages]);
+
+  useLayoutEffect(() => {
+    if (!isOptionsVisible) return;
+
+    const calculatePosition = () => {
+      if (!optionsContainerRef.current) {
+        console.log("Ref not attached yet");
+        return;
+      }
+
+      const screenHeight = window.innerHeight;
+      const elementHeight = optionsContainerRef.current.offsetHeight;
+      const spaceBelow = screenHeight - highlightData.position.top;
+      const isSpaceEnough = spaceBelow >= elementHeight;
+
+      console.log("Screen Height:", screenHeight);
+      console.log("Element Height:", elementHeight);
+      console.log("Space Below:", spaceBelow);
+      console.log("Is Space Enough:", isSpaceEnough);
+
+      if (isSpaceEnough) {
+        console.log("space enough");
+        setPositionStyle({
+          top: highlightData.position.top,
+          left: highlightData.position.left,
+        });
+      } else {
+        console.log("space not enough");
+        setPositionStyle({
+          top: highlightData.position.top - elementHeight,
+          left: highlightData.position.left,
+        });
+      }
+    };
+
+    calculatePosition();
+  }, [isOptionsVisible, highlightData.position]);
 
   const copyToClipboard = () => {
     if (
@@ -335,8 +373,8 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
         <div
           ref={optionsContainerRef}
           style={{
-            top: highlightData.position.top,
-            left: highlightData.position.left,
+            top: positionStyle.top,
+            left: positionStyle.left,
           }}
           className="absolute bg-white border border-gray-300 p-2.5 z-50 w-96 rounded-md"
         >
@@ -384,8 +422,8 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           ref={markdownContainerRef}
           className="absolute bg-white border border-gray-300 rounded-lg shadow-md p-2.5 z-50"
           style={{
-            top: highlightData.position.top,
-            left: highlightData.position.left,
+            top: positionStyle.top,
+            left: positionStyle.left,
             width: "385px",
           }}
         >
