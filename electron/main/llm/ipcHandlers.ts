@@ -2,7 +2,7 @@ import { MessageStreamEvent } from '@anthropic-ai/sdk/resources'
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import Store from 'electron-store'
 import { ProgressResponse } from 'ollama'
-import { ChatCompletionChunk } from 'openai/resources/chat/completions'
+import { ChatCompletionChunk, ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 
 import { LLMConfig, StoreKeys, StoreSchema } from '../electron-store/storeConfig'
 
@@ -13,7 +13,6 @@ import OllamaService from './models/Ollama'
 import OpenAIModelSessionService from './models/OpenAI'
 import { LLMSessionService } from './types'
 import { ChatHistory } from '@/components/Chat/chatUtils'
-import { ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 
 enum LLMType {
   OpenAI = 'openai',
