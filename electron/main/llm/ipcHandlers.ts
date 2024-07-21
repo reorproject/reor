@@ -13,6 +13,7 @@ import OllamaService from './models/Ollama'
 import OpenAIModelSessionService from './models/OpenAI'
 import { LLMSessionService } from './types'
 import { ChatHistory } from '@/components/Chat/chatUtils'
+import { ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 
 enum LLMType {
   OpenAI = 'openai',
@@ -44,13 +45,18 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
         event.sender.send('anthropicTokenStream', chatHistory.id, chunk)
       }
 
+      const transformedChatHistory: ChatCompletionMessageParam[] = chatHistory.displayableChatHistory.map((message) => {
+        const { messageType, context, visibleContent, ...rest } = message
+        return rest
+      })
+
       switch (llmConfig.type) {
         case LLMType.OpenAI:
           await openAISession.streamingResponse(
             llmName,
             llmConfig,
             isJSONMode,
-            chatHistory,
+            transformedChatHistory,
             handleOpenAIChunk,
             store.get(StoreKeys.LLMGenerationParameters),
           )
@@ -60,7 +66,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
             llmName,
             llmConfig,
             isJSONMode,
-            chatHistory,
+            transformedChatHistory,
             handleAnthropicChunk,
             store.get(StoreKeys.LLMGenerationParameters),
           )

@@ -76,7 +76,7 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({ isOpen, onClo
   }, [])
 
   return (
-    <ReorModal isOpen={isOpen} onClose={onClose} widthType={"localLLMSetting"}>
+    <ReorModal isOpen={isOpen} onClose={onClose} widthType="localLLMSetting">
       <div className="mx-2 mb-2 w-[400px] pl-3">
         <h2 className="mb-0  font-semibold text-white">New Local LLM</h2>
         <p className="mb-6 mt-1 text-xs text-white">

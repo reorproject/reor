@@ -39,7 +39,10 @@ export default {
       },
       transitionDuration: {
         '400': '400ms'
-      }
+      },
+      fontSize: {
+        '2lg': '1.0rem',
+      },
     },
   },
   corePlugins: {

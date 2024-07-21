@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 
 import { Editor, EditorContent } from '@tiptap/react'
 
+import { IpcRendererEvent } from 'electron'
 import InEditorBacklinkSuggestionsDisplay, { SuggestionsState } from './BacklinkSuggestionsDisplay'
 import EditorContextMenu from './EditorContextMenu'
 
@@ -22,7 +23,7 @@ const EditorManager: React.FC<EditorManagerProps> = ({
   const [searchTerm, setSearchTerm] = useState('')
   const [menuVisible, setMenuVisible] = useState(false)
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
-  const [editorFlex, setEditorFlex] = useState(true);
+  const [editorFlex, setEditorFlex] = useState(true)
 
   const toggleSearch = useCallback(() => {
     setShowSearch((prevShowSearch) => !prevShowSearch)
@@ -88,23 +89,23 @@ const EditorManager: React.FC<EditorManagerProps> = ({
   // If "Content Flex Center" is set to true in Settings, then it centers the content of the Editor
   useEffect(() => {
     const initEditorContentCenter = async () => {
-      const isCenter = await window.electronStore.getEditorFlexCenter();
-      setEditorFlex(isCenter);
-    };
+      const isCenter = await window.electronStore.getEditorFlexCenter()
+      setEditorFlex(isCenter)
+    }
 
-    const handleEditorChange = (event, editorFlexCenter: boolean) => {
-      setEditorFlex(editorFlexCenter);
-    };
+    const handleEditorChange = (event: IpcRendererEvent, editorFlexCenter: boolean) => {
+      setEditorFlex(editorFlexCenter)
+    }
 
-    initEditorContentCenter();
-    window.ipcRenderer.on("editor-flex-center-changed", handleEditorChange);
+    initEditorContentCenter()
+    window.ipcRenderer.on('editor-flex-center-changed', handleEditorChange)
     // return () => {
     //   window.ipcRenderer.removeListener(
     //     "editor-flex-center-changed",
     //     handleEditorChange
     //   );
     // };
-  }, []);
+  }, [])
 
   return (
     <div
@@ -130,15 +131,10 @@ const EditorManager: React.FC<EditorManagerProps> = ({
           className="absolute right-0 top-4 z-50 mr-14 mt-4 rounded-md border-none  bg-transparent p-2 text-white"
         />
       )}
-      <div
-        className={`${
-          editorFlex ? "flex justify-center items-center h-screen p-4" : ""
-        }`}
-      >
+      {menuVisible && <EditorContextMenu editor={editor} menuPosition={menuPosition} setMenuVisible={setMenuVisible} />}
+      <div className={`${editorFlex ? 'flex h-screen items-center justify-center p-4' : ''}`}>
         <EditorContent
-          className={`w-full ${
-            editorFlex ? "max-w-3xl" : ""
-          } h-full overflow-y-auto p-4 word-break`}
+          className={`w-full ${editorFlex ? 'max-w-3xl' : ''} h-full overflow-y-auto p-4`}
           style={{
             wordBreak: 'break-word',
             backgroundColor: 'rgb(30, 30, 30)',

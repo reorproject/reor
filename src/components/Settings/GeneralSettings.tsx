@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { CreateAppearanceSection, GenSettingsProps, CreateEditorSection } from './GeneralSections'
+import React from 'react'
+import { CreateAppearanceSection, CreateEditorSection } from './GeneralSections'
 
 /*
  *  General Page has the following format:
@@ -19,7 +19,7 @@ import { CreateAppearanceSection, GenSettingsProps, CreateEditorSection } from '
  * SubHeader describe the part of the project you are changing (appearance, editor, sidebar, etc..). Option(s) is the name of the specific change.
  */
 
-const GeneralSettings: React.FC<GenSettingsProps> = () => {
+const GeneralSettings = () => {
   return (
     <div className="w-full flex-col justify-between rounded bg-dark-gray-c-three">
       <h2 className="mb-0 text-2xl font-semibold text-white">General</h2>

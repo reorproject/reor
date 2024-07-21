@@ -48,7 +48,7 @@ const NewRemoteEmbeddingModelModal: React.FC<NewRemoteEmbeddingModelModalProps> 
   }
 
   return (
-    <ReorModal isOpen={isOpen} onClose={saveModelConfigToElectronStore} widthType={"remoteLLMSetting"}>
+    <ReorModal isOpen={isOpen} onClose={saveModelConfigToElectronStore} widthType="remoteLLMSetting">
       <div className="mx-2 mb-2 w-[400px] pl-3">
         <h2 className="mb-0  font-semibold text-white">Set up remote model</h2>
         <p className="mb-6 mt-2 text-xs text-white">

@@ -34,7 +34,7 @@ const useFileByFilepath = () => {
   const [suggestionsState, setSuggestionsState] = useState<SuggestionsState | null>()
   const [needToWriteEditorContentToDisk, setNeedToWriteEditorContentToDisk] = useState<boolean>(false)
   const [needToIndexEditorContent, setNeedToIndexEditorContent] = useState<boolean>(false)
-  const [spellCheckEnabled, setSpellCheckEnabled] = useState<string>('false')
+  const [spellCheckEnabled, setSpellCheckEnabled] = useState<boolean>(false)
 
   useEffect(() => {
     const fetchSpellCheckMode = async () => {
@@ -185,7 +185,7 @@ const useFileByFilepath = () => {
       editor.setOptions({
         editorProps: {
           attributes: {
-            spellcheck: spellCheckEnabled,
+            spellcheck: spellCheckEnabled.toString(),
           },
         },
       })

@@ -2,16 +2,17 @@ import path from 'path'
 
 import { ipcMain } from 'electron'
 import Store from 'electron-store'
-
-import WindowsManager from '../common/windowManager'
-
 import {
+  Tab,
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
   StoreKeys,
   StoreSchema,
 } from './storeConfig'
+
+import WindowsManager from '../common/windowManager'
+
 import { initializeAndMaybeMigrateStore } from './storeSchemaMigrator'
 import { ChatHistory } from '@/components/Chat/chatUtils'
 
@@ -114,12 +115,12 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
 
   ipcMain.handle('get-sb-compact', () => store.get(StoreKeys.IsSBCompact))
 
-  ipcMain.handle('get-editor-flex-center', () => store.get(StoreKeys.EditorFlexCenter));
+  ipcMain.handle('get-editor-flex-center', () => store.get(StoreKeys.EditorFlexCenter))
 
   ipcMain.handle('set-editor-flex-center', (event, setEditorFlexCenter) => {
-    store.set(StoreKeys.EditorFlexCenter, setEditorFlexCenter);
-    event.sender.send('editor-flex-center-changed', setEditorFlexCenter);
-  });
+    store.set(StoreKeys.EditorFlexCenter, setEditorFlexCenter)
+    event.sender.send('editor-flex-center-changed', setEditorFlexCenter)
+  })
 
   ipcMain.handle('set-analytics-mode', (event, isAnalytics) => {
     store.set(StoreKeys.Analytics, isAnalytics)
@@ -195,73 +196,72 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
       return
     }
 
-    const chatHistoriesMap = store.get(StoreKeys.ChatHistories);
-    const allChatHistories = chatHistoriesMap[vaultDir] || [];
+    const chatHistoriesMap = store.get(StoreKeys.ChatHistories)
+    const allChatHistories = chatHistoriesMap[vaultDir] || []
     const filteredChatHistories = allChatHistories.filter((item) => item.id !== chatID)
 
-    chatHistoriesMap[vaultDir] = filteredChatHistories.reverse();
-    store.set(StoreKeys.ChatHistories, chatHistoriesMap);
-  });
+    chatHistoriesMap[vaultDir] = filteredChatHistories.reverse()
+    store.set(StoreKeys.ChatHistories, chatHistoriesMap)
+  })
 
-  ipcMain.handle('get-current-open-files', () => store.get(StoreKeys.OpenTabs) || []);
+  ipcMain.handle('get-current-open-files', () => store.get(StoreKeys.OpenTabs) || [])
 
   ipcMain.handle('set-current-open-files', (event, action, args) => {
-    const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || [];
+    const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || []
 
-    const addTab = ({ tab }) => {
-      if (tab === null) return;
-      const existingTab = openTabs.findIndex((item) => item.filePath === tab.filePath);
+    const addTab = ({ tab }: { tab: Tab }) => {
+      if (tab === null) return
+      const existingTab = openTabs.findIndex((item) => item.filePath === tab.filePath)
 
       /* If tab is already open, do not do anything */
-      if (existingTab !== -1) return;
+      if (existingTab !== -1) return
 
-      openTabs.push(tab);
-      store.set(StoreKeys.OpenTabs, openTabs);
-    };
+      openTabs.push(tab)
+      store.set(StoreKeys.OpenTabs, openTabs)
+    }
 
-    const removeTab = ({ tabId }) => {
-      const updatedTabs = openTabs.filter((tab) => tab.id !== tabId);
-      store.set(StoreKeys.OpenTabs, updatedTabs);
-    };
+    const removeTab = ({ tabId, idx, newIndex }: { tabId: string; idx: number; newIndex: number }) => {
+      openTabs[idx].lastAccessed = false
+      openTabs[newIndex].lastAccessed = true
+      const updatedTabs = openTabs.filter((tab) => tab.id !== tabId)
+      store.set(StoreKeys.OpenTabs, updatedTabs)
+    }
 
     const clearAllTabs = () => {
-      store.set(StoreKeys.OpenTabs, []);
-    };
+      store.set(StoreKeys.OpenTabs, [])
+    }
 
-    const updateTab = ({ draggedIndex, targetIndex }) => {
+    const updateTab = ({ draggedIndex, targetIndex }: { draggedIndex: number; targetIndex: number }) => {
       // Swap dragged and target
-      [openTabs[draggedIndex], openTabs[targetIndex]] = [
-        openTabs[targetIndex],
-        openTabs[draggedIndex],
-      ];
-      store.set(StoreKeys.OpenTabs, openTabs);
-    };
+      ;[openTabs[draggedIndex], openTabs[targetIndex]] = [openTabs[targetIndex], openTabs[draggedIndex]]
+      store.set(StoreKeys.OpenTabs, openTabs)
+    }
 
-    const selectTab = ({ tabs }) => {
-      store.set(StoreKeys.OpenTabs, tabs);
-    };
+    const selectTab = ({ tabs }: { tabs: Tab[] }) => {
+      store.set(StoreKeys.OpenTabs, tabs)
+    }
 
     switch (action) {
-      case "add":
-        addTab(args);
-        break;
-      case "remove":
-        removeTab(args);
-        break;
-      case "update":
-        updateTab(args);
-        break;
-      case "select":
-        selectTab(args);
-        break;
-      case "clear":
-        clearAllTabs();
-        break;
+      case 'add':
+        addTab(args)
+        break
+      case 'remove':
+        removeTab(args)
+        break
+      case 'update':
+        updateTab(args)
+        break
+      case 'select':
+        selectTab(args)
+        break
+      case 'clear':
+        clearAllTabs()
+        break
       default:
-        throw new Error('Unsupported action type');
+        throw new Error('Unsupported action type')
     }
-  });
-};
+  })
+}
 
 export function getDefaultEmbeddingModelConfig(store: Store<StoreSchema>): EmbeddingModelConfig {
   const defaultEmbeddingModelAlias = store.get(StoreKeys.DefaultEmbeddingModelAlias) as string | undefined

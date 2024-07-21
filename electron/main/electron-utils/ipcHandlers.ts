@@ -20,7 +20,7 @@ const electronUtilsHandlers = (
       new MenuItem({
         label: 'New Note',
         click: () => {
-          event.sender.send('add-new-note-response');
+          event.sender.send('add-new-note-response')
         },
       }),
     )
@@ -29,7 +29,7 @@ const electronUtilsHandlers = (
       new MenuItem({
         label: 'New Directory',
         click: () => {
-          event.sender.send('add-new-directory-response');
+          event.sender.send('add-new-directory-response')
         },
       }),
     )
@@ -49,7 +49,7 @@ const electronUtilsHandlers = (
         new MenuItem({
           label: 'New Note',
           click: () => {
-            event.sender.send('add-new-note-response', file.relativePath);
+            event.sender.send('add-new-note-response', file.relativePath)
           },
         }),
       )
@@ -58,7 +58,7 @@ const electronUtilsHandlers = (
         new MenuItem({
           label: 'New Directory',
           click: () => {
-            event.sender.send('add-new-directory-response', file.path);
+            event.sender.send('add-new-directory-response', file.path)
           },
         }),
       )
@@ -152,17 +152,17 @@ const electronUtilsHandlers = (
     windowsManager.createWindow(store, preload, url, indexHtml)
   })
 
-  ipcMain.handle('get-reor-app-version', async () => app.getVersion());
+  ipcMain.handle('get-reor-app-version', async () => app.getVersion())
 
   // Used on EmptyPage.tsx to create a new file
   ipcMain.handle('empty-new-note-listener', (event, relativePath) => {
-    event.sender.send('add-new-note-response', relativePath);
-  });
+    event.sender.send('add-new-note-response', relativePath)
+  })
 
   // Used on EmptyPage.tsx to create a new directory
   ipcMain.handle('empty-new-directory-listener', (event, relativePath) => {
-    event.sender.send('add-new-directory-response', relativePath);
-  });
-};
+    event.sender.send('add-new-directory-response', relativePath)
+  })
+}
 
 export default electronUtilsHandlers

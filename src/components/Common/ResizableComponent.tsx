@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useEffect, CSSProperties } from 'react'
 
 interface ResizableComponentProps {
-  children: React.ReactNode;
-  initialWidth?: number;
-  resizeSide: "left" | "right" | "both";
-  onResize: (width: number) => void;
+  children: React.ReactNode
+  initialWidth?: number
+  resizeSide: 'left' | 'right' | 'both'
+  onResize?: (width: number) => void
 }
 
 const ResizableComponent: React.FC<ResizableComponentProps> = ({
@@ -13,9 +13,9 @@ const ResizableComponent: React.FC<ResizableComponentProps> = ({
   resizeSide,
   onResize,
 }) => {
-  const [width, setWidth] = useState<number>(initialWidth);
-  const [isDragging, setIsDragging] = useState<boolean>(false);
-  const setMaximumWidthCap = 400;
+  const [width, setWidth] = useState<number>(initialWidth)
+  const [isDragging, setIsDragging] = useState<boolean>(false)
+  const setMaximumWidthCap = 400
 
   const startDragging = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault()
@@ -25,21 +25,21 @@ const ResizableComponent: React.FC<ResizableComponentProps> = ({
   const onDrag = useCallback(
     (e: MouseEvent) => {
       if (isDragging) {
-        const deltaWidth = resizeSide === "left" ? -e.movementX : e.movementX;
+        const deltaWidth = resizeSide === 'left' ? -e.movementX : e.movementX
         setWidth((prevWidth) => {
-          const newWidth = prevWidth + deltaWidth;
-          if (newWidth > setMaximumWidthCap) return setMaximumWidthCap;
-          if (newWidth < 50) return 50;
-          return newWidth;
-        });
+          const newWidth = prevWidth + deltaWidth
+          if (newWidth > setMaximumWidthCap) return setMaximumWidthCap
+          if (newWidth < 50) return 50
+          return newWidth
+        })
       }
     },
     [isDragging, resizeSide],
   )
 
   useEffect(() => {
-    if (onResize) onResize(width);
-  }, [width]);
+    if (onResize) onResize(width)
+  }, [onResize, width])
 
   const stopDragging = useCallback(() => {
     setIsDragging(false)
@@ -74,11 +74,11 @@ const ResizableComponent: React.FC<ResizableComponentProps> = ({
     <div
       style={{
         width: `${width}px`,
-        resize: "none",
-        overflow: "auto",
+        resize: 'none',
+        overflow: 'auto',
         maxWidth: `${setMaximumWidthCap}px`,
-        position: "relative",
-        height: "100%",
+        position: 'relative',
+        height: '100%',
       }}
       onMouseDown={resizeSide === 'both' ? startDragging : undefined}
     >

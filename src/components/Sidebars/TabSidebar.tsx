@@ -1,20 +1,31 @@
-import React, { useState } from "react";
-import { removeFileExtension } from "@/utils/strings";
-import { FaPlus } from "react-icons/fa6";
-import { createPortal } from "react-dom";
-import "../../styles/tab.css";
+import React, { useState, DragEventHandler } from 'react'
+import { FaPlus } from 'react-icons/fa6'
+import { createPortal } from 'react-dom'
+import { removeFileExtension } from '@/utils/strings'
+import '../../styles/tab.css'
+import { Tab } from '../Providers/TabProvider'
 
 interface DraggableTabsProps {
-  openTabs: Tab[];
-  onTabSelect: (tab: Tab) => void;
-  onTabClose: (event: any, tabId: string) => void;
-  currentFilePath: string;
-  updateTabOrder: (draggedIndex: number, targetIndex: number) => void;
+  openTabs: Tab[]
+  onTabSelect: (tab: Tab) => void
+  onTabClose: (event: any, tabId: string) => void
+  currentFilePath: string
+  updateTabOrder: (draggedIndex: number, targetIndex: number) => void
 }
 
 interface TooltipProps {
-  filepath: string;
-  position: { x: number; y: number };
+  filepath: string
+  position: { x: number; y: number }
+}
+
+/* Displays the filepath when hovering on a tab */
+const Tooltip: React.FC<TooltipProps> = ({ filepath, position }) => {
+  return createPortal(
+    <div className="tab-tooltip" style={{ top: `${position.y}px`, left: `${position.x}px` }}>
+      {filepath}
+    </div>,
+    document.getElementById('tooltip-container') as HTMLElement,
+  )
 }
 
 const DraggableTabs: React.FC<DraggableTabsProps> = ({
@@ -24,56 +35,56 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
   currentFilePath,
   updateTabOrder,
 }) => {
-  const [hoveredTab, setHoveredTab] = useState<string | null>(null);
-  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [hoveredTab, setHoveredTab] = useState<string | null>(null)
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
 
   const onDragStart = (event: any, tabId: string) => {
-    event.dataTransfer.setData("tabId", tabId);
-  };
+    event.dataTransfer.setData('tabId', tabId)
+  }
 
-  const onDrop = (event) => {
-    event.preventDefault();
-    const draggedTabId = event.dataTransfer.getData("tabId");
+  const onDrop: DragEventHandler<HTMLDivElement> = (event) => {
+    event.preventDefault()
+    const draggedTabId = event.dataTransfer.getData('tabId')
 
-    let target = event.target;
+    let target = event.target as HTMLElement | null
     // Iterate each child until we find the one we moved to
-    while (target && !target.getAttribute("data-tabid")) {
-      target = target.parentElement;
+    while (target && !target.getAttribute('data-tabid')) {
+      target = target.parentElement as HTMLElement | null
     }
 
-    const targetTabId = target ? target.getAttribute("data-tabid") : null;
+    const targetTabId = target ? target.getAttribute('data-tabid') : null
 
     if (draggedTabId && targetTabId) {
-      const draggedIndex = openTabs.findIndex((tab) => tab.id === draggedTabId);
-      const targetIndex = openTabs.findIndex((tab) => tab.id === targetTabId);
-      updateTabOrder(draggedIndex, targetIndex);
+      const draggedIndex = openTabs.findIndex((tab) => tab.id === draggedTabId)
+      const targetIndex = openTabs.findIndex((tab) => tab.id === targetTabId)
+      updateTabOrder(draggedIndex, targetIndex)
     }
-  };
+  }
 
-  const onDragOver = (event: any) => {
-    event.preventDefault();
-  };
+  const onDragOver: DragEventHandler<HTMLDivElement> = (event) => {
+    event.preventDefault()
+  }
 
-  const handleMouseEnter = (e, tab) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    setHoveredTab(tab.filePath);
+  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, tab: Tab) => {
+    const rect = e.currentTarget.getBoundingClientRect() || null
+    setHoveredTab(tab.filePath)
     setTooltipPosition({
       x: rect.left - 75,
       y: rect.bottom - 5,
-    });
-  };
+    })
+  }
 
   const handleMouseLevel = () => {
-    setHoveredTab(null);
-  };
+    setHoveredTab(null)
+  }
 
   return (
-    <div className="flex whitespace-nowrap custom-scrollbar items-center relative">
+    <div className="relative flex items-center whitespace-nowrap">
       {openTabs.map((tab) => (
         <div
           id="titleBarSingleTab"
           key={tab.id}
-          className="flex justify-center items-center h-[10px]"
+          className="flex h-[10px] items-center justify-center"
           onMouseEnter={(e) => handleMouseEnter(e, tab)}
           onMouseLeave={handleMouseLevel}
         >
@@ -83,56 +94,37 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
             onDragStart={(event) => onDragStart(event, tab.id)}
             onDrop={onDrop}
             onDragOver={onDragOver}
-            className={`relative py-2 px-2 text-white cursor-pointer flex justify-between gap-1 items-center text-sm w-[150px]
-              ${
-                currentFilePath === tab.filePath
-                  ? "bg-dark-gray-c-three rounded-md"
-                  : "rounded-md"
-              }`}
+            className={`relative flex w-[150px] cursor-pointer items-center justify-between gap-1 p-2 text-sm text-white
+              ${currentFilePath === tab.filePath ? 'rounded-md bg-dark-gray-c-three' : 'rounded-md'}`}
             onClick={() => onTabSelect(tab)}
           >
             <span className="truncate">{removeFileExtension(tab.title)}</span>
             <span
-              className="text-md cursor-pointer px-1 hover:bg-dark-gray-c-five hover:rounded-m"
+              className="cursor-pointer px-1 hover:rounded-md hover:bg-dark-gray-c-five"
               onClick={(e) => {
-                e.stopPropagation(); // Prevent triggering onClick of parent div
-                onTabClose(e, tab.id);
+                e.stopPropagation() // Prevent triggering onClick of parent div
+                onTabClose(e, tab.id)
               }}
             >
               &times;
             </span>
-            {hoveredTab === tab.filePath && (
-              <Tooltip filepath={tab.filePath} position={tooltipPosition} />
-            )}
+            {hoveredTab === tab.filePath && <Tooltip filepath={tab.filePath} position={tooltipPosition} />}
           </div>
         </div>
       ))}
       {openTabs.length > 0 && (
         <div
-          className="flex items-center justify-center px-2 hover:rounded-md hover:bg-dark-gray-c-three cursor-pointer text-white ml-1 h-[28px]"
-          style={{ WebkitAppRegion: "no-drag" }}
+          id="titleBarFileNavigator"
+          className="ml-1 flex h-[28px] cursor-pointer items-center justify-center px-2 text-white hover:rounded-md hover:bg-dark-gray-c-three"
           onClick={() => {
-            window.electronUtils.showCreateFileModal();
+            window.electronUtils.showCreateFileModal('')
           }}
         >
           <FaPlus size={13} />
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-/* Displays the filepath when hovering on a tab */
-const Tooltip: React.FC<TooltipProps> = ({ filepath, position }) => {
-  return createPortal(
-    <div
-      className="tab-tooltip"
-      style={{ top: `${position.y}px`, left: `${position.x}px` }}
-    >
-      {filepath}
-    </div>,
-    document.getElementById("tooltip-container") as HTMLElement
-  );
-};
-
-export { DraggableTabs };
+export default DraggableTabs

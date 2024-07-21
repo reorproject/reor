@@ -60,7 +60,7 @@ const FileItem: React.FC<FileInfoProps> = ({
     } catch (error) {
       // Handle error (e.g., show an error message)
     }
-  };
+  }
 
   const toggle = () => {
     if (isFileNodeDirectory(file)) {

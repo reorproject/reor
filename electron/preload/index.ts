@@ -6,6 +6,7 @@ import {
   HardwareConfig,
   LLMConfig,
   LLMGenerationParameters,
+  Tab,
 } from 'electron/main/electron-store/storeConfig'
 import {
   AugmentPromptWithFileProps,
@@ -27,13 +28,6 @@ type IPCHandler<T extends (...args: any[]) => any> = (...args: Parameters<T>) =>
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createIPCHandler<T extends (...args: any[]) => any>(channel: string): IPCHandler<T> {
   return (...args: Parameters<T>) => ipcRenderer.invoke(channel, ...args) as Promise<ReturnType<T>>
-}
-
-function createIPCHandlerWithChannel<T extends (...args: arg[]) => any>(
-  channel: string
-): IPCHandler<T> {
-  return (...args: Parameters<T>) =>
-    ipcRenderer.invoke(channel, ...args) as Promise<ReturnType<T>>;
 }
 
 const database = {
@@ -65,7 +59,7 @@ const electronUtils = {
   showChatItemContext: createIPCHandler<(chatRow: ChatHistoryMetadata) => Promise<void>>('show-chat-menu-item'),
   showCreateFileModal: createIPCHandler<(relativePath: string) => Promise<void>>('empty-new-note-listener'),
   showCreateDirectoryModal: createIPCHandler<(relativePath: string) => Promise<void>>('empty-new-directory-listener'),
-};
+}
 
 const electronStore = {
   setVaultDirectoryForWindow: createIPCHandler<(path: string) => Promise<void>>('set-vault-directory-for-window'),
@@ -94,8 +88,8 @@ const electronStore = {
     createIPCHandler<(params: LLMGenerationParameters) => Promise<void>>('set-llm-generation-params'),
   getAnalyticsMode: createIPCHandler<() => Promise<boolean>>('get-analytics-mode'),
   setAnalyticsMode: createIPCHandler<(isAnalytics: boolean) => Promise<void>>('set-analytics-mode'),
-  getSpellCheckMode: createIPCHandler<() => Promise<string>>('get-spellcheck-mode'),
-  setSpellCheckMode: createIPCHandler<(isSpellCheck: string) => Promise<void>>('set-spellcheck-mode'),
+  getSpellCheckMode: createIPCHandler<() => Promise<boolean>>('get-spellcheck-mode'),
+  setSpellCheckMode: createIPCHandler<(isSpellCheck: boolean) => Promise<void>>('set-spellcheck-mode'),
   getHasUserOpenedAppBefore: createIPCHandler<() => Promise<boolean>>('has-user-opened-app-before'),
   setHasUserOpenedAppBefore: createIPCHandler<() => Promise<void>>('set-user-has-opened-app-before'),
   getAllChatHistories: createIPCHandler<() => Promise<ChatHistory[]>>('get-all-chat-histories'),
@@ -108,9 +102,8 @@ const electronStore = {
   setDisplayMarkdown: createIPCHandler<(displayMarkdown: boolean) => Promise<void>>('set-display-markdown'),
   getEditorFlexCenter: createIPCHandler<() => Promise<boolean>>('get-editor-flex-center'),
   setEditorFlexCenter: createIPCHandler<(editorFlexCenter: boolean) => Promise<void>>('set-editor-flex-center'),
-  getCurrentOpenFiles: createIPCHandler<() => Promise<boolean>>('get-current-open-files'),
-  setCurrentOpenFiles: 
-    createIPCHandlerWithChannel<(action: Action, args: Args) => Promise<void>>('set-current-open-files'),
+  getCurrentOpenFiles: createIPCHandler<() => Promise<Tab[]>>('get-current-open-files'),
+  setCurrentOpenFiles: createIPCHandler<(action: string, args: any) => Promise<void>>('set-current-open-files'),
 }
 
 const fileSystem = {

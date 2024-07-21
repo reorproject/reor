@@ -15,8 +15,8 @@ import SidebarManager, { SidebarAbleToShow } from './Sidebars/MainSidebar'
 import SimilarFilesSidebarComponent from './Sidebars/SimilarFilesSidebar'
 import WritingAssistant from './Writing-Assistant/WritingAssistantFloatingMenu'
 import { ChatFilters, ChatHistory } from './Chat/chatUtils'
-import EmptyPage from "./EmptyPage";
-import { TabProvider } from "./Providers/TabProvider";
+import EmptyPage from './EmptyPage'
+import { TabProvider } from './Providers/TabProvider'
 
 const MainPageComponent: React.FC = () => {
   const [showChatbot, setShowChatbot] = useState<boolean>(false)
@@ -67,12 +67,12 @@ const MainPageComponent: React.FC = () => {
     maxDate: new Date(),
   })
 
-  const [sidebarWidth, setSidebarWidth] = useState(40)
-  const [resizableWidth, setResizableWidth] = useState(300);
+  const [sidebarWidth, setSidebarWidth] = useState<number>(40)
+  const [resizableWidth, setResizableWidth] = useState<number>(300)
 
-  const handleResize = (size) => {
-    setResizableWidth(size);
-  };
+  const handleResize = (size: number) => {
+    setResizableWidth(size)
+  }
 
   // find all available files
   useEffect(() => {
@@ -121,18 +121,13 @@ const MainPageComponent: React.FC = () => {
       {/* Displays the dropdown tab when hovering. You cannot use z-index and position absolute inside 
           TitleBar since one of the Parent components inadvertently creates a new stacking context that 
           impacts the z-index. */}
-      <div id="tooltip-container"></div>
-      <TabProvider
-        openFileAndOpenEditor={openFileAndOpenEditor}
-        setFilePath={setFilePath}
-        currentFilePath={filePath}
-      >
+      <div id="tooltip-container" />
+      <TabProvider openFileAndOpenEditor={openFileAndOpenEditor} setFilePath={setFilePath} currentFilePath={filePath}>
         <TitleBar
           history={navigationHistory}
           setHistory={setNavigationHistory}
           currentFilePath={filePath}
           onFileSelect={openFileAndOpenEditor}
-          setFilePath={setFilePath}
           similarFilesOpen={showSimilarFiles} // This might need to be managed differently now
           toggleSimilarFiles={toggleSimilarFiles} // This might need to be managed differently now
           openFileAndOpenEditor={openFileAndOpenEditor}
@@ -153,7 +148,7 @@ const MainPageComponent: React.FC = () => {
         </div>
 
         <ResizableComponent resizeSide="right" onResize={handleResize}>
-          <div className="h-full border-l-0 border-b-0 border-t-0 border-r-[0.001px] border-neutral-700 border-solid w-full">
+          <div className="size-full border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700">
             <SidebarManager
               files={files}
               expandedDirectories={expandedDirectories}
@@ -176,8 +171,8 @@ const MainPageComponent: React.FC = () => {
         </ResizableComponent>
 
         {!showChatbot && filePath ? (
-          <div className="relative w-full h-full flex overflow-hidden">
-            <div className="flex-grow h-full overflow-hidden">
+          <div className="relative flex size-full overflow-hidden">
+            <div className="h-full grow overflow-hidden">
               <EditorManager
                 editor={editor}
                 suggestionsState={suggestionsState}
@@ -204,7 +199,7 @@ const MainPageComponent: React.FC = () => {
           </div>
         ) : (
           !showChatbot && (
-            <div className="relative w-full h-full flex overflow-hidden">
+            <div className="relative flex size-full overflow-hidden">
               <EmptyPage vaultDirectory={vaultDirectory} />
             </div>
           )

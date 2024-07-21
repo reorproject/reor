@@ -1,26 +1,24 @@
-import React, { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { PiSidebar, PiSidebarFill } from "react-icons/pi";
-import { DraggableTabs } from "../Sidebars/TabSidebar";
-import FileHistoryNavigator from "../File/FileSideBar/FileHistoryBar";
-import { useTabs } from "../Providers/TabProvider";
-export const titleBarHeight = "30px";
+import React, { useEffect, useState } from 'react'
+import { PiSidebar, PiSidebarFill } from 'react-icons/pi'
+import DraggableTabs from '../Sidebars/TabSidebar'
+import FileHistoryNavigator from '../File/FileSideBar/FileHistoryBar'
+import { useTabs, Tab } from '../Providers/TabProvider'
+
+export const titleBarHeight = '30px'
 
 interface TitleBarProps {
-  onFileSelect: (path: string) => void;
-  setFilePath: (path: string | null) => void; // Used to set file path to null when no tabs are open
-  currentFilePath: string | null; // Used to create new open tabs when user clicks on new file to open
-  similarFilesOpen: boolean;
-  toggleSimilarFiles: () => void;
-  history: string[];
-  setHistory: (string: string[]) => void;
-  openFileAndOpenEditor: (path: string) => void;
-  sidebarWidth: number;
+  onFileSelect: (path: string) => void
+  currentFilePath: string | null // Used to create new open tabs when user clicks on new file to open
+  similarFilesOpen: boolean
+  toggleSimilarFiles: () => void
+  history: string[]
+  setHistory: (string: string[]) => void
+  openFileAndOpenEditor: (path: string) => void
+  sidebarWidth: number
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
   onFileSelect,
-  setFilePath,
   currentFilePath,
   similarFilesOpen,
   toggleSimilarFiles,
@@ -29,14 +27,19 @@ const TitleBar: React.FC<TitleBarProps> = ({
   openFileAndOpenEditor,
   sidebarWidth,
 }) => {
-  const [platform, setPlatform] = useState("");
-  const { openTabs, addTab, selectTab, removeTab, updateTabOrder } = useTabs();
-  const [openedLastAccess, setOpenedLastAccess] = useState<boolean>(false);
+  const [platform, setPlatform] = useState('')
+  const { openTabs, addTab, selectTab, removeTab, updateTabOrder } = useTabs()
+  const [openedLastAccess, setOpenedLastAccess] = useState<boolean>(false)
 
+  // Note: Do not put dependency on addTab or else removeTab does not work properly.
+  // Typically you would define addTab inside the useEffect and then call it but since
+  // we are using it inside a useContext we can remove it
+  /* eslint-disable */
   useEffect(() => {
-    if (!currentFilePath) return;
-    addTab(currentFilePath);
-  }, [currentFilePath]);
+    if (!currentFilePath) return
+    addTab(currentFilePath)
+  }, [currentFilePath])
+  /* eslint-enable */
 
   useEffect(() => {
     const fetchPlatform = async () => {
@@ -50,55 +53,44 @@ const TitleBar: React.FC<TitleBarProps> = ({
   useEffect(() => {
     const setUpLastAccess = () => {
       if (!openedLastAccess) {
-        openTabs.forEach((tab) => {
+        openTabs.forEach((tab: Tab) => {
           if (tab.lastAccessed) {
-            setOpenedLastAccess(true);
-            openFileAndOpenEditor(tab.filePath);
+            setOpenedLastAccess(true)
+            openFileAndOpenEditor(tab.filePath)
           }
-        });
+        })
       }
-    };
+    }
 
-    setUpLastAccess();
-  }, [openTabs]);
+    setUpLastAccess()
+  }, [openTabs, openFileAndOpenEditor, openedLastAccess])
 
   const handleTabSelect = (tab: Tab) => {
-    selectTab(tab);
-  };
+    selectTab(tab)
+  }
 
-  const handleTabClose = (event, tabId) => {
-    event.stopPropagation();
-    removeTab(tabId);
-  };
+  const handleTabClose = (event: MouseEvent, tabId: string) => {
+    event.stopPropagation()
+    removeTab(tabId)
+  }
 
   return (
-    <div
-      id="customTitleBar"
-      className={`h-titlebar flex justify-between`}
-      style={{ backgroundColor: "#303030", WebkitAppRegion: "drag" }}
-    >
-      <div
-        className="flex mt-[1px]"
-        style={
-          platform === "darwin" ? { marginLeft: "65px" } : { marginLeft: "2px" }
-        }
-      >
+    <div id="customTitleBar" className="flex h-titlebar justify-between" style={{ backgroundColor: '#303030' }}>
+      <div className="mt-px flex" style={platform === 'darwin' ? { marginLeft: '65px' } : { marginLeft: '2px' }}>
         <FileHistoryNavigator
-          id="titleBarFileNavigator"
           history={history}
           setHistory={setHistory}
           onFileSelect={onFileSelect}
-          currentPath={currentFilePath || ""}
-          style={{ WebkitAppRegion: "no-drag" }}
+          currentPath={currentFilePath || ''}
         />
       </div>
 
-      <div className="relative flex-grow">
+      <div className="relative grow">
         <div
-          className="absolute top-0 bottom-0 left-0 overflow-x-auto scrollable-x-thin overflow-y-hidden"
+          className="scrollable-x-thin absolute inset-y-0 left-0 overflow-x-auto overflow-y-hidden"
           style={{
             left: `${sidebarWidth - 25}px`,
-            right: "15px",
+            right: '15px',
           }}
         >
           <div className="flex whitespace-nowrap">
@@ -106,7 +98,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
               openTabs={openTabs}
               onTabSelect={handleTabSelect}
               onTabClose={handleTabClose}
-              currentFilePath={currentFilePath}
+              currentFilePath={currentFilePath || ''}
               updateTabOrder={updateTabOrder}
             />
           </div>

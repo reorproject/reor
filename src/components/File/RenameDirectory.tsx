@@ -90,7 +90,7 @@ const RenameDirModal: React.FC<RenameDirModalProps> = ({ isOpen, fullDirName, on
   }
 
   return (
-    <ReorModal isOpen={isOpen} onClose={onClose} widthType={"renameDirectory"}>
+    <ReorModal isOpen={isOpen} onClose={onClose} widthType="renameDirectory">
       <div className="my-2 ml-3 mr-6 h-full min-w-[400px]">
         <h2 className="mb-3 text-xl font-semibold text-white">Rename Directory</h2>
         <input
