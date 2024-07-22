@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useLayoutEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
 
 import { MessageStreamEvent } from '@anthropic-ai/sdk/resources'
 import Button from '@mui/material/Button'
@@ -26,17 +26,15 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   currentChatHistory,
   setCurrentChatHistory,
 }) => {
-  const [loadingResponse, setLoadingResponse] = useState<boolean>(false);
-  const [customPrompt, setCustomPrompt] = useState<string>("");
-  const [isOptionsVisible, setIsOptionsVisible] = useState<boolean>(false);
-  const [prevPrompt, setPrevPrompt] = useState<string>("");
-  const [positionStyle, setPositionStyle] = useState({ top: 0, left: 0 });
-  const [markdownMaxHeight, setMarkdownMaxHeight] = useState("auto");
-  const markdownContainerRef = useRef(null);
-  const optionsContainerRef = useRef(null);
-  const hasValidMessages = currentChatHistory?.displayableChatHistory.some(
-    (msg) => msg.role === "assistant"
-  );
+  const [loadingResponse, setLoadingResponse] = useState<boolean>(false)
+  const [customPrompt, setCustomPrompt] = useState<string>('')
+  const [isOptionsVisible, setIsOptionsVisible] = useState<boolean>(false)
+  const [prevPrompt, setPrevPrompt] = useState<string>('')
+  const [positionStyle, setPositionStyle] = useState({ top: 0, left: 0 })
+  const [markdownMaxHeight, setMarkdownMaxHeight] = useState("auto")
+  const markdownContainerRef = useRef(null)
+  const optionsContainerRef = useRef(null)
+  const hasValidMessages = currentChatHistory?.displayableChatHistory.some((msg) => msg.role === 'assistant')
   const lastAssistantMessage = currentChatHistory?.displayableChatHistory
     .filter((msg) => msg.role === 'assistant')
     .pop()
@@ -52,37 +50,37 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
     if (hasValidMessages) {
       setIsOptionsVisible(false)
     }
-  }, [hasValidMessages]);
+  }, [hasValidMessages])
 
   useLayoutEffect(() => {
-    if (!isOptionsVisible) return;
+    if (!isOptionsVisible) return
 
     const calculatePosition = () => {
       if (!optionsContainerRef.current) {
-        console.log("Ref not attached yet");
-        return;
+        console.log("Ref not attached yet")
+        return
       }
 
-      const screenHeight = window.innerHeight;
-      const elementHeight = optionsContainerRef.current.offsetHeight;
-      const spaceBelow = screenHeight - highlightData.position.top;
-      const isSpaceEnough = spaceBelow >= elementHeight;
+      const screenHeight = window.innerHeight
+      const elementHeight = optionsContainerRef.current.offsetHeight
+      const spaceBelow = screenHeight - highlightData.position.top
+      const isSpaceEnough = spaceBelow >= elementHeight
 
       if (isSpaceEnough) {
         setPositionStyle({
           top: highlightData.position.top,
           left: highlightData.position.left,
-        });
+        })
       } else {
         setPositionStyle({
           top: highlightData.position.top - elementHeight,
           left: highlightData.position.left,
-        });
+        })
       }
-    };
+    }
 
     calculatePosition();
-  }, [isOptionsVisible, highlightData.position]);
+  }, [isOptionsVisible, highlightData.position])
 
   useLayoutEffect(() => {
     if (hasValidMessages && highlightData && highlightData.position) {
@@ -223,70 +221,33 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           `  """ ${selectedText} """`
         break
     }
-    setPrevPrompt(prompt);
-    await getLLMResponse(prompt, currentChatHistory);
-  };
+    setPrevPrompt(prompt)
+    await getLLMResponse(prompt, currentChatHistory)
+  }
 
-  const getLLMResponse = async (
-    prompt: string,
-    chatHistory: ChatHistory | undefined
-  ) => {
-    const defaultLLMName = await window.llm.getDefaultLLMName();
-    const llmConfigs = await window.llm.getLLMConfigs();
+  useEffect(() => {
+    const appendNewContentToMessageHistory = (
+      chatID: string,
+      newContent: string,
+      newMessageType: 'success' | 'error',
+    ) => {
+      setCurrentChatHistory((prev: ChatHistory | undefined) => {
+        if (chatID !== prev?.id) return prev
+        const newDisplayableHistory = prev?.displayableChatHistory || []
+        if (newDisplayableHistory.length > 0) {
+          const lastMessage = newDisplayableHistory[newDisplayableHistory.length - 1]
 
-    const currentModelConfig = llmConfigs.find(
-      (config) => config.modelName === defaultLLMName
-    );
-    if (!currentModelConfig) {
-      throw new Error(`No model config found for model: ${defaultLLMName}`);
-    }
-
-    try {
-      if (loadingResponse) return;
-      setLoadingResponse(true);
-      if (!chatHistory || !chatHistory.id) {
-        const chatID = Date.now().toString();
-        chatHistory = {
-          id: chatID,
-          displayableChatHistory: [],
-        };
-      }
-      setCurrentChatHistory(chatHistory);
-      chatHistory.displayableChatHistory.push({
-        role: "user",
-        content: prompt,
-        messageType: "success",
-        context: [],
-      });
-      if (!chatHistory) return;
-
-      await window.llm.streamingLLMResponse(
-        defaultLLMName,
-        currentModelConfig,
-        false,
-        chatHistory
-      );
-    } catch (error) {
-      console.error(error);
-    }
-    setLoadingResponse(false);
-  };
-
-  const appendNewContentToMessageHistory = (
-    chatID: string,
-    newContent: string,
-    newMessageType: "success" | "error"
-  ) => {
-    setCurrentChatHistory((prev) => {
-      if (chatID !== prev?.id) return prev;
-      const newDisplayableHistory = prev?.displayableChatHistory || [];
-      if (newDisplayableHistory.length > 0) {
-        const lastMessage =
-          newDisplayableHistory[newDisplayableHistory.length - 1];
-
-        if (lastMessage.role === "assistant") {
-          lastMessage.content += newContent;
-          lastMessage.messageType = newMessageType;
+          if (lastMessage.role === 'assistant') {
+            lastMessage.content += newContent 
+            lastMessage.messageType = newMessageType
+          } else {
+            newDisplayableHistory.push({
+              role: 'assistant',
+              content: newContent,
+              messageType: newMessageType,
+              context: [],
+            })
+          }
         } else {
           newDisplayableHistory.push({
             role: 'assistant',
@@ -371,7 +332,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
             value={customPrompt}
             onChange={(e) => setCustomPrompt(e.target.value)}
             placeholder="Ask AI anything..."
-            className="mb-2.5 p-1 w-full"
+            className="mb-2.5 w-full p-1" 
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
                 handleOption('custom', customPrompt)
@@ -410,7 +371,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           style={{
             top: positionStyle.top,
             left: positionStyle.left,
-            width: "385px",
+            width: '385px',
           }}
         >
           <div
@@ -419,26 +380,18 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
               overflowY: "auto",
             }}
           >
-            {lastAssistantMessage && (
-              <ReactMarkdown
-                rehypePlugins={[rehypeRaw]}
-                className={`p-1 markdown-content break-words rounded-md ${
-                  lastAssistantMessage.messageType === "error"
-                    ? "bg-red-100 text-red-800"
-                    : lastAssistantMessage.role === "assistant"
-                    ? "bg-neutral-200 text-black"
-                    : "bg-blue-100 text-blue-800"
-                }`}
-              >
-                {lastAssistantMessage.visibleContent
-                  ? lastAssistantMessage.visibleContent
-                  : formatOpenAIMessageContentIntoString(
-                      lastAssistantMessage.content
-                    )}
-              </ReactMarkdown>
-            )}
+          {lastAssistantMessage && (
+            <ReactMarkdown
+              rehypePlugins={[rehypeRaw]}
+              className={`markdown-content break-words rounded-md p-1 ${getClassNames(lastAssistantMessage)}`}
+            >
+              {lastAssistantMessage.visibleContent
+                ? lastAssistantMessage.visibleContent
+                : formatOpenAIMessageContentIntoString(lastAssistantMessage.content)}
+            </ReactMarkdown>
+          )}
           </div>
-          <div className="flex justify-between mt-2">
+          <div className="mt-2 flex justify-between">
             <button
               className="mr-1 flex cursor-pointer items-center rounded-md border-0 bg-blue-100 px-2.5 py-1"
               onClick={() => {
