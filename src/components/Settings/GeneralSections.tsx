@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react'
 
-import Switch from "@mui/material/Switch";
+import Switch from '@mui/material/Switch'
 
 // enum SettingsAppearance {
 //   light = "lightMode",
@@ -16,56 +16,40 @@ export interface GenSettingsProps {
 }
 
 const CreateAppearanceSection: React.FC = () => {
-  const [isIconSBCompact, setIsIconSBCompact] = useState<boolean>(false);
+  const [isIconSBCompact, setIsIconSBCompact] = useState<boolean>(false)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false);
   // const [editorAppearance, setEditorApperance] =
   //   useState<SettingsAppearance>("dark");
 
   // Check if SidebarCompact is on or not
   useEffect(() => {
     const fetchParams = async () => {
-      const isIconSBCompact = await window.electronStore.getSBCompact();
+      const storedIsIconSBCompact = await window.electronStore.getSBCompact()
 
-      if (isIconSBCompact !== undefined) {
-        setIsIconSBCompact(isIconSBCompact);
+      if (storedIsIconSBCompact !== undefined) {
+        setIsIconSBCompact(storedIsIconSBCompact)
       }
-    };
+    }
 
-    fetchParams();
-  }, []);
-
-  // Check if we should display header markdown
-  useEffect(() => {
-    const fetchParams = async () => {
-      const displayMarkdown = await window.electronStore.getDisplayMarkdown();
-
-      if (displayMarkdown !== undefined) {
-        setDisplayMarkdown(displayMarkdown);
-      }
-    };
-
-    fetchParams();
-  }, []);
+    fetchParams()
+  }, [])
 
   return (
-    <div className="flex-col w-full">
-      <h4 className="text-white flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-4 mt-6">
+    <div className="w-full flex-col">
+      <h4 className="mt-6 flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-4 text-white">
         Appearance
       </h4>
-      <div className="flex justify-between items-center w-full gap-5 border-b-2 border-solid border-neutral-700 border-0 pb-3 h-[64px]">
+      <div className="flex h-[64px] w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-3">
         <div className="flex flex-col justify-center">
           <p className="text-gray-100">IconSidebar Compact</p>
-          <p className="text-gray-100 text-xs">
-            If on, decreases padding on IconSidebar
-          </p>
+          <p className="text-xs text-gray-100">If on, decreases padding on IconSidebar</p>
         </div>
         <Switch
           checked={isIconSBCompact}
           onChange={() => {
-            setIsIconSBCompact(!isIconSBCompact);
+            setIsIconSBCompact(!isIconSBCompact)
             if (isIconSBCompact !== undefined) {
-              window.electronStore.setSBCompact(!isIconSBCompact);
+              window.electronStore.setSBCompact(!isIconSBCompact)
             }
           }}
         />
@@ -94,7 +78,7 @@ const CreateAppearanceSection: React.FC = () => {
         />
       </div> */}
     </div>
-  );
-};
+  )
+}
 
-export default CreateAppearanceSection;
+export default CreateAppearanceSection

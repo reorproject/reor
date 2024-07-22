@@ -15,8 +15,8 @@
     // "source.organizeImports": "explicit"
   },
   "eslint.alwaysShowStatus": true,
-  "eslint.format.enable": true,
-  "eslint.run": "onSave",
-  "editor.formatOnSave": true,
+  "eslint.format.enable": false,
+  // "eslint.run": "",
+  "editor.formatOnSave": false,
   "editor.codeActionsOnSaveMode": "explicit"  // This is the updated setting
 }

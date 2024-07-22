@@ -1,40 +1,25 @@
-import path from "path";
+import path from 'path'
 
-import { ipcMain } from "electron";
+import { ipcMain } from 'electron'
 
-import { markdownExtensions } from "../filesystem/filesystem";
+import { markdownExtensions } from '../filesystem/filesystem'
 
-import { addExtensionToFilenameIfNoExtensionPresent } from "./path";
+import addExtensionToFilenameIfNoExtensionPresent from './path'
 
-export const pathHandlers = () => {
-  ipcMain.handle("path-basename", (event, pathString: string) => {
-    return path.basename(pathString);
-  });
+const pathHandlers = () => {
+  ipcMain.handle('path-basename', (event, pathString: string) => path.basename(pathString))
 
-  ipcMain.handle("path-sep", () => {
-    return path.sep;
-  });
+  ipcMain.handle('path-sep', () => path.sep)
 
-  ipcMain.handle("join-path", (event, ...args) => {
-    return path.join(...args);
-  });
+  ipcMain.handle('join-path', (event, ...args) => path.join(...args))
 
-  ipcMain.handle("path-dirname", (event, pathString: string) => {
-    return path.dirname(pathString) + path.sep;
-  });
+  ipcMain.handle('path-dirname', (event, pathString: string) => path.dirname(pathString) + path.sep)
 
-  ipcMain.handle("path-relative", (event, from: string, to: string) => {
-    return path.relative(from, to);
-  });
+  ipcMain.handle('path-relative', (event, from: string, to: string) => path.relative(from, to))
 
-  ipcMain.handle(
-    "add-extension-if-no-extension-present",
-    (event, pathString: string) => {
-      return addExtensionToFilenameIfNoExtensionPresent(
-        pathString,
-        markdownExtensions,
-        ".md"
-      );
-    }
-  );
-};
+  ipcMain.handle('add-extension-if-no-extension-present', (event, pathString: string) =>
+    addExtensionToFilenameIfNoExtensionPresent(pathString, markdownExtensions, '.md'),
+  )
+}
+
+export default pathHandlers

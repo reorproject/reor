@@ -1,17 +1,18 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from 'react'
 
-import { DBQueryResult } from "electron/main/vector-database/schema";
-import posthog from "posthog-js";
-import { FaSearch } from "react-icons/fa";
+import { DBQueryResult } from 'electron/main/vector-database/schema'
+import posthog from 'posthog-js'
+import { FaSearch } from 'react-icons/fa'
 
-import { DBSearchPreview } from "../File/DBResultPreview";
+import { DBSearchPreview } from '../File/DBResultPreview'
+import debounce from './utils'
 
 interface SearchComponentProps {
-  onFileSelect: (path: string) => void;
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  searchResults: DBQueryResult[];
-  setSearchResults: (results: DBQueryResult[]) => void;
+  onFileSelect: (path: string) => void
+  searchQuery: string
+  setSearchQuery: (query: string) => void
+  searchResults: DBQueryResult[]
+  setSearchResults: (results: DBQueryResult[]) => void
 }
 
 const SearchComponent: React.FC<SearchComponentProps> = ({
@@ -21,39 +22,39 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   searchResults,
   setSearchResults,
 }) => {
-  const searchInputRef = useRef<HTMLInputElement>(null); // Reference for the input field
+  const searchInputRef = useRef<HTMLInputElement>(null) // Reference for the input field
 
   const handleSearch = async (query: string) => {
-    const results: DBQueryResult[] = await window.database.search(query, 50);
-    setSearchResults(results);
-  };
+    const results: DBQueryResult[] = await window.database.search(query, 50)
+    setSearchResults(results)
+  }
 
   useEffect(() => {
-    searchInputRef.current?.focus();
-  }, []);
-  const debouncedSearch = debounce((query: string) => handleSearch(query), 300);
+    searchInputRef.current?.focus()
+  }, [])
+  const debouncedSearch = debounce((query: string) => handleSearch(query), 300)
 
   useEffect(() => {
     if (searchQuery) {
-      debouncedSearch(searchQuery);
+      debouncedSearch(searchQuery)
     }
-  }, [searchQuery]);
+  }, [searchQuery, debouncedSearch])
 
   const openFileSelectSearch = (path: string) => {
-    onFileSelect(path);
-    posthog.capture("open_file_from_search");
-  };
+    onFileSelect(path)
+    posthog.capture('open_file_from_search')
+  }
 
   return (
-    <div className="p-1 h-below-titlebar overflow-y-auto overflow-x-hidden">
-      <div className="relative p-2 bg-neutral-800 rounded mr-1">
-        <span className="absolute inset-y-0 left-0 flex items-center pl-3 mt-[2px]">
-          <FaSearch className="text-gray-200 text-lg" size={14} />
+    <div className="h-below-titlebar overflow-y-auto overflow-x-hidden p-1">
+      <div className="relative mr-1 rounded bg-neutral-800 p-2">
+        <span className="absolute inset-y-0 left-0 mt-[2px] flex items-center pl-3">
+          <FaSearch className="text-lg text-gray-200" size={14} />
         </span>
         <input
           ref={searchInputRef}
           type="text"
-          className="mt-1 w-full pl-7 mr-1 pr-5 h-8 bg-neutral-700 text-white rounded-md border border-transparent focus:outline-none focus:border-white focus:ring-1 focus:ring-white"
+          className="mr-1 mt-1 h-8 w-full rounded-md border border-transparent bg-neutral-700 pl-7 pr-5 text-white focus:border-white focus:outline-none focus:ring-1 focus:ring-white"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Semantic search..."
@@ -62,9 +63,9 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
       <div className="mt-2 w-full">
         {searchResults.length > 0 && (
           <div className="w-full">
-            {searchResults.map((result, index) => (
+            {searchResults.map((result) => (
               <DBSearchPreview
-                key={index}
+                key={`${result.notepath}-${result.subnoteindex}`}
                 dbResult={result}
                 onSelect={openFileSelectSearch}
               />
@@ -73,19 +74,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
         )}
       </div>
     </div>
-  );
-};
+  )
+}
 
-const debounce = <F extends (...args: string[]) => Promise<void>>(
-  func: F,
-  delay: number
-): ((...args: Parameters<F>) => void) => {
-  let debounceTimer: NodeJS.Timeout;
-
-  return (...args: Parameters<F>) => {
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => func(...args), delay);
-  };
-};
-
-export default SearchComponent;
+export default SearchComponent

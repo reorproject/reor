@@ -1,18 +1,15 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from 'react'
 
-import { Editor, EditorContent } from "@tiptap/react";
+import { Editor, EditorContent } from '@tiptap/react'
 
-import InEditorBacklinkSuggestionsDisplay, {
-  SuggestionsState,
-} from "./BacklinkSuggestionsDisplay";
-import EditorContextMenu from "./EditorContextMenu";
+import InEditorBacklinkSuggestionsDisplay, { SuggestionsState } from './BacklinkSuggestionsDisplay'
+import EditorContextMenu from './EditorContextMenu'
 
 interface EditorManagerProps {
-  editor: Editor | null;
-  filePath: string;
-  suggestionsState: SuggestionsState | null | undefined;
-  flattenedFiles: { relativePath: string }[];
-  showSimilarFiles: boolean;
+  editor: Editor | null
+  suggestionsState: SuggestionsState | null | undefined
+  flattenedFiles: { relativePath: string }[]
+  showSimilarFiles: boolean
 }
 
 const EditorManager: React.FC<EditorManagerProps> = ({
@@ -21,83 +18,79 @@ const EditorManager: React.FC<EditorManagerProps> = ({
   flattenedFiles,
   showSimilarFiles,
 }) => {
-  const [showSearch, setShowSearch] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [menuVisible, setMenuVisible] = useState(false);
-  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 });
+  const [showSearch, setShowSearch] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [menuVisible, setMenuVisible] = useState(false)
+  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
   //   const [showSimilarFiles, setShowSimilarFiles] = useState(true);
 
   const toggleSearch = useCallback(() => {
-    setShowSearch((prevShowSearch) => !prevShowSearch);
-  }, []);
+    setShowSearch((prevShowSearch) => !prevShowSearch)
+  }, [])
 
-  useEffect(() => {
-    console.log("showSimilarFiles", showSimilarFiles);
-  }, [showSimilarFiles]);
+  useEffect(() => {}, [showSimilarFiles])
 
   const handleSearchChange = (value: string) => {
-    setSearchTerm(value);
-    editor?.commands.setSearchTerm(value);
-  };
-
-  const handleNextSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      editor?.commands.nextSearchResult();
-      goToSelection();
-      (event.target as HTMLInputElement).focus();
-    } else if (event.key === "Escape") {
-      toggleSearch();
-      handleSearchChange("");
-    }
-  };
-
+    setSearchTerm(value)
+    editor?.commands.setSearchTerm(value)
+  }
   const goToSelection = () => {
-    if (!editor) return;
-    const { results, resultIndex } = editor.storage.searchAndReplace;
-    const position = results[resultIndex];
-    if (!position) return;
-    editor.commands.setTextSelection(position);
-    const { node } = editor.view.domAtPos(editor.state.selection.anchor);
+    if (!editor) return
+    const { results, resultIndex } = editor.storage.searchAndReplace
+    const position = results[resultIndex]
+    if (!position) return
+    editor.commands.setTextSelection(position)
+    const { node } = editor.view.domAtPos(editor.state.selection.anchor)
     if (node instanceof Element) {
-      node.scrollIntoView?.(false);
+      node.scrollIntoView?.(false)
     }
-  };
+  }
+  const handleNextSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      event.preventDefault()
+      editor?.commands.nextSearchResult()
+      goToSelection()
+      ;(event.target as HTMLInputElement).focus()
+    } else if (event.key === 'Escape') {
+      toggleSearch()
+      handleSearchChange('')
+    }
+  }
 
   const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
+    event.preventDefault()
     setMenuPosition({
       x: event.pageX,
       y: event.pageY,
-    });
-    setMenuVisible(true);
-  };
+    })
+    setMenuVisible(true)
+  }
 
   const hideMenu = () => {
-    if (menuVisible) setMenuVisible(false);
-  };
+    if (menuVisible) setMenuVisible(false)
+  }
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === "f") {
-        toggleSearch();
+      if ((event.metaKey || event.ctrlKey) && event.key === 'f') {
+        toggleSearch()
       }
-      if (event.key === "Escape") {
-        if (showSearch) setShowSearch(false);
-        if (menuVisible) setMenuVisible(false);
+      if (event.key === 'Escape') {
+        if (showSearch) setShowSearch(false)
+        if (menuVisible) setMenuVisible(false)
       }
-    };
+    }
 
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [showSearch, menuVisible, toggleSearch]);
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [showSearch, menuVisible, toggleSearch])
 
   return (
     <div
-      className="relative h-full w-full cursor-text text-slate-400 overflow-y-auto"
+      className="relative size-full cursor-text overflow-y-auto text-slate-400"
       onClick={() => editor?.commands.focus()}
       style={{
-        backgroundColor: "rgb(30, 30, 30)",
+        backgroundColor: 'rgb(30, 30, 30)',
       }}
     >
       {showSearch && (
@@ -107,26 +100,21 @@ const EditorManager: React.FC<EditorManagerProps> = ({
           onKeyDown={handleNextSearch}
           onChange={(event) => handleSearchChange(event.target.value)}
           onBlur={() => {
-            setShowSearch(false);
-            handleSearchChange("");
+            setShowSearch(false)
+            handleSearchChange('')
           }}
           placeholder="Search..."
+          // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus
-          className="absolute top-4 right-0 mt-4 mr-14 z-50 border-none rounded-md p-2 bg-transparent bg-dark-gray-c-ten text-white"
+          className="absolute right-0 top-4 z-50 mr-14 mt-4 rounded-md border-none  bg-transparent p-2 text-white"
         />
       )}
-      {menuVisible && (
-        <EditorContextMenu
-          editor={editor}
-          menuPosition={menuPosition}
-          setMenuVisible={setMenuVisible}
-        />
-      )}
+      {menuVisible && <EditorContextMenu editor={editor} menuPosition={menuPosition} setMenuVisible={setMenuVisible} />}
       <EditorContent
         className="h-full overflow-y-auto"
         style={{
-          wordBreak: "break-word",
-          backgroundColor: "rgb(30, 30, 30)",
+          wordBreak: 'break-word',
+          backgroundColor: 'rgb(30, 30, 30)',
         }}
         onContextMenu={handleContextMenu}
         onClick={hideMenu}
@@ -139,7 +127,7 @@ const EditorManager: React.FC<EditorManagerProps> = ({
         />
       )}
     </div>
-  );
-};
+  )
+}
 
-export default EditorManager;
+export default EditorManager

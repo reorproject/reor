@@ -1,83 +1,90 @@
-import { DBEntry } from "../vector-database/schema";
+import { DBEntry } from '../vector-database/schema'
+
 export interface PromptWithContextLimit {
-  prompt: string;
-  contextCutoffAt?: string;
+  prompt: string
+  contextCutoffAt?: string
 }
 
-export function createPromptWithContextLimitFromContent(
+export const createPromptWithContextLimitFromContent = (
   content: string | DBEntry[],
   basePrompt: string,
   query: string,
   tokenize: (text: string) => number[],
-  contextLimit: number
-): PromptWithContextLimit {
-  let tokenCount = tokenize(query + basePrompt).length;
+  contextLimit: number,
+): PromptWithContextLimit => {
+  const initialTokenCount = tokenize(query + basePrompt).length
+  const contents = Array.isArray(content) ? content.map((entry) => entry.content) : content.split('\n')
 
-  const contentArray: string[] = [];
-  let cutOffLine: string = "";
-  const contents =
-    typeof content === "string"
-      ? content.split("\n")
-      : content.map((entry) => entry.content);
+  const { contentArray, cutOffLine } = contents.reduce<{
+    contentArray: string[]
+    tokenCount: number
+    cutOffLine: string
+  }>(
+    ({ contentArray: _contentArray, tokenCount, cutOffLine: _cutOffLine }, line) => {
+      const lineWithNewLine = `${line}\n`
+      const lineTokens = tokenize(lineWithNewLine).length
 
-  for (const line of contents) {
-    const lineWithNewLine = line + "\n";
-    if (tokenize(lineWithNewLine).length + tokenCount < contextLimit * 0.9) {
-      tokenCount += tokenize(lineWithNewLine).length;
-      contentArray.push(lineWithNewLine);
-    } else if (cutOffLine.length === 0) {
-      cutOffLine = lineWithNewLine;
-    }
-  }
+      if (lineTokens + tokenCount < contextLimit * 0.9) {
+        return {
+          contentArray: [..._contentArray, lineWithNewLine],
+          tokenCount: tokenCount + lineTokens,
+          cutOffLine: _cutOffLine,
+        }
+      }
+      if (_cutOffLine.length === 0) {
+        return { contentArray: _contentArray, tokenCount, cutOffLine: lineWithNewLine }
+      }
+      return { contentArray: _contentArray, tokenCount, cutOffLine: _cutOffLine }
+    },
+    { contentArray: [], tokenCount: initialTokenCount, cutOffLine: '' },
+  )
 
-  const outputPrompt = basePrompt + contentArray.join("") + query;
-
+  const outputPrompt = basePrompt + contentArray.join('') + query
   return {
     prompt: outputPrompt,
     contextCutoffAt: cutOffLine || undefined,
-  };
+  }
 }
 
-export function sliceListOfStringsToContextLength(
+export const sliceListOfStringsToContextLength = (
   strings: string[],
   tokenize: (text: string) => number[],
-  contextLimit: number
-): string[] {
-  let tokenCount = 0;
-  const result: string[] = [];
-
-  for (const string of strings) {
-    const tokens = tokenize(string);
-    const newTokenCount = tokenCount + tokens.length;
-    if (newTokenCount > contextLimit) break;
-    result.push(string);
-    tokenCount = newTokenCount;
-  }
-
-  return result;
+  contextLimit: number,
+): string[] => {
+  return strings.reduce<{ result: string[]; tokenCount: number }>(
+    ({ result, tokenCount }, string) => {
+      const tokens = tokenize(string)
+      const newTokenCount = tokenCount + tokens.length
+      if (newTokenCount > contextLimit) {
+        return { result, tokenCount }
+      }
+      return {
+        result: [...result, string],
+        tokenCount: newTokenCount,
+      }
+    },
+    { result: [], tokenCount: 0 },
+  ).result
 }
 
-export function sliceStringToContextLength(
+export const sliceStringToContextLength = (
   inputString: string,
   tokenize: (text: string) => number[],
-  contextLimit: number
-): string {
-  let tokenCount = 0;
-  let result = "";
-
-  // Split the input string into segments that are likely to be tokenized.
-  // This assumes a whitespace tokenizer; adjust the split logic as needed for your tokenizer.
-  const segments = inputString.split(/(\s+)/);
-
-  for (const segment of segments) {
-    const tokens = tokenize(segment);
-    const newTokenCount = tokenCount + tokens.length;
-
-    if (newTokenCount > contextLimit) break;
-
-    result += segment;
-    tokenCount = newTokenCount;
-  }
-
-  return result;
+  contextLimit: number,
+): string => {
+  const segments = inputString.split(/(\s+)/)
+  return segments.reduce<{ result: string; tokenCount: number }>(
+    ({ result, tokenCount }, segment) => {
+      const tokens = tokenize(segment)
+      const newTokenCount = tokenCount + tokens.length
+      if (newTokenCount > contextLimit) {
+        return { result, tokenCount }
+      }
+      return {
+        result: result + segment,
+        tokenCount: newTokenCount,
+      }
+    },
+    { result: '', tokenCount: 0 },
+  ).result
 }
