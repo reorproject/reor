@@ -33,6 +33,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   const [isOptionsVisible, setIsOptionsVisible] = useState<boolean>(false);
   const [prevPrompt, setPrevPrompt] = useState<string>("");
   const [positionStyle, setPositionStyle] = useState({ top: 0, left: 0 });
+  const [markdownMaxHeight, setMarkdownMaxHeight] = useState("auto");
   const markdownContainerRef = useRef(null);
   const optionsContainerRef = useRef(null);
   const hasValidMessages = currentChatHistory?.displayableChatHistory.some(
@@ -69,19 +70,12 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       const spaceBelow = screenHeight - highlightData.position.top;
       const isSpaceEnough = spaceBelow >= elementHeight;
 
-      console.log("Screen Height:", screenHeight);
-      console.log("Element Height:", elementHeight);
-      console.log("Space Below:", spaceBelow);
-      console.log("Is Space Enough:", isSpaceEnough);
-
       if (isSpaceEnough) {
-        console.log("space enough");
         setPositionStyle({
           top: highlightData.position.top,
           left: highlightData.position.left,
         });
       } else {
-        console.log("space not enough");
         setPositionStyle({
           top: highlightData.position.top - elementHeight,
           left: highlightData.position.left,
@@ -91,6 +85,28 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
 
     calculatePosition();
   }, [isOptionsVisible, highlightData.position]);
+
+  useLayoutEffect(() => {
+    if (hasValidMessages && highlightData && highlightData.position) {
+      const calculateMaxHeight = () => {
+        if (!markdownContainerRef.current) return;
+
+        const screenHeight = window.innerHeight;
+        const containerTop = positionStyle.top;
+        const buttonHeight = 30;
+        const padding = 54;
+        const availableHeight =
+          screenHeight - containerTop - buttonHeight - padding;
+
+        setMarkdownMaxHeight(`${availableHeight}px`);
+      };
+
+      calculateMaxHeight();
+      window.addEventListener("resize", calculateMaxHeight);
+
+      return () => window.removeEventListener("resize", calculateMaxHeight);
+    }
+  }, [hasValidMessages, highlightData]);
 
   const copyToClipboard = () => {
     if (
@@ -284,7 +300,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           newDisplayableHistory[newDisplayableHistory.length - 1];
 
         if (lastMessage.role === "assistant") {
-          lastMessage.content += newContent; // Append new content with a space
+          lastMessage.content += newContent;
           lastMessage.messageType = newMessageType;
         } else {
           newDisplayableHistory.push({
@@ -385,7 +401,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
             value={customPrompt}
             onChange={(e) => setCustomPrompt(e.target.value)}
             placeholder="Ask AI anything..."
-            className="mb-2.5 p-1 w-full" // TailwindCSS classes for styling
+            className="mb-2.5 p-1 w-full"
             onKeyPress={(e) => {
               if (e.key === "Enter") {
                 handleOption("custom", customPrompt);
@@ -427,24 +443,31 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
             width: "385px",
           }}
         >
-          {lastAssistantMessage && (
-            <ReactMarkdown
-              rehypePlugins={[rehypeRaw]}
-              className={`p-1 markdown-content break-words rounded-md ${
-                lastAssistantMessage.messageType === "error"
-                  ? "bg-red-100 text-red-800"
-                  : lastAssistantMessage.role === "assistant"
-                  ? "bg-neutral-200 text-black"
-                  : "bg-blue-100 text-blue-800"
-              }`}
-            >
-              {lastAssistantMessage.visibleContent
-                ? lastAssistantMessage.visibleContent
-                : formatOpenAIMessageContentIntoString(
-                    lastAssistantMessage.content
-                  )}
-            </ReactMarkdown>
-          )}
+          <div
+            style={{
+              maxHeight: markdownMaxHeight,
+              overflowY: "auto",
+            }}
+          >
+            {lastAssistantMessage && (
+              <ReactMarkdown
+                rehypePlugins={[rehypeRaw]}
+                className={`p-1 markdown-content break-words rounded-md ${
+                  lastAssistantMessage.messageType === "error"
+                    ? "bg-red-100 text-red-800"
+                    : lastAssistantMessage.role === "assistant"
+                    ? "bg-neutral-200 text-black"
+                    : "bg-blue-100 text-blue-800"
+                }`}
+              >
+                {lastAssistantMessage.visibleContent
+                  ? lastAssistantMessage.visibleContent
+                  : formatOpenAIMessageContentIntoString(
+                      lastAssistantMessage.content
+                    )}
+              </ReactMarkdown>
+            )}
+          </div>
           <div className="flex justify-between mt-2">
             <button
               className="bg-blue-100 border-0 py-1 px-2.5 rounded-md cursor-pointer flex items-center mr-1"
