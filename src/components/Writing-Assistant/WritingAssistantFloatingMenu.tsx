@@ -32,8 +32,8 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   const [prevPrompt, setPrevPrompt] = useState<string>('')
   const [positionStyle, setPositionStyle] = useState({ top: 0, left: 0 })
   const [markdownMaxHeight, setMarkdownMaxHeight] = useState("auto")
-  const markdownContainerRef = useRef(null)
-  const optionsContainerRef = useRef(null)
+  const markdownContainerRef = useRef<HTMLDivElement>(null)
+  const optionsContainerRef = useRef<HTMLDivElement>(null)
   const hasValidMessages = currentChatHistory?.displayableChatHistory.some((msg) => msg.role === 'assistant')
   const lastAssistantMessage = currentChatHistory?.displayableChatHistory
     .filter((msg) => msg.role === 'assistant')
@@ -56,8 +56,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
     if (!isOptionsVisible) return
 
     const calculatePosition = () => {
-      if (!optionsContainerRef.current) {
-        console.log("Ref not attached yet")
+      if (!optionsContainerRef.current || !highlightData.position) {
         return
       }
 
@@ -79,30 +78,30 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       }
     }
 
-    calculatePosition();
+    calculatePosition()
   }, [isOptionsVisible, highlightData.position])
 
   useLayoutEffect(() => {
-    if (hasValidMessages && highlightData && highlightData.position) {
+    if (hasValidMessages && highlightData.position) {
       const calculateMaxHeight = () => {
-        if (!markdownContainerRef.current) return;
+        if (!markdownContainerRef.current) return
 
-        const screenHeight = window.innerHeight;
-        const containerTop = positionStyle.top;
-        const buttonHeight = 30;
-        const padding = 54;
+        const screenHeight = window.innerHeight
+        const containerTop = positionStyle.top
+        const buttonHeight = 30
+        const padding = 54
         const availableHeight =
-          screenHeight - containerTop - buttonHeight - padding;
+          screenHeight - containerTop - buttonHeight - padding
 
-        setMarkdownMaxHeight(`${availableHeight}px`);
-      };
+        setMarkdownMaxHeight(`${availableHeight}px`)
+      }
 
-      calculateMaxHeight();
-      window.addEventListener("resize", calculateMaxHeight);
+      calculateMaxHeight()
+      window.addEventListener("resize", calculateMaxHeight)
 
-      return () => window.removeEventListener("resize", calculateMaxHeight);
+      return () => window.removeEventListener("resize", calculateMaxHeight)
     }
-  }, [hasValidMessages, highlightData]);
+  }, [hasValidMessages, highlightData])
 
   const copyToClipboard = () => {
     if (!editor || !currentChatHistory || currentChatHistory.displayableChatHistory.length === 0) {
