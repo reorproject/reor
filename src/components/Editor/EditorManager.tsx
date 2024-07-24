@@ -134,7 +134,7 @@ const EditorManager: React.FC<EditorManagerProps> = ({
       {menuVisible && <EditorContextMenu editor={editor} menuPosition={menuPosition} setMenuVisible={setMenuVisible} />}
       <div className={`${editorFlex ? 'hide-scrollbar flex h-screen items-center justify-center py-4 pl-4' : ''}`}>
         <EditorContent
-          className={`w-full ${editorFlex ? 'max-w-3xl' : ''} h-full p-4`}
+          className={`w-full overflow-y-auto ${editorFlex ? 'max-w-3xl' : ''} h-full p-4`}
           style={{
             wordBreak: 'break-word',
             backgroundColor: 'rgb(30, 30, 30)',
