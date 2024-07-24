@@ -14,7 +14,6 @@ interface TitleBarProps {
   history: string[]
   setHistory: (string: string[]) => void
   openFileAndOpenEditor: (path: string) => void
-  sidebarWidth: number
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
@@ -25,7 +24,6 @@ const TitleBar: React.FC<TitleBarProps> = ({
   history,
   setHistory,
   openFileAndOpenEditor,
-  sidebarWidth,
 }) => {
   const [platform, setPlatform] = useState('')
   const { openTabs, addTab, selectTab, removeTab, updateTabOrder } = useTabs()
@@ -85,14 +83,8 @@ const TitleBar: React.FC<TitleBarProps> = ({
         />
       </div>
 
-      <div className="relative grow">
-        <div
-          className="scrollable-x-thin absolute inset-y-0 left-0 overflow-x-auto overflow-y-hidden"
-          style={{
-            left: `${sidebarWidth - 25}px`,
-            right: '15px',
-          }}
-        >
+      <div className="scrollable-x-thin relative left-0 grow overflow-x-auto overflow-y-hidden">
+        <div>
           <div className="flex whitespace-nowrap">
             <DraggableTabs
               openTabs={openTabs}

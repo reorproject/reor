@@ -53,7 +53,7 @@ button {
 }
 
 ::-webkit-scrollbar {
-  width: 7px;
+  width: 0px;
 }
 
 ::-webkit-scrollbar-track {
@@ -83,10 +83,6 @@ button {
   scrollbar-width: thin;
   scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
 }
-
-
-
-
 
 /* CSS for menu that appears when selecting/highlighting text */
 .bubble-menu {
