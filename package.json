@@ -17,7 +17,7 @@
     "dev": "vite",
     "prebuild": "node scripts/downloadOllama.js",
     "build": "tsc && vite build && electron-builder",
-    "postbuild": "node scripts/notarize.js",
+    "notarize": "node scripts/notarize.js",
     "preview": "vite preview",
     "pree2e": "vite build --mode=test",
     "e2e": "playwright test",
