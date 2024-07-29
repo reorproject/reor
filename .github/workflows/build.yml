@@ -1,5 +1,4 @@
 name: Build and Package Electron App
-
 on:
   push:
     branches:
@@ -7,31 +6,24 @@ on:
   pull_request:
     branches:
       - "*"
-
 jobs:
   build_and_package:
     strategy:
       matrix:
         include:
           - os: macos-13
-            # arch: x64
           - os: macos-latest
-            # arch: arm64
           - os: windows-latest
           - os: ubuntu-latest
             arch: x64
-
     runs-on: ${{ matrix.os }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "20"
-
       - name: Cache npm dependencies
         uses: actions/cache@v3
         with:
@@ -39,7 +31,6 @@ jobs:
           key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-npm-
-
       - name: Cache TypeScript build
         uses: actions/cache@v3
         with:
@@ -47,58 +38,51 @@ jobs:
           key: ${{ runner.os }}-tsc-${{ hashFiles('**/tsconfig.json') }}
           restore-keys: |
             ${{ runner.os }}-tsc-
-
       - name: Install dependencies
         run: npm install
-
       - name: Run Linter
         run: npm run lint
-
       - name: Run Tests
         run: npm run test
-
       - name: Set up environment for macOS build
         if: matrix.os == 'macos-13' || matrix.os == 'macos-latest'
         env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          # APPLE_ID: ${{ secrets.APPLE_ID }}
+          # APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # If you use GitHub token for auto-update
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm run build
-
-      - name: Build for non-macos
+      - name: Build for non-macOS
         if: matrix.os != 'macos-13' && matrix.os != 'macos-latest'
         run: |
           npm run build
-
+      - name: Notarize macOS build
+        if: (matrix.os == 'macos-13' || matrix.os == 'macos-latest') && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+        run: npm run notarize
       - name: Set version as env
         run: echo "APP_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
-
       - name: Print APP_VERSION
         run: echo "APP_VERSION=${{ env.APP_VERSION }}"
-
       - name: List output files
         if: matrix.os != 'macos-13' && matrix.os != 'macos-latest' 
         run: |
           ls ./release/${{ env.APP_VERSION }}/
-
       - name: Check runner architecture
         if: matrix.os != 'macos-13' && matrix.os != 'macos-latest' 
         run: uname -m
-        
-
       - name: Rename artifacts for ARM architecture
         if: matrix.os == 'macos-latest'
         run: |
           mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/Reor_${{ env.APP_VERSION }}-arm64.dmg
-
       - name: Rename artifacts for Intel architecture
         if: matrix.os == 'macos-13'
         run: |
           mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/Reor_${{ env.APP_VERSION }}-intel.dmg
-
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
