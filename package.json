@@ -64,7 +64,7 @@
     "date-fns": "^3.3.1",
     "dotenv": "^16.4.5",
      "electron-store": "^8.1.0",
-    "electron-updater": "^6.1.1",
+    "electron-updater": "^6.3.0",
     "install": "^0.13.0",
     "js-tiktoken": "^1.0.10",
     "katex": "^0.16.10",
