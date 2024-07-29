@@ -65,12 +65,6 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # If you use GitHub token for auto-update
         run: |
           npm run build
-      - name: Notarize macOS build
-        if: (matrix.os == 'macos-13' || matrix.os == 'macos-latest')
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
-        run: npm run notarize
 
       - name: Build for non-macos
         if: matrix.os != 'macos-latest' && matrix.os != 'macos-latest-xlarge'

@@ -25,7 +25,6 @@ function printDirectoryTree(startPath, indent = "") {
 }
 
 async function notarizeApp() {
-  console.log("Notarizing the app...");
   const productName = "Reor";
 
   // Get the current platform
