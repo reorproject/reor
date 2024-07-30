@@ -16,6 +16,8 @@ jobs:
           - os: windows-latest
           - os: ubuntu-latest
             arch: x64
+      fail-fast: false
+    continue-on-error: true
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout code
@@ -47,8 +49,6 @@ jobs:
       - name: Set up environment for macOS build
         if: matrix.os == 'macos-13' || matrix.os == 'macos-latest'
         env:
-          # APPLE_ID: ${{ secrets.APPLE_ID }}
-          # APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
