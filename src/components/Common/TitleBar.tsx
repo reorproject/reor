@@ -51,11 +51,13 @@ const TitleBar: React.FC<TitleBarProps> = ({
   useEffect(() => {
     const setUpLastAccess = () => {
       if (!openedLastAccess) {
-        openTabs.forEach((tab: Tab) => {
+        openTabs.some((tab: Tab) => {
           if (tab.lastAccessed) {
             setOpenedLastAccess(true)
             openFileAndOpenEditor(tab.filePath)
+            return true
           }
+          return false
         })
       }
     }

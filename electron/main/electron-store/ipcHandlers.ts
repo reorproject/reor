@@ -221,6 +221,8 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     }
 
     const removeTab = ({ tabId, idx, newIndex }: { tabId: string; idx: number; newIndex: number }) => {
+      // Ensure indices are within range
+      if (idx < 0 || idx >= openTabs.length || newIndex < 0 || newIndex >= openTabs.length) return
       openTabs[idx].lastAccessed = false
       openTabs[newIndex].lastAccessed = true
       const updatedTabs = openTabs.filter((tab) => tab.id !== tabId)

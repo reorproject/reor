@@ -102,9 +102,12 @@ export const TabProvider: React.FC<TabProviderProps> = ({
 
       setOpenTabs((prevTabs) => {
         findIdx = prevTabs.findIndex((tab: Tab) => tab.id === tabId)
+        if (findIdx === -1) return prevTabs
+
         openTabs[findIdx].lastAccessed = false
         closedFilePath = findIdx !== -1 ? prevTabs[findIdx].filePath : ''
         newIndex = findIdx > 0 ? findIdx - 1 : 1
+
         if (closedFilePath === currentFilePath) {
           if (newIndex < openTabs.length) {
             openTabs[newIndex].lastAccessed = true
@@ -113,13 +116,17 @@ export const TabProvider: React.FC<TabProviderProps> = ({
           // Select the new index's file
           else setFilePath('')
         }
-        return prevTabs.filter((tab, idx) => idx !== findIdx)
+
+        return prevTabs.filter((_, idx) => idx !== findIdx)
       })
-      window.electronStore.setCurrentOpenFiles('remove', {
-        tabId,
-        idx: findIdx,
-        newIndex,
-      })
+
+      if (newIndex !== -1 && findIdx !== -1) {
+        window.electronStore.setCurrentOpenFiles('remove', {
+          tabId,
+          idx: findIdx,
+          newIndex,
+        })
+      }
     },
     [currentFilePath, openFileAndOpenEditor, openTabs, setFilePath],
   )
