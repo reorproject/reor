@@ -166,7 +166,7 @@ const useFileByFilepath = () => {
         linkify: true, // Create links from "https://..." text
         breaks: true, // New lines (\n) in markdown input are converted to <br>
         transformPastedText: true, // Allow to paste markdown text in the editor
-        transformCopiedText: true, // Copied text is transformed to markdown
+        transformCopiedText: false, // Copied text is transformed to markdown
       }),
       TaskItem.configure({
         nested: true,
