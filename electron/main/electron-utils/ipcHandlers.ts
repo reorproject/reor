@@ -130,7 +130,7 @@ const electronUtilsHandlers = (
 
           const chatHistoriesMap = store.get(StoreKeys.ChatHistories)
           const allChatHistories = chatHistoriesMap[vaultDir] || []
-          const filteredChatHistories = allChatHistories.filter((item) => item.id !== chatID)
+          const filteredChatHistories = allChatHistories.filter((item) => item.id !== chatID.id)
           chatHistoriesMap[vaultDir] = filteredChatHistories
           store.set(StoreKeys.ChatHistories, chatHistoriesMap)
           event.sender.send('update-chat-histories', chatHistoriesMap[vaultDir] || [])
