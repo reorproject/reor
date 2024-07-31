@@ -6,48 +6,6 @@ interface ModalProps {
   children: React.ReactNode
   hideCloseButton?: boolean
   tailwindStylesOnBackground?: string
-  widthType?: string
-}
-
-/*
- * Modal is used in many places for different functions. The dimensions that newNote window
- * should display is different than what settings should be. This is a wrapper to select the width
- * that should be displayed.
- */
-type ModalWidthType =
-  | 'newNote'
-  | 'newDirectory'
-  | 'renameNote'
-  | 'renameDirectory'
-  | 'flashcardMode'
-  | 'flashcardReviewMode'
-  | 'newEmbeddingModel'
-  | 'localLLMSetting'
-  | 'remoteLLMSetting'
-  | 'indexingProgress'
-  | 'settingsContainer'
-
-type Dimension = '[500px]' | '[750px]' | '[300px]' | 'full' | '[850px]' | '[900px]'
-
-const customDimensionsMap: Record<ModalWidthType, Dimension> = {
-  newNote: '[500px]',
-  newDirectory: '[500px]',
-  renameNote: '[500px]',
-  renameDirectory: '[500px]',
-  flashcardMode: '[750px]',
-  flashcardReviewMode: '[300px]',
-  newEmbeddingModel: '[500px]',
-  localLLMSetting: '[500px]',
-  remoteLLMSetting: '[500px]',
-  indexingProgress: '[850px]',
-  settingsContainer: '[900px]',
-}
-
-const getDimension = (name: ModalWidthType | undefined): Dimension => {
-  if (name === undefined) {
-    return 'full'
-  }
-  return customDimensionsMap[name] || 'full'
 }
 
 const ReorModal: React.FC<ModalProps> = ({
@@ -56,10 +14,9 @@ const ReorModal: React.FC<ModalProps> = ({
   children,
   hideCloseButton,
   tailwindStylesOnBackground,
-  widthType,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null)
-  const widthClass = getDimension(widthType as ModalWidthType)
+  // const widthClass = getDimension(widthType as ModalWidthType);
 
   useEffect(() => {
     const handleOffClick = (event: MouseEvent) => {
@@ -83,7 +40,7 @@ const ReorModal: React.FC<ModalProps> = ({
     >
       <div
         ref={modalRef}
-        className={`w-${widthClass} flex max-w-6xl flex-col items-center justify-center rounded-lg border border-solid border-gray-600 bg-dark-gray-c-three shadow-xl`}
+        className="flex max-w-4xl  flex-col items-center justify-center rounded-lg border border-solid border-gray-600 bg-dark-gray-c-three shadow-xl"
       >
         <div className="z-50 h-0 w-full items-end border-b border-gray-700 px-4">
           {!hideCloseButton && (

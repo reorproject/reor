@@ -68,6 +68,7 @@ const MainPageComponent: React.FC = () => {
   })
 
   const [sidebarWidth, setSidebarWidth] = useState<number>(40)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
   // find all available files
   useEffect(() => {
@@ -117,7 +118,13 @@ const MainPageComponent: React.FC = () => {
           TitleBar since one of the Parent components inadvertently creates a new stacking context that 
           impacts the z-index. */}
       <div id="tooltip-container" />
-      <TabProvider openFileAndOpenEditor={openFileAndOpenEditor} setFilePath={setFilePath} currentFilePath={filePath}>
+      <TabProvider
+        openFileAndOpenEditor={openFileAndOpenEditor}
+        setFilePath={setFilePath}
+        currentFilePath={filePath}
+        sidebarShowing={sidebarShowing}
+        makeSidebarShow={setSidebarShowing}
+      >
         <TitleBar
           history={navigationHistory}
           setHistory={setNavigationHistory}
@@ -160,13 +167,15 @@ const MainPageComponent: React.FC = () => {
               setCurrentChatHistory={openChatAndOpenChat}
               setChatFilters={setChatFilters}
               setShowChatbot={setShowChatbot}
+              isSidebarOpen={isSidebarOpen}
+              setIsSidebarOpen={setIsSidebarOpen}
             />
           </div>
         </ResizableComponent>
 
         {!showChatbot && filePath ? (
           <div className="relative flex size-full overflow-hidden">
-            <div className="h-full grow overflow-hidden">
+            <div className="grow">
               <EditorManager
                 editor={editor}
                 suggestionsState={suggestionsState}

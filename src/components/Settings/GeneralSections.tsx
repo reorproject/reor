@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Switch from '@mui/material/Switch'
 
-export const CreateAppearanceSection = () => {
+export const AppearanceSection = () => {
   const [isIconSBCompact, setIsIconSBCompact] = useState<boolean>(false)
   const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false)
 
@@ -63,7 +63,7 @@ export const CreateAppearanceSection = () => {
   )
 }
 
-export const CreateEditorSection = () => {
+export const EditorSection = () => {
   // const { spellCheckEnabled, setSpellCheckEnabled } = useFileByFilepath()
   const [tempSpellCheckEnabled, setTempSpellCheckEnabled] = useState(false)
   const [editorFlexCenter, setEditorFlexCenter] = useState<boolean>(true)

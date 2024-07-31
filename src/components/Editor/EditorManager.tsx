@@ -109,7 +109,7 @@ const EditorManager: React.FC<EditorManagerProps> = ({
 
   return (
     <div
-      className="relative size-full cursor-text overflow-y-auto text-slate-400 opacity-80"
+      className="relative size-full cursor-text overflow-y-auto text-slate-400 opacity-80 py-1"
       onClick={() => editor?.commands.focus()}
       style={{
         backgroundColor: 'rgb(30, 30, 30)',
@@ -132,7 +132,7 @@ const EditorManager: React.FC<EditorManagerProps> = ({
         />
       )}
       {menuVisible && <EditorContextMenu editor={editor} menuPosition={menuPosition} setMenuVisible={setMenuVisible} />}
-      <div className={`${editorFlex ? 'hide-scrollbar flex h-screen items-center justify-center py-4 pl-4' : ''}`}>
+      <div className={`${editorFlex ? 'hide-scrollbar flex items-center justify-center py-4 pl-4' : ''}`}>
         <EditorContent
           className={`w-full overflow-y-auto ${editorFlex ? 'max-w-3xl' : ''} h-full p-4`}
           style={{

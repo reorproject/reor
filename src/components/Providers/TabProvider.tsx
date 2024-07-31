@@ -100,6 +100,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
       let newIndex = -1
       let findIdx = -1
 
+      console.log('Remove:', tabId)
       setOpenTabs((prevTabs) => {
         findIdx = prevTabs.findIndex((tab: Tab) => tab.id === tabId)
         if (findIdx === -1) return prevTabs

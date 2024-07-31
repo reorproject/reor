@@ -23,7 +23,7 @@ const ResizableComponent: React.FC<ResizableComponentProps> = ({
     (e: MouseEvent) => {
       if (isDragging) {
         const deltaWidth = resizeSide === 'left' ? -e.movementX : e.movementX
-        setWidth(deltaWidth)
+        setWidth((prevWidth) => prevWidth + deltaWidth)
       }
     },
     [isDragging, resizeSide],

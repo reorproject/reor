@@ -1,5 +1,5 @@
 import React from 'react'
-import { CreateAppearanceSection, CreateEditorSection } from './GeneralSections'
+import { AppearanceSection, EditorSection } from './GeneralSections'
 
 /*
  *  General Page has the following format:
@@ -23,8 +23,8 @@ const GeneralSettings = () => {
   return (
     <div className="w-full flex-col justify-between rounded bg-dark-gray-c-three">
       <h2 className="mb-0 text-2xl font-semibold text-white">General</h2>
-      <CreateAppearanceSection />
-      <CreateEditorSection />
+      <AppearanceSection />
+      <EditorSection />
     </div>
   )
 }

@@ -19,7 +19,7 @@ enum SettingsTab {
   EmbeddingModelTab = 'embeddingModel',
   TextGenerationTab = 'textGeneration',
   // RAG = "RAG",
-  ANALYTICSTab = 'analytics',
+  AnalyticsTab = 'analytics',
   ChunkSizeTab = 'chunkSize',
 }
 
@@ -81,9 +81,9 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose: onCloseFromParen
           </div>
           <div
             className={`flex cursor-pointer items-center rounded border-b border-gray-200 p-2 text-sm hover:bg-neutral-600 ${
-              activeTab === SettingsTab.ANALYTICSTab ? 'bg-neutral-700 font-semibold text-white' : 'text-gray-200'
+              activeTab === SettingsTab.AnalyticsTab ? 'bg-neutral-700 font-semibold text-white' : 'text-gray-200'
             }`}
-            onClick={() => setActiveTab(SettingsTab.ANALYTICSTab)}
+            onClick={() => setActiveTab(SettingsTab.AnalyticsTab)}
           >
             Analytics{' '}
           </div>
@@ -114,7 +114,7 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose: onCloseFromParen
             </div>
           )}
 
-          {activeTab === SettingsTab.ANALYTICSTab && (
+          {activeTab === SettingsTab.AnalyticsTab && (
             <div className="w-full">
               <AnalyticsSettings />
             </div>
