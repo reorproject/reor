@@ -5,6 +5,8 @@ import Store from 'electron-store'
 
 import WindowsManager from '../common/windowManager'
 import { StoreKeys, StoreSchema } from '../electron-store/storeConfig'
+import { ChatHistoryMetadata } from '@/components/Chat/hooks/use-chat-history'
+import { FileInfoNode } from '../filesystem/types'
 
 const electronUtilsHandlers = (
   store: Store<StoreSchema>,
@@ -38,7 +40,7 @@ const electronUtilsHandlers = (
     if (browserWindow) menu.popup({ window: browserWindow })
   })
 
-  ipcMain.handle('show-context-menu-file-item', async (event, file) => {
+  ipcMain.handle('show-context-menu-file-item', async (event, file: FileInfoNode) => {
     const menu = new Menu()
 
     const stats = await fs.stat(file.path)
@@ -115,7 +117,7 @@ const electronUtilsHandlers = (
     }
   })
 
-  ipcMain.handle('show-chat-menu-item', (event, chatID) => {
+  ipcMain.handle('show-chat-menu-item', (event, chatRow: ChatHistoryMetadata) => {
     const menu = new Menu()
 
     menu.append(
@@ -130,7 +132,7 @@ const electronUtilsHandlers = (
 
           const chatHistoriesMap = store.get(StoreKeys.ChatHistories)
           const allChatHistories = chatHistoriesMap[vaultDir] || []
-          const filteredChatHistories = allChatHistories.filter((item) => item.id !== chatID)
+          const filteredChatHistories = allChatHistories.filter((item) => item.id !== chatRow.id)
           chatHistoriesMap[vaultDir] = filteredChatHistories
           store.set(StoreKeys.ChatHistories, chatHistoriesMap)
           event.sender.send('update-chat-histories', chatHistoriesMap[vaultDir] || [])
