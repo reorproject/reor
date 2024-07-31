@@ -31,7 +31,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   const [isOptionsVisible, setIsOptionsVisible] = useState<boolean>(false)
   const [prevPrompt, setPrevPrompt] = useState<string>('')
   const [positionStyle, setPositionStyle] = useState({ top: 0, left: 0 })
-  const [markdownMaxHeight, setMarkdownMaxHeight] = useState("auto")
+  const [markdownMaxHeight, setMarkdownMaxHeight] = useState('auto')
   const markdownContainerRef = useRef<HTMLDivElement>(null)
   const optionsContainerRef = useRef<HTMLDivElement>(null)
   const hasValidMessages = currentChatHistory?.displayableChatHistory.some((msg) => msg.role === 'assistant')
@@ -90,18 +90,18 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
         const containerTop = positionStyle.top
         const buttonHeight = 30
         const padding = 54
-        const availableHeight =
-          screenHeight - containerTop - buttonHeight - padding
+        const availableHeight = screenHeight - containerTop - buttonHeight - padding
 
         setMarkdownMaxHeight(`${availableHeight}px`)
       }
 
       calculateMaxHeight()
-      window.addEventListener("resize", calculateMaxHeight)
+      window.addEventListener('resize', calculateMaxHeight)
 
-      return () => window.removeEventListener("resize", calculateMaxHeight)
+      return () => window.removeEventListener('resize', calculateMaxHeight)
     }
-  }, [hasValidMessages, highlightData])
+    return () => {}
+  }, [hasValidMessages, highlightData.position, positionStyle.top])
 
   const copyToClipboard = () => {
     if (!editor || !currentChatHistory || currentChatHistory.displayableChatHistory.length === 0) {
@@ -237,7 +237,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           const lastMessage = newDisplayableHistory[newDisplayableHistory.length - 1]
 
           if (lastMessage.role === 'assistant') {
-            lastMessage.content += newContent 
+            lastMessage.content += newContent
             lastMessage.messageType = newMessageType
           } else {
             newDisplayableHistory.push({
@@ -331,7 +331,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
             value={customPrompt}
             onChange={(e) => setCustomPrompt(e.target.value)}
             placeholder="Ask AI anything..."
-            className="mb-2.5 w-full p-1" 
+            className="mb-2.5 w-full p-1"
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
                 handleOption('custom', customPrompt)
@@ -376,19 +376,19 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           <div
             style={{
               maxHeight: markdownMaxHeight,
-              overflowY: "auto",
+              overflowY: 'auto',
             }}
           >
-          {lastAssistantMessage && (
-            <ReactMarkdown
-              rehypePlugins={[rehypeRaw]}
-              className={`markdown-content break-words rounded-md p-1 ${getClassNames(lastAssistantMessage)}`}
-            >
-              {lastAssistantMessage.visibleContent
-                ? lastAssistantMessage.visibleContent
-                : formatOpenAIMessageContentIntoString(lastAssistantMessage.content)}
-            </ReactMarkdown>
-          )}
+            {lastAssistantMessage && (
+              <ReactMarkdown
+                rehypePlugins={[rehypeRaw]}
+                className={`markdown-content break-words rounded-md p-1 ${getClassNames(lastAssistantMessage)}`}
+              >
+                {lastAssistantMessage.visibleContent
+                  ? lastAssistantMessage.visibleContent
+                  : formatOpenAIMessageContentIntoString(lastAssistantMessage.content)}
+              </ReactMarkdown>
+            )}
           </div>
           <div className="mt-2 flex justify-between">
             <button
