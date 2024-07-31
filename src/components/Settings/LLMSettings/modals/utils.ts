@@ -29,6 +29,14 @@ export const openAIDefaultModels: OpenAILLMConfig[] = [
     apiURL: '',
   },
   {
+    contextLength: 128000,
+    modelName: 'gpt-4o-mini',
+    engine: 'openai',
+    type: 'openai',
+    apiKey: '',
+    apiURL: '',
+  },
+  {
     contextLength: 16385,
     modelName: 'gpt-3.5-turbo',
     engine: 'openai',
