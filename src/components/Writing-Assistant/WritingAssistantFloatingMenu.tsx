@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
 
 import { MessageStreamEvent } from '@anthropic-ai/sdk/resources'
 import Button from '@mui/material/Button'
@@ -30,8 +30,10 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   const [customPrompt, setCustomPrompt] = useState<string>('')
   const [isOptionsVisible, setIsOptionsVisible] = useState<boolean>(false)
   const [prevPrompt, setPrevPrompt] = useState<string>('')
-  const markdownContainerRef = useRef(null)
-  const optionsContainerRef = useRef(null)
+  const [positionStyle, setPositionStyle] = useState({ top: 0, left: 0 })
+  const [markdownMaxHeight, setMarkdownMaxHeight] = useState('auto')
+  const markdownContainerRef = useRef<HTMLDivElement>(null)
+  const optionsContainerRef = useRef<HTMLDivElement>(null)
   const hasValidMessages = currentChatHistory?.displayableChatHistory.some((msg) => msg.role === 'assistant')
   const lastAssistantMessage = currentChatHistory?.displayableChatHistory
     .filter((msg) => msg.role === 'assistant')
@@ -49,6 +51,57 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       setIsOptionsVisible(false)
     }
   }, [hasValidMessages])
+
+  useLayoutEffect(() => {
+    if (!isOptionsVisible) return
+
+    const calculatePosition = () => {
+      if (!optionsContainerRef.current || !highlightData.position) {
+        return
+      }
+
+      const screenHeight = window.innerHeight
+      const elementHeight = optionsContainerRef.current.offsetHeight
+      const spaceBelow = screenHeight - highlightData.position.top
+      const isSpaceEnough = spaceBelow >= elementHeight
+
+      if (isSpaceEnough) {
+        setPositionStyle({
+          top: highlightData.position.top,
+          left: highlightData.position.left,
+        })
+      } else {
+        setPositionStyle({
+          top: highlightData.position.top - elementHeight,
+          left: highlightData.position.left,
+        })
+      }
+    }
+
+    calculatePosition()
+  }, [isOptionsVisible, highlightData.position])
+
+  useLayoutEffect(() => {
+    if (hasValidMessages && highlightData.position) {
+      const calculateMaxHeight = () => {
+        if (!markdownContainerRef.current) return
+
+        const screenHeight = window.innerHeight
+        const containerTop = positionStyle.top
+        const buttonHeight = 30
+        const padding = 54
+        const availableHeight = screenHeight - containerTop - buttonHeight - padding
+
+        setMarkdownMaxHeight(`${availableHeight}px`)
+      }
+
+      calculateMaxHeight()
+      window.addEventListener('resize', calculateMaxHeight)
+
+      return () => window.removeEventListener('resize', calculateMaxHeight)
+    }
+    return () => {}
+  }, [hasValidMessages, highlightData.position, positionStyle.top])
 
   const copyToClipboard = () => {
     if (!editor || !currentChatHistory || currentChatHistory.displayableChatHistory.length === 0) {
@@ -184,7 +237,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           const lastMessage = newDisplayableHistory[newDisplayableHistory.length - 1]
 
           if (lastMessage.role === 'assistant') {
-            lastMessage.content += newContent // Append new content with a space
+            lastMessage.content += newContent
             lastMessage.messageType = newMessageType
           } else {
             newDisplayableHistory.push({
@@ -266,8 +319,8 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
         <div
           ref={optionsContainerRef}
           style={{
-            top: highlightData.position.top,
-            left: highlightData.position.left,
+            top: positionStyle.top,
+            left: positionStyle.left,
           }}
           className="absolute z-50 w-96 rounded-md border border-gray-300 bg-white p-2.5"
         >
@@ -278,7 +331,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
             value={customPrompt}
             onChange={(e) => setCustomPrompt(e.target.value)}
             placeholder="Ask AI anything..."
-            className="mb-2.5 w-full p-1" // TailwindCSS classes for styling
+            className="mb-2.5 w-full p-1"
             onKeyPress={(e) => {
               if (e.key === 'Enter') {
                 handleOption('custom', customPrompt)
@@ -315,21 +368,28 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           ref={markdownContainerRef}
           className="absolute z-50 rounded-lg border border-gray-300 bg-white p-2.5 shadow-md"
           style={{
-            top: highlightData.position.top,
-            left: highlightData.position.left,
+            top: positionStyle.top,
+            left: positionStyle.left,
             width: '385px',
           }}
         >
-          {lastAssistantMessage && (
-            <ReactMarkdown
-              rehypePlugins={[rehypeRaw]}
-              className={`markdown-content break-words rounded-md p-1 ${getClassNames(lastAssistantMessage)}`}
-            >
-              {lastAssistantMessage.visibleContent
-                ? lastAssistantMessage.visibleContent
-                : formatOpenAIMessageContentIntoString(lastAssistantMessage.content)}
-            </ReactMarkdown>
-          )}
+          <div
+            style={{
+              maxHeight: markdownMaxHeight,
+              overflowY: 'auto',
+            }}
+          >
+            {lastAssistantMessage && (
+              <ReactMarkdown
+                rehypePlugins={[rehypeRaw]}
+                className={`markdown-content break-words rounded-md p-1 ${getClassNames(lastAssistantMessage)}`}
+              >
+                {lastAssistantMessage.visibleContent
+                  ? lastAssistantMessage.visibleContent
+                  : formatOpenAIMessageContentIntoString(lastAssistantMessage.content)}
+              </ReactMarkdown>
+            )}
+          </div>
           <div className="mt-2 flex justify-between">
             <button
               className="mr-1 flex cursor-pointer items-center rounded-md border-0 bg-blue-100 px-2.5 py-1"
