@@ -9,6 +9,7 @@ import { FaMagic } from 'react-icons/fa'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 
+import posthog from 'posthog-js'
 import { ChatHistory, ChatMessageToDisplay, formatOpenAIMessageContentIntoString } from '../Chat/chatUtils'
 import useOutsideClick from '../Chat/hooks/use-outside-click'
 import { HighlightData } from '../Editor/HighlightExtension'
@@ -182,7 +183,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       context: [],
     })
     if (!newChatHistory) return
-
+    posthog.capture('submitted_writing_assistant_message')
     await window.llm.streamingLLMResponse(defaultLLMName, currentModelConfig, false, newChatHistory)
     setLoadingResponse(false)
   }
