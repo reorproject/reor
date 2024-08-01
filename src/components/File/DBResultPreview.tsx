@@ -58,12 +58,7 @@ export const DBResultPreview: React.FC<DBResultPreviewProps> = ({ dbResult: entr
         {fileName && <span className="text-xs text-gray-400">{fileName} </span>} | Similarity:{' '}
         {/* eslint-disable-next-line no-underscore-dangle */}
         {cosineDistanceToPercentage(entry._distance)}% |{' '}
-        {modified && (
-          <span className="text-xs text-gray-400">
-            Modified
-            {modified}
-          </span>
-        )}
+        {modified && <span className="text-xs text-gray-400">Modified {modified}</span>}
       </div>
     </div>
   )
@@ -98,12 +93,7 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({ dbResult: entr
         {fileName && <span className="text-xs text-gray-400">{fileName} </span>} | Similarity:{' '}
         {/* eslint-disable-next-line no-underscore-dangle */}
         {cosineDistanceToPercentage(entry._distance)}% |{' '}
-        {modified && (
-          <span className="text-xs text-gray-400">
-            Modified
-            {modified}
-          </span>
-        )}
+        {modified && <span className="text-xs text-gray-400">Modified {modified}</span>}
       </div>
     </div>
   )
