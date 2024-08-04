@@ -42,7 +42,6 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose: onCloseFromParen
       onClose={() => {
         handleSave()
       }}
-      widthType="settingsContainer"
     >
       <div className="flex w-[900px] md:h-[600px] lg:h-[600px] xl:h-[800px]">
         <div className="flex h-full w-[200px] flex-col border-y-0 border-l-0 border-r-[0.1px] border-solid border-gray-700 bg-dark-gray-c-seven p-2 text-white">

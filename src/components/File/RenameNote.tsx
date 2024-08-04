@@ -88,7 +88,7 @@ const RenameNoteModal: React.FC<RenameNoteModalProps> = ({ isOpen, fullNoteName,
   }
 
   return (
-    <ReorModal isOpen={isOpen} onClose={onClose} widthType="renameNote">
+    <ReorModal isOpen={isOpen} onClose={onClose}>
       <div className="my-2 ml-3 mr-6 h-full min-w-[400px]">
         <h2 className="mb-3 text-xl font-semibold text-white">Rename Note</h2>
         <input

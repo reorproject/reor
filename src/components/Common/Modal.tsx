@@ -16,7 +16,6 @@ const ReorModal: React.FC<ModalProps> = ({
   tailwindStylesOnBackground,
 }) => {
   const modalRef = useRef<HTMLDivElement>(null)
-  // const widthClass = getDimension(widthType as ModalWidthType);
 
   useEffect(() => {
     const handleOffClick = (event: MouseEvent) => {

@@ -60,7 +60,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose: p
     }
   }
   return (
-    <ReorModal isOpen={isOpen} onClose={handleClose} widthType="remoteLLMSetting">
+    <ReorModal isOpen={isOpen} onClose={handleClose}>
       <div className="mb-2 ml-3 mr-2 w-[400px]">
         <h2 className="mb-0 font-semibold text-white">Remote LLM Setup</h2>
         <p className="my-2 text-sm text-gray-100">

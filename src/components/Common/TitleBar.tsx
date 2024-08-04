@@ -85,7 +85,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
         />
       </div>
 
-      <div className="scrollable-x-thin relative left-0 grow overflow-x-auto overflow-y-hidden">
+      <div className="relative left-10 max-w-[75%] grow overflow-hidden">
         <div>
           <div className="flex whitespace-nowrap">
             <DraggableTabs

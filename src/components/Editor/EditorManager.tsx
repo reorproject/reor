@@ -99,17 +99,11 @@ const EditorManager: React.FC<EditorManagerProps> = ({
 
     initEditorContentCenter()
     window.ipcRenderer.on('editor-flex-center-changed', handleEditorChange)
-    // return () => {
-    //   window.ipcRenderer.removeListener(
-    //     "editor-flex-center-changed",
-    //     handleEditorChange
-    //   );
-    // };
   }, [])
 
   return (
     <div
-      className="relative size-full cursor-text overflow-y-auto text-slate-400 opacity-80 py-1"
+      className="relative size-full cursor-text overflow-y-auto py-4 text-slate-400 opacity-80"
       onClick={() => editor?.commands.focus()}
       style={{
         backgroundColor: 'rgb(30, 30, 30)',
@@ -128,13 +122,13 @@ const EditorManager: React.FC<EditorManagerProps> = ({
           placeholder="Search..."
           // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus
-          className="absolute right-0 top-4 z-50 mr-14 mt-4 rounded-md border-none  bg-transparent p-2 text-white"
+          className="absolute right-0 top-4 z-50 mr-14 mt-4 rounded-md border-none bg-transparent p-2 text-white"
         />
       )}
       {menuVisible && <EditorContextMenu editor={editor} menuPosition={menuPosition} setMenuVisible={setMenuVisible} />}
-      <div className={`${editorFlex ? 'hide-scrollbar flex items-center justify-center py-4 pl-4' : ''}`}>
+      <div className={`relative h-full ${editorFlex ? 'flex items-center justify-center py-4 pl-4' : ''}`}>
         <EditorContent
-          className={`w-full overflow-y-auto ${editorFlex ? 'max-w-3xl' : ''} h-full p-4`}
+          className={`size-full overflow-y-auto p-4 ${editorFlex ? 'max-w-3xl' : ''}`}
           style={{
             wordBreak: 'break-word',
             backgroundColor: 'rgb(30, 30, 30)',

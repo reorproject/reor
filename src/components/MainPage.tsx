@@ -68,7 +68,6 @@ const MainPageComponent: React.FC = () => {
   })
 
   const [sidebarWidth, setSidebarWidth] = useState<number>(40)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
 
   // find all available files
   useEffect(() => {
@@ -167,15 +166,13 @@ const MainPageComponent: React.FC = () => {
               setCurrentChatHistory={openChatAndOpenChat}
               setChatFilters={setChatFilters}
               setShowChatbot={setShowChatbot}
-              isSidebarOpen={isSidebarOpen}
-              setIsSidebarOpen={setIsSidebarOpen}
             />
           </div>
         </ResizableComponent>
 
         {!showChatbot && filePath ? (
           <div className="relative flex size-full overflow-hidden">
-            <div className="grow">
+            <div className="h-full grow overflow-hidden">
               <EditorManager
                 editor={editor}
                 suggestionsState={suggestionsState}

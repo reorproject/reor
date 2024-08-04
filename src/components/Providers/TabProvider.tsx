@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react'
-
 import { v4 as uuidv4 } from 'uuid'
+import { SidebarAbleToShow } from '../Sidebars/MainSidebar'
 
 export type Tab = {
   id: string // Unique ID for the tab, useful for operations
@@ -16,6 +16,8 @@ interface TabProviderProps {
   openFileAndOpenEditor: (path: string) => void
   setFilePath: (path: string) => void
   currentFilePath: string | null
+  sidebarShowing: string | null
+  makeSidebarShow: (option: SidebarAbleToShow) => void
 }
 
 interface TabContextType {
@@ -44,6 +46,8 @@ export const TabProvider: React.FC<TabProviderProps> = ({
   openFileAndOpenEditor,
   setFilePath,
   currentFilePath,
+  sidebarShowing,
+  makeSidebarShow,
 }) => {
   const [openTabs, setOpenTabs] = useState<Tab[]>([])
 
@@ -100,7 +104,6 @@ export const TabProvider: React.FC<TabProviderProps> = ({
       let newIndex = -1
       let findIdx = -1
 
-      console.log('Remove:', tabId)
       setOpenTabs((prevTabs) => {
         findIdx = prevTabs.findIndex((tab: Tab) => tab.id === tabId)
         if (findIdx === -1) return prevTabs
@@ -158,9 +161,10 @@ export const TabProvider: React.FC<TabProviderProps> = ({
         syncTabsWithBackend('select', { tabs: newTabs })
         return newTabs
       })
+      if (sidebarShowing !== 'files') makeSidebarShow('files')
       openFileAndOpenEditor(selectedTab.filePath)
     },
-    [openFileAndOpenEditor],
+    [openFileAndOpenEditor, makeSidebarShow, sidebarShowing],
   )
 
   const TabContextMemo = useMemo(

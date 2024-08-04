@@ -57,7 +57,7 @@ const NewLocalEmbeddingModelModal: React.FC<NewLocalEmbeddingModelModalProps> = 
   const whiteIconContextValue: { color: string } = useMemo(() => ({ color: 'white' }), [])
   const salmonIconContextValue: { color: string } = useMemo(() => ({ color: 'salmon' }), [])
   return (
-    <ReorModal isOpen={isOpen} onClose={saveModelConfigToElectronStore} widthType="newEmbeddingModel">
+    <ReorModal isOpen={isOpen} onClose={saveModelConfigToElectronStore}>
       <div className="mx-2 mb-2 w-[400px] pl-3">
         <h3 className="mb-0 font-semibold text-white">Upload and attach local model</h3>
         <p className="mb-6 mt-2 text-xs text-white">Download a ONNX embedding model and select its directory below:</p>

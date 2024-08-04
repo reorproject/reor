@@ -68,7 +68,7 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
   }
 
   return (
-    <ReorModal isOpen={isOpen} onClose={onClose} widthType="newDirectory">
+    <ReorModal isOpen={isOpen} onClose={onClose}>
       <div className="my-2 ml-3 mr-6 h-full min-w-[400px]">
         <h2 className="mb-3 text-xl font-semibold text-white">New Directory</h2>
         <input

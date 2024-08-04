@@ -1,4 +1,4 @@
-import React, { useState, DragEventHandler } from 'react'
+import React, { useState, DragEventHandler, useRef, useEffect } from 'react'
 import { FaPlus } from 'react-icons/fa6'
 import { createPortal } from 'react-dom'
 import { removeFileExtension } from '@/utils/strings'
@@ -35,8 +35,23 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
   currentFilePath,
   updateTabOrder,
 }) => {
+  const fixedTabWidth = 200
   const [hoveredTab, setHoveredTab] = useState<string | null>(null)
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
+  const [tabWidth, setTabWidth] = useState(200)
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  /* Calculates the width of each tab */
+  useEffect(() => {
+    const containerWidth = containerRef.current ? containerRef.current.offsetWidth : 0
+    const totalTabsWidth = openTabs.length * fixedTabWidth
+
+    if (totalTabsWidth > containerWidth) {
+      setTabWidth(containerWidth / openTabs.length)
+    } else {
+      setTabWidth(fixedTabWidth)
+    }
+  }, [openTabs.length])
 
   const onDragStart = (event: any, tabId: string) => {
     event.dataTransfer.setData('tabId', tabId)
@@ -79,12 +94,13 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
   }
 
   return (
-    <div className="relative flex items-center whitespace-nowrap">
+    <div ref={containerRef} className="flex w-full shrink-0 items-center whitespace-nowrap">
       {openTabs.map((tab) => (
         <div
           id="titleBarSingleTab"
           key={tab.id}
-          className="flex h-[10px] items-center justify-center"
+          className="slide-in flex h-[10px] items-center justify-center"
+          style={{ width: `${tabWidth}px` }}
           onMouseEnter={(e) => handleMouseEnter(e, tab)}
           onMouseLeave={handleMouseLevel}
         >
@@ -94,7 +110,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
             onDragStart={(event) => onDragStart(event, tab.id)}
             onDrop={onDrop}
             onDragOver={onDragOver}
-            className={`relative flex w-[150px] cursor-pointer items-center justify-between gap-1 p-2 text-sm text-white
+            className={`relative flex w-full cursor-pointer items-center justify-between gap-1 p-2 text-sm text-white
               ${currentFilePath === tab.filePath ? 'rounded-md bg-dark-gray-c-three' : 'rounded-md'}`}
             onClick={() => onTabSelect(tab)}
           >
