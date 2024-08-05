@@ -99,7 +99,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
         <div
           id="titleBarSingleTab"
           key={tab.id}
-          className="slide-in flex h-[10px] items-center justify-center"
+          className="flex h-[10px] animate-slide-in items-center justify-center"
           style={{ width: `${tabWidth}px` }}
           onMouseEnter={(e) => handleMouseEnter(e, tab)}
           onMouseLeave={handleMouseLevel}

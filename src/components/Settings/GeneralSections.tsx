@@ -110,7 +110,9 @@ export const EditorSection = () => {
           <div className="flex flex-col justify-center">
             <p className="text-gray-100 opacity-80">
               Content Flex Center
-              <p className="m-0 pt-1 text-xs text-gray-100">If on, centers content inside editor</p>
+              <p className="m-0 pt-1 text-xs text-gray-100">
+                If on, centers content inside editor. Recommended for larger screens
+              </p>
             </p>
           </div>
           <Switch
