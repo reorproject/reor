@@ -6,9 +6,8 @@ import { Dispatch, Editor } from '@tiptap/react'
 import { AiOutlineDelete } from 'react-icons/ai'
 import { CiViewTable } from 'react-icons/ci'
 import { FaRegCopy } from 'react-icons/fa'
-import { IoMdCut, IoIosSwap } from 'react-icons/io'
+import { IoMdCut } from 'react-icons/io'
 import { MdContentPaste } from 'react-icons/md'
-import { getListOfSuggestions } from '../../utils/strings'
 
 import '../../styles/global.css'
 
@@ -62,18 +61,6 @@ const deleteCommand = (state: EditorState, dispatch: Dispatch | null): boolean =
   if (dispatch) {
     dispatch(transaction)
   }
-
-  return true
-}
-
-/**
- * Replace a selected wort with word
- */
-const replaceWord = (editor: Editor, newWord: string): boolean => {
-  const { state } = editor
-
-  if (state.selection.empty) return false
-  editor.commands.insertContent(newWord)
 
   return true
 }
@@ -156,7 +143,6 @@ interface EditorContextMenuProps {
  */
 const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosition, setMenuVisible }) => {
   const [showTableSelector, setShowTableSelector] = useState<boolean>(false)
-  const [suggestedWord, setSuggestedWord] = useState<string>('')
   /**
    * We use useRef instead of state's because we are changing the style of our DOM but DO NOT
    * want to re-render. This style gets applied once and does not change so no re-render is needed.
@@ -184,35 +170,6 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
     }
   }, [])
 
-  /**
-   * state: State of the editor
-   *
-   */
-  const getSelectedWord = (state: EditorState): string => {
-    const { from, to } = state.selection
-    const text = state.doc.textBetween(from, to, '')
-
-    const words = text.split(/\s+/)
-    return words.length === 1 ? words[0] : ''
-  }
-
-  useEffect(() => {
-    if (!editor) return
-
-    const fetchSuggestion = async () => {
-      const selectedWord = getSelectedWord(editor.state)
-
-      if (selectedWord) {
-        const suggestions = await getListOfSuggestions(selectedWord, 1)
-        setSuggestedWord(suggestions[0] || 'No suggestions')
-      } else {
-        setSuggestedWord('No suggestions')
-      }
-    }
-
-    fetchSuggestion()
-  }, [editor, menuPosition])
-
   if (!editor) return null
 
   const handleTableSelect = (rows: number, cols: number) => {
@@ -224,15 +181,10 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
   const isTextCurrentlySelected = () => !editor.state.selection.empty
 
   // If text is not selected, then do not perform action.
-  const handleCommand = async (command: string) => {
+  const handleCommand = (command: string) => {
     if (!isTextCurrentlySelected()) return
 
     switch (command) {
-      case 'suggest':
-        // const suggestions = await getListOfSuggestions(selectedWord, 1);
-        // setSuggestedWord(suggestions);
-        replaceWord(editor, suggestedWord)
-        break
       case 'cut':
         cutCommand(editor.state, editor.view.dispatch)
         break
@@ -261,17 +213,6 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
           borderRadius: '4px',
         }}
       >
-        {getSelectedWord(editor.state) && suggestedWord !== 'No suggestions' && (
-          <li
-            onClick={() => {
-              handleCommand('suggest')
-            }}
-            className={`bubble-menu-item ${!isTextCurrentlySelected() ? 'disabled opacity-50' : ''}`}
-          >
-            <IoIosSwap className="icon" />
-            <span className="text">{suggestedWord}</span>
-          </li>
-        )}
         <li
           onClick={() => {
             handleCommand('copy')

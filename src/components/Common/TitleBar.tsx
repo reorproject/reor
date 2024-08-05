@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react'
 import { PiSidebar, PiSidebarFill } from 'react-icons/pi'
 import DraggableTabs from '../Sidebars/TabSidebar'
 import FileHistoryNavigator from '../File/FileSideBar/FileHistoryBar'
-import { useTabs, Tab } from '../Providers/TabProvider'
 
 export const titleBarHeight = '30px'
 
@@ -26,18 +25,6 @@ const TitleBar: React.FC<TitleBarProps> = ({
   openFileAndOpenEditor,
 }) => {
   const [platform, setPlatform] = useState('')
-  const { openTabs, addTab, selectTab, removeTab, updateTabOrder } = useTabs()
-  const [openedLastAccess, setOpenedLastAccess] = useState<boolean>(false)
-
-  // Note: Do not put dependency on addTab or else removeTab does not work properly.
-  // Typically you would define addTab inside the useEffect and then call it but since
-  // we are using it inside a useContext we can remove it
-  /* eslint-disable */
-  useEffect(() => {
-    if (!currentFilePath) return
-    addTab(currentFilePath)
-  }, [currentFilePath])
-  /* eslint-enable */
 
   useEffect(() => {
     const fetchPlatform = async () => {
@@ -47,32 +34,6 @@ const TitleBar: React.FC<TitleBarProps> = ({
 
     fetchPlatform()
   }, [])
-
-  useEffect(() => {
-    const setUpLastAccess = () => {
-      if (!openedLastAccess) {
-        openTabs.some((tab: Tab) => {
-          if (tab.lastAccessed) {
-            setOpenedLastAccess(true)
-            openFileAndOpenEditor(tab.filePath)
-            return true
-          }
-          return false
-        })
-      }
-    }
-
-    setUpLastAccess()
-  }, [openTabs, openFileAndOpenEditor, openedLastAccess])
-
-  const handleTabSelect = (tab: Tab) => {
-    selectTab(tab)
-  }
-
-  const handleTabClose = (event: MouseEvent, tabId: string) => {
-    event.stopPropagation()
-    removeTab(tabId)
-  }
 
   return (
     <div id="customTitleBar" className="flex h-titlebar justify-between" style={{ backgroundColor: '#303030' }}>
@@ -88,13 +49,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
       <div className="relative left-10 max-w-[75%] grow overflow-hidden">
         <div>
           <div className="flex whitespace-nowrap">
-            <DraggableTabs
-              openTabs={openTabs}
-              onTabSelect={handleTabSelect}
-              onTabClose={handleTabClose}
-              currentFilePath={currentFilePath || ''}
-              updateTabOrder={updateTabOrder}
-            />
+            <DraggableTabs currentFilePath={currentFilePath || ''} openFileAndOpenEditor={openFileAndOpenEditor} />
           </div>
         </div>
       </div>

@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react'
 
 import { Editor, EditorContent } from '@tiptap/react'
 
-import { IpcRendererEvent } from 'electron'
 import InEditorBacklinkSuggestionsDisplay, { SuggestionsState } from './BacklinkSuggestionsDisplay'
 import EditorContextMenu from './EditorContextMenu'
 
@@ -93,7 +92,7 @@ const EditorManager: React.FC<EditorManagerProps> = ({
       setEditorFlex(isCenter)
     }
 
-    const handleEditorChange = (event: IpcRendererEvent, editorFlexCenter: boolean) => {
+    const handleEditorChange = (event: any, editorFlexCenter: boolean) => {
       setEditorFlex(editorFlexCenter)
     }
 

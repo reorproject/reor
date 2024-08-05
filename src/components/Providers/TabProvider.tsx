@@ -1,15 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react'
 import { v4 as uuidv4 } from 'uuid'
+import { Tab } from 'electron/main/electron-store/storeConfig'
 import { SidebarAbleToShow } from '../Sidebars/MainSidebar'
-
-export type Tab = {
-  id: string // Unique ID for the tab, useful for operations
-  filePath: string // Path to the file open in the tab
-  title: string // Title of the tab
-  lastAccessed: boolean
-  // timeOpened: Date; // Timestamp to preserve order
-  // isDirty: boolean; // Flag to indicate unsaved changes
-}
 
 interface TabProviderProps {
   children: ReactNode
@@ -53,8 +45,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
 
   useEffect(() => {
     const fetchHistoryTabs = async () => {
-      // await window.electronStore.setCurrentOpenFiles("clear");
-      const response: Tab[] = await window.electronStore.getCurrentOpenFiles()
+      const response: Tab[] = await window.electronStore.getCurrentOpenTabs()
       setOpenTabs(response)
     }
 
@@ -62,7 +53,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
   }, [])
 
   const syncTabsWithBackend = async (action: string, args: any) => {
-    await window.electronStore.setCurrentOpenFiles(action, args)
+    await window.electronStore.setCurrentOpenTabs(action, args)
   }
 
   const extractFileName = (path: string) => {
@@ -125,7 +116,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
       })
 
       if (newIndex !== -1 && findIdx !== -1) {
-        window.electronStore.setCurrentOpenFiles('remove', {
+        window.electronStore.setCurrentOpenTabs('remove', {
           tabId,
           idx: findIdx,
           newIndex,

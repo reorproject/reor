@@ -102,8 +102,8 @@ const electronStore = {
   setDisplayMarkdown: createIPCHandler<(displayMarkdown: boolean) => Promise<void>>('set-display-markdown'),
   getEditorFlexCenter: createIPCHandler<() => Promise<boolean>>('get-editor-flex-center'),
   setEditorFlexCenter: createIPCHandler<(editorFlexCenter: boolean) => Promise<void>>('set-editor-flex-center'),
-  getCurrentOpenFiles: createIPCHandler<() => Promise<Tab[]>>('get-current-open-files'),
-  setCurrentOpenFiles: createIPCHandler<(action: string, args: any) => Promise<void>>('set-current-open-files'),
+  getCurrentOpenTabs: createIPCHandler<() => Promise<Tab[]>>('get-current-open-files'),
+  setCurrentOpenTabs: createIPCHandler<(action: string, args: any) => Promise<void>>('set-current-open-files'),
 }
 
 const fileSystem = {

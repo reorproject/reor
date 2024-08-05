@@ -1,9 +1,7 @@
-import React, { useEffect, useRef } from 'react'
-
+import React, { useEffect, useRef, useCallback } from 'react'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 import posthog from 'posthog-js'
 import { FaSearch } from 'react-icons/fa'
-
 import { DBSearchPreview } from '../File/DBResultPreview'
 import debounce from './utils'
 
@@ -22,17 +20,27 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   searchResults,
   setSearchResults,
 }) => {
-  const searchInputRef = useRef<HTMLInputElement>(null) // Reference for the input field
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
-  const handleSearch = async (query: string) => {
-    const results: DBQueryResult[] = await window.database.search(query, 50)
-    setSearchResults(results)
-  }
+  const handleSearch = useCallback(
+    async (query: string) => {
+      const results: DBQueryResult[] = await window.database.search(query, 50)
+      setSearchResults(results)
+    },
+    [setSearchResults],
+  )
+
+  const debouncedSearch = useCallback(
+    (query: string) => {
+      const debouncedFn = debounce(() => handleSearch(query), 300)
+      debouncedFn()
+    },
+    [handleSearch],
+  )
 
   useEffect(() => {
     searchInputRef.current?.focus()
   }, [])
-  const debouncedSearch = debounce((query: string) => handleSearch(query), 300)
 
   useEffect(() => {
     if (searchQuery) {
@@ -40,10 +48,13 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
     }
   }, [searchQuery, debouncedSearch])
 
-  const openFileSelectSearch = (path: string) => {
-    onFileSelect(path)
-    posthog.capture('open_file_from_search')
-  }
+  const openFileSelectSearch = useCallback(
+    (path: string) => {
+      onFileSelect(path)
+      posthog.capture('open_file_from_search')
+    },
+    [onFileSelect],
+  )
 
   return (
     <div className="h-below-titlebar overflow-y-auto overflow-x-hidden p-1">

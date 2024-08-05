@@ -2,7 +2,7 @@ import { MessageStreamEvent } from '@anthropic-ai/sdk/resources'
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 import Store from 'electron-store'
 import { ProgressResponse } from 'ollama'
-import { ChatCompletionChunk, ChatCompletionMessageParam } from 'openai/resources/chat/completions'
+import { ChatCompletionChunk } from 'openai/resources/chat/completions'
 
 import { LLMConfig, StoreKeys, StoreSchema } from '../electron-store/storeConfig'
 
@@ -44,18 +44,13 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
         event.sender.send('anthropicTokenStream', chatHistory.id, chunk)
       }
 
-      const transformedChatHistory: ChatCompletionMessageParam[] = chatHistory.displayableChatHistory.map((message) => {
-        const { messageType, context, visibleContent, ...rest } = message
-        return rest
-      })
-
       switch (llmConfig.type) {
         case LLMType.OpenAI:
           await openAISession.streamingResponse(
             llmName,
             llmConfig,
             isJSONMode,
-            transformedChatHistory,
+            chatHistory.displayableChatHistory,
             handleOpenAIChunk,
             store.get(StoreKeys.LLMGenerationParameters),
           )
@@ -65,7 +60,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
             llmName,
             llmConfig,
             isJSONMode,
-            transformedChatHistory,
+            chatHistory.displayableChatHistory,
             handleAnthropicChunk,
             store.get(StoreKeys.LLMGenerationParameters),
           )

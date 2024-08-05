@@ -1,16 +1,14 @@
 import React, { useState, DragEventHandler, useRef, useEffect } from 'react'
 import { FaPlus } from 'react-icons/fa6'
 import { createPortal } from 'react-dom'
+import { Tab } from 'electron/main/electron-store/storeConfig'
 import { removeFileExtension } from '@/utils/strings'
 import '../../styles/tab.css'
-import { Tab } from '../Providers/TabProvider'
+import { useTabs } from '../Providers/TabProvider'
 
 interface DraggableTabsProps {
-  openTabs: Tab[]
-  onTabSelect: (tab: Tab) => void
-  onTabClose: (event: any, tabId: string) => void
   currentFilePath: string
-  updateTabOrder: (draggedIndex: number, targetIndex: number) => void
+  openFileAndOpenEditor: (path: string) => void
 }
 
 interface TooltipProps {
@@ -28,18 +26,45 @@ const Tooltip: React.FC<TooltipProps> = ({ filepath, position }) => {
   )
 }
 
-const DraggableTabs: React.FC<DraggableTabsProps> = ({
-  openTabs,
-  onTabSelect,
-  onTabClose,
-  currentFilePath,
-  updateTabOrder,
-}) => {
+const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFileAndOpenEditor }) => {
+  const { openTabs, addTab, selectTab, removeTab, updateTabOrder } = useTabs()
+  const [isLastTabAccessed, setIsLastTabAccessed] = useState<boolean>(false)
+
   const fixedTabWidth = 200
   const [hoveredTab, setHoveredTab] = useState<string | null>(null)
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
   const [tabWidth, setTabWidth] = useState(200)
   const containerRef = useRef<HTMLDivElement>(null)
+
+  // Note: Do not put dependency on addTab or else removeTab does not work properly.
+  // Typically you would define addTab inside the useEffect and then call it but since
+  // we are using it inside a useContext we can remove it
+  /* eslint-disable */
+  useEffect(() => {
+    if (!currentFilePath) return
+    addTab(currentFilePath)
+  }, [currentFilePath])
+  /* eslint-enable */
+
+  /*
+   * Deals with setting which file to open on launch.
+   */
+  useEffect(() => {
+    const selectLastTabAccessed = () => {
+      if (!isLastTabAccessed) {
+        openTabs.forEach((tab: Tab) => {
+          if (tab.lastAccessed) {
+            setIsLastTabAccessed(true)
+            openFileAndOpenEditor(tab.filePath)
+            return true
+          }
+          return false
+        })
+      }
+    }
+
+    selectLastTabAccessed()
+  }, [openTabs, openFileAndOpenEditor, isLastTabAccessed])
 
   /* Calculates the width of each tab */
   useEffect(() => {
@@ -93,6 +118,15 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
     setHoveredTab(null)
   }
 
+  const handleTabSelect = (tab: Tab) => {
+    selectTab(tab)
+  }
+
+  const handleTabClose = (event: React.MouseEvent<HTMLSpanElement, MouseEvent>, tabId: string) => {
+    event.stopPropagation()
+    removeTab(tabId)
+  }
+
   return (
     <div ref={containerRef} className="flex w-full shrink-0 items-center whitespace-nowrap">
       {openTabs.map((tab) => (
@@ -112,14 +146,14 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
             onDragOver={onDragOver}
             className={`relative flex w-full cursor-pointer items-center justify-between gap-1 p-2 text-sm text-white
               ${currentFilePath === tab.filePath ? 'rounded-md bg-dark-gray-c-three' : 'rounded-md'}`}
-            onClick={() => onTabSelect(tab)}
+            onClick={() => handleTabSelect(tab)}
           >
             <span className="truncate">{removeFileExtension(tab.title)}</span>
             <span
               className="cursor-pointer px-1 hover:rounded-md hover:bg-dark-gray-c-five"
               onClick={(e) => {
                 e.stopPropagation() // Prevent triggering onClick of parent div
-                onTabClose(e, tab.id)
+                handleTabClose(e, tab.id)
               }}
             >
               &times;
