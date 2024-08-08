@@ -17,6 +17,7 @@ import WritingAssistant from './Writing-Assistant/WritingAssistantFloatingMenu'
 import { ChatFilters, ChatHistory } from './Chat/chatUtils'
 import EmptyPage from './EmptyPage'
 import { TabProvider } from './Providers/TabProvider'
+import { ModalProvider } from './Providers/ModalProvider'
 
 const MainPageComponent: React.FC = () => {
   const [showChatbot, setShowChatbot] = useState<boolean>(false)
@@ -28,7 +29,7 @@ const MainPageComponent: React.FC = () => {
     setFilePath,
     editor,
     openFileByPath,
-    openRelativePath,
+    openAbsolutePath,
     saveCurrentlyOpenedFile,
     suggestionsState,
     highlightData,
@@ -132,6 +133,7 @@ const MainPageComponent: React.FC = () => {
           similarFilesOpen={showSimilarFiles} // This might need to be managed differently now
           toggleSimilarFiles={toggleSimilarFiles} // This might need to be managed differently now
           openFileAndOpenEditor={openFileAndOpenEditor}
+          openAbsolutePath={openAbsolutePath}
         />
       </TabProvider>
 
@@ -140,11 +142,14 @@ const MainPageComponent: React.FC = () => {
           className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5"
           style={{ width: `${sidebarWidth}px` }}
         >
-          <IconsSidebar
-            openRelativePath={openRelativePath}
-            sidebarShowing={sidebarShowing}
-            makeSidebarShow={setSidebarShowing}
-          />
+          <ModalProvider>
+            <IconsSidebar
+              openAbsolutePath={openAbsolutePath}
+              sidebarShowing={sidebarShowing}
+              makeSidebarShow={setSidebarShowing}
+              currentFilePath={filePath}
+            />
+          </ModalProvider>
         </div>
 
         <ResizableComponent resizeSide="right">
@@ -200,7 +205,9 @@ const MainPageComponent: React.FC = () => {
         ) : (
           !showChatbot && (
             <div className="relative flex size-full overflow-hidden">
-              <EmptyPage vaultDirectory={vaultDirectory} />
+              <ModalProvider>
+                <EmptyPage vaultDirectory={vaultDirectory} openAbsolutePath={openAbsolutePath} />
+              </ModalProvider>
             </div>
           )
         )}

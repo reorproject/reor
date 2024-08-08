@@ -55,7 +55,6 @@ const electronUtils = {
   openNewWindow: createIPCHandler<() => Promise<void>>('open-new-window'),
   getReorAppVersion: createIPCHandler<() => Promise<string>>('get-reor-app-version'),
   showFileItemContextMenu: createIPCHandler<(file: FileInfoNode) => Promise<void>>('show-context-menu-file-item'),
-  showMenuItemContext: createIPCHandler<() => Promise<void>>('show-context-menu-item'),
   showChatItemContext: createIPCHandler<(chatRow: ChatHistoryMetadata) => Promise<void>>('show-chat-menu-item'),
   showCreateFileModal: createIPCHandler<(relativePath: string) => Promise<void>>('empty-new-note-listener'),
   showCreateDirectoryModal: createIPCHandler<(relativePath: string) => Promise<void>>('empty-new-directory-listener'),
@@ -104,6 +103,13 @@ const electronStore = {
   setEditorFlexCenter: createIPCHandler<(editorFlexCenter: boolean) => Promise<void>>('set-editor-flex-center'),
   getCurrentOpenTabs: createIPCHandler<() => Promise<Tab[]>>('get-current-open-files'),
   setCurrentOpenTabs: createIPCHandler<(action: string, args: any) => Promise<void>>('set-current-open-files'),
+  addOpenTabs: createIPCHandler<(tab: Tab) => Promise<void>>('add-current-open-files'),
+  removeOpenTabs:
+    createIPCHandler<(tabId: string, idx: number, newIndex: number) => Promise<void>>('remove-current-open-files'),
+  clearOpenTabs: createIPCHandler<() => Promise<void>>('clear-current-open-files'),
+  updateOpenTabs:
+    createIPCHandler<(draggedIndex: number, targetIndex: number) => Promise<void>>('update-current-open-files'),
+  selectOpenTabs: createIPCHandler<(tabs: Tab[]) => Promise<void>>('set-current-open-files'),
 }
 
 const fileSystem = {

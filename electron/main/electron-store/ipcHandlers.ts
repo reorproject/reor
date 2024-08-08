@@ -206,62 +206,40 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
 
   ipcMain.handle('get-current-open-files', () => store.get(StoreKeys.OpenTabs) || [])
 
-  ipcMain.handle('set-current-open-files', (event, action, args) => {
+  ipcMain.handle('add-current-open-files', (event, tab: Tab) => {
+    if (tab === null) return
     const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || []
+    const existingTab = openTabs.findIndex((item) => item.filePath === tab.filePath)
 
-    const addTab = ({ tab }: { tab: Tab }) => {
-      if (tab === null) return
-      const existingTab = openTabs.findIndex((item) => item.filePath === tab.filePath)
+    /* If tab is already open, do not do anything */
+    if (existingTab !== -1) return
+    openTabs.push(tab)
+    store.set(StoreKeys.OpenTabs, openTabs)
+  })
 
-      /* If tab is already open, do not do anything */
-      if (existingTab !== -1) return
+  ipcMain.handle('remove-current-open-files', (event, tabId: string, idx: number, newIndex: number) => {
+    // Ensure indices are within range
+    const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || []
+    if (idx < 0 || idx >= openTabs.length || newIndex < 0 || newIndex >= openTabs.length) return
+    openTabs[idx].lastAccessed = false
+    openTabs[newIndex].lastAccessed = true
+    const updatedTabs = openTabs.filter((tab) => tab.id !== tabId)
+    store.set(StoreKeys.OpenTabs, updatedTabs)
+  })
 
-      openTabs.push(tab)
-      store.set(StoreKeys.OpenTabs, openTabs)
-    }
+  ipcMain.handle('clear-current-open-files', () => {
+    store.set(StoreKeys.OpenTabs, [])
+  })
 
-    const removeTab = ({ tabId, idx, newIndex }: { tabId: string; idx: number; newIndex: number }) => {
-      // Ensure indices are within range
-      if (idx < 0 || idx >= openTabs.length || newIndex < 0 || newIndex >= openTabs.length) return
-      openTabs[idx].lastAccessed = false
-      openTabs[newIndex].lastAccessed = true
-      const updatedTabs = openTabs.filter((tab) => tab.id !== tabId)
-      store.set(StoreKeys.OpenTabs, updatedTabs)
-    }
+  ipcMain.handle('update-current-open-files', (event, draggedIndex: number, targetIndex: number) => {
+    const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || []
+    if (draggedIndex < 0 || draggedIndex >= openTabs.length || targetIndex < 0 || targetIndex >= openTabs.length) return
+    ;[openTabs[draggedIndex], openTabs[targetIndex]] = [openTabs[targetIndex], openTabs[draggedIndex]]
+    store.set(StoreKeys.OpenTabs, openTabs)
+  })
 
-    const clearAllTabs = () => {
-      store.set(StoreKeys.OpenTabs, [])
-    }
-
-    const updateTab = ({ draggedIndex, targetIndex }: { draggedIndex: number; targetIndex: number }) => {
-      // Swap dragged and target
-      ;[openTabs[draggedIndex], openTabs[targetIndex]] = [openTabs[targetIndex], openTabs[draggedIndex]]
-      store.set(StoreKeys.OpenTabs, openTabs)
-    }
-
-    const selectTab = ({ tabs }: { tabs: Tab[] }) => {
-      store.set(StoreKeys.OpenTabs, tabs)
-    }
-
-    switch (action) {
-      case 'add':
-        addTab(args)
-        break
-      case 'remove':
-        removeTab(args)
-        break
-      case 'update':
-        updateTab(args)
-        break
-      case 'select':
-        selectTab(args)
-        break
-      case 'clear':
-        clearAllTabs()
-        break
-      default:
-        throw new Error('Unsupported action type')
-    }
+  ipcMain.handle('set-current-open-files', (event, tabs: Tab[]) => {
+    if (tabs) store.set(StoreKeys.OpenTabs, tabs)
   })
 }
 

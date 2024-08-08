@@ -18,13 +18,13 @@ import StarterKit from '@tiptap/starter-kit'
 import { toast } from 'react-toastify'
 import { Markdown } from 'tiptap-markdown'
 import { useDebounce } from 'use-debounce'
+import { isFilePathAbsolute, getInvalidCharacterInFilePath, removeFileExtension } from '@/utils/strings'
 
 import { BacklinkExtension } from '@/components/Editor/BacklinkExtension'
 import { SuggestionsState } from '@/components/Editor/BacklinkSuggestionsDisplay'
 import HighlightExtension, { HighlightData } from '@/components/Editor/HighlightExtension'
 import { RichTextLink } from '@/components/Editor/RichTextLink'
 import SearchAndReplace from '@/components/Editor/SearchAndReplace'
-import { getInvalidCharacterInFilePath, removeFileExtension } from '@/utils/strings'
 import 'katex/dist/katex.min.css'
 import '../tiptap.scss'
 import welcomeNote from '../utils'
@@ -97,6 +97,31 @@ const useFileByFilepath = () => {
       await window.electronStore.getVaultDirectoryForWindow(),
       relativePathWithExtension,
     )
+    const fileExists = await window.fileSystem.checkFileExists(absolutePath)
+    if (!fileExists) {
+      const basename = await window.path.basename(absolutePath)
+      const content = optionalContentToWriteOnCreate || `## ${removeFileExtension(basename)}\n`
+      await window.fileSystem.createFile(absolutePath, content)
+      setNeedToIndexEditorContent(true)
+    }
+    openFileByPath(absolutePath)
+  }
+
+  const openAbsolutePath = async (filePath: string, optionalContentToWriteOnCreate?: string): Promise<void> => {
+    const invalidChars = await getInvalidCharacterInFilePath(filePath)
+    if (invalidChars) {
+      toast.error(`Could not create note ${filePath}. Character ${invalidChars} cannot be included in note name.`)
+      throw new Error(`Could not create note ${filePath}. Character ${filePath} cannot be included in note name.`)
+    }
+    const filePathWithExtension = await window.path.addExtensionIfNoExtensionPresent(filePath)
+    let absolutePath = filePathWithExtension
+    // If we create a newNote on an empty page (no file open).
+    if (!isFilePathAbsolute(filePath)) {
+      absolutePath = await window.path.join(
+        await window.electronStore.getVaultDirectoryForWindow(),
+        filePathWithExtension,
+      )
+    }
     const fileExists = await window.fileSystem.checkFileExists(absolutePath)
     if (!fileExists) {
       const basename = await window.path.basename(absolutePath)
@@ -305,7 +330,7 @@ const useFileByFilepath = () => {
     navigationHistory,
     setNavigationHistory,
     openFileByPath,
-    openRelativePath,
+    openAbsolutePath,
     suggestionsState,
     spellCheckEnabled,
     highlightData,

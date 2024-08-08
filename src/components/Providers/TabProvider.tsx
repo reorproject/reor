@@ -52,10 +52,6 @@ export const TabProvider: React.FC<TabProviderProps> = ({
     fetchHistoryTabs()
   }, [])
 
-  const syncTabsWithBackend = async (action: string, args: any) => {
-    await window.electronStore.setCurrentOpenTabs(action, args)
-  }
-
   const extractFileName = (path: string) => {
     const parts = path.split(/[/\\]/) // Split on both forward slash and backslash
     return parts.pop() || '' // Returns the last element, which is the file name
@@ -81,7 +77,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
 
       setOpenTabs((prevTabs) => {
         const newTabs = [...prevTabs, tab]
-        syncTabsWithBackend('add', { tab })
+        window.electronStore.addOpenTabs(tab)
         return newTabs
       })
     },
@@ -116,11 +112,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
       })
 
       if (newIndex !== -1 && findIdx !== -1) {
-        window.electronStore.setCurrentOpenTabs('remove', {
-          tabId,
-          idx: findIdx,
-          newIndex,
-        })
+        window.electronStore.removeOpenTabs(tabId, findIdx, newIndex)
       }
     },
     [currentFilePath, openFileAndOpenEditor, openTabs, setFilePath],
@@ -132,11 +124,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
       const newTabs = [...prevTabs]
       const [draggedTab] = newTabs.splice(draggedIndex, 1)
       newTabs.splice(targetIndex, 0, draggedTab)
-      // console.log(`Dragged ${draggedIndex}, target ${targetIndex}`);
-      syncTabsWithBackend('update', {
-        draggedIndex,
-        targetIndex,
-      })
+      window.electronStore.updateOpenTabs(draggedIndex, targetIndex)
       return newTabs
     })
   }, [])
@@ -149,7 +137,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
           ...tab,
           lastAccessed: tab.id === selectedTab.id,
         }))
-        syncTabsWithBackend('select', { tabs: newTabs })
+        window.electronStore.selectOpenTabs(newTabs)
         return newTabs
       })
       if (sidebarShowing !== 'files') makeSidebarShow('files')

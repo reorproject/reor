@@ -13,23 +13,34 @@ import NewNoteComponent from '../File/NewNote'
 import FlashcardMenuModal from '../Flashcard/FlashcardMenuModal'
 import SettingsModal from '../Settings/Settings'
 import { SidebarAbleToShow } from './MainSidebar'
+import { useModalOpeners } from '../Providers/ModalProvider'
 
 interface IconsSidebarProps {
-  openRelativePath: (path: string) => void
+  openAbsolutePath: (path: string) => void
   sidebarShowing: SidebarAbleToShow
   makeSidebarShow: (show: SidebarAbleToShow) => void
+  currentFilePath: string | null
 }
 
-const IconsSidebar: React.FC<IconsSidebarProps> = ({ openRelativePath, sidebarShowing, makeSidebarShow }) => {
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
-  const [isNewNoteModalOpen, setIsNewNoteModalOpen] = useState(false)
-  const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false)
-  const [isFlashcardModeOpen, setIsFlashcardModeOpen] = useState(false)
-  const [customDirectoryPath, setCustomDirectoryPath] = useState('')
-  const [customFilePath, setCustomFilePath] = useState('')
-
+const IconsSidebar: React.FC<IconsSidebarProps> = ({
+  openAbsolutePath,
+  sidebarShowing,
+  makeSidebarShow,
+  currentFilePath,
+}) => {
   const [initialFileToCreateFlashcard, setInitialFileToCreateFlashcard] = useState('')
   const [initialFileToReviewFlashcard, setInitialFileToReviewFlashcard] = useState('')
+
+  const {
+    isNewNoteModalOpen,
+    setIsNewNoteModalOpen,
+    isNewDirectoryModalOpen,
+    setIsNewDirectoryModalOpen,
+    isSettingsModalOpen,
+    setIsSettingsModalOpen,
+    isFlashcardModeOpen,
+    setIsFlashcardModeOpen,
+  } = useModalOpeners()
 
   // open a new flashcard create mode
   useEffect(() => {
@@ -44,31 +55,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ openRelativePath, sidebarSh
     return () => {
       createFlashcardFileListener()
     }
-  }, [])
-
-  // open a new note window
-  useEffect(() => {
-    const handleNewNote = (relativePath: string) => {
-      setCustomFilePath(relativePath)
-      setIsNewNoteModalOpen(true)
-    }
-
-    window.ipcRenderer.receive('add-new-note-response', (relativePath: string) => {
-      handleNewNote(relativePath)
-    })
-  }, [])
-
-  // open a new directory window
-  useEffect(() => {
-    const handleNewDirectory = (dirPath: string) => {
-      setCustomDirectoryPath(dirPath)
-      setIsNewDirectoryModalOpen(true)
-    }
-
-    window.ipcRenderer.receive('add-new-directory-response', (dirPath) => {
-      handleNewDirectory(dirPath)
-    })
-  }, [])
+  }, [setIsFlashcardModeOpen])
 
   return (
     <div className="flex size-full flex-col items-center justify-between gap-1 bg-neutral-800">
@@ -139,13 +126,13 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ openRelativePath, sidebarSh
       <NewNoteComponent
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
-        openRelativePath={openRelativePath}
-        customFilePath={customFilePath}
+        openAbsolutePath={openAbsolutePath}
+        customFilePath={currentFilePath}
       />
       <NewDirectoryComponent
         isOpen={isNewDirectoryModalOpen}
         onClose={() => setIsNewDirectoryModalOpen(false)}
-        onDirectoryCreate={customDirectoryPath}
+        customFilePath={currentFilePath}
       />
       {isFlashcardModeOpen && (
         <FlashcardMenuModal

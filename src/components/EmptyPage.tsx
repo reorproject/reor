@@ -1,15 +1,15 @@
 import React from 'react'
 import { ImFileEmpty } from 'react-icons/im'
-// import { ipcRenderer } from "electron";
+import { useModalOpeners } from './Providers/ModalProvider'
+import NewNoteComponent from './File/NewNote'
 
 interface EmptyPageProps {
   vaultDirectory: string
+  openAbsolutePath: (path: string) => void
 }
 
-const EmptyPage: React.FC<EmptyPageProps> = ({ vaultDirectory }) => {
-  const handleCreateFile = () => {
-    window.electronUtils.showCreateFileModal(vaultDirectory)
-  }
+const EmptyPage: React.FC<EmptyPageProps> = ({ vaultDirectory, openAbsolutePath }) => {
+  const { isNewNoteModalOpen, setIsNewNoteModalOpen } = useModalOpeners()
 
   const handleCreateFolder = () => {
     window.electronUtils.showCreateDirectoryModal(vaultDirectory)
@@ -25,7 +25,7 @@ const EmptyPage: React.FC<EmptyPageProps> = ({ vaultDirectory }) => {
       <div className="m-0 flex max-w-md flex-col gap-2">
         <button
           className="cursor-pointer border-0 bg-transparent pb-1 pr-0 text-left text-2lg text-blue-500"
-          onClick={handleCreateFile}
+          onClick={() => setIsNewNoteModalOpen(true)}
           type="button"
         >
           Create a File
@@ -38,6 +38,12 @@ const EmptyPage: React.FC<EmptyPageProps> = ({ vaultDirectory }) => {
           Create a Folder
         </button>
       </div>
+      <NewNoteComponent
+        isOpen={isNewNoteModalOpen}
+        onClose={() => setIsNewNoteModalOpen(false)}
+        openAbsolutePath={openAbsolutePath}
+        customFilePath=""
+      />
     </div>
   )
 }

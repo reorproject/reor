@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { PiSidebar, PiSidebarFill } from 'react-icons/pi'
 import DraggableTabs from '../Sidebars/TabSidebar'
 import FileHistoryNavigator from '../File/FileSideBar/FileHistoryBar'
+import { ModalProvider } from '../Providers/ModalProvider'
 
 export const titleBarHeight = '30px'
 
@@ -13,6 +14,7 @@ interface TitleBarProps {
   history: string[]
   setHistory: (string: string[]) => void
   openFileAndOpenEditor: (path: string) => void
+  openAbsolutePath: (path: string) => void
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
@@ -23,6 +25,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
   history,
   setHistory,
   openFileAndOpenEditor,
+  openAbsolutePath,
 }) => {
   const [platform, setPlatform] = useState('')
 
@@ -49,7 +52,13 @@ const TitleBar: React.FC<TitleBarProps> = ({
       <div className="relative left-10 max-w-[75%] grow overflow-hidden">
         <div>
           <div className="flex whitespace-nowrap">
-            <DraggableTabs currentFilePath={currentFilePath || ''} openFileAndOpenEditor={openFileAndOpenEditor} />
+            <ModalProvider>
+              <DraggableTabs
+                currentFilePath={currentFilePath || ''}
+                openFileAndOpenEditor={openFileAndOpenEditor}
+                openAbsolutePath={openAbsolutePath}
+              />
+            </ModalProvider>
           </div>
         </div>
       </div>

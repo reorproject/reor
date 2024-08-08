@@ -5,10 +5,13 @@ import { Tab } from 'electron/main/electron-store/storeConfig'
 import { removeFileExtension } from '@/utils/strings'
 import '../../styles/tab.css'
 import { useTabs } from '../Providers/TabProvider'
+import NewNoteComponent from '../File/NewNote'
+import { useModalOpeners } from '../Providers/ModalProvider'
 
 interface DraggableTabsProps {
   currentFilePath: string
   openFileAndOpenEditor: (path: string) => void
+  openAbsolutePath: (path: string) => void
 }
 
 interface TooltipProps {
@@ -26,7 +29,7 @@ const Tooltip: React.FC<TooltipProps> = ({ filepath, position }) => {
   )
 }
 
-const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFileAndOpenEditor }) => {
+const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFileAndOpenEditor, openAbsolutePath }) => {
   const { openTabs, addTab, selectTab, removeTab, updateTabOrder } = useTabs()
   const [isLastTabAccessed, setIsLastTabAccessed] = useState<boolean>(false)
 
@@ -35,6 +38,8 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
   const [tabWidth, setTabWidth] = useState(200)
   const containerRef = useRef<HTMLDivElement>(null)
+
+  const { isNewNoteModalOpen, setIsNewNoteModalOpen } = useModalOpeners()
 
   // Note: Do not put dependency on addTab or else removeTab does not work properly.
   // Typically you would define addTab inside the useEffect and then call it but since
@@ -129,50 +134,55 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
 
   return (
     <div ref={containerRef} className="flex w-full shrink-0 items-center whitespace-nowrap">
-      {openTabs.map((tab) => (
-        <div
-          id="titleBarSingleTab"
-          key={tab.id}
-          className="flex h-[10px] animate-slide-in items-center justify-center"
-          style={{ width: `${tabWidth}px` }}
-          onMouseEnter={(e) => handleMouseEnter(e, tab)}
-          onMouseLeave={handleMouseLevel}
-        >
+      {openTabs &&
+        openTabs.map((tab) => (
           <div
-            data-tabid={tab.id}
-            draggable="true"
-            onDragStart={(event) => onDragStart(event, tab.id)}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            className={`relative flex w-full cursor-pointer items-center justify-between gap-1 p-2 text-sm text-white
-              ${currentFilePath === tab.filePath ? 'rounded-md bg-dark-gray-c-three' : 'rounded-md'}`}
-            onClick={() => handleTabSelect(tab)}
+            id="titleBarSingleTab"
+            key={tab.id}
+            className="flex h-[10px] animate-slide-in items-center justify-center"
+            style={{ width: `${tabWidth}px` }}
+            onMouseEnter={(e) => handleMouseEnter(e, tab)}
+            onMouseLeave={handleMouseLevel}
           >
-            <span className="truncate">{removeFileExtension(tab.title)}</span>
-            <span
-              className="cursor-pointer px-1 hover:rounded-md hover:bg-dark-gray-c-five"
-              onClick={(e) => {
-                e.stopPropagation() // Prevent triggering onClick of parent div
-                handleTabClose(e, tab.id)
-              }}
+            <div
+              data-tabid={tab.id}
+              draggable="true"
+              onDragStart={(event) => onDragStart(event, tab.id)}
+              onDrop={onDrop}
+              onDragOver={onDragOver}
+              className={`relative flex w-full cursor-pointer items-center justify-between gap-1 p-2 text-sm text-white
+              ${currentFilePath === tab.filePath ? 'rounded-md bg-dark-gray-c-three' : 'rounded-md'}`}
+              onClick={() => handleTabSelect(tab)}
             >
-              &times;
-            </span>
-            {hoveredTab === tab.filePath && <Tooltip filepath={tab.filePath} position={tooltipPosition} />}
+              <span className="truncate">{removeFileExtension(tab.title)}</span>
+              <span
+                className="cursor-pointer px-1 hover:rounded-md hover:bg-dark-gray-c-five"
+                onClick={(e) => {
+                  e.stopPropagation() // Prevent triggering onClick of parent div
+                  handleTabClose(e, tab.id)
+                }}
+              >
+                &times;
+              </span>
+              {hoveredTab === tab.filePath && <Tooltip filepath={tab.filePath} position={tooltipPosition} />}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
       {openTabs.length > 0 && (
         <div
           id="titleBarFileNavigator"
           className="ml-1 flex h-[28px] cursor-pointer items-center justify-center px-2 text-white hover:rounded-md hover:bg-dark-gray-c-three"
-          onClick={() => {
-            window.electronUtils.showCreateFileModal('')
-          }}
+          onClick={() => setIsNewNoteModalOpen(true)}
         >
           <FaPlus size={13} />
         </div>
       )}
+      <NewNoteComponent
+        isOpen={isNewNoteModalOpen}
+        onClose={() => setIsNewNoteModalOpen(false)}
+        openAbsolutePath={openAbsolutePath}
+        customFilePath={currentFilePath}
+      />
     </div>
   )
 }

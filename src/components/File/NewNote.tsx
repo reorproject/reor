@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import path from 'path-browserify'
 
 import { Button } from '@material-tailwind/react'
 import posthog from 'posthog-js'
@@ -10,11 +11,11 @@ import { getInvalidCharacterInFilePath } from '@/utils/strings'
 interface NewNoteComponentProps {
   isOpen: boolean
   onClose: () => void
-  openRelativePath: (path: string) => void
-  customFilePath: string
+  openAbsolutePath: (path: string) => void
+  customFilePath: string | null
 }
 
-const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose, openRelativePath, customFilePath }) => {
+const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose, openAbsolutePath, customFilePath }) => {
   const [fileName, setFileName] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -39,12 +40,15 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose, op
   }
 
   const sendNewNoteMsg = async () => {
-    if (!fileName || errorMessage) {
+    if (!fileName || errorMessage || !customFilePath) {
       return
     }
-    const pathPrefix = customFilePath ? customFilePath.replace(/\/?$/, '/') : ''
-    const fullPath = pathPrefix + fileName
-    openRelativePath(fullPath)
+    let finalPath = fileName
+    if (customFilePath !== '') {
+      const directoryName = await path.dirname(customFilePath)
+      finalPath = await path.join(directoryName, fileName)
+    }
+    openAbsolutePath(finalPath)
     posthog.capture('created_new_note_from_new_note_modal')
     onClose()
   }
