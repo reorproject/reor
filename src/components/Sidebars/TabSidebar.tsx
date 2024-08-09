@@ -30,7 +30,7 @@ const Tooltip: React.FC<TooltipProps> = ({ filepath, position }) => {
 }
 
 const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFileAndOpenEditor, openAbsolutePath }) => {
-  const { openTabs, addTab, selectTab, removeTab, updateTabOrder } = useTabs()
+  const { openTabs, addTab, selectTab, removeTabByID, updateTabOrder } = useTabs()
   const [isLastTabAccessed, setIsLastTabAccessed] = useState<boolean>(false)
 
   const fixedTabWidth = 200
@@ -41,7 +41,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
 
   const { isNewNoteModalOpen, setIsNewNoteModalOpen } = useModalOpeners()
 
-  // Note: Do not put dependency on addTab or else removeTab does not work properly.
+  // Note: Do not put dependency on addTab or else removeTabByID does not work properly.
   // Typically you would define addTab inside the useEffect and then call it but since
   // we are using it inside a useContext we can remove it
   /* eslint-disable */
@@ -129,7 +129,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
 
   const handleTabClose = (event: React.MouseEvent<HTMLSpanElement, MouseEvent>, tabId: string) => {
     event.stopPropagation()
-    removeTab(tabId)
+    removeTabByID(tabId)
   }
 
   return (

@@ -2,18 +2,15 @@ import React from 'react'
 import { ImFileEmpty } from 'react-icons/im'
 import { useModalOpeners } from './Providers/ModalProvider'
 import NewNoteComponent from './File/NewNote'
+import NewDirectoryComponent from './File/NewDirectory'
 
 interface EmptyPageProps {
-  vaultDirectory: string
-  openAbsolutePath: (path: string) => void
+  openAbsolutePath: (filePath: string, optionalContentToWriteOnCreate?: string) => Promise<void>
 }
 
-const EmptyPage: React.FC<EmptyPageProps> = ({ vaultDirectory, openAbsolutePath }) => {
-  const { isNewNoteModalOpen, setIsNewNoteModalOpen } = useModalOpeners()
-
-  const handleCreateFolder = () => {
-    window.electronUtils.showCreateDirectoryModal(vaultDirectory)
-  }
+const EmptyPage: React.FC<EmptyPageProps> = ({ openAbsolutePath }) => {
+  const { isNewNoteModalOpen, setIsNewNoteModalOpen, isNewDirectoryModalOpen, setIsNewDirectoryModalOpen } =
+    useModalOpeners()
 
   return (
     <div className="absolute flex size-full flex-col items-center justify-center overflow-hidden pb-40 text-white">
@@ -32,7 +29,7 @@ const EmptyPage: React.FC<EmptyPageProps> = ({ vaultDirectory, openAbsolutePath 
         </button>
         <button
           className="cursor-pointer border-0 bg-transparent pb-1 pr-0 text-left text-2lg text-blue-500"
-          onClick={handleCreateFolder}
+          onClick={() => setIsNewDirectoryModalOpen(true)}
           type="button"
         >
           Create a Folder
@@ -42,6 +39,11 @@ const EmptyPage: React.FC<EmptyPageProps> = ({ vaultDirectory, openAbsolutePath 
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
         openAbsolutePath={openAbsolutePath}
+        customFilePath=""
+      />
+      <NewDirectoryComponent
+        isOpen={isNewDirectoryModalOpen}
+        onClose={() => setIsNewDirectoryModalOpen(false)}
         customFilePath=""
       />
     </div>

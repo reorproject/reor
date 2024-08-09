@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import path from 'path-browserify'
 
 import { Button } from '@material-tailwind/react'
 import posthog from 'posthog-js'
@@ -40,13 +39,14 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose, op
   }
 
   const sendNewNoteMsg = async () => {
-    if (!fileName || errorMessage || !customFilePath) {
+    if (!fileName || errorMessage || customFilePath === null) {
       return
     }
     let finalPath = fileName
     if (customFilePath !== '') {
-      const directoryName = await path.dirname(customFilePath)
-      finalPath = await path.join(directoryName, fileName)
+      const normalizedPath = customFilePath.replace(/\\/g, '/');
+      const directoryName = await window.path.dirname(normalizedPath)
+      finalPath = await window.path.join(directoryName, fileName)
     }
     openAbsolutePath(finalPath)
     posthog.capture('created_new_note_from_new_note_modal')

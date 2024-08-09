@@ -206,7 +206,7 @@ const MainPageComponent: React.FC = () => {
           !showChatbot && (
             <div className="relative flex size-full overflow-hidden">
               <ModalProvider>
-                <EmptyPage vaultDirectory={vaultDirectory} openAbsolutePath={openAbsolutePath} />
+                <EmptyPage openAbsolutePath={openAbsolutePath} />
               </ModalProvider>
             </div>
           )

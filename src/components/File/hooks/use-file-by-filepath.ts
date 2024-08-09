@@ -247,7 +247,7 @@ const useFileByFilepath = () => {
   useEffect(() => {
     const deleteFile = async (path: string) => {
       await window.fileSystem.deleteFile(path)
-
+      window.electronStore.removeOpenTabsByPath(path)
       // if it is the current file, clear the content and set filepath to null so that it won't save anything else
       if (currentlyOpenedFilePath === path) {
         editor?.commands.setContent('')

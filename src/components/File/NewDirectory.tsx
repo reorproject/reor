@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import path from 'path-browserify'
 
 import { Button } from '@material-tailwind/react'
 import posthog from 'posthog-js'
@@ -42,11 +41,14 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
 
   const sendNewDirectoryMsg = async () => {
     try {
-      if (!directoryName || errorMessage || !customFilePath) {
+      if (!directoryName || errorMessage || customFilePath === null) {
         return
       }
-      const directoryPath = await path.dirname(customFilePath)
-      const finalPath = await path.join(directoryPath, directoryName)
+      const directoryPath =
+        customFilePath === ''
+          ? await window.electronStore.getVaultDirectoryForWindow()
+          : await window.path.dirname(customFilePath)
+      const finalPath = await window.path.join(directoryPath, directoryName)
       window.fileSystem.createDirectory(finalPath)
       posthog.capture('created_new_directory_from_new_directory_modal')
       onClose()

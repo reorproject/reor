@@ -110,6 +110,7 @@ const electronStore = {
   updateOpenTabs:
     createIPCHandler<(draggedIndex: number, targetIndex: number) => Promise<void>>('update-current-open-files'),
   selectOpenTabs: createIPCHandler<(tabs: Tab[]) => Promise<void>>('set-current-open-files'),
+  removeOpenTabsByPath: createIPCHandler<(path: string) => Promise<void>>('remove-current-open-files-by-path'),
 }
 
 const fileSystem = {

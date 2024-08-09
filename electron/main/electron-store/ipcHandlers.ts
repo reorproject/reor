@@ -241,6 +241,15 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
   ipcMain.handle('set-current-open-files', (event, tabs: Tab[]) => {
     if (tabs) store.set(StoreKeys.OpenTabs, tabs)
   })
+
+  ipcMain.handle('remove-current-open-files-by-path', (event, filePath: string) => {
+    if (!filePath) return
+    const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || []
+    // Filter out selected tab
+    const updatedTabs = openTabs.filter((tab) => tab.filePath !== filePath)
+    store.set(StoreKeys.OpenTabs, updatedTabs)
+    event.sender.send('remove-tab-after-deletion', updatedTabs)
+  })
 }
 
 export function getDefaultEmbeddingModelConfig(store: Store<StoreSchema>): EmbeddingModelConfig {

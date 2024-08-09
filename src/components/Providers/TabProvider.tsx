@@ -16,7 +16,7 @@ interface TabContextType {
   openTabs: Tab[]
   addTab: (path: string) => void
   selectTab: (tab: Tab) => void
-  removeTab: (tabId: string) => void
+  removeTabByID: (tabId: string) => void
   updateTabOrder: (draggedIdx: number, targetIdx: number) => void
 }
 
@@ -24,13 +24,13 @@ const defaultTypeContext: TabContextType = {
   openTabs: [],
   addTab: () => {},
   selectTab: () => {},
-  removeTab: () => {},
+  removeTabByID: () => {},
   updateTabOrder: () => {},
 }
 
 const TabContext = createContext<TabContextType>(defaultTypeContext)
 
-// Contains openTabs, addTab, selectTab, removeTab, updateTabOrder
+// Contains openTabs, addTab, selectTab, removeTabByID, updateTabOrder
 export const useTabs = (): TabContextType => useContext(TabContext)
 
 export const TabProvider: React.FC<TabProviderProps> = ({
@@ -50,6 +50,17 @@ export const TabProvider: React.FC<TabProviderProps> = ({
     }
 
     fetchHistoryTabs()
+  }, [])
+
+  useEffect(() => {
+    const removeTabByPath = (tabs: Tab[]) => {
+      setOpenTabs(tabs)
+    }
+
+    const removeTabByPathListener = window.ipcRenderer.receive('remove-tab-after-deletion', removeTabByPath)
+    return () => {
+      removeTabByPathListener()
+    }
   }, [])
 
   const extractFileName = (path: string) => {
@@ -85,7 +96,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
   )
 
   /* Removes a tab and syncs it with the backend */
-  const removeTab = useCallback(
+  const removeTabByID = useCallback(
     (tabId: string) => {
       let closedFilePath = ''
       let newIndex = -1
@@ -150,11 +161,11 @@ export const TabProvider: React.FC<TabProviderProps> = ({
     () => ({
       openTabs,
       addTab,
-      removeTab,
+      removeTabByID,
       updateTabOrder,
       selectTab,
     }),
-    [openTabs, addTab, removeTab, updateTabOrder, selectTab],
+    [openTabs, addTab, removeTabByID, updateTabOrder, selectTab],
   )
 
   return <TabContext.Provider value={TabContextMemo}>{children}</TabContext.Provider>
