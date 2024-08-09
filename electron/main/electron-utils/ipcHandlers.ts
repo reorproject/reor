@@ -105,16 +105,6 @@ const electronUtilsHandlers = (
   })
 
   ipcMain.handle('get-reor-app-version', async () => app.getVersion())
-
-  // Used on EmptyPage.tsx to create a new file
-  ipcMain.handle('empty-new-note-listener', (event, relativePath) => {
-    event.sender.send('add-new-note-response', relativePath)
-  })
-
-  // Used on EmptyPage.tsx to create a new directory
-  ipcMain.handle('empty-new-directory-listener', (event, relativePath) => {
-    event.sender.send('add-new-directory-response', relativePath)
-  })
 }
 
 export default electronUtilsHandlers
