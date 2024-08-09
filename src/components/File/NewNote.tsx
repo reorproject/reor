@@ -44,8 +44,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose, op
     }
     let finalPath = fileName
     if (customFilePath !== '') {
-      const normalizedPath = customFilePath.replace(/\\/g, '/')
-      const directoryName = await window.path.dirname(normalizedPath)
+      const directoryName = await window.path.dirname(customFilePath)
       finalPath = await window.path.join(directoryName, fileName)
     }
     openAbsolutePath(finalPath)
