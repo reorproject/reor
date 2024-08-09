@@ -2,16 +2,17 @@ import path from 'path'
 
 import { ipcMain } from 'electron'
 import Store from 'electron-store'
-
-import WindowsManager from '../common/windowManager'
-
 import {
+  Tab,
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
   StoreKeys,
   StoreSchema,
 } from './storeConfig'
+
+import WindowsManager from '../common/windowManager'
+
 import { initializeAndMaybeMigrateStore } from './storeSchemaMigrator'
 import { ChatHistory } from '@/components/Chat/chatUtils'
 
@@ -114,6 +115,13 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
 
   ipcMain.handle('get-sb-compact', () => store.get(StoreKeys.IsSBCompact))
 
+  ipcMain.handle('get-editor-flex-center', () => store.get(StoreKeys.EditorFlexCenter))
+
+  ipcMain.handle('set-editor-flex-center', (event, setEditorFlexCenter) => {
+    store.set(StoreKeys.EditorFlexCenter, setEditorFlexCenter)
+    event.sender.send('editor-flex-center-changed', setEditorFlexCenter)
+  })
+
   ipcMain.handle('set-analytics-mode', (event, isAnalytics) => {
     store.set(StoreKeys.Analytics, isAnalytics)
   })
@@ -191,8 +199,56 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     const chatHistoriesMap = store.get(StoreKeys.ChatHistories)
     const allChatHistories = chatHistoriesMap[vaultDir] || []
     const filteredChatHistories = allChatHistories.filter((item) => item.id !== chatID)
+
     chatHistoriesMap[vaultDir] = filteredChatHistories.reverse()
     store.set(StoreKeys.ChatHistories, chatHistoriesMap)
+  })
+
+  ipcMain.handle('get-current-open-files', () => store.get(StoreKeys.OpenTabs) || [])
+
+  ipcMain.handle('add-current-open-files', (event, tab: Tab) => {
+    if (tab === null) return
+    const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || []
+    const existingTab = openTabs.findIndex((item) => item.filePath === tab.filePath)
+
+    /* If tab is already open, do not do anything */
+    if (existingTab !== -1) return
+    openTabs.push(tab)
+    store.set(StoreKeys.OpenTabs, openTabs)
+  })
+
+  ipcMain.handle('remove-current-open-files', (event, tabId: string, idx: number, newIndex: number) => {
+    // Ensure indices are within range
+    const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || []
+    if (idx < 0 || idx >= openTabs.length || newIndex < 0 || newIndex >= openTabs.length) return
+    openTabs[idx].lastAccessed = false
+    openTabs[newIndex].lastAccessed = true
+    const updatedTabs = openTabs.filter((tab) => tab.id !== tabId)
+    store.set(StoreKeys.OpenTabs, updatedTabs)
+  })
+
+  ipcMain.handle('clear-current-open-files', () => {
+    store.set(StoreKeys.OpenTabs, [])
+  })
+
+  ipcMain.handle('update-current-open-files', (event, draggedIndex: number, targetIndex: number) => {
+    const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || []
+    if (draggedIndex < 0 || draggedIndex >= openTabs.length || targetIndex < 0 || targetIndex >= openTabs.length) return
+    ;[openTabs[draggedIndex], openTabs[targetIndex]] = [openTabs[targetIndex], openTabs[draggedIndex]]
+    store.set(StoreKeys.OpenTabs, openTabs)
+  })
+
+  ipcMain.handle('set-current-open-files', (event, tabs: Tab[]) => {
+    if (tabs) store.set(StoreKeys.OpenTabs, tabs)
+  })
+
+  ipcMain.handle('remove-current-open-files-by-path', (event, filePath: string) => {
+    if (!filePath) return
+    const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || []
+    // Filter out selected tab
+    const updatedTabs = openTabs.filter((tab) => tab.filePath !== filePath)
+    store.set(StoreKeys.OpenTabs, updatedTabs)
+    event.sender.send('remove-tab-after-deletion', updatedTabs)
   })
 }
 

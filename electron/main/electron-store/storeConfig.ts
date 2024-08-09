@@ -48,6 +48,15 @@ export type HardwareConfig = {
   useVulkan: boolean
 }
 
+export type Tab = {
+  id: string // Unique ID for the tab, useful for operations
+  filePath: string // Path to the file open in the tab
+  title: string // Title of the tab
+  lastAccessed: boolean
+  // timeOpened: Date; // Timestamp to preserve order
+  // isDirty: boolean; // Flag to indicate unsaved changes
+}
+
 export interface StoreSchema {
   hasUserOpenedAppBefore: boolean
   schemaVersion: number
@@ -72,6 +81,8 @@ export interface StoreSchema {
   isSBCompact: boolean
   DisplayMarkdown: boolean
   spellCheck: string
+  EditorFlexCenter: boolean
+  OpenTabs: Tab[]
 }
 
 export enum StoreKeys {
@@ -91,4 +102,6 @@ export enum StoreKeys {
   IsSBCompact = 'isSBCompact',
   DisplayMarkdown = 'DisplayMarkdown',
   SpellCheck = 'spellCheck',
+  EditorFlexCenter = 'editorFlexCenter',
+  OpenTabs = 'OpenTabs',
 }

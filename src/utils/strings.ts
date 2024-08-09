@@ -16,7 +16,7 @@ export const getInvalidCharacterInFilePath = async (filename: string): Promise<s
 
   switch (platform) {
     case 'win32':
-      invalidCharacters = /["*:<>?|]/
+      invalidCharacters = /["*<>?|]/
       break
     case 'darwin':
       invalidCharacters = /[:]/
@@ -50,4 +50,14 @@ export const getInvalidCharacterInFileName = async (filename: string): Promise<s
   const idx = filename.search(invalidCharacters)
 
   return idx === -1 ? null : filename[idx]
+}
+
+/**
+ * Returs true if the filePath is absolute. path.isAbsolute does not correctly work
+ * with Windows.
+ */
+export const isFilePathAbsolute = (filePath: string): boolean => {
+  const windowsAbsolutePathPattern = /^[A-Z]:\\|^\\\\/
+  const posixAbsolutePathPattern = /^\//
+  return windowsAbsolutePathPattern.test(filePath) || posixAbsolutePathPattern.test(filePath)
 }

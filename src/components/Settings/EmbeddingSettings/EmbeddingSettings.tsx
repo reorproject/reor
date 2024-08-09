@@ -131,7 +131,7 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
         </ChunkSizeSettings>
       </div>
       {/* Warning message at the bottom */}
-      <p className=" text-xs text-gray-100">
+      <p className="text-xs text-gray-100 opacity-50">
         <i>Note: If you notice some lag in the editor it is likely because you chose too large of a model...</i>
       </p>{' '}
       <NewLocalEmbeddingModelModal
