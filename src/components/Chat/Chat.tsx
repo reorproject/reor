@@ -21,6 +21,8 @@ import {
 
 import errorToStringRendererProcess from '@/utils/error'
 import SimilarEntriesComponent from '../Sidebars/SemanticSidebar/SimilarEntriesComponent'
+import '../../styles/chat.css'
+import { IoChatbubbles } from "react-icons/io5";
 
 // convert ask options to enum
 enum AskOptions {
@@ -251,56 +253,67 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   }, [appendNewContentToMessageHistory])
 
   const getClassName = (message: ChatMessageToDisplay): string => {
-    const baseClasses = 'markdown-content break-words rounded-lg p-1'
-
-    if (message.messageType === 'error') {
-      return `${baseClasses} bg-red-100 text-red-800`
-    }
-    if (message.role === 'assistant') {
-      return `${baseClasses} bg-neutral-600 text-gray-200`
-    }
-    return `${baseClasses} bg-blue-100 text-blue-800`
+    console.log("Message role:", message.role)
+    return message.messageType === 'error'
+      ? `markdown-content ${message.messageType}-chat-message`
+      : `markdown-content ${message.role}-chat-message`
   }
 
   return (
     <div className="flex size-full items-center justify-center">
       <div className="mx-auto flex size-full flex-col overflow-hidden border-y-0 border-l-[0.001px] border-r-0 border-solid border-neutral-700 bg-neutral-800">
-        <div className="flex h-full flex-col overflow-auto bg-transparent p-3 pt-0">
-          <div className="mx-4 mt-2 grow space-y-2">
-            {currentChatHistory?.displayableChatHistory
-              .filter((msg) => msg.role !== 'system')
-              .map((message, index) => (
-                <ReactMarkdown
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={index}
-                  rehypePlugins={[rehypeRaw]}
-                  className={getClassName(message)}
-                >
-                  {message.visibleContent
-                    ? message.visibleContent
-                    : formatOpenAIMessageContentIntoString(message.content)}
-                </ReactMarkdown>
-              ))}
-          </div>
-          {(!currentChatHistory || currentChatHistory?.displayableChatHistory.length === 0) && (
-            <>
-              <div className="flex items-center justify-center text-sm text-gray-300">
-                Start a conversation with your notes by typing a message below.
+        <div className="chat-container relative flex justify-center items-center h-full flex-col overflow-auto bg-transparent p-10 pt-0">
+          <div className="relative mx-auto flex size-full max-w-3xl flex-1 flex-col mt-4 gap-3">
+            {currentChatHistory && currentChatHistory.displayableChatHistory.length > 0 ? (
+              // Display chat history if it exists
+              currentChatHistory.displayableChatHistory
+                .filter((msg) => msg.role !== 'system')
+                .map((message, index) => (
+                  <ReactMarkdown
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={index}
+                    rehypePlugins={[rehypeRaw]}
+                    className={getClassName(message)}
+                  >
+                    {message.visibleContent
+                      ? message.visibleContent
+                      : formatOpenAIMessageContentIntoString(message.content)}
+                  </ReactMarkdown>
+                ))
+            ) : (
+              // Display centered "Start a conversation..." if there is no currentChatHistory
+              <div className="size-full flex flex-col absolute top-60 p-8 gap-4">
+                <div className="flex flex-col items-center justify-center text-center">
+                  <h1 className="text-gray-300 mb-3">
+                    This is a Sample, Username
+                  </h1>
+                  <button
+                    className="h-6 w-40 rounded-lg bg-slate-600 text-white"
+                    onClick={() => {
+                      setIsAddContextFiltersModalOpen(true)
+                    }}
+                    type="button"
+                  >
+                    {chatFilters.files.length > 0 ? 'Update RAG filters' : 'Customise context'}
+                  </button>
+                  {EXAMPLE_PROMPTS[askText].map((option) => (
+                    <PromptSuggestion
+                      key={option}
+                      promptText={option}
+                      onClick={() => {
+                        setUserTextFieldInput(option)
+                      }}
+                    />
+                  ))}
+                </div>
+                <div className="flex flex-col text-white">
+                  <div className="flex items-center">
+                    <IoChatbubbles />
+                    <p className="mx-3 text-sm">Recent chats</p>
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center justify-center text-sm text-gray-300">
-                <button
-                  className="m-2 h-6 w-40
-                  cursor-pointer rounded-lg border-none bg-slate-600 text-center text-white"
-                  onClick={() => {
-                    setIsAddContextFiltersModalOpen(true)
-                  }}
-                  type="button"
-                >
-                  {chatFilters.files.length > 0 ? 'Update RAG filters' : 'Customise context'}
-                </button>
-              </div>
-            </>
-          )}
+            )}
           {isAddContextFiltersModalOpen && (
             <AddContextFiltersModal
               vaultDirectory={vaultDirectory}
@@ -310,6 +323,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
               setChatFilters={setChatFilters}
             />
           )}
+        </div>
           {/* {EXAMPLE_PROMPTS[askText].map((option, index) => {
             return (
               <PromptSuggestion
