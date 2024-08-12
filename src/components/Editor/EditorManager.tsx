@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
-
-import { Editor, EditorContent } from '@tiptap/react'
-
+import { Editor, EditorContent, useEditor } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import { Mathematics } from '@tiptap-pro/extension-mathematics'
 import InEditorBacklinkSuggestionsDisplay, { SuggestionsState } from './BacklinkSuggestionsDisplay'
 import EditorContextMenu from './EditorContextMenu'
 
@@ -22,7 +22,6 @@ const EditorManager: React.FC<EditorManagerProps> = ({
   const [searchTerm, setSearchTerm] = useState('')
   const [menuVisible, setMenuVisible] = useState(false)
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
-  //   const [showSimilarFiles, setShowSimilarFiles] = useState(true);
 
   const toggleSearch = useCallback(() => {
     setShowSearch((prevShowSearch) => !prevShowSearch)
@@ -85,10 +84,14 @@ const EditorManager: React.FC<EditorManagerProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [showSearch, menuVisible, toggleSearch])
 
+  const editorInstance = useEditor({
+    extensions: [StarterKit, Mathematics],
+  })
+
   return (
     <div
       className="relative size-full cursor-text overflow-y-auto text-slate-400"
-      onClick={() => editor?.commands.focus()}
+      onClick={() => editorInstance?.commands.focus()}
       style={{
         backgroundColor: 'rgb(30, 30, 30)',
       }}
@@ -118,7 +121,7 @@ const EditorManager: React.FC<EditorManagerProps> = ({
         }}
         onContextMenu={handleContextMenu}
         onClick={hideMenu}
-        editor={editor}
+        editor={editorInstance}
       />
       {suggestionsState && (
         <InEditorBacklinkSuggestionsDisplay
