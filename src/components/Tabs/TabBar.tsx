@@ -21,8 +21,29 @@ interface TooltipProps {
 
 /* Displays the filepath when hovering on a tab */
 const Tooltip: React.FC<TooltipProps> = ({ filepath, position }) => {
+  const [style, setStyle] = useState({ top: 0, left: 0, maxWidth: '300px' })
+
+  useEffect(() => {
+    const viewportWidth = window.innerWidth
+    let maxWidth = '300px'
+    
+    if (position.x && viewportWidth) {
+      const availableWidth = viewportWidth - position.x - 10
+      maxWidth = `${availableWidth}px`
+    }
+
+    setStyle({
+      top: `${position.y}px`,
+      left: `${position.x}px`,
+      maxWidth: maxWidth
+    })
+  }, [position])
+
   return createPortal(
-    <div className="tab-tooltip" style={{ top: `${position.y}px`, left: `${position.x}px` }}>
+    <div 
+      className="tab-tooltip" 
+      style={style}
+    >
       {filepath}
     </div>,
     document.getElementById('tooltip-container') as HTMLElement,
@@ -133,45 +154,46 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
   }
 
   return (
-    <div ref={containerRef} className="flex w-full shrink-0 items-center whitespace-nowrap">
-      {openTabs &&
-        openTabs.map((tab) => (
-          <div
-            id="titleBarSingleTab"
-            key={tab.id}
-            className="flex h-[10px] animate-slide-in items-center justify-center"
-            style={{ width: `${tabWidth}px` }}
-            onMouseEnter={(e) => handleMouseEnter(e, tab)}
-            onMouseLeave={handleMouseLevel}
-          >
+    <div ref={containerRef} className="flex w-full items-center whitespace-nowrap">
+      <div className="flex flex-grow overflow-hidden">
+        {openTabs &&
+          openTabs.map((tab) => (
             <div
-              data-tabid={tab.id}
-              draggable="true"
-              onDragStart={(event) => onDragStart(event, tab.id)}
-              onDrop={onDrop}
-              onDragOver={onDragOver}
-              className={`relative flex w-full cursor-pointer items-center justify-between gap-1 p-2 text-sm text-white
-              ${currentFilePath === tab.filePath ? 'rounded-md bg-dark-gray-c-three' : 'rounded-md'}`}
-              onClick={() => handleTabSelect(tab)}
+              id="titleBarSingleTab"
+              key={tab.id}
+              className="flex flex-grow  h-[10px] min-w-0 animate-slide-in items-center justify-center"
+              onMouseEnter={(e) => handleMouseEnter(e, tab)}
+              onMouseLeave={handleMouseLevel}
             >
-              <span className="truncate">{removeFileExtension(tab.title)}</span>
-              <span
-                className="cursor-pointer px-1 hover:rounded-md hover:bg-dark-gray-c-five"
-                onClick={(e) => {
-                  e.stopPropagation() // Prevent triggering onClick of parent div
-                  handleTabClose(e, tab.id)
-                }}
+              <div
+                data-tabid={tab.id}
+                draggable="true"
+                onDragStart={(event) => onDragStart(event, tab.id)}
+                onDrop={onDrop}
+                onDragOver={onDragOver}
+                className={`relative flex w-full cursor-pointer items-center justify-between gap-1 p-2 text-sm text-white
+                ${currentFilePath === tab.filePath ? 'rounded-md bg-dark-gray-c-three' : 'rounded-md'}`}
+                onClick={() => handleTabSelect(tab)}
               >
-                &times;
-              </span>
-              {hoveredTab === tab.filePath && <Tooltip filepath={tab.filePath} position={tooltipPosition} />}
+                <span className="truncate">{removeFileExtension(tab.title)}</span>
+                <span
+                  className="cursor-pointer px-1 hover:rounded-md hover:bg-dark-gray-c-five"
+                  onClick={(e) => {
+                    e.stopPropagation() // Prevent triggering onClick of parent div
+                    handleTabClose(e, tab.id)
+                  }}
+                >
+                  &times;
+                </span>
+                {hoveredTab === tab.filePath && <Tooltip filepath={tab.filePath} position={tooltipPosition} />}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       {openTabs.length > 0 && (
         <div
           id="titleBarFileNavigator"
-          className="ml-1 flex h-[28px] cursor-pointer items-center justify-center px-2 text-white hover:rounded-md hover:bg-dark-gray-c-three"
+          className="ml-1 mr-10 flex h-[28px] cursor-pointer items-center justify-center px-2 text-white hover:rounded-md hover:bg-dark-gray-c-three"
           onClick={() => setIsNewNoteModalOpen(true)}
         >
           <FaPlus size={13} />

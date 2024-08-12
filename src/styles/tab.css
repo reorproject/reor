@@ -9,9 +9,13 @@
     z-index: 1010;
     animation: fadeIn 0.3s ease-in-out;
     height: 30px;
-    width: fit-content;
+    max-width: 100%;
     font-size: 14px;
     text-align: center;
+    white-space: nowrap;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 @keyframes fadeIn {

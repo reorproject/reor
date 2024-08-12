@@ -113,7 +113,7 @@ const MainPageComponent: React.FC = () => {
   }, [setCurrentChatHistory, setChatFilters])
 
   return (
-    <div className="overflow-x-hidden">
+    <div className="relative overflow-x-hidden">
       {/* Displays the dropdown tab when hovering. You cannot use z-index and position absolute inside 
           TitleBar since one of the Parent components inadvertently creates a new stacking context that 
           impacts the z-index. */}
