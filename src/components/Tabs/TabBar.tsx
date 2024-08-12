@@ -26,24 +26,21 @@ const Tooltip: React.FC<TooltipProps> = ({ filepath, position }) => {
   useEffect(() => {
     const viewportWidth = window.innerWidth
     let maxWidth = '300px'
-    
+
     if (position.x && viewportWidth) {
       const availableWidth = viewportWidth - position.x - 10
       maxWidth = `${availableWidth}px`
     }
 
     setStyle({
-      top: `${position.y}px`,
-      left: `${position.x}px`,
-      maxWidth: maxWidth
+      top: position.y,
+      left: position.x,
+      maxWidth,
     })
   }, [position])
 
   return createPortal(
-    <div 
-      className="tab-tooltip" 
-      style={style}
-    >
+    <div className="tab-tooltip" style={style}>
       {filepath}
     </div>,
     document.getElementById('tooltip-container') as HTMLElement,
@@ -54,10 +51,8 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
   const { openTabs, addTab, selectTab, removeTabByID, updateTabOrder } = useTabs()
   const [isLastTabAccessed, setIsLastTabAccessed] = useState<boolean>(false)
 
-  const fixedTabWidth = 200
   const [hoveredTab, setHoveredTab] = useState<string | null>(null)
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
-  const [tabWidth, setTabWidth] = useState(200)
   const containerRef = useRef<HTMLDivElement>(null)
 
   const { isNewNoteModalOpen, setIsNewNoteModalOpen } = useModalOpeners()
@@ -91,18 +86,6 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
 
     selectLastTabAccessed()
   }, [openTabs, openFileAndOpenEditor, isLastTabAccessed])
-
-  /* Calculates the width of each tab */
-  useEffect(() => {
-    const containerWidth = containerRef.current ? containerRef.current.offsetWidth : 0
-    const totalTabsWidth = openTabs.length * fixedTabWidth
-
-    if (totalTabsWidth > containerWidth) {
-      setTabWidth(containerWidth / openTabs.length)
-    } else {
-      setTabWidth(fixedTabWidth)
-    }
-  }, [openTabs.length])
 
   const onDragStart = (event: any, tabId: string) => {
     event.dataTransfer.setData('tabId', tabId)
@@ -155,13 +138,13 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
 
   return (
     <div ref={containerRef} className="flex w-full items-center whitespace-nowrap">
-      <div className="flex flex-grow overflow-hidden">
+      <div className="flex grow overflow-hidden">
         {openTabs &&
           openTabs.map((tab) => (
             <div
               id="titleBarSingleTab"
               key={tab.id}
-              className="flex flex-grow  h-[10px] min-w-0 animate-slide-in items-center justify-center"
+              className="flex h-[10px]  min-w-0 grow animate-slide-in items-center justify-center"
               onMouseEnter={(e) => handleMouseEnter(e, tab)}
               onMouseLeave={handleMouseLevel}
             >
@@ -189,7 +172,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
               </div>
             </div>
           ))}
-        </div>
+      </div>
       {openTabs.length > 0 && (
         <div
           id="titleBarFileNavigator"
