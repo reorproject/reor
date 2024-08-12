@@ -1,7 +1,5 @@
 import React from 'react'
 
-import Textarea from '@mui/joy/Textarea'
-import { CircularProgress } from '@mui/material'
 import { PiPaperPlaneRight } from 'react-icons/pi'
 
 interface ChatInputProps {
@@ -19,9 +17,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
   loadingResponse,
   askText,
 }) => (
-<div className="relative w-full flex items-center justify-center h-[30px] mb-10 px-10">
-    <div className="border-1 rounded-lg border-solid border-neutral-700 max-w-3xl w-full p-3">
-      <div className="flex h-full relative">
+  <div className="relative mb-10 flex h-titlebar w-full items-center justify-center px-10">
+    <div className="border-1 w-full max-w-3xl rounded-lg border-solid border-neutral-700 p-3">
+      <div className="relative flex h-full">
         <input
           onKeyDown={(e) => {
             if (!e.shiftKey && e.key === 'Enter') {
@@ -31,7 +29,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           }}
           onChange={(e) => setUserTextFieldInput(e.target.value)}
           value={userTextFieldInput}
-          className="mr-2 w-full bg-gray-300 border-0 focus:outline-none"
+          className="mr-2 w-full border-0 bg-gray-300 focus:outline-none"
           name="Outlined"
           placeholder="Type here to ask your notes..."
           variant="outlined"
@@ -41,9 +39,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
             border: 'none',
           }}
         />
-        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-          <PiPaperPlaneRight 
-            color={userTextFieldInput ? 'white' : 'gray'} 
+        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+          <PiPaperPlaneRight
+            color={userTextFieldInput ? 'white' : 'gray'}
             onClick={handleSubmitNewMessage}
             className={userTextFieldInput ? 'cursor-pointer' : ''}
           />

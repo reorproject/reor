@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 
+import { RiChatNewFill, RiArrowDownSLine } from 'react-icons/ri'
+import { IoChatbubbles } from 'react-icons/io5'
 import { ChatHistoryMetadata } from './hooks/use-chat-history'
 import { ChatHistory } from './chatUtils'
-import { RiChatNewFill, RiArrowDownSLine } from "react-icons/ri";
-import { IoChatbubbles } from "react-icons/io5";
 
 export interface ChatItemProps {
   chatMetadata: ChatHistoryMetadata
@@ -23,10 +23,7 @@ export const ChatItem: React.FC<ChatItemProps> = ({
   const itemClasses = `
     flex items-center cursor-pointer py-2 px-3 rounded-md
     transition-colors duration-150 ease-in-out
-    ${isSelected 
-      ? 'bg-neutral-700 text-white' 
-      : 'text-gray-300 hover:bg-neutral-800'
-    }
+    ${isSelected ? 'bg-neutral-700 text-white' : 'text-gray-300 hover:bg-neutral-800'}
   `
 
   const handleContextMenu = (e: React.MouseEvent) => {
@@ -70,8 +67,8 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
   const [isRecentsOpen, setIsRecentsOpen] = useState(true)
   const dropdownAnimationDelay = 0.2
 
-  const toggleRecents = () => setIsRecentsOpen(prev => !prev)
-  const togglePinned = () => setIsPinnedOpen(prev => !prev)
+  const toggleRecents = () => setIsRecentsOpen((prev) => !prev)
+  const togglePinned = () => setIsPinnedOpen((prev) => !prev)
 
   const currentSelectedChatID = useRef<string | undefined>()
   useEffect(() => {}, [chatHistoriesMetadata])
@@ -93,43 +90,41 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
   }, [chatHistoriesMetadata, setShowChatbot])
 
   return (
-    <div className="h-full overflow-y-auto bg-neutral-800 flex flex-col px-3 pb-4 pt-2.5">
+    <div className="flex h-full flex-col overflow-y-auto bg-neutral-800 px-3 pb-4 pt-2.5">
       <div className="flex h-full flex-col gap-2 text-white/90">
         <div className="flex min-h-0 flex-1 flex-col gap-4">
-        <div className="flex flex-col gap-6 mb-4">
-          <button
-            className="flex items-center justify-center gap-2 rounded-md py-3 
-                      transition-colors duration-200 bg-blue-500 hover:bg-blue-400
-                      shadow-md hover:shadow-lg border-0 text-white hover:text-gray-200
-                      cursor-pointer"
-            onClick={newChat}
-          >
-            <RiChatNewFill className="text-xl" />
-            <span className="font-bold text-xs">
-              Start New Chat
-            </span>
-          </button>
-        </div>
+          <div className="mb-4 flex flex-col gap-6">
+            <button
+              className="flex cursor-pointer items-center justify-center gap-2 rounded-md 
+                      border-0 bg-blue-500 py-3 text-white
+                      shadow-md transition-colors duration-200 hover:bg-blue-400 hover:text-gray-200
+                      hover:shadow-lg"
+              onClick={newChat}
+            >
+              <RiChatNewFill className="text-xl" />
+              <span className="text-xs font-bold">Start New Chat</span>
+            </button>
+          </div>
           {/* Pinned Section */}
           <div className="flex min-h-0 flex-col gap-4">
-            <div className="flex justify-between items-center cursor-pointer" onClick={togglePinned}>
-              <h3 className="mb-1 mt-1 text-sm tracking-wider text-gray-200 font-medium">
-                Pinned
-              </h3>
-              <RiArrowDownSLine className={`transition-transform duration-200 mt-1 ${!isPinnedOpen ? 'rotate-0' : 'rotate-180'}`} />
+            <div className="flex cursor-pointer items-center justify-between" onClick={togglePinned}>
+              <h3 className="my-1 text-sm font-medium tracking-wider text-gray-200">Pinned</h3>
+              <RiArrowDownSLine
+                className={`mt-1 transition-transform duration-200 ${!isPinnedOpen ? 'rotate-0' : 'rotate-180'}`}
+              />
             </div>
           </div>
 
           {/* Recents Section */}
           <div className="flex-1">
-            <div className="flex justify-between items-center cursor-pointer" onClick={toggleRecents}>
-              <h3 className="mb-0 mt-1 text-sm tracking-wider text-gray-200 font-medium">
-                Recents
-              </h3>
-              <RiArrowDownSLine className={`transition-transform duration-200 mt-1 ${!isRecentsOpen ? 'rotate-0' : 'rotate-180'}`} />
+            <div className="flex cursor-pointer items-center justify-between" onClick={toggleRecents}>
+              <h3 className="mb-0 mt-1 text-sm font-medium tracking-wider text-gray-200">Recents</h3>
+              <RiArrowDownSLine
+                className={`mt-1 transition-transform duration-200 ${!isRecentsOpen ? 'rotate-0' : 'rotate-180'}`}
+              />
             </div>
             {isRecentsOpen && (
-              <ul className="flex flex-col m-0 gap-0.5 p-0 list-style:none">
+              <ul className="list-style:none m-0 flex flex-col gap-0.5 p-0">
                 {chatHistoriesMetadata
                   .slice()
                   .reverse()

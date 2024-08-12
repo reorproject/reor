@@ -7,6 +7,7 @@ import posthog from 'posthog-js'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 
+import { IoChatbubbles } from 'react-icons/io5'
 import AddContextFiltersModal from './AddContextFiltersModal'
 import PromptSuggestion from './Chat-Prompts'
 import ChatInput from './ChatInput'
@@ -22,7 +23,6 @@ import {
 import errorToStringRendererProcess from '@/utils/error'
 import SimilarEntriesComponent from '../Sidebars/SemanticSidebar/SimilarEntriesComponent'
 import '../../styles/chat.css'
-import { IoChatbubbles } from "react-icons/io5";
 
 // convert ask options to enum
 enum AskOptions {
@@ -253,7 +253,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   }, [appendNewContentToMessageHistory])
 
   const getClassName = (message: ChatMessageToDisplay): string => {
-    console.log("Message role:", message.role)
+    console.log('Message role:', message.role)
     return message.messageType === 'error'
       ? `markdown-content ${message.messageType}-chat-message`
       : `markdown-content ${message.role}-chat-message`
@@ -262,8 +262,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   return (
     <div className="flex size-full items-center justify-center">
       <div className="mx-auto flex size-full flex-col overflow-hidden border-y-0 border-l-[0.001px] border-r-0 border-solid border-neutral-700 bg-neutral-800">
-        <div className="chat-container relative flex justify-center items-center h-full flex-col overflow-auto bg-transparent p-10 pt-0">
-          <div className="relative mx-auto flex size-full max-w-3xl flex-1 flex-col mt-4 gap-3">
+        <div className="chat-container relative flex h-full flex-col items-center justify-center overflow-auto bg-transparent p-10 pt-0">
+          <div className="relative mx-auto mt-4 flex size-full max-w-3xl flex-1 flex-col gap-3">
             {currentChatHistory && currentChatHistory.displayableChatHistory.length > 0 ? (
               // Display chat history if it exists
               currentChatHistory.displayableChatHistory
@@ -282,11 +282,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                 ))
             ) : (
               // Display centered "Start a conversation..." if there is no currentChatHistory
-              <div className="size-full flex flex-col absolute top-60 p-8 gap-4">
+              <div className="absolute top-60 flex size-full flex-col gap-4 p-8">
                 <div className="flex flex-col items-center justify-center text-center">
-                  <h1 className="text-gray-300 mb-3">
-                    This is a Sample, Username
-                  </h1>
+                  <h1 className="mb-3 text-gray-300">This is a Sample, Username</h1>
                   <button
                     className="h-6 w-40 rounded-lg bg-slate-600 text-white"
                     onClick={() => {
@@ -314,16 +312,16 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                 </div>
               </div>
             )}
-          {isAddContextFiltersModalOpen && (
-            <AddContextFiltersModal
-              vaultDirectory={vaultDirectory}
-              isOpen={isAddContextFiltersModalOpen}
-              onClose={() => setIsAddContextFiltersModalOpen(false)}
-              chatFilters={chatFilters}
-              setChatFilters={setChatFilters}
-            />
-          )}
-        </div>
+            {isAddContextFiltersModalOpen && (
+              <AddContextFiltersModal
+                vaultDirectory={vaultDirectory}
+                isOpen={isAddContextFiltersModalOpen}
+                onClose={() => setIsAddContextFiltersModalOpen(false)}
+                chatFilters={chatFilters}
+                setChatFilters={setChatFilters}
+              />
+            )}
+          </div>
           {/* {EXAMPLE_PROMPTS[askText].map((option, index) => {
             return (
               <PromptSuggestion
