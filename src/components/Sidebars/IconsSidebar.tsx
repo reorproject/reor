@@ -127,12 +127,12 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
         openAbsolutePath={openAbsolutePath}
-        customFilePath={currentFilePath}
+        currentOpenFilePath={currentFilePath}
       />
       <NewDirectoryComponent
         isOpen={isNewDirectoryModalOpen}
         onClose={() => setIsNewDirectoryModalOpen(false)}
-        customFilePath={currentFilePath}
+        currentOpenFilePath={currentFilePath}
       />
       {isFlashcardModeOpen && (
         <FlashcardMenuModal

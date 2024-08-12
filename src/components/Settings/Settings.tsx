@@ -23,7 +23,7 @@ enum SettingsTab {
 
 const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose: onCloseFromParent }) => {
   const [willNeedToReIndex, setWillNeedToReIndex] = useState(false)
-  const [activeTab, setActiveTab] = useState('generalSettings')
+  const [activeTab, setActiveTab] = useState(SettingsTab.GeneralSettingsTab)
 
   const handleSave = () => {
     if (willNeedToReIndex) {
@@ -41,8 +41,8 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose: onCloseFromParen
         handleSave()
       }}
     >
-      <div className="flex w-[900px] md:h-[600px] lg:h-[600px] xl:h-[800px]">
-        <div className="flex h-full w-[200px] flex-col border-y-0 border-l-0 border-r-[0.1px] border-solid border-gray-700 bg-dark-gray-c-seven p-2 text-white">
+      <div className="flex h-[80vh] w-[80vw] md:w-[70vw] lg:w-[50vw] ">
+        <div className="flex w-[150px] flex-col rounded-l-lg border-y-0 border-l-0 border-r-[0.1px] border-solid border-gray-700 bg-dark-gray-c-seven p-2 text-white">
           <div
             className={`mt-2 flex cursor-pointer items-center rounded border-b border-gray-200 p-2 text-sm hover:bg-neutral-600 ${
               activeTab === SettingsTab.GeneralSettingsTab ? 'bg-neutral-700 font-semibold text-white' : 'text-gray-200'
@@ -87,35 +87,17 @@ const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose: onCloseFromParen
         </div>
 
         {/* Right Content Area */}
-        <div className="ml-2 size-full flex-1 px-16">
+        <div className="ml-2 flex-1 overflow-y-auto px-4 lg:px-12">
           {/* <h2 className="text-2xl font-semibold mb-4 text-white">Settings</h2> */}
-          {activeTab === SettingsTab.GeneralSettingsTab && (
-            <div className="size-full">
-              <GeneralSettings />
-            </div>
-          )}
-          {activeTab === SettingsTab.LLMSettingsTab && (
-            <div className="size-full">
-              <LLMSettings />
-            </div>
-          )}
+          {activeTab === SettingsTab.GeneralSettingsTab && <GeneralSettings />}
+          {activeTab === SettingsTab.LLMSettingsTab && <LLMSettings />}
           {activeTab === SettingsTab.EmbeddingModelTab && (
-            <div className="size-full">
-              <EmbeddingModelSettings handleUserHasChangedModel={() => setWillNeedToReIndex(true)} />
-            </div>
+            <EmbeddingModelSettings handleUserHasChangedModel={() => setWillNeedToReIndex(true)} />
           )}
 
-          {activeTab === SettingsTab.TextGenerationTab && (
-            <div className="w-full">
-              <TextGenerationSettings />
-            </div>
-          )}
+          {activeTab === SettingsTab.TextGenerationTab && <TextGenerationSettings />}
 
-          {activeTab === SettingsTab.AnalyticsTab && (
-            <div className="w-full">
-              <AnalyticsSettings />
-            </div>
-          )}
+          {activeTab === SettingsTab.AnalyticsTab && <AnalyticsSettings />}
         </div>
       </div>
     </ReorModal>

@@ -48,12 +48,12 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = ({
     <div>
       <h2 className="mb-4 font-semibold text-white">LLM</h2>
       {llmConfigs.length > 0 && (
-        <div className="flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2">
+        <div className="flex w-full flex-wrap items-center justify-between gap-5 pb-2">
           {/* <h4 className="text-gray-200 text-center font-normal">Default LLM</h4> */}
           <div className="flex-col">
             <p className="mt-5 text-gray-100">Default LLM</p>
           </div>
-          <div className="mb-1 w-[140px]">
+          <div className="mb-1 flex w-[140px] min-w-[128px]">
             <DefaultLLMSelector
               onModelChange={handleModelChange}
               llmConfigs={llmConfigs}
@@ -63,6 +63,7 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = ({
           </div>
         </div>
       )}
+      <div className="h-[2px] w-full bg-neutral-700" />
       <SettingsRow
         title="Local LLM"
         buttonText="Add New Local LLM"

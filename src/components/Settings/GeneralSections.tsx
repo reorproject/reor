@@ -3,7 +3,6 @@ import Switch from '@mui/material/Switch'
 
 export const AppearanceSection = () => {
   const [isIconSBCompact, setIsIconSBCompact] = useState<boolean>(false)
-  const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false)
 
   // Check if SidebarCompact is on or not
   useEffect(() => {
@@ -19,15 +18,16 @@ export const AppearanceSection = () => {
   }, [])
 
   return (
-    <div className="w-full flex-col">
-      <h4 className="mb-1 mt-10 flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2 text-white">
+    <div className="flex w-full flex-col">
+      <h4 className="xs:text-sm mb-1 mt-10 flex w-full items-center justify-between gap-5 pb-2 text-lg text-white sm:text-base">
         Appearance
       </h4>
-      <div className="flex h-[64px] w-full items-center justify-between border-0 border-b-2 border-solid border-neutral-700">
+      <div className="h-[2px] w-full bg-neutral-700" />
+      <div className="flex w-full flex-wrap items-center justify-between">
         <div className="flex flex-col justify-center">
-          <p className="text-gray-100 opacity-80">
+          <p className="xs:text-xs flex flex-col text-base text-gray-100 opacity-80 sm:text-sm">
             IconSidebar Compact
-            <p className="m-0 pt-1 text-xs text-gray-100">If on, decreases padding on IconSidebar</p>
+            <span className="m-0 pt-1 text-xs text-gray-100">Decreases padding on IconSidebar</span>
           </p>
         </div>
         <Switch
@@ -40,25 +40,7 @@ export const AppearanceSection = () => {
           }}
         />
       </div>
-      <div className="mb-1 mt-2 flex h-[64px] w-full items-center justify-between gap-5 border-0 pb-2 opacity-50">
-        <div className="flex flex-col justify-center">
-          <div className="flex gap-2">
-            <p className="m-0 text-gray-100 opacity-80">Dynamic Markdown Heading</p>
-            <span className="rounded-full bg-red-500 px-2 py-1 text-xs font-semibold text-white">Beta</span>
-          </div>
-          <p className="m-0 pt-1 text-xs text-gray-100">Allows you to manually change header markdown on hover</p>
-        </div>
-        <Switch
-          checked={displayMarkdown}
-          onChange={() => {
-            setDisplayMarkdown(!displayMarkdown)
-            if (displayMarkdown !== undefined) {
-              window.electronStore.setDisplayMarkdown(!displayMarkdown)
-            }
-          }}
-          disabled
-        />
-      </div>
+      <div className="h-[2px] w-full bg-neutral-700" />
     </div>
   )
 }
@@ -102,49 +84,48 @@ export const EditorSection = () => {
 
   return (
     <div className="w-full flex-col">
-      <h4 className="mb-1 mt-10 flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2 text-white">
+      <h4 className="xs:text-sm mb-1 mt-10 flex w-full items-center justify-between gap-5 pb-2 text-lg text-white sm:text-base">
         Editor
       </h4>
-      <div className="flex-col">
-        <div className="flex h-[64px] w-full items-center justify-between border-0 border-b-2 border-solid border-neutral-700">
-          <div className="flex flex-col justify-center">
-            <p className="text-gray-100 opacity-80">
-              Content Flex Center
-              <p className="m-0 pt-1 text-xs text-gray-100">
-                If on, centers content inside editor. Recommended for larger screens
-              </p>
-            </p>
-          </div>
-          <Switch
-            checked={editorFlexCenter}
-            onChange={() => {
-              setEditorFlexCenter(!editorFlexCenter)
-              if (editorFlexCenter !== undefined) {
-                window.electronStore.setEditorFlexCenter(!editorFlexCenter)
-              }
-            }}
-          />
+      <div className="h-[2px] w-full bg-neutral-700" />
+      <div className="flex w-full flex-wrap items-center justify-between">
+        <div className="flex w-[70%] flex-col justify-center">
+          <p className="xs:text-xs flex flex-col text-base text-gray-100 opacity-80 sm:text-sm">
+            Content Flex Center
+            <span className="m-0 pt-1 text-xs text-gray-100">
+              Centers content inside editor. Recommended for larger screens
+            </span>
+          </p>
         </div>
-        <div className="flex h-[64px] w-full items-center justify-between border-0 border-b-2 border-solid border-neutral-700">
-          <div className="flex-col">
-            <p className="mb-0 mt-1 text-sm text-gray-300">Spell Check</p>
-            <p className="m-0 text-right text-xs italic text-gray-100 opacity-50">
-              Note: Quit and restart the app for this to take effect
-            </p>
-          </div>
-          <div className="flex flex-col items-end justify-end">
-            <div className="flex items-end">
-              <Switch
-                checked={tempSpellCheckEnabled}
-                onChange={() => {
-                  handleSave(!tempSpellCheckEnabled)
-                }}
-                inputProps={{ 'aria-label': 'controlled' }}
-              />
-            </div>
-          </div>
-        </div>
+        <Switch
+          checked={editorFlexCenter}
+          onChange={() => {
+            setEditorFlexCenter(!editorFlexCenter)
+            if (editorFlexCenter !== undefined) {
+              window.electronStore.setEditorFlexCenter(!editorFlexCenter)
+            }
+          }}
+        />
       </div>
+      <div className="h-[2px] w-full bg-neutral-700" />
+      <div className="flex w-full flex-wrap items-center justify-between">
+        <div className="flex w-[70%] flex-col justify-center">
+          <p className="xs:text-xs flex flex-col text-base text-gray-100 opacity-80 sm:text-sm">
+            Spell Check
+            <span className="m-0 pt-1 text-xs text-gray-100">
+              Note: Quit and restart the app for this to take effect
+            </span>
+          </p>
+        </div>
+        <Switch
+          checked={tempSpellCheckEnabled}
+          onChange={() => {
+            handleSave(!tempSpellCheckEnabled)
+          }}
+          inputProps={{ 'aria-label': 'controlled' }}
+        />
+      </div>
+      <div className="h-[2px] w-full bg-neutral-700" />
     </div>
   )
 }

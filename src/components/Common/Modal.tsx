@@ -39,9 +39,9 @@ const ReorModal: React.FC<ModalProps> = ({
     >
       <div
         ref={modalRef}
-        className="flex max-w-4xl  flex-col items-center justify-center rounded-lg border border-solid border-gray-600 bg-dark-gray-c-three shadow-xl"
+        className="flex flex-col items-center justify-center rounded-lg border border-solid border-gray-700 bg-dark-gray-c-three shadow-xl"
       >
-        <div className="z-50 h-0 w-full items-end border-b border-gray-700 px-4">
+        <div className="z-50 h-0 w-full items-end">
           {!hideCloseButton && (
             <div className="m-2 flex justify-end">
               <button
