@@ -11,10 +11,15 @@ interface NewNoteComponentProps {
   isOpen: boolean
   onClose: () => void
   openAbsolutePath: (path: string) => void
-  customFilePath: string | null
+  currentOpenFilePath: string | null
 }
 
-const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose, openAbsolutePath, customFilePath }) => {
+const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
+  isOpen,
+  onClose,
+  openAbsolutePath,
+  currentOpenFilePath,
+}) => {
   const [fileName, setFileName] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -39,12 +44,12 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose, op
   }
 
   const sendNewNoteMsg = async () => {
-    if (!fileName || errorMessage || customFilePath === null) {
+    if (!fileName || errorMessage || currentOpenFilePath === null) {
       return
     }
     let finalPath = fileName
-    if (customFilePath !== '') {
-      const directoryName = await window.path.dirname(customFilePath)
+    if (currentOpenFilePath !== '') {
+      const directoryName = await window.path.dirname(currentOpenFilePath)
       finalPath = await window.path.join(directoryName, fileName)
     }
     openAbsolutePath(finalPath)
