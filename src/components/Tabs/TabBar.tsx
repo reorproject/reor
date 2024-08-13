@@ -137,14 +137,14 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
   }
 
   return (
-    <div ref={containerRef} className="flex w-full items-center whitespace-nowrap">
-      <div className="flex grow overflow-hidden">
+    <div ref={containerRef} className="flex max-w-full items-center whitespace-nowrap">
+      <div className="flex flex-grow min-w-0">
         {openTabs &&
           openTabs.map((tab) => (
             <div
               id="titleBarSingleTab"
               key={tab.id}
-              className="flex h-[10px] min-w-0 max-w-[150px] grow animate-slide-in items-center justify-center"
+              className="flex flex-grow h-[10px] min-w-0 max-w-[150px] animate-slide-in items-center justify-center"
               onMouseEnter={(e) => handleMouseEnter(e, tab)}
               onMouseLeave={handleMouseLevel}
             >
@@ -154,7 +154,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
                 onDragStart={(event) => onDragStart(event, tab.id)}
                 onDrop={onDrop}
                 onDragOver={onDragOver}
-                className={`relative flex w-full cursor-pointer items-center justify-between gap-1 p-2 text-sm text-white rounded-md
+                className={`relative flex w-full cursor-pointer items-center justify-between gap-1 rounded-md p-2 text-sm text-white
                 ${currentFilePath === tab.filePath ? 'bg-dark-gray-c-eleven' : ''}`}
                 onClick={() => handleTabSelect(tab)}
               >

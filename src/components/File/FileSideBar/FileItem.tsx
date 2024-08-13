@@ -102,9 +102,7 @@ const FileItem: React.FC<FileInfoProps> = ({
             {isExpanded ? <FaChevronDown title="Collapse Directory" /> : <FaChevronRight title="Open Directory" />}
           </span>
         )}
-        <span className={`mt-0 flex-1 truncate`}>
-          {isDirectory ? file.name : removeFileExtension(file.name)}
-        </span>
+        <span className="mt-0 flex-1 truncate">{isDirectory ? file.name : removeFileExtension(file.name)}</span>
       </div>
     </div>
   )

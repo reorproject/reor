@@ -89,7 +89,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   const itemCount = visibleItems.length
 
   return (
-    <div className="h-full grow pt-2 px-1 opacity-70">
+    <div className="h-full grow px-1 pt-2 opacity-70">
       <List
         height={listHeight}
         itemCount={itemCount}

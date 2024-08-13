@@ -102,7 +102,7 @@ const EditorManager: React.FC<EditorManagerProps> = ({
 
   return (
     <div
-      className="relative size-full cursor-text overflow-y-auto py-4 text-slate-400 opacity-80 bg-dark-gray-c-eleven"
+      className="relative size-full cursor-text overflow-y-auto bg-dark-gray-c-eleven py-4 text-slate-400 opacity-80"
       onClick={() => editor?.commands.focus()}
     >
       {showSearch && (
