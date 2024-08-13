@@ -70,7 +70,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       </div>
       {isOpen && (
         <div
-          className="absolute  z-10 max-h-60 overflow-auto rounded-md border border-gray-300 bg-white text-[13px] text-gray-600 shadow-lg"
+          className="absolute z-10 max-h-60 overflow-auto rounded-md border border-gray-300 bg-white text-[13px] text-gray-600 shadow-lg"
           style={{
             position: 'fixed',
             top: 'auto',

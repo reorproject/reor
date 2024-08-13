@@ -18,7 +18,7 @@ import StarterKit from '@tiptap/starter-kit'
 import { toast } from 'react-toastify'
 import { Markdown } from 'tiptap-markdown'
 import { useDebounce } from 'use-debounce'
-import { isFilePathAbsolute, getInvalidCharacterInFilePath, removeFileExtension } from '@/utils/strings'
+import { getInvalidCharacterInFilePath, removeFileExtension } from '@/utils/strings'
 
 import { BacklinkExtension } from '@/components/Editor/BacklinkExtension'
 import { SuggestionsState } from '@/components/Editor/BacklinkSuggestionsDisplay'
@@ -116,7 +116,7 @@ const useFileByFilepath = () => {
     const filePathWithExtension = await window.path.addExtensionIfNoExtensionPresent(filePath)
     let absolutePath = filePathWithExtension
     // If we create a newNote on an empty page (no file open).
-    if (!isFilePathAbsolute(filePath)) {
+    if (!(await window.path.isAbsolute(filePath))) {
       absolutePath = await window.path.join(
         await window.electronStore.getVaultDirectoryForWindow(),
         filePathWithExtension,

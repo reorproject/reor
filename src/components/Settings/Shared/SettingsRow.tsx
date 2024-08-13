@@ -8,17 +8,17 @@ const SettingsRow: React.FC<{
   onClick?: () => void
   children?: React.ReactNode
 }> = ({ title, description, buttonText, onClick, children }) => (
-  <div className="flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2">
-    <div className="flex-col">
+  <div className="flex w-full flex-wrap items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2">
+    <div className="max-w-[50%] flex-col">
       <p className="mt-5 text-gray-100">
         {title}
-        {description && <p className="m-0 pt-1 text-xs text-gray-100 opacity-40">{description}</p>}
+        {description && <span className="block pt-1 text-xs text-gray-100 opacity-40">{description}</span>}
       </p>
     </div>
     <div className="flex">
       {buttonText && (
         <Button
-          className="flex min-w-[192px] cursor-pointer items-center justify-between rounded-md border border-none border-gray-300 bg-dark-gray-c-eight py-2 font-normal hover:bg-dark-gray-c-ten"
+          className="flex min-w-[128px] max-w-full cursor-pointer items-center justify-between whitespace-normal break-words rounded-md border border-none border-gray-300 bg-dark-gray-c-eight py-2 font-normal hover:bg-dark-gray-c-ten"
           onClick={onClick}
           placeholder=""
         >

@@ -102,11 +102,8 @@ const EditorManager: React.FC<EditorManagerProps> = ({
 
   return (
     <div
-      className="relative size-full cursor-text overflow-y-auto py-4 text-slate-400 opacity-80"
+      className="relative size-full cursor-text overflow-y-auto bg-dark-gray-c-eleven py-4 text-slate-400 opacity-80"
       onClick={() => editor?.commands.focus()}
-      style={{
-        backgroundColor: 'rgb(30, 30, 30)',
-      }}
     >
       {showSearch && (
         <input
@@ -127,10 +124,9 @@ const EditorManager: React.FC<EditorManagerProps> = ({
       {menuVisible && <EditorContextMenu editor={editor} menuPosition={menuPosition} setMenuVisible={setMenuVisible} />}
       <div className={`relative h-full overflow-y-auto ${editorFlex ? 'flex justify-center py-4 pl-4' : ''}`}>
         <EditorContent
-          className={`relative size-full ${editorFlex ? 'max-w-xl' : ''}`}
+          className={`relative size-full bg-dark-gray-c-eleven ${editorFlex ? 'max-w-xl' : ''}`}
           style={{
             wordBreak: 'break-word',
-            backgroundColor: 'rgb(30, 30, 30)',
           }}
           onContextMenu={handleContextMenu}
           onClick={hideMenu}

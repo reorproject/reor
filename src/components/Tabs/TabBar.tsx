@@ -137,14 +137,14 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
   }
 
   return (
-    <div ref={containerRef} className="flex w-full items-center whitespace-nowrap">
-      <div className="flex grow overflow-hidden">
+    <div ref={containerRef} className="flex max-w-full items-center whitespace-nowrap">
+      <div className="flex min-w-0 grow">
         {openTabs &&
           openTabs.map((tab) => (
             <div
               id="titleBarSingleTab"
               key={tab.id}
-              className="flex h-[10px]  min-w-0 grow animate-slide-in items-center justify-center"
+              className="flex h-[10px] min-w-0 max-w-[150px] grow animate-slide-in items-center justify-center"
               onMouseEnter={(e) => handleMouseEnter(e, tab)}
               onMouseLeave={handleMouseLevel}
             >
@@ -154,8 +154,8 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
                 onDragStart={(event) => onDragStart(event, tab.id)}
                 onDrop={onDrop}
                 onDragOver={onDragOver}
-                className={`relative flex w-full cursor-pointer items-center justify-between gap-1 p-2 text-sm text-white
-                ${currentFilePath === tab.filePath ? 'rounded-md bg-dark-gray-c-three' : 'rounded-md'}`}
+                className={`relative flex w-full cursor-pointer items-center justify-between gap-1 rounded-md p-2 text-sm text-white
+                ${currentFilePath === tab.filePath ? 'bg-dark-gray-c-eleven' : ''}`}
                 onClick={() => handleTabSelect(tab)}
               >
                 <span className="truncate">{removeFileExtension(tab.title)}</span>
@@ -176,7 +176,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
       {openTabs.length > 0 && (
         <div
           id="titleBarFileNavigator"
-          className="ml-1 mr-10 flex h-[28px] cursor-pointer items-center justify-center px-2 text-white hover:rounded-md hover:bg-dark-gray-c-three"
+          className="ml-1 mr-10 flex h-[28px] cursor-pointer items-center justify-center px-2 text-white hover:rounded-md hover:bg-dark-gray-c-one"
           onClick={() => setIsNewNoteModalOpen(true)}
         >
           <FaPlus size={13} />
@@ -186,7 +186,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
         openAbsolutePath={openAbsolutePath}
-        customFilePath={currentFilePath}
+        currentOpenFilePath={currentFilePath}
       />
     </div>
   )
