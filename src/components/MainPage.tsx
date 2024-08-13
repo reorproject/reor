@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react'
 import posthog from 'posthog-js'
 
 import '../styles/global.css'
+import { generateText } from 'ai'
+import { createOpenAI } from '@ai-sdk/openai'
 import ChatWithLLM from './Chat/Chat'
 import { useChatHistory } from './Chat/hooks/use-chat-history'
 import ResizableComponent from './Common/ResizableComponent'
@@ -18,6 +20,12 @@ import { ChatFilters, ChatHistory } from './Chat/chatUtils'
 import EmptyPage from './EmptyPage'
 import { TabProvider } from './Providers/TabProvider'
 import { ModalProvider } from './Providers/ModalProvider'
+
+const openai = createOpenAI({
+  // custom settings, e.g.
+  // compatibility: 'strict', // strict mode, enable when using the OpenAI API
+  apiKey: '',
+})
 
 const MainPageComponent: React.FC = () => {
   const [showChatbot, setShowChatbot] = useState<boolean>(false)
@@ -68,28 +76,13 @@ const MainPageComponent: React.FC = () => {
     maxDate: new Date(),
   })
 
-  const [sidebarWidth, setSidebarWidth] = useState<number>(40)
-
   // find all available files
   useEffect(() => {
-    const updateWidth = async () => {
-      const isCompact = await window.electronStore.getSBCompact()
-      setSidebarWidth(isCompact ? 40 : 60)
-    }
-
-    // Listen for changes on settings
-    const handleSettingsChange = (isCompact: number) => {
-      setSidebarWidth(isCompact ? 40 : 60)
-    }
-
     const setFileDirectory = async () => {
       const windowDirectory = await window.electronStore.getVaultDirectoryForWindow()
       setVaultDirectory(windowDirectory)
     }
     setFileDirectory()
-    updateWidth()
-
-    window.ipcRenderer.receive('sb-compact-changed', handleSettingsChange)
   }, [])
 
   useEffect(() => {
@@ -111,6 +104,22 @@ const MainPageComponent: React.FC = () => {
       removeAddChatToFileListener()
     }
   }, [setCurrentChatHistory, setChatFilters])
+
+  // test make web request to Google:
+  useEffect(() => {
+    const fetchData = async () => {
+      const { text } = await generateText({
+        model: openai('gpt-4-turbo'),
+        system: 'You are a friendly assistant!',
+        prompt: 'Why is the sky blue?',
+      })
+
+      console.log(text)
+
+      // console.log(message.content)
+    }
+    fetchData()
+  }, [])
 
   return (
     <div className="relative overflow-x-hidden">
@@ -138,10 +147,7 @@ const MainPageComponent: React.FC = () => {
       </TabProvider>
 
       <div className="flex h-below-titlebar">
-        <div
-          className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5"
-          style={{ width: `${sidebarWidth}px` }}
-        >
+        <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5">
           <ModalProvider>
             <IconsSidebar
               openAbsolutePath={openAbsolutePath}
