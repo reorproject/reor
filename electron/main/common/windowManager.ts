@@ -40,6 +40,16 @@ class WindowsManager {
       width,
       height,
     })
+    win.webContents.session.webRequest.onBeforeSendHeaders((details, callback) => {
+      const { requestHeaders } = details
+      requestHeaders.Origin = '*'
+      requestHeaders['Sec-Fetch-Mode'] = 'no-cors'
+      requestHeaders['Sec-Fetch-Site'] = 'none'
+      requestHeaders['Sec-Fetch-Dest'] = 'document'
+      callback({
+        requestHeaders,
+      })
+    })
 
     if (url) {
       // electron-vite-vue#298

@@ -8,14 +8,12 @@ export interface BaseLLMConfig {
 
 export interface OpenAILLMConfig extends BaseLLMConfig {
   type: 'openai'
-  engine: 'openai'
   apiURL: string
   apiKey: string
 }
 
 export interface AnthropicLLMConfig extends BaseLLMConfig {
   type: 'anthropic'
-  engine: 'anthropic'
   apiURL: string
   apiKey: string
 }

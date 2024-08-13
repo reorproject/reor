@@ -23,7 +23,6 @@ export const openAIDefaultModels: OpenAILLMConfig[] = [
   {
     contextLength: 128000,
     modelName: 'gpt-4o',
-    engine: 'openai',
     type: 'openai',
     apiKey: '',
     apiURL: '',
@@ -31,7 +30,6 @@ export const openAIDefaultModels: OpenAILLMConfig[] = [
   {
     contextLength: 128000,
     modelName: 'gpt-4o-mini',
-    engine: 'openai',
     type: 'openai',
     apiKey: '',
     apiURL: '',
@@ -39,7 +37,6 @@ export const openAIDefaultModels: OpenAILLMConfig[] = [
   {
     contextLength: 16385,
     modelName: 'gpt-3.5-turbo',
-    engine: 'openai',
     type: 'openai',
     apiKey: '',
     apiURL: '',
@@ -47,7 +44,6 @@ export const openAIDefaultModels: OpenAILLMConfig[] = [
   {
     contextLength: 128000,
     modelName: 'gpt-4-turbo',
-    engine: 'openai',
     type: 'openai',
     apiKey: '',
     apiURL: '',
@@ -58,7 +54,6 @@ export const AnthropicDefaultModels: AnthropicLLMConfig[] = [
   {
     contextLength: 180000,
     modelName: 'claude-3-5-sonnet-20240620',
-    engine: 'anthropic',
     type: 'anthropic',
     apiKey: '',
     apiURL: '',

@@ -15,8 +15,7 @@ export function validateAIModelConfig(config: LLMConfig): string | null {
     return 'Context length must be a positive number.'
   }
 
-  // Validate engine: ensure it's either "openai" or "llamacpp"
-  if (config.engine !== 'openai' && config.engine !== 'anthropic') {
+  if (config.type !== 'openai' && config.type !== 'anthropic') {
     return "Engine must be either 'openai' or 'llamacpp'."
   }
 

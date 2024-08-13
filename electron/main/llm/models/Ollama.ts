@@ -180,7 +180,6 @@ class OllamaService implements LLMSessionService {
         type: 'openai',
         apiKey: '',
         contextLength: 4096,
-        engine: 'openai',
         apiURL: 'http://localhost:11434/v1/',
       }),
     )
