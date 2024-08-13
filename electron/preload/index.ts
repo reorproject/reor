@@ -142,6 +142,7 @@ const path = {
   join: createIPCHandler<(...pathSegments: string[]) => Promise<string>>('join-path'),
   dirname: createIPCHandler<(pathString: string) => Promise<string>>('path-dirname'),
   relative: createIPCHandler<(from: string, to: string) => Promise<string>>('path-relative'),
+  isAbsolute: createIPCHandler<(filePath: string) => Promise<string>>('path-absolute'),
   addExtensionIfNoExtensionPresent: createIPCHandler<(pathString: string) => Promise<string>>(
     'add-extension-if-no-extension-present',
   ),

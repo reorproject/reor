@@ -16,6 +16,7 @@ export default {
         'dark-gray-c-eight': '#333333',
         'dark-gray-c-nine': '#343434',
         'dark-gray-c-ten': '#383838',
+        'dark-gray-c-eleven': '#191919',
 
         "dark-slate-gray": "#2F4F4F",
         "light-arsenic": "#182c44",

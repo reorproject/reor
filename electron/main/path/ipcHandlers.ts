@@ -17,6 +17,8 @@ const pathHandlers = () => {
 
   ipcMain.handle('path-relative', (event, from: string, to: string) => path.relative(from, to))
 
+  ipcMain.handle('path-absolute', (event, filePath: string) => path.isAbsolute(filePath))
+
   ipcMain.handle('add-extension-if-no-extension-present', (event, pathString: string) =>
     addExtensionToFilenameIfNoExtensionPresent(pathString, markdownExtensions, '.md'),
   )
