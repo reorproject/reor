@@ -56,8 +56,6 @@ const electronUtils = {
   getReorAppVersion: createIPCHandler<() => Promise<string>>('get-reor-app-version'),
   showFileItemContextMenu: createIPCHandler<(file: FileInfoNode) => Promise<void>>('show-context-menu-file-item'),
   showChatItemContext: createIPCHandler<(chatRow: ChatHistoryMetadata) => Promise<void>>('show-chat-menu-item'),
-  showCreateFileModal: createIPCHandler<(relativePath: string) => Promise<void>>('empty-new-note-listener'),
-  showCreateDirectoryModal: createIPCHandler<(relativePath: string) => Promise<void>>('empty-new-directory-listener'),
 }
 
 const electronStore = {

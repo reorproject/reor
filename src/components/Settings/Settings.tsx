@@ -18,9 +18,7 @@ enum SettingsTab {
   LLMSettingsTab = 'llmSettings',
   EmbeddingModelTab = 'embeddingModel',
   TextGenerationTab = 'textGeneration',
-  // RAG = "RAG",
   AnalyticsTab = 'analytics',
-  ChunkSizeTab = 'chunkSize',
 }
 
 const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose: onCloseFromParent }) => {
