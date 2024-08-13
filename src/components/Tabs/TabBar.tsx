@@ -138,13 +138,13 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
 
   return (
     <div ref={containerRef} className="flex max-w-full items-center whitespace-nowrap">
-      <div className="flex flex-grow min-w-0">
+      <div className="flex min-w-0 grow">
         {openTabs &&
           openTabs.map((tab) => (
             <div
               id="titleBarSingleTab"
               key={tab.id}
-              className="flex flex-grow h-[10px] min-w-0 max-w-[150px] animate-slide-in items-center justify-center"
+              className="flex h-[10px] min-w-0 max-w-[150px] grow animate-slide-in items-center justify-center"
               onMouseEnter={(e) => handleMouseEnter(e, tab)}
               onMouseLeave={handleMouseLevel}
             >
