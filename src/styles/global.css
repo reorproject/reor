@@ -53,7 +53,7 @@ button {
 }
 
 ::-webkit-scrollbar {
-  width: 2px;
+  width: 7px;
   /* Adjust the width of the scrollbar */
 }
 
