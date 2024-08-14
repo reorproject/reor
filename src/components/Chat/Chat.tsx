@@ -9,6 +9,7 @@ import rehypeRaw from 'rehype-raw'
 import Textarea from '@mui/joy/Textarea'
 
 import { IoChatbubbles } from 'react-icons/io5'
+import { FaRegUserCircle } from "react-icons/fa";
 import AddContextFiltersModal from './AddContextFiltersModal'
 import PromptSuggestion from './Chat-Prompts'
 import ChatInput from './ChatInput'
@@ -21,6 +22,7 @@ import {
   resolveRAGContext,
 } from './chatUtils'
 
+import ScrollableContainer from './ChatScrollableIntoView'
 import errorToStringRendererProcess from '@/utils/error'
 import SimilarEntriesComponent from '../Sidebars/SemanticSidebar/SimilarEntriesComponent'
 import '../../styles/chat.css'
@@ -266,107 +268,115 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   return (
     <div className="flex size-full items-center justify-center">
       <div className="mx-auto flex size-full flex-col overflow-hidden border-y-0 border-l-[0.001px] border-r-0 border-solid border-neutral-700 bg-neutral-800">
-        <div className="chat-container relative flex h-full flex-col items-center justify-center overflow-auto bg-transparent p-10 pt-0">
-          <div className={`relative mx-auto mt-4 flex size-full ${setContainerMax} flex-1 flex-col gap-3`}>
-            {currentChatHistory && currentChatHistory.displayableChatHistory.length > 0 ? (
-              // Display chat history if it exists
-              currentChatHistory.displayableChatHistory
-                .filter((msg) => msg.role !== 'system')
-                .map((message, index) => (
-                  <ReactMarkdown
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={index}
-                    rehypePlugins={[rehypeRaw]}
-                    className={getClassName(message)}
-                  >
-                    {message.visibleContent
-                      ? message.visibleContent
-                      : formatOpenAIMessageContentIntoString(message.content)}
-                  </ReactMarkdown>
-                ))
-            ) : (
-              // Display centered "Start a conversation..." if there is no currentChatHistory
-              <div className="relative flex flex-col">
-                <div className="relative lg:top-20 flex flex-col size-full">
-                  <div className="flex flex-col items-center justify-center text-center">
-                    <h1 className="mb-10 text-gray-300">This is a Sample, Username</h1>
-                    {/* <button
-                      className="h-6 w-40 rounded-lg bg-slate-600 text-white"
-                      onClick={() => {
-                        setIsAddContextFiltersModalOpen(true)
-                      }}
-                      type="button"
-                    >
-                      {chatFilters.files.length > 0 ? 'Update RAG filters' : 'Customise context'}
-                    </button>
-                    {EXAMPLE_PROMPTS[askText].map((option) => (
-                      <PromptSuggestion
-                        key={option}
-                        promptText={option}
+        <ScrollableContainer>
+          <div className="chat-container relative flex h-full flex-col items-center justify-center overflow-auto bg-transparent p-10 pt-0">
+            <div className={`relative mx-auto mt-4 flex size-full ${setContainerMax} flex-1 flex-col gap-3`}>  
+              {currentChatHistory && currentChatHistory.displayableChatHistory.length > 0 ? (
+                // Display chat history if it exists
+                currentChatHistory.displayableChatHistory
+                  .filter((msg) => msg.role !== 'system')
+                  .map((message, index) => (
+                    <div key={index} className={`flex items-start gap-6 ${getClassName(message)}`}>
+                      <div className="relative top-4 left-4">
+                        {message.role === 'user' ? (
+                          <FaRegUserCircle size={22}  />
+                        ) : (
+                          <img src="/src/assets/reor-logo.svg" style={{ width: '22px', height: '22px' }} />
+                      )}
+                      </div>
+                      <ReactMarkdown
+                        // eslint-disable-next-line react/no-array-index-key
+                        key={index}
+                        rehypePlugins={[rehypeRaw]}
+                        className={getClassName(message)}
+                      >
+                        {message.visibleContent
+                          ? message.visibleContent
+                          : formatOpenAIMessageContentIntoString(message.content)}
+                      </ReactMarkdown>
+                    </div>
+                  ))
+              ) : (
+                // Display centered "Start a conversation..." if there is no currentChatHistory
+                <div className="relative flex flex-col">
+                  <div className="relative lg:top-20 flex flex-col size-full">
+                    <div className="flex flex-col items-center justify-center text-center">
+                      <h1 className="mb-10 text-gray-300">This is a Sample, Username</h1>
+                      {/* <button
+                        className="h-6 w-40 rounded-lg bg-slate-600 text-white"
                         onClick={() => {
-                          setUserTextFieldInput(option)
+                          setIsAddContextFiltersModalOpen(true)
                         }}
-                      />
-                    ))} */}
-                  </div>
-                  <Textarea
-                    onKeyDown={(e) => {
-                      if (!e.shiftKey && e.key == 'Enter') {
-                        e.preventDefault()
-                        handleNewChatMessage()
-                      }
-                    }}
-                    onChange={(e) => setUserNewChatInput(e.target.value)}
-                    value={userNewChatInput}
-                    minRows={4}
-                    placeholder="Ask Reor a question...."
-
-                  />
-                  <div className="flex flex-col text-white">
-                    <div className="flex items-center">
-                      <IoChatbubbles />
-                      <p className="mx-3 text-sm">Recent chats</p>
+                        type="button"
+                      >
+                        {chatFilters.files.length > 0 ? 'Update RAG filters' : 'Customise context'}
+                      </button>
+                      {EXAMPLE_PROMPTS[askText].map((option) => (
+                        <PromptSuggestion
+                          key={option}
+                          promptText={option}
+                          onClick={() => {
+                            setUserTextFieldInput(option)
+                          }}
+                        />
+                      ))} */}
+                    </div>
+                    <Textarea
+                      onKeyDown={(e) => {
+                        if (!e.shiftKey && e.key == 'Enter') {
+                          e.preventDefault()
+                          handleNewChatMessage()
+                        }
+                      }}
+                      onChange={(e) => setUserNewChatInput(e.target.value)}            
+                    />                      
+                    </span>
+                    <div className="flex flex-col text-white">
+                      <div className="flex items-center">
+                        <IoChatbubbles />
+                        <p className="mx-3 text-sm">Recent chats</p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
-            {isAddContextFiltersModalOpen && (
-              <AddContextFiltersModal
-                vaultDirectory={vaultDirectory}
-                isOpen={isAddContextFiltersModalOpen}
-                onClose={() => setIsAddContextFiltersModalOpen(false)}
-                chatFilters={chatFilters}
-                setChatFilters={setChatFilters}
-              />
-            )}
-          </div>
-          {/* {EXAMPLE_PROMPTS[askText].map((option, index) => {
-            return (
-              <PromptSuggestion
-                key={index}
-                promptText={option}
-                onClick={() => {
-                  setUserTextFieldInput(option);
-                }}
-              />
-            );
-          })} */}
-          {userTextFieldInput === '' &&
-          (!currentChatHistory || currentChatHistory?.displayableChatHistory.length === 0) ? (
-            <>
-              {EXAMPLE_PROMPTS[askText].map((option) => (
+              )}
+              {isAddContextFiltersModalOpen && (
+                <AddContextFiltersModal
+                  vaultDirectory={vaultDirectory}
+                  isOpen={isAddContextFiltersModalOpen}
+                  onClose={() => setIsAddContextFiltersModalOpen(false)}
+                  chatFilters={chatFilters}
+                  setChatFilters={setChatFilters}
+                />
+              )}
+            </div>
+            {/* {EXAMPLE_PROMPTS[askText].map((option, index) => {
+              return (
                 <PromptSuggestion
-                  key={option}
+                  key={index}
                   promptText={option}
                   onClick={() => {
-                    setUserTextFieldInput(option)
+                    setUserTextFieldInput(option);
                   }}
                 />
-              ))}
-            </>
-          ) : undefined}
-        </div>
+              );
+            })} */}
+            {userTextFieldInput === '' &&
+            (!currentChatHistory || currentChatHistory?.displayableChatHistory.length === 0) ? (
+              <>
+                {EXAMPLE_PROMPTS[askText].map((option) => (
+                  <PromptSuggestion
+                    key={option}
+                    promptText={option}
+                    onClick={() => {
+                      setUserTextFieldInput(option)
+                    }}
+                  />
+                ))}
+              </>
+            ) : undefined}
+          </div>
+        </ScrollableContainer>
         <ChatInput
           userTextFieldInput={userTextFieldInput}
           setUserTextFieldInput={setUserTextFieldInput}

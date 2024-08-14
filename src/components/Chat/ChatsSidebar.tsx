@@ -90,7 +90,7 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
   }, [chatHistoriesMetadata, setShowChatbot])
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto bg-neutral-800 px-3 pb-4 pt-2.5">
+    <div className="flex h-full flex-col overflow-y-auto bg-neutral-800 px-2 pb-4 pt-2.5">
       <div className="flex h-full flex-col gap-2 text-white/90">
         <div className="flex min-h-0 flex-1 flex-col gap-4">
           <div className="mb-4 flex flex-col gap-6">

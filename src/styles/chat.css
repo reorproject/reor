@@ -9,15 +9,15 @@
     background-color: rgb(50, 50, 50);
     color: rgb(220, 220, 220);
     border-radius: 10px;
-    padding: 10px 15px;
     margin: 10px 0;
+    padding: 0 4px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* AI's message box */
 .assistant-chat-message {
     color: rgb(210, 210, 210);
-    padding: 10px 15px;
+    padding: 0 4px;
     margin: 10px 0;
 }
 

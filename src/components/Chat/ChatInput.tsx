@@ -17,7 +17,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   loadingResponse,
   askText,
 }) => (
-  <div className="relative mb-10 flex h-titlebar w-full items-center justify-center px-10">
+  <div className="relative my-10 flex h-titlebar w-full items-center justify-center px-10">
     <div className="border-1 w-full max-w-3xl rounded-lg border-solid border-neutral-700 p-3">
       <div className="relative flex h-full">
         <input
