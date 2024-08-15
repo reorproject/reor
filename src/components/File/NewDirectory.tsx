@@ -12,10 +12,10 @@ import { getInvalidCharacterInFilePath } from '@/utils/strings'
 interface NewDirectoryComponentProps {
   isOpen: boolean
   onClose: () => void
-  onDirectoryCreate: string
+  currentOpenFilePath: string | null
 }
 
-const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, onClose, onDirectoryCreate }) => {
+const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, onClose, currentOpenFilePath }) => {
   const [directoryName, setDirectoryName] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -41,15 +41,16 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
 
   const sendNewDirectoryMsg = async () => {
     try {
-      if (!directoryName || errorMessage) {
+      if (!directoryName || errorMessage || currentOpenFilePath === null) {
         return
       }
-      const normalizedDirectoryName = directoryName.replace(/\\/g, '/')
-      const basePath = onDirectoryCreate || (await window.electronStore.getVaultDirectoryForWindow())
-      const fullPath = await window.path.join(basePath, normalizedDirectoryName)
-
+      const directoryPath =
+        currentOpenFilePath === ''
+          ? await window.electronStore.getVaultDirectoryForWindow()
+          : await window.path.dirname(currentOpenFilePath)
+      const finalPath = await window.path.join(directoryPath, directoryName)
+      window.fileSystem.createDirectory(finalPath)
       posthog.capture('created_new_directory_from_new_directory_modal')
-      window.fileSystem.createDirectory(fullPath)
       onClose()
     } catch (e) {
       toast.error(errorToStringRendererProcess(e), {

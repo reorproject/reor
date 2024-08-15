@@ -15,6 +15,9 @@ import SidebarManager, { SidebarAbleToShow } from './Sidebars/MainSidebar'
 import SimilarFilesSidebarComponent from './Sidebars/SimilarFilesSidebar'
 import WritingAssistant from './Writing-Assistant/WritingAssistantFloatingMenu'
 import { ChatFilters, ChatHistory } from './Chat/chatUtils'
+import EmptyPage from './EmptyPage'
+import { TabProvider } from './Providers/TabProvider'
+import { ModalProvider } from './Providers/ModalProvider'
 
 const MainPageComponent: React.FC = () => {
   const [showChatbot, setShowChatbot] = useState<boolean>(false)
@@ -23,9 +26,10 @@ const MainPageComponent: React.FC = () => {
 
   const {
     filePath,
+    setFilePath,
     editor,
     openFileByPath,
-    openRelativePath,
+    openAbsolutePath,
     saveCurrentlyOpenedFile,
     suggestionsState,
     highlightData,
@@ -64,7 +68,7 @@ const MainPageComponent: React.FC = () => {
     maxDate: new Date(),
   })
 
-  const [sidebarWidth, setSidebarWidth] = useState(40)
+  const [sidebarWidth, setSidebarWidth] = useState<number>(40)
 
   // find all available files
   useEffect(() => {
@@ -109,26 +113,43 @@ const MainPageComponent: React.FC = () => {
   }, [setCurrentChatHistory, setChatFilters])
 
   return (
-    <div>
-      <TitleBar
-        history={navigationHistory}
-        setHistory={setNavigationHistory}
+    <div className="relative overflow-x-hidden">
+      {/* Displays the dropdown tab when hovering. You cannot use z-index and position absolute inside 
+          TitleBar since one of the Parent components inadvertently creates a new stacking context that 
+          impacts the z-index. */}
+      <div id="tooltip-container" />
+      <TabProvider
+        openFileAndOpenEditor={openFileAndOpenEditor}
+        setFilePath={setFilePath}
         currentFilePath={filePath}
-        onFileSelect={openFileAndOpenEditor}
-        similarFilesOpen={showSimilarFiles} // This might need to be managed differently now
-        toggleSimilarFiles={toggleSimilarFiles} // This might need to be managed differently now
-      />
+        sidebarShowing={sidebarShowing}
+        makeSidebarShow={setSidebarShowing}
+      >
+        <TitleBar
+          history={navigationHistory}
+          setHistory={setNavigationHistory}
+          currentFilePath={filePath}
+          onFileSelect={openFileAndOpenEditor}
+          similarFilesOpen={showSimilarFiles} // This might need to be managed differently now
+          toggleSimilarFiles={toggleSimilarFiles} // This might need to be managed differently now
+          openFileAndOpenEditor={openFileAndOpenEditor}
+          openAbsolutePath={openAbsolutePath}
+        />
+      </TabProvider>
 
       <div className="flex h-below-titlebar">
         <div
           className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5"
           style={{ width: `${sidebarWidth}px` }}
         >
-          <IconsSidebar
-            openRelativePath={openRelativePath}
-            sidebarShowing={sidebarShowing}
-            makeSidebarShow={setSidebarShowing}
-          />
+          <ModalProvider>
+            <IconsSidebar
+              openAbsolutePath={openAbsolutePath}
+              sidebarShowing={sidebarShowing}
+              makeSidebarShow={setSidebarShowing}
+              currentFilePath={filePath}
+            />
+          </ModalProvider>
         </div>
 
         <ResizableComponent resizeSide="right">
@@ -154,7 +175,7 @@ const MainPageComponent: React.FC = () => {
           </div>
         </ResizableComponent>
 
-        {!showChatbot && filePath && (
+        {!showChatbot && filePath ? (
           <div className="relative flex size-full overflow-hidden">
             <div className="h-full grow overflow-hidden">
               <EditorManager
@@ -181,6 +202,14 @@ const MainPageComponent: React.FC = () => {
               </div>
             )}
           </div>
+        ) : (
+          !showChatbot && (
+            <div className="relative flex size-full overflow-hidden">
+              <ModalProvider>
+                <EmptyPage openAbsolutePath={openAbsolutePath} />
+              </ModalProvider>
+            </div>
+          )
         )}
 
         {showChatbot && (

@@ -63,7 +63,7 @@
     "cm6-theme-basic-dark": "^0.2.0",
     "date-fns": "^3.3.1",
     "dotenv": "^16.4.5",
-     "electron-store": "^8.1.0",
+    "electron-store": "^8.1.0",
     "electron-updater": "^6.1.1",
     "install": "^0.13.0",
     "js-tiktoken": "^1.0.10",
@@ -95,6 +95,8 @@
     "tiptap-markdown": "^0.8.10",
     "turndown": "^7.1.2",
     "use-debounce": "^10.0.1",
+    "uuid": "^10.0.0",
+    "uuidv4": "^6.2.13",
     "vectordb": "0.4.10"
   },
   "devDependencies": {
@@ -111,9 +113,9 @@
     "@typescript-eslint/parser": "^7.16.0",
     "@vitejs/plugin-react": "^4.0.4",
     "autoprefixer": "^10.4.16",
+    "electron": "28.2.1",
     "electron-builder": "^24.6.3",
     "eslint": "^8.56.0",
-    "electron": "28.2.1",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^18.0.0",
     "eslint-config-airbnb-typescript-prettier": "^5.0.0",

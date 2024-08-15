@@ -84,17 +84,12 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
     return visibleItems
   }
 
-  const handleMenuContext = (e: React.MouseEvent) => {
-    e.preventDefault()
-    window.electronUtils.showMenuItemContext()
-  }
-
   // Calculate visible items and item count
   const visibleItems = getVisibleFilesAndFlatten(files, expandedDirectories)
   const itemCount = visibleItems.length
 
   return (
-    <div onContextMenu={handleMenuContext} className="h-full grow">
+    <div className="h-full grow px-1 pt-2 opacity-70">
       <List
         height={listHeight}
         itemCount={itemCount}

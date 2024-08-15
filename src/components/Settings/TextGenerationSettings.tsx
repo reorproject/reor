@@ -64,7 +64,7 @@ const TextGenerationSettings: React.FC<TextGenerationSettingsProps> = () => {
   }
 
   return (
-    <div className="flex size-full flex-col justify-between rounded bg-dark-gray-c-three pb-7">
+    <div className="flex size-full flex-col rounded bg-dark-gray-c-three pb-7">
       <h2 className="mb-0 text-2xl font-semibold text-white">Text Generation</h2>{' '}
       <div className="mt-5 w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2">
         <p className="mb-1 mt-2 text-gray-100">Temperature:</p>

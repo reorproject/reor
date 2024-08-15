@@ -1,5 +1,3 @@
-import * as fs from 'fs/promises'
-
 import { app, BrowserWindow, dialog, ipcMain, Menu, MenuItem, shell } from 'electron'
 import Store from 'electron-store'
 
@@ -15,56 +13,8 @@ const electronUtilsHandlers = (
   url: string | undefined,
   indexHtml: string,
 ) => {
-  ipcMain.handle('show-context-menu-item', (event) => {
-    const menu = new Menu()
-
-    menu.append(
-      new MenuItem({
-        label: 'New Note',
-        click: () => {
-          event.sender.send('add-new-note-listener')
-        },
-      }),
-    )
-
-    menu.append(
-      new MenuItem({
-        label: 'New Directory',
-        click: () => {
-          event.sender.send('add-new-directory-listener')
-        },
-      }),
-    )
-
-    const browserWindow = BrowserWindow.fromWebContents(event.sender)
-    if (browserWindow) menu.popup({ window: browserWindow })
-  })
-
   ipcMain.handle('show-context-menu-file-item', async (event, file: FileInfoNode) => {
     const menu = new Menu()
-
-    const stats = await fs.stat(file.path)
-    const isDirectory = stats.isDirectory()
-
-    if (isDirectory) {
-      menu.append(
-        new MenuItem({
-          label: 'New Note',
-          click: () => {
-            event.sender.send('add-new-note-listener', file.relativePath)
-          },
-        }),
-      )
-
-      menu.append(
-        new MenuItem({
-          label: 'New Directory',
-          click: () => {
-            event.sender.send('add-new-directory-listener', file.path)
-          },
-        }),
-      )
-    }
 
     menu.append(
       new MenuItem({

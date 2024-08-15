@@ -134,7 +134,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({
 
   return (
     // eslint-disable-next-line tailwindcss/no-custom-classname
-    <div className="history-container">
+    <div className="history-container flex">
       <button
         id="back"
         ref={buttonRefBack}

@@ -22,7 +22,7 @@ const EditorManager: React.FC<EditorManagerProps> = ({
   const [searchTerm, setSearchTerm] = useState('')
   const [menuVisible, setMenuVisible] = useState(false)
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
-  //   const [showSimilarFiles, setShowSimilarFiles] = useState(true);
+  const [editorFlex, setEditorFlex] = useState(true)
 
   const toggleSearch = useCallback(() => {
     setShowSearch((prevShowSearch) => !prevShowSearch)
@@ -85,13 +85,25 @@ const EditorManager: React.FC<EditorManagerProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [showSearch, menuVisible, toggleSearch])
 
+  // If "Content Flex Center" is set to true in Settings, then it centers the content of the Editor
+  useEffect(() => {
+    const initEditorContentCenter = async () => {
+      const isCenter = await window.electronStore.getEditorFlexCenter()
+      setEditorFlex(isCenter)
+    }
+
+    const handleEditorChange = (event: any, editorFlexCenter: boolean) => {
+      setEditorFlex(editorFlexCenter)
+    }
+
+    initEditorContentCenter()
+    window.ipcRenderer.on('editor-flex-center-changed', handleEditorChange)
+  }, [])
+
   return (
     <div
-      className="relative size-full cursor-text overflow-y-auto text-slate-400"
+      className="relative size-full cursor-text overflow-y-auto bg-dark-gray-c-eleven py-4 text-slate-400 opacity-80"
       onClick={() => editor?.commands.focus()}
-      style={{
-        backgroundColor: 'rgb(30, 30, 30)',
-      }}
     >
       {showSearch && (
         <input
@@ -106,20 +118,21 @@ const EditorManager: React.FC<EditorManagerProps> = ({
           placeholder="Search..."
           // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus
-          className="absolute right-0 top-4 z-50 mr-14 mt-4 rounded-md border-none  bg-transparent p-2 text-white"
+          className="absolute right-0 top-4 z-50 mr-14 mt-4 rounded-md border-none bg-transparent p-2 text-white"
         />
       )}
       {menuVisible && <EditorContextMenu editor={editor} menuPosition={menuPosition} setMenuVisible={setMenuVisible} />}
-      <EditorContent
-        className="h-full overflow-y-auto"
-        style={{
-          wordBreak: 'break-word',
-          backgroundColor: 'rgb(30, 30, 30)',
-        }}
-        onContextMenu={handleContextMenu}
-        onClick={hideMenu}
-        editor={editor}
-      />
+      <div className={`relative h-full overflow-y-auto ${editorFlex ? 'flex justify-center py-4 pl-4' : ''}`}>
+        <EditorContent
+          className={`relative size-full bg-dark-gray-c-eleven ${editorFlex ? 'max-w-xl' : ''}`}
+          style={{
+            wordBreak: 'break-word',
+          }}
+          onContextMenu={handleContextMenu}
+          onClick={hideMenu}
+          editor={editor}
+        />
+      </div>
       {suggestionsState && (
         <InEditorBacklinkSuggestionsDisplay
           suggestionsState={suggestionsState}

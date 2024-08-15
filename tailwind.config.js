@@ -16,6 +16,7 @@ export default {
         'dark-gray-c-eight': '#333333',
         'dark-gray-c-nine': '#343434',
         'dark-gray-c-ten': '#383838',
+        'dark-gray-c-eleven': '#191919',
 
         "dark-slate-gray": "#2F4F4F",
         "light-arsenic": "#182c44",
@@ -39,7 +40,19 @@ export default {
       },
       transitionDuration: {
         '400': '400ms'
-      }
+      },
+      fontSize: {
+        '2lg': '1.0rem',
+      },
+      keyframes: {
+        slideIn: {
+          '0%': { transform: 'translateX(100%)', opacity: '0'},
+          '100%': { transform: 'translateX(0)', opacity: '1'},
+        },
+      },
+      animation: {
+        'slide-in': 'slideIn 0.3s ease-out',
+      },
     },
   },
   corePlugins: {

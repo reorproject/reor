@@ -29,10 +29,18 @@ a {
 
 #customTitleBar {
   -webkit-app-region: drag;
+  height: 40px;
 }
 
-#customTitleBar * {
+#customTitleBar #titleBarFileNavigator, 
+#titleBarSimilarFiles {
   -webkit-app-region: no-drag;
+}
+
+#titleBarSingleTab {
+  -webkit-app-region: no-drag;
+  padding-top: 25px;
+  padding-bottom: 25px;
 }
 
 button {
@@ -55,14 +63,9 @@ button {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgb(112, 112, 112);
-  /* Set the thumb color */
-  border-radius: 10px;
+  background-color: rgba(95, 125, 139, 0.5);
+  border-radius: 2px;
 }
-
-
-
-
 
 /* CSS for menu that appears when selecting/highlighting text */
 .bubble-menu {

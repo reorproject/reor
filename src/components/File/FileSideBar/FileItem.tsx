@@ -61,6 +61,7 @@ const FileItem: React.FC<FileInfoProps> = ({
       // Handle error (e.g., show an error message)
     }
   }
+
   const toggle = () => {
     if (isFileNodeDirectory(file)) {
       onDirectoryToggle(file.path)
@@ -81,7 +82,7 @@ const FileItem: React.FC<FileInfoProps> = ({
     window.electronUtils.showFileItemContextMenu(file)
   }
 
-  const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-neutral-700 h-full mt-0 mb-0 ${
+  const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-neutral-700 h-full mt-0 mb-0 text-cyan-100 font-sans text-xs leading-relaxed rounded-md ${
     isSelected ? 'bg-neutral-700 text-white font-semibold' : 'text-gray-200'
   } ${isDragOver ? 'bg-neutral-500' : ''}`
 
@@ -97,13 +98,11 @@ const FileItem: React.FC<FileInfoProps> = ({
     >
       <div onClick={toggle} className={itemClasses}>
         {isDirectory && (
-          <span className="mr-2 mt-1 text-[13px] ">
+          <span className="mr-2 mt-1 text-gray-200/20 ">
             {isExpanded ? <FaChevronDown title="Collapse Directory" /> : <FaChevronRight title="Open Directory" />}
           </span>
         )}
-        <span className={`mt-0 flex-1 truncate text-[13px] ${isDirectory ? 'font-semibold' : ''}`}>
-          {isDirectory ? file.name : removeFileExtension(file.name)}
-        </span>
+        <span className="mt-0 flex-1 truncate">{isDirectory ? file.name : removeFileExtension(file.name)}</span>
       </div>
     </div>
   )

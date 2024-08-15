@@ -6,6 +6,7 @@ import {
   HardwareConfig,
   LLMConfig,
   LLMGenerationParameters,
+  Tab,
 } from 'electron/main/electron-store/storeConfig'
 import {
   AugmentPromptWithFileProps,
@@ -54,7 +55,6 @@ const electronUtils = {
   openNewWindow: createIPCHandler<() => Promise<void>>('open-new-window'),
   getReorAppVersion: createIPCHandler<() => Promise<string>>('get-reor-app-version'),
   showFileItemContextMenu: createIPCHandler<(file: FileInfoNode) => Promise<void>>('show-context-menu-file-item'),
-  showMenuItemContext: createIPCHandler<() => Promise<void>>('show-context-menu-item'),
   showChatItemContext: createIPCHandler<(chatRow: ChatHistoryMetadata) => Promise<void>>('show-chat-menu-item'),
 }
 
@@ -85,19 +85,30 @@ const electronStore = {
     createIPCHandler<(params: LLMGenerationParameters) => Promise<void>>('set-llm-generation-params'),
   getAnalyticsMode: createIPCHandler<() => Promise<boolean>>('get-analytics-mode'),
   setAnalyticsMode: createIPCHandler<(isAnalytics: boolean) => Promise<void>>('set-analytics-mode'),
-  getSpellCheckMode: createIPCHandler<() => Promise<string>>('get-spellcheck-mode'),
-  setSpellCheckMode: createIPCHandler<(isSpellCheck: string) => Promise<void>>('set-spellcheck-mode'),
+  getSpellCheckMode: createIPCHandler<() => Promise<boolean>>('get-spellcheck-mode'),
+  setSpellCheckMode: createIPCHandler<(isSpellCheck: boolean) => Promise<void>>('set-spellcheck-mode'),
   getHasUserOpenedAppBefore: createIPCHandler<() => Promise<boolean>>('has-user-opened-app-before'),
   setHasUserOpenedAppBefore: createIPCHandler<() => Promise<void>>('set-user-has-opened-app-before'),
   getAllChatHistories: createIPCHandler<() => Promise<ChatHistory[]>>('get-all-chat-histories'),
   updateChatHistory: createIPCHandler<(chatHistory: ChatHistory) => Promise<void>>('update-chat-history'),
   removeChatHistoryAtID: createIPCHandler<(chatID: string) => Promise<void>>('remove-chat-history-at-id'),
   getChatHistory: createIPCHandler<(chatID: string) => Promise<ChatHistory>>('get-chat-history'),
-
   getSBCompact: createIPCHandler<() => Promise<boolean>>('get-sb-compact'),
   setSBCompact: createIPCHandler<(isSBCompact: boolean) => Promise<void>>('set-sb-compact'),
   getDisplayMarkdown: createIPCHandler<() => Promise<boolean>>('get-display-markdown'),
   setDisplayMarkdown: createIPCHandler<(displayMarkdown: boolean) => Promise<void>>('set-display-markdown'),
+  getEditorFlexCenter: createIPCHandler<() => Promise<boolean>>('get-editor-flex-center'),
+  setEditorFlexCenter: createIPCHandler<(editorFlexCenter: boolean) => Promise<void>>('set-editor-flex-center'),
+  getCurrentOpenTabs: createIPCHandler<() => Promise<Tab[]>>('get-current-open-files'),
+  setCurrentOpenTabs: createIPCHandler<(action: string, args: any) => Promise<void>>('set-current-open-files'),
+  addOpenTabs: createIPCHandler<(tab: Tab) => Promise<void>>('add-current-open-files'),
+  removeOpenTabs:
+    createIPCHandler<(tabId: string, idx: number, newIndex: number) => Promise<void>>('remove-current-open-files'),
+  clearOpenTabs: createIPCHandler<() => Promise<void>>('clear-current-open-files'),
+  updateOpenTabs:
+    createIPCHandler<(draggedIndex: number, targetIndex: number) => Promise<void>>('update-current-open-files'),
+  selectOpenTabs: createIPCHandler<(tabs: Tab[]) => Promise<void>>('set-current-open-files'),
+  removeOpenTabsByPath: createIPCHandler<(path: string) => Promise<void>>('remove-current-open-files-by-path'),
 }
 
 const fileSystem = {
@@ -131,6 +142,7 @@ const path = {
   join: createIPCHandler<(...pathSegments: string[]) => Promise<string>>('join-path'),
   dirname: createIPCHandler<(pathString: string) => Promise<string>>('path-dirname'),
   relative: createIPCHandler<(from: string, to: string) => Promise<string>>('path-relative'),
+  isAbsolute: createIPCHandler<(filePath: string) => Promise<string>>('path-absolute'),
   addExtensionIfNoExtensionPresent: createIPCHandler<(pathString: string) => Promise<string>>(
     'add-extension-if-no-extension-present',
   ),

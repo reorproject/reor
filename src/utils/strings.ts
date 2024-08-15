@@ -16,7 +16,7 @@ export const getInvalidCharacterInFilePath = async (filename: string): Promise<s
 
   switch (platform) {
     case 'win32':
-      invalidCharacters = /["*:<>?|]/
+      invalidCharacters = /["*<>?|]/
       break
     case 'darwin':
       invalidCharacters = /[:]/

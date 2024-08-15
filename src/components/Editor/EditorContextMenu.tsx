@@ -16,7 +16,7 @@ interface MenuPosition {
   y: number
 }
 
-const copyCommand = (state: EditorState) => {
+const copyCommand = (state: EditorState): boolean => {
   if (state.selection.empty) return false
 
   const { from, to } = state.selection
@@ -26,7 +26,7 @@ const copyCommand = (state: EditorState) => {
   return true
 }
 
-const cutCommand = (state: EditorState, dispatch: Dispatch | null) => {
+const cutCommand = (state: EditorState, dispatch: Dispatch | null): boolean => {
   if (state.selection.empty) return false
 
   copyCommand(state)
@@ -41,7 +41,7 @@ const cutCommand = (state: EditorState, dispatch: Dispatch | null) => {
  *
  * Pastes text that currently exists in clipboard
  */
-const pasteCommand = async (editor: Editor) => {
+const pasteCommand = async (editor: Editor): Promise<void> => {
   if (navigator.clipboard) {
     try {
       const text = await navigator.clipboard.readText()
@@ -55,7 +55,7 @@ const pasteCommand = async (editor: Editor) => {
 /**
  * Deletes the text that is selected.
  */
-const deleteCommand = (state: EditorState, dispatch: Dispatch | null) => {
+const deleteCommand = (state: EditorState, dispatch: Dispatch | null): boolean => {
   const transaction = state.tr.deleteSelection()
 
   if (dispatch) {
@@ -63,6 +63,17 @@ const deleteCommand = (state: EditorState, dispatch: Dispatch | null) => {
   }
 
   return true
+}
+
+/**
+ * Table that is displayed when hovering over table in contextMenu
+ *
+ * @param param onSelect: callback function that provides row and cols that user selected
+ *
+ * @returns number of rows and cols selected
+ */
+type TableSizeSelectorProps = {
+  onSelect: (rows: number, cols: number) => void
 }
 
 const TableSizeSelector: React.FC<TableSizeSelectorProps> = ({ onSelect }) => {
@@ -131,7 +142,7 @@ interface EditorContextMenuProps {
  *
  */
 const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosition, setMenuVisible }) => {
-  const [showTableSelector, setShowTableSelector] = useState(false)
+  const [showTableSelector, setShowTableSelector] = useState<boolean>(false)
   /**
    * We use useRef instead of state's because we are changing the style of our DOM but DO NOT
    * want to re-render. This style gets applied once and does not change so no re-render is needed.
@@ -257,26 +268,5 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
     </div>
   )
 }
-
-/**
- * Table that is displayed when hovering over table in contextMenu
- *
- * @param param onSelect: callback function that provides row and cols that user selected
- *
- * @returns number of rows and cols selected
- */
-type TableSizeSelectorProps = {
-  onSelect: (rows: number, cols: number) => void
-}
-
-/**
- *
- * Copies text that is selected
- */
-
-/**
- *
- * Cuts text that is selected
- */
 
 export default EditorContextMenu
