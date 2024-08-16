@@ -139,7 +139,7 @@ const AddContextFiltersModal: React.FC<Props> = ({ vaultDirectory, isOpen, onClo
           {/* Vertical divider */}
           <div className="mx-4 flex flex-col items-center justify-center">
             {/* Horizontal separator for larger screens */}
-            <div className="flex w-full md:hidden items-center">
+            <div className="flex w-full items-center md:hidden">
               <div className="h-px grow bg-gray-600" />
               <div className="mx-2 flex items-center justify-center rounded-full bg-gray-800 text-sm font-bold text-white">
                 Or
@@ -148,7 +148,7 @@ const AddContextFiltersModal: React.FC<Props> = ({ vaultDirectory, isOpen, onClo
             </div>
 
             {/* Vertical separator for smaller screens */}
-            <div className="hidden h-full md:flex flex-col items-center">
+            <div className="hidden h-full flex-col items-center md:flex">
               <div className="w-px grow bg-gray-600" />
               <div className="my-2 text-sm font-bold text-white">Or</div>
               <div className="w-px grow bg-gray-600" />
@@ -215,8 +215,8 @@ const AddContextFiltersModal: React.FC<Props> = ({ vaultDirectory, isOpen, onClo
                 {showAdvanced ? 'Hide Advanced' : 'Show Advanced'}
               </div>
               {showAdvanced && (
-                <div className="mt-2 flex flex-col space-x-4 items-center">
-                  <div className="flex flex-col h-[400px] w-[300px] items-center overflow-hidden text-white">
+                <div className="mt-2 flex flex-col items-center space-x-4">
+                  <div className="flex h-[400px] w-[300px] flex-col items-center overflow-hidden text-white">
                     <p className="mb-1">Min Date:</p>
                     <DayPicker
                       selected={minDate}
@@ -225,7 +225,7 @@ const AddContextFiltersModal: React.FC<Props> = ({ vaultDirectory, isOpen, onClo
                       className="my-day-picker size-full"
                     />
                   </div>
-                  <div className="flex flex-col h-[400px] w-[300px] items-center overflow-hidden text-white">
+                  <div className="flex h-[400px] w-[300px] flex-col items-center overflow-hidden text-white">
                     <p className="mb-1">Max Date:</p>
                     <DayPicker
                       selected={maxDate}
