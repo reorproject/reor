@@ -40,6 +40,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose: p
       apiKey,
       engine: 'openai',
     }
+    console.log('modelConfig', modelConfig)
     posthog.capture('save_remote_llm', {
       modelName,
       contextLength: selectedContextLength,
