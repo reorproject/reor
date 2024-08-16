@@ -17,14 +17,13 @@ export default {
         'dark-gray-c-nine': '#343434',
         'dark-gray-c-ten': '#383838',
         'dark-gray-c-eleven': '#191919',
-
         "dark-slate-gray": "#2F4F4F",
         "light-arsenic": "#182c44",
         "distinct-dark-purple": "#3a395e",
         "moodly-blue": "#7f7dcb",
-      },
-      fontFamily: {
-        // "material-icons": ["Material Icons"],
+        'bg-000': 'hsl(var(--bg-000) / 1.0)', 
+
+        'text-gen-100': 'hsl(var(--gen-100) / 1.0)',
       },
       height: {
         titlebar: "30px",

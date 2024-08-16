@@ -46,7 +46,7 @@ const ScrollableContainer = ({ children }) => {
 
   return (
     <div className="relative flex h-full flex-col overflow-auto bg-transparent pt-0" ref={scrollableRef}>
-      <div className="mt-2 grow space-y-2">{children}</div>
+      <div className="bg-dark-gray-c-eleven grow space-y-2">{children}</div>
       {!isAtBottom && (
         <div
           className="fixed bottom-20 left-1/2 -translate-x-1/2 cursor-pointer p-2 pl-60 text-white"

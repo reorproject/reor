@@ -299,42 +299,43 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
               ) : (
                 // Display centered "Start a conversation..." if there is no currentChatHistory
                 <div className="relative flex flex-col">
-                  <div className="relative lg:top-20 flex flex-col size-full">
-                    <div className="flex flex-col items-center justify-center text-center">
-                      <h1 className="mb-10 text-gray-300">This is a Sample, Username</h1>
-                      {/* <button
-                        className="h-6 w-40 rounded-lg bg-slate-600 text-white"
-                        onClick={() => {
-                          setIsAddContextFiltersModalOpen(true)
+                  <div className="relative lg:top-20 flex flex-col size-full text-center">
+                    <h1 className="mb-10 text-gray-300">This is a Sample, Username</h1>
+                    <div className="flex flex-col rounded-md focus-within:ring focus-within:ring-gray-700 bg-bg-000">
+                      <textarea
+                        onKeyDown={(e) => {
+                          if (!e.shiftKey && e.key == 'Enter') {
+                            e.preventDefault()
+                            handleNewChatMessage()
+                          }
                         }}
-                        type="button"
-                      >
-                        {chatFilters.files.length > 0 ? 'Update RAG filters' : 'Customise context'}
-                      </button>
-                      {EXAMPLE_PROMPTS[askText].map((option) => (
-                        <PromptSuggestion
-                          key={option}
-                          promptText={option}
+                        className="h-[100px] w-full bg-transparent rounded-t-md p-4  caret-white border-0 focus:outline-none"
+                        placeholder='What can Reor help you with today?'
+                        onChange={(e) => setUserNewChatInput(e.target.value)}         
+                      />
+                      <div className="self-center w-[calc(100%-5%)] bg-gray-600 h-[1px]"></div>
+                      <div className="flex justify-between items-center px-4 py-3 ">
+                        <span className="bg-transparent rounded-b-md  text-sm text-text-gen-100 tracking-tight">
+                          Xenova/bge-base-en-v1.5
+                        </span>
+                        <button
+                          className="px-4 py-2 border-0 rounded-md bg-blue-600 hover:bg-blue-500 text-white cursor-pointer"
                           onClick={() => {
-                            setUserTextFieldInput(option)
+                            setIsAddContextFiltersModalOpen(true)
                           }}
-                        />
-                      ))} */}
-                    </div>
-                    <Textarea
-                      onKeyDown={(e) => {
-                        if (!e.shiftKey && e.key == 'Enter') {
-                          e.preventDefault()
-                          handleNewChatMessage()
-                        }
-                      }}
-                      onChange={(e) => setUserNewChatInput(e.target.value)}            
-                    />                      
-                    </span>
-                    <div className="flex flex-col text-white">
-                      <div className="flex items-center">
-                        <IoChatbubbles />
-                        <p className="mx-3 text-sm">Recent chats</p>
+                          type="button"
+                        >
+                          {chatFilters.files.length > 0 ? 'Update RAG filters' : 'Customise context'}
+                        </button>
+                        {EXAMPLE_PROMPTS[askText].map((option) => (
+                          <PromptSuggestion
+                            key={option}
+                            promptText={option}
+                            onClick={() => {
+                              setUserTextFieldInput(option)
+                            }}
+                          />
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -377,13 +378,15 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             ) : undefined}
           </div>
         </ScrollableContainer>
-        <ChatInput
-          userTextFieldInput={userTextFieldInput}
-          setUserTextFieldInput={setUserTextFieldInput}
-          handleSubmitNewMessage={() => handleSubmitNewMessage(currentChatHistory)}
-          loadingResponse={loadingResponse}
-          askText={askText}
-        />
+        {currentChatHistory && 
+          <ChatInput
+            userTextFieldInput={userTextFieldInput}
+            setUserTextFieldInput={setUserTextFieldInput}
+            handleSubmitNewMessage={() => handleSubmitNewMessage(currentChatHistory)}
+            loadingResponse={loadingResponse}
+            askText={askText}
+          />
+        }
       </div>
       {showSimilarFiles && (
         <SimilarEntriesComponent

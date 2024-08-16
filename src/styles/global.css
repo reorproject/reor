@@ -2,6 +2,11 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
+:root {
+  --bg-000: 60 1.8% 22%;
+  --gen-100: 50 23.1% 94.9%;
+}
+
 html,
 body {
   padding: 0;
