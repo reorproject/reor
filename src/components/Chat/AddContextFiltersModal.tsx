@@ -145,7 +145,7 @@ const AddContextFiltersModal: React.FC<Props> = ({ vaultDirectory, isOpen, onClo
             <div className="w-px grow bg-gray-600" />
           </div>
           {/* Right side: Context settings */}
-          <div className='flex-1'>
+          <div className="flex-1">
             {/* ${
               internalFilesSelected.length > 0
                 ? "opacity-30	 pointer-events-none"
@@ -154,7 +154,7 @@ const AddContextFiltersModal: React.FC<Props> = ({ vaultDirectory, isOpen, onClo
             <h3 className="mb-2 text-lg text-white">Context settings</h3>
             <div className="mb-4 text-white">
               <p>Number of notes to add to context:</p>
-              <div className="mt-2 w-full rounded bg-neutral-800 pb-2 p-4">
+              <div className="mt-2 w-full rounded bg-neutral-800 p-4 pb-2">
                 <Slider
                   aria-label="Number of Notes"
                   value={numberOfChunksToFetch}
@@ -205,16 +205,16 @@ const AddContextFiltersModal: React.FC<Props> = ({ vaultDirectory, isOpen, onClo
               </div>
               {showAdvanced && (
                 <div className="mt-2 flex space-x-4">
-                  <div className="flex flex-1 flex-col items-center w-[300px] h-[400px] text-white overflow-hidden">
+                  <div className="flex h-[400px] w-[300px] flex-1 flex-col items-center overflow-hidden text-white">
                     <p className="mb-1">Min Date:</p>
                     <DayPicker
                       selected={minDate}
                       onSelect={(date) => setMinDate(date || undefined)}
                       mode="single"
-                      className="my-day-picker w-full h-full"
+                      className="my-day-picker size-full"
                     />
                   </div>
-                  <div className="flex flex-1 flex-col items-center w-[300px] h-[400px] text-white overflow-hidden">
+                  <div className="flex h-[400px] w-[300px] flex-1 flex-col items-center overflow-hidden text-white">
                     <p className="mb-1">Max Date:</p>
                     <DayPicker
                       selected={maxDate}
