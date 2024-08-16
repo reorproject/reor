@@ -101,11 +101,11 @@ const AddContextFiltersModal: React.FC<Props> = ({ vaultDirectory, isOpen, onClo
 
   return (
     <ReorModal isOpen={isOpen} onClose={onClose}>
-      <div className="mb-6 ml-6 mt-2 h-full max-h-[90vh] w-[800px] overflow-y-auto overflow-x-hidden p-4">
+      <div className="mb-6 ml-6 mt-2 h-full max-h-[80vh] w-[70vw] overflow-y-auto overflow-x-hidden p-4">
         <h4 className="mb-4 text-center text-2xl text-white">
           Choose specific context files or customise the RAG search
         </h4>
-        <div className="flex">
+        <div className="flex flex-col md:flex-row">
           {/* Left side: File selection */}
           <div className="flex-1">
             <h3 className="mb-2 text-lg text-white">Select files for context</h3>
@@ -138,12 +138,23 @@ const AddContextFiltersModal: React.FC<Props> = ({ vaultDirectory, isOpen, onClo
 
           {/* Vertical divider */}
           <div className="mx-4 flex flex-col items-center justify-center">
-            <div className="w-px grow bg-gray-600" />
-            <div className="my-2 flex size-8 items-center justify-center rounded-full bg-gray-800 text-sm font-bold text-white">
-              Or
+            {/* Horizontal separator for larger screens */}
+            <div className="flex w-full md:hidden items-center">
+              <div className="h-px grow bg-gray-600" />
+              <div className="mx-2 flex items-center justify-center rounded-full bg-gray-800 text-sm font-bold text-white">
+                Or
+              </div>
+              <div className="h-px grow bg-gray-600" />
             </div>
-            <div className="w-px grow bg-gray-600" />
+
+            {/* Vertical separator for smaller screens */}
+            <div className="hidden h-full md:flex flex-col items-center">
+              <div className="w-px grow bg-gray-600" />
+              <div className="my-2 text-sm font-bold text-white">Or</div>
+              <div className="w-px grow bg-gray-600" />
+            </div>
           </div>
+
           {/* Right side: Context settings */}
           <div className="flex-1">
             {/* ${
@@ -204,8 +215,8 @@ const AddContextFiltersModal: React.FC<Props> = ({ vaultDirectory, isOpen, onClo
                 {showAdvanced ? 'Hide Advanced' : 'Show Advanced'}
               </div>
               {showAdvanced && (
-                <div className="mt-2 flex space-x-4">
-                  <div className="flex h-[400px] w-[300px] flex-1 flex-col items-center overflow-hidden text-white">
+                <div className="mt-2 flex flex-col space-x-4 items-center">
+                  <div className="flex flex-col h-[400px] w-[300px] items-center overflow-hidden text-white">
                     <p className="mb-1">Min Date:</p>
                     <DayPicker
                       selected={minDate}
@@ -214,7 +225,7 @@ const AddContextFiltersModal: React.FC<Props> = ({ vaultDirectory, isOpen, onClo
                       className="my-day-picker size-full"
                     />
                   </div>
-                  <div className="flex h-[400px] w-[300px] flex-1 flex-col items-center overflow-hidden text-white">
+                  <div className="flex flex-col h-[400px] w-[300px] items-center overflow-hidden text-white">
                     <p className="mb-1">Max Date:</p>
                     <DayPicker
                       selected={maxDate}
