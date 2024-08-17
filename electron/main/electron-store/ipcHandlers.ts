@@ -209,7 +209,7 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
   ipcMain.handle('add-current-open-files', (event, tab: Tab) => {
     if (tab === null) return
     const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || []
-    const existingTab = openTabs.findIndex((item) => item.filePath === tab.filePath)
+    const existingTab = openTabs.findIndex((item) => item.path === tab.path)
 
     /* If tab is already open, do not do anything */
     if (existingTab !== -1) return
@@ -246,7 +246,7 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     if (!filePath) return
     const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || []
     // Filter out selected tab
-    const updatedTabs = openTabs.filter((tab) => tab.filePath !== filePath)
+    const updatedTabs = openTabs.filter((tab) => tab.path !== filePath)
     store.set(StoreKeys.OpenTabs, updatedTabs)
     event.sender.send('remove-tab-after-deletion', updatedTabs)
   })

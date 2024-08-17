@@ -9,8 +9,8 @@ import NewNoteComponent from '../File/NewNote'
 import { useModalOpeners } from '../Providers/ModalProvider'
 
 interface DraggableTabsProps {
-  currentFilePath: string
-  openFileAndOpenEditor: (path: string) => void
+  currentTab: string
+  openTabContent: (path: string) => void
   openAbsolutePath: (path: string) => void
 }
 
@@ -47,7 +47,7 @@ const Tooltip: React.FC<TooltipProps> = ({ filepath, position }) => {
   )
 }
 
-const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFileAndOpenEditor, openAbsolutePath }) => {
+const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentTab, openTabContent, openAbsolutePath }) => {
   const { openTabs, addTab, selectTab, removeTabByID, updateTabOrder } = useTabs()
   const [isLastTabAccessed, setIsLastTabAccessed] = useState<boolean>(false)
 
@@ -62,9 +62,9 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
   // we are using it inside a useContext we can remove it
   /* eslint-disable */
   useEffect(() => {
-    if (!currentFilePath) return
-    addTab(currentFilePath)
-  }, [currentFilePath])
+    if (!currentTab) return
+    addTab(currentTab)
+  }, [currentTab])
   /* eslint-enable */
 
   /*
@@ -76,7 +76,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
         openTabs.forEach((tab: Tab) => {
           if (tab.lastAccessed) {
             setIsLastTabAccessed(true)
-            openFileAndOpenEditor(tab.filePath)
+            openTabContent(tab.path)
             return true
           }
           return false
@@ -85,7 +85,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
     }
 
     selectLastTabAccessed()
-  }, [openTabs, openFileAndOpenEditor, isLastTabAccessed])
+  }, [openTabs, openTabContent, isLastTabAccessed])
 
   const onDragStart = (event: any, tabId: string) => {
     event.dataTransfer.setData('tabId', tabId)
@@ -116,7 +116,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
 
   const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, tab: Tab) => {
     const rect = e.currentTarget.getBoundingClientRect() || null
-    setHoveredTab(tab.filePath)
+    setHoveredTab(tab.path)
     setTooltipPosition({
       x: rect.left - 75,
       y: rect.bottom - 5,
@@ -155,7 +155,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
                 onDrop={onDrop}
                 onDragOver={onDragOver}
                 className={`relative flex w-full cursor-pointer items-center justify-between gap-1 rounded-md p-2 text-sm text-white
-                ${currentFilePath === tab.filePath ? 'bg-dark-gray-c-eleven' : ''}`}
+                ${currentTab === tab.path ? 'bg-dark-gray-c-eleven' : ''}`}
                 onClick={() => handleTabSelect(tab)}
               >
                 <span className="truncate">{removeFileExtension(tab.title)}</span>
@@ -168,7 +168,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
                 >
                   &times;
                 </span>
-                {hoveredTab === tab.filePath && <Tooltip filepath={tab.filePath} position={tooltipPosition} />}
+                {hoveredTab === tab.path && <Tooltip filepath={tab.path} position={tooltipPosition} />}
               </div>
             </div>
           ))}
@@ -186,7 +186,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentFilePath, openFile
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
         openAbsolutePath={openAbsolutePath}
-        currentOpenFilePath={currentFilePath}
+        currentOpenFilePath={currentTab}
       />
     </div>
   )

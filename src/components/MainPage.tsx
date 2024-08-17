@@ -23,6 +23,10 @@ const MainPageComponent: React.FC = () => {
   const [showChatbot, setShowChatbot] = useState<boolean>(false)
   const [showSimilarFiles, setShowSimilarFiles] = useState(true)
   const [sidebarShowing, setSidebarShowing] = useState<SidebarAbleToShow>('files')
+  const [currentTab, setCurrentTab] = useState<string>('')
+
+  const filePathRef = React.useRef<string>('')
+  const chatIDRef = React.useRef<string>('')
 
   const {
     filePath,
@@ -44,6 +48,18 @@ const MainPageComponent: React.FC = () => {
 
   const { currentChatHistory, setCurrentChatHistory, chatHistoriesMetadata } = useChatHistory()
 
+  useEffect(() => {
+    if (filePath && filePathRef.current !== filePath) {
+      filePathRef.current = filePath
+      setCurrentTab(filePath)
+    }
+
+    if (currentChatHistory && chatIDRef.current !== currentChatHistory.id) {
+      chatIDRef.current = currentChatHistory.id
+      setCurrentTab(chatHistoriesMetadata.find((chat) => chat.id === currentChatHistory.id)!.displayName)
+    }
+  }, [currentChatHistory, chatHistoriesMetadata, filePath])
+
   const { files, flattenedFiles, expandedDirectories, handleDirectoryToggle } = useFileInfoTree(filePath)
 
   const toggleSimilarFiles = () => {
@@ -58,6 +74,24 @@ const MainPageComponent: React.FC = () => {
   const openChatAndOpenChat = (chatHistory: ChatHistory | undefined) => {
     setShowChatbot(true)
     setCurrentChatHistory(chatHistory)
+  }
+
+  const isFilePath = (path: string) => {
+    const windowsPattern = /^[a-zA-Z]:\\(?:[^\\/:*?"<>|\r\n]+\\)*[^\\/:*?"<>|\r\n]*$/
+    const unixPattern = /^(\/[^/]+)+\/?$/
+    const macPattern = /^(\/[^/]+)+\/?$/
+
+    return windowsPattern.test(path) || unixPattern.test(path) || macPattern.test(path)
+  }
+
+  const openTabContent = async (path: string) => {
+    if (!path) return
+    if (isFilePath(path)) openFileAndOpenEditor(path)
+    else {
+      const chatID = chatHistoriesMetadata.find((chat) => chat.displayName === path)!.id
+      const chat = await window.electronStore.getChatHistory(chatID)
+      openChatAndOpenChat(chat)
+    }
   }
 
   const [vaultDirectory, setVaultDirectory] = useState<string>('')
@@ -119,20 +153,19 @@ const MainPageComponent: React.FC = () => {
           impacts the z-index. */}
       <div id="tooltip-container" />
       <TabProvider
-        openFileAndOpenEditor={openFileAndOpenEditor}
+        openTabContent={openTabContent}
         setFilePath={setFilePath}
-        currentFilePath={filePath}
+        currentTab={currentTab}
         sidebarShowing={sidebarShowing}
         makeSidebarShow={setSidebarShowing}
       >
         <TitleBar
           history={navigationHistory}
           setHistory={setNavigationHistory}
-          currentFilePath={filePath}
-          onFileSelect={openFileAndOpenEditor}
+          currentTab={currentTab}
+          openTabContent={openTabContent}
           similarFilesOpen={showSimilarFiles} // This might need to be managed differently now
           toggleSimilarFiles={toggleSimilarFiles} // This might need to be managed differently now
-          openFileAndOpenEditor={openFileAndOpenEditor}
           openAbsolutePath={openAbsolutePath}
         />
       </TabProvider>

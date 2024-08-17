@@ -7,24 +7,22 @@ import { ModalProvider } from '../Providers/ModalProvider'
 export const titleBarHeight = '30px'
 
 interface TitleBarProps {
-  onFileSelect: (path: string) => void
-  currentFilePath: string | null // Used to create new open tabs when user clicks on new file to open
+  openTabContent: (path: string) => void
+  currentTab: string | null // Used to create new open tabs when user clicks on new file to open
   similarFilesOpen: boolean
   toggleSimilarFiles: () => void
   history: string[]
   setHistory: (string: string[]) => void
-  openFileAndOpenEditor: (path: string) => void
   openAbsolutePath: (path: string) => void
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
-  onFileSelect,
-  currentFilePath,
+  openTabContent,
+  currentTab,
   similarFilesOpen,
   toggleSimilarFiles,
   history,
   setHistory,
-  openFileAndOpenEditor,
   openAbsolutePath,
 }) => {
   const [platform, setPlatform] = useState('')
@@ -44,8 +42,8 @@ const TitleBar: React.FC<TitleBarProps> = ({
         <FileHistoryNavigator
           history={history}
           setHistory={setHistory}
-          onFileSelect={onFileSelect}
-          currentPath={currentFilePath || ''}
+          onFileSelect={openTabContent}
+          currentPath={currentTab || ''}
         />
       </div>
 
@@ -54,8 +52,8 @@ const TitleBar: React.FC<TitleBarProps> = ({
           <div className="flex whitespace-nowrap">
             <ModalProvider>
               <DraggableTabs
-                currentFilePath={currentFilePath || ''}
-                openFileAndOpenEditor={openFileAndOpenEditor}
+                currentTab={currentTab || ''}
+                openTabContent={openTabContent}
                 openAbsolutePath={openAbsolutePath}
               />
             </ModalProvider>

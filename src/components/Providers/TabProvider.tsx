@@ -5,9 +5,9 @@ import { SidebarAbleToShow } from '../Sidebars/MainSidebar'
 
 interface TabProviderProps {
   children: ReactNode
-  openFileAndOpenEditor: (path: string) => void
+  openTabContent: (path: string) => void
   setFilePath: (path: string) => void
-  currentFilePath: string | null
+  currentTab: string | null
   sidebarShowing: string | null
   makeSidebarShow: (option: SidebarAbleToShow) => void
 }
@@ -35,9 +35,9 @@ export const useTabs = (): TabContextType => useContext(TabContext)
 
 export const TabProvider: React.FC<TabProviderProps> = ({
   children,
-  openFileAndOpenEditor,
+  openTabContent,
   setFilePath,
-  currentFilePath,
+  currentTab,
   sidebarShowing,
   makeSidebarShow,
 }) => {
@@ -74,7 +74,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
       const createTabObjectFromPath = (tabPath: string) => {
         return {
           id: uuidv4(),
-          filePath: tabPath,
+          path: tabPath,
           title: extractFileName(path),
           lastAccessed: true,
           // timeOpened: new Date(),
@@ -82,7 +82,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
         }
       }
 
-      const existingTab = openTabs.find((tab: Tab) => tab.filePath === path)
+      const existingTab = openTabs.find((tab: Tab) => tab.path === path)
       if (existingTab) return
       const tab = createTabObjectFromPath(path)
 
@@ -107,13 +107,13 @@ export const TabProvider: React.FC<TabProviderProps> = ({
         if (findIdx === -1) return prevTabs
 
         openTabs[findIdx].lastAccessed = false
-        closedFilePath = findIdx !== -1 ? prevTabs[findIdx].filePath : ''
+        closedFilePath = findIdx !== -1 ? prevTabs[findIdx].path : ''
         newIndex = findIdx > 0 ? findIdx - 1 : 1
 
-        if (closedFilePath === currentFilePath) {
+        if (closedFilePath === currentTab) {
           if (newIndex < openTabs.length) {
             openTabs[newIndex].lastAccessed = true
-            openFileAndOpenEditor(openTabs[newIndex].filePath)
+            openTabContent(openTabs[newIndex].path)
           }
           // Select the new index's file
           else setFilePath('')
@@ -126,7 +126,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
         window.electronStore.removeOpenTabs(tabId, findIdx, newIndex)
       }
     },
-    [currentFilePath, openFileAndOpenEditor, openTabs, setFilePath],
+    [currentTab, openTabContent, openTabs, setFilePath],
   )
 
   /* Updates tab order (on drag) and syncs it with backend */
@@ -152,9 +152,9 @@ export const TabProvider: React.FC<TabProviderProps> = ({
         return newTabs
       })
       if (sidebarShowing !== 'files') makeSidebarShow('files')
-      openFileAndOpenEditor(selectedTab.filePath)
+      openTabContent(selectedTab.path)
     },
-    [openFileAndOpenEditor, makeSidebarShow, sidebarShowing],
+    [openTabContent, makeSidebarShow, sidebarShowing],
   )
 
   const TabContextMemo = useMemo(
