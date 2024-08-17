@@ -406,6 +406,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             ) : undefined}
           </div>
         </ScrollableContainer>
+
         {currentChatHistory && 
           <ChatInput
             userTextFieldInput={userTextFieldInput}
