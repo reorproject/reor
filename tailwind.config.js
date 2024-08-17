@@ -25,6 +25,17 @@ export default {
 
         'text-gen-100': 'hsl(var(--gen-100) / 1.0)',
       },
+      fontFamily: {
+        'styrene': [
+          'ui-sans-serif',
+          'system-ui',
+          'sans-serif',
+          '"Apple Color Emoji"',
+          '"Segoe UI Emoji"',
+          '"Segoe UI Symbol"',
+          '"Noto Color Emoji"',
+        ],
+      },
       height: {
         titlebar: "30px",
         "below-titlebar": "calc(100vh - 30px)",
@@ -48,9 +59,14 @@ export default {
           '0%': { transform: 'translateX(100%)', opacity: '0'},
           '100%': { transform: 'translateX(0)', opacity: '1'},
         },
+        bounce: {
+          '0%, 20%, 50%, 80%, 100%': { opacity: '1' },
+          '40%, 60%': { opacity: '0' },
+        }
       },
       animation: {
         'slide-in': 'slideIn 0.3s ease-out',
+        'bounce': 'bounce 1.4s infinite both',
       },
     },
   },

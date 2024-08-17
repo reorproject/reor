@@ -42,7 +42,7 @@ export const ChatItem: React.FC<ChatItemProps> = ({
         onContextMenu={handleContextMenu}
       >
         <IoChatbubbles />
-        <span className="ml-2 flex-1 truncate text-sm font-medium">{chatMetadata.displayName}</span>
+        <span className="ml-2 flex-1 truncate text-[11px] font-medium">{chatMetadata.displayName}</span>
       </div>
     </div>
   )
@@ -108,7 +108,7 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
           {/* Pinned Section */}
           <div className="flex min-h-0 flex-col gap-4">
             <div className="flex cursor-pointer items-center justify-between" onClick={togglePinned}>
-              <h3 className="my-1 text-sm font-medium tracking-wider text-gray-200">Pinned</h3>
+              <h4 className="my-1 text-xs font-medium tracking-wider text-gray-200">Pinned</h4>
               <RiArrowDownSLine
                 className={`mt-1 transition-transform duration-200 ${!isPinnedOpen ? 'rotate-0' : 'rotate-180'}`}
               />
@@ -118,7 +118,7 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
           {/* Recents Section */}
           <div className="flex-1">
             <div className="flex cursor-pointer items-center justify-between" onClick={toggleRecents}>
-              <h3 className="mb-0 mt-1 text-sm font-medium tracking-wider text-gray-200">Recents</h3>
+              <h4 className="mb-0 mt-1 text-xs font-medium tracking-wider text-gray-200">Recents</h4>
               <RiArrowDownSLine
                 className={`mt-1 transition-transform duration-200 ${!isRecentsOpen ? 'rotate-0' : 'rotate-180'}`}
               />

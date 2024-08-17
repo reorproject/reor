@@ -1,7 +1,16 @@
 /* Main chat container */
+.markdown-content p {
+    padding: 0.25rem;
+    margin: 0;
+    word-wrap: break-word;
+}
+
 .chat-container {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
     line-height: 1.6;
+}
+
+.chat-container p {
+    font-family: ui-sans-serif, -apple-system, system-ui, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif, "Helvetica", "Apple Color Emoji", Arial, "Segoe UI Emoji", "Segoe UI Symbol";
 }
 
 /* User's message box */
@@ -12,13 +21,17 @@
     margin: 10px 0;
     padding: 0 4px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    font-size: 0.94rem;
+    line-height: 1.2rem;
 }
 
 /* AI's message box */
 .assistant-chat-message {
     color: rgb(210, 210, 210);
-    padding: 0 4px;
     margin: 10px 0;
+    padding: 0 4px;
+    font-size: 0.94rem;
+    line-height: 1.2rem;
 }
 
 @keyframes dropdown-fadeIn {

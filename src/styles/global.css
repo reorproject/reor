@@ -52,11 +52,6 @@ button {
   -webkit-app-region: no-drag;
 }
 
-.markdown-content p {
-  padding: 0.25rem;
-  margin: 0;
-}
-
 ::-webkit-scrollbar {
   width: 7px;
   /* Adjust the width of the scrollbar */

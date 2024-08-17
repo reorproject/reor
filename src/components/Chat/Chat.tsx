@@ -6,9 +6,7 @@ import { ChatCompletionChunk } from 'openai/resources/chat/completions'
 import posthog from 'posthog-js'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
-import Textarea from '@mui/joy/Textarea'
 
-import { IoChatbubbles } from 'react-icons/io5'
 import { FaRegUserCircle } from "react-icons/fa";
 import AddContextFiltersModal from './AddContextFiltersModal'
 import PromptSuggestion from './Chat-Prompts'
@@ -22,6 +20,7 @@ import {
   resolveRAGContext,
 } from './chatUtils'
 
+import { LoadingDots } from '@/utils/animations'
 import ScrollableContainer from './ChatScrollableIntoView'
 import errorToStringRendererProcess from '@/utils/error'
 import SimilarEntriesComponent from '../Sidebars/SemanticSidebar/SimilarEntriesComponent'
@@ -92,16 +91,30 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   setChatFilters,
 }) => {
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
-  const [userNewChatInput, setUserNewChatInput] = useState<string>('')
+  // const [userNewChatInput, setUserNewChatInput] = useState<string>('')
   const [askText] = useState<AskOptions>(AskOptions.Ask)
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false)
+  const [loadAnimation, setLoadAnimation] = useState<boolean>(false)
   const [readyToSave, setReadyToSave] = useState<boolean>(false)
   const [currentContext, setCurrentContext] = useState<DBQueryResult[]>([])
   const [isAddContextFiltersModalOpen, setIsAddContextFiltersModalOpen] = useState<boolean>(false)
+  const [defaultLLMName, setDefaultLLMName] = useState<string>('')
+
+  useEffect(() => {
+    const fetchDefaultLLM = async () => {
+      const defaultName =  await window.llm.getDefaultLLMName()
+      setDefaultLLMName(defaultName)
+    }
+
+    fetchDefaultLLM()
+  }, [])
+
 
   useEffect(() => {
     const context = getChatHistoryContext(currentChatHistory)
     setCurrentContext(context)
+    setLoadingResponse(false)
+    setLoadAnimation(false)
   }, [currentChatHistory])
 
   // update chat context when files are added
@@ -175,6 +188,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     try {
       if (loadingResponse) return
       setLoadingResponse(true)
+      setLoadAnimation(true)
       if (!userTextFieldInput.trim()) return
       const defaultLLMName = await window.llm.getDefaultLLMName()
       if (!outputChatHistory || !outputChatHistory.id) {
@@ -226,15 +240,17 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       if (outputChatHistory) {
         appendNewContentToMessageHistory(outputChatHistory.id, errorToStringRendererProcess(error), 'error')
       }
+    } finally {
+      setLoadingResponse(false)
     }
-    // so here we could save the chat history
-    setLoadingResponse(false)
   }
 
   useEffect(() => {
     const handleOpenAIChunk = async (receivedChatID: string, chunk: ChatCompletionChunk) => {
       const newContent = chunk.choices[0].delta.content ?? ''
       if (newContent) {
+        if (loadAnimation)
+          setLoadAnimation(false)
         appendNewContentToMessageHistory(receivedChatID, newContent, 'success')
       }
     }
@@ -242,6 +258,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     const handleAnthropicChunk = async (receivedChatID: string, chunk: MessageStreamEvent) => {
       const newContent = chunk.type === 'content_block_delta' ? (chunk.delta.text ?? '') : ''
       if (newContent) {
+        if (loadAnimation)  
+          setLoadAnimation(false)
         appendNewContentToMessageHistory(receivedChatID, newContent, 'success')
       }
     }
@@ -262,7 +280,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       : `markdown-content ${message.role}-chat-message`
   }
 
-  const handleNewChatMessage = () => {}
+  const handleNewChatMessage = () => {
+    
+  }
 
   const setContainerMax = !currentChatHistory ? `max-w-xl` : 'max-w-3xl'
   return (
@@ -270,25 +290,25 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       <div className="mx-auto flex size-full flex-col overflow-hidden border-y-0 border-l-[0.001px] border-r-0 border-solid border-neutral-700 bg-neutral-800">
         <ScrollableContainer>
           <div className="chat-container relative flex h-full flex-col items-center justify-center overflow-auto bg-transparent p-10 pt-0">
-            <div className={`relative mx-auto mt-4 flex size-full ${setContainerMax} flex-1 flex-col gap-3`}>  
+            <div className={`relative mx-auto mt-4 flex size-full ${setContainerMax} flex-col gap-3`}>  
               {currentChatHistory && currentChatHistory.displayableChatHistory.length > 0 ? (
                 // Display chat history if it exists
                 currentChatHistory.displayableChatHistory
                   .filter((msg) => msg.role !== 'system')
                   .map((message, index) => (
                     <div key={index} className={`flex items-start gap-6 ${getClassName(message)}`}>
-                      <div className="relative top-4 left-4">
+                      <div className="relative top-3 left-4">
                         {message.role === 'user' ? (
                           <FaRegUserCircle size={22}  />
                         ) : (
                           <img src="/src/assets/reor-logo.svg" style={{ width: '22px', height: '22px' }} />
-                      )}
+                        )}
                       </div>
                       <ReactMarkdown
                         // eslint-disable-next-line react/no-array-index-key
                         key={index}
                         rehypePlugins={[rehypeRaw]}
-                        className={getClassName(message)}
+                        className={`w-[93%] ${getClassName(message)}`}
                       >
                         {message.visibleContent
                           ? message.visibleContent
@@ -306,20 +326,20 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                         onKeyDown={(e) => {
                           if (!e.shiftKey && e.key == 'Enter') {
                             e.preventDefault()
-                            handleNewChatMessage()
+                            handleSubmitNewMessage(undefined)
                           }
                         }}
-                        className="h-[100px] w-full bg-transparent rounded-t-md p-4  caret-white border-0 focus:outline-none"
+                        className="h-[100px] w-full bg-transparent rounded-t-md p-4 caret-white border-0 focus:outline-none resize-none text-text-gen-100 font-styrene"
                         placeholder='What can Reor help you with today?'
-                        onChange={(e) => setUserNewChatInput(e.target.value)}         
+                        onChange={(e) => setUserTextFieldInput(e.target.value)}         
                       />
                       <div className="self-center w-[calc(100%-5%)] bg-gray-600 h-[1px]"></div>
                       <div className="flex justify-between items-center px-4 py-3 ">
-                        <span className="bg-transparent rounded-b-md  text-sm text-text-gen-100 tracking-tight">
-                          Xenova/bge-base-en-v1.5
+                        <span className="bg-transparent rounded-b-md  text-sm text-text-gen-100 tracking-tight font-styrene">
+                         {defaultLLMName}
                         </span>
                         <button
-                          className="px-4 py-2 border-0 rounded-md bg-blue-600 hover:bg-blue-500 text-white cursor-pointer"
+                          className="px-4 py-2 border-0 rounded-md bg-blue-600 hover:bg-blue-500 text-white cursor-pointer font-styrene"
                           onClick={() => {
                             setIsAddContextFiltersModalOpen(true)
                           }}
@@ -341,6 +361,14 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                   </div>
                 </div>
               )}
+
+              {loadAnimation && (
+                <div className="relative ml-1 left-4 flex items-start gap-6 mt-4 w-full">
+                  <img src="/src/assets/reor-logo.svg" style={{ width: '22px', height: '22px' }} />
+                  <LoadingDots />
+                </div>
+              )}
+
               {isAddContextFiltersModalOpen && (
                 <AddContextFiltersModal
                   vaultDirectory={vaultDirectory}
