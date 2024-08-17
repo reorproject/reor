@@ -18,6 +18,7 @@ import { ChatFilters, ChatHistory } from './Chat/chatUtils'
 import EmptyPage from './EmptyPage'
 import { TabProvider } from './Providers/TabProvider'
 import { ModalProvider } from './Providers/ModalProvider'
+import { isFilePath } from '../utils/strings'
 
 const MainPageComponent: React.FC = () => {
   const [showChatbot, setShowChatbot] = useState<boolean>(false)
@@ -74,14 +75,6 @@ const MainPageComponent: React.FC = () => {
   const openChatAndOpenChat = (chatHistory: ChatHistory | undefined) => {
     setShowChatbot(true)
     setCurrentChatHistory(chatHistory)
-  }
-
-  const isFilePath = (path: string) => {
-    const windowsPattern = /^[a-zA-Z]:\\(?:[^\\/:*?"<>|\r\n]+\\)*[^\\/:*?"<>|\r\n]*$/
-    const unixPattern = /^(\/[^/]+)+\/?$/
-    const macPattern = /^(\/[^/]+)+\/?$/
-
-    return windowsPattern.test(path) || unixPattern.test(path) || macPattern.test(path)
   }
 
   const openTabContent = async (path: string) => {

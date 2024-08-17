@@ -51,3 +51,11 @@ export const getInvalidCharacterInFileName = async (filename: string): Promise<s
 
   return idx === -1 ? null : filename[idx]
 }
+
+export const isFilePath = (path: string) => {
+  const windowsPattern = /^[a-zA-Z]:\\(?:[^\\/:*?"<>|\r\n]+\\)*[^\\/:*?"<>|\r\n]*$/
+  const unixPattern = /^(\/[^/]+)+\/?$/
+  const macPattern = /^(\/[^/]+)+\/?$/
+
+  return windowsPattern.test(path) || unixPattern.test(path) || macPattern.test(path)
+}

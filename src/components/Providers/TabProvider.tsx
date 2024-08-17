@@ -1,7 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react'
 import { v4 as uuidv4 } from 'uuid'
+
 import { Tab } from 'electron/main/electron-store/storeConfig'
 import { SidebarAbleToShow } from '../Sidebars/MainSidebar'
+import { isFilePath } from '../../utils/strings'
 
 interface TabProviderProps {
   children: ReactNode
@@ -151,7 +153,11 @@ export const TabProvider: React.FC<TabProviderProps> = ({
         window.electronStore.selectOpenTabs(newTabs)
         return newTabs
       })
-      if (sidebarShowing !== 'files') makeSidebarShow('files')
+
+      if (isFilePath(selectedTab.path)) {
+        if (sidebarShowing !== 'files') makeSidebarShow('files')
+      } else if (sidebarShowing !== 'chats') makeSidebarShow('chats')
+
       openTabContent(selectedTab.path)
     },
     [openTabContent, makeSidebarShow, sidebarShowing],
