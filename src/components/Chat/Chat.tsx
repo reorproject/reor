@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
+import { HiOutlineClipboardCopy, HiOutlinePencilAlt } from 'react-icons/hi'
+import { toast } from 'react-toastify'
 import { MessageStreamEvent } from '@anthropic-ai/sdk/resources'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 import { ChatCompletionChunk } from 'openai/resources/chat/completions'
@@ -69,6 +71,7 @@ function anonymizeChatFiltersForPosthog(chatFilters: ChatFilters): AnonymizedCha
 interface ChatWithLLMProps {
   vaultDirectory: string
   openFileByPath: (path: string) => Promise<void>
+  openAbsolutePath: (path: string, optionalContentToWriteOnCreate?: string) => void
 
   currentChatHistory: ChatHistory | undefined
   setCurrentChatHistory: React.Dispatch<React.SetStateAction<ChatHistory | undefined>>
@@ -80,6 +83,7 @@ interface ChatWithLLMProps {
 const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   vaultDirectory,
   openFileByPath,
+  openAbsolutePath,
   currentChatHistory,
   setCurrentChatHistory,
   showSimilarFiles,
@@ -262,6 +266,21 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     return `${baseClasses} bg-blue-100 text-blue-800`
   }
 
+  const getDisplayMessage = (message: ChatMessageToDisplay): string | undefined => {
+    return message.visibleContent ? message.visibleContent : formatOpenAIMessageContentIntoString(message.content)
+  }
+
+  const copyToClipboard = (message: ChatMessageToDisplay) => {
+    navigator.clipboard.writeText(getDisplayMessage(message) ?? '')
+    toast.success('Copied to clipboard!')
+  }
+
+  const createNewNote = async (message: ChatMessageToDisplay) => {
+    const title = `${(getDisplayMessage(message) ?? `${new Date().toDateString()}`).substring(0, 20)}...`
+    openAbsolutePath(title, getDisplayMessage(message))
+    openFileByPath(title)
+  }
+
   return (
     <div className="flex size-full items-center justify-center">
       <div className="mx-auto flex size-full flex-col overflow-hidden border-y-0 border-l-[0.001px] border-r-0 border-solid border-neutral-700 bg-neutral-800">
@@ -270,16 +289,28 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             {currentChatHistory?.displayableChatHistory
               .filter((msg) => msg.role !== 'system')
               .map((message, index) => (
-                <ReactMarkdown
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={index}
-                  rehypePlugins={[rehypeRaw]}
-                  className={getClassName(message)}
-                >
-                  {message.visibleContent
-                    ? message.visibleContent
-                    : formatOpenAIMessageContentIntoString(message.content)}
-                </ReactMarkdown>
+                // eslint-disable-next-line react/no-array-index-key
+                <div key={index}>
+                  <ReactMarkdown rehypePlugins={[rehypeRaw]} className={getClassName(message)}>
+                    {getDisplayMessage(message)}
+                  </ReactMarkdown>
+                  {message.role === 'assistant' && (
+                    <div className="flex">
+                      <div
+                        className="cursor-pointer items-center justify-center rounded p-1 hover:bg-neutral-700"
+                        onClick={() => copyToClipboard(message)}
+                      >
+                        <HiOutlineClipboardCopy color="gray" size={18} className="text-gray-200" title="Copy" />
+                      </div>
+                      <div
+                        className="cursor-pointer items-center justify-center rounded p-1 hover:bg-neutral-700"
+                        onClick={() => createNewNote(message)}
+                      >
+                        <HiOutlinePencilAlt color="gray" size={18} className="text-gray-200" title="New Note" />
+                      </div>
+                    </div>
+                  )}
+                </div>
               ))}
           </div>
           {(!currentChatHistory || currentChatHistory?.displayableChatHistory.length === 0) && (
