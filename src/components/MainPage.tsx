@@ -213,21 +213,23 @@ const MainPageComponent: React.FC = () => {
         )}
 
         {showChatbot && (
-          <div className="h-below-titlebar w-full">
-            <ChatWithLLM
-              vaultDirectory={vaultDirectory}
-              openFileByPath={openFileAndOpenEditor}
-              currentChatHistory={currentChatHistory}
-              setCurrentChatHistory={setCurrentChatHistory}
-              showSimilarFiles={showSimilarFiles} // This might need to be managed differently now
-              chatFilters={chatFilters}
-              setChatFilters={(updatedChatFilters: ChatFilters) => {
-                posthog.capture('add_file_to_chat', {
-                  chatFilesLength: updatedChatFilters.files.length,
-                })
-                setChatFilters(updatedChatFilters)
-              }}
-            />
+          <div className="relative flex size-full overflow-hidden">
+            <div className="h-below-titlebar w-full">
+              <ChatWithLLM
+                vaultDirectory={vaultDirectory}
+                openFileByPath={openFileAndOpenEditor}
+                currentChatHistory={currentChatHistory}
+                setCurrentChatHistory={setCurrentChatHistory}
+                showSimilarFiles={showSimilarFiles} // This might need to be managed differently now
+                chatFilters={chatFilters}
+                setChatFilters={(updatedChatFilters: ChatFilters) => {
+                  posthog.capture('add_file_to_chat', {
+                    chatFilesLength: updatedChatFilters.files.length,
+                  })
+                  setChatFilters(updatedChatFilters)
+                }}
+              />
+            </div>
           </div>
         )}
       </div>
