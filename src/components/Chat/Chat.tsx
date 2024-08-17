@@ -296,24 +296,28 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                 currentChatHistory.displayableChatHistory
                   .filter((msg) => msg.role !== 'system')
                   .map((message, index) => (
-                    <div key={index} className={`flex items-start gap-6 ${getClassName(message)}`}>
-                      <div className="relative top-3 left-4">
+                    <div className={`w-full ${getClassName(message)} flex`}>
+                      <div className="relative items-start pl-4 pt-3">
                         {message.role === 'user' ? (
                           <FaRegUserCircle size={22}  />
                         ) : (
                           <img src="/src/assets/reor-logo.svg" style={{ width: '22px', height: '22px' }} />
                         )}
                       </div>
-                      <ReactMarkdown
-                        // eslint-disable-next-line react/no-array-index-key
-                        key={index}
-                        rehypePlugins={[rehypeRaw]}
-                        className={`w-[93%] ${getClassName(message)}`}
-                      >
-                        {message.visibleContent
-                          ? message.visibleContent
-                          : formatOpenAIMessageContentIntoString(message.content)}
-                      </ReactMarkdown>
+                      <div className="flex-col w-full gap-1">
+                        <div className={`flex flex-col flex-grow px-5 py-2.5`}>
+                          <ReactMarkdown
+                            // eslint-disable-next-line react/no-array-index-key
+                            key={index}
+                            rehypePlugins={[rehypeRaw]}
+                            className="max-w-[95%] break-words"
+                          >
+                            {message.visibleContent
+                              ? message.visibleContent
+                              : formatOpenAIMessageContentIntoString(message.content)}
+                          </ReactMarkdown>
+                        </div>                      
+                      </div>
                     </div>
                   ))
               ) : (
