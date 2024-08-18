@@ -45,10 +45,12 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   useOutsideClick(markdownContainerRef, () => {
     setCurrentChatHistory(undefined)
     setIsSpaceTrigger(false)
+    setCustomPrompt('')
   })
   useOutsideClick(optionsContainerRef, () => {
     setIsOptionsVisible(false)
     setIsSpaceTrigger(false)
+    setCustomPrompt('')
   })
 
   useEffect(() => {
@@ -57,56 +59,41 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
     }
   }, [hasValidMessages])
 
-  // useEffect(() => {
-  //   if (!isOptionsVisible) {
-  //     setIsSlashTrigger(false)
-  //   }
-  // }, [isOptionsVisible])
-
-  // useEffect(() => {
-  //   console.log('WritingAssistant component rendered')
-  // })
-
-  // useEffect(() => {
-  //   console.log('isOptionsVisible:', isOptionsVisible)
-  //   console.log('isSlashTrigger:', isSlashTrigger)
-  //   console.log('hasValidMessages:', hasValidMessages)
-  //   console.log('positionStyle:', positionStyle)
-  // }, [isOptionsVisible, isSlashTrigger, hasValidMessages, positionStyle])
-
   useLayoutEffect(() => {
-    if (!isOptionsVisible || !highlightData.position) return
-
+    if (!editor || (!isSpaceTrigger && !highlightData)) return
     const calculatePosition = () => {
       if (!optionsContainerRef.current) return
+      const { from } = editor.state.selection
+      const coords = editor.view.coordsAtPos(from)
+      const viewportHeight = window.innerHeight
+      const optionsHeight = 200
+      const spaceBelow = viewportHeight - coords.bottom
 
-      if (highlightData.position) {
-        // Use highlight position for selected text
-        const screenHeight = window.innerHeight
-        const elementHeight = optionsContainerRef.current.offsetHeight
-        const spaceBelow = screenHeight - highlightData.position.top
-        const isSpaceEnough = spaceBelow >= elementHeight
+      let top = 0
+      let left = 0
+      if (spaceBelow >= optionsHeight) {
+        // Enough space below, position under the cursor
 
-        if (isSpaceEnough) {
-          setPositionStyle({
-            top: highlightData.position.top,
-            left: highlightData.position.left,
-          })
-        } else {
-          setPositionStyle({
-            top: highlightData.position.top - elementHeight,
-            left: highlightData.position.left,
-          })
-        }
+        left = coords.left - 50
+        top = coords.bottom - 50
+      } else if (spaceBelow < optionsHeight) {
+        // Not enough space below, position above the cursor
+
+        left = coords.left - 100
+        top = coords.top - optionsHeight
       }
-      // If positionStyle is already set (by '/' key), we don't need to do anything
+
+      setPositionStyle({
+        top,
+        left,
+      })
     }
 
     calculatePosition()
-  }, [isOptionsVisible, highlightData.position])
+  }, [isSpaceTrigger, highlightData, editor, isOptionsVisible])
 
   useLayoutEffect(() => {
-    if (hasValidMessages && highlightData.position) {
+    if (hasValidMessages) {
       const calculateMaxHeight = () => {
         if (!markdownContainerRef.current) return
 
@@ -125,46 +112,23 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       return () => window.removeEventListener('resize', calculateMaxHeight)
     }
     return () => {}
-  }, [hasValidMessages, highlightData.position, positionStyle.top])
+  }, [hasValidMessages, positionStyle.top])
 
   useEffect(() => {
     if (editor) {
-      // console.log('Editor is available for keydown event')
       const handleKeyDown = (event: KeyboardEvent) => {
-        // console.log('Key pressed:', event.key)
         if (event.key === ' ') {
           const { from } = editor.state.selection
           const $from = editor.state.doc.resolve(from)
           const start = $from.start()
           const lineText = editor.state.doc.textBetween(start, from, '\n', '\n')
-          // console.log('Line text before cursor:', lineText)
+
           if (lineText.trim() === '' && from === start) {
             event.preventDefault()
             setCursorPosition(from)
-            // console.log('Empty line detected, setting options visible')
-            const coords = editor.view.coordsAtPos(from)
-            const viewportHeight = window.innerHeight
-            const optionsHeight = 200 // Approximate height of options component
-            const spaceBelow = viewportHeight - coords.bottom
 
-            let top
-            let left
-            if (spaceBelow >= optionsHeight) {
-              // Enough space below, position under the cursor
-              top = coords.bottom - 30
-              left = coords.left - 180
-            } else {
-              // Not enough space below, position above the cursor
-              top = coords.top - optionsHeight
-              left = coords.left - 180
-            }
-
-            setPositionStyle({
-              top,
-              left,
-            })
-            setIsOptionsVisible(true)
             setIsSpaceTrigger(true)
+            setIsOptionsVisible(true)
             setSpacePosition(from)
           }
         }
@@ -176,7 +140,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
         editor.view.dom.removeEventListener('keydown', handleKeyDown)
       }
     }
-    // console.log('Editor is not available for keydown event')
+
     return () => {}
   }, [editor])
 
@@ -205,6 +169,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       if (event.key === 'Escape') {
         setIsOptionsVisible(false)
         setIsSpaceTrigger(false)
+        setCustomPrompt('')
         setCurrentChatHistory(undefined)
 
         // Return focus to the editor and set cursor position
@@ -254,6 +219,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
     editor.chain().focus().setTextSelection(endOfSelection).insertContent(`\n${insertionText}`).run()
 
     setCurrentChatHistory(undefined)
+    setCustomPrompt('')
   }
 
   const replaceHighlightedText = () => {
@@ -272,6 +238,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
     }
 
     setCurrentChatHistory(undefined)
+    setCustomPrompt('')
   }
 
   const getLLMResponse = async (prompt: string, chatHistory: ChatHistory | undefined) => {
@@ -309,7 +276,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   const handleOption = async (option: string, customPromptInput?: string) => {
     let selectedText = highlightData.text
     if (!selectedText.trim() && isSpaceTrigger) {
-      selectedText = '' // or you could set it to the current line's text
+      selectedText = ''
     }
 
     let prompt = ''
@@ -437,7 +404,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           <FaMagic />
         </button>
       )}
-      {isOptionsVisible && (!hasValidMessages || isSpaceTrigger) && (
+      {isOptionsVisible && !hasValidMessages && (
         <div
           ref={optionsContainerRef}
           style={{
@@ -446,7 +413,6 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           }}
           className="absolute z-50 w-96 rounded-md border border-gray-300 bg-white p-2.5"
         >
-          {/* {console.log('Rendering options')} */}
           <TextField
             inputRef={textFieldRef}
             autoFocus
