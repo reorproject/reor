@@ -99,6 +99,7 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
                       border-0 bg-blue-500 py-3 text-white
                       shadow-md transition-colors duration-200 hover:bg-blue-400 hover:text-gray-200
                       hover:shadow-lg"
+              type="button"
               onClick={newChat}
             >
               <RiChatNewFill className="text-xl" />
@@ -124,7 +125,7 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
               />
             </div>
             {isRecentsOpen && (
-              <ul className="list-style:none m-0 flex flex-col gap-0.5 p-0">
+              <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
                 {chatHistoriesMetadata
                   .slice()
                   .reverse()

@@ -7,8 +7,7 @@ import posthog from 'posthog-js'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 
-import { FaRegUserCircle } from "react-icons/fa";
-import { FaRegArrowAltCircleDown } from 'react-icons/fa'
+import { FaRegUserCircle } from 'react-icons/fa'
 import AddContextFiltersModal from './AddContextFiltersModal'
 import PromptSuggestion from './Chat-Prompts'
 import ChatInput from './ChatInput'
@@ -21,8 +20,7 @@ import {
   resolveRAGContext,
 } from './chatUtils'
 
-import { LoadingDots } from '@/utils/animations'
-import ScrollableContainer from './ChatScrollableIntoView'
+import LoadingDots from '@/utils/animations'
 import errorToStringRendererProcess from '@/utils/error'
 import SimilarEntriesComponent from '../Sidebars/SemanticSidebar/SimilarEntriesComponent'
 import '../../styles/chat.css'
@@ -99,17 +97,16 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const [readyToSave, setReadyToSave] = useState<boolean>(false)
   const [currentContext, setCurrentContext] = useState<DBQueryResult[]>([])
   const [isAddContextFiltersModalOpen, setIsAddContextFiltersModalOpen] = useState<boolean>(false)
-  const [defaultLLMName, setDefaultLLMName] = useState<string>('')
+  const [defaultModelName, setDefaultLLMName] = useState<string>('')
 
   useEffect(() => {
     const fetchDefaultLLM = async () => {
-      const defaultName =  await window.llm.getDefaultLLMName()
+      const defaultName = await window.llm.getDefaultLLMName()
       setDefaultLLMName(defaultName)
     }
 
     fetchDefaultLLM()
   }, [])
-
 
   useEffect(() => {
     const context = getChatHistoryContext(currentChatHistory)
@@ -250,8 +247,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     const handleOpenAIChunk = async (receivedChatID: string, chunk: ChatCompletionChunk) => {
       const newContent = chunk.choices[0].delta.content ?? ''
       if (newContent) {
-        if (loadAnimation)
-          setLoadAnimation(false)
+        if (loadAnimation) setLoadAnimation(false)
         appendNewContentToMessageHistory(receivedChatID, newContent, 'success')
       }
     }
@@ -259,8 +255,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     const handleAnthropicChunk = async (receivedChatID: string, chunk: MessageStreamEvent) => {
       const newContent = chunk.type === 'content_block_delta' ? (chunk.delta.text ?? '') : ''
       if (newContent) {
-        if (loadAnimation)  
-          setLoadAnimation(false)
+        if (loadAnimation) setLoadAnimation(false)
         appendNewContentToMessageHistory(receivedChatID, newContent, 'success')
       }
     }
@@ -273,7 +268,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       removeOpenAITokenStreamListener()
       removeAnthropicTokenStreamListener()
     }
-  }, [appendNewContentToMessageHistory])
+  }, [appendNewContentToMessageHistory, loadAnimation])
 
   const getClassName = (message: ChatMessageToDisplay): string => {
     return message.messageType === 'error'
@@ -281,17 +276,14 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       : `markdown-content ${message.role}-chat-message`
   }
 
-  const handleNewChatMessage = () => {
-    
-  }
-
   const setContainerMax = !currentChatHistory ? `max-w-xl` : 'max-w-3xl'
   return (
     <div className="flex size-full items-center justify-center">
       <div className="mx-auto flex size-full flex-col overflow-hidden border-y-0 border-l-[0.001px] border-r-0 border-solid border-neutral-700 bg-dark-gray-c-eleven">
-        {/* <ScrollableContainer> */}
         <div className="chat-container relative flex h-full flex-col items-center justify-center overflow-auto bg-transparent">
-          <div className={`relative mx-auto mt-4 flex size-full ${setContainerMax} flex-col gap-3 overflow-x-hidden p-10 pt-0`}>  
+          <div
+            className={`relative mx-auto mt-4 flex size-full ${setContainerMax} flex-col gap-3 overflow-x-hidden p-10 pt-0`}
+          >
             {currentChatHistory && currentChatHistory.displayableChatHistory.length > 0 ? (
               // Display chat history if it exists
               currentChatHistory.displayableChatHistory
@@ -300,13 +292,17 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                   <div className={`w-full ${getClassName(message)} flex`}>
                     <div className="relative items-start pl-4 pt-3">
                       {message.role === 'user' ? (
-                        <FaRegUserCircle size={22}  />
+                        <FaRegUserCircle size={22} />
                       ) : (
-                        <img src="/src/assets/reor-logo.svg" style={{ width: '22px', height: '22px' }} />
+                        <img
+                          src="/src/assets/reor-logo.svg"
+                          style={{ width: '22px', height: '22px' }}
+                          alt="ReorImage"
+                        />
                       )}
                     </div>
-                    <div className="flex-col w-full gap-1">
-                      <div className={`flex flex-col flex-grow px-5 py-2.5`}>
+                    <div className="w-full flex-col gap-1">
+                      <div className="flex grow flex-col px-5 py-2.5">
                         <ReactMarkdown
                           // eslint-disable-next-line react/no-array-index-key
                           key={index}
@@ -317,34 +313,34 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                             ? message.visibleContent
                             : formatOpenAIMessageContentIntoString(message.content)}
                         </ReactMarkdown>
-                      </div>                      
+                      </div>
                     </div>
                   </div>
                 ))
             ) : (
               // Display centered "Start a conversation..." if there is no currentChatHistory
               <div className="relative flex flex-col">
-                <div className="relative lg:top-20 flex flex-col size-full text-center">
+                <div className="relative flex size-full flex-col text-center lg:top-20">
                   <h1 className="mb-10 text-gray-300">This is a Sample, Username</h1>
-                  <div className="flex flex-col rounded-md focus-within:ring focus-within:ring-gray-700 bg-bg-000">
+                  <div className="flex flex-col rounded-md bg-bg-000 focus-within:ring focus-within:ring-gray-700">
                     <textarea
                       onKeyDown={(e) => {
-                        if (!e.shiftKey && e.key == 'Enter') {
+                        if (!e.shiftKey && e.key === 'Enter') {
                           e.preventDefault()
                           handleSubmitNewMessage(undefined)
                         }
                       }}
-                      className="h-[100px] w-full bg-transparent rounded-t-md p-4 caret-white border-0 focus:outline-none resize-none text-text-gen-100 font-styrene"
-                      placeholder='What can Reor help you with today?'
-                      onChange={(e) => setUserTextFieldInput(e.target.value)}         
+                      className="h-[100px] w-full resize-none rounded-t-md border-0 bg-transparent p-4 font-styrene text-text-gen-100 caret-white focus:outline-none"
+                      placeholder="What can Reor help you with today?"
+                      onChange={(e) => setUserTextFieldInput(e.target.value)}
                     />
-                    <div className="self-center w-[calc(100%-5%)] bg-gray-600 h-[1px]"></div>
-                    <div className="flex justify-between items-center px-4 py-3 ">
-                      <span className="bg-transparent rounded-b-md  text-sm text-text-gen-100 tracking-tight font-styrene">
-                        {defaultLLMName}
+                    <div className="h-px w-[calc(100%-5%)] self-center bg-gray-600" />
+                    <div className="flex items-center justify-between px-4 py-3 ">
+                      <span className="rounded-b-md bg-transparent  font-styrene text-sm tracking-tight text-text-gen-100">
+                        {defaultModelName}
                       </span>
                       <button
-                        className="px-4 py-2 border-0 rounded-md bg-blue-600 hover:bg-blue-500 text-white cursor-pointer font-styrene"
+                        className="cursor-pointer rounded-md border-0 bg-blue-600 px-4 py-2 font-styrene text-white hover:bg-blue-500"
                         onClick={() => {
                           setIsAddContextFiltersModalOpen(true)
                         }}
@@ -366,10 +362,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                 </div>
               </div>
             )}
-          
+
             {loadAnimation && (
-              <div className="relative ml-1 left-4 flex items-start gap-6 mt-4 w-full">
-                <img src="/src/assets/reor-logo.svg" style={{ width: '22px', height: '22px' }} />
+              <div className="relative left-4 ml-1 mt-4 flex w-full items-start gap-6">
+                <img src="/src/assets/reor-logo.svg" style={{ width: '22px', height: '22px' }} alt="ReorImage" />
                 <LoadingDots />
               </div>
             )}
@@ -410,18 +406,15 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             </>
           ) : undefined}
         </div>
-        {/* </ScrollableContainer> */}
 
-
-        {currentChatHistory && 
+        {currentChatHistory && (
           <ChatInput
             userTextFieldInput={userTextFieldInput}
             setUserTextFieldInput={setUserTextFieldInput}
             handleSubmitNewMessage={() => handleSubmitNewMessage(currentChatHistory)}
             loadingResponse={loadingResponse}
-            askText={askText}
           />
-        }
+        )}
       </div>
       {showSimilarFiles && (
         <SimilarEntriesComponent
