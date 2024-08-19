@@ -98,11 +98,11 @@ const ContextFilters: React.FC<Props> = ({ vaultDirectory, chatFilters, setChatF
 
   return (
     <div className="w-full">
-      <h2 className="mt-1 text-lg text-white">Choose specific context files or customise the RAG search</h2>
-      <div className="flex flex-col">
+      <h2 className="mb-8 text-center text-xl text-white">Choose specific context files or customise the RAG search</h2>
+      <div className="mx-auto w-3/4 ">
         {/* Left side: File selection */}
-        <div>
-          <h3 className="mb-2 text-sm text-white">Select files for context</h3>
+        <h3 className="mb-0 text-lg text-white">Select files for context</h3>
+        <div className="max-h-[300px] w-full overflow-y-auto text-white">
           <SearchBarWithFilesSuggestion
             vaultDirectory={vaultDirectory}
             searchText={searchText}
@@ -116,18 +116,16 @@ const ContextFilters: React.FC<Props> = ({ vaultDirectory, chatFilters, setChatF
             suggestionsState={suggestionsState}
             setSuggestionsState={setSuggestionsState}
           />
-          <div className="mt-2 max-h-[300px] w-full overflow-y-auto text-white">
-            <List placeholder="">
-              {internalFilesSelected.map((filePath) => (
-                <ListItem key={filePath} placeholder="">
-                  <ListItemIcon>
-                    <FolderIcon color="primary" />
-                  </ListItemIcon>
-                  <ListItemText primary={filePath} />
-                </ListItem>
-              ))}
-            </List>
-          </div>
+          <List placeholder="">
+            {internalFilesSelected.map((filePath) => (
+              <ListItem key={filePath} placeholder="" className="cursor-pointer">
+                <ListItemIcon>
+                  <FolderIcon color="primary" />
+                </ListItemIcon>
+                <ListItemText primary={filePath} />
+              </ListItem>
+            ))}
+          </List>
         </div>
 
         {/* Right side: Context settings */}
@@ -137,9 +135,9 @@ const ContextFilters: React.FC<Props> = ({ vaultDirectory, chatFilters, setChatF
                 ? "opacity-30	 pointer-events-none"
                 : ""
             } */}
-          <h3 className="mb-2 text-sm text-white">Context settings</h3>
+          <h3 className="mb-0 text-lg text-white">Context settings</h3>
           <div className="mb-4 text-white">
-            <p>Number of notes to add to context:</p>
+            <p>Number of notes to add to context: {numberOfChunksToFetch}</p>
             <div className="mt-2 rounded bg-neutral-800 pb-3 pr-2">
               <Slider
                 aria-label="Number of Notes"
@@ -173,11 +171,10 @@ const ContextFilters: React.FC<Props> = ({ vaultDirectory, chatFilters, setChatF
                 }}
               />
             </div>
-            <div className="mt-2 text-center">{numberOfChunksToFetch}</div>
           </div>
           <div className="mb-4 text-white">
             <p>Filter context notes by last modified date:</p>
-            <div className="mt-2 w-full rounded pb-1">
+            <div className="rounded pb-1">
               <CustomSelect
                 options={dateRangeOptions}
                 selectedValue={selectedDateRange}

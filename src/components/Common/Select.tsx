@@ -59,7 +59,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   return (
     <div className="flex w-full" ref={wrapperRef}>
       <div
-        className="flex w-full cursor-pointer items-center  justify-between rounded-md border border-gray-300 bg-dark-gray-c-eight py-2 hover:bg-dark-gray-c-ten"
+        className="flex w-full cursor-pointer items-center justify-between rounded-md border border-gray-300 bg-dark-gray-c-eight py-2 hover:bg-dark-gray-c-ten"
         onClick={toggleDropdown}
       >
         {centerText ? <span /> : null}
@@ -73,7 +73,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
           className="absolute z-10 max-h-60 overflow-auto rounded-md border border-gray-300 bg-white text-[13px] text-gray-600 shadow-lg"
           style={{
             position: 'fixed',
-            top: 'auto',
+            top: wrapperRef.current?.getBoundingClientRect().bottom,
             left: wrapperRef.current?.getBoundingClientRect().left,
             width: wrapperRef.current?.getBoundingClientRect().width,
           }}
