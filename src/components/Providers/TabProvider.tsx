@@ -3,15 +3,16 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { Tab } from 'electron/main/electron-store/storeConfig'
 import { SidebarAbleToShow } from '../Sidebars/MainSidebar'
-import { isFilePath } from '../../utils/strings'
 
 interface TabProviderProps {
   children: ReactNode
   openTabContent: (path: string) => void
   setFilePath: (path: string) => void
+  setCurrentChatHistory: (chatHistory: undefined) => void
   currentTab: string | null
   sidebarShowing: string | null
   makeSidebarShow: (option: SidebarAbleToShow) => void
+  getChatIdFromPath: (path: string) => string
 }
 
 interface TabContextType {
@@ -39,9 +40,11 @@ export const TabProvider: React.FC<TabProviderProps> = ({
   children,
   openTabContent,
   setFilePath,
+  setCurrentChatHistory,
   currentTab,
   sidebarShowing,
   makeSidebarShow,
+  getChatIdFromPath,
 }) => {
   const [openTabs, setOpenTabs] = useState<Tab[]>([])
 
@@ -100,7 +103,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
   /* Removes a tab and syncs it with the backend */
   const removeTabByID = useCallback(
     (tabId: string) => {
-      let closedFilePath = ''
+      let closedPath = ''
       let newIndex = -1
       let findIdx = -1
 
@@ -109,16 +112,20 @@ export const TabProvider: React.FC<TabProviderProps> = ({
         if (findIdx === -1) return prevTabs
 
         openTabs[findIdx].lastAccessed = false
-        closedFilePath = findIdx !== -1 ? prevTabs[findIdx].path : ''
+        closedPath = findIdx !== -1 ? prevTabs[findIdx].path : ''
         newIndex = findIdx > 0 ? findIdx - 1 : 1
 
-        if (closedFilePath === currentTab) {
+        if (closedPath === currentTab) {
           if (newIndex < openTabs.length) {
             openTabs[newIndex].lastAccessed = true
             openTabContent(openTabs[newIndex].path)
           }
           // Select the new index's file
-          else setFilePath('')
+          else if (getChatIdFromPath(closedPath)) {
+            setCurrentChatHistory(undefined)
+          } else {
+            setFilePath('')
+          }
         }
 
         return prevTabs.filter((_, idx) => idx !== findIdx)
@@ -128,7 +135,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
         window.electronStore.removeOpenTabs(tabId, findIdx, newIndex)
       }
     },
-    [currentTab, openTabContent, openTabs, setFilePath],
+    [currentTab, openTabContent, openTabs, setFilePath, setCurrentChatHistory, getChatIdFromPath],
   )
 
   /* Updates tab order (on drag) and syncs it with backend */
@@ -154,13 +161,13 @@ export const TabProvider: React.FC<TabProviderProps> = ({
         return newTabs
       })
 
-      if (isFilePath(selectedTab.path)) {
-        if (sidebarShowing !== 'files') makeSidebarShow('files')
-      } else if (sidebarShowing !== 'chats') makeSidebarShow('chats')
+      if (getChatIdFromPath(selectedTab.path)) {
+        if (sidebarShowing !== 'chats') makeSidebarShow('chats')
+      } else if (sidebarShowing !== 'files') makeSidebarShow('files')
 
       openTabContent(selectedTab.path)
     },
-    [openTabContent, makeSidebarShow, sidebarShowing],
+    [openTabContent, makeSidebarShow, sidebarShowing, getChatIdFromPath],
   )
 
   const TabContextMemo = useMemo(

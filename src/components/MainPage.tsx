@@ -18,7 +18,6 @@ import { ChatFilters, ChatHistory } from './Chat/chatUtils'
 import EmptyPage from './EmptyPage'
 import { TabProvider } from './Providers/TabProvider'
 import { ModalProvider } from './Providers/ModalProvider'
-import { isFilePath } from '../utils/strings'
 
 const MainPageComponent: React.FC = () => {
   const [showChatbot, setShowChatbot] = useState<boolean>(false)
@@ -57,7 +56,8 @@ const MainPageComponent: React.FC = () => {
 
     if (currentChatHistory && chatIDRef.current !== currentChatHistory.id) {
       chatIDRef.current = currentChatHistory.id
-      setCurrentTab(chatHistoriesMetadata.find((chat) => chat.id === currentChatHistory.id)!.displayName)
+      const currentMetadata = chatHistoriesMetadata.find((chat) => chat.id === currentChatHistory.id)
+      if (currentMetadata) setCurrentTab(currentMetadata.displayName)
     }
   }, [currentChatHistory, chatHistoriesMetadata, filePath])
 
@@ -77,14 +77,22 @@ const MainPageComponent: React.FC = () => {
     setCurrentChatHistory(chatHistory)
   }
 
+  const getChatIdFromPath = (path: string) => {
+    const metadata = chatHistoriesMetadata.find((chat) => chat.displayName === path)
+    if (metadata) return metadata.id
+    return ''
+  }
+
   const openTabContent = async (path: string) => {
     if (!path) return
-    if (isFilePath(path)) openFileAndOpenEditor(path)
-    else {
-      const chatID = chatHistoriesMetadata.find((chat) => chat.displayName === path)!.id
+    const chatID = getChatIdFromPath(path)
+    if (chatID) {
       const chat = await window.electronStore.getChatHistory(chatID)
       openChatAndOpenChat(chat)
+    } else {
+      openFileAndOpenEditor(path)
     }
+    setCurrentTab(path)
   }
 
   const [vaultDirectory, setVaultDirectory] = useState<string>('')
@@ -147,10 +155,12 @@ const MainPageComponent: React.FC = () => {
       <div id="tooltip-container" />
       <TabProvider
         openTabContent={openTabContent}
-        setFilePath={setFilePath}
         currentTab={currentTab}
+        setFilePath={setFilePath}
+        setCurrentChatHistory={setCurrentChatHistory}
         sidebarShowing={sidebarShowing}
         makeSidebarShow={setSidebarShowing}
+        getChatIdFromPath={getChatIdFromPath}
       >
         <TitleBar
           history={navigationHistory}
@@ -160,6 +170,7 @@ const MainPageComponent: React.FC = () => {
           similarFilesOpen={showSimilarFiles} // This might need to be managed differently now
           toggleSimilarFiles={toggleSimilarFiles} // This might need to be managed differently now
           openAbsolutePath={openAbsolutePath}
+          setShowChatbot={setShowChatbot}
         />
       </TabProvider>
 
@@ -171,6 +182,7 @@ const MainPageComponent: React.FC = () => {
           <ModalProvider>
             <IconsSidebar
               openAbsolutePath={openAbsolutePath}
+              setShowChatbot={setShowChatbot}
               sidebarShowing={sidebarShowing}
               makeSidebarShow={setSidebarShowing}
               currentFilePath={filePath}
@@ -232,7 +244,7 @@ const MainPageComponent: React.FC = () => {
           !showChatbot && (
             <div className="relative flex size-full overflow-hidden">
               <ModalProvider>
-                <EmptyPage openAbsolutePath={openAbsolutePath} />
+                <EmptyPage openAbsolutePath={openAbsolutePath} setShowChatbot={setShowChatbot} />
               </ModalProvider>
             </div>
           )

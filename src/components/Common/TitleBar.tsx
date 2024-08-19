@@ -14,6 +14,7 @@ interface TitleBarProps {
   history: string[]
   setHistory: (string: string[]) => void
   openAbsolutePath: (path: string) => void
+  setShowChatbot: (showChat: boolean) => void
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
@@ -24,6 +25,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
   history,
   setHistory,
   openAbsolutePath,
+  setShowChatbot,
 }) => {
   const [platform, setPlatform] = useState('')
 
@@ -55,6 +57,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
                 currentTab={currentTab || ''}
                 openTabContent={openTabContent}
                 openAbsolutePath={openAbsolutePath}
+                setShowChatbot={setShowChatbot}
               />
             </ModalProvider>
           </div>

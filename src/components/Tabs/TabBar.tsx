@@ -12,6 +12,7 @@ interface DraggableTabsProps {
   currentTab: string
   openTabContent: (path: string) => void
   openAbsolutePath: (path: string) => void
+  setShowChatbot: (showChat: boolean) => void
 }
 
 interface TooltipProps {
@@ -47,7 +48,12 @@ const Tooltip: React.FC<TooltipProps> = ({ filepath, position }) => {
   )
 }
 
-const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentTab, openTabContent, openAbsolutePath }) => {
+const DraggableTabs: React.FC<DraggableTabsProps> = ({
+  currentTab,
+  openTabContent,
+  openAbsolutePath,
+  setShowChatbot,
+}) => {
   const { openTabs, addTab, selectTab, removeTabByID, updateTabOrder } = useTabs()
   const [isLastTabAccessed, setIsLastTabAccessed] = useState<boolean>(false)
 
@@ -186,6 +192,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentTab, openTabConten
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
         openAbsolutePath={openAbsolutePath}
+        setShowChatbot={setShowChatbot}
         currentOpenFilePath={currentTab}
       />
     </div>

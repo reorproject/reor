@@ -20,6 +20,7 @@ interface IconsSidebarProps {
   sidebarShowing: SidebarAbleToShow
   makeSidebarShow: (show: SidebarAbleToShow) => void
   currentFilePath: string | null
+  setShowChatbot: (showChat: boolean) => void
 }
 
 const IconsSidebar: React.FC<IconsSidebarProps> = ({
@@ -27,6 +28,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
   sidebarShowing,
   makeSidebarShow,
   currentFilePath,
+  setShowChatbot,
 }) => {
   const [initialFileToCreateFlashcard, setInitialFileToCreateFlashcard] = useState('')
   const [initialFileToReviewFlashcard, setInitialFileToReviewFlashcard] = useState('')
@@ -127,6 +129,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
         openAbsolutePath={openAbsolutePath}
+        setShowChatbot={setShowChatbot}
         currentOpenFilePath={currentFilePath}
       />
       <NewDirectoryComponent

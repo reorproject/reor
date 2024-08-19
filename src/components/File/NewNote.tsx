@@ -12,6 +12,7 @@ interface NewNoteComponentProps {
   onClose: () => void
   openAbsolutePath: (path: string) => void
   currentOpenFilePath: string | null
+  setShowChatbot: (showChat: boolean) => void
 }
 
 const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
@@ -19,6 +20,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
   onClose,
   openAbsolutePath,
   currentOpenFilePath,
+  setShowChatbot,
 }) => {
   const [fileName, setFileName] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -52,6 +54,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
       const directoryName = await window.path.dirname(currentOpenFilePath)
       finalPath = await window.path.join(directoryName, fileName)
     }
+    setShowChatbot(false)
     openAbsolutePath(finalPath)
     posthog.capture('created_new_note_from_new_note_modal')
     onClose()

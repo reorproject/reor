@@ -6,9 +6,10 @@ import NewDirectoryComponent from './File/NewDirectory'
 
 interface EmptyPageProps {
   openAbsolutePath: (filePath: string, optionalContentToWriteOnCreate?: string) => Promise<void>
+  setShowChatbot: (showChat: boolean) => void
 }
 
-const EmptyPage: React.FC<EmptyPageProps> = ({ openAbsolutePath }) => {
+const EmptyPage: React.FC<EmptyPageProps> = ({ openAbsolutePath, setShowChatbot }) => {
   const { isNewNoteModalOpen, setIsNewNoteModalOpen, isNewDirectoryModalOpen, setIsNewDirectoryModalOpen } =
     useModalOpeners()
 
@@ -39,6 +40,7 @@ const EmptyPage: React.FC<EmptyPageProps> = ({ openAbsolutePath }) => {
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
         openAbsolutePath={openAbsolutePath}
+        setShowChatbot={setShowChatbot}
         currentOpenFilePath=""
       />
       <NewDirectoryComponent
