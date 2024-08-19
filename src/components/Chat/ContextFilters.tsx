@@ -5,7 +5,7 @@ import FolderIcon from '@mui/icons-material/Folder'
 import { ListItemIcon, ListItemText } from '@mui/material'
 import Slider from '@mui/material/Slider'
 import { sub } from 'date-fns'
-import { DayPicker } from 'react-day-picker'
+import { DateRange, DayPicker } from 'react-day-picker'
 
 import 'react-day-picker/dist/style.css'
 import SearchBarWithFilesSuggestion from '../Common/SearchBarWithFilesSuggestion'
@@ -24,9 +24,10 @@ const ContextFilters: React.FC<Props> = ({ vaultDirectory, chatFilters, setChatF
   const [searchText, setSearchText] = useState<string>('')
   const [suggestionsState, setSuggestionsState] = useState<SuggestionsState | null>(null)
   const [numberOfChunksToFetch, setNumberOfChunksToFetch] = useState<number>(chatFilters.numberOfChunksToFetch || 15)
-  const [minDate, setMinDate] = useState<Date | undefined>(chatFilters.minDate)
-  const [maxDate, setMaxDate] = useState<Date | undefined>(chatFilters.maxDate)
-  const [showAdvanced, setShowAdvanced] = useState<boolean>(false)
+  const [dateRange, setDateRange] = useState<DateRange>({
+    from: chatFilters.minDate,
+    to: chatFilters.maxDate,
+  })
   const [selectedDateRange, setSelectedDateRange] = useState<string>('Anytime')
 
   const dateRangeOptions = [
@@ -43,11 +44,11 @@ const ContextFilters: React.FC<Props> = ({ vaultDirectory, chatFilters, setChatF
       ...chatFilters,
       files: [...new Set([...chatFilters.files, ...internalFilesSelected])],
       numberOfChunksToFetch,
-      minDate: minDate || undefined,
-      maxDate: maxDate || undefined,
+      minDate: dateRange.from || undefined,
+      maxDate: dateRange.to || undefined,
     }
     setChatFilters(updatedChatFilters)
-  }, [internalFilesSelected, numberOfChunksToFetch, minDate, maxDate, chatFilters, setChatFilters])
+  }, [internalFilesSelected, numberOfChunksToFetch, dateRange, chatFilters, setChatFilters])
 
   const handleNumberOfChunksChange = (event: Event, value: number | number[]) => {
     const newValue = Array.isArray(value) ? value[0] : value
@@ -79,13 +80,11 @@ const ContextFilters: React.FC<Props> = ({ vaultDirectory, chatFilters, setChatF
       default:
         newMinDate = undefined
     }
-    setMinDate(newMinDate)
-    setMaxDate(value === 'anytime' ? undefined : now)
+    setDateRange({
+      from: newMinDate,
+      to: value === 'anytime' ? undefined : now,
+    })
     setSelectedDateRange(dateRangeOptions.find((option) => option.value === value)?.label || '')
-  }
-
-  const handleAdvancedToggle = () => {
-    setShowAdvanced(!showAdvanced)
   }
 
   // Define the marks to be closer together
@@ -97,12 +96,11 @@ const ContextFilters: React.FC<Props> = ({ vaultDirectory, chatFilters, setChatF
   useEffect(() => {}, [chatFilters])
 
   return (
-    <div className="w-full">
-      <h2 className="mb-8 text-center text-xl text-white">Choose specific context files or customise the RAG search</h2>
-      <div className="mx-auto w-3/4 ">
-        {/* Left side: File selection */}
-        <h3 className="mb-0 text-lg text-white">Select files for context</h3>
-        <div className="max-h-[300px] w-full overflow-y-auto text-white">
+    <div className="mx-auto w-3/4 text-white">
+      <h2 className="text-2xl font-semibold">Choose specific context files or customise the RAG search</h2>
+      <div className="border-0 border-b-2 border-solid border-neutral-700 py-2">
+        <p className="mb-0">Select files for context</p>
+        <div className="max-h-[300px] w-full overflow-y-auto">
           <SearchBarWithFilesSuggestion
             vaultDirectory={vaultDirectory}
             searchText={searchText}
@@ -127,87 +125,66 @@ const ContextFilters: React.FC<Props> = ({ vaultDirectory, chatFilters, setChatF
             ))}
           </List>
         </div>
-
-        {/* Right side: Context settings */}
-        <div>
-          {/* ${
+      </div>
+      <div>
+        {/* ${
               internalFilesSelected.length > 0
                 ? "opacity-30	 pointer-events-none"
                 : ""
             } */}
-          <h3 className="mb-0 text-lg text-white">Context settings</h3>
-          <div className="mb-4 text-white">
-            <p>Number of notes to add to context: {numberOfChunksToFetch}</p>
-            <div className="mt-2 rounded bg-neutral-800 pb-3 pr-2">
-              <Slider
-                aria-label="Number of Notes"
-                value={numberOfChunksToFetch}
-                valueLabelDisplay="on"
-                step={1}
-                marks={marks}
-                min={0}
-                max={30}
-                onChange={handleNumberOfChunksChange}
-                sx={{
-                  '& .MuiSlider-thumb': {
-                    '&:focus, &:hover, &.Mui-active, &.Mui-focusVisible': {
-                      boxShadow: 'none',
-                    },
-                    '&::after': {
-                      content: 'none',
-                    },
+        <div className="mb-4 border-0 border-b-2 border-solid border-neutral-700 py-2">
+          <p>Number of notes to add to context: {numberOfChunksToFetch}</p>
+          <div className="mt-2 rounded bg-neutral-800 pb-3 pr-2">
+            <Slider
+              aria-label="Number of Notes"
+              value={numberOfChunksToFetch}
+              valueLabelDisplay="on"
+              step={1}
+              marks={marks}
+              min={0}
+              max={30}
+              onChange={handleNumberOfChunksChange}
+              sx={{
+                '& .MuiSlider-thumb': {
+                  '&:focus, &:hover, &.Mui-active, &.Mui-focusVisible': {
+                    boxShadow: 'none',
                   },
-                  '& .MuiSlider-valueLabel': {
-                    fontSize: '0.75rem',
-                    padding: '3px 6px',
-                    lineHeight: '1.2em',
+                  '&::after': {
+                    content: 'none',
                   },
-                  '& .MuiSlider-markLabel': {
-                    color: '#FFFFFF',
-                  },
-                  '& .MuiSlider-mark': {
-                    color: '#FFFFFF',
-                  },
-                }}
-              />
-            </div>
+                },
+                '& .MuiSlider-valueLabel': {
+                  fontSize: '0.75rem',
+                  padding: '3px 6px',
+                  lineHeight: '1.2em',
+                },
+                '& .MuiSlider-markLabel': {
+                  color: '#FFFFFF',
+                },
+                '& .MuiSlider-mark': {
+                  color: '#FFFFFF',
+                },
+              }}
+            />
           </div>
-          <div className="mb-4 text-white">
-            <p>Filter context notes by last modified date:</p>
-            <div className="rounded pb-1">
-              <CustomSelect
-                options={dateRangeOptions}
-                selectedValue={selectedDateRange}
-                onChange={handleDateRangeChange}
-              />
-            </div>
-          </div>
-          <div>
-            <div className="mb-2 cursor-pointer text-xs text-gray-500 underline" onClick={handleAdvancedToggle}>
-              {showAdvanced ? 'Hide Advanced' : 'Show Advanced'}
-            </div>
-            {showAdvanced && (
-              <div className="mt-2 flex space-x-4">
-                <div className="flex flex-1 flex-col items-center text-white">
-                  <p className="mb-1">Min Date:</p>
-                  <DayPicker
-                    selected={minDate}
-                    onSelect={(date) => setMinDate(date || undefined)}
-                    mode="single"
-                    className="my-day-picker w-full"
-                  />
-                </div>
-                <div className="flex flex-1 flex-col items-center text-white">
-                  <p className="mb-1">Max Date:</p>
-                  <DayPicker
-                    selected={maxDate}
-                    onSelect={(date) => setMaxDate(date || undefined)}
-                    mode="single"
-                    className="my-day-picker w-full"
-                  />
-                </div>
-              </div>
-            )}
+        </div>
+        <div className="mb-4 border-0 border-b-2 border-solid border-neutral-700 py-2">
+          <p className="mb-0">
+            Filter context notes by last modified date: {dateRange?.from && dateRange.from.toLocaleDateString()}
+            {dateRange?.to && ` to ${dateRange.to.toLocaleDateString()}`}
+          </p>
+          <div className="flex w-full flex-row items-baseline justify-between">
+            <CustomSelect
+              options={dateRangeOptions}
+              selectedValue={selectedDateRange}
+              onChange={handleDateRangeChange}
+            />
+            <DayPicker
+              selected={dateRange}
+              onSelect={(date) => date && setDateRange(date)}
+              mode="range"
+              className="my-day-picker w-full"
+            />
           </div>
         </div>
       </div>
