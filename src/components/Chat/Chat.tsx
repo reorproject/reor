@@ -84,7 +84,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const [askText] = useState<AskOptions>(AskOptions.Ask)
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false)
   const [loadAnimation, setLoadAnimation] = useState<boolean>(false)
+  const [beginStreaming, setBeginStreaming] = useState<boolean>(false)
   const [readyToSave, setReadyToSave] = useState<boolean>(false)
+  const [triggerUpdate, setTriggerUpdate] = useState<boolean>(false)
   const [currentContext, setCurrentContext] = useState<DBQueryResult[]>([])
   const [isAddContextFiltersModalOpen, setIsAddContextFiltersModalOpen] = useState<boolean>(false)
   const [defaultModelName, setDefaultLLMName] = useState<string>('')
@@ -100,11 +102,17 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   }, [])
 
   useEffect(() => {
+    stopStreamingResponse()
     const context = getChatHistoryContext(currentChatHistory)
     setCurrentContext(context)
-    // setLoadingResponse(false)
-    // setLoadAnimation(false)
   }, [currentChatHistory])
+
+  useEffect(() => {
+    if (beginStreaming) {
+      setBeginStreaming(false)
+      startStreamingResponse()
+    }
+  }, [beginStreaming])
 
   // update chat context when files are added
   useEffect(() => {
@@ -176,8 +184,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
     try {
       if (loadingResponse) return
-      setLoadingResponse(true)
-      setLoadAnimation(true)
       if (!userTextFieldInput.trim()) return
       const defaultLLMName = await window.llm.getDefaultLLMName()
       if (!outputChatHistory || !outputChatHistory.id) {
@@ -207,11 +213,10 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           context: [],
         })
       }
-
       setUserTextFieldInput('')
 
-      console.log("Output chatHistory:", outputChatHistory)
       setCurrentChatHistory(outputChatHistory)
+      setBeginStreaming(true)
 
       if (!outputChatHistory) return
 
@@ -230,11 +235,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       if (outputChatHistory) {
         appendNewContentToMessageHistory(outputChatHistory.id, errorToStringRendererProcess(error), 'error')
       }
-      setLoadAnimation(false)
-      setLoadingResponse(false)
+      stopStreamingResponse()
     } finally {
-      setLoadingResponse(false)
-      setLoadAnimation(false)
+      stopStreamingResponse()
     }
   }
 
@@ -265,6 +268,13 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     }
   }, [appendNewContentToMessageHistory, loadAnimation])
 
+  useEffect(() => {
+    if (triggerUpdate) {
+      handleSubmitNewMessage(undefined)
+      setTriggerUpdate(false)
+    }
+  }, [triggerUpdate])
+
   const getClassName = (message: ChatMessageToDisplay): string => {
     return message.messageType === 'error'
       ? `markdown-content ${message.messageType}-chat-message`
@@ -272,9 +282,19 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   }
 
   const handlePromptSelection = (prompt: string) => {
-    console.log("Text Field Input:", prompt)
     setUserTextFieldInput(prompt)
-    handleSubmitNewMessage(undefined) // Creates a new chatHistory
+    setTriggerUpdate(true)
+  }
+
+
+  const stopStreamingResponse = () => {
+    setLoadAnimation(false)
+    setLoadingResponse(false)
+  }
+
+  const startStreamingResponse = () => {
+    setLoadAnimation(true)
+    setLoadingResponse(true)
   }
 
   useEffect(() => {
