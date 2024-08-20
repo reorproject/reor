@@ -124,19 +124,14 @@ export const TabProvider: React.FC<TabProviderProps> = ({
 
         const nextTabs = prevTabs.filter((_, idx) => idx !== findIdx)
 
-        let fileTabCount = 0
-        let chatTabCount = 0
-        nextTabs.forEach((tab) => {
-          if (getChatIdFromPath(tab.path)) {
-            chatTabCount += 1
-          } else {
-            fileTabCount += 1
-          }
-        })
-        if (!fileTabCount) {
+        const hasFileTabs = nextTabs.some((tab) => !getChatIdFromPath(tab.path))
+        const hasChatTabs = nextTabs.some((tab) => getChatIdFromPath(tab.path))
+
+        if (!hasFileTabs) {
           setFilePath('')
         }
-        if (!chatTabCount) {
+
+        if (!hasChatTabs) {
           setCurrentChatHistory(undefined)
         }
 

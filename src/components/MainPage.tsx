@@ -26,6 +26,14 @@ const MainPageComponent: React.FC = () => {
   const [showSimilarFiles, setShowSimilarFiles] = useState(true)
   const [sidebarShowing, setSidebarShowing] = useState<SidebarAbleToShow>('files')
   const [currentTab, setCurrentTab] = useState<string>('')
+  const [vaultDirectory, setVaultDirectory] = useState<string>('')
+  const [chatFilters, setChatFilters] = useState<ChatFilters>({
+    files: [],
+    numberOfChunksToFetch: 15,
+    minDate: new Date(0),
+    maxDate: new Date(),
+  })
+  const [sidebarWidth, setSidebarWidth] = useState<number>(40)
 
   const filePathRef = React.useRef<string>('')
   const chatIDRef = React.useRef<string>('')
@@ -34,8 +42,7 @@ const MainPageComponent: React.FC = () => {
     filePath,
     setFilePath,
     editor,
-    openFileByPath,
-    openAbsolutePath,
+    openOrCreateFile,
     saveCurrentlyOpenedFile,
     suggestionsState,
     highlightData,
@@ -72,26 +79,6 @@ const MainPageComponent: React.FC = () => {
     setShowSimilarFiles(!showSimilarFiles)
   }
 
-  const openFileLayout = () => {
-    setShowChatbot(false)
-    setSidebarShowing('files')
-  }
-
-  const openChatLayout = () => {
-    setShowChatbot(true)
-    setSidebarShowing('chats')
-  }
-
-  const openFileAndOpenEditor = async (path: string) => {
-    openFileLayout()
-    openFileByPath(path)
-  }
-
-  const openChatAndOpenChat = (chatHistory: ChatHistory | undefined) => {
-    openChatLayout()
-    setCurrentChatHistory(chatHistory)
-  }
-
   const getChatIdFromPath = (path: string) => {
     if (chatHistoriesMetadata.length === 0) return UNINITIALIZED_STATE
     const metadata = chatHistoriesMetadata.find((chat) => chat.displayName === path)
@@ -99,28 +86,31 @@ const MainPageComponent: React.FC = () => {
     return ''
   }
 
+  const openChatSidebarAndChat = (chatHistory: ChatHistory | undefined) => {
+    setShowChatbot(true)
+    setSidebarShowing('chats')
+    setCurrentChatHistory(chatHistory)
+  }
+
+  const openFileAndOpenEditor = async (path: string) => {
+    setShowChatbot(false)
+    setSidebarShowing('files')
+    openOrCreateFile(path)
+  }
+
   const openTabContent = async (path: string) => {
+    // generically opens a chat or a file
     if (!path) return
     const chatID = getChatIdFromPath(path)
     if (chatID) {
       if (chatID === UNINITIALIZED_STATE) return
       const chat = await window.electronStore.getChatHistory(chatID)
-      openChatAndOpenChat(chat)
+      openChatSidebarAndChat(chat)
     } else {
       openFileAndOpenEditor(path)
     }
     setCurrentTab(path)
   }
-
-  const [vaultDirectory, setVaultDirectory] = useState<string>('')
-  const [chatFilters, setChatFilters] = useState<ChatFilters>({
-    files: [],
-    numberOfChunksToFetch: 15,
-    minDate: new Date(0),
-    maxDate: new Date(),
-  })
-
-  const [sidebarWidth, setSidebarWidth] = useState<number>(40)
 
   // find all available files
   useEffect(() => {
@@ -186,8 +176,7 @@ const MainPageComponent: React.FC = () => {
           openTabContent={openTabContent}
           similarFilesOpen={showSimilarFiles} // This might need to be managed differently now
           toggleSimilarFiles={toggleSimilarFiles} // This might need to be managed differently now
-          openAbsolutePath={openAbsolutePath}
-          openFileLayout={openFileLayout}
+          openFileAndOpenEditor={openFileAndOpenEditor}
         />
       </TabProvider>
 
@@ -198,8 +187,7 @@ const MainPageComponent: React.FC = () => {
         >
           <ModalProvider>
             <IconsSidebar
-              openAbsolutePath={openAbsolutePath}
-              openFileLayout={openFileLayout}
+              openFileAndOpenEditor={openFileAndOpenEditor}
               sidebarShowing={sidebarShowing}
               makeSidebarShow={setSidebarShowing}
               currentFilePath={filePath}
@@ -223,7 +211,7 @@ const MainPageComponent: React.FC = () => {
               setFileDirToBeRenamed={setFileDirToBeRenamed}
               currentChatHistory={currentChatHistory}
               chatHistoriesMetadata={chatHistoriesMetadata}
-              setCurrentChatHistory={openChatAndOpenChat}
+              setCurrentChatHistory={openChatSidebarAndChat}
               setChatFilters={setChatFilters}
               setShowChatbot={setShowChatbot}
             />
@@ -251,7 +239,7 @@ const MainPageComponent: React.FC = () => {
                 <SimilarFilesSidebarComponent
                   filePath={filePath}
                   highlightData={highlightData}
-                  openFileByPath={openFileByPath}
+                  openFileAndOpenEditor={openFileAndOpenEditor}
                   saveCurrentlyOpenedFile={saveCurrentlyOpenedFile}
                 />
               </div>
@@ -261,7 +249,7 @@ const MainPageComponent: React.FC = () => {
           !showChatbot && (
             <div className="relative flex size-full overflow-hidden">
               <ModalProvider>
-                <EmptyPage openAbsolutePath={openAbsolutePath} openFileLayout={openFileLayout} />
+                <EmptyPage openFileAndOpenEditor={openFileAndOpenEditor} />
               </ModalProvider>
             </div>
           )

@@ -5,11 +5,11 @@ function addExtensionToFilenameIfNoExtensionPresent(
   acceptableExtensions: string[],
   defaultExtension: string,
 ): string {
-  const extension = path.extname(filename).slice(1).toLowerCase()
-
+  const extension = path.extname(filename).toLowerCase()
   if (acceptableExtensions.includes(extension)) {
     return filename
   }
+
   return `${filename}${defaultExtension}`
 }
 
