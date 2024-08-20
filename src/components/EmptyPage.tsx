@@ -5,11 +5,10 @@ import NewNoteComponent from './File/NewNote'
 import NewDirectoryComponent from './File/NewDirectory'
 
 interface EmptyPageProps {
-  openOrCreateFile: (filePath: string, optionalContentToWriteOnCreate?: string) => Promise<void>
-  openFileLayout: () => void
+  openFileAndOpenEditor: (filePath: string, optionalContentToWriteOnCreate?: string) => Promise<void>
 }
 
-const EmptyPage: React.FC<EmptyPageProps> = ({ openOrCreateFile, openFileLayout }) => {
+const EmptyPage: React.FC<EmptyPageProps> = ({ openFileAndOpenEditor }) => {
   const { isNewNoteModalOpen, setIsNewNoteModalOpen, isNewDirectoryModalOpen, setIsNewDirectoryModalOpen } =
     useModalOpeners()
 
@@ -39,8 +38,7 @@ const EmptyPage: React.FC<EmptyPageProps> = ({ openOrCreateFile, openFileLayout 
       <NewNoteComponent
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
-        openOrCreateFile={openOrCreateFile}
-        openFileLayout={openFileLayout}
+        openFileAndOpenEditor={openFileAndOpenEditor}
         currentOpenFilePath=""
       />
       <NewDirectoryComponent

@@ -8,13 +8,6 @@ import { useTabs } from '../Providers/TabProvider'
 import NewNoteComponent from '../File/NewNote'
 import { useModalOpeners } from '../Providers/ModalProvider'
 
-interface DraggableTabsProps {
-  currentTab: string
-  openTabContent: (path: string) => void
-  openOrCreateFile: (path: string) => void
-  openFileLayout: () => void
-}
-
 interface TooltipProps {
   filepath: string
   position: { x: number; y: number }
@@ -47,13 +40,13 @@ const Tooltip: React.FC<TooltipProps> = ({ filepath, position }) => {
     document.getElementById('tooltip-container') as HTMLElement,
   )
 }
+interface DraggableTabsProps {
+  currentTab: string
+  openTabContent: (path: string) => void
+  openFileAndOpenEditor: (path: string) => void
+}
 
-const DraggableTabs: React.FC<DraggableTabsProps> = ({
-  currentTab,
-  openTabContent,
-  openOrCreateFile,
-  openFileLayout,
-}) => {
+const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentTab, openTabContent, openFileAndOpenEditor }) => {
   const { openTabs, addTab, selectTab, removeTabByID, updateTabOrder } = useTabs()
   const [isLastTabAccessed, setIsLastTabAccessed] = useState<boolean>(false)
 
@@ -191,8 +184,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
       <NewNoteComponent
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
-        openOrCreateFile={openOrCreateFile}
-        openFileLayout={openFileLayout}
+        openFileAndOpenEditor={openFileAndOpenEditor}
         currentOpenFilePath={currentTab}
       />
     </div>

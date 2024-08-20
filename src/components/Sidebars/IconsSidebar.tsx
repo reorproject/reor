@@ -16,19 +16,17 @@ import { SidebarAbleToShow } from './MainSidebar'
 import { useModalOpeners } from '../Providers/ModalProvider'
 
 interface IconsSidebarProps {
-  openOrCreateFile: (path: string) => void
+  openFileAndOpenEditor: (path: string) => void
   sidebarShowing: SidebarAbleToShow
   makeSidebarShow: (show: SidebarAbleToShow) => void
   currentFilePath: string | null
-  openFileLayout: () => void
 }
 
 const IconsSidebar: React.FC<IconsSidebarProps> = ({
-  openOrCreateFile,
+  openFileAndOpenEditor,
   sidebarShowing,
   makeSidebarShow,
   currentFilePath,
-  openFileLayout,
 }) => {
   const [initialFileToCreateFlashcard, setInitialFileToCreateFlashcard] = useState('')
   const [initialFileToReviewFlashcard, setInitialFileToReviewFlashcard] = useState('')
@@ -128,8 +126,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
       <NewNoteComponent
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
-        openOrCreateFile={openOrCreateFile}
-        openFileLayout={openFileLayout}
+        openFileAndOpenEditor={openFileAndOpenEditor}
         currentOpenFilePath={currentFilePath}
       />
       <NewDirectoryComponent
