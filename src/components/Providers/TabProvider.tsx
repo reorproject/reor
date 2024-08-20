@@ -120,15 +120,27 @@ export const TabProvider: React.FC<TabProviderProps> = ({
             openTabs[newIndex].lastAccessed = true
             openTabContent(openTabs[newIndex].path)
           }
-          // Select the new index's file
-          else if (getChatIdFromPath(closedPath)) {
-            setCurrentChatHistory(undefined)
-          } else {
-            setFilePath('')
-          }
         }
 
-        return prevTabs.filter((_, idx) => idx !== findIdx)
+        const nextTabs = prevTabs.filter((_, idx) => idx !== findIdx)
+
+        let fileTabCount = 0
+        let chatTabCount = 0
+        nextTabs.forEach((tab) => {
+          if (getChatIdFromPath(tab.path)) {
+            chatTabCount += 1
+          } else {
+            fileTabCount += 1
+          }
+        })
+        if (!fileTabCount) {
+          setFilePath('')
+        }
+        if (!chatTabCount) {
+          setCurrentChatHistory(undefined)
+        }
+
+        return nextTabs
       })
 
       if (newIndex !== -1 && findIdx !== -1) {

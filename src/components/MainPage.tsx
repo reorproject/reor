@@ -49,15 +49,18 @@ const MainPageComponent: React.FC = () => {
   const { currentChatHistory, setCurrentChatHistory, chatHistoriesMetadata } = useChatHistory()
 
   useEffect(() => {
-    if (filePath && filePathRef.current !== filePath) {
+    if (filePath != null && filePathRef.current !== filePath) {
       filePathRef.current = filePath
       setCurrentTab(filePath)
     }
 
-    if (currentChatHistory && chatIDRef.current !== currentChatHistory.id) {
-      chatIDRef.current = currentChatHistory.id
-      const currentMetadata = chatHistoriesMetadata.find((chat) => chat.id === currentChatHistory.id)
-      if (currentMetadata) setCurrentTab(currentMetadata.displayName)
+    const currentChatHistoryId = currentChatHistory?.id ?? ''
+    if (chatIDRef.current !== currentChatHistoryId) {
+      chatIDRef.current = currentChatHistoryId
+      const currentMetadata = chatHistoriesMetadata.find((chat) => chat.id === currentChatHistoryId)
+      if (currentMetadata) {
+        setCurrentTab(currentMetadata.displayName)
+      }
     }
   }, [currentChatHistory, chatHistoriesMetadata, filePath])
 
