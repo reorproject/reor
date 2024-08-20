@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useRef } from 'react'
 
 import { MessageStreamEvent } from '@anthropic-ai/sdk/resources'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
@@ -98,6 +98,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const [currentContext, setCurrentContext] = useState<DBQueryResult[]>([])
   const [isAddContextFiltersModalOpen, setIsAddContextFiltersModalOpen] = useState<boolean>(false)
   const [defaultModelName, setDefaultLLMName] = useState<string>('')
+  const chatContainerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const fetchDefaultLLM = async () => {
@@ -276,11 +277,21 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       : `markdown-content ${message.role}-chat-message`
   }
 
+  useEffect(() => {
+      if (chatContainerRef.current) {
+        chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+      }
+  }, [currentChatHistory]);
+
   const setContainerMax = !currentChatHistory ? `max-w-xl` : 'max-w-3xl'
   return (
-    <div className="flex size-full items-center justify-center">
+    <div 
+      className="flex size-full items-center justify-center"
+    >
       <div className="mx-auto flex size-full flex-col overflow-hidden border-y-0 border-l-[0.001px] border-r-0 border-solid border-neutral-700 bg-dark-gray-c-eleven">
-        <div className="chat-container relative flex h-full flex-col items-center justify-center overflow-auto bg-transparent">
+        <div 
+          ref={chatContainerRef}
+          className="chat-container relative flex h-full flex-col items-center justify-center overflow-auto bg-transparent">
           <div
             className={`relative mx-auto mt-4 flex size-full ${setContainerMax} flex-col gap-3 overflow-x-hidden p-10 pt-0`}
           >

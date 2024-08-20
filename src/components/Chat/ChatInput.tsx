@@ -52,7 +52,10 @@ const ChatInput: React.FC<ChatInputProps> = ({
                 className={userTextFieldInput ? 'cursor-pointer' : ''}
               />
             ) : (
-              <MdOutlinePause color="white" className="cursor-pointer" />
+              <MdOutlinePause 
+                color="white" 
+                className="cursor-pointer"
+              />
             )}
           </div>
         </div>

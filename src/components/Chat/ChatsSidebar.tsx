@@ -63,12 +63,10 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
   newChat,
   setShowChatbot,
 }) => {
-  const [isPinnedOpen, setIsPinnedOpen] = useState(true)
   const [isRecentsOpen, setIsRecentsOpen] = useState(true)
   const dropdownAnimationDelay = 0.2
 
   const toggleRecents = () => setIsRecentsOpen((prev) => !prev)
-  const togglePinned = () => setIsPinnedOpen((prev) => !prev)
 
   const currentSelectedChatID = useRef<string | undefined>()
   useEffect(() => {}, [chatHistoriesMetadata])
@@ -105,15 +103,6 @@ export const ChatsSidebar: React.FC<ChatListProps> = ({
               <RiChatNewFill className="text-xl" />
               <span className="text-xs font-bold">Start New Chat</span>
             </button>
-          </div>
-          {/* Pinned Section */}
-          <div className="flex min-h-0 flex-col gap-4">
-            <div className="flex cursor-pointer items-center justify-between" onClick={togglePinned}>
-              <h4 className="my-1 text-xs font-medium tracking-wider text-gray-200">Pinned</h4>
-              <RiArrowDownSLine
-                className={`mt-1 transition-transform duration-200 ${!isPinnedOpen ? 'rotate-0' : 'rotate-180'}`}
-              />
-            </div>
           </div>
 
           {/* Recents Section */}
