@@ -86,21 +86,12 @@ const MainPageComponent: React.FC = () => {
     return ''
   }
 
-  const openChatLayout = () => {
+  const openChatSidebarAndChat = (chatHistory: ChatHistory | undefined) => {
     setShowChatbot(true)
     setSidebarShowing('chats')
-  }
-
-  const openChatSidebarAndChat = (chatHistory: ChatHistory | undefined) => {
-    openChatLayout()
     setCurrentChatHistory(chatHistory)
   }
 
-  // const openFileLayout = () => {
-  //   // ok so question 1 is probably why we don't have like openFileLayout occuring automatically when we open a file and the same with chat...
-  //   setShowChatbot(false)
-  //   setSidebarShowing('files')
-  // }
   const openFileAndOpenEditor = async (path: string) => {
     setShowChatbot(false)
     setSidebarShowing('files')
@@ -248,7 +239,7 @@ const MainPageComponent: React.FC = () => {
                 <SimilarFilesSidebarComponent
                   filePath={filePath}
                   highlightData={highlightData}
-                  openFileByPath={openOrCreateFile}
+                  openFileAndOpenEditor={openFileAndOpenEditor}
                   saveCurrentlyOpenedFile={saveCurrentlyOpenedFile}
                 />
               </div>
