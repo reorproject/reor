@@ -19,6 +19,8 @@ import EmptyPage from './EmptyPage'
 import { TabProvider } from './Providers/TabProvider'
 import { ModalProvider } from './Providers/ModalProvider'
 
+const UNINITIALIZED_STATE = 'UNINITIALIZED_STATE'
+
 const MainPageComponent: React.FC = () => {
   const [showChatbot, setShowChatbot] = useState<boolean>(false)
   const [showSimilarFiles, setShowSimilarFiles] = useState(true)
@@ -91,6 +93,7 @@ const MainPageComponent: React.FC = () => {
   }
 
   const getChatIdFromPath = (path: string) => {
+    if (chatHistoriesMetadata.length === 0) return UNINITIALIZED_STATE
     const metadata = chatHistoriesMetadata.find((chat) => chat.displayName === path)
     if (metadata) return metadata.id
     return ''
@@ -100,6 +103,7 @@ const MainPageComponent: React.FC = () => {
     if (!path) return
     const chatID = getChatIdFromPath(path)
     if (chatID) {
+      if (chatID === UNINITIALIZED_STATE) return
       const chat = await window.electronStore.getChatHistory(chatID)
       openChatAndOpenChat(chat)
     } else {
