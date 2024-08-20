@@ -70,13 +70,23 @@ const MainPageComponent: React.FC = () => {
     setShowSimilarFiles(!showSimilarFiles)
   }
 
-  const openFileAndOpenEditor = async (path: string) => {
+  const openFileLayout = () => {
     setShowChatbot(false)
+    setSidebarShowing('files')
+  }
+
+  const openChatLayout = () => {
+    setShowChatbot(true)
+    setSidebarShowing('chats')
+  }
+
+  const openFileAndOpenEditor = async (path: string) => {
+    openFileLayout()
     openFileByPath(path)
   }
 
   const openChatAndOpenChat = (chatHistory: ChatHistory | undefined) => {
-    setShowChatbot(true)
+    openChatLayout()
     setCurrentChatHistory(chatHistory)
   }
 
@@ -173,7 +183,7 @@ const MainPageComponent: React.FC = () => {
           similarFilesOpen={showSimilarFiles} // This might need to be managed differently now
           toggleSimilarFiles={toggleSimilarFiles} // This might need to be managed differently now
           openAbsolutePath={openAbsolutePath}
-          setShowChatbot={setShowChatbot}
+          openFileLayout={openFileLayout}
         />
       </TabProvider>
 
@@ -185,7 +195,7 @@ const MainPageComponent: React.FC = () => {
           <ModalProvider>
             <IconsSidebar
               openAbsolutePath={openAbsolutePath}
-              setShowChatbot={setShowChatbot}
+              openFileLayout={openFileLayout}
               sidebarShowing={sidebarShowing}
               makeSidebarShow={setSidebarShowing}
               currentFilePath={filePath}
@@ -247,7 +257,7 @@ const MainPageComponent: React.FC = () => {
           !showChatbot && (
             <div className="relative flex size-full overflow-hidden">
               <ModalProvider>
-                <EmptyPage openAbsolutePath={openAbsolutePath} setShowChatbot={setShowChatbot} />
+                <EmptyPage openAbsolutePath={openAbsolutePath} openFileLayout={openFileLayout} />
               </ModalProvider>
             </div>
           )
