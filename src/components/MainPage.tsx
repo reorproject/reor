@@ -34,8 +34,7 @@ const MainPageComponent: React.FC = () => {
     filePath,
     setFilePath,
     editor,
-    openFileByPath,
-    openAbsolutePath,
+    openOrCreateFile,
     saveCurrentlyOpenedFile,
     suggestionsState,
     highlightData,
@@ -73,6 +72,7 @@ const MainPageComponent: React.FC = () => {
   }
 
   const openFileLayout = () => {
+    // ok so question 1 is probably why we don't have like openFileLayout occuring automatically when we open a file and the same with chat...
     setShowChatbot(false)
     setSidebarShowing('files')
   }
@@ -84,10 +84,10 @@ const MainPageComponent: React.FC = () => {
 
   const openFileAndOpenEditor = async (path: string) => {
     openFileLayout()
-    openFileByPath(path)
+    openOrCreateFile(path)
   }
 
-  const openChatAndOpenChat = (chatHistory: ChatHistory | undefined) => {
+  const openChatSidebarAndChat = (chatHistory: ChatHistory | undefined) => {
     openChatLayout()
     setCurrentChatHistory(chatHistory)
   }
@@ -105,7 +105,7 @@ const MainPageComponent: React.FC = () => {
     if (chatID) {
       if (chatID === UNINITIALIZED_STATE) return
       const chat = await window.electronStore.getChatHistory(chatID)
-      openChatAndOpenChat(chat)
+      openChatSidebarAndChat(chat)
     } else {
       openFileAndOpenEditor(path)
     }
@@ -186,7 +186,7 @@ const MainPageComponent: React.FC = () => {
           openTabContent={openTabContent}
           similarFilesOpen={showSimilarFiles} // This might need to be managed differently now
           toggleSimilarFiles={toggleSimilarFiles} // This might need to be managed differently now
-          openAbsolutePath={openAbsolutePath}
+          openOrCreateFile={openOrCreateFile}
           openFileLayout={openFileLayout}
         />
       </TabProvider>
@@ -198,7 +198,7 @@ const MainPageComponent: React.FC = () => {
         >
           <ModalProvider>
             <IconsSidebar
-              openAbsolutePath={openAbsolutePath}
+              openOrCreateFile={openOrCreateFile}
               openFileLayout={openFileLayout}
               sidebarShowing={sidebarShowing}
               makeSidebarShow={setSidebarShowing}
@@ -223,7 +223,7 @@ const MainPageComponent: React.FC = () => {
               setFileDirToBeRenamed={setFileDirToBeRenamed}
               currentChatHistory={currentChatHistory}
               chatHistoriesMetadata={chatHistoriesMetadata}
-              setCurrentChatHistory={openChatAndOpenChat}
+              setCurrentChatHistory={openChatSidebarAndChat}
               setChatFilters={setChatFilters}
               setShowChatbot={setShowChatbot}
             />
@@ -251,7 +251,7 @@ const MainPageComponent: React.FC = () => {
                 <SimilarFilesSidebarComponent
                   filePath={filePath}
                   highlightData={highlightData}
-                  openFileByPath={openFileByPath}
+                  openFileByPath={openOrCreateFile}
                   saveCurrentlyOpenedFile={saveCurrentlyOpenedFile}
                 />
               </div>
@@ -261,7 +261,7 @@ const MainPageComponent: React.FC = () => {
           !showChatbot && (
             <div className="relative flex size-full overflow-hidden">
               <ModalProvider>
-                <EmptyPage openAbsolutePath={openAbsolutePath} openFileLayout={openFileLayout} />
+                <EmptyPage openOrCreateFile={openOrCreateFile} openFileLayout={openFileLayout} />
               </ModalProvider>
             </div>
           )

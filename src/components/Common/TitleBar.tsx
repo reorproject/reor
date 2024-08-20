@@ -13,7 +13,7 @@ interface TitleBarProps {
   toggleSimilarFiles: () => void
   history: string[]
   setHistory: (string: string[]) => void
-  openAbsolutePath: (path: string) => void
+  openOrCreateFile: (path: string) => void
   openFileLayout: () => void
 }
 
@@ -24,7 +24,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
   toggleSimilarFiles,
   history,
   setHistory,
-  openAbsolutePath,
+  openOrCreateFile,
   openFileLayout,
 }) => {
   const [platform, setPlatform] = useState('')
@@ -56,7 +56,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
               <DraggableTabs
                 currentTab={currentTab || ''}
                 openTabContent={openTabContent}
-                openAbsolutePath={openAbsolutePath}
+                openOrCreateFile={openOrCreateFile}
                 openFileLayout={openFileLayout}
               />
             </ModalProvider>

@@ -11,7 +11,7 @@ import { useModalOpeners } from '../Providers/ModalProvider'
 interface DraggableTabsProps {
   currentTab: string
   openTabContent: (path: string) => void
-  openAbsolutePath: (path: string) => void
+  openOrCreateFile: (path: string) => void
   openFileLayout: () => void
 }
 
@@ -51,7 +51,7 @@ const Tooltip: React.FC<TooltipProps> = ({ filepath, position }) => {
 const DraggableTabs: React.FC<DraggableTabsProps> = ({
   currentTab,
   openTabContent,
-  openAbsolutePath,
+  openOrCreateFile,
   openFileLayout,
 }) => {
   const { openTabs, addTab, selectTab, removeTabByID, updateTabOrder } = useTabs()
@@ -191,7 +191,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({
       <NewNoteComponent
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
-        openAbsolutePath={openAbsolutePath}
+        openOrCreateFile={openOrCreateFile}
         openFileLayout={openFileLayout}
         currentOpenFilePath={currentTab}
       />

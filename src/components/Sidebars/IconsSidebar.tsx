@@ -16,7 +16,7 @@ import { SidebarAbleToShow } from './MainSidebar'
 import { useModalOpeners } from '../Providers/ModalProvider'
 
 interface IconsSidebarProps {
-  openAbsolutePath: (path: string) => void
+  openOrCreateFile: (path: string) => void
   sidebarShowing: SidebarAbleToShow
   makeSidebarShow: (show: SidebarAbleToShow) => void
   currentFilePath: string | null
@@ -24,7 +24,7 @@ interface IconsSidebarProps {
 }
 
 const IconsSidebar: React.FC<IconsSidebarProps> = ({
-  openAbsolutePath,
+  openOrCreateFile,
   sidebarShowing,
   makeSidebarShow,
   currentFilePath,
@@ -128,7 +128,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
       <NewNoteComponent
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
-        openAbsolutePath={openAbsolutePath}
+        openOrCreateFile={openOrCreateFile}
         openFileLayout={openFileLayout}
         currentOpenFilePath={currentFilePath}
       />

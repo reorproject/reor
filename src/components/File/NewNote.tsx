@@ -10,7 +10,7 @@ import { getInvalidCharacterInFilePath } from '@/utils/strings'
 interface NewNoteComponentProps {
   isOpen: boolean
   onClose: () => void
-  openAbsolutePath: (path: string) => void
+  openOrCreateFile: (path: string) => void
   currentOpenFilePath: string | null
   openFileLayout: () => void
 }
@@ -18,7 +18,7 @@ interface NewNoteComponentProps {
 const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
   isOpen,
   onClose,
-  openAbsolutePath,
+  openOrCreateFile,
   currentOpenFilePath,
   openFileLayout,
 }) => {
@@ -55,7 +55,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
       finalPath = await window.path.join(directoryName, fileName)
     }
     openFileLayout()
-    openAbsolutePath(finalPath)
+    openOrCreateFile(finalPath)
     posthog.capture('created_new_note_from_new_note_modal')
     onClose()
   }
