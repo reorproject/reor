@@ -36,20 +36,10 @@ enum AskOptions {
 
 const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
   [AskOptions.Ask]: [
-    // "What are my thoughts on AGI?",
-    // "Tell me about my notes on Nietzsche",
+    "Create a to-do list based on these tasks.",
+    "Generate a study guide from my notes.",
+    "Summarize key insights from this document."
   ],
-  // [AskOptions.AskFile]: [
-  //   "Summarize this file",
-  //   "What are the key points in this file?",
-  // ],
-  // [AskOptions.TemporalAsk]: [
-  //   "Summarize what I have worked on today",
-  //   "Which tasks have I completed this past week?",
-  // ],
-  // [AskOptions.FlashcardAsk]: [
-  //   "Create some flashcards based on the current note",
-  // ],
 }
 
 interface AnonymizedChatFilters {
@@ -112,8 +102,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   useEffect(() => {
     const context = getChatHistoryContext(currentChatHistory)
     setCurrentContext(context)
-    setLoadingResponse(false)
-    setLoadAnimation(false)
+    // setLoadingResponse(false)
+    // setLoadAnimation(false)
   }, [currentChatHistory])
 
   // update chat context when files are added
@@ -220,6 +210,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
       setUserTextFieldInput('')
 
+      console.log("Output chatHistory:", outputChatHistory)
       setCurrentChatHistory(outputChatHistory)
 
       if (!outputChatHistory) return
@@ -239,8 +230,11 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       if (outputChatHistory) {
         appendNewContentToMessageHistory(outputChatHistory.id, errorToStringRendererProcess(error), 'error')
       }
+      setLoadAnimation(false)
+      setLoadingResponse(false)
     } finally {
       setLoadingResponse(false)
+      setLoadAnimation(false)
     }
   }
 
@@ -277,13 +271,18 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       : `markdown-content ${message.role}-chat-message`
   }
 
+  const handlePromptSelection = (prompt: string) => {
+    console.log("Text Field Input:", prompt)
+    setUserTextFieldInput(prompt)
+    handleSubmitNewMessage(undefined) // Creates a new chatHistory
+  }
+
   useEffect(() => {
       if (chatContainerRef.current) {
         chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
       }
   }, [currentChatHistory]);
 
-  const setContainerMax = !currentChatHistory ? `max-w-xl` : 'max-w-3xl'
   return (
     <div 
       className="flex size-full items-center justify-center"
@@ -293,86 +292,91 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           ref={chatContainerRef}
           className="chat-container relative flex h-full flex-col items-center justify-center overflow-auto bg-transparent">
           <div
-            className={`relative mx-auto mt-4 flex size-full ${setContainerMax} flex-col gap-3 overflow-x-hidden p-10 pt-0`}
+            className={`relative mt-4 flex size-full flex-col gap-3 overflow-x-hidden p-10 pt-0 items-center`}
           >
-            {currentChatHistory && currentChatHistory.displayableChatHistory.length > 0 ? (
-              // Display chat history if it exists
-              currentChatHistory.displayableChatHistory
-                .filter((msg) => msg.role !== 'system')
-                .map((message, index) => (
-                  <div className={`w-full ${getClassName(message)} flex`}>
-                    <div className="relative items-start pl-4 pt-3">
-                      {message.role === 'user' ? (
-                        <FaRegUserCircle size={22} />
-                      ) : (
-                        <img
-                          src="/src/assets/reor-logo.svg"
-                          style={{ width: '22px', height: '22px' }}
-                          alt="ReorImage"
-                        />
-                      )}
-                    </div>
-                    <div className="w-full flex-col gap-1">
-                      <div className="flex grow flex-col px-5 py-2.5">
-                        <ReactMarkdown
-                          // eslint-disable-next-line react/no-array-index-key
-                          key={index}
-                          rehypePlugins={[rehypeRaw]}
-                          className="max-w-[95%] break-words"
-                        >
-                          {message.visibleContent
-                            ? message.visibleContent
-                            : formatOpenAIMessageContentIntoString(message.content)}
-                        </ReactMarkdown>
+            <div className={`w-full max-w-3xl flex-col items-center`}>
+              {currentChatHistory && currentChatHistory.displayableChatHistory.length > 0 ? (
+                // Display chat history if it exists
+                currentChatHistory.displayableChatHistory
+                  .filter((msg) => msg.role !== 'system')
+                  .map((message, index) => (
+                    <div className={`w-full ${getClassName(message)} flex`}>
+                      <div className="relative items-start pl-4 pt-3">
+                        {message.role === 'user' ? (
+                          <FaRegUserCircle size={22} />
+                        ) : (
+                          <img
+                            src="/src/assets/reor-logo.svg"
+                            style={{ width: '22px', height: '22px' }}
+                            alt="ReorImage"
+                          />
+                        )}
+                      </div>
+                      <div className="w-full flex-col gap-1">
+                        <div className="flex grow flex-col px-5 py-2.5">
+                          <ReactMarkdown
+                            // eslint-disable-next-line react/no-array-index-key
+                            key={index}
+                            rehypePlugins={[rehypeRaw]}
+                            className="max-w-[95%] break-words"
+                          >
+                            {message.visibleContent
+                              ? message.visibleContent
+                              : formatOpenAIMessageContentIntoString(message.content)}
+                          </ReactMarkdown>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
-            ) : (
-              // Display centered "Start a conversation..." if there is no currentChatHistory
-              <div className="relative flex flex-col">
-                <div className="relative flex size-full flex-col text-center lg:top-20">
-                  <h1 className="mb-10 text-gray-300">This is a Sample, Username</h1>
-                  <div className="flex flex-col rounded-md bg-bg-000 focus-within:ring focus-within:ring-gray-700">
-                    <textarea
-                      onKeyDown={(e) => {
-                        if (!e.shiftKey && e.key === 'Enter') {
-                          e.preventDefault()
-                          handleSubmitNewMessage(undefined)
-                        }
-                      }}
-                      className="h-[100px] w-full resize-none rounded-t-md border-0 bg-transparent p-4 font-styrene text-text-gen-100 caret-white focus:outline-none"
-                      placeholder="What can Reor help you with today?"
-                      onChange={(e) => setUserTextFieldInput(e.target.value)}
-                    />
-                    <div className="h-px w-[calc(100%-5%)] self-center bg-gray-600" />
-                    <div className="flex items-center justify-between px-4 py-3 ">
-                      <span className="rounded-b-md bg-transparent  font-styrene text-sm tracking-tight text-text-gen-100">
-                        {defaultModelName}
-                      </span>
-                      <button
-                        className="cursor-pointer rounded-md border-0 bg-blue-600 px-4 py-2 font-styrene text-white hover:bg-blue-500"
-                        onClick={() => {
-                          setIsAddContextFiltersModalOpen(true)
+                  ))
+              ) : (
+                // Display centered "Start a conversation..." if there is no currentChatHistory
+                <div className="relative flex flex-col">
+                  <div className="relative flex size-full flex-col text-center lg:top-10">
+                    <div className="size-full flex justify-center">
+                      <img src="/src/assets/reor-logo.svg" style={{ width: '64px', height: '64px' }} alt="ReorImage" />
+                    </div>
+                    <h1 className="mb-10 text-gray-300 text-[28px]">Welcome to your AI-powered assistant! Start your first conversation or pick up where you left off.</h1>
+                    <div className="flex flex-col rounded-md bg-bg-000 focus-within:ring focus-within:ring-gray-700">
+                      <textarea
+                        onKeyDown={(e) => {
+                          if (!e.shiftKey && e.key === 'Enter') {
+                            e.preventDefault()
+                            handleSubmitNewMessage(undefined)
+                          }
                         }}
-                        type="button"
-                      >
-                        {chatFilters.files.length > 0 ? 'Update RAG filters' : 'Customise context'}
-                      </button>
-                      {EXAMPLE_PROMPTS[askText].map((option) => (
-                        <PromptSuggestion
-                          key={option}
-                          promptText={option}
+                        className="h-[100px] w-full resize-none rounded-t-md border-0 bg-transparent p-4 font-styrene text-text-gen-100 caret-white focus:outline-none"
+                        placeholder="What can Reor help you with today?"
+                        onChange={(e) => setUserTextFieldInput(e.target.value)}
+                      />
+                      <div className="h-px w-[calc(100%-5%)] self-center bg-gray-600" />
+                      <div className="flex items-center justify-between px-4 py-3 ">
+                        <span className="rounded-b-md bg-transparent  font-styrene text-sm tracking-tight text-text-gen-100">
+                          {defaultModelName}
+                        </span>
+                        <button
+                          className="cursor-pointer rounded-md border-0 bg-blue-600 px-4 py-2 font-styrene text-white hover:bg-blue-500"
                           onClick={() => {
-                            setUserTextFieldInput(option)
+                            setIsAddContextFiltersModalOpen(true)
                           }}
-                        />
-                      ))}
+                          type="button"
+                        >
+                          {chatFilters.files.length > 0 ? 'Update RAG filters' : 'Customise context'}
+                        </button>
+                      </div>
+                    </div>
+                    <div className="size-full mt-4 lg:flex md:flex-row justify-center">
+                      {EXAMPLE_PROMPTS[askText].map((option) => (
+                          <PromptSuggestion
+                            key={option}
+                            promptText={option}
+                            onClick={() => handlePromptSelection(option)}
+                          />
+                        ))}
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             {loadAnimation && (
               <div className="relative left-4 ml-1 mt-4 flex w-full items-start gap-6">
@@ -391,31 +395,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
               />
             )}
           </div>
-          {/* {EXAMPLE_PROMPTS[askText].map((option, index) => {
-            return (
-              <PromptSuggestion
-                key={index}
-                promptText={option}
-                onClick={() => {
-                  setUserTextFieldInput(option);
-                }}
-              />
-            );
-          })} */}
-          {userTextFieldInput === '' &&
-          (!currentChatHistory || currentChatHistory?.displayableChatHistory.length === 0) ? (
-            <>
-              {EXAMPLE_PROMPTS[askText].map((option) => (
-                <PromptSuggestion
-                  key={option}
-                  promptText={option}
-                  onClick={() => {
-                    setUserTextFieldInput(option)
-                  }}
-                />
-              ))}
-            </>
-          ) : undefined}
         </div>
 
         {currentChatHistory && (
