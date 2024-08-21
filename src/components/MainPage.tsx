@@ -92,10 +92,10 @@ const MainPageComponent: React.FC = () => {
     setCurrentChatHistory(chatHistory)
   }
 
-  const openFileAndOpenEditor = async (path: string) => {
+  const openFileAndOpenEditor = async (path: string, optionalContentToWriteOnCreate?: string) => {
     setShowChatbot(false)
     setSidebarShowing('files')
-    openOrCreateFile(path)
+    openOrCreateFile(path, optionalContentToWriteOnCreate)
   }
 
   const openTabContent = async (path: string) => {
@@ -259,8 +259,7 @@ const MainPageComponent: React.FC = () => {
           <div className="h-below-titlebar w-full">
             <ChatWithLLM
               vaultDirectory={vaultDirectory}
-              openFileByPath={openFileAndOpenEditor}
-              openAbsolutePath={openAbsolutePath}
+              openFileAndOpenEditor={openFileAndOpenEditor}
               currentChatHistory={currentChatHistory}
               setCurrentChatHistory={setCurrentChatHistory}
               showSimilarFiles={showSimilarFiles} // This might need to be managed differently now
