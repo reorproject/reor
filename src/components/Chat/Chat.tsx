@@ -365,7 +365,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     } else {
       setPromptSelected(false)
     }
-  }, [currentChatHistory?.id, promptSelected])
+  }, [currentChatHistory?.id])
   /* eslint-enable */
 
   useEffect(() => {
@@ -401,7 +401,8 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       removeOpenAITokenStreamListener()
       removeAnthropicTokenStreamListener()
     }
-  }, [appendNewContentToMessageHistory, loadingResponse, currentChatHistory?.id, loadAnimation])
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [appendNewContentToMessageHistory, loadingResponse, currentChatHistory?.id])
 
   const handleNewChatMessage = useCallback(
     (prompt: string | undefined) => {
