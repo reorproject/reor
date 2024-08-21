@@ -1,15 +1,18 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from 'react'
 import { v4 as uuidv4 } from 'uuid'
+
 import { Tab } from 'electron/main/electron-store/storeConfig'
 import { SidebarAbleToShow } from '../Sidebars/MainSidebar'
 
 interface TabProviderProps {
   children: ReactNode
-  openFileAndOpenEditor: (path: string) => void
+  openTabContent: (path: string) => void
   setFilePath: (path: string) => void
-  currentFilePath: string | null
+  setCurrentChatHistory: (chatHistory: undefined) => void
+  currentTab: string | null
   sidebarShowing: string | null
   makeSidebarShow: (option: SidebarAbleToShow) => void
+  getChatIdFromPath: (path: string) => string
 }
 
 interface TabContextType {
@@ -35,11 +38,13 @@ export const useTabs = (): TabContextType => useContext(TabContext)
 
 export const TabProvider: React.FC<TabProviderProps> = ({
   children,
-  openFileAndOpenEditor,
+  openTabContent,
   setFilePath,
-  currentFilePath,
+  setCurrentChatHistory,
+  currentTab,
   sidebarShowing,
   makeSidebarShow,
+  getChatIdFromPath,
 }) => {
   const [openTabs, setOpenTabs] = useState<Tab[]>([])
 
@@ -74,7 +79,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
       const createTabObjectFromPath = (tabPath: string) => {
         return {
           id: uuidv4(),
-          filePath: tabPath,
+          path: tabPath,
           title: extractFileName(path),
           lastAccessed: true,
           // timeOpened: new Date(),
@@ -82,7 +87,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
         }
       }
 
-      const existingTab = openTabs.find((tab: Tab) => tab.filePath === path)
+      const existingTab = openTabs.find((tab: Tab) => tab.path === path)
       if (existingTab) return
       const tab = createTabObjectFromPath(path)
 
@@ -98,7 +103,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
   /* Removes a tab and syncs it with the backend */
   const removeTabByID = useCallback(
     (tabId: string) => {
-      let closedFilePath = ''
+      let closedPath = ''
       let newIndex = -1
       let findIdx = -1
 
@@ -107,26 +112,37 @@ export const TabProvider: React.FC<TabProviderProps> = ({
         if (findIdx === -1) return prevTabs
 
         openTabs[findIdx].lastAccessed = false
-        closedFilePath = findIdx !== -1 ? prevTabs[findIdx].filePath : ''
+        closedPath = findIdx !== -1 ? prevTabs[findIdx].path : ''
         newIndex = findIdx > 0 ? findIdx - 1 : 1
 
-        if (closedFilePath === currentFilePath) {
+        if (closedPath === currentTab) {
           if (newIndex < openTabs.length) {
             openTabs[newIndex].lastAccessed = true
-            openFileAndOpenEditor(openTabs[newIndex].filePath)
+            openTabContent(openTabs[newIndex].path)
           }
-          // Select the new index's file
-          else setFilePath('')
         }
 
-        return prevTabs.filter((_, idx) => idx !== findIdx)
+        const nextTabs = prevTabs.filter((_, idx) => idx !== findIdx)
+
+        const hasFileTabs = nextTabs.some((tab) => !getChatIdFromPath(tab.path))
+        const hasChatTabs = nextTabs.some((tab) => getChatIdFromPath(tab.path))
+
+        if (!hasFileTabs) {
+          setFilePath('')
+        }
+
+        if (!hasChatTabs) {
+          setCurrentChatHistory(undefined)
+        }
+
+        return nextTabs
       })
 
       if (newIndex !== -1 && findIdx !== -1) {
         window.electronStore.removeOpenTabs(tabId, findIdx, newIndex)
       }
     },
-    [currentFilePath, openFileAndOpenEditor, openTabs, setFilePath],
+    [currentTab, openTabContent, openTabs, setFilePath, setCurrentChatHistory, getChatIdFromPath],
   )
 
   /* Updates tab order (on drag) and syncs it with backend */
@@ -151,10 +167,14 @@ export const TabProvider: React.FC<TabProviderProps> = ({
         window.electronStore.selectOpenTabs(newTabs)
         return newTabs
       })
-      if (sidebarShowing !== 'files') makeSidebarShow('files')
-      openFileAndOpenEditor(selectedTab.filePath)
+
+      if (getChatIdFromPath(selectedTab.path)) {
+        if (sidebarShowing !== 'chats') makeSidebarShow('chats')
+      } else if (sidebarShowing !== 'files') makeSidebarShow('files')
+
+      openTabContent(selectedTab.path)
     },
-    [openFileAndOpenEditor, makeSidebarShow, sidebarShowing],
+    [openTabContent, makeSidebarShow, sidebarShowing, getChatIdFromPath],
   )
 
   const TabContextMemo = useMemo(

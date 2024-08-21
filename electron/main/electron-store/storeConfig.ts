@@ -50,7 +50,7 @@ export type HardwareConfig = {
 
 export type Tab = {
   id: string // Unique ID for the tab, useful for operations
-  filePath: string // Path to the file open in the tab
+  path: string // Path to the content open in the tab
   title: string // Title of the tab
   lastAccessed: boolean
   // timeOpened: Date; // Timestamp to preserve order

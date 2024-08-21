@@ -15,7 +15,7 @@ import HighlightButton from './SemanticSidebar/HighlightButton'
 interface SimilarFilesSidebarComponentProps {
   filePath: string
   highlightData: HighlightData
-  openFileByPath: (filePath: string) => void
+  openFileAndOpenEditor: (filePath: string) => void
 
   saveCurrentlyOpenedFile: () => Promise<void>
 }
@@ -23,7 +23,7 @@ interface SimilarFilesSidebarComponentProps {
 const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponentProps> = ({
   filePath,
   highlightData,
-  openFileByPath,
+  openFileAndOpenEditor,
   saveCurrentlyOpenedFile,
 }) => {
   const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([])
@@ -112,7 +112,7 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponentProps> 
         similarEntries={similarEntries}
         setSimilarEntries={setSimilarEntries}
         onFileSelect={(path: string) => {
-          openFileByPath(path)
+          openFileAndOpenEditor(path)
           posthog.capture('open_file_from_related_notes')
         }}
         saveCurrentFile={async () => {

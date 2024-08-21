@@ -19,17 +19,30 @@ import EmptyPage from './EmptyPage'
 import { TabProvider } from './Providers/TabProvider'
 import { ModalProvider } from './Providers/ModalProvider'
 
+const UNINITIALIZED_STATE = 'UNINITIALIZED_STATE'
+
 const MainPageComponent: React.FC = () => {
   const [showChatbot, setShowChatbot] = useState<boolean>(false)
   const [showSimilarFiles, setShowSimilarFiles] = useState(true)
   const [sidebarShowing, setSidebarShowing] = useState<SidebarAbleToShow>('files')
+  const [currentTab, setCurrentTab] = useState<string>('')
+  const [vaultDirectory, setVaultDirectory] = useState<string>('')
+  const [chatFilters, setChatFilters] = useState<ChatFilters>({
+    files: [],
+    numberOfChunksToFetch: 15,
+    minDate: new Date(0),
+    maxDate: new Date(),
+  })
+  const [sidebarWidth, setSidebarWidth] = useState<number>(40)
+
+  const filePathRef = React.useRef<string>('')
+  const chatIDRef = React.useRef<string>('')
 
   const {
     filePath,
     setFilePath,
     editor,
-    openFileByPath,
-    openAbsolutePath,
+    openOrCreateFile,
     saveCurrentlyOpenedFile,
     suggestionsState,
     highlightData,
@@ -44,31 +57,60 @@ const MainPageComponent: React.FC = () => {
 
   const { currentChatHistory, setCurrentChatHistory, chatHistoriesMetadata } = useChatHistory()
 
+  useEffect(() => {
+    if (filePath != null && filePathRef.current !== filePath) {
+      filePathRef.current = filePath
+      setCurrentTab(filePath)
+    }
+
+    const currentChatHistoryId = currentChatHistory?.id ?? ''
+    if (chatIDRef.current !== currentChatHistoryId) {
+      chatIDRef.current = currentChatHistoryId
+      const currentMetadata = chatHistoriesMetadata.find((chat) => chat.id === currentChatHistoryId)
+      if (currentMetadata) {
+        setCurrentTab(currentMetadata.displayName)
+      }
+    }
+  }, [currentChatHistory, chatHistoriesMetadata, filePath])
+
   const { files, flattenedFiles, expandedDirectories, handleDirectoryToggle } = useFileInfoTree(filePath)
 
   const toggleSimilarFiles = () => {
     setShowSimilarFiles(!showSimilarFiles)
   }
 
-  const openFileAndOpenEditor = async (path: string) => {
-    setShowChatbot(false)
-    openFileByPath(path)
+  const getChatIdFromPath = (path: string) => {
+    if (chatHistoriesMetadata.length === 0) return UNINITIALIZED_STATE
+    const metadata = chatHistoriesMetadata.find((chat) => chat.displayName === path)
+    if (metadata) return metadata.id
+    return ''
   }
 
-  const openChatAndOpenChat = (chatHistory: ChatHistory | undefined) => {
+  const openChatSidebarAndChat = (chatHistory: ChatHistory | undefined) => {
     setShowChatbot(true)
+    setSidebarShowing('chats')
     setCurrentChatHistory(chatHistory)
   }
 
-  const [vaultDirectory, setVaultDirectory] = useState<string>('')
-  const [chatFilters, setChatFilters] = useState<ChatFilters>({
-    files: [],
-    numberOfChunksToFetch: 15,
-    minDate: new Date(0),
-    maxDate: new Date(),
-  })
+  const openFileAndOpenEditor = async (path: string) => {
+    setShowChatbot(false)
+    setSidebarShowing('files')
+    openOrCreateFile(path)
+  }
 
-  const [sidebarWidth, setSidebarWidth] = useState<number>(40)
+  const openTabContent = async (path: string) => {
+    // generically opens a chat or a file
+    if (!path) return
+    const chatID = getChatIdFromPath(path)
+    if (chatID) {
+      if (chatID === UNINITIALIZED_STATE) return
+      const chat = await window.electronStore.getChatHistory(chatID)
+      openChatSidebarAndChat(chat)
+    } else {
+      openFileAndOpenEditor(path)
+    }
+    setCurrentTab(path)
+  }
 
   // find all available files
   useEffect(() => {
@@ -119,21 +161,22 @@ const MainPageComponent: React.FC = () => {
           impacts the z-index. */}
       <div id="tooltip-container" />
       <TabProvider
-        openFileAndOpenEditor={openFileAndOpenEditor}
+        openTabContent={openTabContent}
+        currentTab={currentTab}
         setFilePath={setFilePath}
-        currentFilePath={filePath}
+        setCurrentChatHistory={setCurrentChatHistory}
         sidebarShowing={sidebarShowing}
         makeSidebarShow={setSidebarShowing}
+        getChatIdFromPath={getChatIdFromPath}
       >
         <TitleBar
           history={navigationHistory}
           setHistory={setNavigationHistory}
-          currentFilePath={filePath}
-          onFileSelect={openFileAndOpenEditor}
+          currentTab={currentTab}
+          openTabContent={openTabContent}
           similarFilesOpen={showSimilarFiles} // This might need to be managed differently now
           toggleSimilarFiles={toggleSimilarFiles} // This might need to be managed differently now
           openFileAndOpenEditor={openFileAndOpenEditor}
-          openAbsolutePath={openAbsolutePath}
         />
       </TabProvider>
 
@@ -144,7 +187,7 @@ const MainPageComponent: React.FC = () => {
         >
           <ModalProvider>
             <IconsSidebar
-              openAbsolutePath={openAbsolutePath}
+              openFileAndOpenEditor={openFileAndOpenEditor}
               sidebarShowing={sidebarShowing}
               makeSidebarShow={setSidebarShowing}
               currentFilePath={filePath}
@@ -168,7 +211,7 @@ const MainPageComponent: React.FC = () => {
               setFileDirToBeRenamed={setFileDirToBeRenamed}
               currentChatHistory={currentChatHistory}
               chatHistoriesMetadata={chatHistoriesMetadata}
-              setCurrentChatHistory={openChatAndOpenChat}
+              setCurrentChatHistory={openChatSidebarAndChat}
               setChatFilters={setChatFilters}
               setShowChatbot={setShowChatbot}
             />
@@ -196,7 +239,7 @@ const MainPageComponent: React.FC = () => {
                 <SimilarFilesSidebarComponent
                   filePath={filePath}
                   highlightData={highlightData}
-                  openFileByPath={openFileByPath}
+                  openFileAndOpenEditor={openFileAndOpenEditor}
                   saveCurrentlyOpenedFile={saveCurrentlyOpenedFile}
                 />
               </div>
@@ -206,7 +249,7 @@ const MainPageComponent: React.FC = () => {
           !showChatbot && (
             <div className="relative flex size-full overflow-hidden">
               <ModalProvider>
-                <EmptyPage openAbsolutePath={openAbsolutePath} />
+                <EmptyPage openFileAndOpenEditor={openFileAndOpenEditor} />
               </ModalProvider>
             </div>
           )
