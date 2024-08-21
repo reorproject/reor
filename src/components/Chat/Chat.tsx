@@ -236,8 +236,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         appendNewContentToMessageHistory(outputChatHistory.id, errorToStringRendererProcess(error), 'error')
       }
       stopStreamingResponse()
-    } finally {
-      stopStreamingResponse()
     }
   }
 
@@ -288,6 +286,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
 
   const stopStreamingResponse = () => {
+    console.log("Stopped streaming!")
     setLoadAnimation(false)
     setLoadingResponse(false)
   }
@@ -350,7 +349,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
                   ))
               ) : (
                 // Display centered "Start a conversation..." if there is no currentChatHistory
-                <div className="relative flex flex-col">
+                <div className="relative flex flex-col w-full">
                   <div className="relative flex size-full flex-col text-center lg:top-10">
                     <div className="size-full flex justify-center">
                       <img src="/src/assets/reor-logo.svg" style={{ width: '64px', height: '64px' }} alt="ReorImage" />
@@ -399,7 +398,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
             </div>
 
             {loadAnimation && (
-              <div className="relative left-4 ml-1 mt-4 flex w-full items-start gap-6">
+              <div className="relative max-w-3xl left-4 ml-1 mt-4 flex w-full items-start gap-6">
                 <img src="/src/assets/reor-logo.svg" style={{ width: '22px', height: '22px' }} alt="ReorImage" />
                 <LoadingDots />
               </div>
