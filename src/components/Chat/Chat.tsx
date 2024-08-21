@@ -69,10 +69,10 @@ interface ChatWithLLMProps {
 interface ChatContainerProps {
   chatContainerRef: MutableRefObject<HTMLDivElement | null>
   currentChatHistory: ChatHistory | undefined
-  handleSubmitNewMessage: () => void
+  handleSubmitNewMessage: (chatHistory: ChatHistory | undefined) => Promise<void>
   loadAnimation: boolean
   isAddContextFiltersModalOpen: boolean
-  chatFilters: ChatFIlters
+  chatFilters: ChatFilters
   setChatFilters: Dispatch<SetStateAction<ChatFilters>>
   setUserTextFieldInput: Dispatch<SetStateAction<string>>
   defaultModelName: string
@@ -114,9 +114,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   }, [])
 
   useEffect(() => {
-    stopStreamingResponse()
     const context = getChatHistoryContext(currentChatHistory)
     setCurrentContext(context)
+    stopStreamingResponse()
   }, [currentChatHistory])
 
   useEffect(() => {
@@ -187,6 +187,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   )
 
   const handleSubmitNewMessage = async (chatHistory: ChatHistory | undefined) => {
+    if (loadingResponse || !userTextFieldInput.trim()) return
+
+    
     posthog.capture('chat_message_submitted', {
       chatId: chatHistory?.id,
       chatLength: chatHistory?.displayableChatHistory.length,
@@ -195,7 +198,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     let outputChatHistory = chatHistory
 
     try {
-      if (loadingResponse || !userTextFieldInput.trim()) return
       const defaultLLMName = await window.llm.getDefaultLLMName()
       if (!outputChatHistory || !outputChatHistory.id) {
         const chatID = Date.now().toString()
@@ -206,14 +208,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       }
       if (outputChatHistory.displayableChatHistory.length === 0) {
         if (chatFilters) {
-          // chatHistory.displayableChatHistory.push({
-          //   role: "system",
-          //   content:
-          //     "You are an advanced question answer agent answering questions based on provided context. You will respond to queries in second person: saying things like 'you'. The context provided was written by the same user who is asking the question.",
-          //   messageType: "success",
-
-          //   context: [],
-          // });
           outputChatHistory.displayableChatHistory.push(await resolveRAGContext(userTextFieldInput, chatFilters))
         }
       } else {
@@ -247,22 +241,24 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         appendNewContentToMessageHistory(outputChatHistory.id, errorToStringRendererProcess(error), 'error')
       }
       stopStreamingResponse()
+    } finally {
+      stopStreamingResponse()
     }
   }
 
   useEffect(() => {
     const handleOpenAIChunk = async (receivedChatID: string, chunk: ChatCompletionChunk) => {
       const newContent = chunk.choices[0].delta.content ?? ''
-      if (newContent) {
-        if (loadAnimation) setLoadAnimation(false)
+      if (loadAnimation) setLoadAnimation(false)
+      if (newContent && loadingResponse) {
         appendNewContentToMessageHistory(receivedChatID, newContent, 'success')
       }
     }
 
     const handleAnthropicChunk = async (receivedChatID: string, chunk: MessageStreamEvent) => {
       const newContent = chunk.type === 'content_block_delta' ? (chunk.delta.text ?? '') : ''
-      if (newContent) {
-        if (loadAnimation) setLoadAnimation(false)
+      if (loadAnimation) setLoadAnimation(false)
+      if (newContent && loadingResponse) {
         appendNewContentToMessageHistory(receivedChatID, newContent, 'success')
       }
     }
@@ -352,7 +348,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 }
 
 
-const ChatContainer: React.FV<ChatContainerProps> = ({
+const ChatContainer: React.FC<ChatContainerProps> = ({
   chatContainerRef,
   currentChatHistory,
   handleSubmitNewMessage,
