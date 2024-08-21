@@ -13,7 +13,7 @@ interface TitleBarProps {
   toggleSimilarFiles: () => void
   history: string[]
   setHistory: (string: string[]) => void
-  openFileAndOpenEditor: (path: string) => void
+  openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => void
 }
 
 const TitleBar: React.FC<TitleBarProps> = ({
