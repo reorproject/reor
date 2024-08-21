@@ -69,7 +69,6 @@ interface ChatWithLLMProps {
 interface ChatContainerProps {
   chatContainerRef: MutableRefObject<HTMLDivElement | null>
   currentChatHistory: ChatHistory | undefined
-  handleSubmitNewMessage: (chatHistory: ChatHistory | undefined) => Promise<void>
   isAddContextFiltersModalOpen: boolean
   chatFilters: ChatFilters
   setChatFilters: Dispatch<ChatFilters>
@@ -85,7 +84,6 @@ interface ChatContainerProps {
 const ChatContainer: React.FC<ChatContainerProps> = ({
   chatContainerRef,
   currentChatHistory,
-  handleSubmitNewMessage,
   isAddContextFiltersModalOpen,
   chatFilters,
   setChatFilters,
@@ -297,6 +295,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     [setCurrentChatHistory], // Add any other dependencies here if needed
   )
 
+  /* eslint-disable */
   const handleSubmitNewMessage = async (chatHistory: ChatHistory | undefined) => {
     posthog.capture('chat_message_submitted', {
       chatId: chatHistory?.id,
@@ -304,10 +303,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       chatFilters: anonymizeChatFiltersForPosthog(chatFilters),
     })
     let outputChatHistory = chatHistory
-    console.log("user field:", userTextFieldInput)
+
     try {
       if (loadingResponse || !userTextFieldInput.trim()) return
-      console.log("Loading response:", loadingResponse, " loadAnimation:", loadAnimation)
       setLoadingResponse(true)
       setLoadAnimation(true)
       const defaultLLMName = await window.llm.getDefaultLLMName()
@@ -353,7 +351,9 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       }
     }
   }
+  /* eslint-enable */
 
+  /* eslint-disable */
   useEffect(() => {
     // Update context when the chat history changes
     const context = getChatHistoryContext(currentChatHistory)
@@ -365,20 +365,21 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     } else {
       setPromptSelected(false)
     }
-  }, [currentChatHistory?.id])
+  }, [currentChatHistory?.id, promptSelected])
+  /* eslint-enable */
 
   useEffect(() => {
     // Handle prompt selection and message submission separately
     if (promptSelected) {
       handleSubmitNewMessage(undefined)
-      console.log("Seeting to false:", promptSelected)
     }
+    /* eslint-disable-next-line react-hooks/exhaustive-deps */
   }, [promptSelected])
 
   useEffect(() => {
     const handleOpenAIChunk = async (receivedChatID: string, chunk: ChatCompletionChunk) => {
       const newContent = chunk.choices[0].delta.content ?? ''
-      if (newContent && receivedChatID == currentChatHistory?.id) {
+      if (newContent && receivedChatID === currentChatHistory?.id) {
         if (loadAnimation) setLoadAnimation(false)
         appendNewContentToMessageHistory(receivedChatID, newContent, 'success')
       }
@@ -386,7 +387,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
 
     const handleAnthropicChunk = async (receivedChatID: string, chunk: MessageStreamEvent) => {
       const newContent = chunk.type === 'content_block_delta' ? (chunk.delta.text ?? '') : ''
-      if (newContent && receivedChatID == currentChatHistory?.id) {
+      if (newContent && receivedChatID === currentChatHistory?.id) {
         if (loadAnimation) setLoadAnimation(false)
         appendNewContentToMessageHistory(receivedChatID, newContent, 'success')
       }
@@ -400,14 +401,11 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
       removeOpenAITokenStreamListener()
       removeAnthropicTokenStreamListener()
     }
-  }, [appendNewContentToMessageHistory, loadingResponse])
-
+  }, [appendNewContentToMessageHistory, loadingResponse, currentChatHistory?.id, loadAnimation])
 
   const handleNewChatMessage = useCallback(
     (prompt: string | undefined) => {
-      console.log("Prompt:", prompt)
-      if (prompt)
-        setUserTextFieldInput(prompt)
+      if (prompt) setUserTextFieldInput(prompt)
       setPromptSelected(true)
     },
     [setUserTextFieldInput],
@@ -425,7 +423,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
         <ChatContainer
           chatContainerRef={chatContainerRef}
           currentChatHistory={currentChatHistory}
-          handleSubmitNewMessage={handleSubmitNewMessage}
           isAddContextFiltersModalOpen={isAddContextFiltersModalOpen}
           chatFilters={chatFilters}
           setChatFilters={setChatFilters}
