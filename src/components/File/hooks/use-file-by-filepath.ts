@@ -71,69 +71,53 @@ const useFileByFilepath = () => {
     3. when the file is deleted
    */
 
-  const openFileByPath = async (newFilePath: string) => {
+  // This function handles the creation of a file if it doesn't exist
+  const createFileIfNotExists = async (filePath: string, optionalContent?: string): Promise<string> => {
+    const invalidChars = await getInvalidCharacterInFilePath(filePath)
+    if (invalidChars) {
+      const errorMessage = `Could not create note ${filePath}. Character ${invalidChars} cannot be included in note name.`
+      toast.error(errorMessage)
+      throw new Error(errorMessage)
+    }
+    const filePathWithExtension = await window.path.addExtensionIfNoExtensionPresent(filePath)
+    const isAbsolutePath = await window.path.isAbsolute(filePathWithExtension)
+    const absolutePath = isAbsolutePath
+      ? filePathWithExtension
+      : await window.path.join(await window.electronStore.getVaultDirectoryForWindow(), filePathWithExtension)
+
+    const fileExists = await window.fileSystem.checkFileExists(absolutePath)
+    if (!fileExists) {
+      const basename = await window.path.basename(absolutePath)
+      const content = optionalContent || `## ${removeFileExtension(basename)}\n`
+      await window.fileSystem.createFile(absolutePath, content)
+      setNeedToIndexEditorContent(true)
+    }
+
+    return absolutePath
+  }
+
+  // This function handles the actual loading of a file into the editor
+  const loadFileIntoEditor = async (filePath: string) => {
     setCurrentlyChangingFilePath(true)
     await writeEditorContentToDisk(editor, currentlyOpenedFilePath)
     if (currentlyOpenedFilePath && needToIndexEditorContent) {
       window.fileSystem.indexFileInDatabase(currentlyOpenedFilePath)
       setNeedToIndexEditorContent(false)
     }
-    const newFileContent = (await window.fileSystem.readFile(newFilePath)) ?? ''
-    editor?.commands.setContent(newFileContent)
-    setCurrentlyOpenedFilePath(newFilePath)
+    const fileContent = (await window.fileSystem.readFile(filePath)) ?? ''
+    editor?.commands.setContent(fileContent)
+    setCurrentlyOpenedFilePath(filePath)
     setCurrentlyChangingFilePath(false)
   }
 
-  const openRelativePath = async (relativePath: string, optionalContentToWriteOnCreate?: string): Promise<void> => {
-    const invalidChars = await getInvalidCharacterInFilePath(relativePath)
-    if (invalidChars) {
-      toast.error(`Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`)
-      throw new Error(
-        `Could not create note ${relativePath}. Character ${invalidChars} cannot be included in note name.`,
-      )
-    }
-    const relativePathWithExtension = await window.path.addExtensionIfNoExtensionPresent(relativePath)
-    const absolutePath = await window.path.join(
-      await window.electronStore.getVaultDirectoryForWindow(),
-      relativePathWithExtension,
-    )
-    const fileExists = await window.fileSystem.checkFileExists(absolutePath)
-    if (!fileExists) {
-      const basename = await window.path.basename(absolutePath)
-      const content = optionalContentToWriteOnCreate || `## ${removeFileExtension(basename)}\n`
-      await window.fileSystem.createFile(absolutePath, content)
-      setNeedToIndexEditorContent(true)
-    }
-    openFileByPath(absolutePath)
-  }
-
-  const openAbsolutePath = async (filePath: string, optionalContentToWriteOnCreate?: string): Promise<void> => {
-    const invalidChars = await getInvalidCharacterInFilePath(filePath)
-    if (invalidChars) {
-      toast.error(`Could not create note ${filePath}. Character ${invalidChars} cannot be included in note name.`)
-      throw new Error(`Could not create note ${filePath}. Character ${filePath} cannot be included in note name.`)
-    }
-    const filePathWithExtension = await window.path.addExtensionIfNoExtensionPresent(filePath)
-    let absolutePath = filePathWithExtension
-    // If we create a newNote on an empty page (no file open).
-    if (!(await window.path.isAbsolute(filePath))) {
-      absolutePath = await window.path.join(
-        await window.electronStore.getVaultDirectoryForWindow(),
-        filePathWithExtension,
-      )
-    }
-    const fileExists = await window.fileSystem.checkFileExists(absolutePath)
-    if (!fileExists) {
-      const basename = await window.path.basename(absolutePath)
-      const content = optionalContentToWriteOnCreate || `## ${removeFileExtension(basename)}\n`
-      await window.fileSystem.createFile(absolutePath, content)
-      setNeedToIndexEditorContent(true)
-    }
-    openFileByPath(absolutePath)
+  // This is the main function that combines file creation (if necessary) and loading into the editor
+  const openOrCreateFile = async (filePath: string, optionalContentToWriteOnCreate?: string): Promise<void> => {
+    const absolutePath = await createFileIfNotExists(filePath, optionalContentToWriteOnCreate)
+    await loadFileIntoEditor(absolutePath)
   }
 
   const openRelativePathRef = useRef<(newFilePath: string) => Promise<void>>()
-  openRelativePathRef.current = openRelativePath
+  // openRelativePathRef.current = openOrCreateFile
 
   const handleSuggestionsStateWithEventCapture = (suggState: SuggestionsState | null): void => {
     setSuggestionsState(suggState)
@@ -269,7 +253,7 @@ const useFileByFilepath = () => {
 
       if (!hasOpened) {
         await window.electronStore.setHasUserOpenedAppBefore()
-        openRelativePath('Welcome to Reor', welcomeNote)
+        openOrCreateFile('Welcome to Reor', welcomeNote)
       }
     }
 
@@ -329,8 +313,7 @@ const useFileByFilepath = () => {
     editor,
     navigationHistory,
     setNavigationHistory,
-    openFileByPath,
-    openAbsolutePath,
+    openOrCreateFile,
     suggestionsState,
     spellCheckEnabled,
     highlightData,

@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState, useRef, Dispatch, MutableRefObject, SetStateAction } from 'react'
 
+import { HiOutlineClipboardCopy, HiOutlinePencilAlt } from 'react-icons/hi'
+import { toast } from 'react-toastify'
 import { MessageStreamEvent } from '@anthropic-ai/sdk/resources'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 import { ChatCompletionChunk } from 'openai/resources/chat/completions'
@@ -58,7 +60,6 @@ function anonymizeChatFiltersForPosthog(chatFilters: ChatFilters): AnonymizedCha
 interface ChatWithLLMProps {
   vaultDirectory: string
   openFileByPath: (path: string) => Promise<void>
-
   currentChatHistory: ChatHistory | undefined
   setCurrentChatHistory: React.Dispatch<React.SetStateAction<ChatHistory | undefined>>
   showSimilarFiles: boolean
