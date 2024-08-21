@@ -87,9 +87,7 @@ const useFileByFilepath = () => {
 
     const fileExists = await window.fileSystem.checkFileExists(absolutePath)
     if (!fileExists) {
-      // const basename = await window.path.basename(absolutePath)
-      const content = optionalContent || `` // ## ${removeFileExtension(basename)}\n
-      await window.fileSystem.createFile(absolutePath, content)
+      await window.fileSystem.createFile(absolutePath, optionalContent || ``)
       setNeedToIndexEditorContent(true)
     }
 

@@ -71,8 +71,6 @@ function anonymizeChatFiltersForPosthog(chatFilters: ChatFilters): AnonymizedCha
 interface ChatWithLLMProps {
   vaultDirectory: string
   openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => Promise<void>
-  // openAbsolutePath: (path: string, optionalContentToWriteOnCreate?: string) => void
-
   currentChatHistory: ChatHistory | undefined
   setCurrentChatHistory: React.Dispatch<React.SetStateAction<ChatHistory | undefined>>
   showSimilarFiles: boolean
@@ -83,7 +81,6 @@ interface ChatWithLLMProps {
 const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   vaultDirectory,
   openFileAndOpenEditor,
-  // openAbsolutePath,
   currentChatHistory,
   setCurrentChatHistory,
   showSimilarFiles,
@@ -278,7 +275,6 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   const createNewNote = async (message: ChatMessageToDisplay) => {
     const title = `${(getDisplayMessage(message) ?? `${new Date().toDateString()}`).substring(0, 20)}...`
     openFileAndOpenEditor(title, getDisplayMessage(message))
-    // openFileByPath(title)
   }
 
   return (

@@ -260,7 +260,6 @@ const MainPageComponent: React.FC = () => {
             <ChatWithLLM
               vaultDirectory={vaultDirectory}
               openFileAndOpenEditor={openFileAndOpenEditor}
-              // openAbsolutePath={openAbsolutePath}
               currentChatHistory={currentChatHistory}
               setCurrentChatHistory={setCurrentChatHistory}
               showSimilarFiles={showSimilarFiles} // This might need to be managed differently now
