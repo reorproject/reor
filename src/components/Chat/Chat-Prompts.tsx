@@ -8,11 +8,11 @@ interface Props {
 
 const PromptSuggestion: FC<Props> = ({ promptText, onClick }: Props) => (
   <button
-    className={`max-w-[200px] h-[100px]
-            mt-2 cursor-pointer rounded border border-solid border-white/50
-             bg-transparent p-5 opacity-40 text-xs rounded-lg mx-1
-            text-base
-            text-white shadow hover:opacity-70`}
+    className={`mx-1 mt-2
+            h-[100px] max-w-[200px] cursor-pointer rounded-lg border
+             border-solid border-white/50 bg-transparent p-5 text-xs
+            text-white
+            opacity-40 shadow hover:opacity-70`}
     onClick={onClick}
     type="button"
   >
