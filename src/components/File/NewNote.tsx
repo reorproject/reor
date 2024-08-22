@@ -5,7 +5,7 @@ import posthog from 'posthog-js'
 
 import ReorModal from '../Common/Modal'
 
-import { getInvalidCharacterInFilePath } from '@/utils/strings'
+import { getInvalidCharacterInFileName, getInvalidCharacterInFilePath } from '@/utils/strings'
 
 interface NewNoteComponentProps {
   isOpen: boolean
@@ -47,6 +47,14 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
     if (!fileName || errorMessage) {
       return
     }
+
+    const invalidCharacters = await getInvalidCharacterInFileName(fileName)
+    if (invalidCharacters) {
+      setErrorMessage(`Cannot put ${invalidCharacters} in File`)
+      throw new Error(`Cannot put ${invalidCharacters} in File`)
+    }
+    setErrorMessage(null)
+
     let finalPath = fileName
     if (currentOpenFilePath !== '' && currentOpenFilePath !== null) {
       const directoryName = await window.path.dirname(currentOpenFilePath)

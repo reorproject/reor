@@ -7,7 +7,7 @@ import { toast } from 'react-toastify'
 import ReorModal from '../Common/Modal'
 
 import errorToStringRendererProcess from '@/utils/error'
-import { getInvalidCharacterInFilePath } from '@/utils/strings'
+import { getInvalidCharacterInFilePath, getInvalidCharacterInFileName } from '@/utils/strings'
 
 interface NewDirectoryComponentProps {
   isOpen: boolean
@@ -41,9 +41,14 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
 
   const sendNewDirectoryMsg = async () => {
     try {
-      if (!directoryName || errorMessage || currentOpenFilePath === null) {
-        return
+      if (!directoryName || errorMessage || currentOpenFilePath === null) return
+      const invalidCharacters = await getInvalidCharacterInFileName(directoryName)
+      if (invalidCharacters) {
+        setErrorMessage(`Cannot put ${invalidCharacters} in directory name`)
+        throw new Error(`Cannot put ${invalidCharacters} in directory name`)
       }
+      setErrorMessage(null)
+
       const directoryPath =
         currentOpenFilePath === ''
           ? await window.electronStore.getVaultDirectoryForWindow()
