@@ -15,7 +15,7 @@ import HighlightButton from './SemanticSidebar/HighlightButton'
 interface SimilarFilesSidebarComponentProps {
   filePath: string
   highlightData: HighlightData
-  openFileAndOpenEditor: (filePath: string) => void
+  openFileAndOpenEditor: (filePath: string, optionalContentToWriteOnCreate?: string) => void
 
   saveCurrentlyOpenedFile: () => Promise<void>
 }
