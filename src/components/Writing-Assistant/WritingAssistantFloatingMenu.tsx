@@ -301,11 +301,15 @@ Return only the edited text. Do not wrap your response in quotes. Do not offer a
 Write a markdown list (using dashes) of key takeaways from my notes. Write at least 3 items, but write more if the text requires it. Be very detailed and don't leave any information out. Do not wrap responses in quotes.`
         break
       default:
-        prompt =
-          'The user has given the following instructions(in triple #) for processing the text selected(in triple quotes): ' +
-          `### ${customPromptInput} ###` +
-          '\n' +
-          `  """ ${selectedText} """`
+        if (selectedText.trim() === '') {
+          prompt = `The user has given the following instructions(in triple #)  ### ${customPromptInput} ###`
+        } else {
+          prompt =
+            'The user has given the following instructions(in triple #) for processing the text selected(in triple quotes): ' +
+            `### ${customPromptInput} ###` +
+            '\n' +
+            `  """ ${selectedText} """`
+        }
         break
     }
     setPrevPrompt(prompt)
