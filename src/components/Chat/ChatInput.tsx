@@ -17,7 +17,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
 }) => (
   <div className="relative flex h-titlebar w-full items-center justify-center bg-dark-gray-c-eleven p-10">
     <div className="  relative bottom-5 flex w-full max-w-3xl">
-      <div className="w-full rounded-lg border-solid border-neutral-700 p-3">
+      <div className="w-full rounded-lg border-2 border-solid border-neutral-700 p-3 focus-within:border-gray-300">
         <div className="relative flex h-full pr-8">
           <textarea
             onKeyDown={(e) => {

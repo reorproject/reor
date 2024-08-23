@@ -34,9 +34,9 @@ enum AskOptions {
 
 const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
   [AskOptions.Ask]: [
-    'Create a to-do list based on these tasks.',
+    'What have I written about Philosophy?',
     'Generate a study guide from my notes.',
-    'Summarize key insights from this document.',
+    'Which authors have I discussed positively about?',
   ],
 }
 
@@ -124,7 +124,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
       className="chat-container relative flex h-full flex-col items-center justify-center overflow-auto bg-transparent"
     >
       <div className="relative mt-4 flex size-full flex-col items-center gap-3 overflow-x-hidden p-10 pt-0">
-        <div className="w-full max-w-3xl flex-col items-center">
+        <div className="w-full max-w-3xl">
           {currentChatHistory && currentChatHistory.displayableChatHistory.length > 0 ? (
             // Display chat history if it exists
             currentChatHistory.displayableChatHistory
@@ -172,15 +172,15 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
               ))
           ) : (
             // Display centered "Start a conversation..." if there is no currentChatHistory
-            <div className="relative flex w-full flex-col">
-              <div className="relative flex size-full flex-col text-center lg:top-10">
+            <div className="relative flex w-full flex-col items-center">
+              <div className="relative flex size-full flex-col text-center lg:top-10 lg:max-w-2xl">
                 <div className="flex size-full justify-center">
                   <img src="/src/assets/reor-logo.svg" style={{ width: '64px', height: '64px' }} alt="ReorImage" />
                 </div>
                 <h1 className="mb-10 text-[28px] text-gray-300">
-                  Welcome to your AI-powered assistant! Start your first conversation or pick up where you left off.
+                  Welcome to your AI-powered assistant! Start a conversation with your second brain!
                 </h1>
-                <div className="flex flex-col rounded-md bg-bg-000 focus-within:ring focus-within:ring-gray-700">
+                <div className="flex flex-col rounded-md bg-bg-000 focus-within:ring focus-within:ring-[#f9f9f9]">
                   <textarea
                     onKeyDown={(e) => {
                       if (!e.shiftKey && e.key === 'Enter') {
