@@ -43,7 +43,7 @@ const Tooltip: React.FC<TooltipProps> = ({ filepath, position }) => {
 interface DraggableTabsProps {
   currentTab: string
   openTabContent: (path: string) => void
-  openFileAndOpenEditor: (path: string) => void
+  openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => void
 }
 
 const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentTab, openTabContent, openFileAndOpenEditor }) => {

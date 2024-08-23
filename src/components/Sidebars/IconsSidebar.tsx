@@ -16,7 +16,7 @@ import { SidebarAbleToShow } from './MainSidebar'
 import { useModalOpeners } from '../Providers/ModalProvider'
 
 interface IconsSidebarProps {
-  openFileAndOpenEditor: (path: string) => void
+  openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => void
   sidebarShowing: SidebarAbleToShow
   makeSidebarShow: (show: SidebarAbleToShow) => void
   currentFilePath: string | null

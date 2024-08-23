@@ -92,10 +92,10 @@ const MainPageComponent: React.FC = () => {
     setCurrentChatHistory(chatHistory)
   }
 
-  const openFileAndOpenEditor = async (path: string) => {
+  const openFileAndOpenEditor = async (path: string, optionalContentToWriteOnCreate?: string) => {
     setShowChatbot(false)
     setSidebarShowing('files')
-    openOrCreateFile(path)
+    openOrCreateFile(path, optionalContentToWriteOnCreate)
   }
 
   const openTabContent = async (path: string) => {
@@ -256,23 +256,21 @@ const MainPageComponent: React.FC = () => {
         )}
 
         {showChatbot && (
-          <div className="relative flex size-full overflow-hidden">
-            <div className="h-below-titlebar w-full">
-              <ChatWithLLM
-                vaultDirectory={vaultDirectory}
-                openFileByPath={openFileAndOpenEditor}
-                currentChatHistory={currentChatHistory}
-                setCurrentChatHistory={setCurrentChatHistory}
-                showSimilarFiles={showSimilarFiles} // This might need to be managed differently now
-                chatFilters={chatFilters}
-                setChatFilters={(updatedChatFilters: ChatFilters) => {
-                  posthog.capture('add_file_to_chat', {
-                    chatFilesLength: updatedChatFilters.files.length,
-                  })
-                  setChatFilters(updatedChatFilters)
-                }}
-              />
-            </div>
+          <div className="h-below-titlebar w-full">
+            <ChatWithLLM
+              vaultDirectory={vaultDirectory}
+              openFileAndOpenEditor={openFileAndOpenEditor}
+              currentChatHistory={currentChatHistory}
+              setCurrentChatHistory={setCurrentChatHistory}
+              showSimilarFiles={showSimilarFiles} // This might need to be managed differently now
+              chatFilters={chatFilters}
+              setChatFilters={(updatedChatFilters: ChatFilters) => {
+                posthog.capture('add_file_to_chat', {
+                  chatFilesLength: updatedChatFilters.files.length,
+                })
+                setChatFilters(updatedChatFilters)
+              }}
+            />
           </div>
         )}
       </div>

@@ -18,7 +18,7 @@ import StarterKit from '@tiptap/starter-kit'
 import { toast } from 'react-toastify'
 import { Markdown } from 'tiptap-markdown'
 import { useDebounce } from 'use-debounce'
-import { getInvalidCharacterInFilePath, removeFileExtension } from '@/utils/strings'
+import { getInvalidCharacterInFilePath } from '@/utils/strings'
 
 import { BacklinkExtension } from '@/components/Editor/BacklinkExtension'
 import { SuggestionsState } from '@/components/Editor/BacklinkSuggestionsDisplay'
@@ -87,9 +87,7 @@ const useFileByFilepath = () => {
 
     const fileExists = await window.fileSystem.checkFileExists(absolutePath)
     if (!fileExists) {
-      const basename = await window.path.basename(absolutePath)
-      const content = optionalContent || `## ${removeFileExtension(basename)}\n`
-      await window.fileSystem.createFile(absolutePath, content)
+      await window.fileSystem.createFile(absolutePath, optionalContent || ``)
       setNeedToIndexEditorContent(true)
     }
 

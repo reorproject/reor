@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useState, useRef, Dispatch, MutableRefObject, SetStateAction } from 'react'
 
+import { HiOutlineClipboardCopy, HiOutlinePencilAlt } from 'react-icons/hi'
+import { toast } from 'react-toastify'
 import { MessageStreamEvent } from '@anthropic-ai/sdk/resources'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 import { ChatCompletionChunk } from 'openai/resources/chat/completions'
@@ -57,7 +59,7 @@ function anonymizeChatFiltersForPosthog(chatFilters: ChatFilters): AnonymizedCha
 
 interface ChatWithLLMProps {
   vaultDirectory: string
-  openFileByPath: (path: string) => Promise<void>
+  openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => Promise<void>
   currentChatHistory: ChatHistory | undefined
   setCurrentChatHistory: React.Dispatch<React.SetStateAction<ChatHistory | undefined>>
   showSimilarFiles: boolean
@@ -67,6 +69,7 @@ interface ChatWithLLMProps {
 
 interface ChatContainerProps {
   chatContainerRef: MutableRefObject<HTMLDivElement | null>
+  openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => Promise<void>
   currentChatHistory: ChatHistory | undefined
   isAddContextFiltersModalOpen: boolean
   chatFilters: ChatFilters
@@ -82,6 +85,7 @@ interface ChatContainerProps {
 
 const ChatContainer: React.FC<ChatContainerProps> = ({
   chatContainerRef,
+  openFileAndOpenEditor,
   currentChatHistory,
   isAddContextFiltersModalOpen,
   chatFilters,
@@ -98,6 +102,20 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
     return message.messageType === 'error'
       ? `markdown-content ${message.messageType}-chat-message text-white`
       : `markdown-content ${message.role}-chat-message`
+  }
+
+  const getDisplayMessage = (message: ChatMessageToDisplay): string | undefined => {
+    return message.visibleContent ? message.visibleContent : formatOpenAIMessageContentIntoString(message.content)
+  }
+
+  const copyToClipboard = (message: ChatMessageToDisplay) => {
+    navigator.clipboard.writeText(getDisplayMessage(message) ?? '')
+    toast.success('Copied to clipboard!')
+  }
+
+  const createNewNote = async (message: ChatMessageToDisplay) => {
+    const title = `${(getDisplayMessage(message) ?? `${new Date().toDateString()}`).substring(0, 20)}...`
+    openFileAndOpenEditor(title, getDisplayMessage(message))
   }
 
   return (
@@ -132,6 +150,22 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
                           ? message.visibleContent
                           : formatOpenAIMessageContentIntoString(message.content)}
                       </ReactMarkdown>
+                      {message.role === 'assistant' && (
+                        <div className="flex">
+                          <div
+                            className="cursor-pointer items-center justify-center rounded p-1 hover:bg-neutral-700"
+                            onClick={() => copyToClipboard(message)}
+                          >
+                            <HiOutlineClipboardCopy color="gray" size={18} className="text-gray-200" title="Copy" />
+                          </div>
+                          <div
+                            className="cursor-pointer items-center justify-center rounded p-1 hover:bg-neutral-700"
+                            onClick={() => createNewNote(message)}
+                          >
+                            <HiOutlinePencilAlt color="gray" size={18} className="text-gray-200" title="New Note" />
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -207,7 +241,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
 
 const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
   vaultDirectory,
-  openFileByPath,
+  openFileAndOpenEditor,
   currentChatHistory,
   setCurrentChatHistory,
   showSimilarFiles,
@@ -411,17 +445,12 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
     [setUserTextFieldInput],
   )
 
-  useEffect(() => {
-    if (chatContainerRef.current) {
-      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight
-    }
-  }, [currentChatHistory])
-
   return (
     <div className="flex size-full items-center justify-center">
       <div className="mx-auto flex size-full flex-col overflow-hidden border-y-0 border-l-[0.001px] border-r-0 border-solid border-neutral-700 bg-dark-gray-c-eleven">
         <ChatContainer
           chatContainerRef={chatContainerRef}
+          openFileAndOpenEditor={openFileAndOpenEditor}
           currentChatHistory={currentChatHistory}
           isAddContextFiltersModalOpen={isAddContextFiltersModalOpen}
           chatFilters={chatFilters}
@@ -449,7 +478,7 @@ const ChatWithLLM: React.FC<ChatWithLLMProps> = ({
           similarEntries={currentContext}
           titleText="Context used in chat"
           onFileSelect={(path: string) => {
-            openFileByPath(path)
+            openFileAndOpenEditor(path)
             posthog.capture('open_file_from_chat_context')
           }}
           saveCurrentFile={() => Promise.resolve()}
