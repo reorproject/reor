@@ -101,15 +101,17 @@ const RenameDirModal: React.FC<RenameDirModalProps> = ({ isOpen, fullDirName, on
           onKeyDown={handleKeyPress}
           placeholder="New directory Name"
         />
-        <Button
-          className="mb-2 mt-3 h-10 w-[80px] cursor-pointer border-none bg-blue-600 px-2 py-0 text-center hover:bg-blue-600"
-          onClick={sendDirRename}
-          placeholder=""
-          disabled={isUpdatingDirName}
-        >
-          Rename
-        </Button>
-        {errorMessage && <p className="text-xs text-red-500">{errorMessage}</p>}
+        <div className="flex items-center gap-3">
+          <Button
+            className="mb-2 mt-3 h-10 w-[80px] cursor-pointer border-none bg-blue-600 px-2 py-0 text-center hover:bg-blue-600"
+            onClick={sendDirRename}
+            placeholder=""
+            disabled={isUpdatingDirName}
+          >
+            Rename
+          </Button>
+          {errorMessage && <p className="text-xs text-red-500">{errorMessage}</p>}
+        </div>
       </div>
     </ReorModal>
   )

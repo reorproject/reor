@@ -2,12 +2,9 @@ import React, { useEffect, useState } from 'react'
 
 import { Button } from '@material-tailwind/react'
 import posthog from 'posthog-js'
-import { toast } from 'react-toastify'
 
 import ReorModal from '../Common/Modal'
-
-import errorToStringRendererProcess from '@/utils/error'
-import { getInvalidCharacterInFilePath, getInvalidCharacterInFileName } from '@/utils/strings'
+import { getInvalidCharacterInFileName } from '@/utils/strings'
 
 interface NewDirectoryComponentProps {
   isOpen: boolean
@@ -26,36 +23,41 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
     }
   }, [isOpen])
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newName = e.target.value
-    setDirectoryName(newName)
+  const handleValidName = async (name: string) => {
+    const invalidCharacters = await getInvalidCharacterInFileName(name)
+    if (invalidCharacters) {
+      setErrorMessage(`Cannot put ${invalidCharacters} in file name`)
+      throw new Error(`Cannot put ${invalidCharacters} in file name`)
+    }
+    setErrorMessage(null)
+  }
 
-    getInvalidCharacterInFilePath(newName).then((invalidCharacter) => {
-      if (invalidCharacter) {
-        setErrorMessage(`The character [${invalidCharacter}] cannot be included in directory name.`)
-      } else {
-        setErrorMessage(null)
-      }
-    })
+  const handleNameChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      const newName = e.target.value
+      await handleValidName(newName)
+      setDirectoryName(newName)
+    } catch (error) {
+      throw new Error('Caught error when renaming directory')
+    }
   }
 
   const sendNewDirectoryMsg = async () => {
-    if (!directoryName || errorMessage || currentOpenFilePath === null) return
-    const invalidCharacters = await getInvalidCharacterInFileName(directoryName)
-    if (invalidCharacters) {
-      setErrorMessage(`Cannot put ${invalidCharacters} in directory name`)
-      throw new Error(`Cannot put ${invalidCharacters} in directory name`)
-    }
-    setErrorMessage(null)
+    try {
+      await handleValidName(directoryName)
+      if (!directoryName || errorMessage || currentOpenFilePath === null) return
 
-    const directoryPath =
-      currentOpenFilePath === ''
-        ? await window.electronStore.getVaultDirectoryForWindow()
-        : await window.path.dirname(currentOpenFilePath)
-    const finalPath = await window.path.join(directoryPath, directoryName)
-    window.fileSystem.createDirectory(finalPath)
-    posthog.capture('created_new_directory_from_new_directory_modal')
-    onClose()
+      const directoryPath =
+        currentOpenFilePath === ''
+          ? await window.electronStore.getVaultDirectoryForWindow()
+          : await window.path.dirname(currentOpenFilePath)
+      const finalPath = await window.path.join(directoryPath, directoryName)
+      window.fileSystem.createDirectory(finalPath)
+      posthog.capture('created_new_directory_from_new_directory_modal')
+      onClose()
+    } catch (e) {
+      throw new Error('Caught error in when creating directory')
+    }
   }
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
