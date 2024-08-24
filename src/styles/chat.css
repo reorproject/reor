@@ -9,9 +9,6 @@
     line-height: 1.6;
 }
 
-.chat-container p {
-    font-family: ui-sans-serif, -apple-system, system-ui, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif, "Helvetica", "Apple Color Emoji", Arial, "Segoe UI Emoji", "Segoe UI Symbol";
-}
 
 /* User's message box */
 .user-chat-message {

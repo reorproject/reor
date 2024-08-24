@@ -180,7 +180,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
                 <h1 className="mb-10 text-[28px] text-gray-300">
                   Welcome to your AI-powered assistant! Start a conversation with your second brain!
                 </h1>
-                <div className="flex flex-col rounded-md bg-bg-000 focus-within:ring focus-within:ring-[#f9f9f9]">
+                <div className="flex flex-col rounded-md bg-bg-000 focus-within:ring-1 focus-within:ring-[#8c8c8c]">
                   <textarea
                     onKeyDown={(e) => {
                       if (!e.shiftKey && e.key === 'Enter') {
@@ -188,17 +188,17 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
                         handlePromptSelection(undefined)
                       }
                     }}
-                    className="h-[100px] w-full resize-none rounded-t-md border-0 bg-transparent p-4 font-styrene text-text-gen-100 caret-white focus:outline-none"
+                    className="h-[100px] w-full resize-none rounded-t-md border-0 bg-transparent p-4 text-text-gen-100 caret-white focus:outline-none"
                     placeholder="What can Reor help you with today?"
                     onChange={(e) => setUserTextFieldInput(e.target.value)}
                   />
                   <div className="h-px w-[calc(100%-5%)] self-center bg-gray-600" />
                   <div className="flex items-center justify-between px-4 py-3 ">
-                    <span className="rounded-b-md bg-transparent  font-styrene text-sm tracking-tight text-text-gen-100">
+                    <span className="rounded-b-md bg-transparent text-sm tracking-tight text-text-gen-100">
                       {defaultModelName}
                     </span>
                     <button
-                      className="cursor-pointer rounded-md border-0 bg-blue-600 px-4 py-2 font-styrene text-white hover:bg-blue-500"
+                      className="cursor-pointer rounded-md border-0 bg-blue-600 px-4 py-2 text-white hover:bg-blue-500"
                       onClick={() => {
                         setIsAddContextFiltersModalOpen(true)
                       }}

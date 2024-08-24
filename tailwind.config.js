@@ -25,17 +25,6 @@ export default {
 
         'text-gen-100': 'hsl(var(--gen-100) / 1.0)',
       },
-      fontFamily: {
-        'styrene': [
-          'ui-sans-serif',
-          'system-ui',
-          'sans-serif',
-          '"Apple Color Emoji"',
-          '"Segoe UI Emoji"',
-          '"Segoe UI Symbol"',
-          '"Noto Color Emoji"',
-        ],
-      },
       height: {
         titlebar: "30px",
         "below-titlebar": "calc(100vh - 30px)",
