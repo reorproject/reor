@@ -1,0 +1,47 @@
+/* Main chat container */
+.markdown-content p {
+    padding: 0.25rem;
+    margin: 0;
+    word-wrap: break-word;
+}
+
+.chat-container {
+    line-height: 1.6;
+}
+
+
+/* User's message box */
+.user-chat-message {
+    background-color: rgb(50, 50, 50);
+    color: rgb(220, 220, 220);
+    border-radius: 10px;
+    margin: 10px 0;
+    padding: 0 4px;
+    font-size: 0.94rem;
+    line-height: 1.2rem;
+}
+
+/* AI's message box */
+.assistant-chat-message {
+    color: rgb(210, 210, 210);
+    margin: 10px 0;
+    padding: 0 4px;
+    font-size: 0.94rem;
+    line-height: 1.2rem;
+}
+
+@keyframes dropdown-fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(10px);
+    }
+}
+
+.animate-dropdown-fadeIn {
+    opacity: 0;
+    animation: dropdown-fadeIn 0.5s ease-out forwards;
+}
