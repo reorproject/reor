@@ -7,22 +7,36 @@ import * as os from 'os'
 import * as path from 'path'
 
 import { app } from 'electron'
-import { LLMGenerationParameters, OpenAILLMConfig } from 'electron/main/electron-store/storeConfig'
+import { LLM, LLMAPIConfig } from 'electron/main/electron-store/storeConfig'
 import { Tiktoken, TiktokenModel, encodingForModel } from 'js-tiktoken'
 import { ModelResponse, ProgressResponse, Ollama } from 'ollama'
-import { ChatCompletionChunk, ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 
 // import ollama,"ollama";
-
-import { LLMSessionService } from '../types'
 
 const OllamaServeType = {
   SYSTEM: 'system', // ollama is installed on the system
   PACKAGED: 'packaged', // ollama is packaged with the app
 }
 
-class OllamaService implements LLMSessionService {
+export const defaultOllamaAPI: LLMAPIConfig = {
+  name: 'Ollama',
+  apiInterface: 'openai',
+  apiURL: 'http://localhost:11434/v1/',
+}
+
+class OllamaService {
   private client!: Ollama
+
+  // streamingResponse(
+  //   modelName: string,
+  //   modelConfig: LLMAPIConfig,
+  //   isJSONMode: boolean,
+  //   messageHistory: Array<ChatCompletionMessageParam>,
+  //   chunkResponse: (chunk: ChatCompletionChunk | MessageStreamEvent) => void,
+  //   generationParams?: LLMGenerationParameters,
+  // ): Promise<void> {
+  //   throw new Error('Method not implemented.')
+  // }
 
   private host = 'http://127.0.0.1:11434'
 
@@ -30,7 +44,8 @@ class OllamaService implements LLMSessionService {
   private childProcess: any
 
   public init = async () => {
-    await this.serve()
+    // add ollama to store if it doesn't alreay exist: store.set(StoreKeys.LLMAPIs, [defaultOllamaAPI])
+    const currentAPIs = await this.serve()
 
     const ollamaLib = await import('ollama')
     this.client = new ollamaLib.Ollama()
@@ -171,17 +186,14 @@ class OllamaService implements LLMSessionService {
     this.childProcess = null
   }
 
-  public getAvailableModels = async (): Promise<OpenAILLMConfig[]> => {
+  public getAvailableModels = async (): Promise<LLM[]> => {
     const ollamaModelsResponse = await this.client.list()
 
     const output = ollamaModelsResponse.models.map(
-      (model: ModelResponse): OpenAILLMConfig => ({
+      (model: ModelResponse): LLM => ({
         modelName: model.name,
-        type: 'openai',
-        apiKey: '',
         contextLength: 4096,
-        engine: 'openai',
-        apiURL: 'http://localhost:11434/v1/',
+        apiName: defaultOllamaAPI.name,
       }),
     )
     return output
@@ -216,16 +228,16 @@ class OllamaService implements LLMSessionService {
     throw new Error('Abort not yet implemented.')
   }
 
-  async streamingResponse(
-    _modelName: string,
-    _modelConfig: OpenAILLMConfig,
-    _isJSONMode: boolean,
-    _messageHistory: ChatCompletionMessageParam[],
-    _handleChunk: (chunk: ChatCompletionChunk) => void,
-    _generationParams?: LLMGenerationParameters,
-  ): Promise<void> {
-    throw new Error('Method not implemented.')
-  }
+  // async streamingResponse(
+  //   _modelName: string,
+  //   _modelConfig: LLM,
+  //   _isJSONMode: boolean,
+  //   _messageHistory: ChatCompletionMessageParam[],
+  //   _handleChunk: (chunk: ChatCompletionChunk) => void,
+  //   _generationParams?: LLMGenerationParameters,
+  // ): Promise<void> {
+  //   throw new Error('Method not implemented.')
+  // }
 }
 
 export default OllamaService

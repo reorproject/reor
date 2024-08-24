@@ -2,8 +2,9 @@ import Store from 'electron-store'
 
 import { StoreKeys, StoreSchema } from './storeConfig'
 import { defaultEmbeddingModelRepos } from '../vector-database/embeddings'
+import { defaultOllamaAPI } from '../llm/models/Ollama'
 
-const currentSchemaVersion = 1
+const currentSchemaVersion = 2
 
 const setupDefaultAnalyticsValue = (store: Store<StoreSchema>) => {
   if (store.get(StoreKeys.Analytics) === undefined) {
@@ -14,18 +15,6 @@ const setupDefaultAnalyticsValue = (store: Store<StoreSchema>) => {
 const setupDefaultSpellCheckValue = (store: Store<StoreSchema>) => {
   if (store.get(StoreKeys.SpellCheck) === undefined) {
     store.set(StoreKeys.SpellCheck, 'false')
-  }
-}
-
-const setupDefaultHardwareConfig = (store: Store<StoreSchema>) => {
-  const hardwareConfig = store.get(StoreKeys.Hardware)
-
-  if (!hardwareConfig) {
-    store.set(StoreKeys.Hardware, {
-      useGPU: process.platform === 'darwin' && process.arch === 'arm64',
-      useCUDA: false,
-      useVulkan: false,
-    })
   }
 }
 
@@ -46,6 +35,15 @@ const setupDefaultEmbeddingModels = (store: Store<StoreSchema>) => {
   }
 }
 
+export const setupDefaultLLMAPIs = (store: Store<StoreSchema>) => {
+  const llmAPIs = store.get(StoreKeys.LLMAPIs)
+
+  const existingOllamaAPI = llmAPIs?.find((api) => api.name === defaultOllamaAPI.name)
+  if (!existingOllamaAPI) {
+    store.set(StoreKeys.LLMAPIs, [defaultOllamaAPI])
+  }
+}
+
 export function setupDefaultStoreValues(store: Store<StoreSchema>) {
   if (!store.get(StoreKeys.MaxRAGExamples)) {
     store.set(StoreKeys.MaxRAGExamples, 15)
@@ -61,14 +59,14 @@ export function setupDefaultStoreValues(store: Store<StoreSchema>) {
 
   setupDefaultEmbeddingModels(store)
 
-  setupDefaultHardwareConfig(store)
+  setupDefaultLLMAPIs(store)
 }
 
 export const initializeAndMaybeMigrateStore = (store: Store<StoreSchema>) => {
   const storeSchemaVersion = store.get(StoreKeys.SchemaVersion)
   if (storeSchemaVersion !== currentSchemaVersion) {
     store.set(StoreKeys.SchemaVersion, currentSchemaVersion)
-    store.set(StoreKeys.LLMs, [])
+    store.set(StoreKeys.LLMAPIs, [])
     store.set(StoreKeys.DefaultLLM, '')
   }
   setupDefaultStoreValues(store)

@@ -1,7 +1,7 @@
 import { MessageStreamEvent } from '@anthropic-ai/sdk/resources'
 import { ChatCompletionChunk, ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 
-import { LLMGenerationParameters, LLMConfig } from '../electron-store/storeConfig'
+import { LLMGenerationParameters, LLMAPIConfig } from '../electron-store/storeConfig'
 
 // Any LLM engine should implement this interface:
 export interface LLMSessionService {
@@ -22,7 +22,7 @@ export interface LLMSessionService {
    */
   streamingResponse(
     modelName: string,
-    modelConfig: LLMConfig,
+    modelConfig: LLMAPIConfig,
     isJSONMode: boolean,
     messageHistory: Array<ChatCompletionMessageParam>,
     chunkResponse: (chunk: ChatCompletionChunk | MessageStreamEvent) => void,

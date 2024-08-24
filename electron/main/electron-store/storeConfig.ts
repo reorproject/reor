@@ -1,26 +1,53 @@
 import { ChatHistory } from '@/components/Chat/chatUtils'
 
-export interface BaseLLMConfig {
+// a type for possible values of the apiInterface field in LLMAPIConfig: containing 'openai' | 'anthropic'
+export type APIInterface = 'openai' | 'anthropic'
+
+export interface LLMAPIConfig {
+  name: string
+  apiInterface: APIInterface
+  apiURL?: string
+  apiKey?: string
+}
+
+// export interface OpenAIAPIConfig extends BaseLLMAPIConfig {
+//   apiInterface: 'openai'
+//   name: 'OpenAI'
+// }
+
+// export interface AnthropicAPIConfig extends BaseLLMAPIConfig {
+//   apiInterface: 'anthropic'
+//   name: 'Anthropic'
+// }
+
+// export type LLMAPIConfig = OpenAIAPIConfig | AnthropicAPIConfig
+
+// Ah nah so the Ollama API will need to be setup from the start...Let's see how the migration code works overall
+
+// export const
+
+// so apparently the idea right now is that we can have some default APIs including Ollama
+// so the frontend can setup the default APIs when the user adds an OpenAI key
+// And then we'll have the Ollama API get setup when a user adds a model from Ollama
+// And then afterwards we can do stuff to update
+
+// export const openAIDefaultAPI: LLMAPIConfig = {
+//   name: openAIDefaultName,
+//   apiInterface: 'openai',
+// }
+
+// export const anthropicDefaultAPI: LLMAPIConfig = {
+//   name: anthropicDefaultName,
+//   apiInterface: 'anthropic',
+// }
+
+export interface LLM {
   modelName: string
-  contextLength: number
-  errorMsg?: string
+  apiName: string
+  contextLength?: number
 }
 
-export interface OpenAILLMConfig extends BaseLLMConfig {
-  type: 'openai'
-  engine: 'openai'
-  apiURL: string
-  apiKey: string
-}
-
-export interface AnthropicLLMConfig extends BaseLLMConfig {
-  type: 'anthropic'
-  engine: 'anthropic'
-  apiURL: string
-  apiKey: string
-}
-
-export type LLMConfig = OpenAILLMConfig | AnthropicLLMConfig
+// actually so like the models themselves, we could just define default APIs
 
 export type LLMGenerationParameters = {
   maxTokens?: number
@@ -37,15 +64,6 @@ export interface EmbeddingModelWithRepo {
 export interface EmbeddingModelWithLocalPath {
   type: 'local'
   localPath: string
-}
-export type RAGConfig = {
-  maxRAGExamples: number
-}
-
-export type HardwareConfig = {
-  useGPU: boolean
-  useCUDA: boolean
-  useVulkan: boolean
 }
 
 export type Tab = {
@@ -64,14 +82,13 @@ export interface StoreSchema {
     vaultDirectories: string[]
     directoryFromPreviousSession?: string
   }
-  LLMs: LLMConfig[]
+  LLMs: LLM[]
+  LLMAPIs: LLMAPIConfig[]
   embeddingModels: {
     [modelAlias: string]: EmbeddingModelConfig
   }
   defaultLLM: string
   defaultEmbedFuncRepo: string
-  RAG?: RAGConfig
-  hardware: HardwareConfig
   llmGenerationParameters: LLMGenerationParameters
   chatHistories: {
     [vaultDir: string]: ChatHistory[]
@@ -91,11 +108,11 @@ export enum StoreKeys {
   SchemaVersion = 'schemaVersion',
   DirectoryFromPreviousSession = 'user.directoryFromPreviousSession',
   LLMs = 'LLMs',
+  LLMAPIs = 'LLMAPIs',
   EmbeddingModels = 'embeddingModels',
   DefaultLLM = 'defaultLLM',
   DefaultEmbeddingModelAlias = 'defaultEmbeddingModelAlias',
   MaxRAGExamples = 'RAG.maxRAGExamples',
-  Hardware = 'hardware',
   LLMGenerationParameters = 'llmGenerationParameters',
   ChatHistories = 'chatHistories',
   ChunkSize = 'chunkSize',

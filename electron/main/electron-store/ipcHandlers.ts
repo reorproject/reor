@@ -87,12 +87,6 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
 
   ipcMain.handle('get-default-embedding-model', () => store.get(StoreKeys.DefaultEmbeddingModelAlias))
 
-  ipcMain.handle('get-hardware-config', () => store.get(StoreKeys.Hardware))
-
-  ipcMain.handle('set-hardware-config', (event, hardwareConfig) => {
-    store.set(StoreKeys.Hardware, hardwareConfig)
-  })
-
   ipcMain.handle('set-llm-generation-params', (event, generationParams) => {
     store.set(StoreKeys.LLMGenerationParameters, generationParams)
   })
@@ -250,6 +244,8 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     store.set(StoreKeys.OpenTabs, updatedTabs)
     event.sender.send('remove-tab-after-deletion', updatedTabs)
   })
+
+  // ipcMain.handle('add-ne')
 }
 
 export function getDefaultEmbeddingModelConfig(store: Store<StoreSchema>): EmbeddingModelConfig {

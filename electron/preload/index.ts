@@ -3,8 +3,8 @@ import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
-  HardwareConfig,
-  LLMConfig,
+  LLM,
+  LLMAPIConfig,
   LLMGenerationParameters,
   Tab,
 } from 'electron/main/electron-store/storeConfig'
@@ -40,9 +40,6 @@ const database = {
     'delete-lance-db-entries-by-filepath',
   ),
   indexFilesInDirectory: createIPCHandler<() => Promise<void>>('index-files-in-directory'),
-  augmentPromptWithTemporalAgent: createIPCHandler<(args: BasePromptRequirements) => Promise<PromptWithRagResults>>(
-    'augment-prompt-with-temporal-agent',
-  ),
   augmentPromptWithFlashcardAgent: createIPCHandler<(args: BasePromptRequirements) => Promise<PromptWithRagResults>>(
     'augment-prompt-with-flashcard-agent',
   ),
@@ -78,8 +75,6 @@ const electronStore = {
   setNoOfRAGExamples: createIPCHandler<(noOfExamples: number) => Promise<void>>('set-no-of-rag-examples'),
   getChunkSize: createIPCHandler<() => Promise<number>>('get-chunk-size'),
   setChunkSize: createIPCHandler<(chunkSize: number) => Promise<void>>('set-chunk-size'),
-  getHardwareConfig: createIPCHandler<() => Promise<HardwareConfig>>('get-hardware-config'),
-  setHardwareConfig: createIPCHandler<(config: HardwareConfig) => Promise<void>>('set-hardware-config'),
   getLLMGenerationParams: createIPCHandler<() => Promise<LLMGenerationParameters>>('get-llm-generation-params'),
   setLLMGenerationParams:
     createIPCHandler<(params: LLMGenerationParameters) => Promise<void>>('set-llm-generation-params'),
@@ -156,21 +151,18 @@ const path = {
 const llm = {
   streamingLLMResponse:
     createIPCHandler<
-      (llmName: string, llmConfig: LLMConfig, isJSONMode: boolean, chatHistory: ChatHistory) => Promise<string>
+      (llmName: string, llmConfig: LLMAPIConfig, isJSONMode: boolean, chatHistory: ChatHistory) => Promise<string>
     >('streaming-llm-response'),
 
-  getLLMConfigs: createIPCHandler<() => Promise<LLMConfig[]>>('get-llm-configs'),
-  pullOllamaModel: createIPCHandler<(modelName: string) => Promise<void>>('pull-ollama-model'),
-  addOrUpdateLLM: createIPCHandler<(modelConfig: LLMConfig) => Promise<void>>('add-or-update-llm'),
+  getLLMConfigs: createIPCHandler<() => Promise<LLM[]>>('get-llm-configs'),
+  getLLMAPIConfigs: createIPCHandler<() => Promise<LLMAPIConfig[]>>('get-llm-api-configs'),
+  addOrUpdateLLMConfig: createIPCHandler<(model: LLM) => Promise<void>>('add-or-update-llm-config'),
+  addOrUpdateLLMAPIConfig:
+    createIPCHandler<(modelConfig: LLMAPIConfig) => Promise<void>>('add-or-update-llm-api-config'),
   removeLLM: createIPCHandler<(modelNameToDelete: string) => Promise<void>>('remove-llm'),
   setDefaultLLM: createIPCHandler<(modelName: string) => Promise<void>>('set-default-llm'),
   getDefaultLLMName: createIPCHandler<() => Promise<string>>('get-default-llm-name'),
-  sliceListOfStringsToContextLength: createIPCHandler<(strings: string[], llmName: string) => Promise<string[]>>(
-    'slice-list-of-strings-to-context-length',
-  ),
-  sliceStringToContextLength: createIPCHandler<(inputString: string, llmName: string) => Promise<string>>(
-    'slice-string-to-context-length',
-  ),
+  pullOllamaModel: createIPCHandler<(modelName: string) => Promise<void>>('pull-ollama-model'),
 }
 
 // Expose to renderer process

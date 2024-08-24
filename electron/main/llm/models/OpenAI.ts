@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-import { LLMGenerationParameters, LLMConfig } from 'electron/main/electron-store/storeConfig'
+import { LLMGenerationParameters, LLMAPIConfig } from 'electron/main/electron-store/storeConfig'
 import { Tiktoken, TiktokenModel, encodingForModel } from 'js-tiktoken'
 import OpenAI from 'openai'
 import { ChatCompletion, ChatCompletionChunk, ChatCompletionMessageParam } from 'openai/resources/chat/completions'
@@ -25,7 +25,7 @@ class OpenAIModelSessionService implements LLMSessionService {
 
   async response(
     modelName: string,
-    modelConfig: LLMConfig,
+    modelConfig: LLMAPIConfig,
     messageHistory: ChatCompletionMessageParam[],
     isJSONMode: boolean,
     generationParams?: LLMGenerationParameters,
@@ -49,7 +49,7 @@ class OpenAIModelSessionService implements LLMSessionService {
 
   async streamingResponse(
     modelName: string,
-    modelConfig: LLMConfig,
+    modelConfig: LLMAPIConfig,
     isJSONMode: boolean,
     messageHistory: ChatCompletionMessageParam[],
     handleChunk: (chunk: ChatCompletionChunk) => void,
