@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-
 import { Editor, EditorContent } from '@tiptap/react'
-
 import InEditorBacklinkSuggestionsDisplay, { SuggestionsState } from './BacklinkSuggestionsDisplay'
 import EditorContextMenu from './EditorContextMenu'
 
@@ -23,6 +21,8 @@ const EditorManager: React.FC<EditorManagerProps> = ({
   const [menuVisible, setMenuVisible] = useState(false)
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
   const [editorFlex, setEditorFlex] = useState(true)
+  const [showPlaceholder, setShowPlaceholder] = useState(false)
+  const [placeholderPosition, setPlaceholderPosition] = useState({ top: 0, left: 0 })
 
   const toggleSearch = useCallback(() => {
     setShowSearch((prevShowSearch) => !prevShowSearch)
@@ -34,6 +34,7 @@ const EditorManager: React.FC<EditorManagerProps> = ({
     setSearchTerm(value)
     editor?.commands.setSearchTerm(value)
   }
+
   const goToSelection = () => {
     if (!editor) return
     const { results, resultIndex } = editor.storage.searchAndReplace
@@ -45,6 +46,7 @@ const EditorManager: React.FC<EditorManagerProps> = ({
       node.scrollIntoView?.(false)
     }
   }
+
   const handleNextSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       event.preventDefault()
@@ -100,6 +102,55 @@ const EditorManager: React.FC<EditorManagerProps> = ({
     window.ipcRenderer.on('editor-flex-center-changed', handleEditorChange)
   }, [])
 
+  useEffect(() => {
+    if (!editor) return
+
+    const handleUpdate = () => {
+      const { state } = editor
+      const { from, to } = state.selection
+
+      const $from = state.doc.resolve(from)
+      const $to = state.doc.resolve(to)
+      const start = $from.before()
+      const end = $to.after()
+
+      const currentLineText = state.doc.textBetween(start, end, '\n', ' ').trim()
+
+      if (currentLineText === '') {
+        const { node } = editor.view.domAtPos(from)
+        const rect = (node as HTMLElement).getBoundingClientRect()
+        const editorRect = editor.view.dom.getBoundingClientRect()
+        setPlaceholderPosition({ top: rect.top - editorRect.top, left: rect.left - editorRect.left })
+        setShowPlaceholder(true)
+      } else {
+        setShowPlaceholder(false)
+      }
+    }
+
+    editor.on('update', handleUpdate)
+    editor.on('selectionUpdate', handleUpdate)
+
+    // eslint-disable-next-line consistent-return
+    return () => {
+      editor.off('update', handleUpdate)
+      editor.off('selectionUpdate', handleUpdate)
+    }
+  }, [editor])
+
+  const handleInput = () => {
+    if (editor) {
+      const { state } = editor
+      const { from, to } = state.selection
+
+      const $from = state.doc.resolve(from)
+      const $to = state.doc.resolve(to)
+      const start = $from.before()
+      const end = $to.after()
+
+      const currentLineText = state.doc.textBetween(start, end, '\n', ' ').trim()
+      setShowPlaceholder(currentLineText === '')
+    }
+  }
   return (
     <div
       className="relative size-full cursor-text overflow-y-auto bg-dark-gray-c-eleven py-4 text-slate-400 opacity-80"
@@ -130,8 +181,17 @@ const EditorManager: React.FC<EditorManagerProps> = ({
           }}
           onContextMenu={handleContextMenu}
           onClick={hideMenu}
+          onInput={handleInput}
           editor={editor}
         />
+        {showPlaceholder && (
+          <div
+            className="pointer-events-none absolute text-gray-500"
+            style={{ top: placeholderPosition.top, left: placeholderPosition.left }}
+          >
+            Press &apos;space&apos; for AI writing assistant
+          </div>
+        )}
       </div>
       {suggestionsState && (
         <InEditorBacklinkSuggestionsDisplay

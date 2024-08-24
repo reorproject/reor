@@ -1,16 +1,14 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
-
-import { MessageStreamEvent } from '@anthropic-ai/sdk/resources'
-import Button from '@mui/material/Button'
-import TextField from '@mui/material/TextField'
-import { Editor } from '@tiptap/react'
 import { ChatCompletionChunk } from 'openai/resources/chat/completions'
+import { MessageStreamEvent } from '@anthropic-ai/sdk/resources'
+import { Editor } from '@tiptap/react'
 import { FaMagic } from 'react-icons/fa'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
-
+import TextField from '@mui/material/TextField'
+import Button from '@mui/material/Button'
 import posthog from 'posthog-js'
-import { ChatHistory, ChatMessageToDisplay, formatOpenAIMessageContentIntoString } from '../Chat/chatUtils'
+import { ChatHistory, formatOpenAIMessageContentIntoString, ChatMessageToDisplay } from '../Chat/chatUtils'
 import useOutsideClick from '../Chat/hooks/use-outside-click'
 import { HighlightData } from '../Editor/HighlightExtension'
 
@@ -33,8 +31,12 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   const [prevPrompt, setPrevPrompt] = useState<string>('')
   const [positionStyle, setPositionStyle] = useState({ top: 0, left: 0 })
   const [markdownMaxHeight, setMarkdownMaxHeight] = useState('auto')
+  const [isSpaceTrigger, setIsSpaceTrigger] = useState<boolean>(false)
+  const [spacePosition, setSpacePosition] = useState<number | null>(null)
+  const [cursorPosition, setCursorPosition] = useState<number | null>(null)
   const markdownContainerRef = useRef<HTMLDivElement>(null)
   const optionsContainerRef = useRef<HTMLDivElement>(null)
+  const textFieldRef = useRef<HTMLInputElement>(null)
   const hasValidMessages = currentChatHistory?.displayableChatHistory.some((msg) => msg.role === 'assistant')
   const lastAssistantMessage = currentChatHistory?.displayableChatHistory
     .filter((msg) => msg.role === 'assistant')
@@ -42,9 +44,13 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
 
   useOutsideClick(markdownContainerRef, () => {
     setCurrentChatHistory(undefined)
+    setIsSpaceTrigger(false)
+    setCustomPrompt('')
   })
   useOutsideClick(optionsContainerRef, () => {
     setIsOptionsVisible(false)
+    setIsSpaceTrigger(false)
+    setCustomPrompt('')
   })
 
   useEffect(() => {
@@ -54,36 +60,40 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   }, [hasValidMessages])
 
   useLayoutEffect(() => {
-    if (!isOptionsVisible) return
-
+    if (!editor || (!isSpaceTrigger && !highlightData)) return
     const calculatePosition = () => {
-      if (!optionsContainerRef.current || !highlightData.position) {
-        return
+      if (!optionsContainerRef.current) return
+      const { from } = editor.state.selection
+      const coords = editor.view.coordsAtPos(from)
+      const viewportHeight = window.innerHeight
+      const optionsHeight = 200
+      const spaceBelow = viewportHeight - coords.bottom
+
+      let top = 0
+      let left = 0
+      if (spaceBelow >= optionsHeight) {
+        // Enough space below, position under the cursor
+
+        left = coords.left - 50
+        top = coords.bottom - 50
+      } else if (spaceBelow < optionsHeight) {
+        // Not enough space below, position above the cursor
+
+        left = coords.left - 100
+        top = coords.top - optionsHeight
       }
 
-      const screenHeight = window.innerHeight
-      const elementHeight = optionsContainerRef.current.offsetHeight
-      const spaceBelow = screenHeight - highlightData.position.top
-      const isSpaceEnough = spaceBelow >= elementHeight
-
-      if (isSpaceEnough) {
-        setPositionStyle({
-          top: highlightData.position.top,
-          left: highlightData.position.left,
-        })
-      } else {
-        setPositionStyle({
-          top: highlightData.position.top - elementHeight,
-          left: highlightData.position.left,
-        })
-      }
+      setPositionStyle({
+        top,
+        left,
+      })
     }
 
     calculatePosition()
-  }, [isOptionsVisible, highlightData.position])
+  }, [isSpaceTrigger, highlightData, editor, isOptionsVisible])
 
   useLayoutEffect(() => {
-    if (hasValidMessages && highlightData.position) {
+    if (hasValidMessages) {
       const calculateMaxHeight = () => {
         if (!markdownContainerRef.current) return
 
@@ -102,7 +112,80 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       return () => window.removeEventListener('resize', calculateMaxHeight)
     }
     return () => {}
-  }, [hasValidMessages, highlightData.position, positionStyle.top])
+  }, [hasValidMessages, positionStyle.top])
+
+  useEffect(() => {
+    if (editor) {
+      const handleKeyDown = (event: KeyboardEvent) => {
+        if (event.key === ' ') {
+          const { from } = editor.state.selection
+          const $from = editor.state.doc.resolve(from)
+          const start = $from.start()
+          const lineText = editor.state.doc.textBetween(start, from, '\n', '\n')
+
+          if (lineText.trim() === '' && from === start) {
+            event.preventDefault()
+            setCursorPosition(from)
+
+            setIsSpaceTrigger(true)
+            setIsOptionsVisible(true)
+            setSpacePosition(from)
+          }
+        }
+      }
+
+      editor.view.dom.addEventListener('keydown', handleKeyDown)
+
+      return () => {
+        editor.view.dom.removeEventListener('keydown', handleKeyDown)
+      }
+    }
+
+    return () => {}
+  }, [editor])
+
+  useEffect(() => {
+    if (editor && isSpaceTrigger && spacePosition !== null) {
+      const checkSpacePresence = () => {
+        const currentContent = editor.state.doc.textBetween(spacePosition, spacePosition + 1)
+        if (currentContent !== ' ') {
+          setIsOptionsVisible(false)
+          setIsSpaceTrigger(false)
+          setSpacePosition(null)
+        }
+      }
+
+      editor.on('update', checkSpacePresence)
+
+      return () => {
+        editor.off('update', checkSpacePresence)
+      }
+    }
+    return () => {}
+  }, [editor, isSpaceTrigger, spacePosition])
+
+  useEffect(() => {
+    const handleEscKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsOptionsVisible(false)
+        setIsSpaceTrigger(false)
+        setCustomPrompt('')
+        setCurrentChatHistory(undefined)
+
+        // Return focus to the editor and set cursor position
+        if (editor && cursorPosition !== null) {
+          editor.commands.focus()
+          editor.commands.setTextSelection(cursorPosition)
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleEscKey)
+
+    return () => {
+      document.removeEventListener('keydown', handleEscKey)
+    }
+  }, [setCurrentChatHistory, editor, cursorPosition])
 
   const copyToClipboard = () => {
     if (!editor || !currentChatHistory || currentChatHistory.displayableChatHistory.length === 0) {
@@ -116,6 +199,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
 
     if (copiedText) navigator.clipboard.writeText(copiedText)
   }
+
   const insertAfterHighlightedText = () => {
     if (!editor || !currentChatHistory || currentChatHistory.displayableChatHistory.length === 0) {
       return
@@ -135,6 +219,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
     editor.chain().focus().setTextSelection(endOfSelection).insertContent(`\n${insertionText}`).run()
 
     setCurrentChatHistory(undefined)
+    setCustomPrompt('')
   }
 
   const replaceHighlightedText = () => {
@@ -153,6 +238,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
     }
 
     setCurrentChatHistory(undefined)
+    setCustomPrompt('')
   }
 
   const getLLMResponse = async (prompt: string, chatHistory: ChatHistory | undefined) => {
@@ -166,7 +252,6 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
 
     if (loadingResponse) return
     setLoadingResponse(true)
-    // make a new variable for chat history to not use the function parameter:
     let newChatHistory = chatHistory
     if (!newChatHistory || !newChatHistory.id) {
       const chatID = Date.now().toString()
@@ -189,8 +274,10 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   }
 
   const handleOption = async (option: string, customPromptInput?: string) => {
-    const selectedText = highlightData.text
-    if (!selectedText.trim()) return
+    let selectedText = highlightData.text
+    if (!selectedText.trim() && isSpaceTrigger) {
+      selectedText = ''
+    }
 
     let prompt = ''
 
@@ -214,11 +301,15 @@ Return only the edited text. Do not wrap your response in quotes. Do not offer a
 Write a markdown list (using dashes) of key takeaways from my notes. Write at least 3 items, but write more if the text requires it. Be very detailed and don't leave any information out. Do not wrap responses in quotes.`
         break
       default:
-        prompt =
-          'The user has given the following instructions(in triple #) for processing the text selected(in triple quotes): ' +
-          `### ${customPromptInput} ###` +
-          '\n' +
-          `  """ ${selectedText} """`
+        if (selectedText.trim() === '') {
+          prompt = `The user has given the following instructions(in triple #)  ### ${customPromptInput} ###`
+        } else {
+          prompt =
+            'The user has given the following instructions(in triple #) for processing the text selected(in triple quotes): ' +
+            `### ${customPromptInput} ###` +
+            '\n' +
+            `  """ ${selectedText} """`
+        }
         break
     }
     setPrevPrompt(prompt)
@@ -299,24 +390,25 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
     }
     return 'bg-blue-100 text-blue-800'
   }
-  if (!highlightData.position) return null
-
+  if (!isSpaceTrigger && !highlightData.position) return null
   return (
     <div>
-      <button
-        style={{
-          top: `${highlightData.position.top}px`,
-          left: `${highlightData.position.left + 30}px`,
-          zIndex: 50,
-        }}
-        className="absolute flex size-7 cursor-pointer items-center justify-center rounded-full border-none bg-gray-200 text-gray-600 shadow-md hover:bg-gray-300"
-        aria-label="Writing Assistant button"
-        onClick={() => setIsOptionsVisible(true)}
-        type="button"
-      >
-        <FaMagic />
-      </button>
-      {!hasValidMessages && isOptionsVisible && (
+      {!isSpaceTrigger && highlightData.position && (
+        <button
+          style={{
+            top: `${highlightData.position.top}px`,
+            left: `${highlightData.position.left + 30}px`,
+            zIndex: 50,
+          }}
+          className="absolute flex size-7 cursor-pointer items-center justify-center rounded-full border-none bg-gray-200 text-gray-600 shadow-md hover:bg-gray-300"
+          aria-label="Writing Assistant button"
+          onClick={() => setIsOptionsVisible(true)}
+          type="button"
+        >
+          <FaMagic />
+        </button>
+      )}
+      {isOptionsVisible && !hasValidMessages && (
         <div
           ref={optionsContainerRef}
           style={{
@@ -326,6 +418,8 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           className="absolute z-50 w-96 rounded-md border border-gray-300 bg-white p-2.5"
         >
           <TextField
+            inputRef={textFieldRef}
+            autoFocus
             type="text"
             variant="outlined"
             size="small"
