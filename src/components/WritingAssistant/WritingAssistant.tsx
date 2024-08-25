@@ -7,23 +7,19 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import posthog from 'posthog-js'
 import { streamText } from 'ai'
-import { Chat, ReorChatMessage, resolveLLMClient } from '../Chat/chatUtils'
+import { appendTextContentToMessages, convertMessageToString, resolveLLMClient } from '../Chat/utils'
 import useOutsideClick from '../Chat/hooks/use-outside-click'
 import { HighlightData } from '../Editor/HighlightExtension'
+import getClassNames, { generatePromptString, getLastMessage } from './utils'
+import { ReorChatMessage } from '../Chat/types'
 
 interface WritingAssistantProps {
   editor: Editor | null
   highlightData: HighlightData
-  currentChatHistory: Chat | undefined
-  setCurrentChatHistory: React.Dispatch<React.SetStateAction<Chat | undefined>>
 }
 
-const WritingAssistant: React.FC<WritingAssistantProps> = ({
-  editor,
-  highlightData,
-  currentChatHistory,
-  setCurrentChatHistory,
-}) => {
+const WritingAssistant: React.FC<WritingAssistantProps> = ({ editor, highlightData }) => {
+  const [messages, setMessages] = useState<ReorChatMessage[]>([])
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false)
   const [customPrompt, setCustomPrompt] = useState<string>('')
   const [isOptionsVisible, setIsOptionsVisible] = useState<boolean>(false)
@@ -36,11 +32,11 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   const markdownContainerRef = useRef<HTMLDivElement>(null)
   const optionsContainerRef = useRef<HTMLDivElement>(null)
   const textFieldRef = useRef<HTMLInputElement>(null)
-  const hasValidMessages = currentChatHistory?.messages.some((msg) => msg.role === 'assistant')
-  const lastAssistantMessage = currentChatHistory?.messages.filter((msg) => msg.role === 'assistant').pop()
+  const lastAssistantMessage = getLastMessage(messages, 'assistant')
+  const hasValidMessages = !!lastAssistantMessage
 
   useOutsideClick(markdownContainerRef, () => {
-    setCurrentChatHistory(undefined)
+    setMessages([])
     setIsSpaceTrigger(false)
     setCustomPrompt('')
   })
@@ -167,7 +163,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
         setIsOptionsVisible(false)
         setIsSpaceTrigger(false)
         setCustomPrompt('')
-        setCurrentChatHistory(undefined)
+        setMessages([])
 
         // Return focus to the editor and set cursor position
         if (editor && cursorPosition !== null) {
@@ -182,13 +178,11 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
     return () => {
       document.removeEventListener('keydown', handleEscKey)
     }
-  }, [setCurrentChatHistory, editor, cursorPosition])
+  }, [editor, cursorPosition])
 
   const copyToClipboard = () => {
-    if (!editor || !currentChatHistory || currentChatHistory.messages.length === 0) {
-      return
-    }
-    const lastMessage = currentChatHistory.messages[currentChatHistory.messages.length - 1]
+    const lastMessage = getLastMessage(messages, 'assistant')
+    if (!lastMessage) return
 
     const copiedText = lastMessage.visibleContent ? lastMessage.visibleContent : lastMessage.content
 
@@ -196,11 +190,8 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   }
 
   const insertAfterHighlightedText = () => {
-    if (!editor || !currentChatHistory || currentChatHistory.messages.length === 0) {
-      return
-    }
-
-    const lastMessage = currentChatHistory.messages[currentChatHistory.messages.length - 1]
+    const lastMessage = getLastMessage(messages, 'assistant')
+    if (!lastMessage || !editor) return
 
     const insertionText = lastMessage.visibleContent ? lastMessage.visibleContent : lastMessage.content
 
@@ -211,153 +202,53 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
 
     editor.chain().focus().setTextSelection(endOfSelection).insertContent(`\n${insertionText}`).run()
 
-    setCurrentChatHistory(undefined)
+    setMessages([])
     setCustomPrompt('')
   }
 
   const replaceHighlightedText = () => {
-    if (!editor || !currentChatHistory || currentChatHistory.messages.length === 0) {
-      return
-    }
-
-    const lastMessage = currentChatHistory.messages[currentChatHistory.messages.length - 1]
-
+    const lastMessage = getLastMessage(messages, 'assistant')
+    if (!lastMessage || !editor) return
     const replacementText = lastMessage.visibleContent ? lastMessage.visibleContent : lastMessage.content
 
     if (replacementText) {
       editor.chain().focus().deleteSelection().insertContent(replacementText).run()
     }
 
-    setCurrentChatHistory(undefined)
+    setMessages([])
     setCustomPrompt('')
   }
 
-  const appendNewContentToMessageHistory = (
-    chatID: string,
-    newContent: string,
-    newMessageType: 'success' | 'error',
-  ) => {
-    setCurrentChatHistory((prev: Chat | undefined) => {
-      if (chatID !== prev?.id) return prev
-      const newDisplayableHistory = prev?.messages || []
-      if (newDisplayableHistory.length > 0) {
-        const lastMessage = newDisplayableHistory[newDisplayableHistory.length - 1]
-
-        if (lastMessage.role === 'assistant') {
-          lastMessage.content += newContent
-          lastMessage.messageType = newMessageType
-        } else {
-          newDisplayableHistory.push({
-            role: 'assistant',
-            content: newContent,
-            messageType: newMessageType,
-            context: [],
-          })
-        }
-      } else {
-        newDisplayableHistory.push({
-          role: 'assistant',
-          content: newContent,
-          messageType: newMessageType,
-          context: [],
-        })
-      }
-      return {
-        id: prev!.id,
-        messages: newDisplayableHistory,
-      }
-    })
-  }
-
-  const getLLMResponse = async (prompt: string, chat: Chat | undefined) => {
+  const getLLMResponse = async (prompt: string) => {
     const defaultLLMName = await window.llm.getDefaultLLMName()
 
     if (loadingResponse) return
     setLoadingResponse(true)
-    let newChatHistory = chat
-    if (!newChatHistory || !newChatHistory.id) {
-      const chatID = Date.now().toString()
-      newChatHistory = {
-        id: chatID,
-        messages: [],
-      }
-    }
-    setCurrentChatHistory(newChatHistory)
-    newChatHistory.messages.push({
-      role: 'user',
-      content: prompt,
-      messageType: 'success',
-      context: [],
-    })
-    if (!newChatHistory) return
     posthog.capture('submitted_writing_assistant_message')
-    const llmClient = await resolveLLMClient(defaultLLMName)
 
     const { textStream } = await streamText({
-      model: llmClient,
-      messages: newChatHistory.messages,
+      model: await resolveLLMClient(defaultLLMName),
+      // messages: newChatHistory.messages,
+      prompt,
     })
 
+    let updatedMessages = messages
     // eslint-disable-next-line no-restricted-syntax
     for await (const textPart of textStream) {
-      appendNewContentToMessageHistory(newChatHistory.id, textPart, 'success')
+      updatedMessages = appendTextContentToMessages(updatedMessages, textPart)
+      setMessages(updatedMessages)
     }
 
     setLoadingResponse(false)
   }
 
   const handleOption = async (option: string, customPromptInput?: string) => {
-    let selectedText = highlightData.text
-    if (!selectedText.trim() && isSpaceTrigger) {
-      selectedText = ''
-    }
-
-    let prompt = ''
-
-    switch (option) {
-      case 'simplify':
-        prompt = `The following text in triple quotes below has already been written:
-"""
-${selectedText}
-"""
-Simplify and condense the writing. Do not return anything other than the simplified writing. Do not wrap responses in quotes.`
-        break
-      case 'copy-editor':
-        prompt = `Act as a copy editor. Go through the text in triple quotes below. Edit it for spelling mistakes, grammar issues, punctuation, and generally for readability and flow. Format the text into appropriately sized paragraphs. Make your best effort.
- 
-""" ${selectedText} """
-Return only the edited text. Do not wrap your response in quotes. Do not offer anything else other than the edited text in the response. Do not translate the text. If in doubt, or you can't make edits, just return the original text.`
-        break
-      case 'takeaways':
-        prompt = `My notes are below in triple quotes:
-""" ${selectedText} """
-Write a markdown list (using dashes) of key takeaways from my notes. Write at least 3 items, but write more if the text requires it. Be very detailed and don't leave any information out. Do not wrap responses in quotes.`
-        break
-      default:
-        if (selectedText.trim() === '') {
-          prompt = `The user has given the following instructions(in triple #)  ### ${customPromptInput} ###`
-        } else {
-          prompt =
-            'The user has given the following instructions(in triple #) for processing the text selected(in triple quotes): ' +
-            `### ${customPromptInput} ###` +
-            '\n' +
-            `  """ ${selectedText} """`
-        }
-        break
-    }
+    const selectedText = highlightData.text
+    const prompt = generatePromptString(option, selectedText, isSpaceTrigger, customPromptInput)
     setPrevPrompt(prompt)
-    await getLLMResponse(prompt, currentChatHistory)
+    await getLLMResponse(prompt)
   }
 
-  function getClassNames(message: ReorChatMessage) {
-    if (message.messageType === 'error') {
-      return 'bg-red-100 text-red-800'
-    }
-    if (message.role === 'assistant') {
-      return 'bg-neutral-200 text-black'
-    }
-    return 'bg-blue-100 text-blue-800'
-  }
   if (!isSpaceTrigger && !highlightData.position) return null
   return (
     <div>
@@ -376,7 +267,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           <FaMagic />
         </button>
       )}
-      {isOptionsVisible && !hasValidMessages && (
+      {isOptionsVisible && !getLastMessage(messages, 'assistant') && (
         <div
           ref={optionsContainerRef}
           style={{
@@ -426,7 +317,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
           </div>
         </div>
       )}
-      {hasValidMessages && (
+      {getLastMessage(messages, 'assistant') && (
         <div
           ref={markdownContainerRef}
           className="absolute z-50 rounded-lg border border-gray-300 bg-white p-2.5 shadow-md"
@@ -442,22 +333,18 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
               overflowY: 'auto',
             }}
           >
-            {lastAssistantMessage && (
-              <ReactMarkdown
-                rehypePlugins={[rehypeRaw]}
-                className={`markdown-content break-words rounded-md p-1 ${getClassNames(lastAssistantMessage)}`}
-              >
-                {lastAssistantMessage.visibleContent || typeof lastAssistantMessage.content !== 'string'
-                  ? lastAssistantMessage.visibleContent
-                  : lastAssistantMessage.content}
-              </ReactMarkdown>
-            )}
+            <ReactMarkdown
+              rehypePlugins={[rehypeRaw]}
+              className={`markdown-content break-words rounded-md p-1 ${getClassNames(lastAssistantMessage)}`}
+            >
+              {convertMessageToString(getLastMessage(messages, 'assistant'))}
+            </ReactMarkdown>
           </div>
           <div className="mt-2 flex justify-between">
             <button
               className="mr-1 flex cursor-pointer items-center rounded-md border-0 bg-blue-100 px-2.5 py-1"
               onClick={() => {
-                getLLMResponse(prevPrompt, currentChatHistory)
+                getLLMResponse(prevPrompt)
               }}
               type="button"
             >

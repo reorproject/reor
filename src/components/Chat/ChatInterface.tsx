@@ -8,10 +8,10 @@ import rehypeRaw from 'rehype-raw'
 import { FaRegUserCircle } from 'react-icons/fa'
 import AddContextFiltersModal from './AddContextFiltersModal'
 import PromptSuggestion from './Chat-Prompts'
-import { ChatFilters, Chat, ReorChatMessage } from './chatUtils'
 
 import LoadingDots from '@/utils/animations'
 import '../../styles/chat.css'
+import { Chat, ChatFilters, ReorChatMessage } from './types'
 
 export enum AskOptions {
   Ask = 'Ask',
@@ -57,9 +57,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   loadAnimation,
 }) => {
   const getClassName = (message: ReorChatMessage): string => {
-    return message.messageType === 'error'
-      ? `markdown-content ${message.messageType}-chat-message text-white`
-      : `markdown-content ${message.role}-chat-message`
+    return `markdown-content ${message.role}-chat-message`
   }
 
   const getDisplayMessage = (message: ReorChatMessage): string | undefined => {

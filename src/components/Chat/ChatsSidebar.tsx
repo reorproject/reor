@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { RiChatNewFill, RiArrowDownSLine } from 'react-icons/ri'
 import { IoChatbubbles } from 'react-icons/io5'
 import { ChatHistoryMetadata } from './hooks/use-chat-history'
-import { Chat } from './chatUtils'
+import { Chat } from './types'
 
 export interface ChatItemProps {
   chatMetadata: ChatHistoryMetadata

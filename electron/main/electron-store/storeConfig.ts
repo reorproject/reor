@@ -1,4 +1,4 @@
-import { Chat } from '@/components/Chat/chatUtils'
+import { Chat } from '@/components/Chat/types'
 
 export type APIInterface = 'openai' | 'anthropic'
 

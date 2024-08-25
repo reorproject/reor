@@ -5,18 +5,12 @@ import posthog from 'posthog-js'
 
 import { streamText } from 'ai'
 import ChatInput from './ChatInput'
-import {
-  anonymizeChatFiltersForPosthog,
-  ChatFilters,
-  Chat,
-  getChatHistoryContext,
-  resolveLLMClient,
-  resolveRAGContext,
-} from './chatUtils'
+import { anonymizeChatFiltersForPosthog, getChatHistoryContext, resolveLLMClient, resolveRAGContext } from './utils'
 
 import SimilarEntriesComponent from '../Sidebars/SemanticSidebar/SimilarEntriesComponent'
 import '../../styles/chat.css'
 import ChatInterface, { AskOptions } from './ChatInterface'
+import { Chat, ChatFilters } from './types'
 
 interface ChatWrapperProps {
   vaultDirectory: string
@@ -79,7 +73,7 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({
   }, [readyToSave, currentChatHistory])
 
   const appendNewContentToMessageHistory = useCallback(
-    (chatID: string, newContent: string, newMessageType: 'success' | 'error') => {
+    (chatID: string, newContent: string) => {
       setCurrentChatHistory((prev) => {
         if (chatID !== prev?.id) return prev
         const newDisplayableHistory = prev?.messages || []
@@ -87,12 +81,10 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({
           const lastMessage = newDisplayableHistory[newDisplayableHistory.length - 1]
           if (lastMessage.role === 'assistant') {
             lastMessage.content += newContent
-            lastMessage.messageType = newMessageType
           } else {
             newDisplayableHistory.push({
               role: 'assistant',
               content: newContent,
-              messageType: newMessageType,
               context: [],
             })
           }
@@ -100,7 +92,6 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({
           newDisplayableHistory.push({
             role: 'assistant',
             content: newContent,
-            messageType: newMessageType,
             context: [],
           })
         }
@@ -142,7 +133,6 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({
       outputChat.messages.push({
         role: 'user',
         content: userTextFieldInput,
-        messageType: 'success',
         context: [],
       })
     }
@@ -163,7 +153,7 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({
 
     // eslint-disable-next-line no-restricted-syntax
     for await (const textPart of textStream) {
-      appendNewContentToMessageHistory(outputChat.id, textPart, 'success')
+      appendNewContentToMessageHistory(outputChat.id, textPart)
     }
     setReadyToSave(true)
     // } catch (error) {

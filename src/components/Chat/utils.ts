@@ -1,49 +1,65 @@
 import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema'
-import { ChatCompletionContentPart, ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 import { createOpenAI } from '@ai-sdk/openai'
 import { createAnthropic } from '@ai-sdk/anthropic'
-import { CoreMessage } from 'ai'
+import { AnonymizedChatFilters, Chat, ChatFilters, ReorChatMessage } from './types'
 
-export type ReorChatMessage = CoreMessage & {
-  messageType: 'success' | 'error'
-  context: DBEntry[]
-  visibleContent?: string
-}
+// export function formatOpenAIMessageContentIntoString(
+//   content: string | ChatCompletionContentPart[] | null | undefined,
+// ): string | undefined {
+//   if (Array.isArray(content)) {
+//     return content.reduce((acc, part) => {
+//       if (part.type === 'text') {
+//         return acc + part.text // Concatenate text parts
+//       }
+//       return acc // Skip image parts
+//     }, '')
+//   }
+//   return content || undefined
+// }
 
-export type Chat = {
-  [x: string]: any
-  id: string
-  messages: ReorChatMessage[]
-}
-
-export interface ChatFilters {
-  numberOfChunksToFetch: number
-  files: string[]
-  minDate?: Date
-  maxDate?: Date
-}
-
-export function formatOpenAIMessageContentIntoString(
-  content: string | ChatCompletionContentPart[] | null | undefined,
-): string | undefined {
-  if (Array.isArray(content)) {
-    return content.reduce((acc, part) => {
-      if (part.type === 'text') {
-        return acc + part.text // Concatenate text parts
-      }
-      return acc // Skip image parts
-    }, '')
+export const appendTextContentToMessages = (messages: ReorChatMessage[], text: string): ReorChatMessage[] => {
+  if (text === '') {
+    return messages
   }
-  return content || undefined
+  if (messages.length === 0) {
+    return [
+      {
+        role: 'assistant',
+        content: text,
+      },
+    ]
+  }
+  const lastMessage = messages[messages.length - 1]
+
+  if (lastMessage.role === 'assistant') {
+    return [
+      ...messages.slice(0, -1),
+      {
+        ...lastMessage,
+        content: lastMessage.content + text,
+      },
+    ]
+  }
+  return [
+    ...messages,
+    {
+      role: 'assistant',
+      content: text,
+    },
+  ]
 }
 
-interface ChatProperties {
-  [key: string]: string // Values must be strings
-}
-
-export type ChatTemplate = {
-  messageHistory: ChatCompletionMessageParam[]
-  properties: ChatProperties
+export const convertMessageToString = (message: ReorChatMessage | undefined): string => {
+  if (!message) {
+    return ''
+  }
+  if (message.visibleContent) {
+    return message.visibleContent
+  }
+  if (typeof message.content === 'string') {
+    return message.content
+  }
+  return ''
 }
 
 // function replaceContentInMessages(
@@ -110,7 +126,6 @@ export const resolveRAGContext = async (query: string, chatFilters: ChatFilters)
     results = await window.database.search(query, chatFilters.numberOfChunksToFetch, timeStampFilter)
   }
   return {
-    messageType: 'success',
     role: 'user',
     context: results,
     content: `Based on the following context answer the question down below. \n\n\nContext: \n${results
@@ -142,13 +157,6 @@ export const getDisplayableChatName = (chat: Chat): string => {
     return 'Empty Chat'
   }
   return lastMessage.slice(0, 30)
-}
-
-export interface AnonymizedChatFilters {
-  numberOfChunksToFetch: number
-  filesLength: number
-  minDate?: Date
-  maxDate?: Date
 }
 
 export function anonymizeChatFiltersForPosthog(chatFilters: ChatFilters): AnonymizedChatFilters {

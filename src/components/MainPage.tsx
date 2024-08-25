@@ -13,11 +13,11 @@ import useFileByFilepath from './File/hooks/use-file-by-filepath'
 import IconsSidebar from './Sidebars/IconsSidebar'
 import SidebarManager, { SidebarAbleToShow } from './Sidebars/MainSidebar'
 import SimilarFilesSidebarComponent from './Sidebars/SimilarFilesSidebar'
-import { ChatFilters, Chat } from './Chat/chatUtils'
 import EmptyPage from './EmptyPage'
 import { TabProvider } from '../providers/TabProvider'
 import { ModalProvider } from '../providers/ModalProvider'
 import WritingAssistant from './WritingAssistant/WritingAssistant'
+import { Chat, ChatFilters } from './Chat/types'
 
 const UNINITIALIZED_STATE = 'UNINITIALIZED_STATE'
 
@@ -228,12 +228,7 @@ const MainPageComponent: React.FC = () => {
                 showSimilarFiles={showSimilarFiles}
               />{' '}
             </div>
-            <WritingAssistant
-              editor={editor}
-              highlightData={highlightData}
-              currentChatHistory={currentChatHistory}
-              setCurrentChatHistory={setCurrentChatHistory}
-            />
+            <WritingAssistant editor={editor} highlightData={highlightData} />
             {showSimilarFiles && (
               <div className="h-full shrink-0 overflow-y-auto overflow-x-hidden">
                 <SimilarFilesSidebarComponent
