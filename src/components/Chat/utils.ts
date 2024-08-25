@@ -1,27 +1,8 @@
 import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema'
-import { ChatCompletionContentPart, ChatCompletionMessageParam } from 'openai/resources/chat/completions'
+import { ChatCompletionContentPart } from 'openai/resources/chat/completions'
 import { createOpenAI } from '@ai-sdk/openai'
 import { createAnthropic } from '@ai-sdk/anthropic'
-import { CoreMessage } from 'ai'
-
-export type ReorChatMessage = CoreMessage & {
-  messageType: 'success' | 'error'
-  context: DBEntry[]
-  visibleContent?: string
-}
-
-export type Chat = {
-  [x: string]: any
-  id: string
-  messages: ReorChatMessage[]
-}
-
-export interface ChatFilters {
-  numberOfChunksToFetch: number
-  files: string[]
-  minDate?: Date
-  maxDate?: Date
-}
+import { AnonymizedChatFilters, Chat, ChatFilters, ReorChatMessage } from './types'
 
 export function formatOpenAIMessageContentIntoString(
   content: string | ChatCompletionContentPart[] | null | undefined,
@@ -35,15 +16,6 @@ export function formatOpenAIMessageContentIntoString(
     }, '')
   }
   return content || undefined
-}
-
-interface ChatProperties {
-  [key: string]: string // Values must be strings
-}
-
-export type ChatTemplate = {
-  messageHistory: ChatCompletionMessageParam[]
-  properties: ChatProperties
 }
 
 // function replaceContentInMessages(
@@ -110,7 +82,6 @@ export const resolveRAGContext = async (query: string, chatFilters: ChatFilters)
     results = await window.database.search(query, chatFilters.numberOfChunksToFetch, timeStampFilter)
   }
   return {
-    messageType: 'success',
     role: 'user',
     context: results,
     content: `Based on the following context answer the question down below. \n\n\nContext: \n${results
@@ -142,13 +113,6 @@ export const getDisplayableChatName = (chat: Chat): string => {
     return 'Empty Chat'
   }
   return lastMessage.slice(0, 30)
-}
-
-export interface AnonymizedChatFilters {
-  numberOfChunksToFetch: number
-  filesLength: number
-  minDate?: Date
-  maxDate?: Date
 }
 
 export function anonymizeChatFiltersForPosthog(chatFilters: ChatFilters): AnonymizedChatFilters {

@@ -8,7 +8,7 @@ import rehypeRaw from 'rehype-raw'
 import { FaRegUserCircle } from 'react-icons/fa'
 import AddContextFiltersModal from './AddContextFiltersModal'
 import PromptSuggestion from './Chat-Prompts'
-import { ChatFilters, Chat, ReorChatMessage } from './chatUtils'
+import { ChatFilters, Chat, ReorChatMessage } from './utils'
 
 import LoadingDots from '@/utils/animations'
 import '../../styles/chat.css'

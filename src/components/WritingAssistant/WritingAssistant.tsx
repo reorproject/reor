@@ -7,9 +7,11 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import posthog from 'posthog-js'
 import { streamText } from 'ai'
-import { Chat, ReorChatMessage, resolveLLMClient } from '../Chat/chatUtils'
+import { resolveLLMClient } from '../Chat/utils'
 import useOutsideClick from '../Chat/hooks/use-outside-click'
 import { HighlightData } from '../Editor/HighlightExtension'
+import getClassNames from './utils'
+import { Chat } from '../Chat/types'
 
 interface WritingAssistantProps {
   editor: Editor | null
@@ -232,11 +234,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
     setCustomPrompt('')
   }
 
-  const appendNewContentToMessageHistory = (
-    chatID: string,
-    newContent: string,
-    newMessageType: 'success' | 'error',
-  ) => {
+  const appendNewContentToMessageHistory = (chatID: string, newContent: string) => {
     setCurrentChatHistory((prev: Chat | undefined) => {
       if (chatID !== prev?.id) return prev
       const newDisplayableHistory = prev?.messages || []
@@ -245,12 +243,10 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
 
         if (lastMessage.role === 'assistant') {
           lastMessage.content += newContent
-          lastMessage.messageType = newMessageType
         } else {
           newDisplayableHistory.push({
             role: 'assistant',
             content: newContent,
-            messageType: newMessageType,
             context: [],
           })
         }
@@ -258,7 +254,6 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
         newDisplayableHistory.push({
           role: 'assistant',
           content: newContent,
-          messageType: newMessageType,
           context: [],
         })
       }
@@ -286,7 +281,6 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
     newChatHistory.messages.push({
       role: 'user',
       content: prompt,
-      messageType: 'success',
       context: [],
     })
     if (!newChatHistory) return
@@ -300,7 +294,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
 
     // eslint-disable-next-line no-restricted-syntax
     for await (const textPart of textStream) {
-      appendNewContentToMessageHistory(newChatHistory.id, textPart, 'success')
+      // appendNewContentToMessageHistory(newChatHistory.id, textPart, 'success')
     }
 
     setLoadingResponse(false)
@@ -349,15 +343,6 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
     await getLLMResponse(prompt, currentChatHistory)
   }
 
-  function getClassNames(message: ReorChatMessage) {
-    if (message.messageType === 'error') {
-      return 'bg-red-100 text-red-800'
-    }
-    if (message.role === 'assistant') {
-      return 'bg-neutral-200 text-black'
-    }
-    return 'bg-blue-100 text-blue-800'
-  }
   if (!isSpaceTrigger && !highlightData.position) return null
   return (
     <div>

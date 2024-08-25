@@ -9,7 +9,7 @@ import { ChatHistoryMetadata } from '../Chat/hooks/use-chat-history'
 import { FileSidebar } from '../File/FileSideBar'
 
 import SearchComponent from './FileSidebarSearch'
-import { ChatFilters, Chat } from '../Chat/chatUtils'
+import { ChatFilters, Chat } from '../Chat/utils'
 
 export type SidebarAbleToShow = 'files' | 'search' | 'chats'
 interface SidebarManagerProps {

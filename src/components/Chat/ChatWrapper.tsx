@@ -12,7 +12,7 @@ import {
   getChatHistoryContext,
   resolveLLMClient,
   resolveRAGContext,
-} from './chatUtils'
+} from './utils'
 
 import SimilarEntriesComponent from '../Sidebars/SemanticSidebar/SimilarEntriesComponent'
 import '../../styles/chat.css'

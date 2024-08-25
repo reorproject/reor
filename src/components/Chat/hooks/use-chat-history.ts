@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { Chat, getDisplayableChatName } from '../chatUtils'
+import { Chat, getDisplayableChatName } from '../utils'
 
 export interface ChatHistoryMetadata {
   id: string

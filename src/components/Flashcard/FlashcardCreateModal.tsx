@@ -14,7 +14,7 @@ import useFileByFilepath from '../File/hooks/use-file-by-filepath'
 import FlashcardCore from './FlashcardsCore'
 import { FlashcardQAPairSchema, FlashcardQAPairUI } from './types'
 import { storeFlashcardPairsAsJSON } from './utils'
-import { resolveLLMClient } from '../Chat/chatUtils'
+import { resolveLLMClient } from '../Chat/utils'
 
 interface FlashcardCreateModalProps {
   isOpen: boolean
