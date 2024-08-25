@@ -1,21 +1,65 @@
 import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema'
-import { ChatCompletionContentPart } from 'openai/resources/chat/completions'
 import { createOpenAI } from '@ai-sdk/openai'
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { AnonymizedChatFilters, Chat, ChatFilters, ReorChatMessage } from './types'
 
-export function formatOpenAIMessageContentIntoString(
-  content: string | ChatCompletionContentPart[] | null | undefined,
-): string | undefined {
-  if (Array.isArray(content)) {
-    return content.reduce((acc, part) => {
-      if (part.type === 'text') {
-        return acc + part.text // Concatenate text parts
-      }
-      return acc // Skip image parts
-    }, '')
+// export function formatOpenAIMessageContentIntoString(
+//   content: string | ChatCompletionContentPart[] | null | undefined,
+// ): string | undefined {
+//   if (Array.isArray(content)) {
+//     return content.reduce((acc, part) => {
+//       if (part.type === 'text') {
+//         return acc + part.text // Concatenate text parts
+//       }
+//       return acc // Skip image parts
+//     }, '')
+//   }
+//   return content || undefined
+// }
+
+export const appendTextContentToMessages = (messages: ReorChatMessage[], text: string): ReorChatMessage[] => {
+  if (text === '') {
+    return messages
   }
-  return content || undefined
+  if (messages.length === 0) {
+    return [
+      {
+        role: 'assistant',
+        content: text,
+      },
+    ]
+  }
+  const lastMessage = messages[messages.length - 1]
+
+  if (lastMessage.role === 'assistant') {
+    return [
+      ...messages.slice(0, -1),
+      {
+        ...lastMessage,
+        content: lastMessage.content + text,
+      },
+    ]
+  }
+  return [
+    ...messages,
+    {
+      role: 'assistant',
+      content: text,
+    },
+  ]
+}
+
+export const convertMessageToString = (message: ReorChatMessage | undefined): string => {
+  if (!message) {
+    return ''
+  }
+  if (message.visibleContent) {
+    return message.visibleContent
+  }
+  if (typeof message.content === 'string') {
+    return message.content
+  }
+  return ''
 }
 
 // function replaceContentInMessages(

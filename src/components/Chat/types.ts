@@ -2,7 +2,7 @@ import { CoreMessage } from 'ai'
 import { DBEntry } from 'electron/main/vector-database/schema'
 
 export type ReorChatMessage = CoreMessage & {
-  context: DBEntry[]
+  context?: DBEntry[]
   visibleContent?: string
 }
 
