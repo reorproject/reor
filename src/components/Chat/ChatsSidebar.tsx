@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { RiChatNewFill, RiArrowDownSLine } from 'react-icons/ri'
 import { IoChatbubbles } from 'react-icons/io5'
 import { ChatHistoryMetadata } from './hooks/use-chat-history'
-import { ChatHistory } from './chatUtils'
+import { Chat } from './chatUtils'
 
 export interface ChatItemProps {
   chatMetadata: ChatHistoryMetadata
@@ -50,7 +50,7 @@ export const ChatItem: React.FC<ChatItemProps> = ({
 
 interface ChatListProps {
   chatHistoriesMetadata: ChatHistoryMetadata[]
-  currentChatHistory: ChatHistory | undefined
+  currentChatHistory: Chat | undefined
   onSelect: (chatID: string) => void
   newChat: () => void
   setShowChatbot: (showChat: boolean) => void

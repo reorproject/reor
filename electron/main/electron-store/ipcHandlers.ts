@@ -14,7 +14,7 @@ import {
 import WindowsManager from '../common/windowManager'
 
 import { initializeAndMaybeMigrateStore } from './storeSchemaMigrator'
-import { ChatHistory } from '@/components/Chat/chatUtils'
+import { Chat } from '@/components/Chat/chatUtils'
 
 export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager: WindowsManager) => {
   initializeAndMaybeMigrateStore(store)
@@ -87,12 +87,6 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
 
   ipcMain.handle('get-default-embedding-model', () => store.get(StoreKeys.DefaultEmbeddingModelAlias))
 
-  ipcMain.handle('get-hardware-config', () => store.get(StoreKeys.Hardware))
-
-  ipcMain.handle('set-hardware-config', (event, hardwareConfig) => {
-    store.set(StoreKeys.Hardware, hardwareConfig)
-  })
-
   ipcMain.handle('set-llm-generation-params', (event, generationParams) => {
     store.set(StoreKeys.LLMGenerationParameters, generationParams)
   })
@@ -156,7 +150,7 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     return chatHistoriesCorrespondingToVault
   })
 
-  ipcMain.handle('update-chat-history', (event, newChat: ChatHistory) => {
+  ipcMain.handle('update-chat-history', (event, newChat: Chat) => {
     const vaultDir = windowsManager.getVaultDirectoryForWinContents(event.sender)
     const allChatHistories = store.get(StoreKeys.ChatHistories)
     if (!vaultDir) {

@@ -9,7 +9,7 @@ import { ChatHistoryMetadata } from '../Chat/hooks/use-chat-history'
 import { FileSidebar } from '../File/FileSideBar'
 
 import SearchComponent from './FileSidebarSearch'
-import { ChatFilters, ChatHistory } from '../Chat/chatUtils'
+import { ChatFilters, Chat } from '../Chat/chatUtils'
 
 export type SidebarAbleToShow = 'files' | 'search' | 'chats'
 interface SidebarManagerProps {
@@ -24,9 +24,9 @@ interface SidebarManagerProps {
   setNoteToBeRenamed: (note: string) => void
   fileDirToBeRenamed: string
   setFileDirToBeRenamed: (dir: string) => void
-  currentChatHistory: ChatHistory | undefined
+  currentChatHistory: Chat | undefined
   chatHistoriesMetadata: ChatHistoryMetadata[]
-  setCurrentChatHistory: (chat: ChatHistory | undefined) => void
+  setCurrentChatHistory: (chat: Chat | undefined) => void
   setChatFilters: (chatFilters: ChatFilters) => void
   setShowChatbot: (showChat: boolean) => void
 }

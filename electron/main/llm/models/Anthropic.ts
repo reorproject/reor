@@ -2,7 +2,7 @@
 /* eslint-disable no-restricted-syntax */
 import Anthropic from '@anthropic-ai/sdk'
 import { Message, MessageParam, MessageStreamEvent } from '@anthropic-ai/sdk/resources'
-import { LLMGenerationParameters, LLMConfig } from 'electron/main/electron-store/storeConfig'
+import { LLMGenerationParameters, LLMAPIConfig } from 'electron/main/electron-store/storeConfig'
 import { Tiktoken, TiktokenModel, encodingForModel } from 'js-tiktoken'
 import { ChatCompletionMessageParam } from 'openai/resources/chat/completions'
 
@@ -28,7 +28,7 @@ class AnthropicModelSessionService implements LLMSessionService {
 
   async response(
     modelName: string,
-    modelConfig: LLMConfig,
+    modelConfig: LLMAPIConfig,
     messageHistory: ChatCompletionMessageParam[],
     isJSONMode: boolean,
     generationParams?: LLMGenerationParameters,
@@ -50,7 +50,7 @@ class AnthropicModelSessionService implements LLMSessionService {
 
   async streamingResponse(
     modelName: string,
-    modelConfig: LLMConfig,
+    modelConfig: LLMAPIConfig,
     isJSONMode: boolean,
     messageHistory: ChatCompletionMessageParam[],
     handleChunk: (chunk: MessageStreamEvent) => void,

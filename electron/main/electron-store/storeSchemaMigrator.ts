@@ -2,8 +2,9 @@ import Store from 'electron-store'
 
 import { StoreKeys, StoreSchema } from './storeConfig'
 import { defaultEmbeddingModelRepos } from '../vector-database/embeddings'
+import { defaultOllamaAPI } from '../llm/models/Ollama'
 
-const currentSchemaVersion = 1
+const currentSchemaVersion = 2
 
 const setupDefaultAnalyticsValue = (store: Store<StoreSchema>) => {
   if (store.get(StoreKeys.Analytics) === undefined) {
@@ -14,18 +15,6 @@ const setupDefaultAnalyticsValue = (store: Store<StoreSchema>) => {
 const setupDefaultSpellCheckValue = (store: Store<StoreSchema>) => {
   if (store.get(StoreKeys.SpellCheck) === undefined) {
     store.set(StoreKeys.SpellCheck, 'false')
-  }
-}
-
-const setupDefaultHardwareConfig = (store: Store<StoreSchema>) => {
-  const hardwareConfig = store.get(StoreKeys.Hardware)
-
-  if (!hardwareConfig) {
-    store.set(StoreKeys.Hardware, {
-      useGPU: process.platform === 'darwin' && process.arch === 'arm64',
-      useCUDA: false,
-      useVulkan: false,
-    })
   }
 }
 
@@ -46,6 +35,15 @@ const setupDefaultEmbeddingModels = (store: Store<StoreSchema>) => {
   }
 }
 
+export const setupDefaultLLMAPIs = (store: Store<StoreSchema>) => {
+  const llmAPIs = store.get(StoreKeys.LLMAPIs)
+
+  const existingOllamaAPI = llmAPIs?.find((api) => api.name === defaultOllamaAPI.name)
+  if (!existingOllamaAPI) {
+    store.set(StoreKeys.LLMAPIs, [defaultOllamaAPI])
+  }
+}
+
 export function setupDefaultStoreValues(store: Store<StoreSchema>) {
   if (!store.get(StoreKeys.MaxRAGExamples)) {
     store.set(StoreKeys.MaxRAGExamples, 15)
@@ -61,15 +59,40 @@ export function setupDefaultStoreValues(store: Store<StoreSchema>) {
 
   setupDefaultEmbeddingModels(store)
 
-  setupDefaultHardwareConfig(store)
+  setupDefaultLLMAPIs(store)
+}
+
+function ensureChatHistoryIsCorrectProperty(store: Store<StoreSchema>) {
+  const chatHistories = store.get(StoreKeys.ChatHistories)
+  if (!chatHistories) {
+    return
+  }
+
+  Object.keys(chatHistories).forEach((vaultDir) => {
+    const chats = chatHistories[vaultDir]
+    chats.map((chat) => {
+      const outputChat = chat
+      if (chat.displayableChatHistory) {
+        outputChat.messages = chat.displayableChatHistory
+        delete outputChat.displayableChatHistory
+      }
+      return outputChat
+    })
+    chatHistories[vaultDir] = chats
+  })
+
+  store.set(StoreKeys.ChatHistories, chatHistories)
 }
 
 export const initializeAndMaybeMigrateStore = (store: Store<StoreSchema>) => {
   const storeSchemaVersion = store.get(StoreKeys.SchemaVersion)
   if (storeSchemaVersion !== currentSchemaVersion) {
     store.set(StoreKeys.SchemaVersion, currentSchemaVersion)
-    store.set(StoreKeys.LLMs, [])
+    store.set(StoreKeys.LLMAPIs, [])
     store.set(StoreKeys.DefaultLLM, '')
   }
+
+  ensureChatHistoryIsCorrectProperty(store)
+
   setupDefaultStoreValues(store)
 }

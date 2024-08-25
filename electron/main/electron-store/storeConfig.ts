@@ -1,26 +1,19 @@
-import { ChatHistory } from '@/components/Chat/chatUtils'
+import { Chat } from '@/components/Chat/chatUtils'
 
-export interface BaseLLMConfig {
+export type APIInterface = 'openai' | 'anthropic'
+
+export interface LLMAPIConfig {
+  name: string
+  apiInterface: APIInterface
+  apiURL?: string
+  apiKey?: string
+}
+
+export interface LLMConfig {
   modelName: string
-  contextLength: number
-  errorMsg?: string
+  apiName: string
+  contextLength?: number
 }
-
-export interface OpenAILLMConfig extends BaseLLMConfig {
-  type: 'openai'
-  engine: 'openai'
-  apiURL: string
-  apiKey: string
-}
-
-export interface AnthropicLLMConfig extends BaseLLMConfig {
-  type: 'anthropic'
-  engine: 'anthropic'
-  apiURL: string
-  apiKey: string
-}
-
-export type LLMConfig = OpenAILLMConfig | AnthropicLLMConfig
 
 export type LLMGenerationParameters = {
   maxTokens?: number
@@ -37,15 +30,6 @@ export interface EmbeddingModelWithRepo {
 export interface EmbeddingModelWithLocalPath {
   type: 'local'
   localPath: string
-}
-export type RAGConfig = {
-  maxRAGExamples: number
-}
-
-export type HardwareConfig = {
-  useGPU: boolean
-  useCUDA: boolean
-  useVulkan: boolean
 }
 
 export type Tab = {
@@ -65,16 +49,15 @@ export interface StoreSchema {
     directoryFromPreviousSession?: string
   }
   LLMs: LLMConfig[]
+  LLMAPIs: LLMAPIConfig[]
   embeddingModels: {
     [modelAlias: string]: EmbeddingModelConfig
   }
   defaultLLM: string
   defaultEmbedFuncRepo: string
-  RAG?: RAGConfig
-  hardware: HardwareConfig
   llmGenerationParameters: LLMGenerationParameters
   chatHistories: {
-    [vaultDir: string]: ChatHistory[]
+    [vaultDir: string]: Chat[]
   }
   analytics?: boolean
   chunkSize: number
@@ -91,11 +74,11 @@ export enum StoreKeys {
   SchemaVersion = 'schemaVersion',
   DirectoryFromPreviousSession = 'user.directoryFromPreviousSession',
   LLMs = 'LLMs',
+  LLMAPIs = 'LLMAPIs',
   EmbeddingModels = 'embeddingModels',
   DefaultLLM = 'defaultLLM',
   DefaultEmbeddingModelAlias = 'defaultEmbeddingModelAlias',
   MaxRAGExamples = 'RAG.maxRAGExamples',
-  Hardware = 'hardware',
   LLMGenerationParameters = 'llmGenerationParameters',
   ChatHistories = 'chatHistories',
   ChunkSize = 'chunkSize',

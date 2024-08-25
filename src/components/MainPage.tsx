@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import posthog from 'posthog-js'
 
 import '../styles/global.css'
-import ChatWithLLM from './Chat/Chat'
+import ChatWrapper from './Chat/ChatWrapper'
 import { useChatHistory } from './Chat/hooks/use-chat-history'
 import ResizableComponent from './Common/ResizableComponent'
 import TitleBar from './Common/TitleBar'
@@ -14,7 +14,7 @@ import IconsSidebar from './Sidebars/IconsSidebar'
 import SidebarManager, { SidebarAbleToShow } from './Sidebars/MainSidebar'
 import SimilarFilesSidebarComponent from './Sidebars/SimilarFilesSidebar'
 import WritingAssistant from './Writing-Assistant/WritingAssistantFloatingMenu'
-import { ChatFilters, ChatHistory } from './Chat/chatUtils'
+import { ChatFilters, Chat } from './Chat/chatUtils'
 import EmptyPage from './EmptyPage'
 import { TabProvider } from './Providers/TabProvider'
 import { ModalProvider } from './Providers/ModalProvider'
@@ -86,7 +86,7 @@ const MainPageComponent: React.FC = () => {
     return ''
   }
 
-  const openChatSidebarAndChat = (chatHistory: ChatHistory | undefined) => {
+  const openChatSidebarAndChat = (chatHistory: Chat | undefined) => {
     setShowChatbot(true)
     setSidebarShowing('chats')
     setCurrentChatHistory(chatHistory)
@@ -257,7 +257,7 @@ const MainPageComponent: React.FC = () => {
 
         {showChatbot && (
           <div className="h-below-titlebar w-full">
-            <ChatWithLLM
+            <ChatWrapper
               vaultDirectory={vaultDirectory}
               openFileAndOpenEditor={openFileAndOpenEditor}
               currentChatHistory={currentChatHistory}

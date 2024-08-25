@@ -1,6 +1,4 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
-import { ChatCompletionChunk } from 'openai/resources/chat/completions'
-import { MessageStreamEvent } from '@anthropic-ai/sdk/resources'
 import { Editor } from '@tiptap/react'
 import { FaMagic } from 'react-icons/fa'
 import ReactMarkdown from 'react-markdown'
@@ -8,15 +6,16 @@ import rehypeRaw from 'rehype-raw'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import posthog from 'posthog-js'
-import { ChatHistory, formatOpenAIMessageContentIntoString, ChatMessageToDisplay } from '../Chat/chatUtils'
+import { streamText } from 'ai'
+import { Chat, ReorChatMessage, resolveLLMClient } from '../Chat/chatUtils'
 import useOutsideClick from '../Chat/hooks/use-outside-click'
 import { HighlightData } from '../Editor/HighlightExtension'
 
 interface WritingAssistantProps {
   editor: Editor | null
   highlightData: HighlightData
-  currentChatHistory: ChatHistory | undefined
-  setCurrentChatHistory: React.Dispatch<React.SetStateAction<ChatHistory | undefined>>
+  currentChatHistory: Chat | undefined
+  setCurrentChatHistory: React.Dispatch<React.SetStateAction<Chat | undefined>>
 }
 
 const WritingAssistant: React.FC<WritingAssistantProps> = ({
@@ -37,10 +36,8 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   const markdownContainerRef = useRef<HTMLDivElement>(null)
   const optionsContainerRef = useRef<HTMLDivElement>(null)
   const textFieldRef = useRef<HTMLInputElement>(null)
-  const hasValidMessages = currentChatHistory?.displayableChatHistory.some((msg) => msg.role === 'assistant')
-  const lastAssistantMessage = currentChatHistory?.displayableChatHistory
-    .filter((msg) => msg.role === 'assistant')
-    .pop()
+  const hasValidMessages = currentChatHistory?.messages.some((msg) => msg.role === 'assistant')
+  const lastAssistantMessage = currentChatHistory?.messages.filter((msg) => msg.role === 'assistant').pop()
 
   useOutsideClick(markdownContainerRef, () => {
     setCurrentChatHistory(undefined)
@@ -188,28 +185,24 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   }, [setCurrentChatHistory, editor, cursorPosition])
 
   const copyToClipboard = () => {
-    if (!editor || !currentChatHistory || currentChatHistory.displayableChatHistory.length === 0) {
+    if (!editor || !currentChatHistory || currentChatHistory.messages.length === 0) {
       return
     }
-    const llmResponse = currentChatHistory.displayableChatHistory[currentChatHistory.displayableChatHistory.length - 1]
+    const lastMessage = currentChatHistory.messages[currentChatHistory.messages.length - 1]
 
-    const copiedText = llmResponse.visibleContent
-      ? llmResponse.visibleContent
-      : formatOpenAIMessageContentIntoString(llmResponse.content)
+    const copiedText = lastMessage.visibleContent ? lastMessage.visibleContent : lastMessage.content
 
-    if (copiedText) navigator.clipboard.writeText(copiedText)
+    if (copiedText && typeof copiedText === 'string') navigator.clipboard.writeText(copiedText)
   }
 
   const insertAfterHighlightedText = () => {
-    if (!editor || !currentChatHistory || currentChatHistory.displayableChatHistory.length === 0) {
+    if (!editor || !currentChatHistory || currentChatHistory.messages.length === 0) {
       return
     }
 
-    const llmResponse = currentChatHistory.displayableChatHistory[currentChatHistory.displayableChatHistory.length - 1]
+    const lastMessage = currentChatHistory.messages[currentChatHistory.messages.length - 1]
 
-    const insertionText = llmResponse.visibleContent
-      ? llmResponse.visibleContent
-      : formatOpenAIMessageContentIntoString(llmResponse.content)
+    const insertionText = lastMessage.visibleContent ? lastMessage.visibleContent : lastMessage.content
 
     editor.view.focus()
 
@@ -223,15 +216,13 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
   }
 
   const replaceHighlightedText = () => {
-    if (!editor || !currentChatHistory || currentChatHistory.displayableChatHistory.length === 0) {
+    if (!editor || !currentChatHistory || currentChatHistory.messages.length === 0) {
       return
     }
 
-    const llmResponse = currentChatHistory.displayableChatHistory[currentChatHistory.displayableChatHistory.length - 1]
+    const lastMessage = currentChatHistory.messages[currentChatHistory.messages.length - 1]
 
-    const replacementText = llmResponse.visibleContent
-      ? llmResponse.visibleContent
-      : formatOpenAIMessageContentIntoString(llmResponse.content)
+    const replacementText = lastMessage.visibleContent ? lastMessage.visibleContent : lastMessage.content
 
     if (replacementText) {
       editor.chain().focus().deleteSelection().insertContent(replacementText).run()
@@ -241,27 +232,58 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
     setCustomPrompt('')
   }
 
-  const getLLMResponse = async (prompt: string, chatHistory: ChatHistory | undefined) => {
-    const defaultLLMName = await window.llm.getDefaultLLMName()
-    const llmConfigs = await window.llm.getLLMConfigs()
+  const appendNewContentToMessageHistory = (
+    chatID: string,
+    newContent: string,
+    newMessageType: 'success' | 'error',
+  ) => {
+    setCurrentChatHistory((prev: Chat | undefined) => {
+      if (chatID !== prev?.id) return prev
+      const newDisplayableHistory = prev?.messages || []
+      if (newDisplayableHistory.length > 0) {
+        const lastMessage = newDisplayableHistory[newDisplayableHistory.length - 1]
 
-    const currentModelConfig = llmConfigs.find((config) => config.modelName === defaultLLMName)
-    if (!currentModelConfig) {
-      throw new Error(`No model config found for model: ${defaultLLMName}`)
-    }
+        if (lastMessage.role === 'assistant') {
+          lastMessage.content += newContent
+          lastMessage.messageType = newMessageType
+        } else {
+          newDisplayableHistory.push({
+            role: 'assistant',
+            content: newContent,
+            messageType: newMessageType,
+            context: [],
+          })
+        }
+      } else {
+        newDisplayableHistory.push({
+          role: 'assistant',
+          content: newContent,
+          messageType: newMessageType,
+          context: [],
+        })
+      }
+      return {
+        id: prev!.id,
+        messages: newDisplayableHistory,
+      }
+    })
+  }
+
+  const getLLMResponse = async (prompt: string, chat: Chat | undefined) => {
+    const defaultLLMName = await window.llm.getDefaultLLMName()
 
     if (loadingResponse) return
     setLoadingResponse(true)
-    let newChatHistory = chatHistory
+    let newChatHistory = chat
     if (!newChatHistory || !newChatHistory.id) {
       const chatID = Date.now().toString()
       newChatHistory = {
         id: chatID,
-        displayableChatHistory: [],
+        messages: [],
       }
     }
     setCurrentChatHistory(newChatHistory)
-    newChatHistory.displayableChatHistory.push({
+    newChatHistory.messages.push({
       role: 'user',
       content: prompt,
       messageType: 'success',
@@ -269,7 +291,18 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
     })
     if (!newChatHistory) return
     posthog.capture('submitted_writing_assistant_message')
-    await window.llm.streamingLLMResponse(defaultLLMName, currentModelConfig, false, newChatHistory)
+    const llmClient = await resolveLLMClient(defaultLLMName)
+
+    const { textStream } = await streamText({
+      model: llmClient,
+      messages: newChatHistory.messages,
+    })
+
+    // eslint-disable-next-line no-restricted-syntax
+    for await (const textPart of textStream) {
+      appendNewContentToMessageHistory(newChatHistory.id, textPart, 'success')
+    }
+
     setLoadingResponse(false)
   }
 
@@ -316,72 +349,7 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
     await getLLMResponse(prompt, currentChatHistory)
   }
 
-  useEffect(() => {
-    const appendNewContentToMessageHistory = (
-      chatID: string,
-      newContent: string,
-      newMessageType: 'success' | 'error',
-    ) => {
-      setCurrentChatHistory((prev: ChatHistory | undefined) => {
-        if (chatID !== prev?.id) return prev
-        const newDisplayableHistory = prev?.displayableChatHistory || []
-        if (newDisplayableHistory.length > 0) {
-          const lastMessage = newDisplayableHistory[newDisplayableHistory.length - 1]
-
-          if (lastMessage.role === 'assistant') {
-            lastMessage.content += newContent
-            lastMessage.messageType = newMessageType
-          } else {
-            newDisplayableHistory.push({
-              role: 'assistant',
-              content: newContent,
-              messageType: newMessageType,
-              context: [],
-            })
-          }
-        } else {
-          newDisplayableHistory.push({
-            role: 'assistant',
-            content: newContent,
-            messageType: newMessageType,
-            context: [],
-          })
-        }
-        return {
-          id: prev!.id,
-          displayableChatHistory: newDisplayableHistory,
-          openAIChatHistory: newDisplayableHistory.map((message) => ({
-            role: message.role,
-            content: message.content,
-          })),
-        }
-      })
-    }
-    const handleOpenAIChunk = async (receivedChatID: string, chunk: ChatCompletionChunk) => {
-      const newContent = chunk.choices[0].delta.content ?? ''
-      if (newContent) {
-        appendNewContentToMessageHistory(receivedChatID, newContent, 'success')
-      }
-    }
-
-    const handleAnthropicChunk = async (receivedChatID: string, chunk: MessageStreamEvent) => {
-      const newContent = chunk.type === 'content_block_delta' ? (chunk.delta.text ?? '') : ''
-      if (newContent) {
-        appendNewContentToMessageHistory(receivedChatID, newContent, 'success')
-      }
-    }
-
-    const removeOpenAITokenStreamListener = window.ipcRenderer.receive('openAITokenStream', handleOpenAIChunk)
-
-    const removeAnthropicTokenStreamListener = window.ipcRenderer.receive('anthropicTokenStream', handleAnthropicChunk)
-
-    return () => {
-      removeOpenAITokenStreamListener()
-      removeAnthropicTokenStreamListener()
-    }
-  }, [setCurrentChatHistory])
-
-  function getClassNames(message: ChatMessageToDisplay) {
+  function getClassNames(message: ReorChatMessage) {
     if (message.messageType === 'error') {
       return 'bg-red-100 text-red-800'
     }
@@ -479,9 +447,9 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
                 rehypePlugins={[rehypeRaw]}
                 className={`markdown-content break-words rounded-md p-1 ${getClassNames(lastAssistantMessage)}`}
               >
-                {lastAssistantMessage.visibleContent
+                {lastAssistantMessage.visibleContent || typeof lastAssistantMessage.content !== 'string'
                   ? lastAssistantMessage.visibleContent
-                  : formatOpenAIMessageContentIntoString(lastAssistantMessage.content)}
+                  : lastAssistantMessage.content}
               </ReactMarkdown>
             )}
           </div>

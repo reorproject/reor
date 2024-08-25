@@ -13,12 +13,12 @@ interface FlashcardCoreProps {
   setCurrentSelectedFlashcard: (current: number) => void
 }
 
-const FlashcardCore = ({
+const FlashcardCore: React.FC<FlashcardCoreProps> = ({
   flashcardQAPairs,
   setFlashcardQAPairs,
   currentSelectedFlashcard,
   setCurrentSelectedFlashcard,
-}: FlashcardCoreProps) => {
+}) => {
   const updateFlashcardUnderReview = (flashcardSelected: number, updatedFlashcard: FlashcardQAPairUI) => {
     const updatedPairs = [...flashcardQAPairs]
     updatedPairs[flashcardSelected] = updatedFlashcard

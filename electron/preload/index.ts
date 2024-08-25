@@ -3,24 +3,16 @@ import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
-  HardwareConfig,
   LLMConfig,
+  LLMAPIConfig,
   LLMGenerationParameters,
   Tab,
 } from 'electron/main/electron-store/storeConfig'
-import {
-  AugmentPromptWithFileProps,
-  FileInfoNode,
-  FileInfoTree,
-  RenameFileProps,
-  WriteFileProps,
-} from 'electron/main/filesystem/types'
-import { PromptWithContextLimit } from 'electron/main/llm/contextLimit'
-import { BasePromptRequirements, PromptWithRagResults } from 'electron/main/vector-database/ipcHandlers'
+import { FileInfoNode, FileInfoTree, RenameFileProps, WriteFileProps } from 'electron/main/filesystem/types'
 import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema'
 
 import { ChatHistoryMetadata } from '@/components/Chat/hooks/use-chat-history'
-import { ChatHistory } from '@/components/Chat/chatUtils'
+import { Chat } from '@/components/Chat/chatUtils'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type IPCHandler<T extends (...args: any[]) => any> = (...args: Parameters<T>) => Promise<ReturnType<T>>
@@ -40,12 +32,6 @@ const database = {
     'delete-lance-db-entries-by-filepath',
   ),
   indexFilesInDirectory: createIPCHandler<() => Promise<void>>('index-files-in-directory'),
-  augmentPromptWithTemporalAgent: createIPCHandler<(args: BasePromptRequirements) => Promise<PromptWithRagResults>>(
-    'augment-prompt-with-temporal-agent',
-  ),
-  augmentPromptWithFlashcardAgent: createIPCHandler<(args: BasePromptRequirements) => Promise<PromptWithRagResults>>(
-    'augment-prompt-with-flashcard-agent',
-  ),
   getDatabaseFields: createIPCHandler<() => Promise<Record<string, string>>>('get-database-fields'),
 }
 
@@ -78,8 +64,6 @@ const electronStore = {
   setNoOfRAGExamples: createIPCHandler<(noOfExamples: number) => Promise<void>>('set-no-of-rag-examples'),
   getChunkSize: createIPCHandler<() => Promise<number>>('get-chunk-size'),
   setChunkSize: createIPCHandler<(chunkSize: number) => Promise<void>>('set-chunk-size'),
-  getHardwareConfig: createIPCHandler<() => Promise<HardwareConfig>>('get-hardware-config'),
-  setHardwareConfig: createIPCHandler<(config: HardwareConfig) => Promise<void>>('set-hardware-config'),
   getLLMGenerationParams: createIPCHandler<() => Promise<LLMGenerationParameters>>('get-llm-generation-params'),
   setLLMGenerationParams:
     createIPCHandler<(params: LLMGenerationParameters) => Promise<void>>('set-llm-generation-params'),
@@ -89,10 +73,10 @@ const electronStore = {
   setSpellCheckMode: createIPCHandler<(isSpellCheck: boolean) => Promise<void>>('set-spellcheck-mode'),
   getHasUserOpenedAppBefore: createIPCHandler<() => Promise<boolean>>('has-user-opened-app-before'),
   setHasUserOpenedAppBefore: createIPCHandler<() => Promise<void>>('set-user-has-opened-app-before'),
-  getAllChatHistories: createIPCHandler<() => Promise<ChatHistory[]>>('get-all-chat-histories'),
-  updateChatHistory: createIPCHandler<(chatHistory: ChatHistory) => Promise<void>>('update-chat-history'),
+  getAllChatHistories: createIPCHandler<() => Promise<Chat[]>>('get-all-chat-histories'),
+  updateChatHistory: createIPCHandler<(chatHistory: Chat) => Promise<void>>('update-chat-history'),
   removeChatHistoryAtID: createIPCHandler<(chatID: string) => Promise<void>>('remove-chat-history-at-id'),
-  getChatHistory: createIPCHandler<(chatID: string) => Promise<ChatHistory>>('get-chat-history'),
+  getChatHistory: createIPCHandler<(chatID: string) => Promise<Chat>>('get-chat-history'),
   getSBCompact: createIPCHandler<() => Promise<boolean>>('get-sb-compact'),
   setSBCompact: createIPCHandler<(isSBCompact: boolean) => Promise<void>>('set-sb-compact'),
   getDisplayMarkdown: createIPCHandler<() => Promise<boolean>>('get-display-markdown'),
@@ -125,15 +109,8 @@ const fileSystem = {
   checkFileExists: createIPCHandler<(filePath: string) => Promise<boolean>>('check-file-exists'),
   deleteFile: createIPCHandler<(filePath: string) => Promise<void>>('delete-file'),
   moveFileOrDir: createIPCHandler<(sourcePath: string, destinationPath: string) => Promise<void>>('move-file-or-dir'),
-  augmentPromptWithFile:
-    createIPCHandler<(augmentPromptWithFileProps: AugmentPromptWithFileProps) => Promise<PromptWithContextLimit>>(
-      'augment-prompt-with-file',
-    ),
   getFilesystemPathsAsDBItems: createIPCHandler<(paths: string[]) => Promise<DBEntry[]>>(
     'get-filesystem-paths-as-db-items',
-  ),
-  generateFlashcardsWithFile: createIPCHandler<(flashcardWithFileProps: AugmentPromptWithFileProps) => Promise<string>>(
-    'generate-flashcards-from-file',
   ),
 }
 
@@ -148,29 +125,23 @@ const path = {
   ),
   pathSep: createIPCHandler<() => Promise<string>>('path-sep'),
   getAllFilenamesInDirectory: createIPCHandler<(dirName: string) => Promise<string[]>>('get-files-in-directory'),
-  getAllFilenamesInDirectoryRecursively: createIPCHandler<(dirName: string) => Promise<string[]>>(
-    'get-files-in-directory-recursive',
-  ),
 }
 
 const llm = {
   streamingLLMResponse:
     createIPCHandler<
-      (llmName: string, llmConfig: LLMConfig, isJSONMode: boolean, chatHistory: ChatHistory) => Promise<string>
+      (llmName: string, llmConfig: LLMAPIConfig, isJSONMode: boolean, chatHistory: Chat) => Promise<string>
     >('streaming-llm-response'),
 
   getLLMConfigs: createIPCHandler<() => Promise<LLMConfig[]>>('get-llm-configs'),
-  pullOllamaModel: createIPCHandler<(modelName: string) => Promise<void>>('pull-ollama-model'),
-  addOrUpdateLLM: createIPCHandler<(modelConfig: LLMConfig) => Promise<void>>('add-or-update-llm'),
+  getLLMAPIConfigs: createIPCHandler<() => Promise<LLMAPIConfig[]>>('get-llm-api-configs'),
+  addOrUpdateLLMConfig: createIPCHandler<(model: LLMConfig) => Promise<void>>('add-or-update-llm-config'),
+  addOrUpdateLLMAPIConfig:
+    createIPCHandler<(modelConfig: LLMAPIConfig) => Promise<void>>('add-or-update-llm-api-config'),
   removeLLM: createIPCHandler<(modelNameToDelete: string) => Promise<void>>('remove-llm'),
   setDefaultLLM: createIPCHandler<(modelName: string) => Promise<void>>('set-default-llm'),
   getDefaultLLMName: createIPCHandler<() => Promise<string>>('get-default-llm-name'),
-  sliceListOfStringsToContextLength: createIPCHandler<(strings: string[], llmName: string) => Promise<string[]>>(
-    'slice-list-of-strings-to-context-length',
-  ),
-  sliceStringToContextLength: createIPCHandler<(inputString: string, llmName: string) => Promise<string>>(
-    'slice-string-to-context-length',
-  ),
+  pullOllamaModel: createIPCHandler<(modelName: string) => Promise<void>>('pull-ollama-model'),
 }
 
 // Expose to renderer process

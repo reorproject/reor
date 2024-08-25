@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 
-import CloudLLMSetupModal, { CloudLLMSetupModalProps } from '../modals/CloudLLMSetup'
+import DefaultLLMAPISetupModal, { CloudLLMSetupModalProps } from '../modals/DefaultLLMAPISetupModal'
 import NewOllamaModelModal from '../modals/NewOllamaModel'
-import RemoteLLMSetupModal from '../modals/RemoteLLMSetup'
+import RemoteLLMSetupModal from '../modals/CustomLLMAPISetup'
 
 const useModals = () => {
   const [modals, setModals] = useState({
@@ -10,14 +10,14 @@ const useModals = () => {
     remoteLLM: { isOpen: false, Component: RemoteLLMSetupModal },
     openai: {
       isOpen: false,
-      Component: ({ isOpen, onClose, refreshLLMs }: Omit<CloudLLMSetupModalProps, 'LLMType'>) => (
-        <CloudLLMSetupModal isOpen={isOpen} onClose={onClose} refreshLLMs={refreshLLMs} LLMType="openai" />
+      Component: ({ isOpen, onClose }: Omit<CloudLLMSetupModalProps, 'apiInterface'>) => (
+        <DefaultLLMAPISetupModal isOpen={isOpen} onClose={onClose} apiInterface="openai" />
       ),
     },
     anthropic: {
       isOpen: false,
-      Component: ({ isOpen, onClose, refreshLLMs }: Omit<CloudLLMSetupModalProps, 'LLMType'>) => (
-        <CloudLLMSetupModal isOpen={isOpen} onClose={onClose} refreshLLMs={refreshLLMs} LLMType="anthropic" />
+      Component: ({ isOpen, onClose }: Omit<CloudLLMSetupModalProps, 'apiInterface'>) => (
+        <DefaultLLMAPISetupModal isOpen={isOpen} onClose={onClose} apiInterface="anthropic" />
       ),
     },
   })
