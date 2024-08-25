@@ -99,14 +99,16 @@ const RenameNoteModal: React.FC<RenameNoteModalProps> = ({ isOpen, fullNoteName,
           onKeyDown={handleKeyPress}
           placeholder="New Note Name"
         />
-        <Button
-          className="mb-2 mt-3 h-10 w-[80px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
-          onClick={sendNoteRename}
-          placeholder=""
-        >
-          Rename
-        </Button>
-        {errorMessage && <p className="text-xs text-red-500">{errorMessage}</p>}
+        <div className="flex items-center gap-3">
+          <Button
+            className="mb-2 mt-3 h-10 w-[80px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
+            onClick={sendNoteRename}
+            placeholder=""
+          >
+            Rename
+          </Button>
+          {errorMessage && <p className="text-xs text-red-500">{errorMessage}</p>}
+        </div>
       </div>
     </ReorModal>
   )

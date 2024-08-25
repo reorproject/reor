@@ -32,22 +32,10 @@ export const getInvalidCharacterInFilePath = async (filename: string): Promise<s
 }
 
 export const getInvalidCharacterInFileName = async (filename: string): Promise<string | null> => {
-  let invalidCharacters: RegExp
-  const platform = await window.electronUtils.getPlatform()
+  // eslint-disable-next-line no-useless-escape
+  const invalidCharacters = /[<>:"\/\\|?*\.\[\]\{\}!@#$%^&()+=,;'`~]/
 
-  switch (platform) {
-    case 'win32':
-      invalidCharacters = /["*/:<>?\\|]/
-      break
-    case 'darwin':
-      invalidCharacters = /[/:]/
-      break
-    default:
-      invalidCharacters = /[/]/
-      break
-  }
-
-  const idx = filename.search(invalidCharacters)
-
-  return idx === -1 ? null : filename[idx]
+  // Check if the filename contains any invalid characters
+  const match = filename.match(invalidCharacters)
+  return match ? match[0] : null
 }
