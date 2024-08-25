@@ -9,7 +9,7 @@ import { anonymizeChatFiltersForPosthog, getChatHistoryContext, resolveLLMClient
 
 import SimilarEntriesComponent from '../Sidebars/SemanticSidebar/SimilarEntriesComponent'
 import '../../styles/chat.css'
-import ChatInterface, { AskOptions } from './ChatInterface'
+import ChatMessages, { AskOptions } from './ChatMessages'
 import { Chat, ChatFilters } from './types'
 
 interface ChatWrapperProps {
@@ -195,7 +195,7 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({
   return (
     <div className="flex size-full items-center justify-center">
       <div className="mx-auto flex size-full flex-col overflow-hidden border-y-0 border-l-[0.001px] border-r-0 border-solid border-neutral-700 bg-dark-gray-c-eleven">
-        <ChatInterface
+        <ChatMessages
           chatContainerRef={chatContainerRef}
           openFileAndOpenEditor={openFileAndOpenEditor}
           currentChatHistory={currentChatHistory}

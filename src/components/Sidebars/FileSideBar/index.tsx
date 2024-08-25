@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react'
 import { FileInfoNode, FileInfoTree } from 'electron/main/filesystem/types'
 import { FixedSizeList as List, ListChildComponentProps } from 'react-window'
 
-import RenameDirModal from '../RenameDirectory'
-import RenameNoteModal from '../RenameNote'
 import FileItem from './FileItem'
 import { isFileNodeDirectory } from './utils'
+import RenameNoteModal from '@/components/File/RenameNote'
+import RenameDirModal from '@/components/File/RenameDirectory'
 
 const handleDragStartImpl = (e: React.DragEvent, file: FileInfoNode) => {
   e.dataTransfer.setData('text/plain', file.path)

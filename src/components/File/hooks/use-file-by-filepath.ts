@@ -26,7 +26,7 @@ import HighlightExtension, { HighlightData } from '@/components/Editor/Highlight
 import { RichTextLink } from '@/components/Editor/RichTextLink'
 import SearchAndReplace from '@/components/Editor/SearchAndReplace'
 import 'katex/dist/katex.min.css'
-import '../tiptap.scss'
+import '../../../styles/tiptap.scss'
 import welcomeNote from '../utils'
 
 const useFileByFilepath = () => {

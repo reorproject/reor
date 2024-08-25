@@ -7,7 +7,7 @@ import rehypeRaw from 'rehype-raw'
 
 import { FaRegUserCircle } from 'react-icons/fa'
 import AddContextFiltersModal from './AddContextFiltersModal'
-import PromptSuggestion from './Chat-Prompts'
+import PromptSuggestion from './ChatPrompts'
 
 import LoadingDots from '@/utils/animations'
 import '../../styles/chat.css'
@@ -25,7 +25,7 @@ export const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
   ],
 }
 
-interface ChatInterfaceProps {
+interface ChatMessagesProps {
   chatContainerRef: MutableRefObject<HTMLDivElement | null>
   openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => Promise<void>
   currentChatHistory: Chat | undefined
@@ -41,7 +41,7 @@ interface ChatInterfaceProps {
   loadAnimation: boolean
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({
+const ChatMessages: React.FC<ChatMessagesProps> = ({
   chatContainerRef,
   openFileAndOpenEditor,
   currentChatHistory,
@@ -195,4 +195,4 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   )
 }
 
-export default ChatInterface
+export default ChatMessages

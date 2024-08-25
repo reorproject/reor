@@ -8,13 +8,13 @@ import { TypeAnimation } from 'react-type-animation'
 import { generateObject } from 'ai'
 import ReorModal from '../Common/Modal'
 import FilesSuggestionsDisplay from '../Editor/BacklinkSuggestionsDisplay'
-import useFileInfoTree from '../File/FileSideBar/hooks/use-file-info-tree'
 import useFileByFilepath from '../File/hooks/use-file-by-filepath'
 
 import FlashcardCore from './FlashcardsCore'
 import { FlashcardQAPairSchema, FlashcardQAPairUI } from './types'
 import { storeFlashcardPairsAsJSON } from './utils'
 import { resolveLLMClient } from '../Chat/utils'
+import useFileInfoTree from '../Sidebars/FileSideBar/hooks/use-file-info-tree'
 
 interface FlashcardCreateModalProps {
   isOpen: boolean
