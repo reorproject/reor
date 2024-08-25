@@ -91,7 +91,6 @@ Make sure you generate the flashcards in the correct format and that are relevan
     setIsLoadingFlashcards(false)
 
     storeFlashcardPairsAsJSON(flashcardUIPairs, selectedFile)
-    throw new Error('Not implemented')
   }
 
   // find all available files
