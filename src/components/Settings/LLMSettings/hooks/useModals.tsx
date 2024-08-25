@@ -10,13 +10,13 @@ const useModals = () => {
     remoteLLM: { isOpen: false, Component: RemoteLLMSetupModal },
     openai: {
       isOpen: false,
-      Component: ({ isOpen, onClose }: Omit<CloudLLMSetupModalProps, 'LLMType'>) => (
+      Component: ({ isOpen, onClose }: Omit<CloudLLMSetupModalProps, 'apiInterface'>) => (
         <DefaultLLMAPISetupModal isOpen={isOpen} onClose={onClose} apiInterface="openai" />
       ),
     },
     anthropic: {
       isOpen: false,
-      Component: ({ isOpen, onClose }: Omit<CloudLLMSetupModalProps, 'LLMType'>) => (
+      Component: ({ isOpen, onClose }: Omit<CloudLLMSetupModalProps, 'apiInterface'>) => (
         <DefaultLLMAPISetupModal isOpen={isOpen} onClose={onClose} apiInterface="anthropic" />
       ),
     },

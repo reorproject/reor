@@ -8,7 +8,7 @@ import rehypeRaw from 'rehype-raw'
 import { FaRegUserCircle } from 'react-icons/fa'
 import AddContextFiltersModal from './AddContextFiltersModal'
 import PromptSuggestion from './Chat-Prompts'
-import { ChatFilters, Chat, ReorChatMessage, formatOpenAIMessageContentIntoString } from './chatUtils'
+import { ChatFilters, Chat, ReorChatMessage } from './chatUtils'
 
 import LoadingDots from '@/utils/animations'
 import '../../styles/chat.css'
@@ -63,7 +63,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
   }
 
   const getDisplayMessage = (message: ReorChatMessage): string | undefined => {
-    return message.visibleContent ? message.visibleContent : formatOpenAIMessageContentIntoString(message.content)
+    return message.visibleContent || typeof message.content !== 'string' ? message.visibleContent : message.content
   }
 
   const copyToClipboard = (message: ReorChatMessage) => {
@@ -104,9 +104,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         rehypePlugins={[rehypeRaw]}
                         className="max-w-[95%] break-words"
                       >
-                        {message.visibleContent
+                        {message.visibleContent || typeof message.content !== 'string'
                           ? message.visibleContent
-                          : formatOpenAIMessageContentIntoString(message.content)}
+                          : message.content}
                       </ReactMarkdown>
                       {message.role === 'assistant' && (
                         <div className="flex">

@@ -5,13 +5,6 @@ import { Button } from '@material-tailwind/react'
 import { APIInterface, LLM, LLMAPIConfig } from 'electron/main/electron-store/storeConfig'
 import ReorModal from '../../../Common/Modal'
 
-export interface CloudLLMSetupModalProps {
-  isOpen: boolean
-  onClose: () => void
-  apiInterface: APIInterface
-  // refreshLLMs?: () => void
-}
-
 export const openAIDefaultAPIName = 'OpenAI'
 export const anthropicDefaultAPIName = 'Anthropic'
 
@@ -45,6 +38,12 @@ export const anthropicDefaultModels: LLM[] = [
     apiName: anthropicDefaultAPIName,
   },
 ]
+export interface CloudLLMSetupModalProps {
+  isOpen: boolean
+  onClose: () => void
+  apiInterface: APIInterface
+  // refreshLLMs?: () => void
+}
 
 const DefaultLLMAPISetupModal: React.FC<CloudLLMSetupModalProps> = ({ isOpen, onClose, apiInterface }) => {
   const [apiKey, setAPIKey] = useState('')

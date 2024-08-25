@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
 
-import { LLMAPIConfig } from 'electron/main/electron-store/storeConfig'
+import { LLM } from 'electron/main/electron-store/storeConfig'
 
 const useLLMConfigs = () => {
-  const [llmConfigs, setLLMConfigs] = useState<LLMAPIConfig[]>([])
+  const [llmConfigs, setLLMConfigs] = useState<LLM[]>([])
   const [defaultLLM, setDefaultLLM] = useState<string>('')
 
   const fetchAndUpdateModelConfigs = async () => {

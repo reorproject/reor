@@ -1,2 +1,2 @@
 echo "\nRunning some lint checks on your (hopefully) beautiful code\n"
-# npm run lint:fix && npm run type-check
+npm run lint:fix && npm run type-check

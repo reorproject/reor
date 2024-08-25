@@ -136,8 +136,8 @@ export const getDisplayableChatName = (chat: Chat): string => {
     return lastMsg.visibleContent.slice(0, 30)
   }
 
-  const lastMessage = formatOpenAIMessageContentIntoString(lastMsg.content)
-  if (!lastMessage || lastMessage === '') {
+  const lastMessage = lastMsg.content
+  if (!lastMessage || lastMessage === '' || typeof lastMessage !== 'string') {
     return 'Empty Chat'
   }
   return lastMessage.slice(0, 30)

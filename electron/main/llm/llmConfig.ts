@@ -48,7 +48,6 @@ export async function addOrUpdateLLMAPIInStore(store: Store<StoreSchema>, newAPI
 }
 
 export async function addOrUpdateLLMInStore(store: Store<StoreSchema>, newLLM: LLM): Promise<void> {
-  console.log('newLLM', newLLM)
   const existingLLMs = store.get(StoreKeys.LLMs) || []
 
   const foundLLM = existingLLMs.find((llm) => llm.modelName === newLLM.modelName)

@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react'
 import posthog from 'posthog-js'
 
 import '../styles/global.css'
-import { toast } from 'react-toastify'
 import ChatWrapper from './Chat/ChatWrapper'
 import { useChatHistory } from './Chat/hooks/use-chat-history'
 import ResizableComponent from './Common/ResizableComponent'
@@ -26,13 +25,6 @@ import { ModalProvider } from './Providers/ModalProvider'
 //   // compatibility: 'strict', // strict mode, enable when using the OpenAI API
 //   apiKey: '',
 // })
-
-window.addEventListener('error', (event) => {
-  console.error('Uncaught exception:', event.error)
-  // Show error to user, log it, etc.
-  // You could call a function here to show a toast notification
-  toast.error(`Error: ${event.error}`)
-})
 
 const UNINITIALIZED_STATE = 'UNINITIALIZED_STATE'
 

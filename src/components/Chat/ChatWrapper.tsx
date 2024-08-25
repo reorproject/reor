@@ -166,6 +166,7 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({
         messages: outputChat.messages,
       })
 
+      // eslint-disable-next-line no-restricted-syntax
       for await (const textPart of textStream) {
         appendNewContentToMessageHistory(outputChat.id, textPart, 'success')
       }
@@ -188,7 +189,7 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({
     } else {
       setPromptSelected(false)
     }
-  }, [currentChatHistory?.id])
+  }, [currentChatHistory, currentChatHistory?.id, promptSelected])
 
   useEffect(() => {
     // Handle prompt selection and message submission separately

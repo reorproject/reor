@@ -1,10 +1,10 @@
 import React from 'react'
 
 import ReactDOM from 'react-dom/client'
+import { toast } from 'react-toastify'
 
 import App from './App'
 import './styles/global.css'
-import { toast } from 'react-toastify'
 
 function handleError(error: Error | string | unknown) {
   // Implement your error reporting logic here

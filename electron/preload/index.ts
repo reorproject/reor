@@ -8,15 +8,7 @@ import {
   LLMGenerationParameters,
   Tab,
 } from 'electron/main/electron-store/storeConfig'
-import {
-  AugmentPromptWithFileProps,
-  FileInfoNode,
-  FileInfoTree,
-  RenameFileProps,
-  WriteFileProps,
-} from 'electron/main/filesystem/types'
-import { PromptWithContextLimit } from 'electron/main/llm/contextLimit'
-import { BasePromptRequirements, PromptWithRagResults } from 'electron/main/vector-database/ipcHandlers'
+import { FileInfoNode, FileInfoTree, RenameFileProps, WriteFileProps } from 'electron/main/filesystem/types'
 import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema'
 
 import { ChatHistoryMetadata } from '@/components/Chat/hooks/use-chat-history'
@@ -40,9 +32,6 @@ const database = {
     'delete-lance-db-entries-by-filepath',
   ),
   indexFilesInDirectory: createIPCHandler<() => Promise<void>>('index-files-in-directory'),
-  augmentPromptWithFlashcardAgent: createIPCHandler<(args: BasePromptRequirements) => Promise<PromptWithRagResults>>(
-    'augment-prompt-with-flashcard-agent',
-  ),
   getDatabaseFields: createIPCHandler<() => Promise<Record<string, string>>>('get-database-fields'),
 }
 
@@ -120,15 +109,8 @@ const fileSystem = {
   checkFileExists: createIPCHandler<(filePath: string) => Promise<boolean>>('check-file-exists'),
   deleteFile: createIPCHandler<(filePath: string) => Promise<void>>('delete-file'),
   moveFileOrDir: createIPCHandler<(sourcePath: string, destinationPath: string) => Promise<void>>('move-file-or-dir'),
-  augmentPromptWithFile:
-    createIPCHandler<(augmentPromptWithFileProps: AugmentPromptWithFileProps) => Promise<PromptWithContextLimit>>(
-      'augment-prompt-with-file',
-    ),
   getFilesystemPathsAsDBItems: createIPCHandler<(paths: string[]) => Promise<DBEntry[]>>(
     'get-filesystem-paths-as-db-items',
-  ),
-  generateFlashcardsWithFile: createIPCHandler<(flashcardWithFileProps: AugmentPromptWithFileProps) => Promise<string>>(
-    'generate-flashcards-from-file',
   ),
 }
 

@@ -1,13 +1,13 @@
 import React from 'react'
 
-import { LLMAPIConfig } from 'electron/main/electron-store/storeConfig'
+import { LLM } from 'electron/main/electron-store/storeConfig'
 import posthog from 'posthog-js'
 
 import CustomSelect from '../../Common/Select'
 
 interface DefaultLLMSelectorProps {
   onModelChange: (model: string) => void
-  llmConfigs: LLMAPIConfig[]
+  llmConfigs: LLM[]
   defaultLLM: string
   setDefaultLLM: (model: string) => void
 }

@@ -10,29 +10,6 @@ export const CONVERT_TO_FLASHCARDS_FROM_CHAT = 'Convert the above message to fla
 
 const FLASHCARD_DIR = '.flashcards'
 
-export const canBeParsedAsFlashcardQAPair = (line: string): boolean =>
-  line.includes(QUESTION_FORMAT) && line.includes(ANSWER_FORMAT)
-
-export const parseFlashcardQAPair = (line: string): FlashcardQAPair => {
-  if (!canBeParsedAsFlashcardQAPair(line)) {
-    toast.error(`Invalid flashcard format. It should include both ${QUESTION_FORMAT} and ${ANSWER_FORMAT}`)
-  }
-  const [question, answer] = line.split('<br/>') // it is always in the order of Q: and A:
-  return {
-    question: question.replace(QUESTION_FORMAT, '').trim(),
-    answer: answer.replace(ANSWER_FORMAT, '').trim(),
-  }
-}
-
-export const parseChatMessageIntoFlashcardPairs = (
-  messageToBeParsed: string,
-  FILE_REFERENCE_DELIMITER: string,
-): FlashcardQAPair[] => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [actualOutput, fileReferences] = messageToBeParsed.split(FILE_REFERENCE_DELIMITER)
-  return actualOutput.split('<br/><br/>').map((line) => parseFlashcardQAPair(line))
-}
-
 export const storeFlashcardPairsAsJSON = async (qnaPairs: FlashcardQAPair[], currentFilePath: string | null) => {
   if (!currentFilePath) {
     toast.error('No file currently selected. Please open a file.')
