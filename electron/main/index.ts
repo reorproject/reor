@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import { app, BrowserWindow } from 'electron'
 import Store from 'electron-store'
 
+import * as Sentry from '@sentry/electron/main'
 import errorToStringMainProcess from './common/error'
 import WindowsManager from './common/windowManager'
 import { registerStoreHandlers } from './electron-store/ipcHandlers'
@@ -13,6 +14,10 @@ import registerFileHandlers from './filesystem/ipcHandlers'
 import { ollamaService, registerLLMSessionHandlers } from './llm/ipcHandlers'
 import registerPathHandlers from './path/ipcHandlers'
 import { registerDBSessionHandlers } from './vector-database/ipcHandlers'
+
+Sentry.init({
+  dsn: 'https://a764a6135d25ba91f0b25c0252be52f3@o4507840138903552.ingest.us.sentry.io/4507840140410880',
+})
 
 const store = new Store<StoreSchema>()
 // store.clear(); // clear store for testing CAUTION: THIS WILL DELETE YOUR CHAT HISTORY
@@ -63,10 +68,12 @@ app.on('activate', () => {
 
 process.on('uncaughtException', (error: Error) => {
   windowsManager.appendNewErrorToDisplayInWindow(errorToStringMainProcess(error))
+  Sentry.captureException(error)
 })
 
 process.on('unhandledRejection', (reason: unknown) => {
   windowsManager.appendNewErrorToDisplayInWindow(errorToStringMainProcess(reason))
+  Sentry.captureException(reason as Error)
 })
 
 registerLLMSessionHandlers(store)
