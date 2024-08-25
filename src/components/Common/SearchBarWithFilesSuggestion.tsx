@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import InEditorBacklinkSuggestionsDisplay, { SuggestionsState } from '../Editor/BacklinkSuggestionsDisplay'
-import useFileInfoTree from '../File/FileSideBar/hooks/use-file-info-tree'
+import useFileInfoTree from '../Sidebars/FileSideBar/hooks/use-file-info-tree'
 
 interface Props {
   vaultDirectory: string

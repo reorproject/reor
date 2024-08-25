@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { PiSidebar, PiSidebarFill } from 'react-icons/pi'
 import DraggableTabs from '../Tabs/TabBar'
-import FileHistoryNavigator from '../File/FileSideBar/FileHistoryBar'
 import { ModalProvider } from '../../providers/ModalProvider'
+import FileHistoryNavigator from '../Sidebars/FileSideBar/FileHistoryBar'
 
 export const titleBarHeight = '30px'
 

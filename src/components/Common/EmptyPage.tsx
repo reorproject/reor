@@ -1,8 +1,8 @@
 import React from 'react'
 import { ImFileEmpty } from 'react-icons/im'
-import { useModalOpeners } from '../providers/ModalProvider'
-import NewNoteComponent from './File/NewNote'
-import NewDirectoryComponent from './File/NewDirectory'
+import { useModalOpeners } from '../../providers/ModalProvider'
+import NewNoteComponent from '../File/NewNote'
+import NewDirectoryComponent from '../File/NewDirectory'
 
 interface EmptyPageProps {
   openFileAndOpenEditor: (filePath: string, optionalContentToWriteOnCreate?: string) => Promise<void>

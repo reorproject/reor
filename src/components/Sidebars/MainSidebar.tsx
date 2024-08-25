@@ -6,10 +6,10 @@ import posthog from 'posthog-js'
 
 import { ChatsSidebar } from '../Chat/ChatsSidebar'
 import { ChatHistoryMetadata } from '../Chat/hooks/use-chat-history'
-import { FileSidebar } from '../File/FileSideBar'
 
 import SearchComponent from './FileSidebarSearch'
 import { Chat, ChatFilters } from '../Chat/types'
+import { FileSidebar } from './FileSideBar'
 
 export type SidebarAbleToShow = 'files' | 'search' | 'chats'
 interface SidebarManagerProps {
