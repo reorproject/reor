@@ -4,9 +4,9 @@ import { createPortal } from 'react-dom'
 import { Tab } from 'electron/main/electron-store/storeConfig'
 import { removeFileExtension } from '@/utils/strings'
 import '../../styles/tab.css'
-import { useTabs } from '../Providers/TabProvider'
+import { useTabs } from '../../providers/TabProvider'
 import NewNoteComponent from '../File/NewNote'
-import { useModalOpeners } from '../Providers/ModalProvider'
+import { useModalOpeners } from '../../providers/ModalProvider'
 
 interface TooltipProps {
   filepath: string

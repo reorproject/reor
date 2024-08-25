@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { v4 as uuidv4 } from 'uuid'
 
 import { Tab } from 'electron/main/electron-store/storeConfig'
-import { SidebarAbleToShow } from '../Sidebars/MainSidebar'
+import { SidebarAbleToShow } from '../components/Sidebars/MainSidebar'
 
 interface TabProviderProps {
   children: ReactNode

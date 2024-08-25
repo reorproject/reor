@@ -3,7 +3,7 @@ import React from 'react'
 import { CheckCircleIcon, CogIcon } from '@heroicons/react/24/solid'
 import { Button } from '@material-tailwind/react'
 
-import useLLMConfigs from './hooks/useLLMConfigs'
+import useLLMConfigs from './hooks/use-llm-configs'
 import LLMSettingsContent from './LLMSettingsContent'
 
 import ReorModal from '@/components/Common/Modal'

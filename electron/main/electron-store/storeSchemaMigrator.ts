@@ -2,7 +2,7 @@ import Store from 'electron-store'
 
 import { StoreKeys, StoreSchema } from './storeConfig'
 import { defaultEmbeddingModelRepos } from '../vector-database/embeddings'
-import { defaultOllamaAPI } from '../llm/models/Ollama'
+import { defaultOllamaAPI } from '../llm/models/ollama'
 
 const currentSchemaVersion = 2
 

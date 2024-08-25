@@ -1,6 +1,6 @@
 import React from 'react'
 import { ImFileEmpty } from 'react-icons/im'
-import { useModalOpeners } from './Providers/ModalProvider'
+import { useModalOpeners } from '../providers/ModalProvider'
 import NewNoteComponent from './File/NewNote'
 import NewDirectoryComponent from './File/NewDirectory'
 

@@ -5,9 +5,9 @@ import { ProgressResponse } from 'ollama'
 import { LLMConfig, LLMAPIConfig, StoreKeys, StoreSchema } from '../electron-store/storeConfig'
 
 import { addOrUpdateLLMAPIInStore, removeLLM, getLLMConfigs, addOrUpdateLLMInStore } from './llmConfig'
-import AnthropicModelSessionService from './models/Anthropic'
-import OllamaService from './models/Ollama'
-import OpenAIModelSessionService from './models/OpenAI'
+import AnthropicModelSessionService from './models/anthropic'
+import OllamaService from './models/ollama'
+import OpenAIModelSessionService from './models/openAI'
 
 export const openAISession = new OpenAIModelSessionService()
 export const anthropicSession = new AnthropicModelSessionService()
