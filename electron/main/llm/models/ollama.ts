@@ -102,12 +102,8 @@ class OllamaService {
         throw new Error('Unsupported platform')
     }
     const exePath = path.join(exeDir, exeName)
-    try {
-      await this.execServe(exePath)
-      return OllamaServeType.PACKAGED
-    } catch (err) {
-      throw new Error(`Failed to start Ollama: ${err}`)
-    }
+    await this.execServe(exePath)
+    return OllamaServeType.PACKAGED
   }
 
   async execServe(_path: string) {

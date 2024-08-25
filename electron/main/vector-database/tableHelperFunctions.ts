@@ -1,7 +1,6 @@
 import * as fs from 'fs'
 
 import { chunkMarkdownByHeadingsAndByCharsIfBig } from '../common/chunking'
-import errorToStringMainProcess from '../common/error'
 import {
   GetFilesInfoList,
   GetFilesInfoTree,
@@ -132,40 +131,15 @@ export const RepopulateTableWithMissingItems = async (
   directoryPath: string,
   onProgress?: (progress: number) => void,
 ) => {
-  let filesInfoTree
+  const filesInfoTree = GetFilesInfoList(directoryPath)
 
-  try {
-    filesInfoTree = GetFilesInfoList(directoryPath)
-  } catch (error) {
-    throw new Error(`Error getting file info list: ${errorToStringMainProcess(error)}`)
-  }
-
-  let tableArray
-  try {
-    tableArray = await getTableAsArray(table)
-  } catch (error) {
-    throw new Error(`Error converting table to array: ${errorToStringMainProcess(error)}`)
-  }
-  let itemsToRemove
-  try {
-    itemsToRemove = await computeDBItemsToRemoveFromTable(filesInfoTree, tableArray)
-  } catch (error) {
-    throw new Error(`Error computing items to remove from table: ${errorToStringMainProcess(error)}`)
-  }
+  const tableArray = await getTableAsArray(table)
+  const itemsToRemove = await computeDBItemsToRemoveFromTable(filesInfoTree, tableArray)
 
   const filePathsToRemove = itemsToRemove.map((x) => x.notepath)
-  try {
-    await table.deleteDBItemsByFilePaths(filePathsToRemove)
-  } catch (error) {
-    throw new Error(`Error deleting items by file paths: ${errorToStringMainProcess(error)}`)
-  }
+  await table.deleteDBItemsByFilePaths(filePathsToRemove)
 
-  let dbItemsToAdd
-  try {
-    dbItemsToAdd = await computeDbItemsToAddOrUpdate(filesInfoTree, tableArray)
-  } catch (error) {
-    throw new Error(`Error computing DB items to add: ${errorToStringMainProcess(error)}`)
-  }
+  const dbItemsToAdd = await computeDbItemsToAddOrUpdate(filesInfoTree, tableArray)
 
   if (dbItemsToAdd.length === 0) {
     if (onProgress) onProgress(1)
@@ -173,18 +147,10 @@ export const RepopulateTableWithMissingItems = async (
   }
 
   const filePathsToDelete = dbItemsToAdd.map((x) => x[0].notepath)
-  try {
-    await table.deleteDBItemsByFilePaths(filePathsToDelete)
-  } catch (error) {
-    throw new Error(`Error deleting DB items by file paths: ${errorToStringMainProcess(error)}`)
-  }
+  await table.deleteDBItemsByFilePaths(filePathsToDelete)
 
   const flattenedItemsToAdd = dbItemsToAdd.flat()
-  try {
-    await table.add(flattenedItemsToAdd, onProgress)
-  } catch (error) {
-    throw new Error(`Error adding items to table: ${errorToStringMainProcess(error)}`)
-  }
+  await table.add(flattenedItemsToAdd, onProgress)
 
   if (onProgress) onProgress(1)
 }

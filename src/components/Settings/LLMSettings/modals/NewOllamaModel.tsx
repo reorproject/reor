@@ -53,7 +53,7 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({ isOpen, onClo
           error: errorMessage,
         },
       }))
-      toast.error(`${taggedModelName} download failed: ${errorMessage}`)
+      throw e
     }
   }
 

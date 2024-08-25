@@ -4,7 +4,6 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import Store from 'electron-store'
 import * as lancedb from 'vectordb'
 
-import errorToStringMainProcess from '../common/error'
 import WindowsManager from '../common/windowManager'
 import { getDefaultEmbeddingModelConfig } from '../electron-store/ipcHandlers'
 import { StoreSchema } from '../electron-store/storeConfig'
@@ -39,44 +38,29 @@ export const registerDBSessionHandlers = (store: Store<StoreSchema>, _windowMana
   })
 
   ipcMain.handle('index-files-in-directory', async (event) => {
-    try {
-      const windowInfo = windowManager.getWindowInfoForContents(event.sender)
-      if (!windowInfo) {
-        throw new Error('No window info found')
-      }
-      const defaultEmbeddingModelConfig = getDefaultEmbeddingModelConfig(store)
-      const dbPath = path.join(app.getPath('userData'), 'vectordb')
-      dbConnection = await lancedb.connect(dbPath)
-
-      await windowInfo.dbTableClient.initialize(
-        dbConnection,
-        windowInfo.vaultDirectoryForWindow,
-        defaultEmbeddingModelConfig,
-      )
-      await RepopulateTableWithMissingItems(
-        windowInfo.dbTableClient,
-        windowInfo.vaultDirectoryForWindow,
-        (progress) => {
-          event.sender.send('indexing-progress', progress)
-        },
-      )
-      const win = BrowserWindow.fromWebContents(event.sender)
-
-      if (win) {
-        windowManager.watcher = startWatchingDirectory(win, windowInfo.vaultDirectoryForWindow)
-        updateFileListForRenderer(win, windowInfo.vaultDirectoryForWindow)
-      }
-      event.sender.send('indexing-progress', 1)
-    } catch (error) {
-      let errorStr = ''
-
-      if (errorToStringMainProcess(error).includes('Embedding function error')) {
-        errorStr = `${error}. Please try downloading an embedding model from Hugging Face and attaching it in settings. More information can be found in settings.`
-      } else {
-        errorStr = `${error}. Please try restarting or open a Github issue.`
-      }
-      event.sender.send('error-to-display-in-window', errorStr)
+    const windowInfo = windowManager.getWindowInfoForContents(event.sender)
+    if (!windowInfo) {
+      throw new Error('No window info found')
     }
+    const defaultEmbeddingModelConfig = getDefaultEmbeddingModelConfig(store)
+    const dbPath = path.join(app.getPath('userData'), 'vectordb')
+    dbConnection = await lancedb.connect(dbPath)
+
+    await windowInfo.dbTableClient.initialize(
+      dbConnection,
+      windowInfo.vaultDirectoryForWindow,
+      defaultEmbeddingModelConfig,
+    )
+    await RepopulateTableWithMissingItems(windowInfo.dbTableClient, windowInfo.vaultDirectoryForWindow, (progress) => {
+      event.sender.send('indexing-progress', progress)
+    })
+    const win = BrowserWindow.fromWebContents(event.sender)
+
+    if (win) {
+      windowManager.watcher = startWatchingDirectory(win, windowInfo.vaultDirectoryForWindow)
+      updateFileListForRenderer(win, windowInfo.vaultDirectoryForWindow)
+    }
+    event.sender.send('indexing-progress', 1)
   })
 
   ipcMain.handle(

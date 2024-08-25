@@ -5,7 +5,6 @@ import { toast } from 'react-toastify'
 
 import ReorModal from '../Common/Modal'
 
-import errorToStringRendererProcess from '@/utils/error'
 import { getInvalidCharacterInFileName, removeFileExtension } from '@/utils/strings'
 
 export interface RenameNoteFuncProps {
@@ -52,33 +51,24 @@ const RenameNoteModal: React.FC<RenameNoteModalProps> = ({ isOpen, fullNoteName,
   }
 
   const sendNoteRename = async () => {
-    try {
-      if (errorMessage) {
-        return
-      }
-      if (!noteName) {
-        toast.error('Note name cannot be empty', {
-          className: 'mt-5',
-          closeOnClick: false,
-          draggable: false,
-        })
-        return
-      }
-
-      // get full path of note
-      await renameNote({
-        path: `${fullNoteName}`,
-        newNoteName: `${dirPrefix}${noteName}.${fileExtension}`,
-      })
-      onClose()
-    } catch (e) {
-      toast.error(errorToStringRendererProcess(e), {
+    if (errorMessage) {
+      return
+    }
+    if (!noteName) {
+      toast.error('Note name cannot be empty', {
         className: 'mt-5',
-        autoClose: false,
         closeOnClick: false,
         draggable: false,
       })
+      return
     }
+
+    // get full path of note
+    await renameNote({
+      path: `${fullNoteName}`,
+      newNoteName: `${dirPrefix}${noteName}.${fileExtension}`,
+    })
+    onClose()
   }
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {

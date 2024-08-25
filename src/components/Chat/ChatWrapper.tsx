@@ -112,7 +112,6 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({
     })
     let outputChat = currentChat
 
-    // try {
     if (loadingResponse || !userTextFieldInput.trim()) return
 
     setLoadingResponse(true)
