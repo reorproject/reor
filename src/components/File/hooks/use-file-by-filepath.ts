@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-use-before-define */
 import { useEffect, useRef, useState } from 'react'
-
+import { Extension } from '@tiptap/core'
 import { MathExtension } from '@aarkue/tiptap-math-extension'
 import Document from '@tiptap/extension-document'
 import Paragraph from '@tiptap/extension-paragraph'
@@ -136,7 +136,6 @@ const useFileByFilepath = () => {
     handleInitialStartup()
     window.ipcRenderer.receive('display-markdown-changed', handleChangeMarkdown)
   }, [])
-
   const editor = useEditor({
     autofocus: true,
 
@@ -144,7 +143,18 @@ const useFileByFilepath = () => {
       setNeedToWriteEditorContentToDisk(true)
       setNeedToIndexEditorContent(true)
     },
-    editorProps: {},
+    editorProps: { 
+      handleKeyDown(view, event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        view.dispatch(
+          view.state.tr.replaceSelectionWith(view.state.schema.nodes.hardBreak.create()).scrollIntoView()
+        );
+        return true;
+      }
+      return false;
+    },
+  },
     extensions: [
       StarterKit,
       Document,
@@ -332,6 +342,9 @@ function getMarkdown(editor: Editor) {
   const modifiedMarkdown = originalMarkdown
     .replace(/\\\[/g, '[') // Replaces \[ with [
     .replace(/\\\]/g, ']') // Replaces \] wi ]
+
+    console.log("Markdown,  ",modifiedMarkdown);
+    
 
   return modifiedMarkdown
 }
