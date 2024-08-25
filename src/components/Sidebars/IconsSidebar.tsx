@@ -13,7 +13,7 @@ import NewNoteComponent from '../File/NewNote'
 import FlashcardMenuModal from '../Flashcard/FlashcardMenuModal'
 import SettingsModal from '../Settings/Settings'
 import { SidebarAbleToShow } from './MainSidebar'
-import { useModalOpeners } from '../Providers/ModalProvider'
+import { useModalOpeners } from '../../providers/ModalProvider'
 
 interface IconsSidebarProps {
   openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => void

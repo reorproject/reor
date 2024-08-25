@@ -2,7 +2,7 @@ import Store from 'electron-store'
 
 import { LLMConfig, LLMAPIConfig, StoreKeys, StoreSchema } from '../electron-store/storeConfig'
 
-import OllamaService from './models/Ollama'
+import OllamaService from './models/ollama'
 
 export async function addOrUpdateLLMAPIInStore(store: Store<StoreSchema>, newAPI: LLMAPIConfig): Promise<void> {
   const existingAPIsInStore = await store.get(StoreKeys.LLMAPIs)

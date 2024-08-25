@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 
 import DefaultLLMSelector from './DefaultLLMSelector'
-import useLLMConfigs from './hooks/useLLMConfigs'
-import useModals from './hooks/useModals'
+import useLLMConfigs from './hooks/use-llm-configs'
+import useModals from './hooks/use-modals'
 
 import CustomSelect from '@/components/Common/Select'
 import SettingsRow from '../Shared/SettingsRow'
