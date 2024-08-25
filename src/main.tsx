@@ -7,8 +7,7 @@ import App from './App'
 import './styles/global.css'
 
 function handleError(error: Error | string | unknown) {
-  // Implement your error reporting logic here
-  // For example, send to main process or display in UI
+  // eslint-disable-next-line no-console
   console.error(error)
   if (error instanceof Error) {
     toast.error(`${error.name}: ${error.message}`)

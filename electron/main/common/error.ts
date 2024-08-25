@@ -14,4 +14,3 @@ function errorToStringMainProcess(error: unknown, depth: number = 0): string {
 }
 
 export default errorToStringMainProcess
-//
