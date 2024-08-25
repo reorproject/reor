@@ -33,31 +33,23 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
   }
 
   const handleNameChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      const newName = e.target.value
-      await handleValidName(newName)
-      setDirectoryName(newName)
-    } catch (error) {
-      throw new Error('Caught error when renaming directory')
-    }
+    const newName = e.target.value
+    await handleValidName(newName)
+    setDirectoryName(newName)
   }
 
   const sendNewDirectoryMsg = async () => {
-    try {
-      await handleValidName(directoryName)
-      if (!directoryName || errorMessage || currentOpenFilePath === null) return
+    await handleValidName(directoryName)
+    if (!directoryName || errorMessage || currentOpenFilePath === null) return
 
-      const directoryPath =
-        currentOpenFilePath === ''
-          ? await window.electronStore.getVaultDirectoryForWindow()
-          : await window.path.dirname(currentOpenFilePath)
-      const finalPath = await window.path.join(directoryPath, directoryName)
-      window.fileSystem.createDirectory(finalPath)
-      posthog.capture('created_new_directory_from_new_directory_modal')
-      onClose()
-    } catch (e) {
-      throw new Error('Caught error in when creating directory')
-    }
+    const directoryPath =
+      currentOpenFilePath === ''
+        ? await window.electronStore.getVaultDirectoryForWindow()
+        : await window.path.dirname(currentOpenFilePath)
+    const finalPath = await window.path.join(directoryPath, directoryName)
+    window.fileSystem.createDirectory(finalPath)
+    posthog.capture('created_new_directory_from_new_directory_modal')
+    onClose()
   }
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {

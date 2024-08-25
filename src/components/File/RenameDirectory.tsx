@@ -5,7 +5,6 @@ import { toast } from 'react-toastify'
 
 import ReorModal from '../Common/Modal'
 
-import errorToStringRendererProcess from '@/utils/error'
 import { getInvalidCharacterInFileName } from '@/utils/strings'
 
 export interface RenameDirFuncProps {
@@ -52,35 +51,26 @@ const RenameDirModal: React.FC<RenameDirModalProps> = ({ isOpen, fullDirName, on
   }
 
   const sendDirRename = async () => {
-    try {
-      if (errorMessage) {
-        return
-      }
-      if (!dirName) {
-        toast.error('Directory name cannot be empty', {
-          className: 'mt-5',
-          closeOnClick: false,
-          draggable: false,
-        })
-        return
-      }
-      setIsUpdatingDirName(true)
-      // get full path of new directory
-
-      await renameDir({
-        path: `${fullDirName}`,
-        newDirName: `${dirPrefix}${dirName}`,
-      })
-      onClose()
-      setIsUpdatingDirName(false)
-    } catch (e) {
-      toast.error(errorToStringRendererProcess(e), {
+    if (errorMessage) {
+      return
+    }
+    if (!dirName) {
+      toast.error('Directory name cannot be empty', {
         className: 'mt-5',
-        autoClose: false,
         closeOnClick: false,
         draggable: false,
       })
+      return
     }
+    setIsUpdatingDirName(true)
+    // get full path of new directory
+
+    await renameDir({
+      path: `${fullDirName}`,
+      newDirName: `${dirPrefix}${dirName}`,
+    })
+    onClose()
+    setIsUpdatingDirName(false)
   }
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {

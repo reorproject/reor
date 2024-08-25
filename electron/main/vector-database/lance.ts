@@ -1,7 +1,5 @@
 import * as lancedb from 'vectordb'
 
-import errorToStringMainProcess from '../common/error'
-
 import { EnhancedEmbeddingFunction } from './embeddings'
 import CreateDatabaseSchema, { isStringifiedSchemaEqual } from './schema'
 
@@ -19,39 +17,33 @@ const GetOrCreateLanceTable = async (
   embedFunc: EnhancedEmbeddingFunction<string>,
   userDirectory: string,
 ): Promise<lancedb.Table<string>> => {
-  try {
-    const allTableNames = await db.tableNames()
-    const intendedSchema = CreateDatabaseSchema(embedFunc.contextLength)
-    const tableName = generateTableName(embedFunc.name, userDirectory)
+  const allTableNames = await db.tableNames()
+  const intendedSchema = CreateDatabaseSchema(embedFunc.contextLength)
+  const tableName = generateTableName(embedFunc.name, userDirectory)
 
-    if (allTableNames.includes(tableName)) {
-      const table = await db.openTable(tableName, embedFunc)
-      const schema = await table.schema
-      if (!isStringifiedSchemaEqual(schema, intendedSchema)) {
-        await db.dropTable(tableName)
+  if (allTableNames.includes(tableName)) {
+    const table = await db.openTable(tableName, embedFunc)
+    const schema = await table.schema
+    if (!isStringifiedSchemaEqual(schema, intendedSchema)) {
+      await db.dropTable(tableName)
 
-        const recreatedTable = await db.createTable({
-          name: tableName,
-          schema: intendedSchema,
-          embeddingFunction: embedFunc,
-        })
-        return recreatedTable
-      }
-
-      return table
+      const recreatedTable = await db.createTable({
+        name: tableName,
+        schema: intendedSchema,
+        embeddingFunction: embedFunc,
+      })
+      return recreatedTable
     }
 
-    const newTable = await db.createTable({
-      name: tableName,
-      schema: intendedSchema,
-      embeddingFunction: embedFunc,
-    })
-    return newTable
-  } catch (error) {
-    const errorMessage = `Error in GetOrCreateLanceTable: ${errorToStringMainProcess(error)}`
-
-    throw new Error(errorMessage)
+    return table
   }
+
+  const newTable = await db.createTable({
+    name: tableName,
+    schema: intendedSchema,
+    embeddingFunction: embedFunc,
+  })
+  return newTable
 }
 
 export default GetOrCreateLanceTable

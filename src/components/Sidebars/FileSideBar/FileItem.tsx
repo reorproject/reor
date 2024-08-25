@@ -54,12 +54,8 @@ const FileItem: React.FC<FileInfoProps> = ({
       destinationPath = pathSegments.join('/')
     }
 
-    try {
-      moveFile(sourcePath, destinationPath)
-      // Refresh file list here or in moveFile function
-    } catch (error) {
-      // Handle error (e.g., show an error message)
-    }
+    moveFile(sourcePath, destinationPath)
+    // Refresh file list here or in moveFile function
   }
 
   const toggle = () => {

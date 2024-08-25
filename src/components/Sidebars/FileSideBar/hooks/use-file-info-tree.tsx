@@ -56,15 +56,11 @@ const useFileInfoTree = (currentFilePath: string | null) => {
   // initial load of files
   useEffect(() => {
     const fetchAndSetFiles = async () => {
-      try {
-        const fetchedFiles = await window.fileSystem.getFilesTreeForWindow()
-        const sortedFiles = sortFilesAndDirectories(fetchedFiles, null)
-        setFileInfoTree(sortedFiles)
-        const updatedFlattenedFiles = flattenFileInfoTree(sortedFiles)
-        setFlattenedFiles(updatedFlattenedFiles)
-      } catch (error) {
-        // no need to do anything
-      }
+      const fetchedFiles = await window.fileSystem.getFilesTreeForWindow()
+      const sortedFiles = sortFilesAndDirectories(fetchedFiles, null)
+      setFileInfoTree(sortedFiles)
+      const updatedFlattenedFiles = flattenFileInfoTree(sortedFiles)
+      setFlattenedFiles(updatedFlattenedFiles)
     }
 
     fetchAndSetFiles()

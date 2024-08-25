@@ -27,11 +27,7 @@ class LanceDBTableWrapper {
   private embedFun!: EnhancedEmbeddingFunction<string | number[]>
 
   async initialize(dbConnection: Connection, userDirectory: string, embeddingModelConfig: EmbeddingModelConfig) {
-    try {
-      this.embedFun = await createEmbeddingFunction(embeddingModelConfig, 'content')
-    } catch (error) {
-      throw new Error(`Embedding function error: ${error}`)
-    }
+    this.embedFun = await createEmbeddingFunction(embeddingModelConfig, 'content')
 
     this.lanceTable = await GetOrCreateLanceTable(dbConnection, this.embedFun, userDirectory)
   }

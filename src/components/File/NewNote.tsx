@@ -39,32 +39,24 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
   }
 
   const handleNameChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      const newName = e.target.value
-      await handleValidName(newName)
-      setFileName(newName)
-    } catch (error) {
-      throw new Error('Caught error when renaming note')
-    }
+    const newName = e.target.value
+    await handleValidName(newName)
+    setFileName(newName)
   }
 
   const sendNewNoteMsg = async () => {
-    try {
-      await handleValidName(fileName)
-      if (!fileName || errorMessage) return
+    await handleValidName(fileName)
+    if (!fileName || errorMessage) return
 
-      let finalPath = fileName
-      if (currentOpenFilePath !== '' && currentOpenFilePath !== null) {
-        const directoryName = await window.path.dirname(currentOpenFilePath)
-        finalPath = await window.path.join(directoryName, fileName)
-      }
-      const basename = await window.path.basename(finalPath)
-      openFileAndOpenEditor(finalPath, `# ${basename}\n`)
-      posthog.capture('created_new_note_from_new_note_modal')
-      onClose()
-    } catch (e) {
-      throw new Error('Caught error when creating note')
+    let finalPath = fileName
+    if (currentOpenFilePath !== '' && currentOpenFilePath !== null) {
+      const directoryName = await window.path.dirname(currentOpenFilePath)
+      finalPath = await window.path.join(directoryName, fileName)
     }
+    const basename = await window.path.basename(finalPath)
+    openFileAndOpenEditor(finalPath, `# ${basename}\n`)
+    posthog.capture('created_new_note_from_new_note_modal')
+    onClose()
   }
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
