@@ -14,7 +14,6 @@ import {
   resolveRAGContext,
 } from './chatUtils'
 
-import errorToStringRendererProcess from '@/utils/error'
 import SimilarEntriesComponent from '../Sidebars/SemanticSidebar/SimilarEntriesComponent'
 import '../../styles/chat.css'
 import ChatInterface, { AskOptions } from './ChatInterface'
@@ -126,56 +125,56 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({
     })
     let outputChat = currentChat
 
-    try {
-      if (loadingResponse || !userTextFieldInput.trim()) return
+    // try {
+    if (loadingResponse || !userTextFieldInput.trim()) return
 
-      setLoadingResponse(true)
-      setLoadAnimation(true)
+    setLoadingResponse(true)
+    setLoadAnimation(true)
 
-      const defaultLLMName = await window.llm.getDefaultLLMName()
-      if (!outputChat || !outputChat.id) {
-        outputChat = {
-          id: Date.now().toString(),
-          messages: [],
-        }
-      }
-      if (outputChat.messages.length === 0) {
-        if (chatFilters) {
-          outputChat.messages.push(await resolveRAGContext(userTextFieldInput, chatFilters))
-        }
-      } else {
-        outputChat.messages.push({
-          role: 'user',
-          content: userTextFieldInput,
-          messageType: 'success',
-          context: [],
-        })
-      }
-      setUserTextFieldInput('')
-
-      setCurrentChatHistory(outputChat)
-
-      if (!outputChat) return
-
-      await window.electronStore.updateChatHistory(outputChat)
-
-      const client = await resolveLLMClient(defaultLLMName)
-
-      const { textStream } = await streamText({
-        model: client,
-        messages: outputChat.messages,
-      })
-
-      // eslint-disable-next-line no-restricted-syntax
-      for await (const textPart of textStream) {
-        appendNewContentToMessageHistory(outputChat.id, textPart, 'success')
-      }
-      setReadyToSave(true)
-    } catch (error) {
-      if (outputChat) {
-        appendNewContentToMessageHistory(outputChat.id, errorToStringRendererProcess(error), 'error')
+    const defaultLLMName = await window.llm.getDefaultLLMName()
+    if (!outputChat || !outputChat.id) {
+      outputChat = {
+        id: Date.now().toString(),
+        messages: [],
       }
     }
+    if (outputChat.messages.length === 0) {
+      if (chatFilters) {
+        outputChat.messages.push(await resolveRAGContext(userTextFieldInput, chatFilters))
+      }
+    } else {
+      outputChat.messages.push({
+        role: 'user',
+        content: userTextFieldInput,
+        messageType: 'success',
+        context: [],
+      })
+    }
+    setUserTextFieldInput('')
+
+    setCurrentChatHistory(outputChat)
+
+    if (!outputChat) return
+
+    await window.electronStore.updateChatHistory(outputChat)
+
+    const client = await resolveLLMClient(defaultLLMName)
+
+    const { textStream } = await streamText({
+      model: client,
+      messages: outputChat.messages,
+    })
+
+    // eslint-disable-next-line no-restricted-syntax
+    for await (const textPart of textStream) {
+      appendNewContentToMessageHistory(outputChat.id, textPart, 'success')
+    }
+    setReadyToSave(true)
+    // } catch (error) {
+    //   if (outputChat) {
+    //     appendNewContentToMessageHistory(outputChat.id, errorToStringRendererProcess(error), 'error')
+    //   }
+    // }
   }
 
   useEffect(() => {

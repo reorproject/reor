@@ -275,12 +275,6 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
 
   const getLLMResponse = async (prompt: string, chat: Chat | undefined) => {
     const defaultLLMName = await window.llm.getDefaultLLMName()
-    // const llmConfigs = await window.llm.getLLMConfigs()
-
-    // const currentModelConfig = llmConfigs.find((config) => config.modelName === defaultLLMName)
-    // if (!currentModelConfig) {
-    //   throw new Error(`No model config found for model: ${defaultLLMName}`)
-    // }
 
     if (loadingResponse) return
     setLoadingResponse(true)
@@ -313,7 +307,6 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({
       appendNewContentToMessageHistory(newChatHistory.id, textPart, 'success')
     }
 
-    // await window.llm.streamingLLMResponse(defaultLLMName, currentModelConfig, false, newChatHistory)
     setLoadingResponse(false)
   }
 
@@ -359,32 +352,6 @@ Write a markdown list (using dashes) of key takeaways from my notes. Write at le
     setPrevPrompt(prompt)
     await getLLMResponse(prompt, currentChatHistory)
   }
-
-  // useEffect(() => {
-
-  //   // const handleOpenAIChunk = async (receivedChatID: string, chunk: ChatCompletionChunk) => {
-  //   //   const newContent = chunk.choices[0].delta.content ?? ''
-  //   //   if (newContent) {
-  //   //     appendNewContentToMessageHistory(receivedChatID, newContent, 'success')
-  //   //   }
-  //   // }
-
-  //   // const handleAnthropicChunk = async (receivedChatID: string, chunk: MessageStreamEvent) => {
-  //   //   const newContent = chunk.type === 'content_block_delta' ? (chunk.delta.text ?? '') : ''
-  //   //   if (newContent) {
-  //   //     appendNewContentToMessageHistory(receivedChatID, newContent, 'success')
-  //   //   }
-  //   // }
-
-  //   // const removeOpenAITokenStreamListener = window.ipcRenderer.receive('openAITokenStream', handleOpenAIChunk)
-
-  //   // const removeAnthropicTokenStreamListener = window.ipcRenderer.receive('anthropicTokenStream', handleAnthropicChunk)
-
-  //   return () => {
-  //     removeOpenAITokenStreamListener()
-  //     removeAnthropicTokenStreamListener()
-  //   }
-  // }, [setCurrentChatHistory])
 
   function getClassNames(message: ReorChatMessage) {
     if (message.messageType === 'error') {

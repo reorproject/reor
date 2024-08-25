@@ -11,8 +11,6 @@ import { LLM, LLMAPIConfig } from 'electron/main/electron-store/storeConfig'
 import { Tiktoken, TiktokenModel, encodingForModel } from 'js-tiktoken'
 import { ModelResponse, ProgressResponse, Ollama } from 'ollama'
 
-// import ollama,"ollama";
-
 const OllamaServeType = {
   SYSTEM: 'system', // ollama is installed on the system
   PACKAGED: 'packaged', // ollama is packaged with the app
@@ -26,17 +24,6 @@ export const defaultOllamaAPI: LLMAPIConfig = {
 
 class OllamaService {
   private client!: Ollama
-
-  // streamingResponse(
-  //   modelName: string,
-  //   modelConfig: LLMAPIConfig,
-  //   isJSONMode: boolean,
-  //   messageHistory: Array<ChatCompletionMessageParam>,
-  //   chunkResponse: (chunk: ChatCompletionChunk | MessageStreamEvent) => void,
-  //   generationParams?: LLMGenerationParameters,
-  // ): Promise<void> {
-  //   throw new Error('Method not implemented.')
-  // }
 
   private host = 'http://127.0.0.1:11434'
 
@@ -227,17 +214,6 @@ class OllamaService {
   public abort(): void {
     throw new Error('Abort not yet implemented.')
   }
-
-  // async streamingResponse(
-  //   _modelName: string,
-  //   _modelConfig: LLM,
-  //   _isJSONMode: boolean,
-  //   _messageHistory: ChatCompletionMessageParam[],
-  //   _handleChunk: (chunk: ChatCompletionChunk) => void,
-  //   _generationParams?: LLMGenerationParameters,
-  // ): Promise<void> {
-  //   throw new Error('Method not implemented.')
-  // }
 }
 
 export default OllamaService

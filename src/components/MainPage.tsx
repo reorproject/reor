@@ -18,13 +18,6 @@ import { ChatFilters, Chat } from './Chat/chatUtils'
 import EmptyPage from './EmptyPage'
 import { TabProvider } from './Providers/TabProvider'
 import { ModalProvider } from './Providers/ModalProvider'
-// import { createOpenAI } from '@ai-sdk/openai'
-
-// const openai = createOpenAI({
-//   // custom settings, e.g.
-//   // compatibility: 'strict', // strict mode, enable when using the OpenAI API
-//   apiKey: '',
-// })
 
 const UNINITIALIZED_STATE = 'UNINITIALIZED_STATE'
 

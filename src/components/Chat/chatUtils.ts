@@ -178,14 +178,14 @@ export const resolveLLMClient = async (llmName: string) => {
 
   if (apiConfig.apiInterface === 'openai') {
     const openai = createOpenAI({
-      apiKey: apiConfig.apiKey,
+      apiKey: apiConfig.apiKey || '',
       baseURL: apiConfig.apiURL,
     })
     return openai(llmName)
   }
   if (apiConfig.apiInterface === 'anthropic') {
     const anthropic = createAnthropic({
-      apiKey: apiConfig.apiKey,
+      apiKey: apiConfig.apiKey || '',
       baseURL: apiConfig.apiURL,
       headers: {
         'anthropic-dangerous-direct-browser-access': 'true',

@@ -244,8 +244,6 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     store.set(StoreKeys.OpenTabs, updatedTabs)
     event.sender.send('remove-tab-after-deletion', updatedTabs)
   })
-
-  // ipcMain.handle('add-ne')
 }
 
 export function getDefaultEmbeddingModelConfig(store: Store<StoreSchema>): EmbeddingModelConfig {

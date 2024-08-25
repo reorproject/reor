@@ -41,7 +41,6 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({ isOpen, onClo
       posthog.capture('download_new_llm', {
         modelName: taggedModelName,
       })
-      //
       await window.llm.pullOllamaModel(taggedModelName)
       await window.llm.setDefaultLLM(taggedModelName)
       toast.success(`${taggedModelName} download complete!`)

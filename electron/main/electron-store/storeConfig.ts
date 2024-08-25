@@ -1,6 +1,5 @@
 import { Chat } from '@/components/Chat/chatUtils'
 
-// a type for possible values of the apiInterface field in LLMAPIConfig: containing 'openai' | 'anthropic'
 export type APIInterface = 'openai' | 'anthropic'
 
 export interface LLMAPIConfig {
@@ -10,44 +9,11 @@ export interface LLMAPIConfig {
   apiKey?: string
 }
 
-// export interface OpenAIAPIConfig extends BaseLLMAPIConfig {
-//   apiInterface: 'openai'
-//   name: 'OpenAI'
-// }
-
-// export interface AnthropicAPIConfig extends BaseLLMAPIConfig {
-//   apiInterface: 'anthropic'
-//   name: 'Anthropic'
-// }
-
-// export type LLMAPIConfig = OpenAIAPIConfig | AnthropicAPIConfig
-
-// Ah nah so the Ollama API will need to be setup from the start...Let's see how the migration code works overall
-
-// export const
-
-// so apparently the idea right now is that we can have some default APIs including Ollama
-// so the frontend can setup the default APIs when the user adds an OpenAI key
-// And then we'll have the Ollama API get setup when a user adds a model from Ollama
-// And then afterwards we can do stuff to update
-
-// export const openAIDefaultAPI: LLMAPIConfig = {
-//   name: openAIDefaultName,
-//   apiInterface: 'openai',
-// }
-
-// export const anthropicDefaultAPI: LLMAPIConfig = {
-//   name: anthropicDefaultName,
-//   apiInterface: 'anthropic',
-// }
-
 export interface LLM {
   modelName: string
   apiName: string
   contextLength?: number
 }
-
-// actually so like the models themselves, we could just define default APIs
 
 export type LLMGenerationParameters = {
   maxTokens?: number

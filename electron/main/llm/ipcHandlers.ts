@@ -4,18 +4,10 @@ import { ProgressResponse } from 'ollama'
 
 import { LLM, LLMAPIConfig, StoreKeys, StoreSchema } from '../electron-store/storeConfig'
 
-// import { sliceStringToContextLength } from './contextLimit'
 import { addOrUpdateLLMAPIInStore, removeLLM, getLLMConfigs, addOrUpdateLLMInStore } from './llmConfig'
 import AnthropicModelSessionService from './models/Anthropic'
 import OllamaService from './models/Ollama'
 import OpenAIModelSessionService from './models/OpenAI'
-
-// enum LLMType {
-//   OpenAI = 'openai',
-//   Anthropic = 'anthropic',
-// }
-
-// export const LLMSessions: { [sessionId: string]: LLMSessionService } = {}
 
 export const openAISession = new OpenAIModelSessionService()
 export const anthropicSession = new AnthropicModelSessionService()
@@ -23,49 +15,6 @@ export const anthropicSession = new AnthropicModelSessionService()
 export const ollamaService = new OllamaService()
 
 export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
-  // ipcMain.handle(
-  //   'streaming-llm-response',
-  //   async (
-  //     event: IpcMainInvokeEvent,
-  //     llmName: string,
-  //     llmConfig: LLMAPIConfig,
-  //     isJSONMode: boolean,
-  //     chatHistory: ChatHistory,
-  //   ): Promise<void> => {
-  //     const handleOpenAIChunk = (chunk: ChatCompletionChunk) => {
-  //       event.sender.send('openAITokenStream', chatHistory.id, chunk)
-  //     }
-
-  //     const handleAnthropicChunk = (chunk: MessageStreamEvent) => {
-  //       event.sender.send('anthropicTokenStream', chatHistory.id, chunk)
-  //     }
-
-  //     switch (llmConfig.engine) {
-  //       case LLMType.OpenAI:
-  //         await openAISession.streamingResponse(
-  //           llmName,
-  //           llmConfig,
-  //           isJSONMode,
-  //           chatHistory.displayableChatHistory,
-  //           handleOpenAIChunk,
-  //           store.get(StoreKeys.LLMGenerationParameters),
-  //         )
-  //         break
-  //       case LLMType.Anthropic:
-  //         await anthropicSession.streamingResponse(
-  //           llmName,
-  //           llmConfig,
-  //           isJSONMode,
-  //           chatHistory.displayableChatHistory,
-  //           handleAnthropicChunk,
-  //           store.get(StoreKeys.LLMGenerationParameters),
-  //         )
-  //         break
-  //       default:
-  //         throw new Error(`LLM type ${llmConfig.engine} not supported.`)
-  //     }
-  //   },
-  // )
   ipcMain.handle('set-default-llm', (event, modelName: string) => {
     store.set(StoreKeys.DefaultLLM, modelName)
   })

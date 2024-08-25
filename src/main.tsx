@@ -9,6 +9,7 @@ import './styles/global.css'
 function handleError(error: Error | string | unknown) {
   // Implement your error reporting logic here
   // For example, send to main process or display in UI
+  console.error(error)
   if (error instanceof Error) {
     toast.error(`${error.name}: ${error.message}`)
   } else {
