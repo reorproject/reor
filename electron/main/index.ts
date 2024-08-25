@@ -8,10 +8,10 @@ import errorToStringMainProcess from './common/error'
 import WindowsManager from './common/windowManager'
 import { registerStoreHandlers } from './electron-store/ipcHandlers'
 import { StoreSchema } from './electron-store/storeConfig'
-import electronUtilsHandlers from './electron-utils/ipcHandlers'
+import registerElectronUtilsHandlers from './electron-utils/ipcHandlers'
 import registerFileHandlers from './filesystem/ipcHandlers'
 import { ollamaService, registerLLMSessionHandlers } from './llm/ipcHandlers'
-import pathHandlers from './path/ipcHandlers'
+import registerPathHandlers from './path/ipcHandlers'
 import { registerDBSessionHandlers } from './vector-database/ipcHandlers'
 
 const store = new Store<StoreSchema>()
@@ -40,11 +40,7 @@ const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
 
 app.whenReady().then(async () => {
-  try {
-    await ollamaService.init()
-  } catch (error) {
-    windowsManager.appendNewErrorToDisplayInWindow(errorToStringMainProcess(error))
-  }
+  await ollamaService.init()
   windowsManager.createWindow(store, preload, url, indexHtml)
 })
 
@@ -65,9 +61,17 @@ app.on('activate', () => {
   }
 })
 
+process.on('uncaughtException', (error: Error) => {
+  windowsManager.appendNewErrorToDisplayInWindow(errorToStringMainProcess(error))
+})
+
+process.on('unhandledRejection', (reason: unknown) => {
+  windowsManager.appendNewErrorToDisplayInWindow(errorToStringMainProcess(reason))
+})
+
 registerLLMSessionHandlers(store)
 registerDBSessionHandlers(store, windowsManager)
 registerStoreHandlers(store, windowsManager)
 registerFileHandlers(store, windowsManager)
-electronUtilsHandlers(store, windowsManager, preload, url, indexHtml)
-pathHandlers()
+registerElectronUtilsHandlers(store, windowsManager, preload, url, indexHtml)
+registerPathHandlers()

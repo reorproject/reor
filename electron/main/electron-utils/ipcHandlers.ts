@@ -6,7 +6,7 @@ import { StoreKeys, StoreSchema } from '../electron-store/storeConfig'
 import { ChatHistoryMetadata } from '@/components/Chat/hooks/use-chat-history'
 import { FileInfoNode } from '../filesystem/types'
 
-const electronUtilsHandlers = (
+const registerElectronUtilsHandlers = (
   store: Store<StoreSchema>,
   windowsManager: WindowsManager,
   preload: string,
@@ -107,4 +107,4 @@ const electronUtilsHandlers = (
   ipcMain.handle('get-reor-app-version', async () => app.getVersion())
 }
 
-export default electronUtilsHandlers
+export default registerElectronUtilsHandlers

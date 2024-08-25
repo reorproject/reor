@@ -6,7 +6,7 @@ import { markdownExtensions } from '../filesystem/filesystem'
 
 import addExtensionToFilenameIfNoExtensionPresent from './path'
 
-const pathHandlers = () => {
+const registerPathHandlers = () => {
   ipcMain.handle('path-basename', (event, pathString: string) => path.basename(pathString))
 
   ipcMain.handle('path-sep', () => path.sep)
@@ -24,4 +24,4 @@ const pathHandlers = () => {
   )
 }
 
-export default pathHandlers
+export default registerPathHandlers
