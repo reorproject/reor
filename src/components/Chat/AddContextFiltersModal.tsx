@@ -12,7 +12,7 @@ import ReorModal from '../Common/Modal'
 import SearchBarWithFilesSuggestion from '../Common/SearchBarWithFilesSuggestion'
 import CustomSelect from '../Common/Select'
 import { SuggestionsState } from '../Editor/BacklinkSuggestionsDisplay'
-import { ChatFilters } from './utils'
+import { ChatFilters } from './types'
 
 interface Props {
   isOpen: boolean

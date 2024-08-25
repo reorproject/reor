@@ -12,7 +12,7 @@ import { FileInfoNode, FileInfoTree, RenameFileProps, WriteFileProps } from 'ele
 import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema'
 
 import { ChatHistoryMetadata } from '@/components/Chat/hooks/use-chat-history'
-import { Chat } from '@/components/Chat/utils'
+import { Chat } from '@/components/Chat/types'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type IPCHandler<T extends (...args: any[]) => any> = (...args: Parameters<T>) => Promise<ReturnType<T>>
