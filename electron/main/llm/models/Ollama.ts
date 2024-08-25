@@ -7,7 +7,7 @@ import * as os from 'os'
 import * as path from 'path'
 
 import { app } from 'electron'
-import { LLM, LLMAPIConfig } from 'electron/main/electron-store/storeConfig'
+import { LLMConfig, LLMAPIConfig } from 'electron/main/electron-store/storeConfig'
 import { Tiktoken, TiktokenModel, encodingForModel } from 'js-tiktoken'
 import { ModelResponse, ProgressResponse, Ollama } from 'ollama'
 
@@ -173,11 +173,11 @@ class OllamaService {
     this.childProcess = null
   }
 
-  public getAvailableModels = async (): Promise<LLM[]> => {
+  public getAvailableModels = async (): Promise<LLMConfig[]> => {
     const ollamaModelsResponse = await this.client.list()
 
     const output = ollamaModelsResponse.models.map(
-      (model: ModelResponse): LLM => ({
+      (model: ModelResponse): LLMConfig => ({
         modelName: model.name,
         contextLength: 4096,
         apiName: defaultOllamaAPI.name,

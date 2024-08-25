@@ -3,7 +3,7 @@ import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
-  LLM,
+  LLMConfig,
   LLMAPIConfig,
   LLMGenerationParameters,
   Tab,
@@ -133,9 +133,9 @@ const llm = {
       (llmName: string, llmConfig: LLMAPIConfig, isJSONMode: boolean, chatHistory: Chat) => Promise<string>
     >('streaming-llm-response'),
 
-  getLLMConfigs: createIPCHandler<() => Promise<LLM[]>>('get-llm-configs'),
+  getLLMConfigs: createIPCHandler<() => Promise<LLMConfig[]>>('get-llm-configs'),
   getLLMAPIConfigs: createIPCHandler<() => Promise<LLMAPIConfig[]>>('get-llm-api-configs'),
-  addOrUpdateLLMConfig: createIPCHandler<(model: LLM) => Promise<void>>('add-or-update-llm-config'),
+  addOrUpdateLLMConfig: createIPCHandler<(model: LLMConfig) => Promise<void>>('add-or-update-llm-config'),
   addOrUpdateLLMAPIConfig:
     createIPCHandler<(modelConfig: LLMAPIConfig) => Promise<void>>('add-or-update-llm-api-config'),
   removeLLM: createIPCHandler<(modelNameToDelete: string) => Promise<void>>('remove-llm'),

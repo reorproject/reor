@@ -2,13 +2,13 @@ import React, { useState } from 'react'
 
 import { Button } from '@material-tailwind/react'
 
-import { APIInterface, LLM, LLMAPIConfig } from 'electron/main/electron-store/storeConfig'
+import { APIInterface, LLMConfig, LLMAPIConfig } from 'electron/main/electron-store/storeConfig'
 import ReorModal from '../../../Common/Modal'
 
 export const openAIDefaultAPIName = 'OpenAI'
 export const anthropicDefaultAPIName = 'Anthropic'
 
-export const openAIDefaultModels: LLM[] = [
+export const openAIDefaultModels: LLMConfig[] = [
   {
     contextLength: 128000,
     modelName: 'gpt-4o',
@@ -31,7 +31,7 @@ export const openAIDefaultModels: LLM[] = [
   },
 ]
 
-export const anthropicDefaultModels: LLM[] = [
+export const anthropicDefaultModels: LLMConfig[] = [
   {
     contextLength: 180000,
     modelName: 'claude-3-5-sonnet-20240620',

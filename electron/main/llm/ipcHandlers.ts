@@ -2,7 +2,7 @@ import { ipcMain } from 'electron'
 import Store from 'electron-store'
 import { ProgressResponse } from 'ollama'
 
-import { LLM, LLMAPIConfig, StoreKeys, StoreSchema } from '../electron-store/storeConfig'
+import { LLMConfig, LLMAPIConfig, StoreKeys, StoreSchema } from '../electron-store/storeConfig'
 
 import { addOrUpdateLLMAPIInStore, removeLLM, getLLMConfigs, addOrUpdateLLMInStore } from './llmConfig'
 import AnthropicModelSessionService from './models/Anthropic'
@@ -25,7 +25,7 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
 
   ipcMain.handle('get-llm-api-configs', async () => store.get(StoreKeys.LLMAPIs))
 
-  ipcMain.handle('add-or-update-llm-config', async (event, llmConfig: LLM) => {
+  ipcMain.handle('add-or-update-llm-config', async (event, llmConfig: LLMConfig) => {
     await addOrUpdateLLMInStore(store, llmConfig)
   })
 

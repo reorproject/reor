@@ -11,6 +11,7 @@ export type ReorChatMessage = CoreMessage & {
 }
 
 export type Chat = {
+  [x: string]: any
   id: string
   messages: ReorChatMessage[]
 }
@@ -120,13 +121,13 @@ export const resolveRAGContext = async (query: string, chatFilters: ChatFilters)
 }
 
 export const getChatHistoryContext = (chatHistory: Chat | undefined): DBQueryResult[] => {
-  if (!chatHistory) return []
+  if (!chatHistory || !chatHistory.messages) return []
   const contextForChat = chatHistory.messages.map((message) => message.context).flat()
   return contextForChat as DBQueryResult[]
 }
 
 export const getDisplayableChatName = (chat: Chat): string => {
-  if (chat.messages.length === 0 || !chat.messages[chat.messages.length - 1].content) {
+  if (!chat.messages || chat.messages.length === 0 || !chat.messages[chat.messages.length - 1].content) {
     return 'Empty Chat'
   }
 

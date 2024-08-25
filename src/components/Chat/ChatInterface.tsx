@@ -83,7 +83,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
     >
       <div className="relative mt-4 flex size-full flex-col items-center gap-3 overflow-x-hidden p-10 pt-0">
         <div className="w-full max-w-3xl">
-          {currentChatHistory && currentChatHistory.messages.length > 0 ? (
+          {currentChatHistory && currentChatHistory.messages && currentChatHistory.messages.length > 0 ? (
             // Display chat history if it exists
             currentChatHistory.messages
               .filter((msg) => msg.role !== 'system')

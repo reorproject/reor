@@ -107,10 +107,6 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({
         return {
           id: prev!.id,
           messages: newDisplayableHistory,
-          openAIChatHistory: newDisplayableHistory.map((message) => ({
-            role: message.role,
-            content: message.content,
-          })),
         }
       })
     },

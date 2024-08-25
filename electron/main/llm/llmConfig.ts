@@ -1,6 +1,6 @@
 import Store from 'electron-store'
 
-import { LLM, LLMAPIConfig, StoreKeys, StoreSchema } from '../electron-store/storeConfig'
+import { LLMConfig, LLMAPIConfig, StoreKeys, StoreSchema } from '../electron-store/storeConfig'
 
 import OllamaService from './models/Ollama'
 
@@ -18,7 +18,7 @@ export async function addOrUpdateLLMAPIInStore(store: Store<StoreSchema>, newAPI
   }
 }
 
-export async function addOrUpdateLLMInStore(store: Store<StoreSchema>, newLLM: LLM): Promise<void> {
+export async function addOrUpdateLLMInStore(store: Store<StoreSchema>, newLLM: LLMConfig): Promise<void> {
   const existingLLMs = store.get(StoreKeys.LLMs) || []
 
   const foundLLM = existingLLMs.find((llm) => llm.modelName === newLLM.modelName)
@@ -32,7 +32,7 @@ export async function addOrUpdateLLMInStore(store: Store<StoreSchema>, newLLM: L
   }
 }
 
-export async function getLLMConfigs(store: Store<StoreSchema>, ollamaSession: OllamaService): Promise<LLM[]> {
+export async function getLLMConfigs(store: Store<StoreSchema>, ollamaSession: OllamaService): Promise<LLMConfig[]> {
   const llmConfigsFromStore = store.get(StoreKeys.LLMs)
   const ollamaLLMConfigs = await ollamaSession.getAvailableModels()
 
@@ -43,11 +43,11 @@ export async function getLLMConfig(
   store: Store<StoreSchema>,
   ollamaSession: OllamaService,
   modelName: string,
-): Promise<LLM | undefined> {
+): Promise<LLMConfig | undefined> {
   const llmConfigs = await getLLMConfigs(store, ollamaSession)
 
   if (llmConfigs) {
-    return llmConfigs.find((model: LLM) => model.modelName === modelName)
+    return llmConfigs.find((model: LLMConfig) => model.modelName === modelName)
   }
   return undefined
 }

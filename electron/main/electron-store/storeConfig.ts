@@ -9,7 +9,7 @@ export interface LLMAPIConfig {
   apiKey?: string
 }
 
-export interface LLM {
+export interface LLMConfig {
   modelName: string
   apiName: string
   contextLength?: number
@@ -48,7 +48,7 @@ export interface StoreSchema {
     vaultDirectories: string[]
     directoryFromPreviousSession?: string
   }
-  LLMs: LLM[]
+  LLMs: LLMConfig[]
   LLMAPIs: LLMAPIConfig[]
   embeddingModels: {
     [modelAlias: string]: EmbeddingModelConfig

@@ -62,6 +62,28 @@ export function setupDefaultStoreValues(store: Store<StoreSchema>) {
   setupDefaultLLMAPIs(store)
 }
 
+function ensureChatHistoryIsCorrectProperty(store: Store<StoreSchema>) {
+  const chatHistories = store.get(StoreKeys.ChatHistories)
+  if (!chatHistories) {
+    return
+  }
+
+  Object.keys(chatHistories).forEach((vaultDir) => {
+    const chats = chatHistories[vaultDir]
+    chats.map((chat) => {
+      const outputChat = chat
+      if (chat.displayableChatHistory) {
+        outputChat.messages = chat.displayableChatHistory
+        delete outputChat.displayableChatHistory
+      }
+      return outputChat
+    })
+    chatHistories[vaultDir] = chats
+  })
+
+  store.set(StoreKeys.ChatHistories, chatHistories)
+}
+
 export const initializeAndMaybeMigrateStore = (store: Store<StoreSchema>) => {
   const storeSchemaVersion = store.get(StoreKeys.SchemaVersion)
   if (storeSchemaVersion !== currentSchemaVersion) {
@@ -69,5 +91,8 @@ export const initializeAndMaybeMigrateStore = (store: Store<StoreSchema>) => {
     store.set(StoreKeys.LLMAPIs, [])
     store.set(StoreKeys.DefaultLLM, '')
   }
+
+  ensureChatHistoryIsCorrectProperty(store)
+
   setupDefaultStoreValues(store)
 }
