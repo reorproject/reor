@@ -3,7 +3,7 @@ import * as path from 'path'
 
 import { listFiles, downloadFile } from '@huggingface/hub'
 
-import { customFetchUsingElectronNet } from '../common/network'
+import customFetchUsingElectronNet from '../common/network'
 
 async function downloadAndSaveFile(repo: string, HFFilePath: string, systemFilePath: string): Promise<void> {
   // Call the downloadFile function and await its result

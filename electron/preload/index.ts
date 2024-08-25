@@ -60,8 +60,6 @@ const electronStore = {
       (modelName: string, updatedModel: EmbeddingModelWithLocalPath | EmbeddingModelWithRepo) => Promise<void>
     >('update-embedding-model'),
   removeEmbeddingModel: createIPCHandler<(modelName: string) => Promise<void>>('remove-embedding-model'),
-  getNoOfRAGExamples: createIPCHandler<() => Promise<number>>('get-no-of-rag-examples'),
-  setNoOfRAGExamples: createIPCHandler<(noOfExamples: number) => Promise<void>>('set-no-of-rag-examples'),
   getChunkSize: createIPCHandler<() => Promise<number>>('get-chunk-size'),
   setChunkSize: createIPCHandler<(chunkSize: number) => Promise<void>>('set-chunk-size'),
   getLLMGenerationParams: createIPCHandler<() => Promise<LLMGenerationParameters>>('get-llm-generation-params'),
@@ -128,11 +126,6 @@ const path = {
 }
 
 const llm = {
-  streamingLLMResponse:
-    createIPCHandler<
-      (llmName: string, llmConfig: LLMAPIConfig, isJSONMode: boolean, chatHistory: Chat) => Promise<string>
-    >('streaming-llm-response'),
-
   getLLMConfigs: createIPCHandler<() => Promise<LLMConfig[]>>('get-llm-configs'),
   getLLMAPIConfigs: createIPCHandler<() => Promise<LLMAPIConfig[]>>('get-llm-api-configs'),
   addOrUpdateLLMConfig: createIPCHandler<(model: LLMConfig) => Promise<void>>('add-or-update-llm-config'),
