@@ -1,15 +1,18 @@
 import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema'
 import { ChatCompletionContentPart, ChatCompletionMessageParam } from 'openai/resources/chat/completions'
+import { createOpenAI } from '@ai-sdk/openai'
+import { createAnthropic } from '@ai-sdk/anthropic'
+import { CoreMessage } from 'ai'
 
-export type ChatMessageToDisplay = ChatCompletionMessageParam & {
+export type ReorChatMessage = CoreMessage & {
   messageType: 'success' | 'error'
   context: DBEntry[]
   visibleContent?: string
 }
 
-export type ChatHistory = {
+export type Chat = {
   id: string
-  displayableChatHistory: ChatMessageToDisplay[]
+  messages: ReorChatMessage[]
 }
 
 export interface ChatFilters {
@@ -97,7 +100,7 @@ export const generateTimeStampFilter = (minDate?: Date, maxDate?: Date): string 
   return filter
 }
 
-export const resolveRAGContext = async (query: string, chatFilters: ChatFilters): Promise<ChatMessageToDisplay> => {
+export const resolveRAGContext = async (query: string, chatFilters: ChatFilters): Promise<ReorChatMessage> => {
   let results: DBEntry[] = []
   if (chatFilters.files.length > 0) {
     results = await window.fileSystem.getFilesystemPathsAsDBItems(chatFilters.files)
@@ -116,20 +119,18 @@ export const resolveRAGContext = async (query: string, chatFilters: ChatFilters)
   }
 }
 
-export const getChatHistoryContext = (chatHistory: ChatHistory | undefined): DBQueryResult[] => {
+export const getChatHistoryContext = (chatHistory: Chat | undefined): DBQueryResult[] => {
   if (!chatHistory) return []
-  const contextForChat = chatHistory.displayableChatHistory.map((message) => message.context).flat()
+  const contextForChat = chatHistory.messages.map((message) => message.context).flat()
   return contextForChat as DBQueryResult[]
 }
 
-export const getDisplayableChatName = (chat: ChatHistory): string => {
-  const actualHistory = chat.displayableChatHistory
-
-  if (actualHistory.length === 0 || !actualHistory[actualHistory.length - 1].content) {
+export const getDisplayableChatName = (chat: Chat): string => {
+  if (chat.messages.length === 0 || !chat.messages[chat.messages.length - 1].content) {
     return 'Empty Chat'
   }
 
-  const lastMsg = actualHistory[0]
+  const lastMsg = chat.messages[0]
 
   if (lastMsg.visibleContent) {
     return lastMsg.visibleContent.slice(0, 30)
@@ -140,4 +141,57 @@ export const getDisplayableChatName = (chat: ChatHistory): string => {
     return 'Empty Chat'
   }
   return lastMessage.slice(0, 30)
+}
+
+export interface AnonymizedChatFilters {
+  numberOfChunksToFetch: number
+  filesLength: number
+  minDate?: Date
+  maxDate?: Date
+}
+
+export function anonymizeChatFiltersForPosthog(chatFilters: ChatFilters): AnonymizedChatFilters {
+  const { numberOfChunksToFetch, files, minDate, maxDate } = chatFilters
+  return {
+    numberOfChunksToFetch,
+    filesLength: files.length,
+    minDate,
+    maxDate,
+  }
+}
+
+export const resolveLLMClient = async (llmName: string) => {
+  const llmConfigs = await window.llm.getLLMConfigs()
+  const apiConfigs = await window.llm.getLLMAPIConfigs()
+
+  const llmConfig = llmConfigs.find((llm) => llm.modelName === llmName)
+
+  if (!llmConfig) {
+    throw new Error(`LLM ${llmName} not found.`)
+  }
+
+  const apiConfig = apiConfigs.find((api) => api.name === llmConfig.apiName)
+
+  if (!apiConfig) {
+    throw new Error(`API ${llmConfig.apiName} not found.`)
+  }
+
+  if (apiConfig.apiInterface === 'openai') {
+    const openai = createOpenAI({
+      apiKey: apiConfig.apiKey,
+      baseURL: apiConfig.apiURL,
+    })
+    return openai(llmName)
+  }
+  if (apiConfig.apiInterface === 'anthropic') {
+    const anthropic = createAnthropic({
+      apiKey: apiConfig.apiKey,
+      baseURL: apiConfig.apiURL,
+      headers: {
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+    })
+    return anthropic(llmName)
+  }
+  throw new Error(`API interface ${apiConfig.apiInterface} not supported.`)
 }

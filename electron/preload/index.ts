@@ -20,7 +20,7 @@ import { BasePromptRequirements, PromptWithRagResults } from 'electron/main/vect
 import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema'
 
 import { ChatHistoryMetadata } from '@/components/Chat/hooks/use-chat-history'
-import { ChatHistory } from '@/components/Chat/chatUtils'
+import { Chat } from '@/components/Chat/chatUtils'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type IPCHandler<T extends (...args: any[]) => any> = (...args: Parameters<T>) => Promise<ReturnType<T>>
@@ -84,10 +84,10 @@ const electronStore = {
   setSpellCheckMode: createIPCHandler<(isSpellCheck: boolean) => Promise<void>>('set-spellcheck-mode'),
   getHasUserOpenedAppBefore: createIPCHandler<() => Promise<boolean>>('has-user-opened-app-before'),
   setHasUserOpenedAppBefore: createIPCHandler<() => Promise<void>>('set-user-has-opened-app-before'),
-  getAllChatHistories: createIPCHandler<() => Promise<ChatHistory[]>>('get-all-chat-histories'),
-  updateChatHistory: createIPCHandler<(chatHistory: ChatHistory) => Promise<void>>('update-chat-history'),
+  getAllChatHistories: createIPCHandler<() => Promise<Chat[]>>('get-all-chat-histories'),
+  updateChatHistory: createIPCHandler<(chatHistory: Chat) => Promise<void>>('update-chat-history'),
   removeChatHistoryAtID: createIPCHandler<(chatID: string) => Promise<void>>('remove-chat-history-at-id'),
-  getChatHistory: createIPCHandler<(chatID: string) => Promise<ChatHistory>>('get-chat-history'),
+  getChatHistory: createIPCHandler<(chatID: string) => Promise<Chat>>('get-chat-history'),
   getSBCompact: createIPCHandler<() => Promise<boolean>>('get-sb-compact'),
   setSBCompact: createIPCHandler<(isSBCompact: boolean) => Promise<void>>('set-sb-compact'),
   getDisplayMarkdown: createIPCHandler<() => Promise<boolean>>('get-display-markdown'),
@@ -143,15 +143,12 @@ const path = {
   ),
   pathSep: createIPCHandler<() => Promise<string>>('path-sep'),
   getAllFilenamesInDirectory: createIPCHandler<(dirName: string) => Promise<string[]>>('get-files-in-directory'),
-  getAllFilenamesInDirectoryRecursively: createIPCHandler<(dirName: string) => Promise<string[]>>(
-    'get-files-in-directory-recursive',
-  ),
 }
 
 const llm = {
   streamingLLMResponse:
     createIPCHandler<
-      (llmName: string, llmConfig: LLMAPIConfig, isJSONMode: boolean, chatHistory: ChatHistory) => Promise<string>
+      (llmName: string, llmConfig: LLMAPIConfig, isJSONMode: boolean, chatHistory: Chat) => Promise<string>
     >('streaming-llm-response'),
 
   getLLMConfigs: createIPCHandler<() => Promise<LLM[]>>('get-llm-configs'),

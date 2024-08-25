@@ -5,14 +5,16 @@ import { CircularProgress } from '@mui/material'
 import posthog from 'posthog-js'
 import { TypeAnimation } from 'react-type-animation'
 
+import { generateObject } from 'ai'
 import ReorModal from '../Common/Modal'
 import FilesSuggestionsDisplay from '../Editor/BacklinkSuggestionsDisplay'
 import useFileInfoTree from '../File/FileSideBar/hooks/use-file-info-tree'
 import useFileByFilepath from '../File/hooks/use-file-by-filepath'
 
 import FlashcardCore from './FlashcardsCore'
-import { FlashcardQAPairUI } from './types'
+import { FlashcardQAPairSchema, FlashcardQAPairUI } from './types'
 import { storeFlashcardPairsAsJSON } from './utils'
+import { resolveLLMClient } from '../Chat/chatUtils'
 
 interface FlashcardCreateModalProps {
   isOpen: boolean
@@ -25,7 +27,6 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({ isOpen, onC
   const [isLoadingFlashcards, setIsLoadingFlashcards] = useState<boolean>(false)
   const [currentSelectedFlashcard, setCurrentSelectedFlashcard] = useState<number>(0)
   const [selectedFile, setSelectedFile] = useState<string>(initialFlashcardFile)
-  // const [availableFiles, setAvailableFiles] = useState<string[]>([]);
   const [vaultDirectory, setVaultDirectory] = useState<string>('')
 
   const { flattenedFiles } = useFileInfoTree(vaultDirectory)
@@ -58,29 +59,39 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({ isOpen, onC
   // handle the creation process
   const createFlashcardsFromFile = async (): Promise<void> => {
     posthog.capture('create_flashcard_from_file')
-    // send the file as context to the backend
     const llmName = await window.llm.getDefaultLLMName()
     setIsLoadingFlashcards(true)
-    const result = await window.fileSystem.generateFlashcardsWithFile({
-      prompt: 'Generate flashcards as json from this file',
-      llmName,
-      filePath: selectedFile,
+
+    const fileContents = await window.fileSystem.readFile(selectedFile)
+    const { object } = await generateObject({
+      model: await resolveLLMClient(llmName),
+      output: 'array',
+      schema: FlashcardQAPairSchema,
+      messages: [
+        {
+          content: `You are an expert in generating flashcards. You are asked to generate a list of flashcards for a note the user provides. Each flashcard has the following structure:
+{
+  question: string
+  answer: string
+}
+  
+Make sure you generate the flashcards in the correct format and that are relevant to the note provided. The user wants to test their knowledge on the note using the flashcards you generate.`,
+          role: 'system',
+        },
+        {
+          content: `The note for which you will generate flashcards is the following:\n${fileContents}`,
+          role: 'user',
+        },
+      ],
     })
 
-    // receive the output as JSON from the backend
-    // store the flashcards in memory so that we can render it in flashcardQA pairs
-    // and set UI as flipped = false
-    const flashcardUIPairs: FlashcardQAPairUI[] = (JSON.parse(result).flashcards as { Q: string; A: string }[]).map(
-      (card) => ({
-        question: card.Q,
-        answer: card.A,
-        isFlipped: false,
-      }),
-    )
+    // so we'll need to display the error here if there is one:
+    const flashcardUIPairs = FlashcardQAPairSchema.array().parse(object) as FlashcardQAPairUI[]
     setFlashcardQAPairs(flashcardUIPairs)
     setIsLoadingFlashcards(false)
 
     storeFlashcardPairsAsJSON(flashcardUIPairs, selectedFile)
+    throw new Error('Not implemented')
   }
 
   // find all available files
@@ -161,8 +172,6 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({ isOpen, onC
             disabled:pointer-events-none
             disabled:opacity-25"
               onClick={() => createFlashcardsFromFile()}
-              // Write to the flashcards directory if the flashcards generated are valid
-              // onClick={async () => await storeFlashcardPairsAsJSON(flashcardQAPairs, fileToGenerateFlashcardsFor)}
               placeholder=""
               disabled={isLoadingFlashcards}
             >

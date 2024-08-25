@@ -9,7 +9,6 @@ import { StoreKeys, StoreSchema } from '../electron-store/storeConfig'
 import { createPromptWithContextLimitFromContent, PromptWithContextLimit } from '../llm/contextLimit'
 import { ollamaService, openAISession } from '../llm/ipcHandlers'
 import { getLLMConfig } from '../llm/llmConfig'
-import addExtensionToFilenameIfNoExtensionPresent from '../path/path'
 import { DBEntry } from '../vector-database/schema'
 import {
   convertFileInfoListToDBItems,
@@ -22,8 +21,6 @@ import {
   createFileRecursive,
   isHidden,
   GetFilesInfoListForListOfPaths,
-  GetFilesInfoList,
-  markdownExtensions,
   startWatchingDirectory,
   updateFileListForRenderer,
 } from './filesystem'
@@ -229,7 +226,7 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
           {
             role: 'system',
             content: `You are an experienced teacher reading through some notes a student has made and extracting atomic facts. You never come up with your own facts. You generate atomic facts directly from what you read.
-            An atomic fact is a fact that relates to a single piece of knowledge and makes it easy to create a question for which the atomic fact is the answer"`,
+An atomic fact is a fact that relates to a single piece of knowledge and makes it easy to create a question for which the atomic fact is the answer"`,
           },
           {
             role: 'user',
@@ -278,16 +275,6 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
   ipcMain.handle('get-files-in-directory', (event, dirName: string) => {
     const itemsInDir = fs.readdirSync(dirName).filter((item) => !isHidden(item))
     return itemsInDir
-  })
-
-  ipcMain.handle('get-files-in-directory-recursive', (event, dirName: string) => {
-    const fileNameSet = new Set<string>()
-
-    const fileList = GetFilesInfoList(dirName)
-    fileList.forEach((file) => {
-      fileNameSet.add(addExtensionToFilenameIfNoExtensionPresent(file.path, markdownExtensions, '.md'))
-    })
-    return Array.from(fileNameSet)
   })
 
   ipcMain.handle('open-directory-dialog', async () => {

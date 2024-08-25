@@ -30,6 +30,7 @@
   "dependencies": {
     "@aarkue/tiptap-math-extension": "^1.2.2",
     "@ai-sdk/anthropic": "^0.0.47",
+    "@ai-sdk/openai": "^0.0.53",
     "@anthropic-ai/sdk": "0.27.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
@@ -100,7 +101,8 @@
     "use-debounce": "^10.0.1",
     "uuid": "^10.0.0",
     "uuidv4": "^6.2.13",
-    "vectordb": "0.4.10"
+    "vectordb": "0.4.10",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "@electron/notarize": "2.3.2",

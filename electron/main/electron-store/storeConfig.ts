@@ -1,4 +1,4 @@
-import { ChatHistory } from '@/components/Chat/chatUtils'
+import { Chat } from '@/components/Chat/chatUtils'
 
 // a type for possible values of the apiInterface field in LLMAPIConfig: containing 'openai' | 'anthropic'
 export type APIInterface = 'openai' | 'anthropic'
@@ -91,7 +91,7 @@ export interface StoreSchema {
   defaultEmbedFuncRepo: string
   llmGenerationParameters: LLMGenerationParameters
   chatHistories: {
-    [vaultDir: string]: ChatHistory[]
+    [vaultDir: string]: Chat[]
   }
   analytics?: boolean
   chunkSize: number
