@@ -63,8 +63,8 @@ function downloadIfMissing(platformKey) {
           binariesInfo[platformKey].url = response.headers.location;
           downloadIfMissing(platformKey); // Retry with the new URL
         } else {
-          console.error(
-            `Failed to download ${platformKey} binary. Status code: ${response.statusCode}`
+          throw new Error(
+            `Failed to download ${platformKey} binary: ${response.statusCode} ${response.statusMessage}`
           );
         }
       });
