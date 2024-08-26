@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useRef } from "react"
 
 /**
  * Name of component that user right clicked on.
@@ -25,11 +25,28 @@ interface ContextMenuPos {
 
 interface CustomContextMenuProps {
     focusedItem: ContextMenuFocus
+    hideFocusedItem: () => void
 }
 
 
-const CustomContextMenu: React.FC<CustomContextMenuProps> = ({ focusedItem }) => {
+const CustomContextMenu: React.FC<CustomContextMenuProps> = ({ focusedItem, hideFocusedItem }) => {
     const { currentSelection, locations } = focusedItem
+    const menuRef = useRef<HTMLDivElement>(null)
+    
+    useEffect(() => {
+        const handleOutsideClick = (event: MouseEvent) => {
+            if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+                hideFocusedItem()
+            }
+        }
+
+        document.addEventListener('mousedown', handleOutsideClick)
+        return () => {
+            document.removeEventListener('mousedown', handleOutsideClick)
+        }
+    }, [hideFocusedItem])
+
+    if (currentSelection === 'None') return null
 
     switch(currentSelection) {
         case 'FileSidebar': {
@@ -55,9 +72,19 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({ focusedItem }) =>
     }
 
     return (
-        <div style={{ left: locations.x, top: locations.y }} className="z-4000 size-full bg-white">
-            Testing
+        <div 
+            ref={menuRef}
+            className="absolute bg-white p-8 rounded-md z-[1020]"
+            style={{
+                left: locations.x,
+                top: locations.y,
+                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+            }}
+        >
+            {currentSelection === 'FileSidebar' && <div>FileSidebar Option 1</div>}
+            {currentSelection === 'FileItem' && <div></div>}
         </div>
+    
     )
 }
 

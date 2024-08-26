@@ -168,13 +168,20 @@ const MainPageComponent: React.FC = () => {
     })
   }
 
+  const hideFocusedItem = () => {
+    setFocusedItem({
+      currentSelection: 'None',
+      locations: { x: 0, y: 0 },
+    })
+  }
+
   return (
     <div className="relative overflow-x-hidden">
       {/* Displays the dropdown tab when hovering. You cannot use z-index and position absolute inside 
           TitleBar since one of the Parent components inadvertently creates a new stacking context that 
           impacts the z-index. */}
       <div id="tooltip-container" />
-      <CustomContextMenu focusedItem={focusedItem} />
+      <CustomContextMenu focusedItem={focusedItem} hideFocusedItem={hideFocusedItem} />
       <TabProvider
         openTabContent={openTabContent}
         currentTab={currentTab}
