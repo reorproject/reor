@@ -1,23 +1,22 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 const fs = require("fs");
 const https = require("https");
 const os = require("os");
 const path = require("path");
+const AdmZip = require("adm-zip");
 
 // Mapping of OS to binary info
 const binariesInfo = {
   darwin: {
-    url: "https://github.com/ollama/ollama/releases/download/v0.1.48/ollama-darwin",
+    url: "https://github.com/ollama/ollama/releases/download/v0.3.6/ollama-darwin",
     path: "../binaries/darwin/ollama-darwin",
   },
   linux: {
-    url: "https://github.com/ollama/ollama/releases/download/v0.1.48/ollama-linux-amd64",
+    url: "https://github.com/ollama/ollama/releases/download/v0.3.6/ollama-linux-amd64",
     path: "../binaries/linux/ollama-linux-amd64",
   },
   win32: {
-    url: "https://github.com/ollama/ollama/releases/download/v0.1.48/ollama-windows-amd64.exe",
-    path: "../binaries/win32/ollama-windows-amd64.exe",
+    url: "https://github.com/ollama/ollama/releases/download/v0.3.6/ollama-windows-amd64.zip",
+    path: "../binaries/win32/ollama.exe",
   },
 };
 
@@ -32,7 +31,17 @@ function ensureDirectoryExistence(filePath) {
 function setExecutable(filePath) {
   fs.chmod(filePath, 0o755, (err) => {
     if (err) throw err;
-    ;
+    console.log(`Made ${filePath} executable`);
+  });
+}
+
+function extractZip(zipPath, extractPath) {
+  return new Promise((resolve, reject) => {
+    const zip = new AdmZip(zipPath);
+    zip.extractAllToAsync(extractPath, true, (err) => {
+      if (err) reject(err);
+      else resolve();
+    });
   });
 }
 
@@ -43,23 +52,27 @@ function downloadIfMissing(platformKey) {
 
   fs.access(filePath, fs.constants.F_OK, (err) => {
     if (err) {
-      ;
+      console.log(`Downloading ${platformKey} binary...`);
       const request = https.get(info.url, (response) => {
         if (response.statusCode === 200) {
           const file = fs.createWriteStream(filePath);
           response.pipe(file);
           file.on("finish", () => {
-            file.close(() => {
-              ;
-              // Set as executable if not on Windows
-              if (platformKey !== "win32") {
+            file.close(async () => {
+              console.log(`Downloaded ${platformKey} binary`);
+              if (platformKey === "win32") {
+                console.log("Extracting ZIP file...");
+                const extractPath = path.dirname(filePath);
+                await extractZip(filePath, extractPath);
+                fs.unlinkSync(filePath); // Remove the ZIP file
+                console.log("ZIP file extracted and removed");
+              } else {
                 setExecutable(filePath);
               }
             });
           });
         } else if (response.statusCode === 302 || response.statusCode === 301) {
-          // Handle redirection (if any)
-          ;
+          console.log(`Redirecting to: ${response.headers.location}`);
           binariesInfo[platformKey].url = response.headers.location;
           downloadIfMissing(platformKey); // Retry with the new URL
         } else {
@@ -74,8 +87,7 @@ function downloadIfMissing(platformKey) {
         );
       });
     } else {
-      ;
-      // Ensure it's executable if it already exists and not on Windows
+      console.log(`${platformKey} binary already exists`);
       if (platformKey !== "win32") {
         setExecutable(filePath);
       }
@@ -84,7 +96,6 @@ function downloadIfMissing(platformKey) {
 }
 
 const platform = os.platform();
-
 if (process.argv[2] === "all") {
   Object.keys(binariesInfo).forEach(downloadIfMissing);
 } else {
