@@ -79,7 +79,7 @@ class OllamaService {
     let exeDir = ''
     switch (process.platform) {
       case 'win32':
-        exeName = 'ollama-windows-amd64.exe'
+        exeName = 'ollama.exe'
         exeDir = app.isPackaged
           ? path.join(process.resourcesPath, 'binaries')
           : path.join(app.getAppPath(), 'binaries', 'win32')
