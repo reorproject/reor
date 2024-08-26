@@ -16,7 +16,7 @@ const binariesInfo = {
   },
   win32: {
     url: "https://github.com/ollama/ollama/releases/download/v0.3.6/ollama-windows-amd64.zip",
-    path: "../binaries/win32/ollama.exe",
+    path: "../binaries/win32/", // This is now a directory path
   },
 };
 
@@ -50,21 +50,23 @@ function downloadIfMissing(platformKey) {
   const filePath = path.join(__dirname, info.path);
   ensureDirectoryExistence(filePath);
 
-  fs.access(filePath, fs.constants.F_OK, (err) => {
+  const isWin32 = platformKey === "win32";
+  const downloadPath = isWin32 ? filePath + "ollama.zip" : filePath;
+
+  fs.access(isWin32 ? path.join(filePath, "ollama.exe") : filePath, fs.constants.F_OK, (err) => {
     if (err) {
       console.log(`Downloading ${platformKey} binary...`);
       const request = https.get(info.url, (response) => {
         if (response.statusCode === 200) {
-          const file = fs.createWriteStream(filePath);
+          const file = fs.createWriteStream(downloadPath);
           response.pipe(file);
           file.on("finish", () => {
             file.close(async () => {
               console.log(`Downloaded ${platformKey} binary`);
-              if (platformKey === "win32") {
+              if (isWin32) {
                 console.log("Extracting ZIP file...");
-                const extractPath = path.dirname(filePath);
-                await extractZip(filePath, extractPath);
-                fs.unlinkSync(filePath); // Remove the ZIP file
+                await extractZip(downloadPath, filePath);
+                fs.unlinkSync(downloadPath); // Remove the ZIP file
                 console.log("ZIP file extracted and removed");
               } else {
                 setExecutable(filePath);
@@ -88,7 +90,7 @@ function downloadIfMissing(platformKey) {
       });
     } else {
       console.log(`${platformKey} binary already exists`);
-      if (platformKey !== "win32") {
+      if (!isWin32) {
         setExecutable(filePath);
       }
     }
