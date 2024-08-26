@@ -43,39 +43,81 @@ function setExecutable(filePath) {
   });
 }
 
-function downloadAndExtractZip(url, extractPath) {
+function downloadAndExtractZip(url, extractPath, redirectCount = 0, timeout = 500000) {
   return new Promise((resolve, reject) => {
+    if (redirectCount > 5) {
+      reject(new Error("Too many redirects"));
+      return;
+    }
+
     const tempPath = path.join(os.tmpdir(), 'ollama-temp.zip');
     const file = fs.createWriteStream(tempPath);
+    let fileStream = null;
 
-    https.get(url, (response) => {
+    const cleanupAndReject = (error) => {
+      if (fileStream) fileStream.close();
+      fs.unlink(tempPath, (unlinkError) => {
+        if (unlinkError) {
+          console.error(`Failed to delete temporary file ${tempPath}: ${unlinkError.message}`);
+        }
+        reject(error);
+      });
+    };
+
+    const request = https.get(url, (response) => {
       if (response.statusCode === 200) {
-        response.pipe(file);
-        file.on('finish', () => {
-          file.close(() => {
+        fileStream = response.pipe(file);
+        fileStream.on('finish', () => {
+          fileStream.close(() => {
             console.log('Download completed, extracting...');
             try {
               const zip = new AdmZip(tempPath);
               zip.extractAllTo(extractPath, true);
-              fs.unlinkSync(tempPath);
-              console.log('Extraction completed');
-              resolve();
+              fs.unlink(tempPath, (unlinkError) => {
+                if (unlinkError) {
+                  console.error(`Failed to delete temporary file ${tempPath}: ${unlinkError.message}`);
+                }
+                console.log('Extraction completed');
+                resolve();
+              });
             } catch (error) {
-              reject(new Error(`Failed to extract zip file: ${error.message}`));
+              cleanupAndReject(new Error(`Failed to extract zip file: ${error.message}`));
             }
           });
         });
       } else if (response.statusCode === 302 || response.statusCode === 301) {
-        reject(new Error(`Unexpected redirect: ${response.statusCode} ${response.statusMessage}`));
+        file.close(() => {
+          fs.unlink(tempPath, (unlinkError) => {
+            if (unlinkError) {
+              console.error(`Failed to delete temporary file ${tempPath}: ${unlinkError.message}`);
+            }
+            console.log(`Following redirect to: ${response.headers.location}`);
+            downloadAndExtractZip(response.headers.location, extractPath, redirectCount + 1, timeout)
+              .then(resolve)
+              .catch(reject);
+          });
+        });
       } else {
-        reject(new Error(`Failed to download: ${response.statusCode} ${response.statusMessage}`));
+        cleanupAndReject(new Error(`Failed to download: ${response.statusCode} ${response.statusMessage}`));
       }
-    }).on('error', (error) => {
-      reject(new Error(`Network error during download: ${error.message}`));
+    });
+
+    request.on('error', (error) => {
+      cleanupAndReject(new Error(`Network error during download: ${error.message}`));
+    });
+
+    request.on('timeout', () => {
+      request.destroy();
+      cleanupAndReject(new Error(`Download timed out after ${timeout}ms`));
+    });
+
+    request.setTimeout(timeout);
+
+    file.on('error', (error) => {
+      cleanupAndReject(new Error(`File system error: ${error.message}`));
     });
   });
 }
-
 function downloadFile(url, filePath, redirectCount = 0, timeout = 500000) {
   return new Promise((resolve, reject) => {
     if (redirectCount > 5) {
