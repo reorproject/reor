@@ -18,7 +18,7 @@ import { ModalProvider } from '../providers/ModalProvider'
 import WritingAssistant from './WritingAssistant/WritingAssistant'
 import { Chat, ChatFilters } from './Chat/types'
 import useFileInfoTree from './Sidebars/FileSideBar/hooks/use-file-info-tree'
-import { ContextMenuLocations } from './Menu/CustomContextMenu'
+import CustomContextMenu, { ContextMenuLocations, ContextMenuFocus } from './Menu/CustomContextMenu'
 
 const UNINITIALIZED_STATE = 'UNINITIALIZED_STATE'
 
@@ -35,7 +35,10 @@ const MainPageComponent: React.FC = () => {
     maxDate: new Date(),
   })
   const [sidebarWidth, setSidebarWidth] = useState<number>(40)
-  const [focusedItem,  setFocusedItem] = useState<ContextMenuLocations>('None')
+  const [focusedItem,  setFocusedItem] = useState<ContextMenuFocus>({
+    currentSelection: 'None',
+    locations: { x: 0, y: 0 },
+  })
 
   const filePathRef = React.useRef<string>('')
   const chatIDRef = React.useRef<string>('')
@@ -158,7 +161,11 @@ const MainPageComponent: React.FC = () => {
 
   const handleFocusedItem = (event: React.MouseEvent<HTMLDivElement>, focusedItem: ContextMenuLocations) => {
     event.preventDefault()
-    console.log("Focused item:", focusedItem)
+
+    setFocusedItem({
+      currentSelection: focusedItem,
+      locations: { x: event.clientX, y: event.clientY },
+    })
   }
 
   return (
@@ -167,6 +174,7 @@ const MainPageComponent: React.FC = () => {
           TitleBar since one of the Parent components inadvertently creates a new stacking context that 
           impacts the z-index. */}
       <div id="tooltip-container" />
+      <CustomContextMenu focusedItem={focusedItem} />
       <TabProvider
         openTabContent={openTabContent}
         currentTab={currentTab}
