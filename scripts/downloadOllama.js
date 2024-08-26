@@ -37,10 +37,29 @@ function setExecutable(filePath) {
 function extractZip(zipPath, extractPath) {
   return new Promise((resolve, reject) => {
     const zip = new AdmZip(zipPath);
-    zip.extractAllToAsync(extractPath, true, (err) => {
-      if (err) reject(err);
-      else resolve();
+    const zipEntries = zip.getEntries();
+
+    const excludedDirs = ['cuda', 'rocm']; 
+    zipEntries.forEach((entry) => {
+      const entryPath = entry.entryName;
+      const shouldExtract = !excludedDirs.some(dir => entryPath.startsWith(dir + '/'));
+
+      if (shouldExtract) {
+        if (entry.isDirectory) {
+          const dirPath = path.join(extractPath, entryPath);
+          ensureDirectoryExistence(dirPath);
+        } else {
+          const filePath = path.join(extractPath, entryPath);
+          const fileContent = entry.getData();
+          fs.writeFileSync(filePath, fileContent);
+          console.log(`Extracted: ${filePath}`);
+        }
+      } else {
+        console.log(`Skipped: ${entryPath}`);
+      }
     });
+
+    resolve();
   });
 }
 
