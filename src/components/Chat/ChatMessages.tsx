@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 
 import { FaRegUserCircle } from 'react-icons/fa'
-import AddContextFiltersModal from './AddContextFiltersModal'
+import ContextFilters from './ContextFilters'
 import PromptSuggestion from './ChatPrompts'
 
 import LoadingDots from '@/utils/animations'
@@ -29,13 +29,11 @@ interface ChatMessagesProps {
   chatContainerRef: MutableRefObject<HTMLDivElement | null>
   openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => Promise<void>
   currentChatHistory: Chat | undefined
-  isAddContextFiltersModalOpen: boolean
   chatFilters: ChatFilters
   setChatFilters: Dispatch<ChatFilters>
   setUserTextFieldInput: Dispatch<SetStateAction<string>>
   defaultModelName: string
   vaultDirectory: string
-  setIsAddContextFiltersModalOpen: Dispatch<SetStateAction<boolean>>
   handlePromptSelection: (prompt: string | undefined) => void
   askText: AskOptions
   loadAnimation: boolean
@@ -45,13 +43,11 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   chatContainerRef,
   openFileAndOpenEditor,
   currentChatHistory,
-  isAddContextFiltersModalOpen,
   chatFilters,
   setChatFilters,
   setUserTextFieldInput,
   defaultModelName,
   vaultDirectory,
-  setIsAddContextFiltersModalOpen,
   handlePromptSelection,
   askText,
   loadAnimation,
@@ -136,6 +132,11 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
                 <h1 className="mb-10 text-[28px] text-gray-300">
                   Welcome to your AI-powered assistant! Start a conversation with your second brain!
                 </h1>
+                <ContextFilters
+                  vaultDirectory={vaultDirectory}
+                  chatFilters={chatFilters}
+                  setChatFilters={setChatFilters}
+                />
                 <div className="flex flex-col rounded-md bg-bg-000 focus-within:ring-1 focus-within:ring-[#8c8c8c]">
                   <textarea
                     onKeyDown={(e) => {
@@ -153,15 +154,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
                     <span className="rounded-b-md bg-transparent text-sm tracking-tight text-text-gen-100">
                       {defaultModelName}
                     </span>
-                    <button
-                      className="cursor-pointer rounded-md border-0 bg-blue-600 px-4 py-2 text-white hover:bg-blue-500"
-                      onClick={() => {
-                        setIsAddContextFiltersModalOpen(true)
-                      }}
-                      type="button"
-                    >
-                      {chatFilters.files.length > 0 ? 'Update RAG filters' : 'Customise context'}
-                    </button>
                   </div>
                 </div>
                 <div className="mt-4 size-full justify-center md:flex-row lg:flex">
@@ -179,16 +171,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
             <img src="/src/assets/reor-logo.svg" style={{ width: '22px', height: '22px' }} alt="ReorImage" />
             <LoadingDots />
           </div>
-        )}
-
-        {isAddContextFiltersModalOpen && (
-          <AddContextFiltersModal
-            vaultDirectory={vaultDirectory}
-            isOpen={isAddContextFiltersModalOpen}
-            onClose={() => setIsAddContextFiltersModalOpen(false)}
-            chatFilters={chatFilters}
-            setChatFilters={setChatFilters}
-          />
         )}
       </div>
     </div>

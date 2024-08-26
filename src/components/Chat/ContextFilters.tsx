@@ -11,7 +11,8 @@ import 'react-day-picker/dist/style.css'
 import SearchBarWithFilesSuggestion from '../Common/SearchBarWithFilesSuggestion'
 import CustomSelect from '../Common/Select'
 import { SuggestionsState } from '../Editor/BacklinkSuggestionsDisplay'
-import { ChatFilters } from './chatUtils'
+import { ChatFilters } from './types'
+import ClickPopover from '../Common/ClickPopover'
 
 interface Props {
   vaultDirectory: string
@@ -29,6 +30,11 @@ const ContextFilters: React.FC<Props> = ({ vaultDirectory, chatFilters, setChatF
     to: chatFilters.maxDate,
   })
   const [selectedDateRange, setSelectedDateRange] = useState<string>('Anytime')
+  const [isPopoverOpen, setPopoverOpen] = useState(false)
+
+  const togglePopover = () => {
+    setPopoverOpen(!isPopoverOpen)
+  }
 
   const dateRangeOptions = [
     { label: 'Anytime', value: 'anytime' },
@@ -96,45 +102,52 @@ const ContextFilters: React.FC<Props> = ({ vaultDirectory, chatFilters, setChatF
   useEffect(() => {}, [chatFilters])
 
   return (
-    <div className="mx-auto w-3/4 text-white">
-      <h2 className="text-2xl font-semibold">Choose specific context files or customise the RAG search</h2>
-      <div className="border-0 border-b-2 border-solid border-neutral-700 py-2">
-        <p className="mb-0">Select files for context</p>
-        <div className="max-h-[300px] w-full overflow-y-auto">
-          <SearchBarWithFilesSuggestion
-            vaultDirectory={vaultDirectory}
-            searchText={searchText}
-            setSearchText={setSearchText}
-            onSelectSuggestion={(file: string) => {
-              if (file && !internalFilesSelected.includes(file)) {
-                setInternalFilesSelected([...internalFilesSelected, file])
-              }
-              setSuggestionsState(null)
-            }}
-            suggestionsState={suggestionsState}
-            setSuggestionsState={setSuggestionsState}
-          />
-          <List placeholder="">
-            {internalFilesSelected.map((filePath) => (
-              <ListItem key={filePath} placeholder="" className="cursor-pointer">
-                <ListItemIcon>
-                  <FolderIcon color="primary" />
-                </ListItemIcon>
-                <ListItemText primary={filePath} />
-              </ListItem>
-            ))}
-          </List>
-        </div>
+    <div className="mb-4 flex w-full flex-wrap items-center justify-center gap-x-5 gap-y-3 py-1 text-white">
+      <div
+        className="relative cursor-pointer rounded-full border border-transparent bg-dark-gray-c-ten px-4 py-[8px] text-xs transition duration-150 ease-in-out hover:border-white hover:bg-neutral-700"
+        onClick={togglePopover}
+      >
+        Files added to context: {internalFilesSelected.length}
+        <ClickPopover isOpen={isPopoverOpen} onClose={() => setPopoverOpen(false)}>
+          <div className="max-h-[300px] w-full overflow-y-auto">
+            <SearchBarWithFilesSuggestion
+              vaultDirectory={vaultDirectory}
+              searchText={searchText}
+              setSearchText={setSearchText}
+              onSelectSuggestion={(file: string) => {
+                if (file && !internalFilesSelected.includes(file)) {
+                  setInternalFilesSelected([...internalFilesSelected, file])
+                }
+                setSuggestionsState(null)
+              }}
+              suggestionsState={suggestionsState}
+              setSuggestionsState={setSuggestionsState}
+            />
+            <List placeholder="">
+              {internalFilesSelected.map((filePath) => (
+                <ListItem key={filePath} placeholder="" className="cursor-pointer">
+                  <ListItemIcon>
+                    <FolderIcon color="primary" />
+                  </ListItemIcon>
+                  <ListItemText primary={filePath} />
+                </ListItem>
+              ))}
+            </List>
+          </div>
+        </ClickPopover>
       </div>
-      <div>
-        {/* ${
+      {/* ${
               internalFilesSelected.length > 0
                 ? "opacity-30	 pointer-events-none"
                 : ""
             } */}
-        <div className="mb-4 border-0 border-b-2 border-solid border-neutral-700 py-2">
-          <p>Number of notes to add to context: {numberOfChunksToFetch}</p>
-          <div className="mt-2 rounded bg-neutral-800 pb-3 pr-2">
+      <div
+        className="relative cursor-pointer rounded-full border border-transparent bg-dark-gray-c-ten px-4 py-[8px] text-xs transition duration-150 ease-in-out hover:border-white hover:bg-neutral-700"
+        onClick={togglePopover}
+      >
+        Number of context notes: {numberOfChunksToFetch}
+        <ClickPopover isOpen={isPopoverOpen} onClose={() => setPopoverOpen(false)}>
+          <div className="rounded bg-neutral-800 pb-3 pr-2">
             <Slider
               aria-label="Number of Notes"
               value={numberOfChunksToFetch}
@@ -167,12 +180,15 @@ const ContextFilters: React.FC<Props> = ({ vaultDirectory, chatFilters, setChatF
               }}
             />
           </div>
-        </div>
-        <div className="mb-4 border-0 border-b-2 border-solid border-neutral-700 py-2">
-          <p className="mb-0">
-            Filter context notes by last modified date: {dateRange?.from && dateRange.from.toLocaleDateString()}
-            {dateRange?.to && ` to ${dateRange.to.toLocaleDateString()}`}
-          </p>
+        </ClickPopover>
+      </div>
+      <div
+        className="relative cursor-pointer rounded-full border border-transparent bg-dark-gray-c-ten px-4 py-[8px] text-xs transition duration-150 ease-in-out hover:border-white hover:bg-neutral-700"
+        onClick={togglePopover}
+      >
+        Date filter: {dateRange?.from && dateRange.from.toLocaleDateString()}
+        {dateRange?.to && ` to ${dateRange.to.toLocaleDateString()}`}
+        <ClickPopover isOpen={isPopoverOpen} onClose={() => setPopoverOpen(false)}>
           <div className="flex w-full flex-row items-baseline justify-between">
             <CustomSelect
               options={dateRangeOptions}
@@ -186,7 +202,7 @@ const ContextFilters: React.FC<Props> = ({ vaultDirectory, chatFilters, setChatF
               className="my-day-picker w-full"
             />
           </div>
-        </div>
+        </ClickPopover>
       </div>
     </div>
   )
