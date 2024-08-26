@@ -61,6 +61,7 @@
     "@tiptap/react": "^2.2.4",
     "@tiptap/starter-kit": "^2.2.4",
     "@xenova/transformers": "^2.8.0",
+    "adm-zip": "^0.5.15",
     "ai": "^3.3.17",
     "apache-arrow": "^14.0.2",
     "chokidar": "^3.5.3",
