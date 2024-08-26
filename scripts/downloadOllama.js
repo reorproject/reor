@@ -43,7 +43,22 @@ function setExecutable(filePath) {
   });
 }
 
-function downloadAndExtractZip(url, extractPath, redirectCount = 0, timeout = 500000) {
+function removeDirectory(dirPath) {
+  if (fs.existsSync(dirPath)) {
+    fs.readdirSync(dirPath).forEach((file) => {
+      const curPath = path.join(dirPath, file);
+      if (fs.lstatSync(curPath).isDirectory()) {
+        removeDirectory(curPath);
+      } else {
+        fs.unlinkSync(curPath);
+      }
+    });
+    fs.rmdirSync(dirPath);
+  }
+}
+
+
+function downloadAndExtractZip(url, extractPath, redirectCount = 0, timeout = 30000) {
   return new Promise((resolve, reject) => {
     if (redirectCount > 5) {
       reject(new Error("Too many redirects"));
@@ -78,6 +93,19 @@ function downloadAndExtractZip(url, extractPath, redirectCount = 0, timeout = 50
                   console.error(`Failed to delete temporary file ${tempPath}: ${unlinkError.message}`);
                 }
                 console.log('Extraction completed');
+
+                // Windows-specific cleanup
+                if (process.platform === 'win32') {
+                  console.log('Performing Windows-specific cleanup...');
+                  const cudaPath = path.join(extractPath, 'cuda');
+                  const rocmPath = path.join(extractPath, 'rocm');
+                  
+                  removeDirectory(cudaPath);
+                  removeDirectory(rocmPath);
+                  
+                  console.log('Cleanup completed');
+                }
+
                 resolve();
               });
             } catch (error) {
@@ -118,6 +146,7 @@ function downloadAndExtractZip(url, extractPath, redirectCount = 0, timeout = 50
     });
   });
 }
+
 function downloadFile(url, filePath, redirectCount = 0, timeout = 500000) {
   return new Promise((resolve, reject) => {
     if (redirectCount > 5) {
