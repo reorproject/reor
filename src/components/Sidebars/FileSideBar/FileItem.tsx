@@ -7,6 +7,7 @@ import { FaChevronDown, FaChevronRight } from 'react-icons/fa'
 import { isFileNodeDirectory, moveFile } from './utils'
 
 import { removeFileExtension } from '@/utils/strings'
+import { ContextMenuLocations } from '../../Menu/CustomContextMenu'
 
 interface FileInfoProps {
   file: FileInfoNode
@@ -16,6 +17,7 @@ interface FileInfoProps {
   onDirectoryToggle: (path: string) => void
   isExpanded?: boolean
   indentMultiplyer?: number
+  handleFocusedItem: (event: React.MouseEvent<HTMLDivElement>, focusedItem: ContextMenuLocations) => void
 }
 
 const FileItem: React.FC<FileInfoProps> = ({
@@ -26,6 +28,7 @@ const FileItem: React.FC<FileInfoProps> = ({
   onDirectoryToggle,
   isExpanded,
   indentMultiplyer,
+  handleFocusedItem,
 }) => {
   const isDirectory = isFileNodeDirectory(file)
   const isSelected = file.path === selectedFilePath
@@ -72,21 +75,23 @@ const FileItem: React.FC<FileInfoProps> = ({
     handleDragStart(e, file)
   }
 
-  const handleContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    window.electronUtils.showFileItemContextMenu(file)
-  }
-
   const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-neutral-700 h-full mt-0 mb-0 text-cyan-100 font-sans text-xs leading-relaxed rounded-md ${
     isSelected ? 'bg-neutral-700 text-white font-semibold' : 'text-gray-200'
   } ${isDragOver ? 'bg-neutral-500' : ''}`
+
+  const handleFocusDirOrFile = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.stopPropagation()
+    if (isDirectory)
+      handleFocusedItem(event, 'DirectoryItem')
+    else
+      handleFocusedItem(event, 'FileItem')
+  }
 
   return (
     <div
       draggable
       onDragStart={localHandleDragStart}
-      onContextMenu={handleContextMenu}
+      onContextMenu={(e) => handleFocusDirOrFile(e)}
       style={{ paddingLeft: `${indentation}px` }}
       onDragOver={handleDragOver}
       onDrop={handleDrop}

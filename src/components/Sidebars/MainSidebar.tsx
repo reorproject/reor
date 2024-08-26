@@ -10,6 +10,7 @@ import { ChatHistoryMetadata } from '../Chat/hooks/use-chat-history'
 import SearchComponent from './FileSidebarSearch'
 import { Chat, ChatFilters } from '../Chat/types'
 import { FileSidebar } from './FileSideBar'
+import { ContextMenuLocations } from '../Menu/CustomContextMenu'
 
 export type SidebarAbleToShow = 'files' | 'search' | 'chats'
 interface SidebarManagerProps {
@@ -29,6 +30,7 @@ interface SidebarManagerProps {
   setCurrentChatHistory: (chat: Chat | undefined) => void
   setChatFilters: (chatFilters: ChatFilters) => void
   setShowChatbot: (showChat: boolean) => void
+  handleFocusedItem: (event: React.MouseEvent<HTMLDivElement>, focusedItem: ContextMenuLocations) => void
 }
 
 const SidebarManager: React.FC<SidebarManagerProps> = ({
@@ -48,12 +50,13 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
   setCurrentChatHistory,
   setChatFilters,
   setShowChatbot,
+  handleFocusedItem,
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [searchResults, setSearchResults] = useState<DBQueryResult[]>([])
 
   return (
-    <div className="size-full overflow-y-hidden">
+    <div onContextMenu={(e) => handleFocusedItem(e, 'FileSidebar')} className="size-full overflow-y-hidden">
       {sidebarShowing === 'files' && (
         <FileSidebar
           files={files}
@@ -66,6 +69,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
           setNoteToBeRenamed={setNoteToBeRenamed}
           fileDirToBeRenamed={fileDirToBeRenamed}
           setFileDirToBeRenamed={setFileDirToBeRenamed}
+          handleFocusedItem={handleFocusedItem}
         />
       )}
       {sidebarShowing === 'search' && (
@@ -101,6 +105,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
             })
           }}
           setShowChatbot={setShowChatbot}
+          handleFocusedItem={handleFocusedItem}
         />
       )}
     </div>

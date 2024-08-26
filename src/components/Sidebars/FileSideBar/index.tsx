@@ -7,6 +7,8 @@ import FileItem from './FileItem'
 import { isFileNodeDirectory } from './utils'
 import RenameNoteModal from '@/components/File/RenameNote'
 import RenameDirModal from '@/components/File/RenameDirectory'
+import { ContextMenuLocations } from '../../Menu/CustomContextMenu'
+
 
 const handleDragStartImpl = (e: React.DragEvent, file: FileInfoNode) => {
   e.dataTransfer.setData('text/plain', file.path)
@@ -14,8 +16,16 @@ const handleDragStartImpl = (e: React.DragEvent, file: FileInfoNode) => {
 } // Assuming FileItem is in a separate file
 
 const Rows: React.FC<ListChildComponentProps> = ({ index, style, data }) => {
-  const { visibleItems, selectedFilePath, onFileSelect, handleDragStart, handleDirectoryToggle, expandedDirectories } =
-    data
+  const { 
+    visibleItems, 
+    selectedFilePath, 
+    onFileSelect, 
+    handleDragStart, 
+    handleDirectoryToggle, 
+    expandedDirectories,
+    handleFocusedItem 
+  } = data
+
   const fileObject = visibleItems[index]
   return (
     <div style={style}>
@@ -27,6 +37,7 @@ const Rows: React.FC<ListChildComponentProps> = ({ index, style, data }) => {
         onDirectoryToggle={handleDirectoryToggle}
         isExpanded={expandedDirectories.has(fileObject.file.path) && expandedDirectories.get(fileObject.file.path)}
         indentMultiplyer={fileObject.indentMultiplyer}
+        handleFocusedItem={handleFocusedItem}
       />
     </div>
   )
@@ -40,6 +51,7 @@ interface FileExplorerProps {
   expandedDirectories: Map<string, boolean>
   handleDirectoryToggle: (path: string) => void
   lheight?: number
+  handleFocusedItem: (event: React.MouseEvent<HTMLDivElement>, focusedItem: ContextMenuLocations) => void
 }
 
 const FileExplorer: React.FC<FileExplorerProps> = ({
@@ -50,6 +62,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   expandedDirectories,
   handleDirectoryToggle,
   lheight,
+  handleFocusedItem,
 }) => {
   const [listHeight, setListHeight] = useState(lheight ?? window.innerHeight)
 
@@ -102,6 +115,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
           handleDragStart,
           handleDirectoryToggle,
           expandedDirectories,
+          handleFocusedItem,
         }}
       >
         {Rows}
@@ -122,6 +136,7 @@ interface FileListProps {
   fileDirToBeRenamed: string
   setFileDirToBeRenamed: (dir: string) => void
   listHeight?: number
+  handleFocusedItem: (event: React.MouseEvent<HTMLDivElement>, focusedItem: ContextMenuLocations) => void
 }
 
 export const FileSidebar: React.FC<FileListProps> = ({
@@ -136,6 +151,7 @@ export const FileSidebar: React.FC<FileListProps> = ({
   fileDirToBeRenamed,
   setFileDirToBeRenamed,
   listHeight,
+  handleFocusedItem,
 }) => (
   <div className="flex h-full flex-col overflow-hidden text-white">
     {noteToBeRenamed && (
@@ -166,6 +182,7 @@ export const FileSidebar: React.FC<FileListProps> = ({
       expandedDirectories={expandedDirectories}
       handleDirectoryToggle={handleDirectoryToggle}
       lheight={listHeight}
+      handleFocusedItem={handleFocusedItem}
     />
   </div>
 )

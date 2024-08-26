@@ -18,6 +18,7 @@ import { ModalProvider } from '../providers/ModalProvider'
 import WritingAssistant from './WritingAssistant/WritingAssistant'
 import { Chat, ChatFilters } from './Chat/types'
 import useFileInfoTree from './Sidebars/FileSideBar/hooks/use-file-info-tree'
+import { ContextMenuLocations } from './Menu/CustomContextMenu'
 
 const UNINITIALIZED_STATE = 'UNINITIALIZED_STATE'
 
@@ -34,6 +35,7 @@ const MainPageComponent: React.FC = () => {
     maxDate: new Date(),
   })
   const [sidebarWidth, setSidebarWidth] = useState<number>(40)
+  const [focusedItem,  setFocusedItem] = useState<ContextMenuLocations>('None')
 
   const filePathRef = React.useRef<string>('')
   const chatIDRef = React.useRef<string>('')
@@ -154,6 +156,11 @@ const MainPageComponent: React.FC = () => {
     }
   }, [setCurrentChatHistory, setChatFilters])
 
+  const handleFocusedItem = (event: React.MouseEvent<HTMLDivElement>, focusedItem: ContextMenuLocations) => {
+    event.preventDefault()
+    console.log("Focused item:", focusedItem)
+  }
+
   return (
     <div className="relative overflow-x-hidden">
       {/* Displays the dropdown tab when hovering. You cannot use z-index and position absolute inside 
@@ -214,6 +221,7 @@ const MainPageComponent: React.FC = () => {
               setCurrentChatHistory={openChatSidebarAndChat}
               setChatFilters={setChatFilters}
               setShowChatbot={setShowChatbot}
+              handleFocusedItem={handleFocusedItem}
             />
           </div>
         </ResizableComponent>
