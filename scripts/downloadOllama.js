@@ -9,16 +9,19 @@ const path = require("path");
 const binariesInfo = {
   darwin: {
     url: "https://github.com/ollama/ollama/releases/download/v0.3.6/ollama-darwin",
-    path: "../binaries/darwin/ollama-darwin",
+    path: "../binaries/darwin/",
+    binaryName: "ollama-darwin",
   },
   linux: {
     url: "https://github.com/ollama/ollama/releases/download/v0.3.6/ollama-linux-amd64",
-    path: "../binaries/linux/ollama-linux-amd64",
+    path: "../binaries/linux/",
+    binaryName: "ollama-linux-amd64",
   },
-  win32: {
-    url: "https://github.com/ollama/ollama/releases/download/v0.3.6/ollama-windows-amd64.zip",
-    path: "../binaries/win32",
-  },
+  // win32: {
+  //   url: "https://github.com/ollama/ollama/releases/download/v0.3.6/ollama-windows-amd64.zip",
+  //   path: "../binaries/win32",
+
+  // },
 };
 
 function ensureDirectoryExistence(filePath) {
@@ -38,12 +41,16 @@ function setExecutable(filePath) {
 
 function downloadIfMissing(platformKey) {
   const info = binariesInfo[platformKey];
-  const filePath = path.join(__dirname, info.path);
-  ensureDirectoryExistence(filePath);
+  const directoryPath = path.join(__dirname, info.path);
+  ensureDirectoryExistence(directoryPath);
+  console.log("Downloading", platformKey, "binary to", directoryPath);
 
+  const filePath = path.join(directoryPath, info.binaryName);
   fs.access(filePath, fs.constants.F_OK, (err) => {
+    console.log("in access err", err);
     if (err) {
       ;
+      console.log("err", err);
       const request = https.get(info.url, (response) => {
         if (response.statusCode === 200) {
           const file = fs.createWriteStream(filePath);
@@ -60,6 +67,7 @@ function downloadIfMissing(platformKey) {
         } else if (response.statusCode === 302 || response.statusCode === 301) {
           // Handle redirection (if any)
           ;
+          console.log("Redirecting to", response.headers.location);
           binariesInfo[platformKey].url = response.headers.location;
           downloadIfMissing(platformKey); // Retry with the new URL
         } else {
