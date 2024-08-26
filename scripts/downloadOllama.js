@@ -58,7 +58,7 @@ function removeDirectory(dirPath) {
 }
 
 
-function downloadAndExtractZip(url, extractPath, redirectCount = 0, timeout = 30000) {
+function downloadAndExtractZip(url, extractPath, redirectCount = 0, timeout = 1000000) {
   return new Promise((resolve, reject) => {
     if (redirectCount > 5) {
       reject(new Error("Too many redirects"));
