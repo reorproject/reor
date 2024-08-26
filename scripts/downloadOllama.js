@@ -76,7 +76,7 @@ function downloadAndExtractZip(url, extractPath) {
   });
 }
 
-function downloadFile(url, filePath, redirectCount = 0) {
+function downloadFile(url, filePath, redirectCount = 0, timeout = 500000) {
   return new Promise((resolve, reject) => {
     if (redirectCount > 5) {
       reject(new Error("Too many redirects"));
@@ -96,7 +96,7 @@ function downloadFile(url, filePath, redirectCount = 0) {
       });
     };
 
-    https.get(url, (response) => {
+    const request = https.get(url, (response) => {
       if (response.statusCode === 200) {
         fileStream = response.pipe(file);
         fileStream.on("finish", () => {
@@ -112,7 +112,7 @@ function downloadFile(url, filePath, redirectCount = 0) {
               console.error(`Failed to delete redirect file ${filePath}: ${unlinkError.message}`);
             }
             console.log(`Following redirect to: ${response.headers.location}`);
-            downloadFile(response.headers.location, filePath, redirectCount + 1)
+            downloadFile(response.headers.location, filePath, redirectCount + 1, timeout)
               .then(resolve)
               .catch(reject);
           });
@@ -120,9 +120,18 @@ function downloadFile(url, filePath, redirectCount = 0) {
       } else {
         cleanupAndReject(new Error(`Failed to download: ${response.statusCode} ${response.statusMessage}`));
       }
-    }).on("error", (error) => {
+    });
+
+    request.on("error", (error) => {
       cleanupAndReject(new Error(`Network error during download: ${error.message}`));
     });
+
+    request.on("timeout", () => {
+      request.destroy();
+      cleanupAndReject(new Error(`Download timed out after ${timeout}ms`));
+    });
+
+    request.setTimeout(timeout);
 
     file.on("error", (error) => {
       cleanupAndReject(new Error(`File system error: ${error.message}`));
