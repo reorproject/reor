@@ -56,7 +56,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
   const [searchResults, setSearchResults] = useState<DBQueryResult[]>([])
 
   return (
-    <div onContextMenu={(e) => handleFocusedItem(e, 'FileSidebar')} className="size-full overflow-y-hidden">
+    <div className="size-full overflow-y-hidden">
       {sidebarShowing === 'files' && (
         <FileSidebar
           files={files}

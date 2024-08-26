@@ -181,7 +181,12 @@ const MainPageComponent: React.FC = () => {
           TitleBar since one of the Parent components inadvertently creates a new stacking context that 
           impacts the z-index. */}
       <div id="tooltip-container" />
-      <CustomContextMenu focusedItem={focusedItem} hideFocusedItem={hideFocusedItem} />
+      <CustomContextMenu 
+        focusedItem={focusedItem} 
+        hideFocusedItem={hideFocusedItem} 
+        editor={editor}
+        setFilePath={setFilePath}
+      />
       <TabProvider
         openTabContent={openTabContent}
         currentTab={currentTab}

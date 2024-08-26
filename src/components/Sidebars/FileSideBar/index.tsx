@@ -102,7 +102,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   const itemCount = visibleItems.length
 
   return (
-    <div className="h-full grow px-1 pt-2 opacity-70">
+    <div onContextMenu={(e) => handleFocusedItem(e, 'FileSidebar')} className="h-full grow px-1 pt-2 opacity-70 bg-orange">
       <List
         height={listHeight}
         itemCount={itemCount}
