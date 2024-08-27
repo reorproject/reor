@@ -82,7 +82,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
         const models = await window.ipcRenderer.invoke('get-llm-configs')
         setLlmModels(models)
       } catch (error) {
-        console.error('Failed to fetch LLM models:', error)
+        throw new Error("Not able to fetch the llm models")
       }
     }
 
@@ -92,7 +92,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   const sendMessageButtonHandler = (e: any) => {
     // Logic to send message button to the selected LLM
     e.preventDefault()
-    console.log(`the message ${e.target} is being sent in llm model ${selectedLlm}`)
 
     handlePromptSelection(undefined)
   }
