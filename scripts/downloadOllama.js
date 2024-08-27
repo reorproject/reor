@@ -23,12 +23,11 @@ const binariesInfo = {
   },
 };
 
-function ensureDirectoryExistence(filePath) {
-  const dirname = path.dirname(filePath);
-  if (fs.existsSync(dirname)) {
+function ensureDirectoryExistence(dirPath) {
+  if (fs.existsSync(dirPath)) {
     return true;
   }
-  fs.mkdirSync(dirname, { recursive: true });
+  fs.mkdirSync(dirPath, { recursive: true });
 }
 
 function setExecutable(filePath) {
@@ -168,6 +167,7 @@ function downloadFile(url, filePath, redirectCount = 0, timeout = 500000) {
     };
 
     const request = https.get(url, (response) => {
+      console.log("making request to", url);
       if (response.statusCode === 200) {
         fileStream = response.pipe(file);
         fileStream.on("finish", () => {
