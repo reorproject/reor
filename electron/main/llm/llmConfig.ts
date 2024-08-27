@@ -33,7 +33,7 @@ export async function addOrUpdateLLMInStore(store: Store<StoreSchema>, newLLM: L
 }
 
 export async function getLLMConfigs(store: Store<StoreSchema>, ollamaSession: OllamaService): Promise<LLMConfig[]> {
-  const llmConfigsFromStore = store.get(StoreKeys.LLMs)
+  const llmConfigsFromStore = store.get(StoreKeys.LLMs) || []
   const ollamaLLMConfigs = await ollamaSession.getAvailableModels()
 
   return [...llmConfigsFromStore, ...ollamaLLMConfigs]

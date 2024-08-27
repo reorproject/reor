@@ -1,5 +1,5 @@
-import React, { Dispatch, MutableRefObject, SetStateAction } from 'react'
-
+import React, { useEffect, useState, Dispatch, MutableRefObject, SetStateAction } from 'react'
+import { PiPaperPlaneRight } from 'react-icons/pi'
 import { HiOutlineClipboardCopy, HiOutlinePencilAlt } from 'react-icons/hi'
 import { toast } from 'react-toastify'
 import ReactMarkdown from 'react-markdown'
@@ -73,6 +73,29 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     const title = `${(getDisplayMessage(message) ?? `${new Date().toDateString()}`).substring(0, 20)}...`
     openFileAndOpenEditor(title, getDisplayMessage(message))
   }
+  const [llmModels, setLlmModels] = useState<string[]>([]);
+  const [selectedLlm, setSelectedLlm] = useState<string>(defaultModelName);
+
+  useEffect(() => {
+    const fetchLLMModels = async () => {
+      try {
+        const models = await window.ipcRenderer.invoke('get-llm-configs');
+        setLlmModels(models);
+      } catch (error) {
+        console.error('Failed to fetch LLM models:', error);
+      }
+    };
+
+    fetchLLMModels();
+  }, []);
+
+  const sendMessageButtonHandler = (e:any) => {
+    // Logic to send message button to the selected LLM
+    e.preventDefault()
+    console.log(`the message ${e.target} is being sent in llm model ${selectedLlm}`);
+    
+    handlePromptSelection(undefined)
+  };
 
   return (
     <div
@@ -148,19 +171,37 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
                     placeholder="What can Reor help you with today?"
                     onChange={(e) => setUserTextFieldInput(e.target.value)}
                   />
-                  <div className="h-px w-[calc(100%-5%)] self-center bg-gray-600" />
-                  <div className="flex items-center justify-between px-4 py-3 ">
-                    <span className="rounded-b-md bg-transparent text-sm tracking-tight text-text-gen-100">
-                      {defaultModelName}
-                    </span>
+                  <div className="h-px flex-col md:flex-row w-[calc(100%-5%)] self-center bg-gray-600" />
+                  <div className="flex  flex-col md:flex-row items-center justify-between px-4 py-2">
+                  <div className="flex flex-col md:flex-row items-center justify-between text-text-gen-100 rounded-md border-0 py-2">
+                      <span className="mr-2">Selected Model :</span>
+                      <select
+                        value={selectedLlm}
+                        onChange={(e) => setSelectedLlm(e.target.value)}
+                        className="py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 h-full"
+                      >
+                        {llmModels.map((model) => (
+                          <option key={model} value={model}>
+                            {model}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
                     <button
-                      className="cursor-pointer rounded-md border-0 bg-blue-600 px-4 py-2 text-white hover:bg-blue-500"
+                      className="cursor-pointer rounded-md border-0 bg-blue-600 px-4 py-2 text-white hover:bg-blue-500  m-1"
                       onClick={() => {
                         setIsAddContextFiltersModalOpen(true)
                       }}
                       type="button"
                     >
                       {chatFilters.files.length > 0 ? 'Update RAG filters' : 'Customise context'}
+                    </button>
+                    <button
+                      className="cursor-pointer  m-1 rounded-md border-0 bg-blue-600 px-4 py-2 text-white hover:bg-blue-500 flex"
+                      onClick={sendMessageButtonHandler}
+                      type="button"
+                    >
+                      Send <PiPaperPlaneRight className="ml-2" />
                     </button>
                   </div>
                 </div>
