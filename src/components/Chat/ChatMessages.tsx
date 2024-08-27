@@ -89,10 +89,10 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     fetchLLMModels()
   }, [])
 
-  const sendMessageButtonHandler = async(e: any) => {
+  const sendMessageButtonHandler = async (e: any) => {
     // Logic to send message button to the selected LLM
     e.preventDefault()
-    await window.ipcRenderer.invoke("set-default-llm",selectedLlm)
+    await window.ipcRenderer.invoke('set-default-llm', selectedLlm)
     handlePromptSelection(undefined)
   }
 
