@@ -147,7 +147,7 @@ contextBridge.exposeInMainWorld('llm', llm)
 
 // Additional exposures that don't fit the pattern above
 contextBridge.exposeInMainWorld('ipcRenderer', {
-  invoke:ipcRenderer.invoke.bind(ipcRenderer),
+  invoke: ipcRenderer.invoke.bind(ipcRenderer),
   on: ipcRenderer.on.bind(ipcRenderer),
   receive: (channel: string, func: (...args: unknown[]) => void) => {
     const subscription = (_event: Electron.IpcRendererEvent, ...args: unknown[]) => func(...args)
@@ -168,7 +168,7 @@ declare global {
     path: typeof path
     llm: typeof llm
     ipcRenderer: {
-      invoke:typeof ipcRenderer.invoke
+      invoke: typeof ipcRenderer.invoke
       on: typeof ipcRenderer.on
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       receive: (channel: string, func: (...args: any[]) => void) => () => void
