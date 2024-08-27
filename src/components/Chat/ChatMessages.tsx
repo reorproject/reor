@@ -82,7 +82,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
         const models = await window.ipcRenderer.invoke('get-llm-configs')
         setLlmModels(models)
       } catch (error) {
-        throw new Error("Not able to fetch the llm models")
+        throw new Error('Not able to fetch the llm models')
       }
     }
 
