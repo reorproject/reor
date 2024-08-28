@@ -189,8 +189,10 @@ const MainPageComponent: React.FC = () => {
       <div id="tooltip-container" />
       <CustomContextMenu 
         focusedItem={focusedItem} 
+        setFocusedItem={setFocusedItem}
         hideFocusedItem={hideFocusedItem} 
         handleDeleteFile={handleDeleteFile}
+        handleDeleteChat={updateChatHistoriesMetadata}
       />
       <TabProvider
         openTabContent={openTabContent}

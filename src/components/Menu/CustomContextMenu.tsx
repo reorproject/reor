@@ -18,7 +18,7 @@ export interface ContextMenuFocus {
     currentSelection: ContextMenuLocations
     locations: ContextMenuPos
     file?: FileInfoNode
-    chatRow?: ChatHistoryMetadata 
+    chatMetadata?: ChatHistoryMetadata 
 }
 
 export type HandleFocusedItemType = (
@@ -35,18 +35,26 @@ interface ContextMenuPos {
 
 interface CustomContextMenuProps {
     focusedItem: ContextMenuFocus
+    setFocusedItem: (item: ContextMenuFocus) => void
     hideFocusedItem: () => void
     handleDeleteFile: (path: string | undefined) => void
-    handleDeleteChat: (chatID: string) => void
+    handleDeleteChat: (chatID: string | undefined) => void
 }
 
+interface MenuItemType {
+    title: string
+    onSelect: ((...args: any[]) => void) | null
+    icon: string
+}
 
 const CustomContextMenu: React.FC<CustomContextMenuProps> = ({ 
-    focusedItem, 
+    focusedItem,
+    setFocusedItem,
     hideFocusedItem,
-    handleDeleteFile
+    handleDeleteFile,
+    handleDeleteChat,
 }) => {
-    const { currentSelection, locations, file, chatRow } = focusedItem
+    const { currentSelection, locations, file, chatMetadata } = focusedItem
     const menuRef = useRef<HTMLDivElement>(null)
     
     useEffect(() => {
@@ -64,7 +72,7 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
 
     if (currentSelection === 'None') return null
 
-    let displayList = null
+    let displayList: MenuItemType[] = []
     switch(currentSelection) {
         case 'FileSidebar': {
             displayList = [
@@ -88,7 +96,7 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
         }
         case 'ChatItem': {
             displayList = [
-                {title: 'Delete Chat', onSelect: null, icon: ''},
+                {title: 'Delete Chat', onSelect: () => handleDeleteChat(chatMetadata?.id), icon: ''},
             ]
             break
         }
@@ -105,33 +113,49 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
         }
     }
 
+    // Selects the item then hides menu
+    const handleSubmit = (item: MenuItemType) => {
+      if (item.onSelect)
+       item.onSelect()
+      setFocusedItem((prevItem: ContextMenuFocus) => ({
+        ...prevItem,
+        currentSelection: 'None' as ContextMenuLocations,
+      }))
+      console.log("Previous item:", focusedItem)
+    }
+
+    useEffect(() => {
+
+    },)
+
     return (
-        <div 
+      <div>
+        {focusedItem.currentSelection !== 'None' && (
+          <div 
             ref={menuRef}
             className="absolute p-2 rounded-md z-[1020] bg-[#1E1E1E] overflow-y-auto"
             style={{
-                left: locations.x,
-                top: locations.y,
-                boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
+             left: locations.x,
+              top: locations.y,
+              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
             }}
-        >
+          >
             {/* TODO: onClick is a temporarily fix since not everyhing is implemented. */}
             <div className="flex flex-col">
-                {displayList?.map((item, index) => (
-                    <div
-                        key={index}
-                        className="text-[11px] text-white/90 cursor-pointer hover:bg-blue-500 hover:rounded-md px-2 py-1"
-                        onClick={item.onSelect ? item.onSelect : () =>  {}}
-                    >
-                        {item.title}
-                    </div>
-                ))}
+              {displayList?.map((item, index) => (
+                <div
+                  key={index}
+                  className="text-[11px] text-white/90 cursor-pointer hover:bg-blue-500 hover:rounded-md px-2 py-1"
+                  onClick={item.onSelect ? item.onSelect : () => {}}
+                >
+                  {item.title}
+                </div>
+              ))}
             </div>
-        </div>
-    
+          </div>
+        )}
+      </div>
     )
 }
-
-
 
 export default CustomContextMenu

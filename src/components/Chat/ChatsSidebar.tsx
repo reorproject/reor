@@ -14,7 +14,7 @@ export interface ChatItemProps {
     event: React.MouseEvent<HTMLDivElement>,
     focusedItem: ContextMenuLocations,
     additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>
-  ) => void;  // currentSelectedChatID: React.MutableRefObject<string | undefined>
+  ) => void;
 }
 
 export const ChatItem: React.FC<ChatItemProps> = ({
@@ -40,7 +40,7 @@ export const ChatItem: React.FC<ChatItemProps> = ({
         className={itemClasses}
         onContextMenu={(e) => {
           e.stopPropagation()
-          handleFocusedItem(e, 'ChatItem')
+          handleFocusedItem(e, 'ChatItem', { chatMetadata })
         }}
       >
         <IoChatbubbles />

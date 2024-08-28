@@ -29,13 +29,9 @@ export const useChatHistory = () => {
     setCurrentChatHistory(undefined)
   }
 
-  const updateChatHistoriesMetadata = (retrievedChatHistoriesMetadata: Chat[]) => {
-    setChatHistoriesMetadata(
-      retrievedChatHistoriesMetadata.map((chat: Chat) => ({
-        id: chat.id,
-        displayName: getDisplayableChatName(chat),
-      })),
-    )
+  const updateChatHistoriesMetadata = (chatID: string | undefined) => {
+    setChatHistoriesMetadata(chatHistoriesMetadata?.filter((item: ChatHistoryMetadata) => item.id !== chatID))
+    window.electronStore.removeChatHistoryAtID(chatID)
   }
 
   
