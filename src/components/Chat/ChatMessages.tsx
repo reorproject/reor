@@ -56,6 +56,11 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   askText,
   loadAnimation,
 }) => {
+  
+  const [llmModels, setLlmModels] = useState<string[]>([])
+  const [selectedLlm, setSelectedLlm] = useState<string>(defaultModelName)
+
+
   const getClassName = (message: ReorChatMessage): string => {
     return `markdown-content ${message.role}-chat-message`
   }
@@ -73,14 +78,14 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     const title = `${(getDisplayMessage(message) ?? `${new Date().toDateString()}`).substring(0, 20)}...`
     openFileAndOpenEditor(title, getDisplayMessage(message))
   }
-  const [llmModels, setLlmModels] = useState<string[]>([])
-  const [selectedLlm, setSelectedLlm] = useState<string>(defaultModelName)
-
+  
   useEffect(() => {
     const fetchLLMModels = async () => {
       try {
-        const models = await window.ipcRenderer.invoke('get-llm-configs')
-        setLlmModels(models)
+        const LLMConfigs =  await window.llm.getLLMConfigs();
+        // Create an array of modelName strings
+        const modelNames = LLMConfigs.map(config => config.modelName);
+        setLlmModels(modelNames)
       } catch (error) {
         throw new Error('Not able to fetch the llm models')
       }
@@ -92,7 +97,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   const sendMessageButtonHandler = async (e: any) => {
     // Logic to send message button to the selected LLM
     e.preventDefault()
-    await window.ipcRenderer.invoke('set-default-llm', selectedLlm)
+    await window.llm.setDefaultLLM(selectedLlm)
     handlePromptSelection(undefined)
   }
 
