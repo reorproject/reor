@@ -7,7 +7,7 @@ import FileItem from './FileItem'
 import { isFileNodeDirectory } from './utils'
 import RenameNoteModal from '@/components/File/RenameNote'
 import RenameDirModal from '@/components/File/RenameDirectory'
-import { ContextMenuLocations } from '../../Menu/CustomContextMenu'
+import { ContextMenuLocations, ContextMenuFocus } from '../../Menu/CustomContextMenu'
 
 
 const handleDragStartImpl = (e: React.DragEvent, file: FileInfoNode) => {
@@ -51,8 +51,11 @@ interface FileExplorerProps {
   expandedDirectories: Map<string, boolean>
   handleDirectoryToggle: (path: string) => void
   lheight?: number
-  handleFocusedItem: (event: React.MouseEvent<HTMLDivElement>, focusedItem: ContextMenuLocations) => void
-}
+  handleFocusedItem: (
+    event: React.MouseEvent<HTMLDivElement>,
+    focusedItem: ContextMenuLocations,
+    additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>
+  ) => void;}
 
 const FileExplorer: React.FC<FileExplorerProps> = ({
   files,
@@ -136,7 +139,11 @@ interface FileListProps {
   fileDirToBeRenamed: string
   setFileDirToBeRenamed: (dir: string) => void
   listHeight?: number
-  handleFocusedItem: (event: React.MouseEvent<HTMLDivElement>, focusedItem: ContextMenuLocations) => void
+  handleFocusedItem: (
+    event: React.MouseEvent<HTMLDivElement>,
+    focusedItem: ContextMenuLocations,
+    additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>
+  ) => void;
 }
 
 export const FileSidebar: React.FC<FileListProps> = ({

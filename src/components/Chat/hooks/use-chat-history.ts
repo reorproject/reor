@@ -29,24 +29,16 @@ export const useChatHistory = () => {
     setCurrentChatHistory(undefined)
   }
 
-  useEffect(() => {
-    const updateChatHistoriesMetadata = window.ipcRenderer.receive(
-      'update-chat-histories',
-      (retrievedChatHistoriesMetadata: Chat[]) => {
-        setChatHistoriesMetadata(
-          retrievedChatHistoriesMetadata.map((chat: Chat) => ({
-            id: chat.id,
-            displayName: getDisplayableChatName(chat),
-          })),
-        )
-      },
+  const updateChatHistoriesMetadata = (retrievedChatHistoriesMetadata: Chat[]) => {
+    setChatHistoriesMetadata(
+      retrievedChatHistoriesMetadata.map((chat: Chat) => ({
+        id: chat.id,
+        displayName: getDisplayableChatName(chat),
+      })),
     )
+  }
 
-    return () => {
-      updateChatHistoriesMetadata()
-    }
-  }, [])
-
+  
   useEffect(() => {
     fetchChatHistories()
   }, [])
@@ -55,5 +47,6 @@ export const useChatHistory = () => {
     currentChatHistory,
     setCurrentChatHistory,
     chatHistoriesMetadata,
+    updateChatHistoriesMetadata,
   }
 }

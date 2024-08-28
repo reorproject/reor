@@ -7,7 +7,7 @@ import { FaChevronDown, FaChevronRight } from 'react-icons/fa'
 import { isFileNodeDirectory, moveFile } from './utils'
 
 import { removeFileExtension } from '@/utils/strings'
-import { ContextMenuLocations } from '../../Menu/CustomContextMenu'
+import { ContextMenuLocations, ContextMenuFocus } from '../../Menu/CustomContextMenu'
 
 interface FileInfoProps {
   file: FileInfoNode
@@ -17,8 +17,11 @@ interface FileInfoProps {
   onDirectoryToggle: (path: string) => void
   isExpanded?: boolean
   indentMultiplyer?: number
-  handleFocusedItem: (event: React.MouseEvent<HTMLDivElement>, focusedItem: ContextMenuLocations) => void
-}
+  handleFocusedItem: (
+    event: React.MouseEvent<HTMLDivElement>,
+    focusedItem: ContextMenuLocations,
+    additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>
+  ) => void;}
 
 const FileItem: React.FC<FileInfoProps> = ({
   file,
@@ -83,9 +86,9 @@ const FileItem: React.FC<FileInfoProps> = ({
   const handleFocusDirOrFile = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation()
     if (isDirectory)
-      handleFocusedItem(event, 'DirectoryItem')
+      handleFocusedItem(event, 'DirectoryItem', { file })
     else
-      handleFocusedItem(event, 'FileItem')
+      handleFocusedItem(event, 'FileItem', { file })
   }
 
   return (

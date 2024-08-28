@@ -18,7 +18,7 @@ import { ModalProvider } from '../providers/ModalProvider'
 import WritingAssistant from './WritingAssistant/WritingAssistant'
 import { Chat, ChatFilters } from './Chat/types'
 import useFileInfoTree from './Sidebars/FileSideBar/hooks/use-file-info-tree'
-import CustomContextMenu, { ContextMenuLocations, ContextMenuFocus } from './Menu/CustomContextMenu'
+import CustomContextMenu, { ContextMenuLocations, ContextMenuFocus, HandleFocusedItemType } from './Menu/CustomContextMenu'
 
 const UNINITIALIZED_STATE = 'UNINITIALIZED_STATE'
 
@@ -58,9 +58,10 @@ const MainPageComponent: React.FC = () => {
     renameFile,
     navigationHistory,
     setNavigationHistory,
+    handleDeleteFile,
   } = useFileByFilepath()
 
-  const { currentChatHistory, setCurrentChatHistory, chatHistoriesMetadata } = useChatHistory()
+  const { currentChatHistory, setCurrentChatHistory, chatHistoriesMetadata, updateChatHistoriesMetadata } = useChatHistory()
 
   useEffect(() => {
     if (filePath != null && filePathRef.current !== filePath) {
@@ -159,12 +160,17 @@ const MainPageComponent: React.FC = () => {
     }
   }, [setCurrentChatHistory, setChatFilters])
 
-  const handleFocusedItem = (event: React.MouseEvent<HTMLDivElement>, focusedItem: ContextMenuLocations) => {
+  const handleFocusedItem: HandleFocusedItemType = (
+    event: React.MouseEvent<HTMLDivElement>, 
+    focusedItem: ContextMenuLocations,
+    additionalData: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>> = {}
+  ) => {
     event.preventDefault()
 
     setFocusedItem({
       currentSelection: focusedItem,
       locations: { x: event.clientX, y: event.clientY },
+      ...additionalData,
     })
   }
 
@@ -184,8 +190,7 @@ const MainPageComponent: React.FC = () => {
       <CustomContextMenu 
         focusedItem={focusedItem} 
         hideFocusedItem={hideFocusedItem} 
-        editor={editor}
-        setFilePath={setFilePath}
+        handleDeleteFile={handleDeleteFile}
       />
       <TabProvider
         openTabContent={openTabContent}

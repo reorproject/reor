@@ -1,8 +1,6 @@
 import { FileInfoNode } from "electron/main/filesystem/types"
 import React, { useEffect, useRef } from "react"
 import { ChatHistoryMetadata } from "../Chat/hooks/use-chat-history"
-import { deleteFileItem } from "./ContextMenuActions"
-import { Editor } from "@tiptap/react"
 
 /**
  * Name of component that user right clicked on.
@@ -23,6 +21,12 @@ export interface ContextMenuFocus {
     chatRow?: ChatHistoryMetadata 
 }
 
+export type HandleFocusedItemType = (
+    event: React.MouseEvent<HTMLDivElement>, 
+    focusedItem: ContextMenuLocations,
+    additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>
+) => void;
+
 interface ContextMenuPos {
     x: number
     y: number
@@ -32,16 +36,15 @@ interface ContextMenuPos {
 interface CustomContextMenuProps {
     focusedItem: ContextMenuFocus
     hideFocusedItem: () => void
-    editor: Editor | null
-    setFilePath: (path: string) => void
+    handleDeleteFile: (path: string | undefined) => void
+    handleDeleteChat: (chatID: string) => void
 }
 
 
 const CustomContextMenu: React.FC<CustomContextMenuProps> = ({ 
     focusedItem, 
     hideFocusedItem,
-    editor,
-    setFilePath,
+    handleDeleteFile
 }) => {
     const { currentSelection, locations, file, chatRow } = focusedItem
     const menuRef = useRef<HTMLDivElement>(null)
@@ -76,7 +79,7 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
         }
         case 'FileItem': {
             displayList = [
-                {title: 'Delete', onSelect: () => deleteFileItem(file?.path), icon: ''},
+                {title: 'Delete', onSelect: () => handleDeleteFile(file?.path), icon: ''},
                 {title: 'Rename', onSelect: null, icon: ''},
                 {title: 'Create flashcard set', onSelect: null, icon: ''},
                 {title: 'Add File to chat context', onSelect: null, icon: ''},

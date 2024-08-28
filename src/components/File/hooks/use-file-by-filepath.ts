@@ -225,24 +225,18 @@ const useFileByFilepath = () => {
     }
   }
 
-  // delete file depending on file path returned by the listener
-  useEffect(() => {
-    const deleteFile = async (path: string) => {
-      await window.fileSystem.deleteFile(path)
-      window.electronStore.removeOpenTabsByPath(path)
-      // if it is the current file, clear the content and set filepath to null so that it won't save anything else
-      if (currentlyOpenedFilePath === path) {
-        editor?.commands.setContent('')
-        setCurrentlyOpenedFilePath(null)
-      }
-    }
+  // Delete file when contextMenu selects 'Delete' choice
+  const handleDeleteFile = async (path: string | undefined) => {
 
-    const removeDeleteFileListener = window.ipcRenderer.receive('delete-file-listener', deleteFile)
+    if (!path) return
+    await window.fileSystem.deleteFile(path)
+    window.electronStore.removeOpenTabsByPath(path)
 
-    return () => {
-      removeDeleteFileListener()
+    if (currentlyOpenedFilePath === path) {
+      editor?.commands.setContent('')
+      setCurrentlyOpenedFilePath(null)
     }
-  }, [currentlyOpenedFilePath, editor])
+  }
 
   useEffect(() => {
     async function checkAppUsage() {
@@ -322,6 +316,7 @@ const useFileByFilepath = () => {
     renameFile: renameFileNode,
     setSuggestionsState,
     setSpellCheckEnabled,
+    handleDeleteFile,
   }
 }
 

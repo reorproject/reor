@@ -4,14 +4,17 @@ import { RiChatNewFill, RiArrowDownSLine } from 'react-icons/ri'
 import { IoChatbubbles } from 'react-icons/io5'
 import { ChatHistoryMetadata } from './hooks/use-chat-history'
 import { Chat } from './types'
-import { ContextMenuLocations } from '../Menu/CustomContextMenu'
+import { ContextMenuLocations, ContextMenuFocus } from '../Menu/CustomContextMenu'
 
 export interface ChatItemProps {
   chatMetadata: ChatHistoryMetadata
   selectedChatID: string | null
   onChatSelect: (path: string) => void
-  handleFocusedItem: (event: React.MouseEvent<HTMLDivElement>, focusedItem: ContextMenuLocations) => void
-  // currentSelectedChatID: React.MutableRefObject<string | undefined>
+  handleFocusedItem: (
+    event: React.MouseEvent<HTMLDivElement>,
+    focusedItem: ContextMenuLocations,
+    additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>
+  ) => void;  // currentSelectedChatID: React.MutableRefObject<string | undefined>
 }
 
 export const ChatItem: React.FC<ChatItemProps> = ({
@@ -33,7 +36,6 @@ export const ChatItem: React.FC<ChatItemProps> = ({
       <div
         onClick={() => {
           onChatSelect(chatMetadata.id)
-          // currentSelectedChatID.current = chatMetadata.id
         }}
         className={itemClasses}
         onContextMenu={(e) => {
@@ -54,8 +56,11 @@ interface ChatListProps {
   onSelect: (chatID: string) => void
   newChat: () => void
   setShowChatbot: (showChat: boolean) => void
-  handleFocusedItem: (event: React.MouseEvent<HTMLDivElement>, focusedItem: ContextMenuLocations) => void
-}
+  handleFocusedItem: (
+    event: React.MouseEvent<HTMLDivElement>,
+    focusedItem: ContextMenuLocations,
+    additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>
+  ) => void;}
 
 export const ChatsSidebar: React.FC<ChatListProps> = ({
   chatHistoriesMetadata,

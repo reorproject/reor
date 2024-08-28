@@ -10,7 +10,7 @@ import { ChatHistoryMetadata } from '../Chat/hooks/use-chat-history'
 import SearchComponent from './FileSidebarSearch'
 import { Chat, ChatFilters } from '../Chat/types'
 import { FileSidebar } from './FileSideBar'
-import { ContextMenuLocations } from '../Menu/CustomContextMenu'
+import { ContextMenuLocations, ContextMenuFocus } from '../Menu/CustomContextMenu'
 
 export type SidebarAbleToShow = 'files' | 'search' | 'chats'
 interface SidebarManagerProps {
@@ -30,7 +30,11 @@ interface SidebarManagerProps {
   setCurrentChatHistory: (chat: Chat | undefined) => void
   setChatFilters: (chatFilters: ChatFilters) => void
   setShowChatbot: (showChat: boolean) => void
-  handleFocusedItem: (event: React.MouseEvent<HTMLDivElement>, focusedItem: ContextMenuLocations) => void
+  handleFocusedItem: (
+    event: React.MouseEvent<HTMLDivElement>,
+    focusedItem: ContextMenuLocations,
+    additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>
+  ) => void;
 }
 
 const SidebarManager: React.FC<SidebarManagerProps> = ({
