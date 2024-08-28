@@ -124,10 +124,6 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
       console.log("Previous item:", focusedItem)
     }
 
-    useEffect(() => {
-
-    },)
-
     return (
       <div>
         {focusedItem.currentSelection !== 'None' && (
@@ -146,7 +142,7 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
                 <div
                   key={index}
                   className="text-[11px] text-white/90 cursor-pointer hover:bg-blue-500 hover:rounded-md px-2 py-1"
-                  onClick={item.onSelect ? item.onSelect : () => {}}
+                  onClick={() => handleSubmit(item)}
                 >
                   {item.title}
                 </div>
