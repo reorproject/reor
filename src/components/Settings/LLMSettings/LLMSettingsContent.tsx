@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 
 import DefaultLLMSelector from './DefaultLLMSelector'
 import useLLMConfigs from './hooks/use-llm-configs'
@@ -7,37 +7,11 @@ import useModals from './hooks/use-modals'
 import CustomSelect from '@/components/Common/Select'
 import SettingsRow from '../Shared/SettingsRow'
 
-interface LLMSettingsContentProps {
-  userHasCompleted?: (completed: boolean) => void
-  userTriedToSubmit?: boolean
-  isInitialSetup: boolean
-}
+interface LLMSettingsContentProps {}
 
-const LLMSettingsContent: React.FC<LLMSettingsContentProps> = ({
-  userHasCompleted,
-  userTriedToSubmit,
-  isInitialSetup,
-}) => {
+const LLMSettingsContent: React.FC<LLMSettingsContentProps> = () => {
   const { llmConfigs, defaultLLM, setDefaultLLM, fetchAndUpdateModelConfigs } = useLLMConfigs()
   const { modals, openModal, closeModal } = useModals()
-
-  const [userMadeChanges, setUserMadeChanges] = useState<boolean>(false)
-  const [currentError, setCurrentError] = useState<string>('')
-
-  useEffect(() => {
-    if (defaultLLM) {
-      setCurrentError('')
-      userHasCompleted?.(true)
-    } else {
-      setCurrentError('No model selected')
-      userHasCompleted?.(false)
-    }
-  }, [defaultLLM, userHasCompleted])
-
-  const handleModelChange = (model: string) => {
-    setUserMadeChanges(true)
-    userHasCompleted?.(!!model)
-  }
 
   const modalOptions = [
     { label: 'OpenAI Setup', value: 'openai' },
@@ -52,17 +26,13 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = ({
           {/* <h4 className="text-gray-200 text-center font-normal">Default LLM</h4> */}
           <div className="flex-col">
             <p className="mt-5 text-gray-100">Default LLM</p>
-          </div>
+          </div>{' '}
           <div className="mb-1 flex w-[140px] min-w-[128px]">
-            <DefaultLLMSelector
-              onModelChange={handleModelChange}
-              llmConfigs={llmConfigs}
-              defaultLLM={defaultLLM}
-              setDefaultLLM={setDefaultLLM}
-            />
+            <DefaultLLMSelector llmConfigs={llmConfigs} defaultLLM={defaultLLM} setDefaultLLM={setDefaultLLM} />
           </div>
         </div>
       )}
+
       <div className="h-[2px] w-full bg-neutral-700" />
       <SettingsRow
         title="Local LLM"
@@ -84,13 +54,6 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = ({
         buttonText="Remote LLM Setup"
         onClick={() => openModal('remoteLLM')}
       />
-      {!isInitialSetup && userMadeChanges && (
-        <p className="mt-1 text-xs text-slate-100">
-          Note: You&apos;ll need to refresh the chat window to apply these changes.
-        </p>
-      )}
-      {userTriedToSubmit && !defaultLLM && <p className="mt-1 text-sm text-red-500">{currentError}</p>}
-      {/* Render modals */}
       {Object.entries(modals).map(([key, { isOpen, Component }]) => (
         <Component
           key={key}

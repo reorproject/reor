@@ -6,22 +6,15 @@ import posthog from 'posthog-js'
 import CustomSelect from '../../Common/Select'
 
 interface DefaultLLMSelectorProps {
-  onModelChange: (model: string) => void
   llmConfigs: LLMConfig[]
   defaultLLM: string
   setDefaultLLM: (model: string) => void
 }
 
-const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({
-  onModelChange,
-  llmConfigs,
-  defaultLLM,
-  setDefaultLLM,
-}) => {
+const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({ llmConfigs, defaultLLM, setDefaultLLM }) => {
   const handleDefaultModelChange = (selectedModel: string) => {
     setDefaultLLM(selectedModel)
     window.llm.setDefaultLLM(selectedModel)
-    onModelChange(selectedModel)
     posthog.capture('change_default_llm', {
       defaultLLM: selectedModel,
     })

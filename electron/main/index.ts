@@ -20,7 +20,7 @@ Sentry.init({
 })
 
 const store = new Store<StoreSchema>()
-// store.clear(); // clear store for testing CAUTION: THIS WILL DELETE YOUR CHAT HISTORY
+// store.clear() // clear store for testing CAUTION: THIS WILL DELETE YOUR CHAT HISTORY
 const windowsManager = new WindowsManager()
 
 process.env.DIST_ELECTRON = join(__dirname, '../')
