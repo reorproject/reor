@@ -9,7 +9,6 @@ import { FaRegUserCircle } from 'react-icons/fa'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import AddContextFiltersModal from './AddContextFiltersModal'
 import PromptSuggestion from './ChatPrompts'
-
 import LoadingDots from '@/utils/animations'
 import '../../styles/chat.css'
 import { Chat, ChatFilters, ReorChatMessage } from './types'
@@ -108,7 +107,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
                     {message.role === 'user' ? (
                       <FaRegUserCircle size={22} />
                     ) : (
-                      <img src="/src/assets/reor-logo.svg" style={{ width: '22px', height: '22px' }} alt="ReorImage" />
+                      <img src="icon.png" style={{ width: '22px', height: '22px' }} alt="ReorImage" />
                     )}
                   </div>
                   <div className="w-full flex-col gap-1">
@@ -148,7 +147,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
             <div className="relative flex w-full flex-col items-center">
               <div className="relative flex size-full flex-col text-center lg:top-10 lg:max-w-2xl">
                 <div className="flex size-full justify-center">
-                  <img src="/src/assets/reor-logo.svg" style={{ width: '64px', height: '64px' }} alt="ReorImage" />
+                  <img src="icon.png" style={{ width: '64px', height: '64px' }} alt="ReorImage" />
                 </div>
                 <h1 className="mb-10 text-[28px] text-gray-300">
                   Welcome to your AI-powered assistant! Start a conversation with your second brain!
@@ -211,7 +210,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 
         {loadAnimation && (
           <div className="relative left-4 ml-1 mt-4 flex w-full max-w-3xl items-start gap-6">
-            <img src="/src/assets/reor-logo.svg" style={{ width: '22px', height: '22px' }} alt="ReorImage" />
+            <img src="icon.png" style={{ width: '22px', height: '22px' }} alt="ReorImage" />
             <LoadingDots />
           </div>
         )}
