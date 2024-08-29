@@ -57,11 +57,9 @@ const InitialSetupLLMSettings: React.FC<InitialSetupLLMSettingsProps> = ({ userH
             fetchAndUpdateModelConfigs()
           }}
         >
-          <LLMSettingsContent
-            userHasCompleted={userHasCompleted}
-            userTriedToSubmit={userTriedToSubmit}
-            isInitialSetup
-          />
+          <div className="p-5">
+            <LLMSettingsContent />
+          </div>
         </ReorModal>
       </div>
       {userTriedToSubmit && llmConfigs.length === 0 && (
