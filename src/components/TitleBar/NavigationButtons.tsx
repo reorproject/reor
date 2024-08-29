@@ -4,7 +4,7 @@ import posthog from 'posthog-js'
 import { IoMdArrowRoundBack, IoMdArrowRoundForward } from 'react-icons/io'
 
 import { removeFileExtension } from '@/utils/strings'
-import '../../../styles/history.scss'
+import '../../styles/history.scss'
 
 interface FileHistoryNavigatorProps {
   history: string[]
