@@ -11,6 +11,7 @@ interface NewNoteComponentProps {
   onClose: () => void
   openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => void
   currentOpenFilePath: string | null
+  optionalAbsoluteCreate?: string | null
 }
 
 const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
@@ -18,6 +19,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
   onClose,
   openFileAndOpenEditor,
   currentOpenFilePath,
+  optionalAbsoluteCreate,
 }) => {
   const [fileName, setFileName] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -49,9 +51,13 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
     if (!fileName || errorMessage) return
 
     let finalPath = fileName
-    if (currentOpenFilePath !== '' && currentOpenFilePath !== null) {
-      const directoryName = await window.path.dirname(currentOpenFilePath)
-      finalPath = await window.path.join(directoryName, fileName)
+    if (optionalAbsoluteCreate) {
+      finalPath = await window.path.join(optionalAbsoluteCreate, fileName)
+    } else {
+      if (currentOpenFilePath !== '' && currentOpenFilePath !== null) {
+        const directoryName = await window.path.dirname(currentOpenFilePath)
+        finalPath = await window.path.join(directoryName, fileName)
+      }
     }
     const basename = await window.path.basename(finalPath)
     openFileAndOpenEditor(finalPath, `# ${basename}\n`)
