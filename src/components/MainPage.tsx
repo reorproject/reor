@@ -53,6 +53,7 @@ const MainPageComponent: React.FC = () => {
     highlightData,
     noteToBeRenamed,
     setNoteToBeRenamed,
+    setFileNodeToBeRenamed,
     fileDirToBeRenamed,
     setFileDirToBeRenamed,
     renameFile,
@@ -187,13 +188,18 @@ const MainPageComponent: React.FC = () => {
           TitleBar since one of the Parent components inadvertently creates a new stacking context that 
           impacts the z-index. */}
       <div id="tooltip-container" />
-      <CustomContextMenu 
-        focusedItem={focusedItem} 
-        setFocusedItem={setFocusedItem}
-        hideFocusedItem={hideFocusedItem} 
-        handleDeleteFile={handleDeleteFile}
-        handleDeleteChat={updateChatHistoriesMetadata}
-      />
+      <ModalProvider>
+        <CustomContextMenu 
+          focusedItem={focusedItem} 
+          setFocusedItem={setFocusedItem}
+          hideFocusedItem={hideFocusedItem} 
+          handleDeleteFile={handleDeleteFile}
+          handleDeleteChat={updateChatHistoriesMetadata}
+          setFileNodeToBeRenamed={setFileNodeToBeRenamed}
+          openFileAndOpenEditor={openFileAndOpenEditor}
+          currentFilePath={filePath}
+        />
+      </ModalProvider>
       <TabProvider
         openTabContent={openTabContent}
         currentTab={currentTab}

@@ -270,15 +270,15 @@ const useFileByFilepath = () => {
   }
 
   // open a new file rename dialog
-  useEffect(() => {
-    const renameFileListener = window.ipcRenderer.receive('rename-file-listener', (noteName: string) =>
-      setFileNodeToBeRenamed(noteName),
-    )
+  // useEffect(() => {
+  //   const renameFileListener = window.ipcRenderer.receive('rename-file-listener', (noteName: string) =>
+  //     setFileNodeToBeRenamed(noteName),
+  //   )
 
-    return () => {
-      renameFileListener()
-    }
-  }, [])
+  //   return () => {
+  //     renameFileListener()
+  //   }
+  // }, [])
 
   useEffect(() => {
     const handleWindowClose = async () => {
@@ -315,6 +315,7 @@ const useFileByFilepath = () => {
     fileDirToBeRenamed,
     setFileDirToBeRenamed,
     renameFile: renameFileNode,
+    setFileNodeToBeRenamed,
     setSuggestionsState,
     setSpellCheckEnabled,
     handleDeleteFile,
