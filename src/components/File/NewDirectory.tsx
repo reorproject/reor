@@ -10,9 +10,10 @@ interface NewDirectoryComponentProps {
   isOpen: boolean
   onClose: () => void
   currentOpenFilePath: string | null
+  optionalAbsoluteCreate: string | null
 }
 
-const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, onClose, currentOpenFilePath }) => {
+const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, onClose, currentOpenFilePath, optionalAbsoluteCreate }) => {
   const [directoryName, setDirectoryName] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -42,11 +43,16 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
     await handleValidName(directoryName)
     if (!directoryName || errorMessage || currentOpenFilePath === null) return
 
-    const directoryPath =
+    let finalPath = ''
+    if (optionalAbsoluteCreate) {
+      finalPath = await window.path.join(optionalAbsoluteCreate, directoryName)
+    } else {
+      const directoryPath =
       currentOpenFilePath === ''
         ? await window.electronStore.getVaultDirectoryForWindow()
         : await window.path.dirname(currentOpenFilePath)
-    const finalPath = await window.path.join(directoryPath, directoryName)
+        finalPath = await window.path.join(directoryPath, directoryName)
+    }    
     window.fileSystem.createDirectory(finalPath)
     posthog.capture('created_new_directory_from_new_directory_modal')
     onClose()

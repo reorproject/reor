@@ -115,7 +115,7 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
       }
       case 'DirectoryItem': {
           displayList = [
-              {title: 'New Directory', onSelect: null, icon: ''},
+              {title: 'New Directory', onSelect: () => setIsNewDirectoryModalOpen(true), icon: ''},
               {title: 'New Note', onSelect: () => setIsNewNoteModalOpen(true), icon: ''},
               {title: 'Delete', onSelect: null, icon: ''},
               {title: 'Rename', onSelect: null, icon: ''},
@@ -169,13 +169,14 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
         openFileAndOpenEditor={openFileAndOpenEditor}
-        currentOpenFilePath={file?.path ? file?.path : null}
+        currentOpenFilePath={null}
         optionalAbsoluteCreate={file?.path ? file?.path : null}
       />
       <NewDirectoryComponent
         isOpen={isNewDirectoryModalOpen}
         onClose={() => setIsNewDirectoryModalOpen(false)}
-        currentOpenFilePath={null}
+        currentOpenFilePath={file?.path ? file?.path : null}
+        optionalAbsoluteCreate={file?.path ? file?.path : null}
       />
     </div>
   )
