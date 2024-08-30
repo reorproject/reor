@@ -117,8 +117,8 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
           displayList = [
               {title: 'New Directory', onSelect: () => setIsNewDirectoryModalOpen(true), icon: ''},
               {title: 'New Note', onSelect: () => setIsNewNoteModalOpen(true), icon: ''},
-              {title: 'Delete', onSelect: null, icon: ''},
-              {title: 'Rename', onSelect: null, icon: ''},
+              {title: 'Delete', onSelect: () => handleDeleteFile(file?.path), icon: ''},
+              {title: 'Rename', onSelect: () => {file?.path ? setFileNodeToBeRenamed(file?.path) : ''}, icon: ''},
               {title: 'Create flashcard set', onSelect: null, icon: ''},
               {title: 'Add file to chat context', onSelect: null, icon: ''},
           ]
