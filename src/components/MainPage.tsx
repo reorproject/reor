@@ -141,25 +141,17 @@ const MainPageComponent: React.FC = () => {
     window.ipcRenderer.receive('sb-compact-changed', handleSettingsChange)
   }, [])
 
-  useEffect(() => {
-    const handleAddFileToChatFilters = (file: string) => {
-      setSidebarShowing('chats')
-      setShowChatbot(true)
-      // setFileIsOpen(false);
-      setCurrentChatHistory(undefined)
-      setChatFilters((prevChatFilters) => ({
-        ...prevChatFilters,
-        files: [...prevChatFilters.files, file],
-      }))
-    }
-    const removeAddChatToFileListener = window.ipcRenderer.receive('add-file-to-chat-listener', (noteName: string) => {
-      handleAddFileToChatFilters(noteName)
-    })
-
-    return () => {
-      removeAddChatToFileListener()
-    }
-  }, [setCurrentChatHistory, setChatFilters])
+  const handleAddFileToChatFilters = (file: string | null) => {
+    if (!file) return
+    setSidebarShowing('chats')
+    setShowChatbot(true)
+    // setFileIsOpen(false);
+    setCurrentChatHistory(undefined)
+    setChatFilters((prevChatFilters) => ({
+      ...prevChatFilters,
+      files: [...prevChatFilters.files, file],
+    }))
+  }
 
   const handleFocusedItem: HandleFocusedItemType = (
     event: React.MouseEvent<HTMLDivElement>, 
@@ -198,6 +190,7 @@ const MainPageComponent: React.FC = () => {
           setFileNodeToBeRenamed={setFileNodeToBeRenamed}
           openFileAndOpenEditor={openFileAndOpenEditor}
           currentFilePath={filePath}
+          handleAddFileToChatFilters={handleAddFileToChatFilters}
         />
       </ModalProvider>
       <TabProvider

@@ -56,7 +56,7 @@ const registerElectronUtilsHandlers = (
       new MenuItem({
         label: 'Add file to chat context',
         click: () => {
-          event.sender.send('add-file-to-chat-listener', file.path)
+          // event.sender.send('add-file-to-chat-listener', file.path)
         },
       }),
     )

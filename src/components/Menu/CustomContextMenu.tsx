@@ -51,6 +51,7 @@ interface CustomContextMenuProps {
   setFileNodeToBeRenamed: (newName: string) => void
   openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => void
   currentFilePath: string | null
+  handleAddFileToChatFilters: (file: string | null) => void
 }
 
 const CustomContextMenu: React.FC<CustomContextMenuProps> = ({ 
@@ -62,6 +63,7 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
     setFileNodeToBeRenamed,
     openFileAndOpenEditor,
     currentFilePath,
+    handleAddFileToChatFilters,
 }) => {
   const { currentSelection, locations, file, chatMetadata } = focusedItem
   const menuRef = useRef<HTMLDivElement>(null)
@@ -98,6 +100,7 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
     setInitialFileToCreateFlashcard(noteName)
   }
 
+
   let displayList: MenuItemType[] = []
   switch(currentSelection) {
       case 'FileSidebar': {
@@ -116,7 +119,7 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
               {title: 'Delete', onSelect: () => handleDeleteFile(file?.path), icon: ''},
               {title: 'Rename', onSelect: () => {file?.path ? setFileNodeToBeRenamed(file?.path) : ''}, icon: ''},
               {title: 'Create flashcard set', onSelect: () => handleMakeFlashcard(file ? file.path : null), icon: ''},
-              {title: 'Add File to chat context', onSelect: null, icon: ''},
+              {title: 'Add File to chat context', onSelect: () => handleAddFileToChatFilters(file ? file.path : null), icon: ''},
           ]
           break
       }
@@ -133,7 +136,7 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
               {title: 'Delete', onSelect: () => handleDeleteFile(file?.path), icon: ''},
               {title: 'Rename', onSelect: () => {file?.path ? setFileNodeToBeRenamed(file?.path) : ''}, icon: ''},
               {title: 'Create flashcard set', onSelect: () => handleMakeFlashcard(file ? file.path : null), icon: ''},
-              {title: 'Add file to chat context', onSelect: null, icon: ''},
+              {title: 'Add file to chat context', onSelect: () => handleAddFileToChatFilters(file ? file.path : null), icon: ''},
           ]
           break
       }
