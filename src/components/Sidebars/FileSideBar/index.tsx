@@ -51,11 +51,11 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   handleDirectoryToggle,
   lheight,
 }) => {
-  const [listHeight, setListHeight] = useState(lheight ?? window.innerHeight)
+  const [listHeight, setListHeight] = useState(lheight ?? window.innerHeight - 50)
 
   useEffect(() => {
     const updateHeight = () => {
-      setListHeight(lheight ?? window.innerHeight)
+      setListHeight(lheight ?? window.innerHeight - 50)
     }
     window.addEventListener('resize', updateHeight)
     return () => {
