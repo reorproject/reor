@@ -37,6 +37,8 @@ const MainPageContent: React.FC = () => {
 
   const { currentlyOpenFilePath, openOrCreateFile } = useFileContext()
 
+  const { files, flattenedFiles, expandedDirectories, handleDirectoryToggle } = useFileInfoTree(currentlyOpenFilePath)
+
   useEffect(() => {
     if (currentlyOpenFilePath != null && filePathRef.current !== currentlyOpenFilePath) {
       filePathRef.current = currentlyOpenFilePath
@@ -53,12 +55,6 @@ const MainPageContent: React.FC = () => {
     }
   }, [currentChatHistory, chatHistoriesMetadata, currentlyOpenFilePath])
 
-  const { files, flattenedFiles, expandedDirectories, handleDirectoryToggle } = useFileInfoTree(currentlyOpenFilePath)
-
-  const toggleSimilarFiles = () => {
-    setShowSimilarFiles(!showSimilarFiles)
-  }
-
   const getChatIdFromPath = (path: string) => {
     if (chatHistoriesMetadata.length === 0) return UNINITIALIZED_STATE
     const metadata = chatHistoriesMetadata.find((chat) => chat.displayName === path)
@@ -66,13 +62,7 @@ const MainPageContent: React.FC = () => {
     return ''
   }
 
-  const openFileAndOpenEditor = async (path: string, optionalContentToWriteOnCreate?: string) => {
-    setShowChatbot(false)
-    setSidebarShowing('files')
-    openOrCreateFile(path, optionalContentToWriteOnCreate)
-  }
-
-  const openTabContent = async (path: string) => {
+  const openTabContent = async (path: string, optionalContentToWriteOnCreate?: string) => {
     if (!path) return
     const chatID = getChatIdFromPath(path)
     if (chatID) {
@@ -80,7 +70,9 @@ const MainPageContent: React.FC = () => {
       const chat = await window.electronStore.getChatHistory(chatID)
       openChatSidebarAndChat(chat)
     } else {
-      openFileAndOpenEditor(path)
+      setShowChatbot(false)
+      setSidebarShowing('files')
+      openOrCreateFile(path, optionalContentToWriteOnCreate)
     }
     setCurrentTab(path)
   }
@@ -126,15 +118,17 @@ const MainPageContent: React.FC = () => {
           currentTab={currentTab}
           openTabContent={openTabContent}
           similarFilesOpen={showSimilarFiles}
-          toggleSimilarFiles={toggleSimilarFiles}
-          openFileAndOpenEditor={openFileAndOpenEditor}
+          toggleSimilarFiles={() => {
+            setShowSimilarFiles(!showSimilarFiles)
+          }}
+          openFileAndOpenEditor={openTabContent}
         />
       </TabProvider>
 
       <div className="flex h-below-titlebar">
         <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5">
           <IconsSidebar
-            openFileAndOpenEditor={openFileAndOpenEditor}
+            openFileAndOpenEditor={openTabContent}
             sidebarShowing={sidebarShowing}
             makeSidebarShow={setSidebarShowing}
           />
@@ -146,7 +140,7 @@ const MainPageContent: React.FC = () => {
               files={files}
               expandedDirectories={expandedDirectories}
               handleDirectoryToggle={handleDirectoryToggle}
-              onFileSelect={openFileAndOpenEditor}
+              onFileSelect={openTabContent}
               sidebarShowing={sidebarShowing}
             />
           </div>
@@ -160,14 +154,14 @@ const MainPageContent: React.FC = () => {
             <WritingAssistant />
             {showSimilarFiles && (
               <div className="h-full shrink-0 overflow-y-auto overflow-x-hidden">
-                <SimilarFilesSidebarComponent openFileAndOpenEditor={openFileAndOpenEditor} />
+                <SimilarFilesSidebarComponent openFileAndOpenEditor={openTabContent} />
               </div>
             )}
           </div>
         ) : (
           !showChatbot && (
             <div className="relative flex size-full overflow-hidden">
-              <EmptyPage openFileAndOpenEditor={openFileAndOpenEditor} />
+              <EmptyPage openFileAndOpenEditor={openTabContent} />
             </div>
           )
         )}
@@ -176,7 +170,7 @@ const MainPageContent: React.FC = () => {
           <div className="h-below-titlebar w-full">
             <ChatWrapper
               vaultDirectory={vaultDirectory}
-              openFileAndOpenEditor={openFileAndOpenEditor}
+              openFileAndOpenEditor={openTabContent}
               showSimilarFiles={showSimilarFiles}
             />
           </div>
@@ -188,11 +182,11 @@ const MainPageContent: React.FC = () => {
 
 const MainPageComponent: React.FC = () => {
   return (
-    <ChatProvider>
-      <FileProvider>
+    <FileProvider>
+      <ChatProvider>
         <MainPageContent />
-      </FileProvider>
-    </ChatProvider>
+      </ChatProvider>
+    </FileProvider>
   )
 }
 

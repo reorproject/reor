@@ -62,7 +62,6 @@ export interface StoreSchema {
   analytics?: boolean
   chunkSize: number
   isSBCompact: boolean
-  DisplayMarkdown: boolean
   spellCheck: string
   EditorFlexCenter: boolean
   OpenTabs: Tab[]
@@ -83,7 +82,6 @@ export enum StoreKeys {
   ChatHistories = 'chatHistories',
   ChunkSize = 'chunkSize',
   IsSBCompact = 'isSBCompact',
-  DisplayMarkdown = 'DisplayMarkdown',
   SpellCheck = 'spellCheck',
   EditorFlexCenter = 'editorFlexCenter',
   OpenTabs = 'OpenTabs',

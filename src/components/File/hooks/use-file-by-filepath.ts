@@ -28,6 +28,7 @@ import 'katex/dist/katex.min.css'
 import '../../../styles/tiptap.scss'
 import welcomeNote from '../utils'
 import SearchAndReplace from '@/components/Editor/Search/SearchAndReplaceExtension'
+import getMarkdown from '@/components/Editor/utils'
 
 const useFileByFilepath = () => {
   const [currentlyOpenFilePath, setCurrentlyOpenFilePath] = useState<string | null>(null)
@@ -52,8 +53,6 @@ const useFileByFilepath = () => {
     text: '',
     position: null,
   })
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false)
 
   const setFileNodeToBeRenamed = async (filePath: string) => {
     const isDirectory = await window.fileSystem.isDirectory(filePath)
@@ -71,7 +70,6 @@ const useFileByFilepath = () => {
     3. when the file is deleted
    */
 
-  // This function handles the creation of a file if it doesn't exist
   const createFileIfNotExists = async (filePath: string, optionalContent?: string): Promise<string> => {
     const invalidChars = await getInvalidCharacterInFilePath(filePath)
     if (invalidChars) {
@@ -115,22 +113,6 @@ const useFileByFilepath = () => {
 
   const openRelativePathRef = useRef<(newFilePath: string) => Promise<void>>()
   // openRelativePathRef.current = openOrCreateFile
-
-  // Check if we should display markdown or not
-  useEffect(() => {
-    const handleInitialStartup = async () => {
-      const isMarkdownSet = await window.electronStore.getDisplayMarkdown()
-      setDisplayMarkdown(isMarkdownSet)
-    }
-
-    // Even listener
-    const handleChangeMarkdown = (isMarkdownSet: boolean) => {
-      setDisplayMarkdown(isMarkdownSet)
-    }
-
-    handleInitialStartup()
-    window.ipcRenderer.receive('display-markdown-changed', handleChangeMarkdown)
-  }, [])
 
   const editor = useEditor({
     autofocus: true,
@@ -220,12 +202,10 @@ const useFileByFilepath = () => {
     }
   }
 
-  // delete file depending on file path returned by the listener
   useEffect(() => {
     const deleteFile = async (path: string) => {
       await window.fileSystem.deleteFile(path)
       window.electronStore.removeOpenTabsByPath(path)
-      // if it is the current file, clear the content and set filepath to null so that it won't save anything else
       if (currentlyOpenFilePath === path) {
         editor?.commands.setContent('')
         setCurrentlyOpenFilePath(null)
@@ -318,17 +298,6 @@ const useFileByFilepath = () => {
     setSuggestionsState,
     setSpellCheckEnabled,
   }
-}
-
-function getMarkdown(editor: Editor) {
-  // Fetch the current markdown content from the editor
-  const originalMarkdown = editor.storage.markdown.getMarkdown()
-  // Replace the escaped square brackets with unescaped ones
-  const modifiedMarkdown = originalMarkdown
-    .replace(/\\\[/g, '[') // Replaces \[ with [
-    .replace(/\\\]/g, ']') // Replaces \] wi ]
-
-  return modifiedMarkdown
 }
 
 export default useFileByFilepath
