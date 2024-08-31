@@ -1,7 +1,11 @@
 import React, { createContext, useContext, ReactNode } from 'react'
 import useFileByFilepath from '@/components/File/hooks/use-file-by-filepath'
+import useFileInfoTree from '@/components/Sidebars/FileSideBar/hooks/use-file-info-tree'
 
-type FileContextType = ReturnType<typeof useFileByFilepath>
+type FileByFilepathType = ReturnType<typeof useFileByFilepath>
+type FileInfoTreeType = ReturnType<typeof useFileInfoTree>
+
+type FileContextType = FileByFilepathType & FileInfoTreeType
 
 export const FileContext = createContext<FileContextType | undefined>(undefined)
 
@@ -14,7 +18,16 @@ export const useFileContext = () => {
 }
 
 export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const fileContextValue = useFileByFilepath()
+  const fileByFilepathValue = useFileByFilepath()
+  const fileInfoTreeValue = useFileInfoTree(fileByFilepathValue.currentlyOpenFilePath)
 
-  return <FileContext.Provider value={fileContextValue}>{children}</FileContext.Provider>
+  const combinedContextValue: FileContextType = React.useMemo(
+    () => ({
+      ...fileByFilepathValue,
+      ...fileInfoTreeValue,
+    }),
+    [fileByFilepathValue, fileInfoTreeValue],
+  )
+
+  return <FileContext.Provider value={combinedContextValue}>{children}</FileContext.Provider>
 }

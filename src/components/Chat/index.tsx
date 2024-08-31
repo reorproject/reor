@@ -13,13 +13,13 @@ import ChatMessages, { AskOptions } from './ChatMessages'
 import { Chat } from './types'
 import { useChatContext } from '@/providers/ChatContext'
 
-interface ChatWrapperProps {
+interface ChatComponentProps {
   vaultDirectory: string
   openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => Promise<void>
   showSimilarFiles: boolean
 }
 
-const ChatWrapper: React.FC<ChatWrapperProps> = ({ vaultDirectory, openFileAndOpenEditor, showSimilarFiles }) => {
+const ChatComponent: React.FC<ChatComponentProps> = ({ vaultDirectory, openFileAndOpenEditor, showSimilarFiles }) => {
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
   const [askText] = useState<AskOptions>(AskOptions.Ask)
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false)
@@ -216,4 +216,4 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({ vaultDirectory, openFileAndOp
   )
 }
 
-export default ChatWrapper
+export default ChatComponent

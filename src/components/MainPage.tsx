@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import '../styles/global.css'
-import ChatWrapper from './Chat/ChatWrapper'
+import ChatComponent from './Chat'
 import ResizableComponent from './Common/ResizableComponent'
 import TitleBar from './TitleBar/TitleBar'
 import EditorManager from './Editor/EditorManager'
@@ -11,7 +11,6 @@ import SimilarFilesSidebarComponent from './Sidebars/SimilarFilesSidebar'
 import EmptyPage from './Common/EmptyPage'
 import { TabProvider } from '../providers/TabProvider'
 import WritingAssistant from './WritingAssistant/WritingAssistant'
-import useFileInfoTree from './Sidebars/FileSideBar/hooks/use-file-info-tree'
 import { ChatProvider, useChatContext } from '@/providers/ChatContext'
 import { FileProvider, useFileContext } from '@/providers/FileContext'
 
@@ -36,8 +35,6 @@ const MainPageContent: React.FC = () => {
   } = useChatContext()
 
   const { currentlyOpenFilePath, openOrCreateFile } = useFileContext()
-
-  const { files, flattenedFiles, expandedDirectories, handleDirectoryToggle } = useFileInfoTree(currentlyOpenFilePath)
 
   useEffect(() => {
     if (currentlyOpenFilePath != null && filePathRef.current !== currentlyOpenFilePath) {
@@ -136,20 +133,14 @@ const MainPageContent: React.FC = () => {
 
         <ResizableComponent resizeSide="right">
           <div className="size-full border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700">
-            <SidebarManager
-              files={files}
-              expandedDirectories={expandedDirectories}
-              handleDirectoryToggle={handleDirectoryToggle}
-              onFileSelect={openTabContent}
-              sidebarShowing={sidebarShowing}
-            />
+            <SidebarManager onFileSelect={openTabContent} sidebarShowing={sidebarShowing} />
           </div>
         </ResizableComponent>
 
         {!showChatbot && currentlyOpenFilePath ? (
           <div className="relative flex size-full overflow-hidden">
             <div className="h-full grow overflow-hidden">
-              <EditorManager flattenedFiles={flattenedFiles} showSimilarFiles={showSimilarFiles} />
+              <EditorManager showSimilarFiles={showSimilarFiles} />
             </div>
             <WritingAssistant />
             {showSimilarFiles && (
@@ -168,7 +159,7 @@ const MainPageContent: React.FC = () => {
 
         {showChatbot && (
           <div className="h-below-titlebar w-full">
-            <ChatWrapper
+            <ChatComponent
               vaultDirectory={vaultDirectory}
               openFileAndOpenEditor={openTabContent}
               showSimilarFiles={showSimilarFiles}

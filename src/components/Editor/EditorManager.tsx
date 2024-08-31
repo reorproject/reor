@@ -6,11 +6,11 @@ import SearchBar from './Search/SearchBar'
 import { useFileContext } from '@/providers/FileContext'
 
 interface EditorManagerProps {
-  flattenedFiles: { relativePath: string }[]
+  // flattenedFiles: { relativePath: string }[]
   showSimilarFiles: boolean
 }
 
-const EditorManager: React.FC<EditorManagerProps> = ({ flattenedFiles, showSimilarFiles }) => {
+const EditorManager: React.FC<EditorManagerProps> = ({ showSimilarFiles }) => {
   const [showSearchBar, setShowSearchBar] = useState(false)
   const [menuVisible, setMenuVisible] = useState(false)
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
@@ -18,7 +18,7 @@ const EditorManager: React.FC<EditorManagerProps> = ({ flattenedFiles, showSimil
   const [showPlaceholder, setShowPlaceholder] = useState(false)
   const [placeholderPosition, setPlaceholderPosition] = useState({ top: 0, left: 0 })
 
-  const { editor, suggestionsState } = useFileContext()
+  const { editor, suggestionsState, flattenedFiles } = useFileContext()
 
   useEffect(() => {}, [showSimilarFiles])
 
