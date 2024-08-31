@@ -11,8 +11,6 @@ interface TitleBarProps {
   currentTab: string | null // Used to create new open tabs when user clicks on new file to open
   similarFilesOpen: boolean
   toggleSimilarFiles: () => void
-  history: string[]
-  setHistory: (string: string[]) => void
   openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => void
 }
 
@@ -21,8 +19,6 @@ const TitleBar: React.FC<TitleBarProps> = ({
   currentTab,
   similarFilesOpen,
   toggleSimilarFiles,
-  history,
-  setHistory,
   openFileAndOpenEditor,
 }) => {
   const [platform, setPlatform] = useState('')
@@ -39,12 +35,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
   return (
     <div id="customTitleBar" className="flex h-titlebar justify-between" style={{ backgroundColor: '#303030' }}>
       <div className="mt-px flex" style={platform === 'darwin' ? { marginLeft: '65px' } : { marginLeft: '2px' }}>
-        <FileHistoryNavigator
-          history={history}
-          setHistory={setHistory}
-          onFileSelect={openTabContent}
-          currentPath={currentTab || ''}
-        />
+        <FileHistoryNavigator onFileSelect={openTabContent} currentPath={currentTab || ''} />
       </div>
 
       <div className="relative left-10 max-w-[75%] grow overflow-hidden">

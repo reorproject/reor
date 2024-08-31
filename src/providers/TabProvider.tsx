@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Tab } from 'electron/main/electron-store/storeConfig'
 import { SidebarAbleToShow } from '../components/Sidebars/MainSidebar'
 import { useChatContext } from './ChatContext'
+import { useFileContext } from './FileContext'
 
 interface TabContextType {
   openTabs: Tab[]
@@ -28,7 +29,7 @@ export const useTabs = (): TabContextType => useContext(TabContext)
 interface TabProviderProps {
   children: ReactNode
   openTabContent: (path: string) => void
-  setFilePath: (path: string) => void
+  // setFilePath: (path: string) => void
   currentTab: string | null
   sidebarShowing: string | null
   makeSidebarShow: (option: SidebarAbleToShow) => void
@@ -38,7 +39,7 @@ interface TabProviderProps {
 export const TabProvider: React.FC<TabProviderProps> = ({
   children,
   openTabContent,
-  setFilePath,
+  // setFilePath,
   currentTab,
   sidebarShowing,
   makeSidebarShow,
@@ -46,6 +47,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
 }) => {
   const [openTabs, setOpenTabs] = useState<Tab[]>([])
   const { setCurrentChatHistory } = useChatContext()
+  const { setCurrentlyOpenFilePath } = useFileContext()
 
   useEffect(() => {
     const fetchHistoryTabs = async () => {
@@ -127,7 +129,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
         const hasChatTabs = nextTabs.some((tab) => getChatIdFromPath(tab.path))
 
         if (!hasFileTabs) {
-          setFilePath('')
+          setCurrentlyOpenFilePath('')
         }
 
         if (!hasChatTabs) {
@@ -141,7 +143,7 @@ export const TabProvider: React.FC<TabProviderProps> = ({
         window.electronStore.removeOpenTabs(tabId, findIdx, newIndex)
       }
     },
-    [currentTab, openTabContent, openTabs, setFilePath, setCurrentChatHistory, getChatIdFromPath],
+    [openTabs, currentTab, openTabContent, getChatIdFromPath, setCurrentlyOpenFilePath, setCurrentChatHistory],
   )
 
   /* Updates tab order (on drag) and syncs it with backend */

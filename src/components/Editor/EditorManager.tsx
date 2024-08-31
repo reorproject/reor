@@ -1,28 +1,24 @@
 import React, { useEffect, useState } from 'react'
-import { Editor, EditorContent } from '@tiptap/react'
-import InEditorBacklinkSuggestionsDisplay, { SuggestionsState } from './BacklinkSuggestionsDisplay'
+import { EditorContent } from '@tiptap/react'
+import InEditorBacklinkSuggestionsDisplay from './BacklinkSuggestionsDisplay'
 import EditorContextMenu from './EditorContextMenu'
 import SearchBar from './Search/SearchBar'
+import { useFileContext } from '@/providers/FileContext'
 
 interface EditorManagerProps {
-  editor: Editor | null
-  suggestionsState: SuggestionsState | null | undefined
   flattenedFiles: { relativePath: string }[]
   showSimilarFiles: boolean
 }
 
-const EditorManager: React.FC<EditorManagerProps> = ({
-  editor,
-  suggestionsState,
-  flattenedFiles,
-  showSimilarFiles,
-}) => {
+const EditorManager: React.FC<EditorManagerProps> = ({ flattenedFiles, showSimilarFiles }) => {
   const [showSearchBar, setShowSearchBar] = useState(false)
   const [menuVisible, setMenuVisible] = useState(false)
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
   const [editorFlex, setEditorFlex] = useState(true)
   const [showPlaceholder, setShowPlaceholder] = useState(false)
   const [placeholderPosition, setPlaceholderPosition] = useState({ top: 0, left: 0 })
+
+  const { editor, suggestionsState } = useFileContext()
 
   useEffect(() => {}, [showSimilarFiles])
 

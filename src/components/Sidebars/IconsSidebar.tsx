@@ -19,15 +19,9 @@ interface IconsSidebarProps {
   openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => void
   sidebarShowing: SidebarAbleToShow
   makeSidebarShow: (show: SidebarAbleToShow) => void
-  currentFilePath: string | null
 }
 
-const IconsSidebar: React.FC<IconsSidebarProps> = ({
-  openFileAndOpenEditor,
-  sidebarShowing,
-  makeSidebarShow,
-  currentFilePath,
-}) => {
+const IconsSidebar: React.FC<IconsSidebarProps> = ({ openFileAndOpenEditor, sidebarShowing, makeSidebarShow }) => {
   const [initialFileToCreateFlashcard, setInitialFileToCreateFlashcard] = useState('')
   const [initialFileToReviewFlashcard, setInitialFileToReviewFlashcard] = useState('')
   const [sidebarWidth, setSidebarWidth] = useState<number>(40)
@@ -147,13 +141,8 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
         openFileAndOpenEditor={openFileAndOpenEditor}
-        currentOpenFilePath={currentFilePath}
       />
-      <NewDirectoryComponent
-        isOpen={isNewDirectoryModalOpen}
-        onClose={() => setIsNewDirectoryModalOpen(false)}
-        currentOpenFilePath={currentFilePath}
-      />
+      <NewDirectoryComponent isOpen={isNewDirectoryModalOpen} onClose={() => setIsNewDirectoryModalOpen(false)} />
       {isFlashcardModeOpen && (
         <FlashcardMenuModal
           isOpen={isFlashcardModeOpen}

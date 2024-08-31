@@ -6,31 +6,27 @@ import { toast } from 'react-toastify'
 import removeMd from 'remove-markdown'
 
 import '../../styles/global.css'
-import { HighlightData } from '../Editor/HighlightExtension'
 
 import errorToStringRendererProcess from '@/utils/error'
 import SimilarEntriesComponent from './SemanticSidebar/SimilarEntriesComponent'
 import HighlightButton from './SemanticSidebar/HighlightButton'
+import { useFileContext } from '@/providers/FileContext'
 
 interface SimilarFilesSidebarComponentProps {
-  filePath: string
-  highlightData: HighlightData
   openFileAndOpenEditor: (filePath: string, optionalContentToWriteOnCreate?: string) => void
-
-  saveCurrentlyOpenedFile: () => Promise<void>
 }
 
-const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponentProps> = ({
-  filePath,
-  highlightData,
-  openFileAndOpenEditor,
-  saveCurrentlyOpenedFile,
-}) => {
+const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponentProps> = ({ openFileAndOpenEditor }) => {
   const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([])
   const [isLoadingSimilarEntries, setIsLoadingSimilarEntries] = useState(false)
 
-  const getChunkForInitialSearchFromFile = async (filePathForChunk: string) => {
+  const { currentlyOpenFilePath, highlightData } = useFileContext()
+
+  const getChunkForInitialSearchFromFile = async (filePathForChunk: string | null) => {
     // TODO: proper semantic chunking - current quick win is just to take top 500 characters
+    if (!filePathForChunk) {
+      return undefined
+    }
     const fileContent: string = await window.fileSystem.readFile(filePathForChunk)
     if (!fileContent) {
       return undefined
@@ -40,7 +36,7 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponentProps> 
   }
   const performSearchOnChunk = async (
     sanitizedText: string,
-    fileToBeExcluded: string,
+    fileToBeExcluded: string | null,
     withReranking = false,
   ): Promise<DBQueryResult[]> => {
     try {
@@ -79,20 +75,20 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponentProps> 
         setSimilarEntries([])
       }
     }
-    if (filePath) {
-      handleNewFileOpen(filePath)
+    if (currentlyOpenFilePath) {
+      handleNewFileOpen(currentlyOpenFilePath)
     }
-  }, [filePath])
+  }, [currentlyOpenFilePath])
 
   const updateSimilarEntries = async (isRefined?: boolean) => {
-    const sanitizedText = await getChunkForInitialSearchFromFile(filePath)
+    const sanitizedText = await getChunkForInitialSearchFromFile(currentlyOpenFilePath)
 
     if (!sanitizedText) {
-      toast.error(`Error: Could not get chunk for search ${filePath}`)
+      toast.error(`Error: Could not get chunk for search ${currentlyOpenFilePath}`)
       return
     }
 
-    const searchResults = await performSearchOnChunk(sanitizedText, filePath, isRefined)
+    const searchResults = await performSearchOnChunk(sanitizedText, currentlyOpenFilePath, isRefined)
     setSimilarEntries(searchResults)
   }
 
@@ -103,7 +99,7 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponentProps> 
         onClick={async () => {
           setSimilarEntries([])
           const databaseFields = await window.database.getDatabaseFields()
-          const filterString = `${databaseFields.NOTE_PATH} != '${filePath}'`
+          const filterString = `${databaseFields.NOTE_PATH} != '${currentlyOpenFilePath}'`
           const searchResults: DBQueryResult[] = await window.database.search(highlightData.text, 20, filterString)
           setSimilarEntries(searchResults)
         }}
@@ -114,9 +110,6 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponentProps> 
         onFileSelect={(path: string) => {
           openFileAndOpenEditor(path)
           posthog.capture('open_file_from_related_notes')
-        }}
-        saveCurrentFile={async () => {
-          await saveCurrentlyOpenedFile()
         }}
         updateSimilarEntries={updateSimilarEntries}
         isLoadingSimilarEntries={isLoadingSimilarEntries}

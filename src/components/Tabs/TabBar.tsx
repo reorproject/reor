@@ -185,7 +185,6 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentTab, openTabConten
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
         openFileAndOpenEditor={openFileAndOpenEditor}
-        currentOpenFilePath={currentTab}
       />
     </div>
   )

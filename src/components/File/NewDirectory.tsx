@@ -5,16 +5,18 @@ import posthog from 'posthog-js'
 
 import ReorModal from '../Common/Modal'
 import { getInvalidCharacterInFileName } from '@/utils/strings'
+import { useFileContext } from '@/providers/FileContext'
 
 interface NewDirectoryComponentProps {
   isOpen: boolean
   onClose: () => void
-  currentOpenFilePath: string | null
 }
 
-const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, onClose, currentOpenFilePath }) => {
+const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, onClose }) => {
   const [directoryName, setDirectoryName] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const { currentlyOpenFilePath } = useFileContext()
 
   useEffect(() => {
     if (!isOpen) {
@@ -40,12 +42,12 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
 
   const sendNewDirectoryMsg = async () => {
     await handleValidName(directoryName)
-    if (!directoryName || errorMessage || currentOpenFilePath === null) return
+    if (!directoryName || errorMessage || currentlyOpenFilePath === null) return
 
     const directoryPath =
-      currentOpenFilePath === ''
+      currentlyOpenFilePath === ''
         ? await window.electronStore.getVaultDirectoryForWindow()
-        : await window.path.dirname(currentOpenFilePath)
+        : await window.path.dirname(currentlyOpenFilePath)
     const finalPath = await window.path.join(directoryPath, directoryName)
     window.fileSystem.createDirectory(finalPath)
     posthog.capture('created_new_directory_from_new_directory_modal')

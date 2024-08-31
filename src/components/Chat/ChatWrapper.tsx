@@ -209,7 +209,6 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({ vaultDirectory, openFileAndOp
             openFileAndOpenEditor(path)
             posthog.capture('open_file_from_chat_context')
           }}
-          saveCurrentFile={() => Promise.resolve()}
           isLoadingSimilarEntries={false}
         />
       )}

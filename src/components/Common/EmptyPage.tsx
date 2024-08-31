@@ -39,13 +39,8 @@ const EmptyPage: React.FC<EmptyPageProps> = ({ openFileAndOpenEditor }) => {
         isOpen={isNewNoteModalOpen}
         onClose={() => setIsNewNoteModalOpen(false)}
         openFileAndOpenEditor={openFileAndOpenEditor}
-        currentOpenFilePath=""
       />
-      <NewDirectoryComponent
-        isOpen={isNewDirectoryModalOpen}
-        onClose={() => setIsNewDirectoryModalOpen(false)}
-        currentOpenFilePath=""
-      />
+      <NewDirectoryComponent isOpen={isNewDirectoryModalOpen} onClose={() => setIsNewDirectoryModalOpen(false)} />
     </div>
   )
 }

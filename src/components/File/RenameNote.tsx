@@ -6,36 +6,27 @@ import { toast } from 'react-toastify'
 import ReorModal from '../Common/Modal'
 
 import { getInvalidCharacterInFileName, removeFileExtension } from '@/utils/strings'
+import { useFileContext } from '@/providers/FileContext'
 
-export interface RenameNoteFuncProps {
-  path: string
-  newNoteName: string
-}
+const RenameNoteModal: React.FC = () => {
+  const { noteToBeRenamed, setNoteToBeRenamed, renameFile } = useFileContext()
 
-interface RenameNoteModalProps {
-  isOpen: boolean
-  fullNoteName: string
-  onClose: () => void
-  renameNote: (props: RenameNoteFuncProps) => Promise<void>
-}
-
-const RenameNoteModal: React.FC<RenameNoteModalProps> = ({ isOpen, fullNoteName, onClose, renameNote }) => {
-  const fileExtension = fullNoteName.split('.').pop() || 'md'
+  const fileExtension = noteToBeRenamed.split('.').pop() || 'md'
   const [dirPrefix, setDirPrefix] = useState<string>('')
   const [noteName, setNoteName] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   useEffect(() => {
     const setDirectoryUponNoteChange = async () => {
-      const initialNotePathPrefix = await window.path.dirname(fullNoteName)
+      const initialNotePathPrefix = await window.path.dirname(noteToBeRenamed)
       setDirPrefix(initialNotePathPrefix)
-      const initialNoteName = await window.path.basename(fullNoteName)
+      const initialNoteName = await window.path.basename(noteToBeRenamed)
       const trimmedInitialNoteName = removeFileExtension(initialNoteName) || ''
       setNoteName(trimmedInitialNoteName)
     }
 
     setDirectoryUponNoteChange()
-  }, [fullNoteName])
+  }, [noteToBeRenamed])
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value
@@ -48,6 +39,9 @@ const RenameNoteModal: React.FC<RenameNoteModalProps> = ({ isOpen, fullNoteName,
         setErrorMessage(null)
       }
     })
+  }
+  const onClose = () => {
+    setNoteToBeRenamed('')
   }
 
   const sendNoteRename = async () => {
@@ -63,11 +57,7 @@ const RenameNoteModal: React.FC<RenameNoteModalProps> = ({ isOpen, fullNoteName,
       return
     }
 
-    // get full path of note
-    await renameNote({
-      path: `${fullNoteName}`,
-      newNoteName: `${dirPrefix}${noteName}.${fileExtension}`,
-    })
+    await renameFile(noteToBeRenamed, `${dirPrefix}${noteName}.${fileExtension}`)
     onClose()
   }
 
@@ -78,7 +68,7 @@ const RenameNoteModal: React.FC<RenameNoteModalProps> = ({ isOpen, fullNoteName,
   }
 
   return (
-    <ReorModal isOpen={isOpen} onClose={onClose}>
+    <ReorModal isOpen={!!noteToBeRenamed} onClose={onClose}>
       <div className="my-2 ml-3 mr-6 h-full min-w-[400px]">
         <h2 className="mb-3 text-xl font-semibold text-white">Rename Note</h2>
         <input

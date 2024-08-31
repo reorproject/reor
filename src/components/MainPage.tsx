@@ -5,7 +5,6 @@ import ChatWrapper from './Chat/ChatWrapper'
 import ResizableComponent from './Common/ResizableComponent'
 import TitleBar from './TitleBar/TitleBar'
 import EditorManager from './Editor/EditorManager'
-import useFileByFilepath from './File/hooks/use-file-by-filepath'
 import IconsSidebar from './Sidebars/IconsSidebar'
 import SidebarManager, { SidebarAbleToShow } from './Sidebars/MainSidebar'
 import SimilarFilesSidebarComponent from './Sidebars/SimilarFilesSidebar'
@@ -14,6 +13,7 @@ import { TabProvider } from '../providers/TabProvider'
 import WritingAssistant from './WritingAssistant/WritingAssistant'
 import useFileInfoTree from './Sidebars/FileSideBar/hooks/use-file-info-tree'
 import { ChatProvider, useChatContext } from '@/providers/ChatContext'
+import { FileProvider, useFileContext } from '@/providers/FileContext'
 
 const UNINITIALIZED_STATE = 'UNINITIALIZED_STATE'
 
@@ -35,27 +35,12 @@ const MainPageContent: React.FC = () => {
     chatHistoriesMetadata,
   } = useChatContext()
 
-  const {
-    filePath,
-    setFilePath,
-    editor,
-    openOrCreateFile,
-    saveCurrentlyOpenedFile,
-    suggestionsState,
-    highlightData,
-    noteToBeRenamed,
-    setNoteToBeRenamed,
-    fileDirToBeRenamed,
-    setFileDirToBeRenamed,
-    renameFile,
-    navigationHistory,
-    setNavigationHistory,
-  } = useFileByFilepath()
+  const { currentlyOpenFilePath, openOrCreateFile } = useFileContext()
 
   useEffect(() => {
-    if (filePath != null && filePathRef.current !== filePath) {
-      filePathRef.current = filePath
-      setCurrentTab(filePath)
+    if (currentlyOpenFilePath != null && filePathRef.current !== currentlyOpenFilePath) {
+      filePathRef.current = currentlyOpenFilePath
+      setCurrentTab(currentlyOpenFilePath)
     }
 
     const currentChatHistoryId = currentChatHistory?.id ?? ''
@@ -66,9 +51,9 @@ const MainPageContent: React.FC = () => {
         setCurrentTab(currentMetadata.displayName)
       }
     }
-  }, [currentChatHistory, chatHistoriesMetadata, filePath])
+  }, [currentChatHistory, chatHistoriesMetadata, currentlyOpenFilePath])
 
-  const { files, flattenedFiles, expandedDirectories, handleDirectoryToggle } = useFileInfoTree(filePath)
+  const { files, flattenedFiles, expandedDirectories, handleDirectoryToggle } = useFileInfoTree(currentlyOpenFilePath)
 
   const toggleSimilarFiles = () => {
     setShowSimilarFiles(!showSimilarFiles)
@@ -133,14 +118,11 @@ const MainPageContent: React.FC = () => {
       <TabProvider
         openTabContent={openTabContent}
         currentTab={currentTab}
-        setFilePath={setFilePath}
         sidebarShowing={sidebarShowing}
         makeSidebarShow={setSidebarShowing}
         getChatIdFromPath={getChatIdFromPath}
       >
         <TitleBar
-          history={navigationHistory}
-          setHistory={setNavigationHistory}
           currentTab={currentTab}
           openTabContent={openTabContent}
           similarFilesOpen={showSimilarFiles}
@@ -155,7 +137,6 @@ const MainPageContent: React.FC = () => {
             openFileAndOpenEditor={openFileAndOpenEditor}
             sidebarShowing={sidebarShowing}
             makeSidebarShow={setSidebarShowing}
-            currentFilePath={filePath}
           />
         </div>
 
@@ -165,37 +146,21 @@ const MainPageContent: React.FC = () => {
               files={files}
               expandedDirectories={expandedDirectories}
               handleDirectoryToggle={handleDirectoryToggle}
-              selectedFilePath={filePath}
               onFileSelect={openFileAndOpenEditor}
               sidebarShowing={sidebarShowing}
-              renameFile={renameFile}
-              noteToBeRenamed={noteToBeRenamed}
-              setNoteToBeRenamed={setNoteToBeRenamed}
-              fileDirToBeRenamed={fileDirToBeRenamed}
-              setFileDirToBeRenamed={setFileDirToBeRenamed}
             />
           </div>
         </ResizableComponent>
 
-        {!showChatbot && filePath ? (
+        {!showChatbot && currentlyOpenFilePath ? (
           <div className="relative flex size-full overflow-hidden">
             <div className="h-full grow overflow-hidden">
-              <EditorManager
-                editor={editor}
-                suggestionsState={suggestionsState}
-                flattenedFiles={flattenedFiles}
-                showSimilarFiles={showSimilarFiles}
-              />
+              <EditorManager flattenedFiles={flattenedFiles} showSimilarFiles={showSimilarFiles} />
             </div>
-            <WritingAssistant editor={editor} highlightData={highlightData} />
+            <WritingAssistant />
             {showSimilarFiles && (
               <div className="h-full shrink-0 overflow-y-auto overflow-x-hidden">
-                <SimilarFilesSidebarComponent
-                  filePath={filePath}
-                  highlightData={highlightData}
-                  openFileAndOpenEditor={openFileAndOpenEditor}
-                  saveCurrentlyOpenedFile={saveCurrentlyOpenedFile}
-                />
+                <SimilarFilesSidebarComponent openFileAndOpenEditor={openFileAndOpenEditor} />
               </div>
             )}
           </div>
@@ -224,7 +189,9 @@ const MainPageContent: React.FC = () => {
 const MainPageComponent: React.FC = () => {
   return (
     <ChatProvider>
-      <MainPageContent />
+      <FileProvider>
+        <MainPageContent />
+      </FileProvider>
     </ChatProvider>
   )
 }
