@@ -21,7 +21,7 @@ import useFileInfoTree from './Sidebars/FileSideBar/hooks/use-file-info-tree'
 const UNINITIALIZED_STATE = 'UNINITIALIZED_STATE'
 
 const MainPageComponent: React.FC = () => {
-  const [showChatbot, setShowChatbot] = useState<boolean>(false)
+  const [showChatbot, setShowChatbot] = useState<boolean>(false) // the state around what is being shown should probably be a dedicated type
   const [showSimilarFiles, setShowSimilarFiles] = useState(true)
   const [sidebarShowing, setSidebarShowing] = useState<SidebarAbleToShow>('files')
   const [currentTab, setCurrentTab] = useState<string>('')
@@ -96,7 +96,6 @@ const MainPageComponent: React.FC = () => {
   }
 
   const openTabContent = async (path: string) => {
-    // generically opens a chat or a file
     if (!path) return
     const chatID = getChatIdFromPath(path)
     if (chatID) {

@@ -11,14 +11,12 @@ export interface ChatHistoryMetadata {
 export const useChatHistory = () => {
   const [currentChatHistory, setCurrentChatHistory] = useState<Chat>()
   const [chatHistoriesMetadata, setChatHistoriesMetadata] = useState<ChatHistoryMetadata[]>([])
-  // const [chatHistories, setChatHistories] = useState<ChatHistory[]>([]);
 
   const fetchChatHistories = async () => {
     let allChatHistories = await window.electronStore.getAllChatHistories()
     if (!allChatHistories) {
       allChatHistories = []
     }
-    // setAllChatHistories(allChatHistories);
     setChatHistoriesMetadata(
       allChatHistories.map((chat) => ({
         id: chat.id,
