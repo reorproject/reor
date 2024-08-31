@@ -109,11 +109,11 @@ const TableSizeSelector: React.FC<TableSizeSelectorProps> = ({ onSelect }) => {
   }
 
   return (
-    <div className="table-size-selector flex flex-col items-center justify-center">
+    <div className="table-size-selector flex flex-col items-center justify-center bg-[#1E1E1E]">
       {generateCells()}
       <div className="flex w-full justify-center pt-2">
         <div className="text-white">
-          {hoveredRows} x{hoveredCols}
+          {hoveredRows} x {hoveredCols}
         </div>
       </div>
     </div>
@@ -200,13 +200,13 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
     setMenuVisible(false)
   }
 
+  const itemClass = 'text-[12px] text-white/90 cursor-pointer hover:bg-blue-500 hover:rounded-md px-2 py-1'
   return (
     <div>
       <ul
-        className="bubble-menu"
+        className="absolute py-2 px-1 rounded-md z-[1020] bg-[#1E1E1E] overflow-y-auto w-[150px]"
         style={{
-          position: 'absolute',
-          top: `${menuPosition.y - 30}px`,
+          top: `${menuPosition.y - 60}px`,
           left: `${menuPosition.x - 190}px`,
           zIndex: 1000,
           boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
@@ -217,16 +217,14 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
           onClick={() => {
             handleCommand('copy')
           }}
-          className={`bubble-menu-item ${!isTextCurrentlySelected() ? 'disabled opacity-50' : ''}`}
+          className={`${itemClass} ${!isTextCurrentlySelected() ? 'disabled opacity-50' : ''}`}
         >
-          <FaRegCopy className="icon" />
           <span className="text">Copy</span>
         </li>
         <li
           onClick={() => handleCommand('cut')}
-          className={`bubble-menu-item ${!isTextCurrentlySelected() ? 'disabled opacity-50' : ''}`}
+          className={`${itemClass} ${!isTextCurrentlySelected() ? 'disabled opacity-50' : ''}`}
         >
-          <IoMdCut className="icon" />
           <span className="text">Cut</span>
         </li>
         <li
@@ -234,21 +232,20 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
             pasteCommand(editor)
             setMenuVisible(false)
           }}
-          className="bubble-menu-item"
+          className={`${itemClass}`}
         >
-          <MdContentPaste className="icon" />
           <span className="text">Paste</span>
         </li>
         <li
           onClick={() => handleCommand('delete')}
-          className={`bubble-menu-item ${!isTextCurrentlySelected() ? 'disabled opacity-50' : ''}`}
+          className={`${itemClass} ${!isTextCurrentlySelected() ? 'disabled opacity-50' : ''}`}
         >
-          <AiOutlineDelete className="icon" />
           <span className="text">Delete</span>
         </li>
-        <div className="h-px w-full bg-gray-500" />
-        <li ref={tableButtonRef} onMouseEnter={() => setShowTableSelector(true)} className="bubble-menu-item">
-          <CiViewTable className="icon" />
+        <div className="h-px w-full bg-gray-500 my-1" />
+        <li ref={tableButtonRef} onMouseEnter={() => setShowTableSelector(true)} 
+          className={`${itemClass}`}
+        >
           <span className="text">Table</span>
         </li>
       </ul>
@@ -257,8 +254,8 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
           ref={tableSelectorRef}
           style={{
             position: 'absolute',
-            top: `${menuPosition.y + 120}px`,
-            left: `${menuPosition.x}px`,
+            top: `${menuPosition.y + 70}px`,
+            left: `${menuPosition.x - 100}px`,
             zIndex: 1002,
           }}
         >

@@ -160,7 +160,7 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
       {focusedItem.currentSelection !== 'None' && (
           <div 
             ref={menuRef}
-            className="absolute p-2 rounded-md z-[1020] bg-[#1E1E1E] overflow-y-auto"
+            className="absolute py-2 px-1 rounded-md z-[1020] bg-[#1E1E1E] overflow-y-auto"
             style={{
             left: locations.x,
               top: locations.y,
@@ -172,7 +172,7 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
               {displayList?.map((item, index) => (
                 <div
                   key={index}
-                  className="text-[11px] text-white/90 cursor-pointer hover:bg-blue-500 hover:rounded-md px-2 py-1"
+                  className="text-[12px] text-white/90 cursor-pointer hover:bg-blue-500 hover:rounded-md px-2 py-1"
                   onClick={() => handleSubmit(item)}
                 >
                   {item.title}
