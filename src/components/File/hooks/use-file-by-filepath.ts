@@ -116,10 +116,6 @@ const useFileByFilepath = () => {
   const openRelativePathRef = useRef<(newFilePath: string) => Promise<void>>()
   // openRelativePathRef.current = openOrCreateFile
 
-  const handleSuggestionsStateWithEventCapture = (suggState: SuggestionsState | null): void => {
-    setSuggestionsState(suggState)
-  }
-
   // Check if we should display markdown or not
   useEffect(() => {
     const handleInitialStartup = async () => {
@@ -182,7 +178,7 @@ const useFileByFilepath = () => {
         linkOnPaste: true,
         openOnClick: true,
       }),
-      BacklinkExtension(openRelativePathRef, handleSuggestionsStateWithEventCapture),
+      BacklinkExtension(openRelativePathRef, setSuggestionsState),
     ],
   })
 
