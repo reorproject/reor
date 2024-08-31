@@ -1,7 +1,8 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Editor, EditorContent } from '@tiptap/react'
 import InEditorBacklinkSuggestionsDisplay, { SuggestionsState } from './BacklinkSuggestionsDisplay'
 import EditorContextMenu from './EditorContextMenu'
+import SearchBar from './Search/SearchBar'
 
 interface EditorManagerProps {
   editor: Editor | null
@@ -16,48 +17,14 @@ const EditorManager: React.FC<EditorManagerProps> = ({
   flattenedFiles,
   showSimilarFiles,
 }) => {
-  const [showSearch, setShowSearch] = useState(false)
-  const [searchTerm, setSearchTerm] = useState('')
+  const [showSearchBar, setShowSearchBar] = useState(false)
   const [menuVisible, setMenuVisible] = useState(false)
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
   const [editorFlex, setEditorFlex] = useState(true)
   const [showPlaceholder, setShowPlaceholder] = useState(false)
   const [placeholderPosition, setPlaceholderPosition] = useState({ top: 0, left: 0 })
 
-  const toggleSearch = useCallback(() => {
-    setShowSearch((prevShowSearch) => !prevShowSearch)
-  }, [])
-
   useEffect(() => {}, [showSimilarFiles])
-
-  const handleSearchChange = (value: string) => {
-    setSearchTerm(value)
-    editor?.commands.setSearchTerm(value)
-  }
-
-  const goToSelection = () => {
-    if (!editor) return
-    const { results, resultIndex } = editor.storage.searchAndReplace
-    const position = results[resultIndex]
-    if (!position) return
-    editor.commands.setTextSelection(position)
-    const { node } = editor.view.domAtPos(editor.state.selection.anchor)
-    if (node instanceof Element) {
-      node.scrollIntoView?.(false)
-    }
-  }
-
-  const handleNextSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      editor?.commands.nextSearchResult()
-      goToSelection()
-      ;(event.target as HTMLInputElement).focus()
-    } else if (event.key === 'Escape') {
-      toggleSearch()
-      handleSearchChange('')
-    }
-  }
 
   const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault()
@@ -72,22 +39,6 @@ const EditorManager: React.FC<EditorManagerProps> = ({
     if (menuVisible) setMenuVisible(false)
   }
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === 'f') {
-        toggleSearch()
-      }
-      if (event.key === 'Escape') {
-        if (showSearch) setShowSearch(false)
-        if (menuVisible) setMenuVisible(false)
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [showSearch, menuVisible, toggleSearch])
-
-  // If "Content Flex Center" is set to true in Settings, then it centers the content of the Editor
   useEffect(() => {
     const initEditorContentCenter = async () => {
       const isCenter = await window.electronStore.getEditorFlexCenter()
@@ -151,27 +102,13 @@ const EditorManager: React.FC<EditorManagerProps> = ({
       setShowPlaceholder(currentLineText === '')
     }
   }
+
   return (
     <div
       className="relative size-full cursor-text overflow-y-auto bg-dark-gray-c-eleven py-4 text-slate-400 opacity-80"
       onClick={() => editor?.commands.focus()}
     >
-      {showSearch && (
-        <input
-          type="text"
-          value={searchTerm}
-          onKeyDown={handleNextSearch}
-          onChange={(event) => handleSearchChange(event.target.value)}
-          onBlur={() => {
-            setShowSearch(false)
-            handleSearchChange('')
-          }}
-          placeholder="Search..."
-          // eslint-disable-next-line jsx-a11y/no-autofocus
-          autoFocus
-          className="absolute right-0 top-4 z-50 mr-14 mt-4 rounded-md border-none bg-transparent p-2 text-white"
-        />
-      )}
+      <SearchBar editor={editor} showSearch={showSearchBar} setShowSearch={setShowSearchBar} />
       {menuVisible && <EditorContextMenu editor={editor} menuPosition={menuPosition} setMenuVisible={setMenuVisible} />}
       <div className={`relative h-full overflow-y-auto ${editorFlex ? 'flex justify-center py-4 pl-4' : ''}`}>
         <EditorContent

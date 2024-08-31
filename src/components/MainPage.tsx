@@ -14,7 +14,6 @@ import SidebarManager, { SidebarAbleToShow } from './Sidebars/MainSidebar'
 import SimilarFilesSidebarComponent from './Sidebars/SimilarFilesSidebar'
 import EmptyPage from './Common/EmptyPage'
 import { TabProvider } from '../providers/TabProvider'
-import { ModalProvider } from '../providers/ModalProvider'
 import WritingAssistant from './WritingAssistant/WritingAssistant'
 import { Chat, ChatFilters } from './Chat/types'
 import useFileInfoTree from './Sidebars/FileSideBar/hooks/use-file-info-tree'
@@ -22,7 +21,7 @@ import useFileInfoTree from './Sidebars/FileSideBar/hooks/use-file-info-tree'
 const UNINITIALIZED_STATE = 'UNINITIALIZED_STATE'
 
 const MainPageComponent: React.FC = () => {
-  const [showChatbot, setShowChatbot] = useState<boolean>(false)
+  const [showChatbot, setShowChatbot] = useState<boolean>(false) // the state around what is being shown should probably be a dedicated type
   const [showSimilarFiles, setShowSimilarFiles] = useState(true)
   const [sidebarShowing, setSidebarShowing] = useState<SidebarAbleToShow>('files')
   const [currentTab, setCurrentTab] = useState<string>('')
@@ -33,8 +32,6 @@ const MainPageComponent: React.FC = () => {
     minDate: new Date(0),
     maxDate: new Date(),
   })
-  const [sidebarWidth, setSidebarWidth] = useState<number>(40)
-
   const filePathRef = React.useRef<string>('')
   const chatIDRef = React.useRef<string>('')
 
@@ -99,7 +96,6 @@ const MainPageComponent: React.FC = () => {
   }
 
   const openTabContent = async (path: string) => {
-    // generically opens a chat or a file
     if (!path) return
     const chatID = getChatIdFromPath(path)
     if (chatID) {
@@ -112,33 +108,18 @@ const MainPageComponent: React.FC = () => {
     setCurrentTab(path)
   }
 
-  // find all available files
   useEffect(() => {
-    const updateWidth = async () => {
-      const isCompact = await window.electronStore.getSBCompact()
-      setSidebarWidth(isCompact ? 40 : 60)
-    }
-
-    // Listen for changes on settings
-    const handleSettingsChange = (isCompact: number) => {
-      setSidebarWidth(isCompact ? 40 : 60)
-    }
-
     const setFileDirectory = async () => {
       const windowDirectory = await window.electronStore.getVaultDirectoryForWindow()
       setVaultDirectory(windowDirectory)
     }
     setFileDirectory()
-    updateWidth()
-
-    window.ipcRenderer.receive('sb-compact-changed', handleSettingsChange)
   }, [])
 
   useEffect(() => {
     const handleAddFileToChatFilters = (file: string) => {
       setSidebarShowing('chats')
       setShowChatbot(true)
-      // setFileIsOpen(false);
       setCurrentChatHistory(undefined)
       setChatFilters((prevChatFilters) => ({
         ...prevChatFilters,
@@ -174,25 +155,20 @@ const MainPageComponent: React.FC = () => {
           setHistory={setNavigationHistory}
           currentTab={currentTab}
           openTabContent={openTabContent}
-          similarFilesOpen={showSimilarFiles} // This might need to be managed differently now
-          toggleSimilarFiles={toggleSimilarFiles} // This might need to be managed differently now
+          similarFilesOpen={showSimilarFiles}
+          toggleSimilarFiles={toggleSimilarFiles}
           openFileAndOpenEditor={openFileAndOpenEditor}
         />
       </TabProvider>
 
       <div className="flex h-below-titlebar">
-        <div
-          className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5"
-          style={{ width: `${sidebarWidth}px` }}
-        >
-          <ModalProvider>
-            <IconsSidebar
-              openFileAndOpenEditor={openFileAndOpenEditor}
-              sidebarShowing={sidebarShowing}
-              makeSidebarShow={setSidebarShowing}
-              currentFilePath={filePath}
-            />
-          </ModalProvider>
+        <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5">
+          <IconsSidebar
+            openFileAndOpenEditor={openFileAndOpenEditor}
+            sidebarShowing={sidebarShowing}
+            makeSidebarShow={setSidebarShowing}
+            currentFilePath={filePath}
+          />
         </div>
 
         <ResizableComponent resizeSide="right">
@@ -243,9 +219,7 @@ const MainPageComponent: React.FC = () => {
         ) : (
           !showChatbot && (
             <div className="relative flex size-full overflow-hidden">
-              <ModalProvider>
-                <EmptyPage openFileAndOpenEditor={openFileAndOpenEditor} />
-              </ModalProvider>
+              <EmptyPage openFileAndOpenEditor={openFileAndOpenEditor} />
             </div>
           )
         )}
@@ -257,7 +231,7 @@ const MainPageComponent: React.FC = () => {
               openFileAndOpenEditor={openFileAndOpenEditor}
               currentChatHistory={currentChatHistory}
               setCurrentChatHistory={setCurrentChatHistory}
-              showSimilarFiles={showSimilarFiles} // This might need to be managed differently now
+              showSimilarFiles={showSimilarFiles}
               chatFilters={chatFilters}
               setChatFilters={(updatedChatFilters: ChatFilters) => {
                 posthog.capture('add_file_to_chat', {
