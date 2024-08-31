@@ -98,6 +98,8 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
               numberOfChunksToFetch: 15,
               minDate: new Date(0),
               maxDate: new Date(),
+              numItems: 10,
+              dateFilter: 'all',
             })
           }}
           setShowChatbot={setShowChatbot}

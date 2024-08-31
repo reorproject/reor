@@ -7,9 +7,17 @@ interface ContextSettingsBarProps {
   chatFilters: ChatFilters
   setChatFilters: React.Dispatch<React.SetStateAction<ChatFilters>>
   vaultDirectory: string
+  maxWidth?: string
+  backgroundColor?: string
 }
 
-const ContextSettingsBar: React.FC<ContextSettingsBarProps> = ({ chatFilters, setChatFilters, vaultDirectory }) => {
+const ContextSettingsBar: React.FC<ContextSettingsBarProps> = ({
+  chatFilters,
+  setChatFilters,
+  vaultDirectory,
+  maxWidth,
+  backgroundColor,
+}) => {
   const [openTooltip, setOpenTooltip] = useState<string | null>(null)
 
   const handleTooltipClick = useCallback((tooltipType: string) => {
@@ -32,15 +40,16 @@ const ContextSettingsBar: React.FC<ContextSettingsBarProps> = ({ chatFilters, se
   }
 
   return (
-    <div className="flex w-full max-w-3xl items-center justify-between bg-gray-800 p-2 text-sm text-white">
+    <div className={`flex w-full ${maxWidth} items-center justify-between ${backgroundColor} p-2 text-sm text-white`}>
       <div className="cursor-pointer" onClick={() => handleTooltipClick('files')}>
         Files added to context: {chatFilters.files.length}
       </div>
       <div className="cursor-pointer" onClick={() => handleTooltipClick('items')}>
-        Number of context notes: {chatFilters.numItems}
+        Number of context notes: {chatFilters.files.length}
       </div>
       <div className="cursor-pointer" onClick={() => handleTooltipClick('date')}>
-        Date filter: {chatFilters.dateFilter}
+        Date filter: {chatFilters.minDate?.toLocaleDateString() || 'None'} -{' '}
+        {chatFilters.maxDate?.toLocaleDateString() || 'None'}
       </div>
       {renderPopup('files')}
       {renderPopup('items')}

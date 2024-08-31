@@ -32,6 +32,7 @@ const MainPageComponent: React.FC = () => {
     minDate: undefined,
     maxDate: undefined,
     dateFilter: 'Anytime',
+    numberOfChunksToFetch: 15,
   })
   const [sidebarWidth, setSidebarWidth] = useState<number>(40)
 

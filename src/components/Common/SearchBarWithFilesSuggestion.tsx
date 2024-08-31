@@ -27,14 +27,20 @@ const SearchBarWithFilesSuggestion: React.FC<SearchBarWithFilesSuggestionProps> 
         .filter((file) => file.path.toLowerCase().includes(text.toLowerCase()))
         .map((file) => file.path)
 
-      setSuggestionsState({
-        suggestionsState: {
-          textWithinBrackets: text,
-          position: { top: 0, left: 0 },
-          onSelect: (suggestion: string) => onSelectSuggestion(`${suggestion}.md`),
-        },
-        suggestions: filteredSuggestions,
-      })
+      if (inputRef.current) {
+        const rect = inputRef.current.getBoundingClientRect()
+        setSuggestionsState({
+          suggestionsState: {
+            textWithinBrackets: text,
+            position: {
+              top: rect.bottom + window.scrollY,
+              left: rect.left + window.scrollX,
+            },
+            onSelect: (suggestion: string) => onSelectSuggestion(`${suggestion}.md`),
+          },
+          suggestions: filteredSuggestions,
+        })
+      }
     },
     [flattenedFiles, setSuggestionsState, onSelectSuggestion],
   )

@@ -93,27 +93,29 @@ const ContextSettingsPopup: React.FC<ContextSettingsPopupProps> = ({
   )
 
   useEffect(() => {
-    const updatedChatFilters: ChatFilters = {
-      ...chatFilters,
-      files: [...new Set([...chatFilters.files, ...internalFilesSelected])],
-      numItems: numberOfChunksToFetch,
-      minDate: minDate || undefined,
-      maxDate: maxDate || undefined,
-      dateFilter: selectedDateRange,
+    if (type === 'files') {
+      setChatFilters({
+        files: [...new Set([...chatFilters.files, ...internalFilesSelected])],
+      })
     }
-    setChatFilters(updatedChatFilters)
-  }, [internalFilesSelected, numberOfChunksToFetch, minDate, maxDate, selectedDateRange, chatFilters, setChatFilters])
+  }, [internalFilesSelected, type, setChatFilters, chatFilters.files])
 
-  // const removeFile = useCallback(
-  //   (fileToRemove: string) => {
-  //     setInternalFilesSelected((prevFiles) => prevFiles.filter((file) => file !== fileToRemove))
-  //     setChatFilters((prevFilters) => ({
-  //       ...prevFilters,
-  //       files: prevFilters.files.filter((file) => file !== fileToRemove),
-  //     }))
-  //   },
-  //   [setChatFilters],
-  // )
+  useEffect(() => {
+    if (type === 'items') {
+      setChatFilters({ numItems: numberOfChunksToFetch })
+    }
+  }, [numberOfChunksToFetch, type, setChatFilters])
+
+  useEffect(() => {
+    if (type === 'date') {
+      setChatFilters({
+        minDate: minDate || undefined,
+        maxDate: maxDate || undefined,
+        dateFilter: selectedDateRange,
+      })
+    }
+  }, [minDate, maxDate, selectedDateRange, type, setChatFilters])
+
   const removeFile = useCallback(
     (fileToRemove: string) => {
       setInternalFilesSelected((prevFiles) => prevFiles.filter((file) => file !== fileToRemove))
