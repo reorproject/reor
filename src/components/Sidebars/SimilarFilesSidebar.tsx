@@ -11,14 +11,14 @@ import errorToStringRendererProcess from '@/utils/error'
 import SimilarEntriesComponent from './SemanticSidebar/SimilarEntriesComponent'
 import HighlightButton from './SemanticSidebar/HighlightButton'
 import { useFileContext } from '@/contexts/FileContext'
-import { useChatContext } from '@/contexts/ChatContext'
+import { useTabsContext } from '@/contexts/TabContext'
 
 const SimilarFilesSidebarComponent: React.FC = () => {
   const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([])
   const [isLoadingSimilarEntries, setIsLoadingSimilarEntries] = useState(false)
 
   const { currentlyOpenFilePath, highlightData } = useFileContext()
-  const { openTabContent } = useChatContext()
+  const { openTabContent } = useTabsContext()
 
   const getChunkForInitialSearchFromFile = async (filePathForChunk: string | null) => {
     // TODO: proper semantic chunking - current quick win is just to take top 500 characters

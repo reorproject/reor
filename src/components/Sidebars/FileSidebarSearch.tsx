@@ -4,7 +4,7 @@ import posthog from 'posthog-js'
 import { FaSearch } from 'react-icons/fa'
 import { DBSearchPreview } from '../File/DBResultPreview'
 import debounce from './utils'
-import { useChatContext } from '@/contexts/ChatContext'
+import { useTabsContext } from '@/contexts/TabContext'
 
 interface SearchComponentProps {
   searchQuery: string
@@ -19,7 +19,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   searchResults,
   setSearchResults,
 }) => {
-  const { openTabContent } = useChatContext()
+  const { openTabContent } = useTabsContext()
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   const handleSearch = useCallback(

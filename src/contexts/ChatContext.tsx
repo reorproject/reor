@@ -2,13 +2,12 @@ import React, { createContext, useContext, useState, useCallback, useEffect } fr
 import { ChatHistoryMetadata, useChatHistory } from '@/components/Chat/hooks/use-chat-history'
 import { Chat, ChatFilters } from '@/components/Chat/types'
 import { SidebarAbleToShow } from '@/components/Sidebars/MainSidebar'
-import { useFileContext } from './FileContext'
 
-const UNINITIALIZED_STATE = 'UNINITIALIZED_STATE'
+export const UNINITIALIZED_STATE = 'UNINITIALIZED_STATE'
 
 interface ChatContextType {
-  openTabContent: (path: string, optionalContentToWriteOnCreate?: string) => void
-  currentTab: string
+  // openTabContent: (path: string, optionalContentToWriteOnCreate?: string) => void
+  // currentTab: string
   sidebarShowing: SidebarAbleToShow
   setSidebarShowing: (option: SidebarAbleToShow) => void
   getChatIdFromPath: (path: string) => string
@@ -26,7 +25,7 @@ const ChatContext = createContext<ChatContextType | undefined>(undefined)
 
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [showChatbot, setShowChatbot] = useState<boolean>(false)
-  const [currentTab, setCurrentTab] = useState<string>('')
+  // const [currentTab, setCurrentTab] = useState<string>('')
   const [chatFilters, setChatFilters] = useState<ChatFilters>({
     files: [],
     numberOfChunksToFetch: 15,
@@ -35,11 +34,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   })
   const [sidebarShowing, setSidebarShowing] = useState<SidebarAbleToShow>('files')
 
-  const { openOrCreateFile, currentlyOpenFilePath } = useFileContext()
   const { currentChatHistory, setCurrentChatHistory, chatHistoriesMetadata } = useChatHistory()
 
-  const filePathRef = React.useRef<string>('')
-  const chatIDRef = React.useRef<string>('')
+  // const filePathRef = React.useRef<string>('')
+  // const chatIDRef = React.useRef<string>('')
 
   const openChatSidebarAndChat = useCallback(
     (chatHistory: Chat | undefined) => {
@@ -59,21 +57,21 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     [chatHistoriesMetadata],
   )
 
-  useEffect(() => {
-    if (currentlyOpenFilePath != null && filePathRef.current !== currentlyOpenFilePath) {
-      filePathRef.current = currentlyOpenFilePath
-      setCurrentTab(currentlyOpenFilePath)
-    }
+  // useEffect(() => {
+  //   if (currentlyOpenFilePath != null && filePathRef.current !== currentlyOpenFilePath) {
+  //     filePathRef.current = currentlyOpenFilePath
+  //     setCurrentTab(currentlyOpenFilePath)
+  //   }
 
-    const currentChatHistoryId = currentChatHistory?.id ?? ''
-    if (chatIDRef.current !== currentChatHistoryId) {
-      chatIDRef.current = currentChatHistoryId
-      const currentMetadata = chatHistoriesMetadata.find((chat) => chat.id === currentChatHistoryId)
-      if (currentMetadata) {
-        setCurrentTab(currentMetadata.displayName)
-      }
-    }
-  }, [currentChatHistory, chatHistoriesMetadata, currentlyOpenFilePath])
+  //   const currentChatHistoryId = currentChatHistory?.id ?? ''
+  //   if (chatIDRef.current !== currentChatHistoryId) {
+  //     chatIDRef.current = currentChatHistoryId
+  //     const currentMetadata = chatHistoriesMetadata.find((chat) => chat.id === currentChatHistoryId)
+  //     if (currentMetadata) {
+  //       setCurrentTab(currentMetadata.displayName)
+  //     }
+  //   }
+  // }, [currentChatHistory, chatHistoriesMetadata, currentlyOpenFilePath])
 
   useEffect(() => {
     const handleAddFileToChatFilters = (file: string) => {
@@ -94,28 +92,28 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [setCurrentChatHistory, setChatFilters, setShowChatbot])
 
-  const openTabContent = React.useCallback(
-    async (path: string, optionalContentToWriteOnCreate?: string) => {
-      if (!path) return
-      const chatID = getChatIdFromPath(path)
-      if (chatID) {
-        if (chatID === UNINITIALIZED_STATE) return
-        const chat = await window.electronStore.getChatHistory(chatID)
-        openChatSidebarAndChat(chat)
-      } else {
-        setShowChatbot(false)
-        setSidebarShowing('files')
-        openOrCreateFile(path, optionalContentToWriteOnCreate)
-      }
-      setCurrentTab(path)
-    },
-    [getChatIdFromPath, openChatSidebarAndChat, setShowChatbot, setSidebarShowing, openOrCreateFile, setCurrentTab],
-  )
+  // const openTabContent = React.useCallback(
+  //   async (path: string, optionalContentToWriteOnCreate?: string) => {
+  //     if (!path) return
+  //     const chatID = getChatIdFromPath(path)
+  //     if (chatID) {
+  //       if (chatID === UNINITIALIZED_STATE) return
+  //       const chat = await window.electronStore.getChatHistory(chatID)
+  //       openChatSidebarAndChat(chat)
+  //     } else {
+  //       setShowChatbot(false)
+  //       setSidebarShowing('files')
+  //       openOrCreateFile(path, optionalContentToWriteOnCreate)
+  //     }
+  //     setCurrentTab(path)
+  //   },
+  //   [getChatIdFromPath, openChatSidebarAndChat, setShowChatbot, setSidebarShowing, openOrCreateFile, setCurrentTab],
+  // )
 
   const value = React.useMemo(
     () => ({
-      openTabContent,
-      currentTab,
+      // openTabContent,
+      // currentTab,
       sidebarShowing,
       setSidebarShowing,
       getChatIdFromPath,
@@ -129,8 +127,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       openChatSidebarAndChat,
     }),
     [
-      openTabContent,
-      currentTab,
+      // openTabContent,
+      // currentTab,
       sidebarShowing,
       setSidebarShowing,
       getChatIdFromPath,

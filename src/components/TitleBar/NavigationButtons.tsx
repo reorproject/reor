@@ -6,7 +6,7 @@ import { IoMdArrowRoundBack, IoMdArrowRoundForward } from 'react-icons/io'
 import { removeFileExtension } from '@/utils/strings'
 import '../../styles/history.scss'
 import { useFileContext } from '@/contexts/FileContext'
-import { useChatContext } from '@/contexts/ChatContext'
+import { useTabsContext } from '@/contexts/TabContext'
 
 const FileHistoryNavigator: React.FC = () => {
   const [showMenu, setShowMenu] = useState<string>('')
@@ -15,7 +15,7 @@ const FileHistoryNavigator: React.FC = () => {
   const buttonRefBack = useRef<HTMLButtonElement>(null)
   const buttonRefForward = useRef<HTMLButtonElement>(null)
 
-  const { currentTab, openTabContent } = useChatContext()
+  const { currentTab, openTabContent } = useTabsContext()
   const { navigationHistory, setNavigationHistory } = useFileContext()
 
   useEffect(() => {

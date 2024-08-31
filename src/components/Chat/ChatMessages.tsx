@@ -13,6 +13,7 @@ import LoadingDots from '@/utils/animations'
 import '../../styles/chat.css'
 import { ReorChatMessage } from './types'
 import { useChatContext } from '@/contexts/ChatContext'
+import { useTabsContext } from '@/contexts/TabContext'
 
 export enum AskOptions {
   Ask = 'Ask',
@@ -49,7 +50,8 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   askText,
   loadAnimation,
 }) => {
-  const { currentChatHistory, chatFilters, setChatFilters, openTabContent } = useChatContext()
+  const { currentChatHistory, chatFilters, setChatFilters } = useChatContext()
+  const { openTabContent } = useTabsContext()
   const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([])
   const [selectedLlm, setSelectedLlm] = useState<string>(defaultModelName)
 

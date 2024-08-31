@@ -13,6 +13,7 @@ import { TabProvider } from '../contexts/TabContext'
 import WritingAssistant from './WritingAssistant/WritingAssistant'
 import { ChatProvider, useChatContext } from '@/contexts/ChatContext'
 import { FileProvider, useFileContext } from '@/contexts/FileContext'
+import ModalProvider from '@/contexts/ModalContext'
 
 const MainPageContent: React.FC = () => {
   const [showSimilarFiles, setShowSimilarFiles] = useState(true)
@@ -33,14 +34,12 @@ const MainPageContent: React.FC = () => {
   return (
     <div className="relative overflow-x-hidden">
       <div id="tooltip-container" />
-      <TabProvider>
-        <TitleBar
-          similarFilesOpen={showSimilarFiles}
-          toggleSimilarFiles={() => {
-            setShowSimilarFiles(!showSimilarFiles)
-          }}
-        />
-      </TabProvider>
+      <TitleBar
+        similarFilesOpen={showSimilarFiles}
+        toggleSimilarFiles={() => {
+          setShowSimilarFiles(!showSimilarFiles)
+        }}
+      />
 
       <div className="flex h-below-titlebar">
         <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5">
@@ -87,7 +86,11 @@ const MainPageComponent: React.FC = () => {
   return (
     <FileProvider>
       <ChatProvider>
-        <MainPageContent />
+        <TabProvider>
+          <ModalProvider>
+            <MainPageContent />
+          </ModalProvider>
+        </TabProvider>
       </ChatProvider>
     </FileProvider>
   )

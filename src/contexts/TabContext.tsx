@@ -2,10 +2,12 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { v4 as uuidv4 } from 'uuid'
 
 import { Tab } from 'electron/main/electron-store/storeConfig'
-import { useChatContext } from './ChatContext'
+import { UNINITIALIZED_STATE, useChatContext } from './ChatContext'
 import { useFileContext } from './FileContext'
 
 interface TabContextType {
+  currentTab: string
+  openTabContent: (path: string, optionalContentToWriteOnCreate?: string) => void
   openTabs: Tab[]
   addTab: (path: string) => void
   selectTab: (tab: Tab) => void
@@ -13,27 +15,37 @@ interface TabContextType {
   updateTabOrder: (draggedIdx: number, targetIdx: number) => void
 }
 
-const defaultTypeContext: TabContextType = {
-  openTabs: [],
-  addTab: () => {},
-  selectTab: () => {},
-  removeTabByID: () => {},
-  updateTabOrder: () => {},
+const TabContext = createContext<TabContextType | undefined>(undefined)
+
+export const useTabsContext = (): TabContextType => {
+  const context = useContext(TabContext)
+  if (context === undefined) {
+    throw new Error('useTabs must be used within a TabProvider')
+  }
+  return context
 }
-
-const TabContext = createContext<TabContextType>(defaultTypeContext)
-
-export const useTabs = (): TabContextType => useContext(TabContext)
 
 interface TabProviderProps {
   children: ReactNode
 }
 
 export const TabProvider: React.FC<TabProviderProps> = ({ children }) => {
+  const [currentTab, setCurrentTab] = useState<string>('')
   const [openTabs, setOpenTabs] = useState<Tab[]>([])
-  const { setCurrentChatHistory, openTabContent, currentTab, sidebarShowing, setSidebarShowing, getChatIdFromPath } =
-    useChatContext()
-  const { setCurrentlyOpenFilePath } = useFileContext()
+  const {
+    currentChatHistory,
+    setCurrentChatHistory,
+    chatHistoriesMetadata,
+    openChatSidebarAndChat,
+    setShowChatbot,
+    sidebarShowing,
+    setSidebarShowing,
+    getChatIdFromPath,
+  } = useChatContext()
+  const { currentlyOpenFilePath, setCurrentlyOpenFilePath, openOrCreateFile } = useFileContext()
+
+  const filePathRef = React.useRef<string>('')
+  const chatIDRef = React.useRef<string>('')
 
   useEffect(() => {
     const fetchHistoryTabs = async () => {
@@ -54,6 +66,22 @@ export const TabProvider: React.FC<TabProviderProps> = ({ children }) => {
       removeTabByPathListener()
     }
   }, [])
+
+  useEffect(() => {
+    if (currentlyOpenFilePath != null && filePathRef.current !== currentlyOpenFilePath) {
+      filePathRef.current = currentlyOpenFilePath
+      setCurrentTab(currentlyOpenFilePath)
+    }
+
+    const currentChatHistoryId = currentChatHistory?.id ?? ''
+    if (chatIDRef.current !== currentChatHistoryId) {
+      chatIDRef.current = currentChatHistoryId
+      const currentMetadata = chatHistoriesMetadata.find((chat) => chat.id === currentChatHistoryId)
+      if (currentMetadata) {
+        setCurrentTab(currentMetadata.displayName)
+      }
+    }
+  }, [currentChatHistory, chatHistoriesMetadata, currentlyOpenFilePath])
 
   const extractFileName = (path: string) => {
     const parts = path.split(/[/\\]/) // Split on both forward slash and backslash
@@ -85,6 +113,24 @@ export const TabProvider: React.FC<TabProviderProps> = ({ children }) => {
       })
     },
     [openTabs],
+  )
+
+  const openTabContent = React.useCallback(
+    async (path: string, optionalContentToWriteOnCreate?: string) => {
+      if (!path) return
+      const chatID = getChatIdFromPath(path)
+      if (chatID) {
+        if (chatID === UNINITIALIZED_STATE) return
+        const chat = await window.electronStore.getChatHistory(chatID)
+        openChatSidebarAndChat(chat)
+      } else {
+        setShowChatbot(false)
+        setSidebarShowing('files')
+        openOrCreateFile(path, optionalContentToWriteOnCreate)
+      }
+      setCurrentTab(path)
+    },
+    [getChatIdFromPath, openChatSidebarAndChat, setShowChatbot, setSidebarShowing, openOrCreateFile, setCurrentTab],
   )
 
   /* Removes a tab and syncs it with the backend */
@@ -166,13 +212,15 @@ export const TabProvider: React.FC<TabProviderProps> = ({ children }) => {
 
   const TabContextMemo = useMemo(
     () => ({
+      currentTab,
+      openTabContent,
       openTabs,
       addTab,
       removeTabByID,
       updateTabOrder,
       selectTab,
     }),
-    [openTabs, addTab, removeTabByID, updateTabOrder, selectTab],
+    [currentTab, openTabs, addTab, removeTabByID, updateTabOrder, selectTab, openTabContent],
   )
 
   return <TabContext.Provider value={TabContextMemo}>{children}</TabContext.Provider>

@@ -6,7 +6,7 @@ import posthog from 'posthog-js'
 import ReorModal from '../Common/Modal'
 import { getInvalidCharacterInFileName } from '@/utils/strings'
 import { useFileContext } from '@/contexts/FileContext'
-import { useChatContext } from '@/contexts/ChatContext'
+import { useTabsContext } from '@/contexts/TabContext'
 
 interface NewNoteComponentProps {
   isOpen: boolean
@@ -14,7 +14,7 @@ interface NewNoteComponentProps {
 }
 
 const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose }) => {
-  const { openTabContent } = useChatContext()
+  const { openTabContent } = useTabsContext()
   const [fileName, setFileName] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 

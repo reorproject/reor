@@ -4,10 +4,9 @@ import { createPortal } from 'react-dom'
 import { Tab } from 'electron/main/electron-store/storeConfig'
 import { removeFileExtension } from '@/utils/strings'
 import '../../styles/tab.css'
-import { useTabs } from '../../contexts/TabContext'
+import { useTabsContext } from '../../contexts/TabContext'
 import NewNoteComponent from '../File/NewNote'
 import { useModalOpeners } from '../../contexts/ModalContext'
-import { useChatContext } from '@/contexts/ChatContext'
 
 interface TooltipProps {
   filepath: string
@@ -43,8 +42,7 @@ const Tooltip: React.FC<TooltipProps> = ({ filepath, position }) => {
 }
 
 const DraggableTabs: React.FC = () => {
-  const { currentTab, openTabContent } = useChatContext()
-  const { openTabs, addTab, selectTab, removeTabByID, updateTabOrder } = useTabs()
+  const { currentTab, openTabContent, openTabs, addTab, selectTab, removeTabByID, updateTabOrder } = useTabsContext()
   const [isLastTabAccessed, setIsLastTabAccessed] = useState<boolean>(false)
 
   const [hoveredTab, setHoveredTab] = useState<string | null>(null)

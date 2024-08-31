@@ -12,6 +12,7 @@ import '../../styles/chat.css'
 import ChatMessages, { AskOptions } from './ChatMessages'
 import { Chat } from './types'
 import { useChatContext } from '@/contexts/ChatContext'
+import { useTabsContext } from '@/contexts/TabContext'
 
 interface ChatComponentProps {
   vaultDirectory: string
@@ -30,7 +31,8 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ vaultDirectory, showSimil
   const [defaultModelName, setDefaultLLMName] = useState<string>('')
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
-  const { setCurrentChatHistory, currentChatHistory, chatFilters, openTabContent } = useChatContext()
+  const { setCurrentChatHistory, currentChatHistory, chatFilters } = useChatContext()
+  const { openTabContent } = useTabsContext()
 
   useEffect(() => {
     const fetchDefaultLLM = async () => {
