@@ -2,13 +2,10 @@ import React, { useState } from 'react'
 
 import { FileInfoTree } from 'electron/main/filesystem/types'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
-import posthog from 'posthog-js'
 
 import { ChatsSidebar } from '../Chat/ChatsSidebar'
-import { ChatHistoryMetadata } from '../Chat/hooks/use-chat-history'
 
 import SearchComponent from './FileSidebarSearch'
-import { Chat, ChatFilters } from '../Chat/types'
 import { FileSidebar } from './FileSideBar'
 
 export type SidebarAbleToShow = 'files' | 'search' | 'chats'
@@ -24,11 +21,6 @@ interface SidebarManagerProps {
   setNoteToBeRenamed: (note: string) => void
   fileDirToBeRenamed: string
   setFileDirToBeRenamed: (dir: string) => void
-  currentChatHistory: Chat | undefined
-  chatHistoriesMetadata: ChatHistoryMetadata[]
-  setCurrentChatHistory: (chat: Chat | undefined) => void
-  setChatFilters: (chatFilters: ChatFilters) => void
-  setShowChatbot: (showChat: boolean) => void
 }
 
 const SidebarManager: React.FC<SidebarManagerProps> = ({
@@ -43,11 +35,6 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
   setNoteToBeRenamed,
   fileDirToBeRenamed,
   setFileDirToBeRenamed,
-  currentChatHistory,
-  chatHistoriesMetadata,
-  setCurrentChatHistory,
-  setChatFilters,
-  setShowChatbot,
 }) => {
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [searchResults, setSearchResults] = useState<DBQueryResult[]>([])
@@ -78,31 +65,7 @@ const SidebarManager: React.FC<SidebarManagerProps> = ({
         />
       )}
 
-      {sidebarShowing === 'chats' && (
-        <ChatsSidebar
-          chatHistoriesMetadata={chatHistoriesMetadata}
-          currentChatHistory={currentChatHistory}
-          onSelect={(chatID) => {
-            async function fetchChatHistory() {
-              const chat = await window.electronStore.getChatHistory(chatID)
-              setCurrentChatHistory(chat)
-            }
-            fetchChatHistory()
-          }}
-          newChat={() => {
-            posthog.capture('create_new_chat')
-            setCurrentChatHistory(undefined)
-
-            setChatFilters({
-              files: [],
-              numberOfChunksToFetch: 15,
-              minDate: new Date(0),
-              maxDate: new Date(),
-            })
-          }}
-          setShowChatbot={setShowChatbot}
-        />
-      )}
+      {sidebarShowing === 'chats' && <ChatsSidebar />}
     </div>
   )
 }

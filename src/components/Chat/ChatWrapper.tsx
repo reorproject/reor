@@ -10,27 +10,16 @@ import { anonymizeChatFiltersForPosthog, getChatHistoryContext, resolveLLMClient
 import SimilarEntriesComponent from '../Sidebars/SemanticSidebar/SimilarEntriesComponent'
 import '../../styles/chat.css'
 import ChatMessages, { AskOptions } from './ChatMessages'
-import { Chat, ChatFilters } from './types'
+import { Chat } from './types'
+import { useChatContext } from '@/providers/ChatContext'
 
 interface ChatWrapperProps {
   vaultDirectory: string
   openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => Promise<void>
-  currentChatHistory: Chat | undefined
-  setCurrentChatHistory: React.Dispatch<React.SetStateAction<Chat | undefined>>
   showSimilarFiles: boolean
-  chatFilters: ChatFilters
-  setChatFilters: React.Dispatch<ChatFilters>
 }
 
-const ChatWrapper: React.FC<ChatWrapperProps> = ({
-  vaultDirectory,
-  openFileAndOpenEditor,
-  currentChatHistory,
-  setCurrentChatHistory,
-  showSimilarFiles,
-  chatFilters,
-  setChatFilters,
-}) => {
+const ChatWrapper: React.FC<ChatWrapperProps> = ({ vaultDirectory, openFileAndOpenEditor, showSimilarFiles }) => {
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
   const [askText] = useState<AskOptions>(AskOptions.Ask)
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false)
@@ -42,6 +31,8 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({
   const [defaultModelName, setDefaultLLMName] = useState<string>('')
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
+  const { setCurrentChatHistory, currentChatHistory, chatFilters } = useChatContext()
+
   useEffect(() => {
     const fetchDefaultLLM = async () => {
       const defaultName = await window.llm.getDefaultLLMName()
@@ -51,7 +42,6 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({
     fetchDefaultLLM()
   }, [])
 
-  // update chat context when files are added
   useEffect(() => {
     const setContextOnFileAdded = async () => {
       if (chatFilters.files.length > 0) {
@@ -101,7 +91,7 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({
         }
       })
     },
-    [setCurrentChatHistory], // Add any other dependencies here if needed
+    [setCurrentChatHistory],
   )
 
   const handleSubmitNewMessage = async (currentChat: Chat | undefined) => {
@@ -155,11 +145,6 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({
       appendNewContentToMessageHistory(outputChat.id, textPart)
     }
     setReadyToSave(true)
-    // } catch (error) {
-    //   if (outputChat) {
-    //     appendNewContentToMessageHistory(outputChat.id, errorToStringRendererProcess(error), 'error')
-    //   }
-    // }
   }
 
   useEffect(() => {
@@ -197,10 +182,7 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({
         <ChatMessages
           chatContainerRef={chatContainerRef}
           openFileAndOpenEditor={openFileAndOpenEditor}
-          currentChatHistory={currentChatHistory}
           isAddContextFiltersModalOpen={isAddContextFiltersModalOpen}
-          chatFilters={chatFilters}
-          setChatFilters={setChatFilters}
           setUserTextFieldInput={setUserTextFieldInput}
           defaultModelName={defaultModelName}
           vaultDirectory={vaultDirectory}

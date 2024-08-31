@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { Tab } from 'electron/main/electron-store/storeConfig'
 import { SidebarAbleToShow } from '../components/Sidebars/MainSidebar'
+import { useChatContext } from './ChatContext'
 
 interface TabContextType {
   openTabs: Tab[]
@@ -22,16 +23,12 @@ const defaultTypeContext: TabContextType = {
 
 const TabContext = createContext<TabContextType>(defaultTypeContext)
 
-// Contains openTabs, addTab, selectTab, removeTabByID, updateTabOrder
 export const useTabs = (): TabContextType => useContext(TabContext)
-
-// so then apparently, useTabs is a hook that allows you to call those functions
 
 interface TabProviderProps {
   children: ReactNode
   openTabContent: (path: string) => void
   setFilePath: (path: string) => void
-  setCurrentChatHistory: (chatHistory: undefined) => void
   currentTab: string | null
   sidebarShowing: string | null
   makeSidebarShow: (option: SidebarAbleToShow) => void
@@ -42,13 +39,13 @@ export const TabProvider: React.FC<TabProviderProps> = ({
   children,
   openTabContent,
   setFilePath,
-  setCurrentChatHistory,
   currentTab,
   sidebarShowing,
   makeSidebarShow,
   getChatIdFromPath,
 }) => {
   const [openTabs, setOpenTabs] = useState<Tab[]>([])
+  const { setCurrentChatHistory } = useChatContext()
 
   useEffect(() => {
     const fetchHistoryTabs = async () => {

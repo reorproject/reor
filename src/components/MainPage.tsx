@@ -1,10 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
-import posthog from 'posthog-js'
-
 import '../styles/global.css'
 import ChatWrapper from './Chat/ChatWrapper'
-import { useChatHistory } from './Chat/hooks/use-chat-history'
 import ResizableComponent from './Common/ResizableComponent'
 import TitleBar from './TitleBar/TitleBar'
 import EditorManager from './Editor/EditorManager'
@@ -15,25 +12,28 @@ import SimilarFilesSidebarComponent from './Sidebars/SimilarFilesSidebar'
 import EmptyPage from './Common/EmptyPage'
 import { TabProvider } from '../providers/TabProvider'
 import WritingAssistant from './WritingAssistant/WritingAssistant'
-import { Chat, ChatFilters } from './Chat/types'
 import useFileInfoTree from './Sidebars/FileSideBar/hooks/use-file-info-tree'
+import { ChatProvider, useChatContext } from '@/providers/ChatContext'
 
 const UNINITIALIZED_STATE = 'UNINITIALIZED_STATE'
 
-const MainPageComponent: React.FC = () => {
-  const [showChatbot, setShowChatbot] = useState<boolean>(false) // the state around what is being shown should probably be a dedicated type
+const MainPageContent: React.FC = () => {
   const [showSimilarFiles, setShowSimilarFiles] = useState(true)
   const [sidebarShowing, setSidebarShowing] = useState<SidebarAbleToShow>('files')
   const [currentTab, setCurrentTab] = useState<string>('')
   const [vaultDirectory, setVaultDirectory] = useState<string>('')
-  const [chatFilters, setChatFilters] = useState<ChatFilters>({
-    files: [],
-    numberOfChunksToFetch: 15,
-    minDate: new Date(0),
-    maxDate: new Date(),
-  })
   const filePathRef = React.useRef<string>('')
   const chatIDRef = React.useRef<string>('')
+
+  const {
+    showChatbot,
+    setShowChatbot,
+    currentChatHistory,
+    setCurrentChatHistory,
+    setChatFilters,
+    openChatSidebarAndChat,
+    chatHistoriesMetadata,
+  } = useChatContext()
 
   const {
     filePath,
@@ -51,8 +51,6 @@ const MainPageComponent: React.FC = () => {
     navigationHistory,
     setNavigationHistory,
   } = useFileByFilepath()
-
-  const { currentChatHistory, setCurrentChatHistory, chatHistoriesMetadata } = useChatHistory()
 
   useEffect(() => {
     if (filePath != null && filePathRef.current !== filePath) {
@@ -81,12 +79,6 @@ const MainPageComponent: React.FC = () => {
     const metadata = chatHistoriesMetadata.find((chat) => chat.displayName === path)
     if (metadata) return metadata.id
     return ''
-  }
-
-  const openChatSidebarAndChat = (chatHistory: Chat | undefined) => {
-    setShowChatbot(true)
-    setSidebarShowing('chats')
-    setCurrentChatHistory(chatHistory)
   }
 
   const openFileAndOpenEditor = async (path: string, optionalContentToWriteOnCreate?: string) => {
@@ -133,19 +125,15 @@ const MainPageComponent: React.FC = () => {
     return () => {
       removeAddChatToFileListener()
     }
-  }, [setCurrentChatHistory, setChatFilters])
+  }, [setCurrentChatHistory, setChatFilters, setShowChatbot])
 
   return (
     <div className="relative overflow-x-hidden">
-      {/* Displays the dropdown tab when hovering. You cannot use z-index and position absolute inside 
-          TitleBar since one of the Parent components inadvertently creates a new stacking context that 
-          impacts the z-index. */}
       <div id="tooltip-container" />
       <TabProvider
         openTabContent={openTabContent}
         currentTab={currentTab}
         setFilePath={setFilePath}
-        setCurrentChatHistory={setCurrentChatHistory}
         sidebarShowing={sidebarShowing}
         makeSidebarShow={setSidebarShowing}
         getChatIdFromPath={getChatIdFromPath}
@@ -185,11 +173,6 @@ const MainPageComponent: React.FC = () => {
               setNoteToBeRenamed={setNoteToBeRenamed}
               fileDirToBeRenamed={fileDirToBeRenamed}
               setFileDirToBeRenamed={setFileDirToBeRenamed}
-              currentChatHistory={currentChatHistory}
-              chatHistoriesMetadata={chatHistoriesMetadata}
-              setCurrentChatHistory={openChatSidebarAndChat}
-              setChatFilters={setChatFilters}
-              setShowChatbot={setShowChatbot}
             />
           </div>
         </ResizableComponent>
@@ -202,7 +185,7 @@ const MainPageComponent: React.FC = () => {
                 suggestionsState={suggestionsState}
                 flattenedFiles={flattenedFiles}
                 showSimilarFiles={showSimilarFiles}
-              />{' '}
+              />
             </div>
             <WritingAssistant editor={editor} highlightData={highlightData} />
             {showSimilarFiles && (
@@ -229,21 +212,20 @@ const MainPageComponent: React.FC = () => {
             <ChatWrapper
               vaultDirectory={vaultDirectory}
               openFileAndOpenEditor={openFileAndOpenEditor}
-              currentChatHistory={currentChatHistory}
-              setCurrentChatHistory={setCurrentChatHistory}
               showSimilarFiles={showSimilarFiles}
-              chatFilters={chatFilters}
-              setChatFilters={(updatedChatFilters: ChatFilters) => {
-                posthog.capture('add_file_to_chat', {
-                  chatFilesLength: updatedChatFilters.files.length,
-                })
-                setChatFilters(updatedChatFilters)
-              }}
             />
           </div>
         )}
       </div>
     </div>
+  )
+}
+
+const MainPageComponent: React.FC = () => {
+  return (
+    <ChatProvider>
+      <MainPageContent />
+    </ChatProvider>
   )
 }
 
