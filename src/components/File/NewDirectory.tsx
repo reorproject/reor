@@ -10,7 +10,7 @@ interface NewDirectoryComponentProps {
   isOpen: boolean
   onClose: () => void
   currentOpenFilePath: string | null
-  optionalAbsoluteCreate: string | null
+  optionalAbsoluteCreate?: string | null
 }
 
 const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, onClose, currentOpenFilePath, optionalAbsoluteCreate }) => {

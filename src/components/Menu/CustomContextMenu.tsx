@@ -4,6 +4,7 @@ import { ChatHistoryMetadata } from "../Chat/hooks/use-chat-history"
 import { useModalOpeners } from '../../providers/ModalProvider'
 import NewNoteComponent from "../File/NewNote"
 import NewDirectoryComponent from '../File/NewDirectory'
+import FlashcardMenuModal from '../Flashcard/FlashcardMenuModal'
 
 /**
  * Name of component that user right clicked on.
@@ -70,6 +71,12 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
     setIsNewNoteModalOpen,
     isNewDirectoryModalOpen,
     setIsNewDirectoryModalOpen,
+    setIsFlashcardModeOpen,
+    setInitialFileToCreateFlashcard,
+    isFlashcardModeOpen,
+    setInitialFileToReviewFlashcard,
+    initialFileToCreateFlashcard,
+    initialFileToReviewFlashcard,
   } = useModalOpeners()
 
   useEffect(() => {
@@ -84,6 +91,12 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
           document.removeEventListener('mousedown', handleOutsideClick)
       }
   }, [hideFocusedItem])
+
+  const handleMakeFlashcard = (noteName: string | null) => {
+    if (!noteName) return
+    setIsFlashcardModeOpen(!!noteName)
+    setInitialFileToCreateFlashcard(noteName)
+  }
 
   let displayList: MenuItemType[] = []
   switch(currentSelection) {
@@ -102,7 +115,7 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
           displayList = [
               {title: 'Delete', onSelect: () => handleDeleteFile(file?.path), icon: ''},
               {title: 'Rename', onSelect: () => {file?.path ? setFileNodeToBeRenamed(file?.path) : ''}, icon: ''},
-              {title: 'Create flashcard set', onSelect: null, icon: ''},
+              {title: 'Create flashcard set', onSelect: () => handleMakeFlashcard(file ? file.path : null), icon: ''},
               {title: 'Add File to chat context', onSelect: null, icon: ''},
           ]
           break
@@ -119,7 +132,7 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
               {title: 'New Note', onSelect: () => setIsNewNoteModalOpen(true), icon: ''},
               {title: 'Delete', onSelect: () => handleDeleteFile(file?.path), icon: ''},
               {title: 'Rename', onSelect: () => {file?.path ? setFileNodeToBeRenamed(file?.path) : ''}, icon: ''},
-              {title: 'Create flashcard set', onSelect: null, icon: ''},
+              {title: 'Create flashcard set', onSelect: () => handleMakeFlashcard(file ? file.path : null), icon: ''},
               {title: 'Add file to chat context', onSelect: null, icon: ''},
           ]
           break
@@ -178,6 +191,18 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
         currentOpenFilePath={file?.path ? file?.path : null}
         optionalAbsoluteCreate={file?.path ? file?.path : null}
       />
+      {isFlashcardModeOpen && (
+        <FlashcardMenuModal
+          isOpen={isFlashcardModeOpen}
+          onClose={() => {
+            setIsFlashcardModeOpen(false)
+            setInitialFileToCreateFlashcard('')
+            setInitialFileToReviewFlashcard('')
+          }}
+          initialFileToCreateFlashcard={initialFileToCreateFlashcard}
+          initialFileToReviewFlashcard={initialFileToReviewFlashcard}
+        />
+      )}
     </div>
   )
 }

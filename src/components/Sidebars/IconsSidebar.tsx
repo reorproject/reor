@@ -28,8 +28,6 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
   makeSidebarShow,
   currentFilePath,
 }) => {
-  const [initialFileToCreateFlashcard, setInitialFileToCreateFlashcard] = useState('')
-  const [initialFileToReviewFlashcard, setInitialFileToReviewFlashcard] = useState('')
 
   const {
     isNewNoteModalOpen,
@@ -40,6 +38,10 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
     setIsSettingsModalOpen,
     isFlashcardModeOpen,
     setIsFlashcardModeOpen,
+    initialFileToCreateFlashcard,
+    setInitialFileToCreateFlashcard,
+    initialFileToReviewFlashcard,
+    setInitialFileToReviewFlashcard,
   } = useModalOpeners()
 
   // open a new flashcard create mode

@@ -16,6 +16,10 @@ interface ModalOpenContextType {
   setIsSettingsModalOpen: (settingsOpen: boolean) => void
   isFlashcardModeOpen: boolean
   setIsFlashcardModeOpen: (flashcardOpen: boolean) => void
+  initialFileToCreateFlashcard: string
+  setInitialFileToCreateFlashcard: (flashcardName: string) => void
+  initialFileToReviewFlashcard: string
+  setInitialFileToReviewFlashcard: (flashcardName: string) => void
 }
 
 const defaultModalContext: ModalOpenContextType = {
@@ -27,6 +31,10 @@ const defaultModalContext: ModalOpenContextType = {
   setIsSettingsModalOpen: () => {},
   isFlashcardModeOpen: false,
   setIsFlashcardModeOpen: () => {},
+  initialFileToCreateFlashcard: '',
+  setInitialFileToCreateFlashcard: () => {},
+  initialFileToReviewFlashcard: '',
+  setInitialFileToReviewFlashcard: () => {},
 }
 
 const ModalContext = createContext<ModalOpenContextType>(defaultModalContext)
@@ -38,6 +46,8 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
   const [isFlashcardModeOpen, setIsFlashcardModeOpen] = useState(false)
+  const [initialFileToCreateFlashcard, setInitialFileToCreateFlashcard] = useState('')
+  const [initialFileToReviewFlashcard, setInitialFileToReviewFlashcard] = useState('')
 
   const modalOpenContextValue = useMemo(
     () => ({
@@ -49,6 +59,10 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
       setIsSettingsModalOpen,
       isFlashcardModeOpen,
       setIsFlashcardModeOpen,
+      initialFileToCreateFlashcard,
+      setInitialFileToCreateFlashcard,
+      initialFileToReviewFlashcard,
+      setInitialFileToReviewFlashcard,
     }),
     [isNewNoteModalOpen, isNewDirectoryModalOpen, isSettingsModalOpen, isFlashcardModeOpen],
   )
