@@ -33,7 +33,6 @@ const MainPageComponent: React.FC = () => {
     minDate: new Date(0),
     maxDate: new Date(),
   })
-  const [sidebarWidth, setSidebarWidth] = useState<number>(40)
 
   const filePathRef = React.useRef<string>('')
   const chatIDRef = React.useRef<string>('')
@@ -112,33 +111,18 @@ const MainPageComponent: React.FC = () => {
     setCurrentTab(path)
   }
 
-  // find all available files
   useEffect(() => {
-    const updateWidth = async () => {
-      const isCompact = await window.electronStore.getSBCompact()
-      setSidebarWidth(isCompact ? 40 : 60)
-    }
-
-    // Listen for changes on settings
-    const handleSettingsChange = (isCompact: number) => {
-      setSidebarWidth(isCompact ? 40 : 60)
-    }
-
     const setFileDirectory = async () => {
       const windowDirectory = await window.electronStore.getVaultDirectoryForWindow()
       setVaultDirectory(windowDirectory)
     }
     setFileDirectory()
-    updateWidth()
-
-    window.ipcRenderer.receive('sb-compact-changed', handleSettingsChange)
   }, [])
 
   useEffect(() => {
     const handleAddFileToChatFilters = (file: string) => {
       setSidebarShowing('chats')
       setShowChatbot(true)
-      // setFileIsOpen(false);
       setCurrentChatHistory(undefined)
       setChatFilters((prevChatFilters) => ({
         ...prevChatFilters,
@@ -181,10 +165,7 @@ const MainPageComponent: React.FC = () => {
       </TabProvider>
 
       <div className="flex h-below-titlebar">
-        <div
-          className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5"
-          style={{ width: `${sidebarWidth}px` }}
-        >
+        <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5">
           <ModalProvider>
             <IconsSidebar
               openFileAndOpenEditor={openFileAndOpenEditor}
