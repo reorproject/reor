@@ -9,10 +9,10 @@ import IconsSidebar from './Sidebars/IconsSidebar'
 import SidebarManager from './Sidebars/MainSidebar'
 import SimilarFilesSidebarComponent from './Sidebars/SimilarFilesSidebar'
 import EmptyPage from './Common/EmptyPage'
-import { TabProvider } from '../providers/TabProvider'
+import { TabProvider } from '../contexts/TabContext'
 import WritingAssistant from './WritingAssistant/WritingAssistant'
-import { ChatProvider, useChatContext } from '@/providers/ChatContext'
-import { FileProvider, useFileContext } from '@/providers/FileContext'
+import { ChatProvider, useChatContext } from '@/contexts/ChatContext'
+import { FileProvider, useFileContext } from '@/contexts/FileContext'
 
 const MainPageContent: React.FC = () => {
   const [showSimilarFiles, setShowSimilarFiles] = useState(true)

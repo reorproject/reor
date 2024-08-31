@@ -2,7 +2,7 @@ import React from 'react'
 
 import RenameNoteModal from '@/components/File/RenameNote'
 import RenameDirModal from '@/components/File/RenameDirectory'
-import { useFileContext } from '@/providers/FileContext'
+import { useFileContext } from '@/contexts/FileContext'
 import FileExplorer from './FileExplorer'
 
 interface FileSidebarProps {

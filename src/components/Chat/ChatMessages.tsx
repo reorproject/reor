@@ -12,7 +12,7 @@ import PromptSuggestion from './ChatPrompts'
 import LoadingDots from '@/utils/animations'
 import '../../styles/chat.css'
 import { ReorChatMessage } from './types'
-import { useChatContext } from '@/providers/ChatContext'
+import { useChatContext } from '@/contexts/ChatContext'
 
 export enum AskOptions {
   Ask = 'Ask',

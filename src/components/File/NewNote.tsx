@@ -5,8 +5,8 @@ import posthog from 'posthog-js'
 
 import ReorModal from '../Common/Modal'
 import { getInvalidCharacterInFileName } from '@/utils/strings'
-import { useFileContext } from '@/providers/FileContext'
-import { useChatContext } from '@/providers/ChatContext'
+import { useFileContext } from '@/contexts/FileContext'
+import { useChatContext } from '@/contexts/ChatContext'
 
 interface NewNoteComponentProps {
   isOpen: boolean

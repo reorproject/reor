@@ -4,7 +4,7 @@ import posthog from 'posthog-js'
 import { FaSearch } from 'react-icons/fa'
 import { DBSearchPreview } from '../File/DBResultPreview'
 import debounce from './utils'
-import { useChatContext } from '@/providers/ChatContext'
+import { useChatContext } from '@/contexts/ChatContext'
 
 interface SearchComponentProps {
   searchQuery: string

@@ -6,7 +6,7 @@ import { toast } from 'react-toastify'
 import ReorModal from '../Common/Modal'
 
 import { getInvalidCharacterInFileName, removeFileExtension } from '@/utils/strings'
-import { useFileContext } from '@/providers/FileContext'
+import { useFileContext } from '@/contexts/FileContext'
 
 const RenameNoteModal: React.FC = () => {
   const { noteToBeRenamed, setNoteToBeRenamed, renameFile } = useFileContext()

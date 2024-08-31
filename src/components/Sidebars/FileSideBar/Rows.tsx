@@ -3,10 +3,10 @@ import { ListChildComponentProps } from 'react-window'
 import { FileInfoNode } from 'electron/main/filesystem/types'
 import { FaChevronDown, FaChevronRight } from 'react-icons/fa'
 import posthog from 'posthog-js'
-import { useFileContext } from '@/providers/FileContext'
+import { useFileContext } from '@/contexts/FileContext'
 import { isFileNodeDirectory, moveFile } from './utils'
 import { removeFileExtension } from '@/utils/strings'
-import { useChatContext } from '@/providers/ChatContext'
+import { useChatContext } from '@/contexts/ChatContext'
 
 const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data }) => {
   const { visibleItems } = data

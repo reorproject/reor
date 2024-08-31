@@ -10,8 +10,8 @@ import posthog from 'posthog-js'
 import errorToStringRendererProcess from '@/utils/error'
 import SimilarEntriesComponent from './SemanticSidebar/SimilarEntriesComponent'
 import HighlightButton from './SemanticSidebar/HighlightButton'
-import { useFileContext } from '@/providers/FileContext'
-import { useChatContext } from '@/providers/ChatContext'
+import { useFileContext } from '@/contexts/FileContext'
+import { useChatContext } from '@/contexts/ChatContext'
 
 const SimilarFilesSidebarComponent: React.FC = () => {
   const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([])

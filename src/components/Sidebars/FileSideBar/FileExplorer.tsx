@@ -4,7 +4,7 @@ import { FileInfoNode, FileInfoTree } from 'electron/main/filesystem/types'
 import { FixedSizeList as List } from 'react-window'
 
 import { isFileNodeDirectory } from './utils'
-import { useFileContext } from '@/providers/FileContext'
+import { useFileContext } from '@/contexts/FileContext'
 import FileItemRows from './Rows'
 
 interface FileExplorerProps {

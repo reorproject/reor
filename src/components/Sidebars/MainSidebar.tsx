@@ -6,7 +6,7 @@ import { ChatsSidebar } from '../Chat/ChatsSidebar'
 
 import SearchComponent from './FileSidebarSearch'
 import FileSidebar from './FileSideBar'
-import { useChatContext } from '@/providers/ChatContext'
+import { useChatContext } from '@/contexts/ChatContext'
 
 export type SidebarAbleToShow = 'files' | 'search' | 'chats'
 

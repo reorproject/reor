@@ -8,7 +8,7 @@ import { PiGraph } from 'react-icons/pi'
 import '../../../styles/global.css'
 import ResizableComponent from '@/components/Common/ResizableComponent'
 import { DBResultPreview } from '@/components/File/DBResultPreview'
-import { useFileContext } from '@/providers/FileContext'
+import { useFileContext } from '@/contexts/FileContext'
 
 interface SimilarEntriesComponentProps {
   similarEntries: DBQueryResult[]

@@ -12,8 +12,8 @@ import NewDirectoryComponent from '../File/NewDirectory'
 import NewNoteComponent from '../File/NewNote'
 import FlashcardMenuModal from '../Flashcard/FlashcardMenuModal'
 import SettingsModal from '../Settings/Settings'
-import { useModalOpeners } from '../../providers/ModalProvider'
-import { useChatContext } from '@/providers/ChatContext'
+import { useModalOpeners } from '../../contexts/ModalContext'
+import { useChatContext } from '@/contexts/ChatContext'
 
 const IconsSidebar: React.FC = () => {
   const { sidebarShowing, setSidebarShowing } = useChatContext()

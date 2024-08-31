@@ -5,8 +5,8 @@ import { IoMdArrowRoundBack, IoMdArrowRoundForward } from 'react-icons/io'
 
 import { removeFileExtension } from '@/utils/strings'
 import '../../styles/history.scss'
-import { useFileContext } from '@/providers/FileContext'
-import { useChatContext } from '@/providers/ChatContext'
+import { useFileContext } from '@/contexts/FileContext'
+import { useChatContext } from '@/contexts/ChatContext'
 
 const FileHistoryNavigator: React.FC = () => {
   const [showMenu, setShowMenu] = useState<string>('')

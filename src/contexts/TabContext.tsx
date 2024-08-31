@@ -27,23 +27,9 @@ export const useTabs = (): TabContextType => useContext(TabContext)
 
 interface TabProviderProps {
   children: ReactNode
-  // openTabContent: (path: string) => void
-  // // setFilePath: (path: string) => void
-  // currentTab: string | null
-  // sidebarShowing: string | null
-  // makeSidebarShow: (option: SidebarAbleToShow) => void
-  // getChatIdFromPath: (path: string) => string
 }
 
-export const TabProvider: React.FC<TabProviderProps> = ({
-  children,
-  // openTabContent,
-  // // setFilePath,
-  // currentTab,
-  // sidebarShowing,
-  // makeSidebarShow,
-  // getChatIdFromPath,
-}) => {
+export const TabProvider: React.FC<TabProviderProps> = ({ children }) => {
   const [openTabs, setOpenTabs] = useState<Tab[]>([])
   const { setCurrentChatHistory, openTabContent, currentTab, sidebarShowing, setSidebarShowing, getChatIdFromPath } =
     useChatContext()

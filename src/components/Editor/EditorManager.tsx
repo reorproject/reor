@@ -3,7 +3,7 @@ import { EditorContent } from '@tiptap/react'
 import InEditorBacklinkSuggestionsDisplay from './BacklinkSuggestionsDisplay'
 import EditorContextMenu from './EditorContextMenu'
 import SearchBar from './Search/SearchBar'
-import { useFileContext } from '@/providers/FileContext'
+import { useFileContext } from '@/contexts/FileContext'
 
 interface EditorManagerProps {
   // flattenedFiles: { relativePath: string }[]

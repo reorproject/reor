@@ -5,7 +5,7 @@ import posthog from 'posthog-js'
 
 import ReorModal from '../Common/Modal'
 import { getInvalidCharacterInFileName } from '@/utils/strings'
-import { useFileContext } from '@/providers/FileContext'
+import { useFileContext } from '@/contexts/FileContext'
 
 interface NewDirectoryComponentProps {
   isOpen: boolean

@@ -10,7 +10,7 @@ import { appendTextContentToMessages, convertMessageToString, resolveLLMClient }
 import useOutsideClick from '../Chat/hooks/use-outside-click'
 import getClassNames, { generatePromptString, getLastMessage } from './utils'
 import { ReorChatMessage } from '../Chat/types'
-import { useFileContext } from '@/providers/FileContext'
+import { useFileContext } from '@/contexts/FileContext'
 
 const WritingAssistant: React.FC = () => {
   const [messages, setMessages] = useState<ReorChatMessage[]>([])

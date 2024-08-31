@@ -4,10 +4,10 @@ import { createPortal } from 'react-dom'
 import { Tab } from 'electron/main/electron-store/storeConfig'
 import { removeFileExtension } from '@/utils/strings'
 import '../../styles/tab.css'
-import { useTabs } from '../../providers/TabProvider'
+import { useTabs } from '../../contexts/TabContext'
 import NewNoteComponent from '../File/NewNote'
-import { useModalOpeners } from '../../providers/ModalProvider'
-import { useChatContext } from '@/providers/ChatContext'
+import { useModalOpeners } from '../../contexts/ModalContext'
+import { useChatContext } from '@/contexts/ChatContext'
 
 interface TooltipProps {
   filepath: string

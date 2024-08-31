@@ -11,7 +11,7 @@ import SimilarEntriesComponent from '../Sidebars/SemanticSidebar/SimilarEntriesC
 import '../../styles/chat.css'
 import ChatMessages, { AskOptions } from './ChatMessages'
 import { Chat } from './types'
-import { useChatContext } from '@/providers/ChatContext'
+import { useChatContext } from '@/contexts/ChatContext'
 
 interface ChatComponentProps {
   vaultDirectory: string
