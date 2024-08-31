@@ -286,7 +286,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({ editor, highlightDa
             onChange={(e) => setCustomPrompt(e.target.value)}
             placeholder="Ask AI anything..."
             className="mb-2.5 w-full p-1"
-            onKeyPress={(e) => {
+            onKeyDown={(e) => {
               if (e.key === 'Enter') {
                 handleOption('custom', customPrompt)
               }

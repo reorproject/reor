@@ -24,10 +24,10 @@ import { BacklinkExtension } from '@/components/Editor/BacklinkExtension'
 import { SuggestionsState } from '@/components/Editor/BacklinkSuggestionsDisplay'
 import HighlightExtension, { HighlightData } from '@/components/Editor/HighlightExtension'
 import { RichTextLink } from '@/components/Editor/RichTextLink'
-import SearchAndReplace from '@/components/Editor/SearchAndReplace'
 import 'katex/dist/katex.min.css'
 import '../../../styles/tiptap.scss'
 import welcomeNote from '../utils'
+import SearchAndReplace from '@/components/Editor/Search/SearchAndReplaceExtension'
 
 const useFileByFilepath = () => {
   const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<string | null>(null)
@@ -94,7 +94,6 @@ const useFileByFilepath = () => {
     return absolutePath
   }
 
-  // This function handles the actual loading of a file into the editor
   const loadFileIntoEditor = async (filePath: string) => {
     setCurrentlyChangingFilePath(true)
     await writeEditorContentToDisk(editor, currentlyOpenedFilePath)
