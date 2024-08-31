@@ -1,26 +1,24 @@
 import React, { useEffect, useState } from 'react'
 
 import { DBQueryResult } from 'electron/main/vector-database/schema'
-import posthog from 'posthog-js'
 import { toast } from 'react-toastify'
 import removeMd from 'remove-markdown'
 
 import '../../styles/global.css'
 
+import posthog from 'posthog-js'
 import errorToStringRendererProcess from '@/utils/error'
 import SimilarEntriesComponent from './SemanticSidebar/SimilarEntriesComponent'
 import HighlightButton from './SemanticSidebar/HighlightButton'
 import { useFileContext } from '@/providers/FileContext'
+import { useChatContext } from '@/providers/ChatContext'
 
-interface SimilarFilesSidebarComponentProps {
-  openFileAndOpenEditor: (filePath: string, optionalContentToWriteOnCreate?: string) => void
-}
-
-const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponentProps> = ({ openFileAndOpenEditor }) => {
+const SimilarFilesSidebarComponent: React.FC = () => {
   const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([])
   const [isLoadingSimilarEntries, setIsLoadingSimilarEntries] = useState(false)
 
   const { currentlyOpenFilePath, highlightData } = useFileContext()
+  const { openTabContent } = useChatContext()
 
   const getChunkForInitialSearchFromFile = async (filePathForChunk: string | null) => {
     // TODO: proper semantic chunking - current quick win is just to take top 500 characters
@@ -107,8 +105,8 @@ const SimilarFilesSidebarComponent: React.FC<SimilarFilesSidebarComponentProps> 
       <SimilarEntriesComponent
         similarEntries={similarEntries}
         setSimilarEntries={setSimilarEntries}
-        onFileSelect={(path: string) => {
-          openFileAndOpenEditor(path)
+        onSelect={(path) => {
+          openTabContent(path)
           posthog.capture('open_file_from_related_notes')
         }}
         updateSimilarEntries={updateSimilarEntries}

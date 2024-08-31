@@ -6,14 +6,15 @@ import posthog from 'posthog-js'
 import ReorModal from '../Common/Modal'
 import { getInvalidCharacterInFileName } from '@/utils/strings'
 import { useFileContext } from '@/providers/FileContext'
+import { useChatContext } from '@/providers/ChatContext'
 
 interface NewNoteComponentProps {
   isOpen: boolean
   onClose: () => void
-  openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => void
 }
 
-const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose, openFileAndOpenEditor }) => {
+const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose }) => {
+  const { openTabContent } = useChatContext()
   const [fileName, setFileName] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -51,7 +52,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose, op
       finalPath = await window.path.join(directoryName, fileName)
     }
     const basename = await window.path.basename(finalPath)
-    openFileAndOpenEditor(finalPath, `# ${basename}\n`)
+    openTabContent(finalPath, `# ${basename}\n`)
     posthog.capture('created_new_note_from_new_note_modal')
     onClose()
   }

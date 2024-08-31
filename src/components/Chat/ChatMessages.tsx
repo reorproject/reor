@@ -28,7 +28,6 @@ export const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
 
 interface ChatMessagesProps {
   chatContainerRef: MutableRefObject<HTMLDivElement | null>
-  openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => Promise<void>
   isAddContextFiltersModalOpen: boolean
   setUserTextFieldInput: Dispatch<SetStateAction<string>>
   defaultModelName: string
@@ -41,11 +40,7 @@ interface ChatMessagesProps {
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({
   chatContainerRef,
-  openFileAndOpenEditor,
-  // currentChatHistory,
   isAddContextFiltersModalOpen,
-  // chatFilters,
-  // setChatFilters,
   setUserTextFieldInput,
   defaultModelName,
   vaultDirectory,
@@ -54,7 +49,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   askText,
   loadAnimation,
 }) => {
-  const { currentChatHistory, chatFilters, setChatFilters } = useChatContext()
+  const { currentChatHistory, chatFilters, setChatFilters, openTabContent } = useChatContext()
   const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([])
   const [selectedLlm, setSelectedLlm] = useState<string>(defaultModelName)
 
@@ -73,7 +68,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 
   const createNewNote = async (message: ReorChatMessage) => {
     const title = `${(getDisplayMessage(message) ?? `${new Date().toDateString()}`).substring(0, 20)}...`
-    openFileAndOpenEditor(title, getDisplayMessage(message))
+    openTabContent(title, getDisplayMessage(message))
   }
 
   useEffect(() => {

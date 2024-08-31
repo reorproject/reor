@@ -6,19 +6,16 @@ import { IoMdArrowRoundBack, IoMdArrowRoundForward } from 'react-icons/io'
 import { removeFileExtension } from '@/utils/strings'
 import '../../styles/history.scss'
 import { useFileContext } from '@/providers/FileContext'
+import { useChatContext } from '@/providers/ChatContext'
 
-interface FileHistoryNavigatorProps {
-  onFileSelect: (path: string) => void
-  currentPath: string
-}
-
-const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({ onFileSelect, currentPath }) => {
+const FileHistoryNavigator: React.FC = () => {
   const [showMenu, setShowMenu] = useState<string>('')
   const [currentIndex, setCurrentIndex] = useState<number>(-1)
   const longPressTimer = useRef<NodeJS.Timeout | null>(null)
   const buttonRefBack = useRef<HTMLButtonElement>(null)
   const buttonRefForward = useRef<HTMLButtonElement>(null)
 
+  const { currentTab, openTabContent } = useChatContext()
   const { navigationHistory, setNavigationHistory } = useFileContext()
 
   useEffect(() => {
@@ -27,10 +24,10 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({ onFileSelec
       setNavigationHistory(updatedHistory)
       setCurrentIndex(updatedHistory.length - 1)
     }
-    if (currentPath && currentPath !== navigationHistory[currentIndex]) {
-      handleFileSelect(currentPath)
+    if (currentTab && currentTab !== navigationHistory[currentIndex]) {
+      handleFileSelect(currentTab)
     }
-  }, [currentPath, navigationHistory, currentIndex, setNavigationHistory])
+  }, [currentTab, navigationHistory, currentIndex, setNavigationHistory])
 
   const canGoBack = currentIndex > 0
   const canGoForward = currentIndex < navigationHistory.length - 1
@@ -39,7 +36,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({ onFileSelec
     if (canGoBack && showMenu === '') {
       const newIndex = currentIndex - 1
       setCurrentIndex(newIndex)
-      onFileSelect(navigationHistory[newIndex])
+      openTabContent(navigationHistory[newIndex])
       posthog.capture('file_history_navigator_back')
     }
   }
@@ -48,7 +45,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({ onFileSelec
     if (canGoForward && showMenu === '') {
       const newIndex = currentIndex + 1
       setCurrentIndex(newIndex)
-      onFileSelect(navigationHistory[newIndex])
+      openTabContent(navigationHistory[newIndex])
       posthog.capture('file_history_navigator_forward')
     }
   }
@@ -57,7 +54,7 @@ const FileHistoryNavigator: React.FC<FileHistoryNavigatorProps> = ({ onFileSelec
     if (path) {
       const newIndex = navigationHistory.indexOf(path)
       setCurrentIndex(newIndex)
-      onFileSelect(path)
+      openTabContent(path)
       posthog.capture('file_history_navigator_go_to_selected_file')
     }
     setShowMenu('')

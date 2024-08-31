@@ -15,11 +15,10 @@ import { useChatContext } from '@/providers/ChatContext'
 
 interface ChatComponentProps {
   vaultDirectory: string
-  openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => Promise<void>
   showSimilarFiles: boolean
 }
 
-const ChatComponent: React.FC<ChatComponentProps> = ({ vaultDirectory, openFileAndOpenEditor, showSimilarFiles }) => {
+const ChatComponent: React.FC<ChatComponentProps> = ({ vaultDirectory, showSimilarFiles }) => {
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
   const [askText] = useState<AskOptions>(AskOptions.Ask)
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false)
@@ -31,7 +30,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ vaultDirectory, openFileA
   const [defaultModelName, setDefaultLLMName] = useState<string>('')
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
-  const { setCurrentChatHistory, currentChatHistory, chatFilters } = useChatContext()
+  const { setCurrentChatHistory, currentChatHistory, chatFilters, openTabContent } = useChatContext()
 
   useEffect(() => {
     const fetchDefaultLLM = async () => {
@@ -181,7 +180,6 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ vaultDirectory, openFileA
       <div className="mx-auto flex size-full flex-col overflow-hidden border-y-0 border-l-[0.001px] border-r-0 border-solid border-neutral-700 bg-dark-gray-c-eleven">
         <ChatMessages
           chatContainerRef={chatContainerRef}
-          openFileAndOpenEditor={openFileAndOpenEditor}
           isAddContextFiltersModalOpen={isAddContextFiltersModalOpen}
           setUserTextFieldInput={setUserTextFieldInput}
           defaultModelName={defaultModelName}
@@ -205,8 +203,8 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ vaultDirectory, openFileA
         <SimilarEntriesComponent
           similarEntries={currentContext}
           titleText="Context used in chat"
-          onFileSelect={(path: string) => {
-            openFileAndOpenEditor(path)
+          onSelect={(path: string) => {
+            openTabContent(path)
             posthog.capture('open_file_from_chat_context')
           }}
           isLoadingSimilarEntries={false}

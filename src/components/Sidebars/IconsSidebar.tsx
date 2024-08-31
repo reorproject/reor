@@ -12,16 +12,11 @@ import NewDirectoryComponent from '../File/NewDirectory'
 import NewNoteComponent from '../File/NewNote'
 import FlashcardMenuModal from '../Flashcard/FlashcardMenuModal'
 import SettingsModal from '../Settings/Settings'
-import { SidebarAbleToShow } from './MainSidebar'
 import { useModalOpeners } from '../../providers/ModalProvider'
+import { useChatContext } from '@/providers/ChatContext'
 
-interface IconsSidebarProps {
-  openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => void
-  sidebarShowing: SidebarAbleToShow
-  makeSidebarShow: (show: SidebarAbleToShow) => void
-}
-
-const IconsSidebar: React.FC<IconsSidebarProps> = ({ openFileAndOpenEditor, sidebarShowing, makeSidebarShow }) => {
+const IconsSidebar: React.FC = () => {
+  const { sidebarShowing, setSidebarShowing } = useChatContext()
   const [initialFileToCreateFlashcard, setInitialFileToCreateFlashcard] = useState('')
   const [initialFileToReviewFlashcard, setInitialFileToReviewFlashcard] = useState('')
   const [sidebarWidth, setSidebarWidth] = useState<number>(40)
@@ -75,7 +70,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ openFileAndOpenEditor, side
     >
       <div
         className=" flex h-8 w-full cursor-pointer items-center justify-center"
-        onClick={() => makeSidebarShow('files')}
+        onClick={() => setSidebarShowing('files')}
       >
         <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
           <ImFilesEmpty
@@ -88,7 +83,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ openFileAndOpenEditor, side
       </div>
       <div
         className=" flex h-8 w-full cursor-pointer items-center justify-center"
-        onClick={() => makeSidebarShow('chats')}
+        onClick={() => setSidebarShowing('chats')}
       >
         <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
           <IoChatbubbleEllipsesOutline
@@ -101,7 +96,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ openFileAndOpenEditor, side
       </div>
       <div
         className="flex h-8 w-full cursor-pointer items-center justify-center"
-        onClick={() => makeSidebarShow('search')}
+        onClick={() => setSidebarShowing('search')}
       >
         <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
           <FaSearch
@@ -137,11 +132,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ openFileAndOpenEditor, side
         </div>
       </div>
 
-      <NewNoteComponent
-        isOpen={isNewNoteModalOpen}
-        onClose={() => setIsNewNoteModalOpen(false)}
-        openFileAndOpenEditor={openFileAndOpenEditor}
-      />
+      <NewNoteComponent isOpen={isNewNoteModalOpen} onClose={() => setIsNewNoteModalOpen(false)} />
       <NewDirectoryComponent isOpen={isNewDirectoryModalOpen} onClose={() => setIsNewDirectoryModalOpen(false)} />
       {isFlashcardModeOpen && (
         <FlashcardMenuModal

@@ -2,7 +2,6 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { v4 as uuidv4 } from 'uuid'
 
 import { Tab } from 'electron/main/electron-store/storeConfig'
-import { SidebarAbleToShow } from '../components/Sidebars/MainSidebar'
 import { useChatContext } from './ChatContext'
 import { useFileContext } from './FileContext'
 
@@ -28,25 +27,26 @@ export const useTabs = (): TabContextType => useContext(TabContext)
 
 interface TabProviderProps {
   children: ReactNode
-  openTabContent: (path: string) => void
-  // setFilePath: (path: string) => void
-  currentTab: string | null
-  sidebarShowing: string | null
-  makeSidebarShow: (option: SidebarAbleToShow) => void
-  getChatIdFromPath: (path: string) => string
+  // openTabContent: (path: string) => void
+  // // setFilePath: (path: string) => void
+  // currentTab: string | null
+  // sidebarShowing: string | null
+  // makeSidebarShow: (option: SidebarAbleToShow) => void
+  // getChatIdFromPath: (path: string) => string
 }
 
 export const TabProvider: React.FC<TabProviderProps> = ({
   children,
-  openTabContent,
-  // setFilePath,
-  currentTab,
-  sidebarShowing,
-  makeSidebarShow,
-  getChatIdFromPath,
+  // openTabContent,
+  // // setFilePath,
+  // currentTab,
+  // sidebarShowing,
+  // makeSidebarShow,
+  // getChatIdFromPath,
 }) => {
   const [openTabs, setOpenTabs] = useState<Tab[]>([])
-  const { setCurrentChatHistory } = useChatContext()
+  const { setCurrentChatHistory, openTabContent, currentTab, sidebarShowing, setSidebarShowing, getChatIdFromPath } =
+    useChatContext()
   const { setCurrentlyOpenFilePath } = useFileContext()
 
   useEffect(() => {
@@ -170,12 +170,12 @@ export const TabProvider: React.FC<TabProviderProps> = ({
       })
 
       if (getChatIdFromPath(selectedTab.path)) {
-        if (sidebarShowing !== 'chats') makeSidebarShow('chats')
-      } else if (sidebarShowing !== 'files') makeSidebarShow('files')
+        if (sidebarShowing !== 'chats') setSidebarShowing('chats')
+      } else if (sidebarShowing !== 'files') setSidebarShowing('files')
 
       openTabContent(selectedTab.path)
     },
-    [openTabContent, makeSidebarShow, sidebarShowing, getChatIdFromPath],
+    [openTabContent, setSidebarShowing, sidebarShowing, getChatIdFromPath],
   )
 
   const TabContextMemo = useMemo(

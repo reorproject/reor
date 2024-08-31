@@ -6,17 +6,14 @@ import posthog from 'posthog-js'
 import { useFileContext } from '@/providers/FileContext'
 import { isFileNodeDirectory, moveFile } from './utils'
 import { removeFileExtension } from '@/utils/strings'
-
-const handleDragFile = (e: React.DragEvent, file: FileInfoNode) => {
-  e.dataTransfer.setData('text/plain', file.path)
-  e.dataTransfer.effectAllowed = 'move'
-}
+import { useChatContext } from '@/providers/ChatContext'
 
 const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data }) => {
-  const { visibleItems, onFileSelect } = data
+  const { visibleItems } = data
   const fileObject = visibleItems[index]
 
   const { handleDirectoryToggle, expandedDirectories, currentlyOpenFilePath } = useFileContext()
+  const { openTabContent } = useChatContext()
 
   const [isDragOver, setIsDragOver] = useState(false)
 
@@ -32,6 +29,11 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
 
   const handleDragLeave = () => {
     setIsDragOver(false)
+  }
+
+  const handleDragFile = (e: React.DragEvent, file: FileInfoNode) => {
+    e.dataTransfer.setData('text/plain', file.path)
+    e.dataTransfer.effectAllowed = 'move'
   }
 
   const handleDrop = async (e: React.DragEvent) => {
@@ -53,7 +55,7 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
     if (isDirectory) {
       handleDirectoryToggle(fileObject.file.path)
     } else {
-      onFileSelect(fileObject.file.path)
+      openTabContent(fileObject.file.path)
       posthog.capture('open_file_from_sidebar')
     }
   }

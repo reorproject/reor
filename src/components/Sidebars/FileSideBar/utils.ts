@@ -26,12 +26,10 @@ export const sortFilesAndDirectories = (fileList: FileInfoTree, currentFilePath:
     const aIsDirectory = isFileNodeDirectory(a)
     const bIsDirectory = isFileNodeDirectory(b)
 
-    // Both are directories: sort alphabetically
     if (aIsDirectory && bIsDirectory) {
       return a.name.localeCompare(b.name)
     }
 
-    // One is a directory and the other is a file
     if (aIsDirectory && !bIsDirectory) {
       return -1
     }
@@ -39,7 +37,6 @@ export const sortFilesAndDirectories = (fileList: FileInfoTree, currentFilePath:
       return 1
     }
 
-    // if current file path is not null and one of the files is the current file path, then it should be sorted as the first file after all directories
     if (currentFilePath !== null) {
       if (a.path === currentFilePath) {
         return -1
@@ -49,12 +46,10 @@ export const sortFilesAndDirectories = (fileList: FileInfoTree, currentFilePath:
       }
     }
 
-    // Both are files: sort by dateModified
     return b.dateModified.getTime() - a.dateModified.getTime()
   })
 
   fileList.forEach((fileInfoNode) => {
-    // If a node has children, sort them recursively
     if (fileInfoNode.children && fileInfoNode.children.length > 0) {
       sortFilesAndDirectories(fileInfoNode.children, currentFilePath)
     }

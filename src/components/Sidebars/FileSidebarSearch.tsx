@@ -4,9 +4,9 @@ import posthog from 'posthog-js'
 import { FaSearch } from 'react-icons/fa'
 import { DBSearchPreview } from '../File/DBResultPreview'
 import debounce from './utils'
+import { useChatContext } from '@/providers/ChatContext'
 
 interface SearchComponentProps {
-  onFileSelect: (path: string) => void
   searchQuery: string
   setSearchQuery: (query: string) => void
   searchResults: DBQueryResult[]
@@ -14,12 +14,12 @@ interface SearchComponentProps {
 }
 
 const SearchComponent: React.FC<SearchComponentProps> = ({
-  onFileSelect,
   searchQuery,
   setSearchQuery,
   searchResults,
   setSearchResults,
 }) => {
+  const { openTabContent } = useChatContext()
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   const handleSearch = useCallback(
@@ -50,10 +50,10 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
 
   const openFileSelectSearch = useCallback(
     (path: string) => {
-      onFileSelect(path)
+      openTabContent(path)
       posthog.capture('open_file_from_search')
     },
-    [onFileSelect],
+    [openTabContent],
   )
 
   return (

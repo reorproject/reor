@@ -6,23 +6,20 @@ import { ChatsSidebar } from '../Chat/ChatsSidebar'
 
 import SearchComponent from './FileSidebarSearch'
 import FileSidebar from './FileSideBar'
+import { useChatContext } from '@/providers/ChatContext'
 
 export type SidebarAbleToShow = 'files' | 'search' | 'chats'
-interface SidebarManagerProps {
-  onFileSelect: (path: string) => void
-  sidebarShowing: SidebarAbleToShow
-}
 
-const SidebarManager: React.FC<SidebarManagerProps> = ({ onFileSelect, sidebarShowing }) => {
+const SidebarManager: React.FC = () => {
+  const { sidebarShowing } = useChatContext()
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [searchResults, setSearchResults] = useState<DBQueryResult[]>([])
 
   return (
     <div className="size-full overflow-y-hidden">
-      {sidebarShowing === 'files' && <FileSidebar onFileSelect={onFileSelect} />}
+      {sidebarShowing === 'files' && <FileSidebar />}
       {sidebarShowing === 'search' && (
         <SearchComponent
-          onFileSelect={onFileSelect}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           searchResults={searchResults}

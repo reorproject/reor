@@ -13,7 +13,7 @@ import { useFileContext } from '@/providers/FileContext'
 interface SimilarEntriesComponentProps {
   similarEntries: DBQueryResult[]
   setSimilarEntries?: (entries: DBQueryResult[]) => void
-  onFileSelect: (path: string) => void
+  onSelect: (path: string) => void
   updateSimilarEntries?: (isRefined?: boolean) => Promise<void>
   titleText: string
   isLoadingSimilarEntries: boolean
@@ -22,7 +22,7 @@ interface SimilarEntriesComponentProps {
 const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   similarEntries,
   setSimilarEntries,
-  onFileSelect,
+  onSelect,
   updateSimilarEntries,
   titleText,
   isLoadingSimilarEntries,
@@ -37,12 +37,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
           .filter((dbResult) => dbResult)
           .map((dbResult) => (
             <div className="px-2 pb-2 pt-1" key={`${dbResult.notepath}-${dbResult.subnoteindex}`}>
-              <DBResultPreview
-                dbResult={dbResult}
-                onSelect={(path: string) => {
-                  onFileSelect(path)
-                }}
-              />
+              <DBResultPreview dbResult={dbResult} onSelect={onSelect} />
             </div>
           ))}
       </div>

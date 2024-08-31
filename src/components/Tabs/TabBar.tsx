@@ -7,6 +7,7 @@ import '../../styles/tab.css'
 import { useTabs } from '../../providers/TabProvider'
 import NewNoteComponent from '../File/NewNote'
 import { useModalOpeners } from '../../providers/ModalProvider'
+import { useChatContext } from '@/providers/ChatContext'
 
 interface TooltipProps {
   filepath: string
@@ -40,13 +41,9 @@ const Tooltip: React.FC<TooltipProps> = ({ filepath, position }) => {
     document.getElementById('tooltip-container') as HTMLElement,
   )
 }
-interface DraggableTabsProps {
-  currentTab: string
-  openTabContent: (path: string) => void
-  openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => void
-}
 
-const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentTab, openTabContent, openFileAndOpenEditor }) => {
+const DraggableTabs: React.FC = () => {
+  const { currentTab, openTabContent } = useChatContext()
   const { openTabs, addTab, selectTab, removeTabByID, updateTabOrder } = useTabs()
   const [isLastTabAccessed, setIsLastTabAccessed] = useState<boolean>(false)
 
@@ -181,11 +178,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentTab, openTabConten
           <FaPlus size={13} />
         </div>
       )}
-      <NewNoteComponent
-        isOpen={isNewNoteModalOpen}
-        onClose={() => setIsNewNoteModalOpen(false)}
-        openFileAndOpenEditor={openFileAndOpenEditor}
-      />
+      <NewNoteComponent isOpen={isNewNoteModalOpen} onClose={() => setIsNewNoteModalOpen(false)} />
     </div>
   )
 }

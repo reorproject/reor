@@ -8,11 +8,10 @@ import { useFileContext } from '@/providers/FileContext'
 import FileItemRows from './Rows'
 
 interface FileExplorerProps {
-  onFileSelect: (path: string) => void
   lheight?: number
 }
 
-const FileExplorer: React.FC<FileExplorerProps> = ({ onFileSelect, lheight }) => {
+const FileExplorer: React.FC<FileExplorerProps> = ({ lheight }) => {
   const [listHeight, setListHeight] = useState(lheight ?? window.innerHeight)
 
   const { files, expandedDirectories } = useFileContext()
@@ -60,7 +59,6 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ onFileSelect, lheight }) =>
         width="100%"
         itemData={{
           visibleItems,
-          onFileSelect,
         }}
       >
         {FileItemRows}

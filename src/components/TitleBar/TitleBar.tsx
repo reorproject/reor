@@ -7,20 +7,11 @@ import FileHistoryNavigator from './NavigationButtons'
 export const titleBarHeight = '30px'
 
 interface TitleBarProps {
-  openTabContent: (path: string) => void
-  currentTab: string | null // Used to create new open tabs when user clicks on new file to open
   similarFilesOpen: boolean
   toggleSimilarFiles: () => void
-  openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => void
 }
 
-const TitleBar: React.FC<TitleBarProps> = ({
-  openTabContent,
-  currentTab,
-  similarFilesOpen,
-  toggleSimilarFiles,
-  openFileAndOpenEditor,
-}) => {
+const TitleBar: React.FC<TitleBarProps> = ({ similarFilesOpen, toggleSimilarFiles }) => {
   const [platform, setPlatform] = useState('')
 
   useEffect(() => {
@@ -35,18 +26,14 @@ const TitleBar: React.FC<TitleBarProps> = ({
   return (
     <div id="customTitleBar" className="flex h-titlebar justify-between" style={{ backgroundColor: '#303030' }}>
       <div className="mt-px flex" style={platform === 'darwin' ? { marginLeft: '65px' } : { marginLeft: '2px' }}>
-        <FileHistoryNavigator onFileSelect={openTabContent} currentPath={currentTab || ''} />
+        <FileHistoryNavigator />
       </div>
 
       <div className="relative left-10 max-w-[75%] grow overflow-hidden">
         <div>
           <div className="flex whitespace-nowrap">
             <ModalProvider>
-              <DraggableTabs
-                currentTab={currentTab || ''}
-                openTabContent={openTabContent}
-                openFileAndOpenEditor={openFileAndOpenEditor}
-              />
+              <DraggableTabs />
             </ModalProvider>
           </div>
         </div>
