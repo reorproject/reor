@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react'
-
-import posthog from 'posthog-js'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import '../styles/global.css'
+import posthog from 'posthog-js'
 import ChatWrapper from './Chat/ChatWrapper'
 import { useChatHistory } from './Chat/hooks/use-chat-history'
 import ResizableComponent from './Common/ResizableComponent'
@@ -29,9 +28,10 @@ const MainPageComponent: React.FC = () => {
   const [vaultDirectory, setVaultDirectory] = useState<string>('')
   const [chatFilters, setChatFilters] = useState<ChatFilters>({
     files: [],
-    numberOfChunksToFetch: 15,
-    minDate: new Date(0),
-    maxDate: new Date(),
+    numItems: 15,
+    minDate: undefined,
+    maxDate: undefined,
+    dateFilter: 'Anytime',
   })
   const [sidebarWidth, setSidebarWidth] = useState<number>(40)
 
@@ -154,6 +154,16 @@ const MainPageComponent: React.FC = () => {
     }
   }, [setCurrentChatHistory, setChatFilters])
 
+  const updateChatFilters = useCallback((newFilters: Partial<ChatFilters>) => {
+    setChatFilters((prevFilters) => ({
+      ...prevFilters,
+      ...newFilters,
+      files: Array.isArray(newFilters.files) ? newFilters.files : prevFilters.files,
+      numItems: typeof newFilters.numItems === 'number' ? newFilters.numItems : prevFilters.numItems,
+      dateFilter: newFilters.dateFilter || prevFilters.dateFilter,
+    }))
+  }, [])
+
   return (
     <div className="relative overflow-x-hidden">
       {/* Displays the dropdown tab when hovering. You cannot use z-index and position absolute inside 
@@ -212,7 +222,7 @@ const MainPageComponent: React.FC = () => {
               currentChatHistory={currentChatHistory}
               chatHistoriesMetadata={chatHistoriesMetadata}
               setCurrentChatHistory={openChatSidebarAndChat}
-              setChatFilters={setChatFilters}
+              setChatFilters={updateChatFilters}
               setShowChatbot={setShowChatbot}
             />
           </div>
@@ -257,11 +267,11 @@ const MainPageComponent: React.FC = () => {
               openFileAndOpenEditor={openFileAndOpenEditor}
               currentChatHistory={currentChatHistory}
               setCurrentChatHistory={setCurrentChatHistory}
-              showSimilarFiles={showSimilarFiles} // This might need to be managed differently now
+              showSimilarFiles={showSimilarFiles}
               chatFilters={chatFilters}
               setChatFilters={(updatedChatFilters: ChatFilters) => {
                 posthog.capture('add_file_to_chat', {
-                  chatFilesLength: updatedChatFilters.files.length,
+                  chatFilesLength: updatedChatFilters.files?.length,
                 })
                 setChatFilters(updatedChatFilters)
               }}

@@ -1,18 +1,19 @@
 import React, { useEffect, useState, Dispatch, MutableRefObject, SetStateAction } from 'react'
 import { PiPaperPlaneRight } from 'react-icons/pi'
 import { HiOutlineClipboardCopy, HiOutlinePencilAlt } from 'react-icons/hi'
+import { FaRegUserCircle } from 'react-icons/fa'
 import { toast } from 'react-toastify'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 
-import { FaRegUserCircle } from 'react-icons/fa'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
-import AddContextFiltersModal from './AddContextFiltersModal'
 import PromptSuggestion from './ChatPrompts'
+// Add this import
 
 import LoadingDots from '@/utils/animations'
 import '../../styles/chat.css'
 import { Chat, ChatFilters, ReorChatMessage } from './types'
+import ContextSettingsBar from './ContextSettingsBar'
 
 export enum AskOptions {
   Ask = 'Ask',
@@ -30,13 +31,11 @@ interface ChatMessagesProps {
   chatContainerRef: MutableRefObject<HTMLDivElement | null>
   openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => Promise<void>
   currentChatHistory: Chat | undefined
-  isAddContextFiltersModalOpen: boolean
   chatFilters: ChatFilters
-  setChatFilters: Dispatch<ChatFilters>
+  setChatFilters: Dispatch<SetStateAction<ChatFilters>>
   setUserTextFieldInput: Dispatch<SetStateAction<string>>
   defaultModelName: string
   vaultDirectory: string
-  setIsAddContextFiltersModalOpen: Dispatch<SetStateAction<boolean>>
   handlePromptSelection: (prompt: string | undefined) => void
   askText: AskOptions
   loadAnimation: boolean
@@ -46,19 +45,18 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   chatContainerRef,
   openFileAndOpenEditor,
   currentChatHistory,
-  isAddContextFiltersModalOpen,
   chatFilters,
   setChatFilters,
   setUserTextFieldInput,
   defaultModelName,
   vaultDirectory,
-  setIsAddContextFiltersModalOpen,
   handlePromptSelection,
   askText,
   loadAnimation,
 }) => {
   const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([])
   const [selectedLlm, setSelectedLlm] = useState<string>(defaultModelName)
+  const [showTitlebar, setShowTitlebar] = useState(true)
 
   const getClassName = (message: ReorChatMessage): string => {
     return `markdown-content ${message.role}-chat-message`
@@ -87,8 +85,18 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   }, [])
 
   const sendMessageButtonHandler = async () => {
+    setShowTitlebar(false)
     await window.llm.setDefaultLLM(selectedLlm)
     handlePromptSelection(undefined)
+  }
+
+  const handleUserInput = (input: string) => {
+    setUserTextFieldInput(input)
+    if (input.trim().length > 0) {
+      setShowTitlebar(false)
+    } else {
+      setShowTitlebar(true)
+    }
   }
 
   return (
@@ -153,20 +161,27 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
                 <h1 className="mb-10 text-[28px] text-gray-300">
                   Welcome to your AI-powered assistant! Start a conversation with your second brain!
                 </h1>
-                <div className="flex flex-col rounded-md bg-bg-000 focus-within:ring-1 focus-within:ring-[#8c8c8c]">
+                <div className="flex w-full flex-col rounded-md bg-bg-000 focus-within:ring-1 focus-within:ring-[#8c8c8c]">
+                  {showTitlebar && !currentChatHistory?.messages.length && (
+                    <ContextSettingsBar
+                      chatFilters={chatFilters}
+                      setChatFilters={setChatFilters}
+                      vaultDirectory={vaultDirectory}
+                    />
+                  )}
                   <textarea
                     onKeyDown={(e) => {
                       if (!e.shiftKey && e.key === 'Enter') {
                         e.preventDefault()
-                        handlePromptSelection(undefined)
+                        sendMessageButtonHandler()
                       }
                     }}
                     className="h-[100px] w-full resize-none rounded-t-md border-0 bg-transparent p-4 text-text-gen-100 caret-white focus:outline-none"
                     placeholder="What can Reor help you with today?"
-                    onChange={(e) => setUserTextFieldInput(e.target.value)}
+                    onChange={(e) => handleUserInput(e.target.value)}
                   />
                   <div className="h-px w-[calc(100%-5%)] flex-col self-center bg-gray-600 md:flex-row" />
-                  <div className="flex  flex-col items-center justify-between px-4 py-2 md:flex-row">
+                  <div className="flex flex-col items-center justify-between px-4 py-2 md:flex-row">
                     <div className="flex flex-col items-center justify-between rounded-md border-0 py-2 text-text-gen-100 md:flex-row">
                       <select
                         value={selectedLlm}
@@ -180,15 +195,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
                         ))}
                       </select>
                     </div>
-                    <button
-                      className="m-1 cursor-pointer rounded-md border-0 bg-blue-600 px-4 py-2 text-white  hover:bg-blue-500"
-                      onClick={() => {
-                        setIsAddContextFiltersModalOpen(true)
-                      }}
-                      type="button"
-                    >
-                      {chatFilters.files.length > 0 ? 'Update RAG filters' : 'Customise context'}
-                    </button>
                     <button
                       className="m-1 flex cursor-pointer items-center justify-center rounded-md border-0 bg-blue-600 p-2 text-white hover:bg-blue-500"
                       onClick={sendMessageButtonHandler}
@@ -214,16 +220,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
             <img src="/src/assets/reor-logo.svg" style={{ width: '22px', height: '22px' }} alt="ReorImage" />
             <LoadingDots />
           </div>
-        )}
-
-        {isAddContextFiltersModalOpen && (
-          <AddContextFiltersModal
-            vaultDirectory={vaultDirectory}
-            isOpen={isAddContextFiltersModalOpen}
-            onClose={() => setIsAddContextFiltersModalOpen(false)}
-            chatFilters={chatFilters}
-            setChatFilters={setChatFilters}
-          />
         )}
       </div>
     </div>

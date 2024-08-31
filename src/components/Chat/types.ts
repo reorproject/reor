@@ -13,10 +13,11 @@ export type Chat = {
 }
 
 export interface ChatFilters {
-  numberOfChunksToFetch: number
   files: string[]
+  numItems: number
   minDate?: Date
   maxDate?: Date
+  dateFilter: string
 }
 
 export interface AnonymizedChatFilters {
