@@ -1,14 +1,11 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react'
-import { FaFolder, FaFile, FaTimes } from 'react-icons/fa'
-import { List, ListItem, ListItemPrefix, Typography } from '@material-tailwind/react'
+import { Typography } from '@material-tailwind/react'
 import Slider from '@mui/material/Slider'
 import { sub } from 'date-fns'
 import { DayPicker } from 'react-day-picker'
 import 'react-day-picker/dist/style.css'
 import { ChatFilters } from './types'
 import CustomSelect from '../Common/Select'
-import SearchBarWithFilesSuggestion from '../Common/SearchBarWithFilesSuggestion'
-import InEditorBacklinkSuggestionsDisplay, { SuggestionsState } from '../Editor/BacklinkSuggestionsDisplay'
 import useFileInfoTree from '../Sidebars/FileSideBar/hooks/use-file-info-tree'
 
 interface ContextSettingsPopupProps {
@@ -28,7 +25,6 @@ const ContextSettingsPopup: React.FC<ContextSettingsPopupProps> = ({
 }) => {
   const [internalFilesSelected, setInternalFilesSelected] = useState<string[]>(chatFilters?.files || [])
   const [searchText, setSearchText] = useState<string>('')
-  const [suggestionsState, setSuggestionsState] = useState<SuggestionsState | null>(null)
   const [numberOfChunksToFetch, setNumberOfChunksToFetch] = useState<number>(chatFilters.numItems || 15)
   const [minDate, setMinDate] = useState<Date | undefined>(chatFilters.minDate)
   const [maxDate, setMaxDate] = useState<Date | undefined>(chatFilters.maxDate)
@@ -49,15 +45,6 @@ const ContextSettingsPopup: React.FC<ContextSettingsPopupProps> = ({
   ]
 
   const popupRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    console.log('ContextSettingsPopup - Important values changed:', {
-      type,
-      vaultDirectory,
-      chatFilters,
-      flattenedFilesCount: memoizedFlattenedFiles.length,
-    })
-  }, [type, vaultDirectory, chatFilters, memoizedFlattenedFiles])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -109,58 +96,17 @@ const ContextSettingsPopup: React.FC<ContextSettingsPopupProps> = ({
 
   const handleSelectSuggestion = useCallback(
     (file: string) => {
-      console.log('ContextSettingsPopup - Suggestion selected:', file)
       if (file && !internalFilesSelected.includes(file)) {
         setInternalFilesSelected((prev) => [...prev, file])
       }
       setSearchText('')
-      setSuggestionsState(null)
     },
     [internalFilesSelected],
   )
 
-  const handleSearchTextChange = useCallback(
-    (value: string) => {
-      console.log('ContextSettingsPopup - Search text changed:', value)
-      setSearchText(value)
-
-      // Update suggestionsState when search text changes
-      if (value.length > 0) {
-        setSuggestionsState({
-          textWithinBrackets: value,
-          position: { top: 0, left: 0 }, // We'll adjust this in the render
-          onSelect: handleSelectSuggestion,
-        })
-      } else {
-        setSuggestionsState(null)
-      }
-    },
-    [handleSelectSuggestion],
-  )
-
-  useEffect(() => {
-    if (type === 'files') {
-      setChatFilters({
-        files: [...new Set([...chatFilters.files, ...internalFilesSelected])],
-      })
-    }
-  }, [internalFilesSelected, type, setChatFilters, chatFilters.files])
-
-  useEffect(() => {
-    if (type === 'items') {
-      setChatFilters({ numItems: numberOfChunksToFetch })
-    }
-  }, [numberOfChunksToFetch, type, setChatFilters])
-
-  useEffect(() => {
-    if (type === 'date') {
-      setChatFilters({
-        minDate: minDate || undefined,
-        maxDate: maxDate || undefined,
-        dateFilter: selectedDateRange,
-      })
-    }
-  }, [minDate, maxDate, selectedDateRange, type, setChatFilters])
+  const handleSearchTextChange = useCallback((value: string) => {
+    setSearchText(value)
+  }, [])
 
   const removeFile = useCallback(
     (fileToRemove: string) => {
@@ -208,14 +154,6 @@ const ContextSettingsPopup: React.FC<ContextSettingsPopupProps> = ({
     label: i % 5 === 0 ? i.toString() : '',
   }))
 
-  const setSuggestionsStateCallback = useCallback((state: SuggestionsState | null) => {
-    setSuggestionsState(state)
-  }, [])
-
-  // useEffect(() => {
-  //   console.log('ContextSettingsPopup - suggestionsState:', suggestionsState)
-  // }, [suggestionsState])
-
   return (
     <div
       ref={popupRef}
@@ -224,59 +162,43 @@ const ContextSettingsPopup: React.FC<ContextSettingsPopupProps> = ({
     >
       {type === 'files' && (
         <div>
-          <Typography placeholder="Add Files to Context" variant="h6" color="white" className="mb-4">
-            Add Files to Context
-          </Typography>
-          <div className="relative mb-4">
-            <SearchBarWithFilesSuggestion
-              vaultDirectory={vaultDirectory}
-              searchText={searchText}
-              setSearchText={handleSearchTextChange}
-              onSelectSuggestion={handleSelectSuggestion}
-              suggestionsState={suggestionsState}
-              setSuggestionsState={setSuggestionsStateCallback}
+          <h2 className="mb-4 text-lg font-semibold text-white">Add Files to Context</h2>
+          <div className="mb-4">
+            <input
+              type="text"
+              className="w-full rounded-md border border-gray-300 px-3 py-2"
+              value={searchText}
+              onChange={(e) => handleSearchTextChange(e.target.value)}
+              placeholder="Search for files by name"
             />
-            {suggestionsState && (
-              <div className="absolute inset-x-0 z-10">
-                <InEditorBacklinkSuggestionsDisplay
-                  suggestionsState={{
-                    ...suggestionsState,
-                    position: { top: 0, left: 0 }, // Position relative to parent
-                  }}
-                  suggestions={memoizedFlattenedFiles.map((file) => file.path)}
-                  maxWidth="w-full"
-                />
-              </div>
-            )}
           </div>
-          <div className="max-h-60 overflow-y-auto">
-            <List placeholder="No files selected" className="p-0">
-              {internalFilesSelected.map((filePath) => (
-                <ListItem
-                  placeholder={filePath}
-                  key={filePath}
-                  className="flex items-center justify-between rounded-md p-2 hover:bg-neutral-700"
-                >
-                  <div className="flex items-center overflow-hidden">
-                    <ListItemPrefix placeholder={filePath}>
-                      {filePath.endsWith('/') ? (
-                        <FaFolder className="mr-2 text-yellow-500" />
-                      ) : (
-                        <FaFile className="mr-2 text-blue-500" />
-                      )}
-                    </ListItemPrefix>
-                    <Typography placeholder={filePath} variant="small" color="white" className="max-w-[200px] truncate">
-                      {filePath}
-                    </Typography>
-                  </div>
-                  <FaTimes
-                    className="cursor-pointer text-gray-400 hover:text-white"
-                    onClick={() => removeFile(filePath)}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </div>
+          {searchText && (
+            <ul className="mb-4 max-h-40 overflow-y-auto rounded-md bg-neutral-700 p-2">
+              {memoizedFlattenedFiles
+                .filter((file) => file.path.toLowerCase().includes(searchText.toLowerCase()))
+                .map((file) => (
+                  <li key={file.path}>
+                    <button
+                      type="button"
+                      className="w-full cursor-pointer p-1 text-left hover:bg-neutral-600"
+                      onClick={() => handleSelectSuggestion(file.path)}
+                    >
+                      {file.path.split('/').pop()}
+                    </button>
+                  </li>
+                ))}
+            </ul>
+          )}
+          <ul className="max-h-60 overflow-y-auto">
+            {internalFilesSelected.map((filePath) => (
+              <li key={filePath} className="mb-2 flex items-center justify-between">
+                <span className="text-white">{filePath.split('/').pop()}</span>
+                <button type="button" onClick={() => removeFile(filePath)} className="text-gray-400 hover:text-white">
+                  ×
+                </button>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
       {type === 'items' && (

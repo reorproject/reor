@@ -2,11 +2,9 @@ import React, { useCallback, useRef } from 'react'
 import { SuggestionsState } from '../Editor/BacklinkSuggestionsDisplay'
 
 interface Props {
-  vaultDirectory: string
   searchText: string
   setSearchText: (text: string) => void
   onSelectSuggestion: (suggestion: string) => void
-  suggestionsState: SuggestionsState | null
   setSuggestionsState: (state: SuggestionsState | null) => void
 }
 
@@ -29,7 +27,7 @@ const SearchBarWithFilesSuggestion: React.FC<Props> = ({
           top: inputCoords.bottom,
           left: inputCoords.left,
         },
-        onSelect: (suggestion) => onSelectSuggestion(`${suggestion}.md`),
+        onSelect: (suggestion: string) => onSelectSuggestion(`${suggestion}.md`),
       }
       setSuggestionsState(newSuggestionsState)
     } else {
