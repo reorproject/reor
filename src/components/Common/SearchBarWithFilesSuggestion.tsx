@@ -1,62 +1,54 @@
-import React, { useEffect, useRef, useCallback } from 'react'
+import React, { useCallback, useRef } from 'react'
+import { SuggestionsState } from '../Editor/BacklinkSuggestionsDisplay'
 
-import { SuggestionsDisplayProps } from '../Editor/BacklinkSuggestionsDisplay'
-import useFileInfoTree from '../Sidebars/FileSideBar/hooks/use-file-info-tree'
-
-interface SearchBarWithFilesSuggestionProps {
+interface Props {
   vaultDirectory: string
   searchText: string
   setSearchText: (text: string) => void
   onSelectSuggestion: (suggestion: string) => void
-  setSuggestionsState: (state: SuggestionsDisplayProps | null) => void
+  suggestionsState: SuggestionsState | null
+  setSuggestionsState: (state: SuggestionsState | null) => void
 }
 
-const SearchBarWithFilesSuggestion: React.FC<SearchBarWithFilesSuggestionProps> = ({
-  vaultDirectory,
+const SearchBarWithFilesSuggestion: React.FC<Props> = ({
   searchText,
   setSearchText,
   onSelectSuggestion,
   setSuggestionsState,
 }) => {
-  const { flattenedFiles } = useFileInfoTree(vaultDirectory)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  const updateSuggestions = useCallback(
-    (text: string) => {
-      const filteredSuggestions = flattenedFiles
-        .filter((file) => file.path.toLowerCase().includes(text.toLowerCase()))
-        .map((file) => file.path)
+  const updateSuggestions = useCallback(() => {
+    const inputCoords = inputRef.current?.getBoundingClientRect()
+    if (!inputCoords) return
 
-      if (inputRef.current) {
-        const rect = inputRef.current.getBoundingClientRect()
-        setSuggestionsState({
-          suggestionsState: {
-            textWithinBrackets: text,
-            position: {
-              top: rect.bottom + window.scrollY,
-              left: rect.left + window.scrollX,
-            },
-            onSelect: (suggestion: string) => onSelectSuggestion(`${suggestion}.md`),
-          },
-          suggestions: filteredSuggestions,
-        })
+    if (searchText.length > 0) {
+      const newSuggestionsState = {
+        textWithinBrackets: searchText,
+        position: {
+          top: inputCoords.bottom,
+          left: inputCoords.left,
+        },
+        onSelect: (suggestion) => onSelectSuggestion(`${suggestion}.md`),
       }
+      setSuggestionsState(newSuggestionsState)
+    } else {
+      setSuggestionsState(null)
+    }
+  }, [searchText, setSuggestionsState, onSelectSuggestion])
+
+  const handleInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const newValue = e.target.value
+      console.log('SearchBarWithFilesSuggestion - Input changed:', newValue)
+      setSearchText(newValue)
+      updateSuggestions()
     },
-    [flattenedFiles, setSuggestionsState, onSelectSuggestion],
+    [setSearchText, updateSuggestions],
   )
 
-  useEffect(() => {
-    updateSuggestions(searchText)
-  }, [searchText, updateSuggestions])
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newText = e.target.value
-    setSearchText(newText)
-    updateSuggestions(newText)
-  }
-
   return (
-    <div className="relative">
+    <div className="mb-3 text-xl font-semibold text-white">
       <input
         ref={inputRef}
         type="text"
@@ -65,6 +57,9 @@ const SearchBarWithFilesSuggestion: React.FC<SearchBarWithFilesSuggestionProps> 
         onChange={handleInputChange}
         placeholder="Search for files by name"
       />
+      {!searchText && (
+        <p className="text-xs text-red-500">Choose a file by searching or by right clicking a file in directory</p>
+      )}
     </div>
   )
 }
