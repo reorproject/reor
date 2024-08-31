@@ -11,7 +11,8 @@ import AddContextFiltersModal from './AddContextFiltersModal'
 import PromptSuggestion from './ChatPrompts'
 import LoadingDots from '@/utils/animations'
 import '../../styles/chat.css'
-import { Chat, ChatFilters, ReorChatMessage } from './types'
+import { ReorChatMessage } from './types'
+import { useChatContext } from '@/providers/ChatContext'
 
 export enum AskOptions {
   Ask = 'Ask',
@@ -28,10 +29,7 @@ export const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
 interface ChatMessagesProps {
   chatContainerRef: MutableRefObject<HTMLDivElement | null>
   openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => Promise<void>
-  currentChatHistory: Chat | undefined
   isAddContextFiltersModalOpen: boolean
-  chatFilters: ChatFilters
-  setChatFilters: Dispatch<ChatFilters>
   setUserTextFieldInput: Dispatch<SetStateAction<string>>
   defaultModelName: string
   vaultDirectory: string
@@ -44,10 +42,10 @@ interface ChatMessagesProps {
 const ChatMessages: React.FC<ChatMessagesProps> = ({
   chatContainerRef,
   openFileAndOpenEditor,
-  currentChatHistory,
+  // currentChatHistory,
   isAddContextFiltersModalOpen,
-  chatFilters,
-  setChatFilters,
+  // chatFilters,
+  // setChatFilters,
   setUserTextFieldInput,
   defaultModelName,
   vaultDirectory,
@@ -56,6 +54,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   askText,
   loadAnimation,
 }) => {
+  const { currentChatHistory, chatFilters, setChatFilters } = useChatContext()
   const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([])
   const [selectedLlm, setSelectedLlm] = useState<string>(defaultModelName)
 
