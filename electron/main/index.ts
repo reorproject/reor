@@ -68,12 +68,16 @@ app.on('activate', () => {
 
 process.on('uncaughtException', (error: Error) => {
   windowsManager.appendNewErrorToDisplayInWindow(errorToStringMainProcess(error))
-  Sentry.captureException(error)
+  if (process.env.NODE_ENV === 'production') {
+    Sentry.captureException(error)
+  }
 })
 
 process.on('unhandledRejection', (reason: unknown) => {
   windowsManager.appendNewErrorToDisplayInWindow(errorToStringMainProcess(reason))
-  Sentry.captureException(reason as Error)
+  if (process.env.NODE_ENV === 'production') {
+    Sentry.captureException(reason as Error)
+  }
 })
 
 registerLLMSessionHandlers(store)
