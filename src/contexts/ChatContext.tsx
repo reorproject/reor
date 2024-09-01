@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react'
 import { ChatHistoryMetadata, useChatHistory } from '@/components/Chat/hooks/use-chat-history'
-import { Chat, ChatFilters } from '@/components/Chat/types'
+import { Chat } from '@/components/Chat/types'
 import { SidebarAbleToShow } from '@/components/Sidebars/MainSidebar'
 
 export const UNINITIALIZED_STATE = 'UNINITIALIZED_STATE'
@@ -16,8 +16,8 @@ interface ChatContextType {
   currentChatHistory: Chat | undefined
   setCurrentChatHistory: React.Dispatch<React.SetStateAction<Chat | undefined>>
   chatHistoriesMetadata: ChatHistoryMetadata[]
-  chatFilters: ChatFilters
-  setChatFilters: React.Dispatch<React.SetStateAction<ChatFilters>>
+  // chatFilters: ChatFilters
+  // setChatFilters: React.Dispatch<React.SetStateAction<ChatFilters>>
   openChatSidebarAndChat: (chatHistory: Chat | undefined) => void
 }
 
@@ -26,12 +26,12 @@ const ChatContext = createContext<ChatContextType | undefined>(undefined)
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [showChatbot, setShowChatbot] = useState<boolean>(false)
   // const [currentTab, setCurrentTab] = useState<string>('')
-  const [chatFilters, setChatFilters] = useState<ChatFilters>({
-    files: [],
-    numberOfChunksToFetch: 15,
-    minDate: new Date(0),
-    maxDate: new Date(),
-  })
+  // const [chatFilters, setChatFilters] = useState<ChatFilters>({
+  //   files: [],
+  //   numberOfChunksToFetch: 15,
+  //   minDate: new Date(0),
+  //   maxDate: new Date(),
+  // })
   const [sidebarShowing, setSidebarShowing] = useState<SidebarAbleToShow>('files')
 
   const { currentChatHistory, setCurrentChatHistory, chatHistoriesMetadata } = useChatHistory()
@@ -74,23 +74,24 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // }, [currentChatHistory, chatHistoriesMetadata, currentlyOpenFilePath])
 
   useEffect(() => {
-    const handleAddFileToChatFilters = (file: string) => {
-      setSidebarShowing('chats')
-      setShowChatbot(true)
-      setCurrentChatHistory(undefined)
-      setChatFilters((prevChatFilters) => ({
-        ...prevChatFilters,
-        files: [...prevChatFilters.files, file],
-      }))
+    const handleAddFileToChatFilters = () => {
+      // setSidebarShowing('chats')
+      // setShowChatbot(true)
+      // setCurrentChatHistory(undefined)
+      // setChatFilters((prevChatFilters) => ({
+      //   ...prevChatFilters,
+      //   files: [...prevChatFilters.files, file],
+      // }))
+      // TODO: CALL START CONVERSATION FUNCTION
     }
-    const removeAddChatToFileListener = window.ipcRenderer.receive('add-file-to-chat-listener', (noteName: string) => {
-      handleAddFileToChatFilters(noteName)
+    const removeAddChatToFileListener = window.ipcRenderer.receive('add-file-to-chat-listener', () => {
+      handleAddFileToChatFilters()
     })
 
     return () => {
       removeAddChatToFileListener()
     }
-  }, [setCurrentChatHistory, setChatFilters, setShowChatbot])
+  }, [])
 
   const value = React.useMemo(
     () => ({
@@ -104,8 +105,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       currentChatHistory,
       setCurrentChatHistory,
       chatHistoriesMetadata,
-      chatFilters,
-      setChatFilters,
+      // chatFilters,
+      // setChatFilters,
       openChatSidebarAndChat,
     }),
     [
@@ -119,8 +120,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       currentChatHistory,
       setCurrentChatHistory,
       chatHistoriesMetadata,
-      chatFilters,
-      setChatFilters,
+      // chatFilters,
+      // setChatFilters,
       openChatSidebarAndChat,
     ],
   )

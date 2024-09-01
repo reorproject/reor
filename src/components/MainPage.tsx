@@ -65,7 +65,7 @@ const MainPageContent: React.FC = () => {
 
         {showChatbot && (
           <div className="h-below-titlebar w-full">
-            <ChatComponent showSimilarFiles={showSimilarFiles} />
+            <ChatComponent />
           </div>
         )}
       </div>

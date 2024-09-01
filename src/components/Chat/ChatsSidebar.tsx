@@ -45,7 +45,7 @@ export const ChatsSidebar: React.FC = () => {
   const [isRecentsOpen, setIsRecentsOpen] = useState(true)
   const dropdownAnimationDelay = 0.2
 
-  const { setShowChatbot, chatHistoriesMetadata, setCurrentChatHistory, setChatFilters } = useChatContext()
+  const { setShowChatbot, chatHistoriesMetadata, setCurrentChatHistory } = useChatContext()
 
   const toggleRecents = () => setIsRecentsOpen((prev) => !prev)
 
@@ -77,13 +77,6 @@ export const ChatsSidebar: React.FC = () => {
               onClick={() => {
                 posthog.capture('create_new_chat')
                 setCurrentChatHistory(undefined)
-
-                setChatFilters({
-                  files: [],
-                  numberOfChunksToFetch: 15,
-                  minDate: new Date(0),
-                  maxDate: new Date(),
-                })
               }}
             >
               <RiChatNewFill className="text-xl" />

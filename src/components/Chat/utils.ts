@@ -159,7 +159,12 @@ export const getDisplayableChatName = (chat: Chat): string => {
   return lastMessage.slice(0, 30)
 }
 
-export function anonymizeChatFiltersForPosthog(chatFilters: ChatFilters): AnonymizedChatFilters {
+export function anonymizeChatFiltersForPosthog(
+  chatFilters: ChatFilters | undefined,
+): AnonymizedChatFilters | undefined {
+  if (!chatFilters) {
+    return undefined
+  }
   const { numberOfChunksToFetch, files, minDate, maxDate } = chatFilters
   return {
     numberOfChunksToFetch,

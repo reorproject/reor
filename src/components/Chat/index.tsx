@@ -1,37 +1,26 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react'
 
-import { DBQueryResult } from 'electron/main/vector-database/schema'
 import posthog from 'posthog-js'
 
 import { streamText } from 'ai'
-import ChatInput from './ChatInput'
-import { anonymizeChatFiltersForPosthog, getChatHistoryContext, resolveLLMClient, resolveRAGContext } from './utils'
+import { anonymizeChatFiltersForPosthog, resolveLLMClient, resolveRAGContext } from './utils'
 
-import SimilarEntriesComponent from '../Sidebars/SemanticSidebar/SimilarEntriesComponent'
 import '../../styles/chat.css'
-import ChatMessages, { AskOptions } from './ChatMessages'
-import { Chat } from './types'
+import ChatMessages from './ChatMessages'
+import { Chat, ChatFilters } from './types'
 import { useChatContext } from '@/contexts/ChatContext'
-import { useTabsContext } from '@/contexts/TabContext'
+import StartConversation from './StartConversation'
 
-interface ChatComponentProps {
-  showSimilarFiles: boolean
-}
-
-const ChatComponent: React.FC<ChatComponentProps> = ({ showSimilarFiles }) => {
-  const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
-  const [askText] = useState<AskOptions>(AskOptions.Ask)
+const ChatComponent: React.FC = () => {
+  // const [userTextFieldInput, setUserTextFieldInput] = useState<string | undefined>()
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false)
   const [loadAnimation, setLoadAnimation] = useState<boolean>(false)
   const [readyToSave, setReadyToSave] = useState<boolean>(false)
-  const [promptSelected, setPromptSelected] = useState<boolean>(false)
-  const [currentContext, setCurrentContext] = useState<DBQueryResult[]>([])
-  const [isAddContextFiltersModalOpen, setIsAddContextFiltersModalOpen] = useState<boolean>(false)
+  // const [currentContext, setCurrentContext] = useState<DBQueryResult[]>([])
   const [defaultModelName, setDefaultLLMName] = useState<string>('')
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
-  const { setCurrentChatHistory, currentChatHistory, chatFilters } = useChatContext()
-  const { openTabContent } = useTabsContext()
+  const { setCurrentChatHistory, currentChatHistory } = useChatContext()
 
   useEffect(() => {
     const fetchDefaultLLM = async () => {
@@ -42,18 +31,18 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ showSimilarFiles }) => {
     fetchDefaultLLM()
   }, [])
 
-  useEffect(() => {
-    const setContextOnFileAdded = async () => {
-      if (chatFilters.files.length > 0) {
-        const results = await window.fileSystem.getFilesystemPathsAsDBItems(chatFilters.files)
-        setCurrentContext(results as DBQueryResult[])
-      } else if (!currentChatHistory?.id) {
-        // if there is no prior history, set current context to empty
-        setCurrentContext([])
-      }
-    }
-    setContextOnFileAdded()
-  }, [chatFilters.files, currentChatHistory?.id])
+  // useEffect(() => {
+  //   const setContextOnFileAdded = async () => {
+  //     if (chatFilters.files.length > 0) {
+  //       const results = await window.fileSystem.getFilesystemPathsAsDBItems(chatFilters.files)
+  //       setCurrentContext(results as DBQueryResult[])
+  //     } else if (!currentChatHistory?.id) {
+  //       // if there is no prior history, set current context to empty
+  //       setCurrentContext([])
+  //     }
+  //   }
+  //   setContextOnFileAdded()
+  // }, [chatFilters.files, currentChatHistory?.id])
 
   useEffect(() => {
     if (readyToSave && currentChatHistory) {
@@ -94,7 +83,14 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ showSimilarFiles }) => {
     [setCurrentChatHistory],
   )
 
-  const handleSubmitNewMessage = async (currentChat: Chat | undefined) => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const handleSubmitNewMessage = async (
+    currentChat: Chat | undefined,
+    userTextFieldInput: string | undefined,
+    chatFilters?: ChatFilters,
+  ) => {
+    console.log('calling new chat with', userTextFieldInput)
+    console.log('curent chat: ', currentChat)
     posthog.capture('chat_message_submitted', {
       chatId: currentChat?.id,
       chatLength: currentChat?.messages.length,
@@ -102,7 +98,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ showSimilarFiles }) => {
     })
     let outputChat = currentChat
 
-    if (loadingResponse || !userTextFieldInput.trim()) return
+    if (loadingResponse || !userTextFieldInput?.trim()) return
 
     setLoadingResponse(true)
     setLoadAnimation(true)
@@ -114,10 +110,8 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ showSimilarFiles }) => {
         messages: [],
       }
     }
-    if (outputChat.messages.length === 0) {
-      if (chatFilters) {
-        outputChat.messages.push(await resolveRAGContext(userTextFieldInput, chatFilters))
-      }
+    if (outputChat.messages.length === 0 && chatFilters) {
+      outputChat.messages.push(await resolveRAGContext(userTextFieldInput ?? '', chatFilters))
     } else {
       outputChat.messages.push({
         role: 'user',
@@ -125,7 +119,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ showSimilarFiles }) => {
         context: [],
       })
     }
-    setUserTextFieldInput('')
+    // setUserTextFieldInput('')
 
     setCurrentChatHistory(outputChat)
 
@@ -134,7 +128,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ showSimilarFiles }) => {
     await window.electronStore.updateChatHistory(outputChat)
 
     const client = await resolveLLMClient(defaultLLMName)
-
+    console.log('outputchat is: ', outputChat)
     const { textStream } = await streamText({
       model: client,
       messages: outputChat.messages,
@@ -144,62 +138,80 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ showSimilarFiles }) => {
     for await (const textPart of textStream) {
       appendNewContentToMessageHistory(outputChat.id, textPart)
     }
+    setLoadingResponse(false)
     setReadyToSave(true)
   }
 
-  useEffect(() => {
-    // Update context when the chat history changes
-    const context = getChatHistoryContext(currentChatHistory)
-    setCurrentContext(context)
+  // useEffect(() => {
+  //   // Update context when the chat history changes
+  //   const context = getChatHistoryContext(currentChatHistory)
+  //   setCurrentContext(context)
 
-    if (!promptSelected) {
-      setLoadAnimation(false)
-      setLoadingResponse(false)
-    } else {
-      setPromptSelected(false)
-    }
-  }, [currentChatHistory, currentChatHistory?.id, promptSelected])
+  //   if (!promptSelected) {
+  //     setLoadAnimation(false)
+  //     setLoadingResponse(false)
+  //   } else {
+  //     setPromptSelected(false)
+  //   }
+  // }, [currentChatHistory, currentChatHistory?.id, promptSelected])
 
-  useEffect(() => {
-    // Handle prompt selection and message submission separately
-    if (promptSelected) {
-      handleSubmitNewMessage(undefined)
-    }
-    /* eslint-disable-next-line react-hooks/exhaustive-deps */
-  }, [promptSelected])
+  // useEffect(() => {
+  //   // Handle prompt selection and message submission separately
+  //   if (promptSelected) {
+  //     handleSubmitNewMessage(undefined)
+  //   }
+  //   /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  // }, [promptSelected])
+
+  // const handleNewChatMessage = useCallback(
+  //   (prompt: string | undefined) => {
+  //     setUserTextFieldInput(prompt)
+  //   },
+  //   [setUserTextFieldInput],
+  // )
 
   const handleNewChatMessage = useCallback(
-    (prompt: string | undefined) => {
-      if (prompt) setUserTextFieldInput(prompt)
-      setPromptSelected(true)
+    (userTextFieldInput: string | undefined, chatFilters?: ChatFilters) => {
+      handleSubmitNewMessage(currentChatHistory, userTextFieldInput, chatFilters)
     },
-    [setUserTextFieldInput],
+    [currentChatHistory, handleSubmitNewMessage],
   )
 
   return (
     <div className="flex size-full items-center justify-center">
       <div className="mx-auto flex size-full flex-col overflow-hidden border-y-0 border-l-[0.001px] border-r-0 border-solid border-neutral-700 bg-dark-gray-c-eleven">
-        <ChatMessages
-          chatContainerRef={chatContainerRef}
-          isAddContextFiltersModalOpen={isAddContextFiltersModalOpen}
-          setUserTextFieldInput={setUserTextFieldInput}
-          defaultModelName={defaultModelName}
-          setIsAddContextFiltersModalOpen={setIsAddContextFiltersModalOpen}
-          handlePromptSelection={handleNewChatMessage}
-          askText={askText}
-          loadAnimation={loadAnimation}
-        />
+        {currentChatHistory && currentChatHistory.messages && currentChatHistory.messages.length > 0 ? (
+          <ChatMessages
+            currentChatHistory={currentChatHistory}
+            chatContainerRef={chatContainerRef}
+            // userTextFieldInput={userTextFieldInput}
+            // setUserTextFieldInput={setUserTextFieldInput}
+            loadAnimation={loadAnimation}
+            handleNewChatMessage={handleNewChatMessage}
+            loadingResponse={loadingResponse}
+          />
+        ) : (
+          <StartConversation
+            // chatFilters={chatFilters}
+            // setChatFilters={setChatFilters}
+            // setUserTextFieldInput={setUserTextFieldInput}
+            defaultModelName={defaultModelName}
+            // isAddContextFiltersModalOpen={isAddContextFiltersModalOpen}
+            // setIsAddContextFiltersModalOpen={setIsAddContextFiltersModalOpen}
+            handleNewChatMessage={handleNewChatMessage}
+          />
+        )}
 
-        {currentChatHistory && (
+        {/* {currentChatHistory && (
           <ChatInput
             userTextFieldInput={userTextFieldInput}
             setUserTextFieldInput={setUserTextFieldInput}
             handleSubmitNewMessage={() => handleSubmitNewMessage(currentChatHistory)}
             loadingResponse={loadingResponse}
           />
-        )}
+        )} */}
       </div>
-      {showSimilarFiles && (
+      {/* {showSimilarFiles && (
         <SimilarEntriesComponent
           similarEntries={currentContext}
           titleText="Context used in chat"
@@ -209,7 +221,7 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ showSimilarFiles }) => {
           }}
           isLoadingSimilarEntries={false}
         />
-      )}
+      )} */}
     </div>
   )
 }
