@@ -160,7 +160,7 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
       {focusedItem.currentSelection !== 'None' && (
           <div 
             ref={menuRef}
-            className="absolute py-2 px-1 rounded-md z-[1020] bg-[#1E1E1E] overflow-y-auto"
+            className="absolute py-2 px-1 rounded-md z-[1020] bg-[#1E1E1E] overflow-y-auto border-solid border-1 border-gray-700"
             style={{
             left: locations.x,
               top: locations.y,

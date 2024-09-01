@@ -124,7 +124,9 @@ interface EditorContextMenuProps {
   editor: Editor | null
   menuPosition: MenuPosition
   setMenuVisible: (visible: boolean) => void
+  hideMenu: () => void
 }
+
 /**
  *
  * Options:
@@ -141,7 +143,7 @@ interface EditorContextMenuProps {
  * @returns Dropdown menu to perform actions on selected text
  *
  */
-const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosition, setMenuVisible }) => {
+const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosition, setMenuVisible, hideMenu }) => {
   const [showTableSelector, setShowTableSelector] = useState<boolean>(false)
   /**
    * We use useRef instead of state's because we are changing the style of our DOM but DO NOT
@@ -149,6 +151,7 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
    */
   const tableButtonRef = useRef<HTMLLIElement>(null)
   const tableSelectorRef = useRef<HTMLDivElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     // Checks if we hover outside the table. In that case, do not display table selector
@@ -164,9 +167,17 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
       }
     }
 
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        hideMenu()
+      }
+    }
+
     document.addEventListener('mouseover', checkIfOutside)
+    document.addEventListener('mousedown', handleOutsideClick)
     return () => {
       document.removeEventListener('mouseover', checkIfOutside)
+      document.removeEventListener('mousedown', handleOutsideClick)
     }
   }, [])
 
@@ -200,11 +211,11 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
     setMenuVisible(false)
   }
 
-  const itemClass = 'text-[12px] text-white/90 cursor-pointer hover:bg-blue-500 hover:rounded-md px-2 py-1'
+  const itemClass = 'text-[12px] text-white cursor-pointer hover:bg-blue-500 hover:rounded-md px-2 py-1'
   return (
-    <div>
+    <div ref={menuRef}>
       <ul
-        className="absolute py-2 px-1 rounded-md z-[1020] bg-[#1E1E1E] overflow-y-auto w-[150px]"
+        className="absolute py-2 px-1 rounded-lg z-[1020] bg-[#1E1E1E] overflow-y-auto w-[150px] border-solid border-1 border-gray-700"
         style={{
           top: `${menuPosition.y - 60}px`,
           left: `${menuPosition.x - 190}px`,
@@ -217,7 +228,7 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
           onClick={() => {
             handleCommand('copy')
           }}
-          className={`${itemClass} ${!isTextCurrentlySelected() ? 'disabled opacity-50' : ''}`}
+          className={`${itemClass}  ${!isTextCurrentlySelected()? 'disabled opacity-50' : ''}`}
         >
           <span className="text">Copy</span>
         </li>
@@ -242,7 +253,7 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
         >
           <span className="text">Delete</span>
         </li>
-        <div className="h-px w-full bg-gray-500 my-1" />
+        <div className="h-px w-full bg-gray-700 my-1" />
         <li ref={tableButtonRef} onMouseEnter={() => setShowTableSelector(true)} 
           className={`${itemClass}`}
         >

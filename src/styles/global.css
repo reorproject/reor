@@ -79,7 +79,7 @@ button {
 /* Css for table on bubble-menu */
 .table-size-selector {
   background: #1E1E1E;
-  border: 1px solid #ccc;
+  border: 1px solid rgb(55 65 81);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 10px;
   z-index: 1050;
