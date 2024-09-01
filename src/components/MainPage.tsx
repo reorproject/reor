@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import '../styles/global.css'
 import ChatComponent from './Chat'
@@ -17,19 +17,10 @@ import ModalProvider from '@/contexts/ModalContext'
 
 const MainPageContent: React.FC = () => {
   const [showSimilarFiles, setShowSimilarFiles] = useState(true)
-  const [vaultDirectory, setVaultDirectory] = useState<string>('')
 
   const { currentlyOpenFilePath } = useFileContext()
 
   const { showChatbot } = useChatContext()
-
-  useEffect(() => {
-    const setFileDirectory = async () => {
-      const windowDirectory = await window.electronStore.getVaultDirectoryForWindow()
-      setVaultDirectory(windowDirectory)
-    }
-    setFileDirectory()
-  }, [])
 
   return (
     <div className="relative overflow-x-hidden">
@@ -74,7 +65,7 @@ const MainPageContent: React.FC = () => {
 
         {showChatbot && (
           <div className="h-below-titlebar w-full">
-            <ChatComponent vaultDirectory={vaultDirectory} showSimilarFiles={showSimilarFiles} />
+            <ChatComponent showSimilarFiles={showSimilarFiles} />
           </div>
         )}
       </div>

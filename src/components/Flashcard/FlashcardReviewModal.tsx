@@ -21,7 +21,7 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({ isOpen, onC
   useEffect(() => {
     const getFlashcardsFromDirectory = async () => {
       const vaultDirectoryWithFlashcards = await getFlashcardVaultDirectory()
-      const files = await window.path.getAllFilenamesInDirectory(vaultDirectoryWithFlashcards)
+      const files = await window.fileSystem.getAllFilenamesInDirectory(vaultDirectoryWithFlashcards)
       setFlashcardFiles(files)
       setCurrentSelectedFlashcard(0)
     }

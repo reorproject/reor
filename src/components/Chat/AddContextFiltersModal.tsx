@@ -17,12 +17,12 @@ import { ChatFilters } from './types'
 interface Props {
   isOpen: boolean
   onClose: () => void
-  vaultDirectory: string
   setChatFilters: (chatFilters: ChatFilters) => void
   chatFilters: ChatFilters
 }
 
-const AddContextFiltersModal: React.FC<Props> = ({ vaultDirectory, isOpen, onClose, chatFilters, setChatFilters }) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const AddContextFiltersModal: React.FC<Props> = ({ isOpen, onClose, chatFilters, setChatFilters }) => {
   const [internalFilesSelected, setInternalFilesSelected] = useState<string[]>(chatFilters?.files || [])
   const [searchText, setSearchText] = useState<string>('')
   const [suggestionsState, setSuggestionsState] = useState<SuggestionsState | null>(null)
@@ -41,16 +41,16 @@ const AddContextFiltersModal: React.FC<Props> = ({ vaultDirectory, isOpen, onClo
     { label: 'Past year', value: 'lastYear' },
   ]
 
-  useEffect(() => {
-    const updatedChatFilters: ChatFilters = {
-      ...chatFilters,
-      files: [...new Set([...chatFilters.files, ...internalFilesSelected])],
-      numberOfChunksToFetch,
-      minDate: minDate || undefined,
-      maxDate: maxDate || undefined,
-    }
-    setChatFilters(updatedChatFilters)
-  }, [internalFilesSelected, numberOfChunksToFetch, minDate, maxDate, chatFilters, setChatFilters])
+  // useEffect(() => {
+  //   const updatedChatFilters: ChatFilters = {
+  //     ...chatFilters,
+  //     files: [...new Set([...chatFilters.files, ...internalFilesSelected])],
+  //     numberOfChunksToFetch,
+  //     minDate: minDate || undefined,
+  //     maxDate: maxDate || undefined,
+  //   }
+  //   setChatFilters(updatedChatFilters)
+  // }, [internalFilesSelected, numberOfChunksToFetch, minDate, maxDate, setChatFilters])
 
   const handleNumberOfChunksChange = (event: Event, value: number | number[]) => {
     const newValue = Array.isArray(value) ? value[0] : value
@@ -110,7 +110,6 @@ const AddContextFiltersModal: React.FC<Props> = ({ vaultDirectory, isOpen, onClo
           <div className="flex-1">
             <h3 className="mb-2 text-lg text-white">Select files for context</h3>
             <SearchBarWithFilesSuggestion
-              vaultDirectory={vaultDirectory}
               searchText={searchText}
               setSearchText={setSearchText}
               onSelectSuggestion={(file: string) => {

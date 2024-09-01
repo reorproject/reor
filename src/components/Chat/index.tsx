@@ -15,11 +15,10 @@ import { useChatContext } from '@/contexts/ChatContext'
 import { useTabsContext } from '@/contexts/TabContext'
 
 interface ChatComponentProps {
-  vaultDirectory: string
   showSimilarFiles: boolean
 }
 
-const ChatComponent: React.FC<ChatComponentProps> = ({ vaultDirectory, showSimilarFiles }) => {
+const ChatComponent: React.FC<ChatComponentProps> = ({ showSimilarFiles }) => {
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
   const [askText] = useState<AskOptions>(AskOptions.Ask)
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false)
@@ -185,7 +184,6 @@ const ChatComponent: React.FC<ChatComponentProps> = ({ vaultDirectory, showSimil
           isAddContextFiltersModalOpen={isAddContextFiltersModalOpen}
           setUserTextFieldInput={setUserTextFieldInput}
           defaultModelName={defaultModelName}
-          vaultDirectory={vaultDirectory}
           setIsAddContextFiltersModalOpen={setIsAddContextFiltersModalOpen}
           handlePromptSelection={handleNewChatMessage}
           askText={askText}

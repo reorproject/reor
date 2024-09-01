@@ -32,7 +32,6 @@ interface ChatMessagesProps {
   isAddContextFiltersModalOpen: boolean
   setUserTextFieldInput: Dispatch<SetStateAction<string>>
   defaultModelName: string
-  vaultDirectory: string
   setIsAddContextFiltersModalOpen: Dispatch<SetStateAction<boolean>>
   handlePromptSelection: (prompt: string | undefined) => void
   askText: AskOptions
@@ -44,7 +43,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   isAddContextFiltersModalOpen,
   setUserTextFieldInput,
   defaultModelName,
-  vaultDirectory,
   setIsAddContextFiltersModalOpen,
   handlePromptSelection,
   askText,
@@ -213,7 +211,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 
         {isAddContextFiltersModalOpen && (
           <AddContextFiltersModal
-            vaultDirectory={vaultDirectory}
             isOpen={isAddContextFiltersModalOpen}
             onClose={() => setIsAddContextFiltersModalOpen(false)}
             chatFilters={chatFilters}

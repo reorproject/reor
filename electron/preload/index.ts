@@ -108,6 +108,7 @@ const fileSystem = {
   getFilesystemPathsAsDBItems: createIPCHandler<(paths: string[]) => Promise<DBEntry[]>>(
     'get-filesystem-paths-as-db-items',
   ),
+  getAllFilenamesInDirectory: createIPCHandler<(dirName: string) => Promise<string[]>>('get-files-in-directory'),
 }
 
 const path = {
@@ -120,7 +121,6 @@ const path = {
     'add-extension-if-no-extension-present',
   ),
   pathSep: createIPCHandler<() => Promise<string>>('path-sep'),
-  getAllFilenamesInDirectory: createIPCHandler<(dirName: string) => Promise<string[]>>('get-files-in-directory'),
 }
 
 const llm = {

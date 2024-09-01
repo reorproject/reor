@@ -92,24 +92,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [setCurrentChatHistory, setChatFilters, setShowChatbot])
 
-  // const openTabContent = React.useCallback(
-  //   async (path: string, optionalContentToWriteOnCreate?: string) => {
-  //     if (!path) return
-  //     const chatID = getChatIdFromPath(path)
-  //     if (chatID) {
-  //       if (chatID === UNINITIALIZED_STATE) return
-  //       const chat = await window.electronStore.getChatHistory(chatID)
-  //       openChatSidebarAndChat(chat)
-  //     } else {
-  //       setShowChatbot(false)
-  //       setSidebarShowing('files')
-  //       openOrCreateFile(path, optionalContentToWriteOnCreate)
-  //     }
-  //     setCurrentTab(path)
-  //   },
-  //   [getChatIdFromPath, openChatSidebarAndChat, setShowChatbot, setSidebarShowing, openOrCreateFile, setCurrentTab],
-  // )
-
   const value = React.useMemo(
     () => ({
       // openTabContent,

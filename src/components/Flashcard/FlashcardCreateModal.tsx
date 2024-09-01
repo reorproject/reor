@@ -14,7 +14,7 @@ import FlashcardCore from './FlashcardsCore'
 import { FlashcardQAPairSchema, FlashcardQAPairUI } from './types'
 import { storeFlashcardPairsAsJSON } from './utils'
 import { resolveLLMClient } from '../Chat/utils'
-import useFileInfoTree from '../Sidebars/FileSideBar/hooks/use-file-info-tree'
+import useFileInfoTreeHook from '../Sidebars/FileSideBar/hooks/use-file-info-tree'
 
 interface FlashcardCreateModalProps {
   isOpen: boolean
@@ -29,7 +29,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({ isOpen, onC
   const [selectedFile, setSelectedFile] = useState<string>(initialFlashcardFile)
   const [vaultDirectory, setVaultDirectory] = useState<string>('')
 
-  const { flattenedFiles } = useFileInfoTree(vaultDirectory)
+  const { flattenedFiles } = useFileInfoTreeHook(vaultDirectory)
   const { suggestionsState, setSuggestionsState } = useFileByFilepath()
 
   const [searchText, setSearchText] = useState<string>(initialFlashcardFile)
