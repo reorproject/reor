@@ -64,7 +64,14 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
       initialFileToReviewFlashcard,
       setInitialFileToReviewFlashcard,
     }),
-    [isNewNoteModalOpen, isNewDirectoryModalOpen, isSettingsModalOpen, isFlashcardModeOpen],
+    [
+      isNewNoteModalOpen,
+      isNewDirectoryModalOpen,
+      isSettingsModalOpen,
+      isFlashcardModeOpen,
+      initialFileToReviewFlashcard,
+      initialFileToCreateFlashcard,
+    ],
   )
 
   return <ModalContext.Provider value={modalOpenContextValue}>{children}</ModalContext.Provider>

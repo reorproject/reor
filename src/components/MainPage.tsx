@@ -18,7 +18,11 @@ import { ModalProvider } from '../providers/ModalProvider'
 import WritingAssistant from './WritingAssistant/WritingAssistant'
 import { Chat, ChatFilters } from './Chat/types'
 import useFileInfoTree from './Sidebars/FileSideBar/hooks/use-file-info-tree'
-import CustomContextMenu, { ContextMenuLocations, ContextMenuFocus, HandleFocusedItemType } from './Menu/CustomContextMenu'
+import CustomContextMenu, {
+  ContextMenuLocations,
+  ContextMenuFocus,
+  HandleFocusedItemType,
+} from './Menu/CustomContextMenu'
 
 const UNINITIALIZED_STATE = 'UNINITIALIZED_STATE'
 
@@ -35,7 +39,7 @@ const MainPageComponent: React.FC = () => {
     maxDate: new Date(),
   })
   const [sidebarWidth, setSidebarWidth] = useState<number>(40)
-  const [focusedItem,  setFocusedItem] = useState<ContextMenuFocus>({
+  const [focusedItem, setFocusedItem] = useState<ContextMenuFocus>({
     currentSelection: 'None',
     locations: { x: 0, y: 0 },
   })
@@ -62,7 +66,8 @@ const MainPageComponent: React.FC = () => {
     handleDeleteFile,
   } = useFileByFilepath()
 
-  const { currentChatHistory, setCurrentChatHistory, chatHistoriesMetadata, updateChatHistoriesMetadata } = useChatHistory()
+  const { currentChatHistory, setCurrentChatHistory, chatHistoriesMetadata, updateChatHistoriesMetadata } =
+    useChatHistory()
 
   useEffect(() => {
     if (filePath != null && filePathRef.current !== filePath) {
@@ -154,24 +159,26 @@ const MainPageComponent: React.FC = () => {
   }
 
   const handleFocusedItem: HandleFocusedItemType = (
-    event: React.MouseEvent<HTMLDivElement>, 
-    focusedItem: ContextMenuLocations,
-    additionalData: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>> = {}
+    event: React.MouseEvent<HTMLDivElement>,
+    item: ContextMenuLocations,
+    additionalData: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>> = {},
   ) => {
     event.preventDefault()
 
     setFocusedItem({
-      currentSelection: focusedItem,
+      currentSelection: item,
       locations: { x: event.clientX, y: event.clientY },
       ...additionalData,
     })
   }
 
   const hideFocusedItem = () => {
-    setFocusedItem({
+    setFocusedItem((prevItem: ContextMenuFocus) => ({
       currentSelection: 'None',
       locations: { x: 0, y: 0 },
-    })
+      file: prevItem.file,
+      chatMetadata: prevItem.chatMetadata,
+    }))
   }
 
   return (
@@ -181,15 +188,13 @@ const MainPageComponent: React.FC = () => {
           impacts the z-index. */}
       <div id="tooltip-container" />
       <ModalProvider>
-        <CustomContextMenu 
-          focusedItem={focusedItem} 
-          setFocusedItem={setFocusedItem}
-          hideFocusedItem={hideFocusedItem} 
+        <CustomContextMenu
+          focusedItem={focusedItem}
+          hideFocusedItem={hideFocusedItem}
           handleDeleteFile={handleDeleteFile}
           handleDeleteChat={updateChatHistoriesMetadata}
           setFileNodeToBeRenamed={setFileNodeToBeRenamed}
           openFileAndOpenEditor={openFileAndOpenEditor}
-          currentFilePath={filePath}
           handleAddFileToChatFilters={handleAddFileToChatFilters}
         />
       </ModalProvider>

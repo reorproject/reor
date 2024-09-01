@@ -34,7 +34,6 @@ export const useChatHistory = () => {
     window.electronStore.removeChatHistoryAtID(chatID)
   }
 
-  
   useEffect(() => {
     fetchChatHistories()
   }, [])

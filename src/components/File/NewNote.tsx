@@ -53,11 +53,9 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
     let finalPath = fileName
     if (optionalAbsoluteCreate) {
       finalPath = await window.path.join(optionalAbsoluteCreate, fileName)
-    } else {
-      if (currentOpenFilePath !== '' && currentOpenFilePath !== null) {
-        const directoryName = await window.path.dirname(currentOpenFilePath)
-        finalPath = await window.path.join(directoryName, fileName)
-      }
+    } else if (currentOpenFilePath !== '' && currentOpenFilePath !== null) {
+      const directoryName = await window.path.dirname(currentOpenFilePath)
+      finalPath = await window.path.join(directoryName, fileName)
     }
     const basename = await window.path.basename(finalPath)
     openFileAndOpenEditor(finalPath, `# ${basename}\n`)

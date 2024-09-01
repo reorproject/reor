@@ -227,7 +227,6 @@ const useFileByFilepath = () => {
 
   // Delete file when contextMenu selects 'Delete' choice
   const handleDeleteFile = async (path: string | undefined) => {
-
     if (!path) return false
     await window.fileSystem.deleteFile(path)
     window.electronStore.removeOpenTabsByPath(path)

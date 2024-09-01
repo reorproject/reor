@@ -20,8 +20,9 @@ interface FileInfoProps {
   handleFocusedItem: (
     event: React.MouseEvent<HTMLDivElement>,
     focusedItem: ContextMenuLocations,
-    additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>
-  ) => void;}
+    additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>,
+  ) => void
+}
 
 const FileItem: React.FC<FileInfoProps> = ({
   file,
@@ -80,15 +81,13 @@ const FileItem: React.FC<FileInfoProps> = ({
 
   const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-neutral-700 
     h-full mt-0 mb-0 text-cyan-100 font-sans text-xs leading-relaxed rounded-md z-1000 hover:z-900 ${
-    isSelected ? 'bg-neutral-700 text-white font-semibold' : 'text-gray-200'
-  } ${isDragOver ? 'bg-neutral-500' : ''}`
+      isSelected ? 'bg-neutral-700 text-white font-semibold' : 'text-gray-200'
+    } ${isDragOver ? 'bg-neutral-500' : ''}`
 
   const handleFocusDirOrFile = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation()
-    if (isDirectory)
-      handleFocusedItem(event, 'DirectoryItem', { file })
-    else
-      handleFocusedItem(event, 'FileItem', { file })
+    if (isDirectory) handleFocusedItem(event, 'DirectoryItem', { file })
+    else handleFocusedItem(event, 'FileItem', { file })
   }
 
   return (

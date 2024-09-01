@@ -13,8 +13,8 @@ export interface ChatItemProps {
   handleFocusedItem: (
     event: React.MouseEvent<HTMLDivElement>,
     focusedItem: ContextMenuLocations,
-    additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>
-  ) => void;
+    additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>,
+  ) => void
 }
 
 export const ChatItem: React.FC<ChatItemProps> = ({
@@ -59,8 +59,9 @@ interface ChatListProps {
   handleFocusedItem: (
     event: React.MouseEvent<HTMLDivElement>,
     focusedItem: ContextMenuLocations,
-    additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>
-  ) => void;}
+    additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>,
+  ) => void
+}
 
 export const ChatsSidebar: React.FC<ChatListProps> = ({
   chatHistoriesMetadata,

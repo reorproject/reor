@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 
 import { FaSearch } from 'react-icons/fa'
 import { GrNewWindow } from 'react-icons/gr'
@@ -28,7 +28,6 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
   makeSidebarShow,
   currentFilePath,
 }) => {
-
   const {
     isNewNoteModalOpen,
     setIsNewNoteModalOpen,
@@ -57,7 +56,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
     return () => {
       createFlashcardFileListener()
     }
-  }, [setIsFlashcardModeOpen])
+  }, [setIsFlashcardModeOpen, setInitialFileToCreateFlashcard])
 
   return (
     <div className="flex size-full flex-col items-center justify-between gap-1 bg-neutral-800">

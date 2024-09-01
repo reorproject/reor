@@ -3,11 +3,6 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import { EditorState } from '@tiptap/pm/state'
 import { Dispatch, Editor } from '@tiptap/react'
-import { AiOutlineDelete } from 'react-icons/ai'
-import { CiViewTable } from 'react-icons/ci'
-import { FaRegCopy } from 'react-icons/fa'
-import { IoMdCut } from 'react-icons/io'
-import { MdContentPaste } from 'react-icons/md'
 
 import '../../styles/global.css'
 
@@ -145,10 +140,7 @@ interface EditorContextMenuProps {
  */
 const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosition, setMenuVisible, hideMenu }) => {
   const [showTableSelector, setShowTableSelector] = useState<boolean>(false)
-  /**
-   * We use useRef instead of state's because we are changing the style of our DOM but DO NOT
-   * want to re-render. This style gets applied once and does not change so no re-render is needed.
-   */
+
   const tableButtonRef = useRef<HTMLLIElement>(null)
   const tableSelectorRef = useRef<HTMLDivElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -179,7 +171,7 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
       document.removeEventListener('mouseover', checkIfOutside)
       document.removeEventListener('mousedown', handleOutsideClick)
     }
-  }, [])
+  }, [hideMenu])
 
   if (!editor) return null
 
@@ -211,11 +203,11 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
     setMenuVisible(false)
   }
 
-  const itemClass = 'text-[12px] text-white cursor-pointer hover:bg-blue-500 hover:rounded-md px-2 py-1'
+  const itemClass = 'text-[12px] text-white cursor-pointer hover:rounded-md px-2 py-1'
   return (
     <div ref={menuRef}>
       <ul
-        className="absolute py-2 px-1 rounded-lg z-[1020] bg-[#1E1E1E] overflow-y-auto w-[150px] border-solid border-1 border-gray-700"
+        className="absolute z-[1020] w-[150px] overflow-y-auto rounded-lg border-solid border-gray-700 bg-[#1E1E1E] px-1 py-2"
         style={{
           top: `${menuPosition.y - 60}px`,
           left: `${menuPosition.x - 190}px`,
@@ -228,13 +220,13 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
           onClick={() => {
             handleCommand('copy')
           }}
-          className={`${itemClass}  ${!isTextCurrentlySelected()? 'disabled opacity-50' : ''}`}
+          className={`${itemClass}  ${!isTextCurrentlySelected() ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-500'}`}
         >
           <span className="text">Copy</span>
         </li>
         <li
           onClick={() => handleCommand('cut')}
-          className={`${itemClass} ${!isTextCurrentlySelected() ? 'disabled opacity-50' : ''}`}
+          className={`${itemClass} ${!isTextCurrentlySelected() ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-500'}`}
         >
           <span className="text">Cut</span>
         </li>
@@ -243,20 +235,18 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
             pasteCommand(editor)
             setMenuVisible(false)
           }}
-          className={`${itemClass}`}
+          className={`${itemClass} hover:bg-blue-500`}
         >
           <span className="text">Paste</span>
         </li>
         <li
           onClick={() => handleCommand('delete')}
-          className={`${itemClass} ${!isTextCurrentlySelected() ? 'disabled opacity-50' : ''}`}
+          className={`${itemClass} ${!isTextCurrentlySelected() ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-500'}`}
         >
           <span className="text">Delete</span>
         </li>
-        <div className="h-px w-full bg-gray-700 my-1" />
-        <li ref={tableButtonRef} onMouseEnter={() => setShowTableSelector(true)} 
-          className={`${itemClass}`}
-        >
+        <div className="my-1 h-px w-full bg-gray-700" />
+        <li ref={tableButtonRef} onMouseEnter={() => setShowTableSelector(true)} className={`${itemClass}`}>
           <span className="text">Table</span>
         </li>
       </ul>

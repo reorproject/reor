@@ -33,8 +33,8 @@ interface SidebarManagerProps {
   handleFocusedItem: (
     event: React.MouseEvent<HTMLDivElement>,
     focusedItem: ContextMenuLocations,
-    additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>
-  ) => void;
+    additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>,
+  ) => void
 }
 
 const SidebarManager: React.FC<SidebarManagerProps> = ({

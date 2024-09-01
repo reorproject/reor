@@ -9,21 +9,20 @@ import RenameNoteModal from '@/components/File/RenameNote'
 import RenameDirModal from '@/components/File/RenameDirectory'
 import { ContextMenuLocations, ContextMenuFocus } from '../../Menu/CustomContextMenu'
 
-
 const handleDragStartImpl = (e: React.DragEvent, file: FileInfoNode) => {
   e.dataTransfer.setData('text/plain', file.path)
   e.dataTransfer.effectAllowed = 'move'
 } // Assuming FileItem is in a separate file
 
 const Rows: React.FC<ListChildComponentProps> = ({ index, style, data }) => {
-  const { 
-    visibleItems, 
-    selectedFilePath, 
-    onFileSelect, 
-    handleDragStart, 
-    handleDirectoryToggle, 
+  const {
+    visibleItems,
+    selectedFilePath,
+    onFileSelect,
+    handleDragStart,
+    handleDirectoryToggle,
     expandedDirectories,
-    handleFocusedItem 
+    handleFocusedItem,
   } = data
 
   const fileObject = visibleItems[index]
@@ -54,8 +53,9 @@ interface FileExplorerProps {
   handleFocusedItem: (
     event: React.MouseEvent<HTMLDivElement>,
     focusedItem: ContextMenuLocations,
-    additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>
-  ) => void;}
+    additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>,
+  ) => void
+}
 
 const FileExplorer: React.FC<FileExplorerProps> = ({
   files,
@@ -105,7 +105,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({
   const itemCount = visibleItems.length
 
   return (
-    <div onContextMenu={(e) => handleFocusedItem(e, 'FileSidebar')} className="h-full grow px-1 pt-2 opacity-70 bg-orange">
+    <div onContextMenu={(e) => handleFocusedItem(e, 'FileSidebar')} className="h-full grow px-1 pt-2 opacity-70">
       <List
         height={listHeight}
         itemCount={itemCount}
@@ -142,8 +142,8 @@ interface FileListProps {
   handleFocusedItem: (
     event: React.MouseEvent<HTMLDivElement>,
     focusedItem: ContextMenuLocations,
-    additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>
-  ) => void;
+    additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>,
+  ) => void
 }
 
 export const FileSidebar: React.FC<FileListProps> = ({
