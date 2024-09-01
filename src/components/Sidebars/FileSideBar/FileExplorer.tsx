@@ -12,13 +12,12 @@ interface FileExplorerProps {
 }
 
 const FileExplorer: React.FC<FileExplorerProps> = ({ lheight }) => {
-  const [listHeight, setListHeight] = useState(lheight ?? window.innerHeight)
-
+  const [listHeight, setListHeight] = useState(lheight ?? window.innerHeight - 50)
   const { files, expandedDirectories } = useFileContext()
 
   useEffect(() => {
     const updateHeight = () => {
-      setListHeight(lheight ?? window.innerHeight)
+      setListHeight(lheight ?? window.innerHeight - 50)
     }
     window.addEventListener('resize', updateHeight)
     return () => {

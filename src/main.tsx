@@ -15,13 +15,17 @@ Sentry.init({
 window.addEventListener('error', (event) => {
   event.preventDefault()
   toast.error(errorToStringRendererProcess(event.error))
-  Sentry.captureException(event.error)
+  if (process.env.NODE_ENV === 'production') {
+    Sentry.captureException(event.error)
+  }
 })
 
 window.addEventListener('unhandledrejection', (event) => {
   event.preventDefault()
   toast.error(errorToStringRendererProcess(event.reason))
-  Sentry.captureException(event.reason)
+  if (process.env.NODE_ENV === 'production') {
+    Sentry.captureException(event.reason)
+  }
 })
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(<App />)
