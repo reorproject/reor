@@ -77,8 +77,6 @@ const electronStore = {
   getChatHistory: createIPCHandler<(chatID: string) => Promise<Chat>>('get-chat-history'),
   getSBCompact: createIPCHandler<() => Promise<boolean>>('get-sb-compact'),
   setSBCompact: createIPCHandler<(isSBCompact: boolean) => Promise<void>>('set-sb-compact'),
-  getDisplayMarkdown: createIPCHandler<() => Promise<boolean>>('get-display-markdown'),
-  setDisplayMarkdown: createIPCHandler<(displayMarkdown: boolean) => Promise<void>>('set-display-markdown'),
   getEditorFlexCenter: createIPCHandler<() => Promise<boolean>>('get-editor-flex-center'),
   setEditorFlexCenter: createIPCHandler<(editorFlexCenter: boolean) => Promise<void>>('set-editor-flex-center'),
   getCurrentOpenTabs: createIPCHandler<() => Promise<Tab[]>>('get-current-open-files'),
@@ -110,6 +108,7 @@ const fileSystem = {
   getFilesystemPathsAsDBItems: createIPCHandler<(paths: string[]) => Promise<DBEntry[]>>(
     'get-filesystem-paths-as-db-items',
   ),
+  getAllFilenamesInDirectory: createIPCHandler<(dirName: string) => Promise<string[]>>('get-files-in-directory'),
 }
 
 const path = {
@@ -122,7 +121,6 @@ const path = {
     'add-extension-if-no-extension-present',
   ),
   pathSep: createIPCHandler<() => Promise<string>>('path-sep'),
-  getAllFilenamesInDirectory: createIPCHandler<(dirName: string) => Promise<string[]>>('get-files-in-directory'),
 }
 
 const llm = {

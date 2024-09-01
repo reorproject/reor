@@ -8,7 +8,6 @@ import 'react-toastify/dist/ReactToastify.css'
 import IndexingProgress from './components/Common/IndexingProgress'
 import MainPageComponent from './components/MainPage'
 import InitialSetupSinglePage from './components/Settings/InitialSettingsSinglePage'
-import { ModalProvider } from './providers/ModalProvider'
 
 interface AppProps {}
 
@@ -83,11 +82,7 @@ const App: React.FC<AppProps> = () => {
       {userHasConfiguredSettingsForIndexing && indexingProgress < 1 && (
         <IndexingProgress indexingProgress={indexingProgress} />
       )}
-      {userHasConfiguredSettingsForIndexing && indexingProgress >= 1 && (
-        <ModalProvider>
-          <MainPageComponent />
-        </ModalProvider>
-      )}
+      {userHasConfiguredSettingsForIndexing && indexingProgress >= 1 && <MainPageComponent />}
     </div>
   )
 }

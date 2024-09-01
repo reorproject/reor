@@ -28,9 +28,10 @@ import 'katex/dist/katex.min.css'
 import '../../../styles/tiptap.scss'
 import welcomeNote from '../utils'
 import SearchAndReplace from '@/components/Editor/Search/SearchAndReplaceExtension'
+import getMarkdown from '@/components/Editor/utils'
 
 const useFileByFilepath = () => {
-  const [currentlyOpenedFilePath, setCurrentlyOpenedFilePath] = useState<string | null>(null)
+  const [currentlyOpenFilePath, setCurrentlyOpenFilePath] = useState<string | null>(null)
   const [suggestionsState, setSuggestionsState] = useState<SuggestionsState | null>()
   const [needToWriteEditorContentToDisk, setNeedToWriteEditorContentToDisk] = useState<boolean>(false)
   const [needToIndexEditorContent, setNeedToIndexEditorContent] = useState<boolean>(false)
@@ -52,8 +53,6 @@ const useFileByFilepath = () => {
     text: '',
     position: null,
   })
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [displayMarkdown, setDisplayMarkdown] = useState<boolean>(false)
 
   const setFileNodeToBeRenamed = async (filePath: string) => {
     const isDirectory = await window.fileSystem.isDirectory(filePath)
@@ -71,7 +70,6 @@ const useFileByFilepath = () => {
     3. when the file is deleted
    */
 
-  // This function handles the creation of a file if it doesn't exist
   const createFileIfNotExists = async (filePath: string, optionalContent?: string): Promise<string> => {
     const invalidChars = await getInvalidCharacterInFilePath(filePath)
     if (invalidChars) {
@@ -96,14 +94,14 @@ const useFileByFilepath = () => {
 
   const loadFileIntoEditor = async (filePath: string) => {
     setCurrentlyChangingFilePath(true)
-    await writeEditorContentToDisk(editor, currentlyOpenedFilePath)
-    if (currentlyOpenedFilePath && needToIndexEditorContent) {
-      window.fileSystem.indexFileInDatabase(currentlyOpenedFilePath)
+    await writeEditorContentToDisk(editor, currentlyOpenFilePath)
+    if (currentlyOpenFilePath && needToIndexEditorContent) {
+      window.fileSystem.indexFileInDatabase(currentlyOpenFilePath)
       setNeedToIndexEditorContent(false)
     }
     const fileContent = (await window.fileSystem.readFile(filePath)) ?? ''
     editor?.commands.setContent(fileContent)
-    setCurrentlyOpenedFilePath(filePath)
+    setCurrentlyOpenFilePath(filePath)
     setCurrentlyChangingFilePath(false)
   }
 
@@ -115,22 +113,6 @@ const useFileByFilepath = () => {
 
   const openRelativePathRef = useRef<(newFilePath: string) => Promise<void>>()
   // openRelativePathRef.current = openOrCreateFile
-
-  // Check if we should display markdown or not
-  useEffect(() => {
-    const handleInitialStartup = async () => {
-      const isMarkdownSet = await window.electronStore.getDisplayMarkdown()
-      setDisplayMarkdown(isMarkdownSet)
-    }
-
-    // Even listener
-    const handleChangeMarkdown = (isMarkdownSet: boolean) => {
-      setDisplayMarkdown(isMarkdownSet)
-    }
-
-    handleInitialStartup()
-    window.ipcRenderer.receive('display-markdown-changed', handleChangeMarkdown)
-  }, [])
 
   const editor = useEditor({
     autofocus: true,
@@ -198,12 +180,12 @@ const useFileByFilepath = () => {
 
   useEffect(() => {
     if (debouncedEditor && !currentlyChangingFilePath) {
-      writeEditorContentToDisk(editor, currentlyOpenedFilePath)
+      writeEditorContentToDisk(editor, currentlyOpenFilePath)
     }
-  }, [debouncedEditor, currentlyOpenedFilePath, editor, currentlyChangingFilePath])
+  }, [debouncedEditor, currentlyOpenFilePath, editor, currentlyChangingFilePath])
 
   const saveCurrentlyOpenedFile = async () => {
-    await writeEditorContentToDisk(editor, currentlyOpenedFilePath)
+    await writeEditorContentToDisk(editor, currentlyOpenFilePath)
   }
 
   const writeEditorContentToDisk = async (_editor: Editor | null, filePath: string | null) => {
@@ -220,15 +202,13 @@ const useFileByFilepath = () => {
     }
   }
 
-  // delete file depending on file path returned by the listener
   useEffect(() => {
     const deleteFile = async (path: string) => {
       await window.fileSystem.deleteFile(path)
       window.electronStore.removeOpenTabsByPath(path)
-      // if it is the current file, clear the content and set filepath to null so that it won't save anything else
-      if (currentlyOpenedFilePath === path) {
+      if (currentlyOpenFilePath === path) {
         editor?.commands.setContent('')
-        setCurrentlyOpenedFilePath(null)
+        setCurrentlyOpenFilePath(null)
       }
     }
 
@@ -237,11 +217,11 @@ const useFileByFilepath = () => {
     return () => {
       removeDeleteFileListener()
     }
-  }, [currentlyOpenedFilePath, editor])
+  }, [currentlyOpenFilePath, editor])
 
   useEffect(() => {
     async function checkAppUsage() {
-      if (!editor || currentlyOpenedFilePath) return
+      if (!editor || currentlyOpenFilePath) return
       const hasOpened = await window.electronStore.getHasUserOpenedAppBefore()
 
       if (!hasOpened) {
@@ -251,7 +231,7 @@ const useFileByFilepath = () => {
     }
 
     checkAppUsage()
-  }, [editor, currentlyOpenedFilePath])
+  }, [editor, currentlyOpenFilePath])
 
   const renameFileNode = async (oldFilePath: string, newFilePath: string) => {
     await window.fileSystem.renameFileRecursive({
@@ -264,8 +244,8 @@ const useFileByFilepath = () => {
     setNavigationHistory(navigationHistoryUpdated)
 
     // reset the editor to the new file path
-    if (currentlyOpenedFilePath === oldFilePath) {
-      setCurrentlyOpenedFilePath(newFilePath)
+    if (currentlyOpenFilePath === oldFilePath) {
+      setCurrentlyOpenFilePath(newFilePath)
     }
   }
 
@@ -282,13 +262,13 @@ const useFileByFilepath = () => {
 
   useEffect(() => {
     const handleWindowClose = async () => {
-      if (currentlyOpenedFilePath !== null && editor && editor.getHTML() !== null) {
+      if (currentlyOpenFilePath !== null && editor && editor.getHTML() !== null) {
         const markdown = getMarkdown(editor)
         await window.fileSystem.writeFile({
-          filePath: currentlyOpenedFilePath,
+          filePath: currentlyOpenFilePath,
           content: markdown,
         })
-        await window.fileSystem.indexFileInDatabase(currentlyOpenedFilePath)
+        await window.fileSystem.indexFileInDatabase(currentlyOpenFilePath)
       }
     }
 
@@ -297,11 +277,11 @@ const useFileByFilepath = () => {
     return () => {
       removeWindowCloseListener()
     }
-  }, [currentlyOpenedFilePath, editor])
+  }, [currentlyOpenFilePath, editor])
 
   return {
-    filePath: currentlyOpenedFilePath,
-    setFilePath: setCurrentlyOpenedFilePath,
+    currentlyOpenFilePath,
+    setCurrentlyOpenFilePath,
     saveCurrentlyOpenedFile,
     editor,
     navigationHistory,
@@ -318,17 +298,6 @@ const useFileByFilepath = () => {
     setSuggestionsState,
     setSpellCheckEnabled,
   }
-}
-
-function getMarkdown(editor: Editor) {
-  // Fetch the current markdown content from the editor
-  const originalMarkdown = editor.storage.markdown.getMarkdown()
-  // Replace the escaped square brackets with unescaped ones
-  const modifiedMarkdown = originalMarkdown
-    .replace(/\\\[/g, '[') // Replaces \[ with [
-    .replace(/\\\]/g, ']') // Replaces \] wi ]
-
-  return modifiedMarkdown
 }
 
 export default useFileByFilepath

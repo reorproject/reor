@@ -1,10 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import InEditorBacklinkSuggestionsDisplay, { SuggestionsState } from '../Editor/BacklinkSuggestionsDisplay'
-import useFileInfoTree from '../Sidebars/FileSideBar/hooks/use-file-info-tree'
+import useFileInfoTreeHook from '../Sidebars/FileSideBar/hooks/use-file-info-tree'
 
 interface Props {
-  vaultDirectory: string
   searchText: string
   setSearchText: (text: string) => void
   onSelectSuggestion: (suggestion: string) => void
@@ -13,14 +12,16 @@ interface Props {
 }
 
 const SearchBarWithFilesSuggestion = ({
-  vaultDirectory,
   searchText,
   setSearchText,
   onSelectSuggestion,
   suggestionsState,
   setSuggestionsState,
 }: Props) => {
-  const { flattenedFiles } = useFileInfoTree(vaultDirectory)
+  const [sidebarWidth, setSidebarWidth] = useState(0)
+  const [vaultDirectory, setVaultDirectory] = useState<string | null>(null)
+
+  const { flattenedFiles } = useFileInfoTreeHook(vaultDirectory)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const initializeSuggestionsStateOnFocus = () => {
@@ -39,7 +40,13 @@ const SearchBarWithFilesSuggestion = ({
     })
   }
 
-  const [sidebarWidth, setSidebarWidth] = useState(0)
+  useEffect(() => {
+    const setFileDirectory = async () => {
+      const windowDirectory = await window.electronStore.getVaultDirectoryForWindow()
+      setVaultDirectory(windowDirectory)
+    }
+    setFileDirectory()
+  }, [])
 
   useEffect(() => {
     // Calculate the width of the sidebar
