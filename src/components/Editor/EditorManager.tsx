@@ -5,12 +5,7 @@ import EditorContextMenu from './EditorContextMenu'
 import SearchBar from './Search/SearchBar'
 import { useFileContext } from '@/contexts/FileContext'
 
-interface EditorManagerProps {
-  // flattenedFiles: { relativePath: string }[]
-  showSimilarFiles: boolean
-}
-
-const EditorManager: React.FC<EditorManagerProps> = ({ showSimilarFiles }) => {
+const EditorManager: React.FC = () => {
   const [showSearchBar, setShowSearchBar] = useState(false)
   const [menuVisible, setMenuVisible] = useState(false)
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
@@ -19,8 +14,6 @@ const EditorManager: React.FC<EditorManagerProps> = ({ showSimilarFiles }) => {
   const [placeholderPosition, setPlaceholderPosition] = useState({ top: 0, left: 0 })
 
   const { editor, suggestionsState, flattenedFiles } = useFileContext()
-
-  useEffect(() => {}, [showSimilarFiles])
 
   const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault()

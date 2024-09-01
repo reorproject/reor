@@ -46,7 +46,7 @@ const MainPageContent: React.FC = () => {
         {!showChatbot && currentlyOpenFilePath ? (
           <div className="relative flex size-full overflow-hidden">
             <div className="h-full grow overflow-hidden">
-              <EditorManager showSimilarFiles={showSimilarFiles} />
+              <EditorManager />
             </div>
             <WritingAssistant />
             {showSimilarFiles && (
