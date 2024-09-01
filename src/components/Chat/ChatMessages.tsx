@@ -50,6 +50,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
               currentChatHistory.messages
                 .filter((msg) => msg.role !== 'system')
                 .map((message, index) => (
+                  // eslint-disable-next-line react/no-array-index-key
                   <div key={index} className={`w-full ${getClassNameBasedOnMessageRole(message)} mb-4 flex`}>
                     <div className="relative items-start pl-4 pt-3">
                       {message.role === 'user' ? (
