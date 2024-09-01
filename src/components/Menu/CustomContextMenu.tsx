@@ -79,15 +79,28 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
     }
 
     document.addEventListener('mousedown', handleOutsideClick)
+
+    const menuElement = menuRef.current;
+    if (menuElement) {
+      const { height } = menuElement.getBoundingClientRect();
+      if (locations.y + height > window.innerHeight) {
+        menuElement.style.top = `${window.innerHeight - height - 10}px`;
+      }
+    }
+
     return () => {
       document.removeEventListener('mousedown', handleOutsideClick)
     }
-  }, [hideFocusedItem])
+  }, [hideFocusedItem, locations.y])
 
   const handleMakeFlashcard = (noteName: string | null) => {
     if (!noteName) return
     setIsFlashcardModeOpen(!!noteName)
     setInitialFileToCreateFlashcard(noteName)
+  }
+
+  const handleRenameFile = (name: string | undefined) => {
+    if (name) setFileNodeToBeRenamed(name)
   }
 
   let displayList: MenuItemType[] = []
@@ -127,13 +140,7 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
         { title: 'New Directory', onSelect: () => setIsNewDirectoryModalOpen(true), icon: '' },
         { title: 'New Note', onSelect: () => setIsNewNoteModalOpen(true), icon: '' },
         { title: 'Delete', onSelect: () => handleDeleteFile(file?.path), icon: '' },
-        {
-          title: 'Rename',
-          onSelect: () => {
-            if (file?.path) setFileNodeToBeRenamed(file?.path)
-          },
-          icon: '',
-        },
+        { title: 'Rename', onSelect: () => handleRenameFile(file?.path), icon: '' },
         { title: 'Create flashcard set', onSelect: () => handleMakeFlashcard(file ? file.path : null), icon: '' },
         {
           title: 'Add file to chat context',
