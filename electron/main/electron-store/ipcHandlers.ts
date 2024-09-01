@@ -131,7 +131,7 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     store.set(StoreKeys.hasUserOpenedAppBefore, true)
   })
 
-  ipcMain.handle('get-all-chat-histories', (event) => {
+  ipcMain.handle('get-all-chats', (event) => {
     const vaultDir = windowsManager.getVaultDirectoryForWinContents(event.sender)
 
     if (!vaultDir) {
@@ -143,7 +143,7 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     return chatHistoriesCorrespondingToVault
   })
 
-  ipcMain.handle('update-chat-history', (event, newChat: Chat) => {
+  ipcMain.handle('update-chat', (event, newChat: Chat) => {
     const vaultDir = windowsManager.getVaultDirectoryForWinContents(event.sender)
     const allChatHistories = store.get(StoreKeys.ChatHistories)
     if (!vaultDir) {
@@ -166,7 +166,7 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     event.sender.send('update-chat-histories', chatHistoriesCorrespondingToVault)
   })
 
-  ipcMain.handle('get-chat-history', (event, chatId: string) => {
+  ipcMain.handle('get-chat', (event, chatId: string) => {
     const vaultDir = windowsManager.getVaultDirectoryForWinContents(event.sender)
     if (!vaultDir) {
       return null
@@ -176,7 +176,7 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     return vaultChatHistories.find((chat) => chat.id === chatId)
   })
 
-  ipcMain.handle('remove-chat-history-at-id', (event, chatID: string) => {
+  ipcMain.handle('remove-chat-at-id', (event, chatID: string) => {
     const vaultDir = windowsManager.getVaultDirectoryForWinContents(event.sender)
 
     if (!vaultDir) {

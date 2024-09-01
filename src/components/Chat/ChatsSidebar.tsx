@@ -3,20 +3,20 @@ import React, { useEffect, useRef, useState } from 'react'
 import { RiChatNewFill, RiArrowDownSLine } from 'react-icons/ri'
 import { IoChatbubbles } from 'react-icons/io5'
 import posthog from 'posthog-js'
-import { ChatHistoryMetadata } from './hooks/use-chat-history'
-import { useChatContext } from '@/contexts/ChatContext'
+import { ChatMetadata, useChatContext } from '@/contexts/ChatContext'
+import { useTabsContext } from '@/contexts/TabContext'
 
 export interface ChatItemProps {
-  chatMetadata: ChatHistoryMetadata
+  chatMetadata: ChatMetadata
 }
 
 export const ChatItem: React.FC<ChatItemProps> = ({ chatMetadata }) => {
-  const { setCurrentChatHistory, currentChatHistory } = useChatContext()
-
+  const { currentOpenChat } = useChatContext()
+  const { openTabContent } = useTabsContext()
   const itemClasses = `
     flex items-center cursor-pointer py-2 px-3 rounded-md
     transition-colors duration-150 ease-in-out
-    ${chatMetadata.id === currentChatHistory?.id ? 'bg-neutral-700 text-white' : 'text-gray-300 hover:bg-neutral-800'}
+    ${chatMetadata.id === currentOpenChat?.id ? 'bg-neutral-700 text-white' : 'text-gray-300 hover:bg-neutral-800'}
   `
 
   const handleContextMenu = (e: React.MouseEvent) => {
@@ -28,8 +28,7 @@ export const ChatItem: React.FC<ChatItemProps> = ({ chatMetadata }) => {
     <div>
       <div
         onClick={async () => {
-          const chat = await window.electronStore.getChatHistory(chatMetadata.id)
-          setCurrentChatHistory(chat)
+          openTabContent(chatMetadata.id)
         }}
         className={itemClasses}
         onContextMenu={handleContextMenu}
@@ -45,7 +44,7 @@ export const ChatsSidebar: React.FC = () => {
   const [isRecentsOpen, setIsRecentsOpen] = useState(true)
   const dropdownAnimationDelay = 0.2
 
-  const { setShowChatbot, chatHistoriesMetadata, setCurrentChatHistory } = useChatContext()
+  const { setShowChatbot, allChatsMetadata, setCurrentOpenChat } = useChatContext()
 
   const toggleRecents = () => setIsRecentsOpen((prev) => !prev)
 
@@ -55,13 +54,13 @@ export const ChatsSidebar: React.FC = () => {
       if (chatID === currentSelectedChatID.current) {
         setShowChatbot(false)
       }
-      window.electronStore.removeChatHistoryAtID(chatID)
+      window.electronStore.removeChatAtID(chatID)
     })
 
     return () => {
       deleteChatRow()
     }
-  }, [chatHistoriesMetadata, setShowChatbot])
+  }, [allChatsMetadata, setShowChatbot])
 
   return (
     <div className="flex h-full flex-col overflow-y-auto bg-neutral-800 px-2 pb-4 pt-2.5">
@@ -76,7 +75,8 @@ export const ChatsSidebar: React.FC = () => {
               type="button"
               onClick={() => {
                 posthog.capture('create_new_chat')
-                setCurrentChatHistory(undefined)
+                setShowChatbot(true)
+                setCurrentOpenChat(undefined)
               }}
             >
               <RiChatNewFill className="text-xl" />
@@ -94,7 +94,7 @@ export const ChatsSidebar: React.FC = () => {
             </div>
             {isRecentsOpen && (
               <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
-                {chatHistoriesMetadata
+                {allChatsMetadata
                   .slice()
                   .reverse()
                   .map((chatMetadata, index) => (

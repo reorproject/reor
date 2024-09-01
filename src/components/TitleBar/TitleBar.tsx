@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { PiSidebar, PiSidebarFill } from 'react-icons/pi'
-import DraggableTabs from '../Tabs/TabBar'
-import { ModalProvider } from '../../contexts/ModalContext'
+// import DraggableTabs from '../Tabs/TabBar'
 import FileHistoryNavigator from './NavigationButtons'
 
 export const titleBarHeight = '30px'
@@ -24,12 +23,12 @@ const TitleBar: React.FC<TitleBarProps> = ({ similarFilesOpen, toggleSimilarFile
   }, [])
 
   return (
-    <div id="customTitleBar" className="flex h-titlebar justify-between" style={{ backgroundColor: '#303030' }}>
+    <div id="customTitleBar" className="flex h-titlebar justify-between bg-[#303030]">
       <div className="mt-px flex" style={platform === 'darwin' ? { marginLeft: '65px' } : { marginLeft: '2px' }}>
         <FileHistoryNavigator />
       </div>
 
-      <div className="relative left-10 max-w-[75%] grow overflow-hidden">
+      {/* <div className="relative left-10 max-w-[75%] grow overflow-hidden">
         <div>
           <div className="flex whitespace-nowrap">
             <ModalProvider>
@@ -37,7 +36,7 @@ const TitleBar: React.FC<TitleBarProps> = ({ similarFilesOpen, toggleSimilarFile
             </ModalProvider>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div
         className="mt-[0.5px] flex justify-end"

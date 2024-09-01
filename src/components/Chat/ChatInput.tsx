@@ -15,10 +15,10 @@ const ChatInput: React.FC<ChatInputProps> = ({
   handleSubmitNewMessage,
   loadingResponse,
 }) => (
-  <div className="relative flex h-titlebar w-full items-center justify-center bg-dark-gray-c-eleven p-10">
+  <div className="flex h-titlebar w-full items-center justify-center bg-dark-gray-c-eleven p-10">
     <div className="  relative bottom-5 flex w-full max-w-3xl">
       <div className="w-full rounded-lg border-2 border-solid border-neutral-700 p-3 focus-within:ring-1 focus-within:ring-[#8c8c8c]">
-        <div className="relative flex h-full pr-8">
+        <div className="flex h-full pr-8">
           <textarea
             onKeyDown={(e) => {
               if (userTextFieldInput && !e.shiftKey && e.key === 'Enter') {

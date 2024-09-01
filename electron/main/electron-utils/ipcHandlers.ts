@@ -3,8 +3,8 @@ import Store from 'electron-store'
 
 import WindowsManager from '../common/windowManager'
 import { StoreKeys, StoreSchema } from '../electron-store/storeConfig'
-import { ChatHistoryMetadata } from '@/components/Chat/hooks/use-chat-history'
 import { FileInfoNode } from '../filesystem/types'
+import { ChatMetadata } from '@/contexts/ChatContext'
 
 const registerElectronUtilsHandlers = (
   store: Store<StoreSchema>,
@@ -67,7 +67,7 @@ const registerElectronUtilsHandlers = (
     }
   })
 
-  ipcMain.handle('show-chat-menu-item', (event, chatRow: ChatHistoryMetadata) => {
+  ipcMain.handle('show-chat-menu-item', (event, chatRow: ChatMetadata) => {
     const menu = new Menu()
 
     menu.append(

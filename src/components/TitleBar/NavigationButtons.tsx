@@ -15,19 +15,20 @@ const FileHistoryNavigator: React.FC = () => {
   const buttonRefBack = useRef<HTMLButtonElement>(null)
   const buttonRefForward = useRef<HTMLButtonElement>(null)
 
-  const { currentTab, openTabContent } = useTabsContext()
+  const { openTabContent } = useTabsContext()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { navigationHistory, setNavigationHistory } = useFileContext()
 
-  useEffect(() => {
-    const handleFileSelect = (path: string) => {
-      const updatedHistory = [...navigationHistory.filter((val) => val !== path).slice(0, currentIndex + 1), path]
-      setNavigationHistory(updatedHistory)
-      setCurrentIndex(updatedHistory.length - 1)
-    }
-    if (currentTab && currentTab !== navigationHistory[currentIndex]) {
-      handleFileSelect(currentTab)
-    }
-  }, [currentTab, navigationHistory, currentIndex, setNavigationHistory])
+  // useEffect(() => {
+  //   const handleFileSelect = (path: string) => {
+  //     const updatedHistory = [...navigationHistory.filter((val) => val !== path).slice(0, currentIndex + 1), path]
+  //     setNavigationHistory(updatedHistory)
+  //     setCurrentIndex(updatedHistory.length - 1)
+  //   }
+  //   if (currentTabID && currentTabID !== navigationHistory[currentIndex]) {
+  //     handleFileSelect(currentTabID)
+  //   }
+  // }, [currentTabID, navigationHistory, currentIndex, setNavigationHistory])
 
   const canGoBack = currentIndex > 0
   const canGoForward = currentIndex < navigationHistory.length - 1

@@ -20,7 +20,7 @@ const ChatComponent: React.FC = () => {
   const [defaultModelName, setDefaultLLMName] = useState<string>('')
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
-  const { setCurrentChatHistory, currentChatHistory } = useChatContext()
+  const { setCurrentOpenChat, currentOpenChat } = useChatContext()
 
   useEffect(() => {
     const fetchDefaultLLM = async () => {
@@ -44,15 +44,15 @@ const ChatComponent: React.FC = () => {
   // }, [chatFilters.files, currentChatHistory?.id])
 
   useEffect(() => {
-    if (readyToSave && currentChatHistory) {
-      window.electronStore.updateChatHistory(currentChatHistory)
+    if (readyToSave && currentOpenChat) {
+      window.electronStore.updateChat(currentOpenChat)
       setReadyToSave(false)
     }
-  }, [readyToSave, currentChatHistory])
+  }, [readyToSave, currentOpenChat])
 
   const appendNewContentToMessageHistory = useCallback(
     (chatID: string, newContent: string) => {
-      setCurrentChatHistory((prev) => {
+      setCurrentOpenChat((prev) => {
         if (chatID !== prev?.id) return prev
         const newDisplayableHistory = prev?.messages || []
         if (newDisplayableHistory.length > 0) {
@@ -79,64 +79,63 @@ const ChatComponent: React.FC = () => {
         }
       })
     },
-    [setCurrentChatHistory],
+    [setCurrentOpenChat],
   )
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const handleSubmitNewMessage = async (
-    currentChat: Chat | undefined,
-    userTextFieldInput: string | undefined,
-    chatFilters?: ChatFilters,
-  ) => {
-    posthog.capture('chat_message_submitted', {
-      chatId: currentChat?.id,
-      chatLength: currentChat?.messages.length,
-      chatFilters: anonymizeChatFiltersForPosthog(chatFilters),
-    })
-    let outputChat = currentChat
-
-    if (loadingResponse || !userTextFieldInput?.trim()) return
-
-    setLoadingResponse(true)
-    setLoadAnimation(true)
-
-    const defaultLLMName = await window.llm.getDefaultLLMName()
-    if (!outputChat || !outputChat.id) {
-      outputChat = {
-        id: Date.now().toString(),
-        messages: [],
-      }
-    }
-    if (outputChat.messages.length === 0 && chatFilters) {
-      outputChat.messages.push(await resolveRAGContext(userTextFieldInput ?? '', chatFilters))
-    } else {
-      outputChat.messages.push({
-        role: 'user',
-        content: userTextFieldInput,
-        context: [],
+  const handleSubmitNewMessage = useCallback(
+    async (currentChat: Chat | undefined, userTextFieldInput: string | undefined, chatFilters?: ChatFilters) => {
+      posthog.capture('chat_message_submitted', {
+        chatId: currentChat?.id,
+        chatLength: currentChat?.messages.length,
+        chatFilters: anonymizeChatFiltersForPosthog(chatFilters),
       })
-    }
-    // setUserTextFieldInput('')
+      let outputChat = currentChat
 
-    setCurrentChatHistory(outputChat)
+      if (loadingResponse || !userTextFieldInput?.trim()) return
 
-    if (!outputChat) return
+      setLoadingResponse(true)
+      setLoadAnimation(true)
 
-    await window.electronStore.updateChatHistory(outputChat)
+      const defaultLLMName = await window.llm.getDefaultLLMName()
+      if (!outputChat || !outputChat.id) {
+        outputChat = {
+          id: Date.now().toString(),
+          messages: [],
+        }
+      }
+      if (outputChat.messages.length === 0 && chatFilters) {
+        outputChat.messages.push(await resolveRAGContext(userTextFieldInput ?? '', chatFilters))
+      } else {
+        outputChat.messages.push({
+          role: 'user',
+          content: userTextFieldInput,
+          context: [],
+        })
+      }
+      // setUserTextFieldInput('')
 
-    const client = await resolveLLMClient(defaultLLMName)
-    const { textStream } = await streamText({
-      model: client,
-      messages: outputChat.messages,
-    })
+      setCurrentOpenChat(outputChat)
 
-    // eslint-disable-next-line no-restricted-syntax
-    for await (const textPart of textStream) {
-      appendNewContentToMessageHistory(outputChat.id, textPart)
-    }
-    setLoadingResponse(false)
-    setReadyToSave(true)
-  }
+      if (!outputChat) return
+
+      await window.electronStore.updateChat(outputChat)
+
+      const client = await resolveLLMClient(defaultLLMName)
+      const { textStream } = await streamText({
+        model: client,
+        messages: outputChat.messages,
+      })
+
+      // eslint-disable-next-line no-restricted-syntax
+      for await (const textPart of textStream) {
+        setLoadAnimation(false)
+        appendNewContentToMessageHistory(outputChat.id, textPart)
+      }
+      setLoadingResponse(false)
+      setReadyToSave(true)
+    },
+    [loadingResponse, setCurrentOpenChat, appendNewContentToMessageHistory],
+  )
 
   // useEffect(() => {
   //   // Update context when the chat history changes
@@ -168,17 +167,17 @@ const ChatComponent: React.FC = () => {
 
   const handleNewChatMessage = useCallback(
     (userTextFieldInput: string | undefined, chatFilters?: ChatFilters) => {
-      handleSubmitNewMessage(currentChatHistory, userTextFieldInput, chatFilters)
+      handleSubmitNewMessage(currentOpenChat, userTextFieldInput, chatFilters)
     },
-    [currentChatHistory, handleSubmitNewMessage],
+    [currentOpenChat, handleSubmitNewMessage],
   )
 
   return (
     <div className="flex size-full items-center justify-center">
       <div className="mx-auto flex size-full flex-col overflow-hidden border-y-0 border-l-[0.001px] border-r-0 border-solid border-neutral-700 bg-dark-gray-c-eleven">
-        {currentChatHistory && currentChatHistory.messages && currentChatHistory.messages.length > 0 ? (
+        {currentOpenChat && currentOpenChat.messages && currentOpenChat.messages.length > 0 ? (
           <ChatMessages
-            currentChatHistory={currentChatHistory}
+            currentChatHistory={currentOpenChat}
             chatContainerRef={chatContainerRef}
             loadAnimation={loadAnimation}
             handleNewChatMessage={handleNewChatMessage}

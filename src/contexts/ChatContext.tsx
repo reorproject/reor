@@ -1,24 +1,24 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react'
-import { ChatHistoryMetadata, useChatHistory } from '@/components/Chat/hooks/use-chat-history'
 import { Chat } from '@/components/Chat/types'
 import { SidebarAbleToShow } from '@/components/Sidebars/MainSidebar'
+import { getDisplayableChatName } from '@/components/Chat/utils'
 
 export const UNINITIALIZED_STATE = 'UNINITIALIZED_STATE'
+export interface ChatMetadata {
+  id: string
+  displayName: string
+}
 
 interface ChatContextType {
-  // openTabContent: (path: string, optionalContentToWriteOnCreate?: string) => void
-  // currentTab: string
   sidebarShowing: SidebarAbleToShow
   setSidebarShowing: (option: SidebarAbleToShow) => void
   getChatIdFromPath: (path: string) => string
   showChatbot: boolean
   setShowChatbot: (show: boolean) => void
-  currentChatHistory: Chat | undefined
-  setCurrentChatHistory: React.Dispatch<React.SetStateAction<Chat | undefined>>
-  chatHistoriesMetadata: ChatHistoryMetadata[]
-  // chatFilters: ChatFilters
-  // setChatFilters: React.Dispatch<React.SetStateAction<ChatFilters>>
-  openChatSidebarAndChat: (chatHistory: Chat | undefined) => void
+  currentOpenChat: Chat | undefined
+  setCurrentOpenChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
+  allChatsMetadata: ChatMetadata[]
+  openChatSidebarAndChat: (chat: Chat | undefined) => void
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined)
@@ -34,27 +34,77 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // })
   const [sidebarShowing, setSidebarShowing] = useState<SidebarAbleToShow>('files')
 
-  const { currentChatHistory, setCurrentChatHistory, chatHistoriesMetadata } = useChatHistory()
+  // const {
+  //   currentOpenChat: currentChatHistory,
+  //   setCurrentOpenChat: setCurrentChatHistory,
+  //   allChatsMetadata: chatHistoriesMetadata,
+  // } = useChatHistory()
+
+  const [currentOpenChat, setCurrentOpenChat] = useState<Chat>()
+  const [allChatsMetadata, setAllChatsMetadata] = useState<ChatMetadata[]>([])
+
+  const fetchChatHistories = async () => {
+    let allChats = await window.electronStore.getAllChats()
+    if (!allChats) {
+      allChats = []
+    }
+    setAllChatsMetadata(
+      allChats.map((chat) => ({
+        id: chat.id,
+        displayName: getDisplayableChatName(chat),
+      })),
+    )
+
+    setCurrentOpenChat(undefined)
+  }
+
+  useEffect(() => {
+    const updateChatHistoriesMetadata = window.ipcRenderer.receive(
+      'update-chat-histories',
+      (retrievedChatHistoriesMetadata: Chat[]) => {
+        setAllChatsMetadata(
+          retrievedChatHistoriesMetadata.map((chat: Chat) => ({
+            id: chat.id,
+            displayName: getDisplayableChatName(chat),
+          })),
+        )
+      },
+    )
+
+    return () => {
+      updateChatHistoriesMetadata()
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchChatHistories()
+  }, [])
+
+  // return {
+  //   currentOpenChat,
+  //   setCurrentOpenChat,
+  //   allChatsMetadata,
+  // }
 
   // const filePathRef = React.useRef<string>('')
   // const chatIDRef = React.useRef<string>('')
 
   const openChatSidebarAndChat = useCallback(
-    (chatHistory: Chat | undefined) => {
+    (chat: Chat | undefined) => {
       setShowChatbot(true)
-      setCurrentChatHistory(chatHistory)
+      setCurrentOpenChat(chat)
     },
-    [setCurrentChatHistory],
+    [setCurrentOpenChat],
   )
 
   const getChatIdFromPath = useCallback(
     (path: string) => {
-      if (chatHistoriesMetadata.length === 0) return UNINITIALIZED_STATE
-      const metadata = chatHistoriesMetadata.find((chat) => chat.displayName === path)
+      if (allChatsMetadata.length === 0) return UNINITIALIZED_STATE
+      const metadata = allChatsMetadata.find((chat) => chat.displayName === path)
       if (metadata) return metadata.id
       return ''
     },
-    [chatHistoriesMetadata],
+    [allChatsMetadata],
   )
 
   // useEffect(() => {
@@ -95,33 +145,25 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const value = React.useMemo(
     () => ({
-      // openTabContent,
-      // currentTab,
+      currentOpenChat,
+      setCurrentOpenChat,
+      allChatsMetadata,
       sidebarShowing,
       setSidebarShowing,
       getChatIdFromPath,
       showChatbot,
       setShowChatbot,
-      currentChatHistory,
-      setCurrentChatHistory,
-      chatHistoriesMetadata,
-      // chatFilters,
-      // setChatFilters,
       openChatSidebarAndChat,
     }),
     [
-      // openTabContent,
-      // currentTab,
+      allChatsMetadata,
       sidebarShowing,
       setSidebarShowing,
       getChatIdFromPath,
       showChatbot,
       setShowChatbot,
-      currentChatHistory,
-      setCurrentChatHistory,
-      chatHistoriesMetadata,
-      // chatFilters,
-      // setChatFilters,
+      currentOpenChat,
+      setCurrentOpenChat,
       openChatSidebarAndChat,
     ],
   )
