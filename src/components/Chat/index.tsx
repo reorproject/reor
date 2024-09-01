@@ -27,7 +27,6 @@ const ChatComponent: React.FC = () => {
       const defaultName = await window.llm.getDefaultLLMName()
       setDefaultLLMName(defaultName)
     }
-
     fetchDefaultLLM()
   }, [])
 
@@ -89,8 +88,6 @@ const ChatComponent: React.FC = () => {
     userTextFieldInput: string | undefined,
     chatFilters?: ChatFilters,
   ) => {
-    console.log('calling new chat with', userTextFieldInput)
-    console.log('curent chat: ', currentChat)
     posthog.capture('chat_message_submitted', {
       chatId: currentChat?.id,
       chatLength: currentChat?.messages.length,
@@ -128,7 +125,6 @@ const ChatComponent: React.FC = () => {
     await window.electronStore.updateChatHistory(outputChat)
 
     const client = await resolveLLMClient(defaultLLMName)
-    console.log('outputchat is: ', outputChat)
     const { textStream } = await streamText({
       model: client,
       messages: outputChat.messages,
@@ -184,32 +180,13 @@ const ChatComponent: React.FC = () => {
           <ChatMessages
             currentChatHistory={currentChatHistory}
             chatContainerRef={chatContainerRef}
-            // userTextFieldInput={userTextFieldInput}
-            // setUserTextFieldInput={setUserTextFieldInput}
             loadAnimation={loadAnimation}
             handleNewChatMessage={handleNewChatMessage}
             loadingResponse={loadingResponse}
           />
         ) : (
-          <StartConversation
-            // chatFilters={chatFilters}
-            // setChatFilters={setChatFilters}
-            // setUserTextFieldInput={setUserTextFieldInput}
-            defaultModelName={defaultModelName}
-            // isAddContextFiltersModalOpen={isAddContextFiltersModalOpen}
-            // setIsAddContextFiltersModalOpen={setIsAddContextFiltersModalOpen}
-            handleNewChatMessage={handleNewChatMessage}
-          />
+          <StartConversation defaultModelName={defaultModelName} handleNewChatMessage={handleNewChatMessage} />
         )}
-
-        {/* {currentChatHistory && (
-          <ChatInput
-            userTextFieldInput={userTextFieldInput}
-            setUserTextFieldInput={setUserTextFieldInput}
-            handleSubmitNewMessage={() => handleSubmitNewMessage(currentChatHistory)}
-            loadingResponse={loadingResponse}
-          />
-        )} */}
       </div>
       {/* {showSimilarFiles && (
         <SimilarEntriesComponent

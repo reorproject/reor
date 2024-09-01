@@ -9,12 +9,11 @@ import '../../styles/chat.css'
 import { Chat, ChatFilters, ReorChatMessage } from './types'
 import { useTabsContext } from '@/contexts/TabContext'
 import ChatInput from './ChatInput'
+import { getClassNameBasedOnMessageRole, getDisplayMessage } from './utils'
 
 interface ChatMessagesProps {
   currentChatHistory: Chat | undefined
   chatContainerRef: MutableRefObject<HTMLDivElement | null>
-  // userTextFieldInput: string | undefined
-  // setUserTextFieldInput: Dispatch<SetStateAction<string | undefined>>
   loadAnimation: boolean
   handleNewChatMessage: (userTextFieldInput: string | undefined, chatFilters?: ChatFilters) => void
   loadingResponse: boolean
@@ -23,30 +22,19 @@ interface ChatMessagesProps {
 const ChatMessages: React.FC<ChatMessagesProps> = ({
   currentChatHistory,
   chatContainerRef,
-  // userTextFieldInput,
-  // setUserTextFieldInput,
   handleNewChatMessage,
   loadAnimation,
   loadingResponse,
 }) => {
-  // const { currentChatHistory } = useChatContext()
   const { openTabContent } = useTabsContext()
   const [userTextFieldInput, setUserTextFieldInput] = useState<string | undefined>()
-
-  const getClassName = (message: ReorChatMessage): string => {
-    return `markdown-content ${message.role}-chat-message`
-  }
-
-  const getDisplayMessage = (message: ReorChatMessage): string | undefined => {
-    return message.visibleContent || typeof message.content !== 'string' ? message.visibleContent : message.content
-  }
 
   const copyToClipboard = (message: ReorChatMessage) => {
     navigator.clipboard.writeText(getDisplayMessage(message) ?? '')
     toast.success('Copied to clipboard!')
   }
 
-  const createNewNote = async (message: ReorChatMessage) => {
+  const createNewNoteFromMessage = async (message: ReorChatMessage) => {
     const title = `${(getDisplayMessage(message) ?? `${new Date().toDateString()}`).substring(0, 20)}...`
     openTabContent(title, getDisplayMessage(message))
   }
@@ -65,7 +53,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
               .filter((msg) => msg.role !== 'system')
               .map((message, index) => (
                 // eslint-disable-next-line react/no-array-index-key
-                <div key={index} className={`w-full ${getClassName(message)} flex`}>
+                <div key={index} className={`w-full ${getClassNameBasedOnMessageRole(message)} flex`}>
                   <div className="relative items-start pl-4 pt-3">
                     {message.role === 'user' ? (
                       <FaRegUserCircle size={22} />
@@ -88,7 +76,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
                           </div>
                           <div
                             className="cursor-pointer items-center justify-center rounded p-1 hover:bg-neutral-700"
-                            onClick={() => createNewNote(message)}
+                            onClick={() => createNewNoteFromMessage(message)}
                           >
                             <HiOutlinePencilAlt color="gray" size={18} className="text-gray-200" title="New Note" />
                           </div>
@@ -117,15 +105,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
             loadingResponse={loadingResponse}
           />
         )}
-
-        {/* {isAddContextFiltersModalOpen && (
-          <AddContextFiltersModal
-            isOpen={isAddContextFiltersModalOpen}
-            onClose={() => setIsAddContextFiltersModalOpen(false)}
-            chatFilters={chatFilters}
-            setChatFilters={setChatFilters}
-          />
-        )} */}
       </div>
     </div>
   )

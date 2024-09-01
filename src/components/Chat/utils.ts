@@ -209,3 +209,11 @@ export const resolveLLMClient = async (llmName: string) => {
   }
   throw new Error(`API interface ${apiConfig.apiInterface} not supported.`)
 }
+
+export const getClassNameBasedOnMessageRole = (message: ReorChatMessage): string => {
+  return `markdown-content ${message.role}-chat-message`
+}
+
+export const getDisplayMessage = (message: ReorChatMessage): string | undefined => {
+  return message.visibleContent || typeof message.content !== 'string' ? message.visibleContent : message.content
+}
