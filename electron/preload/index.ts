@@ -40,8 +40,6 @@ const electronUtils = {
   getPlatform: createIPCHandler<() => Promise<string>>('get-platform'),
   openNewWindow: createIPCHandler<() => Promise<void>>('open-new-window'),
   getReorAppVersion: createIPCHandler<() => Promise<string>>('get-reor-app-version'),
-  showFileItemContextMenu: createIPCHandler<(file: FileInfoNode) => Promise<void>>('show-context-menu-file-item'),
-  showChatItemContext: createIPCHandler<(chatRow: ChatHistoryMetadata) => Promise<void>>('show-chat-menu-item'),
 }
 
 const electronStore = {

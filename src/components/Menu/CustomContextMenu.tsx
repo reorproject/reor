@@ -80,11 +80,11 @@ const CustomContextMenu: React.FC<CustomContextMenuProps> = ({
 
     document.addEventListener('mousedown', handleOutsideClick)
 
-    const menuElement = menuRef.current;
+    const menuElement = menuRef.current
     if (menuElement) {
-      const { height } = menuElement.getBoundingClientRect();
+      const { height } = menuElement.getBoundingClientRect()
       if (locations.y + height > window.innerHeight) {
-        menuElement.style.top = `${window.innerHeight - height - 10}px`;
+        menuElement.style.top = `${window.innerHeight - height - 10}px`
       }
     }
 
