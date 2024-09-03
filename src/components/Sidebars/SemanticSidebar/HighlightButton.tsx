@@ -32,11 +32,20 @@ const HighlightButton: React.FC<HighlightButtonProps> = ({ highlightData, onClic
     onClick() // This calls the provided onClick handler
     setShowArrow(true) // Show the arrow icon
   }
+  const adjustPosition = (TopHighlightData: any) => {
+    const viewportHeight = window.innerHeight
+    var NewTop = TopHighlightData;
+    // Ensure the icon is within the viewport vertically
+    if (TopHighlightData + 50 > viewportHeight) {
+      NewTop = viewportHeight - 100
+    }
+    return NewTop
+  }
 
   return (
     <button
       onClick={handleClick}
-      style={{ top: `${top}px`, left: `${left}px` }}
+      style={{ top: `${adjustPosition(top)}px`, left: `${left}px` }}
       className="absolute flex size-7 cursor-pointer items-center justify-center rounded-full border-none bg-gray-200 text-white shadow-md hover:bg-gray-300"
       aria-label="Highlight button"
       type="button"

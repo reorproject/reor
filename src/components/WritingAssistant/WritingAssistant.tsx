@@ -241,6 +241,16 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({ editor, highlightDa
 
     setLoadingResponse(false)
   }
+  const adjustPosition = (top: any) => {
+    const viewportHeight = window.innerHeight
+    var NewTop = top;
+    // Ensure the icon is within the viewport vertically
+    if (top + 50 > viewportHeight) {
+      NewTop = viewportHeight - 100
+    }
+
+    return NewTop
+  }
 
   const handleOption = async (option: string, customPromptInput?: string) => {
     const selectedText = highlightData.text
@@ -255,7 +265,7 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({ editor, highlightDa
       {!isSpaceTrigger && highlightData.position && (
         <button
           style={{
-            top: `${highlightData.position.top}px`,
+            top: `${adjustPosition(highlightData.position.top)}px`,
             left: `${highlightData.position.left + 30}px`,
             zIndex: 50,
           }}
