@@ -32,9 +32,9 @@ const HighlightButton: React.FC<HighlightButtonProps> = ({ highlightData, onClic
     onClick() // This calls the provided onClick handler
     setShowArrow(true) // Show the arrow icon
   }
-  const adjustPosition = (TopHighlightData: any) => {
+  const adjustPosition = (TopHighlightData: number) => {
     const viewportHeight = window.innerHeight
-    var NewTop = TopHighlightData;
+    let NewTop = TopHighlightData
     // Ensure the icon is within the viewport vertically
     if (TopHighlightData + 50 > viewportHeight) {
       NewTop = viewportHeight - 100

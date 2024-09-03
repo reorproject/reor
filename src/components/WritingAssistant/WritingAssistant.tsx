@@ -241,9 +241,9 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({ editor, highlightDa
 
     setLoadingResponse(false)
   }
-  const adjustPosition = (top: any) => {
+  const adjustPosition = (top: number) => {
     const viewportHeight = window.innerHeight
-    var NewTop = top;
+    let NewTop = top
     // Ensure the icon is within the viewport vertically
     if (top + 50 > viewportHeight) {
       NewTop = viewportHeight - 100
