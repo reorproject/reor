@@ -23,7 +23,7 @@ const TitleBar: React.FC<TitleBarProps> = ({ similarFilesOpen, toggleSimilarFile
   }, [])
 
   return (
-    <div id="customTitleBar" className="flex h-titlebar justify-between bg-[#303030]">
+    <div id="customTitleBar" className="flex justify-between bg-[#303030]">
       <div className="mt-px flex" style={platform === 'darwin' ? { marginLeft: '65px' } : { marginLeft: '2px' }}>
         <FileHistoryNavigator />
       </div>

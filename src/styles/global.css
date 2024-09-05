@@ -34,7 +34,7 @@ a {
 
 #customTitleBar {
   -webkit-app-region: drag;
-  height: 40px;
+  height: 32px;
 }
 
 #customTitleBar #titleBarFileNavigator, 

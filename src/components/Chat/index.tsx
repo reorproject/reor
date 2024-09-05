@@ -9,14 +9,12 @@ import '../../styles/chat.css'
 import ChatMessages from './ChatMessages'
 import { Chat, ChatFilters } from './types'
 import { useChatContext } from '@/contexts/ChatContext'
-import StartConversation from './StartConversation'
+import StartChat from './StartChat'
 
 const ChatComponent: React.FC = () => {
-  // const [userTextFieldInput, setUserTextFieldInput] = useState<string | undefined>()
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false)
   const [loadAnimation, setLoadAnimation] = useState<boolean>(false)
   const [readyToSave, setReadyToSave] = useState<boolean>(false)
-  // const [currentContext, setCurrentContext] = useState<DBQueryResult[]>([])
   const [defaultModelName, setDefaultLLMName] = useState<string>('')
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
@@ -184,7 +182,7 @@ const ChatComponent: React.FC = () => {
             loadingResponse={loadingResponse}
           />
         ) : (
-          <StartConversation defaultModelName={defaultModelName} handleNewChatMessage={handleNewChatMessage} />
+          <StartChat defaultModelName={defaultModelName} handleNewChatMessage={handleNewChatMessage} />
         )}
       </div>
       {/* {showSimilarFiles && (

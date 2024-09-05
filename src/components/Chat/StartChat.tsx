@@ -12,12 +12,12 @@ const EXAMPLE_PROMPT_OPTIONS = [
   'Which authors have I discussed positively about?',
 ]
 
-interface StartConversationProps {
+interface StartChatProps {
   defaultModelName: string
   handleNewChatMessage: (userTextFieldInput: string | undefined, chatFilters?: ChatFilters) => void
 }
 
-const StartConversation: React.FC<StartConversationProps> = ({ defaultModelName, handleNewChatMessage }) => {
+const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMessage }) => {
   const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([])
   const [selectedLlm, setSelectedLlm] = useState<string>(defaultModelName)
   //   text input state:
@@ -122,4 +122,4 @@ const StartConversation: React.FC<StartConversationProps> = ({ defaultModelName,
   )
 }
 
-export default StartConversation
+export default StartChat
