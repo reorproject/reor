@@ -6,14 +6,14 @@ import posthog from 'posthog-js'
 import { useFileContext } from '@/contexts/FileContext'
 import { isFileNodeDirectory, moveFile } from './utils'
 import { removeFileExtension } from '@/utils/strings'
-import { useTabsContext } from '@/contexts/WindowContentContext'
+import { useWindowContentContext } from '@/contexts/WindowContentContext'
 
 const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data }) => {
   const { visibleItems } = data
   const fileObject = visibleItems[index]
 
   const { handleDirectoryToggle, expandedDirectories, currentlyOpenFilePath } = useFileContext()
-  const { openTabContent } = useTabsContext()
+  const { openContent: openTabContent } = useWindowContentContext()
 
   const [isDragOver, setIsDragOver] = useState(false)
 

@@ -3,32 +3,32 @@ import React, { createContext, useContext, useEffect, useMemo, ReactNode } from 
 import { UNINITIALIZED_STATE, useChatContext } from './ChatContext'
 import { useFileContext } from './FileContext'
 
-interface TabContextType {
-  openTabContent: (pathOrChatID: string, optionalContentToWriteOnCreate?: string) => void
+interface WindowContentContextType {
+  openContent: (pathOrChatID: string, optionalContentToWriteOnCreate?: string) => void
 }
 
-const TabContext = createContext<TabContextType | undefined>(undefined)
+const WindowContentContext = createContext<WindowContentContextType | undefined>(undefined)
 
-export const useTabsContext = (): TabContextType => {
-  const context = useContext(TabContext)
+export const useWindowContentContext = (): WindowContentContextType => {
+  const context = useContext(WindowContentContext)
   if (context === undefined) {
-    throw new Error('useTabs must be used within a TabProvider')
+    throw new Error('useWindowContent must be used within a WindowContentProvider')
   }
   return context
 }
 
-interface TabContentProviderProps {
+interface WindowContentProviderProps {
   children: ReactNode
 }
 
-export const WindowContentProvider: React.FC<TabContentProviderProps> = ({ children }) => {
+export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ children }) => {
   const { currentOpenChat, setCurrentOpenChat, allChatsMetadata, setShowChatbot, setSidebarShowing } = useChatContext()
   const { currentlyOpenFilePath, openOrCreateFile } = useFileContext()
 
   const filePathRef = React.useRef<string>('')
   const chatIDRef = React.useRef<string>('')
 
-  const openTabContent = React.useCallback(
+  const openContent = React.useCallback(
     async (pathOrChatID: string, optionalContentToWriteOnCreate?: string) => {
       if (!pathOrChatID) return
       const chatMetadata = allChatsMetadata.find((chat) => chat.id === pathOrChatID)
@@ -47,15 +47,6 @@ export const WindowContentProvider: React.FC<TabContentProviderProps> = ({ child
     [allChatsMetadata, setShowChatbot, setCurrentOpenChat, setSidebarShowing, openOrCreateFile],
   )
 
-  // useEffect(() => {
-  //   const fetchHistoryTabs = async () => {
-  //     const response: Tab[] = await window.electronStore.getCurrentOpenTabs()
-  //     setOpenTabs(response)
-  //   }
-
-  //   fetchHistoryTabs()
-  // }, [])
-
   useEffect(() => {
     if (currentlyOpenFilePath != null && filePathRef.current !== currentlyOpenFilePath) {
       filePathRef.current = currentlyOpenFilePath
@@ -67,12 +58,12 @@ export const WindowContentProvider: React.FC<TabContentProviderProps> = ({ child
     }
   }, [currentOpenChat, allChatsMetadata, currentlyOpenFilePath])
 
-  const TabContextMemo = useMemo(
+  const WindowContentContextMemo = useMemo(
     () => ({
-      openTabContent,
+      openContent,
     }),
-    [openTabContent],
+    [openContent],
   )
 
-  return <TabContext.Provider value={TabContextMemo}>{children}</TabContext.Provider>
+  return <WindowContentContext.Provider value={WindowContentContextMemo}>{children}</WindowContentContext.Provider>
 }

@@ -6,7 +6,7 @@ import rehypeRaw from 'rehype-raw'
 import { FaRegUserCircle } from 'react-icons/fa'
 import '../../styles/chat.css'
 import { Chat, ChatFilters, ReorChatMessage } from './types'
-import { useTabsContext } from '@/contexts/WindowContentContext'
+import { useWindowContentContext } from '@/contexts/WindowContentContext'
 import ChatInput from './ChatInput'
 import { getClassNameBasedOnMessageRole, getDisplayMessage } from './utils'
 import LoadingDots from '@/utils/animations'
@@ -26,7 +26,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   loadAnimation,
   loadingResponse,
 }) => {
-  const { openTabContent } = useTabsContext()
+  const { openContent: openTabContent } = useWindowContentContext()
   const [userTextFieldInput, setUserTextFieldInput] = useState<string | undefined>()
 
   const copyToClipboard = (message: ReorChatMessage) => {

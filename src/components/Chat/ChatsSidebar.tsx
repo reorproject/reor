@@ -4,7 +4,7 @@ import { RiChatNewFill, RiArrowDownSLine } from 'react-icons/ri'
 import { IoChatbubbles } from 'react-icons/io5'
 import posthog from 'posthog-js'
 import { ChatMetadata, useChatContext } from '@/contexts/ChatContext'
-import { useTabsContext } from '@/contexts/WindowContentContext'
+import { useWindowContentContext } from '@/contexts/WindowContentContext'
 
 export interface ChatItemProps {
   chatMetadata: ChatMetadata
@@ -12,7 +12,7 @@ export interface ChatItemProps {
 
 export const ChatItem: React.FC<ChatItemProps> = ({ chatMetadata }) => {
   const { currentOpenChat } = useChatContext()
-  const { openTabContent } = useTabsContext()
+  const { openContent: openTabContent } = useWindowContentContext()
   const itemClasses = `
     flex items-center cursor-pointer py-2 px-3 rounded-md
     transition-colors duration-150 ease-in-out

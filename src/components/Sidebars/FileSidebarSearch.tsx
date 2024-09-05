@@ -4,7 +4,7 @@ import posthog from 'posthog-js'
 import { FaSearch } from 'react-icons/fa'
 import { DBSearchPreview } from '../File/DBResultPreview'
 import debounce from './utils'
-import { useTabsContext } from '@/contexts/WindowContentContext'
+import { useWindowContentContext } from '@/contexts/WindowContentContext'
 
 interface SearchComponentProps {
   searchQuery: string
@@ -19,7 +19,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   searchResults,
   setSearchResults,
 }) => {
-  const { openTabContent } = useTabsContext()
+  const { openContent: openTabContent } = useWindowContentContext()
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   const handleSearch = useCallback(

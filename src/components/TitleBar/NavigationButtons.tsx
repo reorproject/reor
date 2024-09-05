@@ -6,7 +6,7 @@ import { IoMdArrowRoundBack, IoMdArrowRoundForward } from 'react-icons/io'
 import { removeFileExtension } from '@/utils/strings'
 import '../../styles/history.scss'
 import { useFileContext } from '@/contexts/FileContext'
-import { useTabsContext } from '@/contexts/WindowContentContext'
+import { useWindowContentContext } from '@/contexts/WindowContentContext'
 
 const FileHistoryNavigator: React.FC = () => {
   const [showMenu, setShowMenu] = useState<string>('')
@@ -15,7 +15,7 @@ const FileHistoryNavigator: React.FC = () => {
   const buttonRefBack = useRef<HTMLButtonElement>(null)
   const buttonRefForward = useRef<HTMLButtonElement>(null)
 
-  const { openTabContent } = useTabsContext()
+  const { openContent: openTabContent } = useWindowContentContext()
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { navigationHistory, setNavigationHistory } = useFileContext()
 
