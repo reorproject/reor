@@ -3,20 +3,6 @@ import { createOpenAI } from '@ai-sdk/openai'
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { AnonymizedChatFilters, Chat, ChatFilters, ReorChatMessage } from './types'
 
-// export function formatOpenAIMessageContentIntoString(
-//   content: string | ChatCompletionContentPart[] | null | undefined,
-// ): string | undefined {
-//   if (Array.isArray(content)) {
-//     return content.reduce((acc, part) => {
-//       if (part.type === 'text') {
-//         return acc + part.text // Concatenate text parts
-//       }
-//       return acc // Skip image parts
-//     }, '')
-//   }
-//   return content || undefined
-// }
-
 export const appendTextContentToMessages = (messages: ReorChatMessage[], text: string): ReorChatMessage[] => {
   if (text === '') {
     return messages
@@ -61,42 +47,6 @@ export const convertMessageToString = (message: ReorChatMessage | undefined): st
   }
   return ''
 }
-
-// function replaceContentInMessages(
-//   messages: ChatMessageToDisplay[],
-//   context: ChatProperties
-// ): ChatMessageToDisplay[] {
-//   return messages.map((message) => {
-//     if ("content" in message) {
-//       if (typeof message.content === "string") {
-//         message.content = message.content.replace(
-//           /\{(\w+)\}/g,
-//           (match, key) => {
-//             return key in context ? context[key] : match;
-//           }
-//         );
-//       }
-//     }
-//     return message;
-//   });
-// }
-
-// const ragPromptTemplate: ChatCompletionMessageParam[] = [
-//   {
-//     content:
-//       "You are an advanced question answer agent answering questions based on provided context.",
-//     role: "system",
-//   },
-//   {
-//     content: `
-// Context:
-// {context}
-
-// Query:
-// {query}`,
-//     role: "user",
-//   },
-// ];
 
 export const generateTimeStampFilter = (minDate?: Date, maxDate?: Date): string => {
   let filter = ''

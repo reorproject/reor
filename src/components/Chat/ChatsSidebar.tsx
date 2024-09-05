@@ -4,7 +4,7 @@ import { RiChatNewFill, RiArrowDownSLine } from 'react-icons/ri'
 import { IoChatbubbles } from 'react-icons/io5'
 import posthog from 'posthog-js'
 import { ChatMetadata, useChatContext } from '@/contexts/ChatContext'
-import { useTabsContext } from '@/contexts/TabContext'
+import { useTabsContext } from '@/contexts/WindowContentContext'
 
 export interface ChatItemProps {
   chatMetadata: ChatMetadata

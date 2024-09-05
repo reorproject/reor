@@ -4,7 +4,7 @@ import posthog from 'posthog-js'
 import { FaSearch } from 'react-icons/fa'
 import { DBSearchPreview } from '../File/DBResultPreview'
 import debounce from './utils'
-import { useTabsContext } from '@/contexts/TabContext'
+import { useTabsContext } from '@/contexts/WindowContentContext'
 
 interface SearchComponentProps {
   searchQuery: string

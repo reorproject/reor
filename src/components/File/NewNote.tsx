@@ -6,7 +6,7 @@ import posthog from 'posthog-js'
 import ReorModal from '../Common/Modal'
 import { getInvalidCharacterInFileName } from '@/utils/strings'
 import { useFileContext } from '@/contexts/FileContext'
-import { useTabsContext } from '@/contexts/TabContext'
+import { useTabsContext } from '@/contexts/WindowContentContext'
 
 interface NewNoteComponentProps {
   isOpen: boolean

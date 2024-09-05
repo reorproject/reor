@@ -6,7 +6,7 @@ import posthog from 'posthog-js'
 import { useFileContext } from '@/contexts/FileContext'
 import { isFileNodeDirectory, moveFile } from './utils'
 import { removeFileExtension } from '@/utils/strings'
-import { useTabsContext } from '@/contexts/TabContext'
+import { useTabsContext } from '@/contexts/WindowContentContext'
 
 const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data }) => {
   const { visibleItems } = data
