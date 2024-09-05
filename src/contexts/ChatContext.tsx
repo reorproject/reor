@@ -25,20 +25,7 @@ const ChatContext = createContext<ChatContextType | undefined>(undefined)
 
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [showChatbot, setShowChatbot] = useState<boolean>(false)
-  // const [currentTab, setCurrentTab] = useState<string>('')
-  // const [chatFilters, setChatFilters] = useState<ChatFilters>({
-  //   files: [],
-  //   numberOfChunksToFetch: 15,
-  //   minDate: new Date(0),
-  //   maxDate: new Date(),
-  // })
   const [sidebarShowing, setSidebarShowing] = useState<SidebarAbleToShow>('files')
-
-  // const {
-  //   currentOpenChat: currentChatHistory,
-  //   setCurrentOpenChat: setCurrentChatHistory,
-  //   allChatsMetadata: chatHistoriesMetadata,
-  // } = useChatHistory()
 
   const [currentOpenChat, setCurrentOpenChat] = useState<Chat>()
   const [allChatsMetadata, setAllChatsMetadata] = useState<ChatMetadata[]>([])
@@ -80,15 +67,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     fetchChatHistories()
   }, [])
 
-  // return {
-  //   currentOpenChat,
-  //   setCurrentOpenChat,
-  //   allChatsMetadata,
-  // }
-
-  // const filePathRef = React.useRef<string>('')
-  // const chatIDRef = React.useRef<string>('')
-
   const openChatSidebarAndChat = useCallback(
     (chat: Chat | undefined) => {
       setShowChatbot(true)
@@ -106,22 +84,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     },
     [allChatsMetadata],
   )
-
-  // useEffect(() => {
-  //   if (currentlyOpenFilePath != null && filePathRef.current !== currentlyOpenFilePath) {
-  //     filePathRef.current = currentlyOpenFilePath
-  //     setCurrentTab(currentlyOpenFilePath)
-  //   }
-
-  //   const currentChatHistoryId = currentChatHistory?.id ?? ''
-  //   if (chatIDRef.current !== currentChatHistoryId) {
-  //     chatIDRef.current = currentChatHistoryId
-  //     const currentMetadata = chatHistoriesMetadata.find((chat) => chat.id === currentChatHistoryId)
-  //     if (currentMetadata) {
-  //       setCurrentTab(currentMetadata.displayName)
-  //     }
-  //   }
-  // }, [currentChatHistory, chatHistoriesMetadata, currentlyOpenFilePath])
 
   useEffect(() => {
     const handleAddFileToChatFilters = () => {

@@ -19,7 +19,7 @@ interface StartChatProps {
 
 const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMessage }) => {
   const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([])
-  const [selectedLlm, setSelectedLlm] = useState<string>(defaultModelName)
+  const [selectedLLM, setSelectedLLM] = useState<string>(defaultModelName)
   //   text input state:
   const [userTextFieldInput, setUserTextFieldInput] = useState<string | undefined>()
   const [chatFilters, setChatFilters] = useState<ChatFilters>({
@@ -34,13 +34,16 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
     const fetchLLMModels = async () => {
       const LLMConfigs = await window.llm.getLLMConfigs()
       setLLMConfigs(LLMConfigs)
+      const defaultLLM = await window.llm.getDefaultLLMName()
+      setSelectedLLM(defaultLLM)
+      console.log('fetched defaultLLM', defaultLLM)
     }
     fetchLLMModels()
   }, [])
 
-  const sendMessageButtonHandler = async () => {
-    await window.llm.setDefaultLLM(selectedLlm)
+  const sendMessageHandler = async () => {
     handleNewChatMessage(userTextFieldInput, chatFilters)
+    await window.llm.setDefaultLLM(selectedLLM)
   }
 
   return (
@@ -57,7 +60,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
             onKeyDown={(e) => {
               if (!e.shiftKey && e.key === 'Enter') {
                 e.preventDefault()
-                handleNewChatMessage(userTextFieldInput, chatFilters)
+                sendMessageHandler()
               }
             }}
             className="h-[100px] w-full resize-none rounded-t-md border-0 bg-transparent p-4 text-text-gen-100 caret-white focus:outline-none"
@@ -68,13 +71,13 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
           <div className="flex flex-col items-center justify-between px-4 py-2 md:flex-row">
             <div className="flex flex-col items-center justify-between rounded-md border-0 py-2 text-text-gen-100 md:flex-row">
               <select
-                value={selectedLlm}
-                onChange={(e) => setSelectedLlm(e.target.value)}
+                value={selectedLLM}
+                onChange={(e) => setSelectedLLM(e.target.value)}
                 className="h-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                {llmConfigs.map((model) => (
-                  <option key={model.modelName} value={model.modelName}>
-                    {model.modelName}
+                {llmConfigs.map((llm) => (
+                  <option key={llm.modelName} value={llm.modelName}>
+                    {llm.modelName}
                   </option>
                 ))}
               </select>
@@ -90,7 +93,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
             </button>
             <button
               className="m-1 flex cursor-pointer items-center justify-center rounded-md border-0 bg-blue-600 p-2 text-white hover:bg-blue-500"
-              onClick={sendMessageButtonHandler}
+              onClick={sendMessageHandler}
               type="button"
               aria-label="Send message"
             >
