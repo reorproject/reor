@@ -6,16 +6,6 @@ import '../../styles/chat.css'
 import AddContextFiltersModal from './AddContextFiltersModal'
 import { ChatFilters } from './types'
 
-// export enum AskOptions {
-//   Ask = 'Ask',
-// }
-
-// export const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
-//   [AskOptions.Ask]: [
-
-//   ],
-// }
-
 const EXAMPLE_PROMPT_OPTIONS = [
   'What have I written about Philosophy?',
   'Generate a study guide from my notes.',
