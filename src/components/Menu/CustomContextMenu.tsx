@@ -1,8 +1,5 @@
 import { FileInfoNode } from 'electron/main/filesystem/types'
 import React, { useEffect, useRef } from 'react'
-import NewNoteComponent from '../File/NewNote'
-import NewDirectoryComponent from '../File/NewDirectory'
-import FlashcardMenuModal from '../Flashcard/FlashcardMenuModal'
 import { useFileContext } from '@/contexts/FileContext'
 import { ChatMetadata, useChatContext } from '@/contexts/ChatContext'
 import { useModalOpeners } from '@/contexts/ModalContext'
@@ -39,18 +36,8 @@ const CustomContextMenu: React.FC = () => {
   const { currentSelection, locations, file, chatMetadata } = focusedItem
   const menuRef = useRef<HTMLDivElement>(null)
 
-  const {
-    isNewNoteModalOpen,
-    setIsNewNoteModalOpen,
-    isNewDirectoryModalOpen,
-    setIsNewDirectoryModalOpen,
-    setIsFlashcardModeOpen,
-    setInitialFileToCreateFlashcard,
-    isFlashcardModeOpen,
-    setInitialFileToReviewFlashcard,
-    initialFileToCreateFlashcard,
-    initialFileToReviewFlashcard,
-  } = useModalOpeners()
+  const { setIsNewNoteModalOpen, setIsNewDirectoryModalOpen, setIsFlashcardModeOpen, setInitialFileToCreateFlashcard } =
+    useModalOpeners()
 
   const { deleteFile, setNoteToBeRenamed } = useFileContext()
   const { handleDeleteChat } = useChatContext()
@@ -167,20 +154,6 @@ const CustomContextMenu: React.FC = () => {
             ))}
           </div>
         </div>
-      )}
-      <NewNoteComponent isOpen={isNewNoteModalOpen} onClose={() => setIsNewNoteModalOpen(false)} />
-      <NewDirectoryComponent isOpen={isNewDirectoryModalOpen} onClose={() => setIsNewDirectoryModalOpen(false)} />
-      {isFlashcardModeOpen && (
-        <FlashcardMenuModal
-          isOpen={isFlashcardModeOpen}
-          onClose={() => {
-            setIsFlashcardModeOpen(false)
-            setInitialFileToCreateFlashcard('')
-            setInitialFileToReviewFlashcard('')
-          }}
-          initialFileToCreateFlashcard={initialFileToCreateFlashcard}
-          initialFileToReviewFlashcard={initialFileToReviewFlashcard}
-        />
       )}
     </div>
   )

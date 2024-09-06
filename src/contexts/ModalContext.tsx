@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useMemo } from 'react'
+import React, { createContext, useContext, useState, ReactNode, useMemo, useEffect } from 'react'
 
 interface ModalProviderProps {
   children: ReactNode
@@ -22,24 +22,15 @@ interface ModalOpenContextType {
   setInitialFileToReviewFlashcard: (flashcardName: string) => void
 }
 
-const defaultModalContext: ModalOpenContextType = {
-  isNewNoteModalOpen: false,
-  setIsNewNoteModalOpen: () => {},
-  isNewDirectoryModalOpen: false,
-  setIsNewDirectoryModalOpen: () => {},
-  isSettingsModalOpen: false,
-  setIsSettingsModalOpen: () => {},
-  isFlashcardModeOpen: false,
-  setIsFlashcardModeOpen: () => {},
-  initialFileToCreateFlashcard: '',
-  setInitialFileToCreateFlashcard: () => {},
-  initialFileToReviewFlashcard: '',
-  setInitialFileToReviewFlashcard: () => {},
+const ModalContext = createContext<ModalOpenContextType | undefined>(undefined)
+
+export const useModalOpeners = (): ModalOpenContextType => {
+  const context = useContext(ModalContext)
+  if (context === undefined) {
+    throw new Error('useModalOpeners must be used within a ModalProvider')
+  }
+  return context
 }
-
-const ModalContext = createContext<ModalOpenContextType>(defaultModalContext)
-
-export const useModalOpeners = (): ModalOpenContextType => useContext(ModalContext)
 
 export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   const [isNewNoteModalOpen, setIsNewNoteModalOpen] = useState(false)
@@ -48,6 +39,20 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   const [isFlashcardModeOpen, setIsFlashcardModeOpen] = useState(false)
   const [initialFileToCreateFlashcard, setInitialFileToCreateFlashcard] = useState('')
   const [initialFileToReviewFlashcard, setInitialFileToReviewFlashcard] = useState('')
+
+  useEffect(() => {
+    const createFlashcardFileListener = window.ipcRenderer.receive(
+      'create-flashcard-file-listener',
+      (noteName: string) => {
+        setIsFlashcardModeOpen(!!noteName)
+        setInitialFileToCreateFlashcard(noteName)
+      },
+    )
+
+    return () => {
+      createFlashcardFileListener()
+    }
+  }, [setIsFlashcardModeOpen, setInitialFileToCreateFlashcard])
 
   const modalOpenContextValue = useMemo(
     () => ({

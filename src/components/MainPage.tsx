@@ -15,6 +15,7 @@ import { ChatProvider, useChatContext } from '@/contexts/ChatContext'
 import { FileProvider, useFileContext } from '@/contexts/FileContext'
 import ModalProvider from '@/contexts/ModalContext'
 import CustomContextMenu from './Menu/CustomContextMenu'
+import CommonModals from './Common/CommonModals'
 
 const MainPageContent: React.FC = () => {
   const [showSimilarFiles, setShowSimilarFiles] = useState(true)
@@ -70,6 +71,7 @@ const MainPageContent: React.FC = () => {
             <ChatComponent />
           </div>
         )}
+        <CommonModals />
       </div>
     </div>
   )
