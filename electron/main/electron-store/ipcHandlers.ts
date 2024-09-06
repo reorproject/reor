@@ -176,7 +176,8 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     return vaultChatHistories.find((chat) => chat.id === chatId)
   })
 
-  ipcMain.handle('remove-chat-at-id', (event, chatID: string) => {
+  ipcMain.handle('delete-chat-at-id', (event, chatID: string | undefined) => {
+    if (!chatID) return
     const vaultDir = windowsManager.getVaultDirectoryForWinContents(event.sender)
 
     if (!vaultDir) {

@@ -12,26 +12,24 @@ export interface ChatItemProps {
 
 export const ChatItem: React.FC<ChatItemProps> = ({ chatMetadata }) => {
   const { currentOpenChat } = useChatContext()
-  const { openContent: openTabContent } = useWindowContentContext()
+  const { openContent, showContextMenu: handleFocusedItem } = useWindowContentContext()
+
   const itemClasses = `
     flex items-center cursor-pointer py-2 px-3 rounded-md
     transition-colors duration-150 ease-in-out
     ${chatMetadata.id === currentOpenChat?.id ? 'bg-neutral-700 text-white' : 'text-gray-300 hover:bg-neutral-800'}
   `
-
-  const handleContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault()
-    window.electronUtils.showChatItemContext(chatMetadata)
-  }
-
   return (
     <div>
       <div
         onClick={async () => {
-          openTabContent(chatMetadata.id)
+          openContent(chatMetadata.id)
         }}
         className={itemClasses}
-        onContextMenu={handleContextMenu}
+        onContextMenu={(e) => {
+          e.stopPropagation()
+          handleFocusedItem(e, 'ChatItem', { chatMetadata })
+        }}
       >
         <IoChatbubbles />
         <span className="ml-2 flex-1 truncate text-[11px] font-medium">{chatMetadata.displayName}</span>
@@ -47,14 +45,14 @@ export const ChatsSidebar: React.FC = () => {
   const { setShowChatbot, allChatsMetadata, setCurrentOpenChat } = useChatContext()
 
   const toggleRecents = () => setIsRecentsOpen((prev) => !prev)
-
   const currentSelectedChatID = useRef<string | undefined>()
+
   useEffect(() => {
-    const deleteChatRow = window.ipcRenderer.receive('remove-chat-at-id', (chatID) => {
+    const deleteChatRow = window.ipcRenderer.receive('delete-chat-at-id', (chatID) => {
       if (chatID === currentSelectedChatID.current) {
         setShowChatbot(false)
       }
-      window.electronStore.removeChatAtID(chatID)
+      window.electronStore.deleteChatAtID(chatID)
     })
 
     return () => {

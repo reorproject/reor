@@ -19,6 +19,7 @@ interface ChatContextType {
   setCurrentOpenChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
   allChatsMetadata: ChatMetadata[]
   openChatSidebarAndChat: (chat: Chat | undefined) => void
+  handleDeleteChat: (chatID: string | undefined) => Promise<boolean>
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined)
@@ -105,6 +106,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [])
 
+  const handleDeleteChat = useCallback(async (chatID: string | undefined) => {
+    if (!chatID) return false
+    await window.electronStore.deleteChatAtID(chatID)
+    return true
+  }, [])
+
   const value = React.useMemo(
     () => ({
       currentOpenChat,
@@ -116,6 +123,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       showChatbot,
       setShowChatbot,
       openChatSidebarAndChat,
+      handleDeleteChat,
     }),
     [
       allChatsMetadata,
@@ -127,6 +135,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       currentOpenChat,
       setCurrentOpenChat,
       openChatSidebarAndChat,
+      handleDeleteChat,
     ],
   )
 

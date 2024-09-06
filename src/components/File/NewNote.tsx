@@ -15,6 +15,7 @@ interface NewNoteComponentProps {
 
 const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose }) => {
   const { openContent: openTabContent } = useWindowContentContext()
+
   const [fileName, setFileName] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -49,6 +50,7 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose }) 
     let finalPath = fileName
     if (currentlyOpenFilePath !== '' && currentlyOpenFilePath !== null) {
       const directoryName = await window.path.dirname(currentlyOpenFilePath)
+
       finalPath = await window.path.join(directoryName, fileName)
     }
     const basename = await window.path.basename(finalPath)

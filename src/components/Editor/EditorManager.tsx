@@ -98,7 +98,15 @@ const EditorManager: React.FC = () => {
       onClick={() => editor?.commands.focus()}
     >
       <SearchBar editor={editor} showSearch={showSearchBar} setShowSearch={setShowSearchBar} />
-      {menuVisible && <EditorContextMenu editor={editor} menuPosition={menuPosition} setMenuVisible={setMenuVisible} />}
+      {menuVisible && (
+        <EditorContextMenu
+          editor={editor}
+          menuPosition={menuPosition}
+          setMenuVisible={setMenuVisible}
+          hideMenu={hideMenu}
+        />
+      )}
+
       <div className={`relative h-full overflow-y-auto ${editorFlex ? 'flex justify-center py-4 pl-4' : ''}`}>
         <EditorContent
           className={`relative size-full bg-dark-gray-c-eleven ${editorFlex ? 'max-w-xl' : ''}`}

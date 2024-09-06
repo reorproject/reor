@@ -17,8 +17,6 @@ import { useChatContext } from '@/contexts/ChatContext'
 
 const IconsSidebar: React.FC = () => {
   const { sidebarShowing, setSidebarShowing } = useChatContext()
-  const [initialFileToCreateFlashcard, setInitialFileToCreateFlashcard] = useState('')
-  const [initialFileToReviewFlashcard, setInitialFileToReviewFlashcard] = useState('')
   const [sidebarWidth, setSidebarWidth] = useState<number>(40)
 
   const {
@@ -30,9 +28,12 @@ const IconsSidebar: React.FC = () => {
     setIsSettingsModalOpen,
     isFlashcardModeOpen,
     setIsFlashcardModeOpen,
+    initialFileToCreateFlashcard,
+    setInitialFileToCreateFlashcard,
+    initialFileToReviewFlashcard,
+    setInitialFileToReviewFlashcard,
   } = useModalOpeners()
 
-  // open a new flashcard create mode
   useEffect(() => {
     const createFlashcardFileListener = window.ipcRenderer.receive(
       'create-flashcard-file-listener',
@@ -45,7 +46,7 @@ const IconsSidebar: React.FC = () => {
     return () => {
       createFlashcardFileListener()
     }
-  }, [setIsFlashcardModeOpen])
+  }, [setIsFlashcardModeOpen, setInitialFileToCreateFlashcard])
 
   useEffect(() => {
     const updateWidth = async () => {
@@ -53,7 +54,6 @@ const IconsSidebar: React.FC = () => {
       setSidebarWidth(isCompact ? 40 : 60)
     }
 
-    // Listen for changes on settings
     const handleSettingsChange = (isCompact: number) => {
       setSidebarWidth(isCompact ? 40 : 60)
     }
