@@ -32,9 +32,10 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose }) 
     const invalidCharacters = await getInvalidCharacterInFileName(name)
     if (invalidCharacters) {
       setErrorMessage(`Cannot put ${invalidCharacters} in file name`)
-      throw new Error(`Cannot put ${invalidCharacters} in file name`)
+      return false
     }
     setErrorMessage(null)
+    return true
   }
 
   const handleNameChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,8 +45,8 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose }) 
   }
 
   const sendNewNoteMsg = async () => {
-    await handleValidName(fileName)
-    if (!fileName || errorMessage) return
+    const validName = await handleValidName(fileName)
+    if (!fileName || errorMessage || !validName) return
 
     let finalPath = fileName
     if (currentlyOpenFilePath !== '' && currentlyOpenFilePath !== null) {

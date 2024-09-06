@@ -40,7 +40,7 @@ export const ChatItem: React.FC<ChatItemProps> = ({ chatMetadata }) => {
 
 export const ChatSidebar: React.FC = () => {
   const [isRecentsOpen, setIsRecentsOpen] = useState(true)
-  const dropdownAnimationDelay = 0.2
+  const dropdownAnimationDelay = 0.02
 
   const { setShowChatbot, allChatsMetadata, setCurrentOpenChat } = useChatContext()
 

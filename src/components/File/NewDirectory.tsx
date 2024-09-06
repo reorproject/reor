@@ -29,9 +29,10 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
     const invalidCharacters = await getInvalidCharacterInFileName(name)
     if (invalidCharacters) {
       setErrorMessage(`Cannot put ${invalidCharacters} in file name`)
-      throw new Error(`Cannot put ${invalidCharacters} in file name`)
+      return false
     }
     setErrorMessage(null)
+    return true
   }
 
   const handleNameChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,23 +42,17 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
   }
 
   const sendNewDirectoryMsg = async () => {
-    await handleValidName(directoryName)
-    if (!directoryName || errorMessage || currentlyOpenFilePath === null) return
+    const validName = await handleValidName(directoryName)
+    if (!directoryName || errorMessage || !validName) return
 
     const directoryPath =
-      currentlyOpenFilePath === ''
+      currentlyOpenFilePath === '' || currentlyOpenFilePath === null
         ? await window.electronStore.getVaultDirectoryForWindow()
-        : await window.path.dirname(currentlyOpenFilePath)
+        : await window.path.dirname(currentlyOpenFilePath as string)
     const finalPath = await window.path.join(directoryPath, directoryName)
     window.fileSystem.createDirectory(finalPath)
     posthog.capture('created_new_directory_from_new_directory_modal')
     onClose()
-  }
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      sendNewDirectoryMsg()
-    }
   }
 
   return (
@@ -69,7 +64,11 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
           className=" block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
           value={directoryName}
           onChange={handleNameChange}
-          onKeyDown={handleKeyPress}
+          onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+            if (e.key === 'Enter') {
+              sendNewDirectoryMsg()
+            }
+          }}
           placeholder="Directory Name"
         />
 
