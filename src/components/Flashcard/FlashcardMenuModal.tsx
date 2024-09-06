@@ -33,7 +33,7 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
       onClose={onClose}
       // tailwindStylesOnBackground="bg-gradient-to-r from-orange-900 to-yellow-900"
     >
-      <div className=" mx-6 mb-6 mt-2 flex-col justify-center w-[65vw] lg:w-[45vw]">
+      <div className=" mx-6 mb-6 mt-2 w-[65vw] flex-col justify-center lg:w-[45vw]">
         <h2 className="mb-3 text-center text-xl font-semibold text-white">Flashcard Mode</h2>
         {isReviewFlashcardMode && (
           <FlashcardReviewModal isOpen={isReviewFlashcardMode} onClose={() => setIsReviewFlashcardMode(false)} />
