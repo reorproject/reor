@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 
-import { ChatsSidebar } from '../Chat/ChatsSidebar'
+import { ChatSidebar } from '../Chat/ChatSidebar'
 
 import SearchComponent from './FileSidebarSearch'
 import { useChatContext } from '@/contexts/ChatContext'
@@ -29,7 +29,7 @@ const SidebarManager: React.FC = () => {
         />
       )}
 
-      {sidebarShowing === 'chats' && <ChatsSidebar />}
+      {sidebarShowing === 'chats' && <ChatSidebar />}
     </div>
   )
 }

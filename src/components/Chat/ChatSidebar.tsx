@@ -12,7 +12,7 @@ export interface ChatItemProps {
 
 export const ChatItem: React.FC<ChatItemProps> = ({ chatMetadata }) => {
   const { currentOpenChat } = useChatContext()
-  const { openContent, showContextMenu: handleFocusedItem } = useWindowContentContext()
+  const { openContent, showContextMenu } = useWindowContentContext()
 
   const itemClasses = `
     flex items-center cursor-pointer py-2 px-3 rounded-md
@@ -28,7 +28,7 @@ export const ChatItem: React.FC<ChatItemProps> = ({ chatMetadata }) => {
         className={itemClasses}
         onContextMenu={(e) => {
           e.stopPropagation()
-          handleFocusedItem(e, 'ChatItem', { chatMetadata })
+          showContextMenu(e, 'ChatItem', { chatMetadata })
         }}
       >
         <IoChatbubbles />
@@ -38,7 +38,7 @@ export const ChatItem: React.FC<ChatItemProps> = ({ chatMetadata }) => {
   )
 }
 
-export const ChatsSidebar: React.FC = () => {
+export const ChatSidebar: React.FC = () => {
   const [isRecentsOpen, setIsRecentsOpen] = useState(true)
   const dropdownAnimationDelay = 0.2
 
