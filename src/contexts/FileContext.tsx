@@ -47,6 +47,7 @@ type FileContextType = {
   renameFile: (oldFilePath: string, newFilePath: string) => Promise<void>
   setSuggestionsState: React.Dispatch<React.SetStateAction<SuggestionsState | null | undefined>>
   setSpellCheckEnabled: React.Dispatch<React.SetStateAction<boolean>>
+  deleteFile: (path: string | undefined) => Promise<boolean>
 } & ReturnType<typeof useFileInfoTreeHook>
 
 export const FileContext = createContext<FileContextType | undefined>(undefined)
@@ -220,23 +221,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }
 
   useEffect(() => {
-    const deleteFile = async (path: string) => {
-      await window.fileSystem.deleteFile(path)
-      window.electronStore.removeOpenTabsByPath(path)
-      if (currentlyOpenFilePath === path) {
-        editor?.commands.setContent('')
-        setCurrentlyOpenFilePath(null)
-      }
-    }
-
-    const removeDeleteFileListener = window.ipcRenderer.receive('delete-file-listener', deleteFile)
-
-    return () => {
-      removeDeleteFileListener()
-    }
-  }, [currentlyOpenFilePath, editor])
-
-  useEffect(() => {
     async function checkAppUsage() {
       if (!editor || currentlyOpenFilePath) return
       const hasOpened = await window.electronStore.getHasUserOpenedAppBefore()
@@ -265,16 +249,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }
 
   useEffect(() => {
-    const renameFileListener = window.ipcRenderer.receive('rename-file-listener', (noteName: string) =>
-      setFileNodeToBeRenamed(noteName),
-    )
-
-    return () => {
-      renameFileListener()
-    }
-  }, [])
-
-  useEffect(() => {
     const handleWindowClose = async () => {
       if (currentlyOpenFilePath !== null && editor && editor.getHTML() !== null) {
         const markdown = getMarkdown(editor)
@@ -293,6 +267,16 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, [currentlyOpenFilePath, editor])
 
+  const deleteFile = async (path: string | undefined) => {
+    if (!path) return false
+    await window.fileSystem.deleteFile(path)
+    if (currentlyOpenFilePath === path) {
+      editor?.commands.setContent('')
+      setCurrentlyOpenFilePath(null)
+    }
+    return true
+  }
+
   const fileByFilepathValue = {
     currentlyOpenFilePath,
     setCurrentlyOpenFilePath,
@@ -309,8 +293,10 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     fileDirToBeRenamed,
     setFileDirToBeRenamed,
     renameFile: renameFileNode,
+    setFileNodeToBeRenamed,
     setSuggestionsState,
     setSpellCheckEnabled,
+    deleteFile,
   }
 
   const fileInfoTreeValue = useFileInfoTreeHook(currentlyOpenFilePath)

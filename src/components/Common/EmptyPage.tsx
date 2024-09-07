@@ -1,12 +1,9 @@
 import React from 'react'
 import { ImFileEmpty } from 'react-icons/im'
 import { useModalOpeners } from '../../contexts/ModalContext'
-import NewNoteComponent from '../File/NewNote'
-import NewDirectoryComponent from '../File/NewDirectory'
 
 const EmptyPage: React.FC = () => {
-  const { isNewNoteModalOpen, setIsNewNoteModalOpen, isNewDirectoryModalOpen, setIsNewDirectoryModalOpen } =
-    useModalOpeners()
+  const { setIsNewNoteModalOpen, setIsNewDirectoryModalOpen } = useModalOpeners()
 
   return (
     <div className="absolute flex size-full flex-col items-center justify-center overflow-hidden pb-40 text-white">
@@ -31,8 +28,6 @@ const EmptyPage: React.FC = () => {
           Create a Folder
         </button>
       </div>
-      <NewNoteComponent isOpen={isNewNoteModalOpen} onClose={() => setIsNewNoteModalOpen(false)} />
-      <NewDirectoryComponent isOpen={isNewDirectoryModalOpen} onClose={() => setIsNewDirectoryModalOpen(false)} />
     </div>
   )
 }

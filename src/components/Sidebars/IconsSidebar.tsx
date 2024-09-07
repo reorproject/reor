@@ -8,44 +8,20 @@ import { MdOutlineQuiz, MdSettings } from 'react-icons/md'
 import { VscNewFolder } from 'react-icons/vsc'
 import { HiOutlinePencilAlt } from 'react-icons/hi'
 
-import NewDirectoryComponent from '../File/NewDirectory'
-import NewNoteComponent from '../File/NewNote'
-import FlashcardMenuModal from '../Flashcard/FlashcardMenuModal'
-import SettingsModal from '../Settings/Settings'
 import { useModalOpeners } from '../../contexts/ModalContext'
 import { useChatContext } from '@/contexts/ChatContext'
 
 const IconsSidebar: React.FC = () => {
   const { sidebarShowing, setSidebarShowing } = useChatContext()
-  const [initialFileToCreateFlashcard, setInitialFileToCreateFlashcard] = useState('')
-  const [initialFileToReviewFlashcard, setInitialFileToReviewFlashcard] = useState('')
   const [sidebarWidth, setSidebarWidth] = useState<number>(40)
 
   const {
-    isNewNoteModalOpen,
     setIsNewNoteModalOpen,
-    isNewDirectoryModalOpen,
     setIsNewDirectoryModalOpen,
     isSettingsModalOpen,
     setIsSettingsModalOpen,
-    isFlashcardModeOpen,
     setIsFlashcardModeOpen,
   } = useModalOpeners()
-
-  // open a new flashcard create mode
-  useEffect(() => {
-    const createFlashcardFileListener = window.ipcRenderer.receive(
-      'create-flashcard-file-listener',
-      (noteName: string) => {
-        setIsFlashcardModeOpen(!!noteName)
-        setInitialFileToCreateFlashcard(noteName)
-      },
-    )
-
-    return () => {
-      createFlashcardFileListener()
-    }
-  }, [setIsFlashcardModeOpen])
 
   useEffect(() => {
     const updateWidth = async () => {
@@ -53,7 +29,6 @@ const IconsSidebar: React.FC = () => {
       setSidebarWidth(isCompact ? 40 : 60)
     }
 
-    // Listen for changes on settings
     const handleSettingsChange = (isCompact: number) => {
       setSidebarWidth(isCompact ? 40 : 60)
     }
@@ -132,22 +107,7 @@ const IconsSidebar: React.FC = () => {
         </div>
       </div>
 
-      <NewNoteComponent isOpen={isNewNoteModalOpen} onClose={() => setIsNewNoteModalOpen(false)} />
-      <NewDirectoryComponent isOpen={isNewDirectoryModalOpen} onClose={() => setIsNewDirectoryModalOpen(false)} />
-      {isFlashcardModeOpen && (
-        <FlashcardMenuModal
-          isOpen={isFlashcardModeOpen}
-          onClose={() => {
-            setIsFlashcardModeOpen(false)
-            setInitialFileToCreateFlashcard('')
-            setInitialFileToReviewFlashcard('')
-          }}
-          initialFileToCreateFlashcard={initialFileToCreateFlashcard}
-          initialFileToReviewFlashcard={initialFileToReviewFlashcard}
-        />
-      )}
       <div className="grow border-yellow-300" />
-      <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} />
       <div
         className="mb-[2px] flex w-full cursor-pointer items-center justify-center border-none bg-transparent pb-2"
         onClick={() => window.electronUtils.openNewWindow()}

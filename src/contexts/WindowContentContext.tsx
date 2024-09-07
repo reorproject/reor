@@ -1,10 +1,14 @@
-import React, { createContext, useContext, useEffect, useMemo, ReactNode } from 'react'
+import React, { createContext, useContext, useEffect, useMemo, ReactNode, useState } from 'react'
 
 import { UNINITIALIZED_STATE, useChatContext } from './ChatContext'
 import { useFileContext } from './FileContext'
+import { OnShowContextMenuData, ShowContextMenuInputType } from '@/components/Menu/CustomContextMenu'
 
 interface WindowContentContextType {
   openContent: (pathOrChatID: string, optionalContentToWriteOnCreate?: string) => void
+  focusedItem: OnShowContextMenuData
+  showContextMenu: ShowContextMenuInputType
+  hideFocusedItem: () => void
 }
 
 const WindowContentContext = createContext<WindowContentContextType | undefined>(undefined)
@@ -22,6 +26,11 @@ interface WindowContentProviderProps {
 }
 
 export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ children }) => {
+  const [focusedItem, setFocusedItem] = useState<OnShowContextMenuData>({
+    currentSelection: 'None',
+    position: { x: 0, y: 0 },
+  })
+
   const { currentOpenChat, setCurrentOpenChat, allChatsMetadata, setShowChatbot, setSidebarShowing } = useChatContext()
   const { currentlyOpenFilePath, openOrCreateFile } = useFileContext()
 
@@ -47,6 +56,27 @@ export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ ch
     [allChatsMetadata, setShowChatbot, setCurrentOpenChat, setSidebarShowing, openOrCreateFile],
   )
 
+  const showContextMenu: ShowContextMenuInputType = React.useCallback(
+    (event, locationOnScreen, additionalData = {}) => {
+      event.preventDefault()
+      setFocusedItem({
+        currentSelection: locationOnScreen,
+        position: { x: event.clientX, y: event.clientY },
+        ...additionalData,
+      })
+    },
+    [setFocusedItem],
+  )
+
+  const hideFocusedItem = React.useCallback(() => {
+    setFocusedItem((prevItem: OnShowContextMenuData) => ({
+      currentSelection: 'None',
+      position: { x: 0, y: 0 },
+      file: prevItem.file,
+      chatMetadata: prevItem.chatMetadata,
+    }))
+  }, [setFocusedItem])
+
   useEffect(() => {
     if (currentlyOpenFilePath != null && filePathRef.current !== currentlyOpenFilePath) {
       filePathRef.current = currentlyOpenFilePath
@@ -61,8 +91,11 @@ export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ ch
   const WindowContentContextMemo = useMemo(
     () => ({
       openContent,
+      focusedItem,
+      showContextMenu,
+      hideFocusedItem,
     }),
-    [openContent],
+    [openContent, focusedItem, showContextMenu, hideFocusedItem],
   )
 
   return <WindowContentContext.Provider value={WindowContentContextMemo}>{children}</WindowContentContext.Provider>

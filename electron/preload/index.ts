@@ -8,11 +8,10 @@ import {
   LLMGenerationParameters,
   Tab,
 } from 'electron/main/electron-store/storeConfig'
-import { FileInfoNode, FileInfoTree, RenameFileProps, WriteFileProps } from 'electron/main/filesystem/types'
+import { FileInfoTree, RenameFileProps, WriteFileProps } from 'electron/main/filesystem/types'
 import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema'
 
 import { Chat } from '@/components/Chat/types'
-import { ChatMetadata } from '@/contexts/ChatContext'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type IPCHandler<T extends (...args: any[]) => any> = (...args: Parameters<T>) => Promise<ReturnType<T>>
@@ -40,8 +39,6 @@ const electronUtils = {
   getPlatform: createIPCHandler<() => Promise<string>>('get-platform'),
   openNewWindow: createIPCHandler<() => Promise<void>>('open-new-window'),
   getReorAppVersion: createIPCHandler<() => Promise<string>>('get-reor-app-version'),
-  showFileItemContextMenu: createIPCHandler<(file: FileInfoNode) => Promise<void>>('show-context-menu-file-item'),
-  showChatItemContext: createIPCHandler<(chatRow: ChatMetadata) => Promise<void>>('show-chat-menu-item'),
 }
 
 const electronStore = {
@@ -73,7 +70,7 @@ const electronStore = {
   setHasUserOpenedAppBefore: createIPCHandler<() => Promise<void>>('set-user-has-opened-app-before'),
   getAllChats: createIPCHandler<() => Promise<Chat[]>>('get-all-chats'),
   updateChat: createIPCHandler<(chat: Chat) => Promise<void>>('update-chat'),
-  removeChatAtID: createIPCHandler<(chatID: string) => Promise<void>>('remove-chat-at-id'),
+  deleteChatAtID: createIPCHandler<(chatID: string) => Promise<void>>('delete-chat-at-id'),
   getChat: createIPCHandler<(chatID: string) => Promise<Chat>>('get-chat'),
   getSBCompact: createIPCHandler<() => Promise<boolean>>('get-sb-compact'),
   setSBCompact: createIPCHandler<(isSBCompact: boolean) => Promise<void>>('set-sb-compact'),

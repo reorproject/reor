@@ -103,7 +103,7 @@ Make sure you generate the flashcards in the correct format and that are relevan
 
   return (
     <ReorModal isOpen={isOpen} onClose={onClose}>
-      <div className="mx-6 mb-6 mt-2 h-full w-[800px]">
+      <div className="mx-6 mb-6 mt-2 h-full w-[60vw] lg:w-[40vw]">
         <h2 className="mb-3 text-xl font-semibold text-white">
           Select a file to generate flashcards for:
           <input

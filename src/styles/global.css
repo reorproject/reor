@@ -67,49 +67,6 @@ button {
   border-radius: 2px;
 }
 
-/* CSS for menu that appears when selecting/highlighting text */
-.bubble-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 225px;
-  background: #323232;
-  border: 1px solid gray;
-  border-radius: 4px;
-  box-shadow: 0 2px 6px 2px rgba(60, 64, 67, 0.15);
-  max-height: calc(100vh - 94px);
-  overflow-y: auto;
-
-  cursor: default;
-  font-size: 13px;
-  margin: 0;
-  outline: none;
-  padding: 6px 0;
-  position: absolute;
-  align-items: flex-start;
-}
-
-.bubble-menu-item {
-  display: flex;
-  align-items: center;
-  padding: 8px 12px;
-  margin: 0;
-  background: transparent;
-  border: none;
-  color: white;
-  justify-content: flex-start;
-  width: 100%;
-}
-
-.bubble-menu-item:hover {
-  background: #242424;
-}
-
-.bubble-menu-item.disabled {
-  color: #ccc;
-  cursor: not-allowed;
-}
-
 .icon {
   margin-right: 16px;
 }
@@ -121,8 +78,8 @@ button {
 
 /* Css for table on bubble-menu */
 .table-size-selector {
-  background: #323232;
-  border: 1px solid #ccc;
+  background: #1E1E1E;
+  border: 1px solid rgb(55 65 81);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 10px;
   z-index: 1050;
@@ -136,7 +93,7 @@ button {
   width: 20px;
   height: 20px;
   border: 1px solid #ccc;
-  background-color: #6f6c6c;
+  background-color: #323232;
   transition: background-color 0.3s;
   margin: 1px;
 }

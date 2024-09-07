@@ -13,7 +13,7 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
   const fileObject = visibleItems[index]
 
   const { handleDirectoryToggle, expandedDirectories, currentlyOpenFilePath } = useFileContext()
-  const { openContent: openTabContent } = useWindowContentContext()
+  const { openContent, showContextMenu } = useWindowContentContext()
 
   const [isDragOver, setIsDragOver] = useState(false)
 
@@ -55,7 +55,7 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
     if (isDirectory) {
       handleDirectoryToggle(fileObject.file.path)
     } else {
-      openTabContent(fileObject.file.path)
+      openContent(fileObject.file.path)
       posthog.capture('open_file_from_sidebar')
     }
   }
@@ -65,10 +65,10 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
     handleDragFile(e, fileObject.file)
   }
 
-  const handleContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    window.electronUtils.showFileItemContextMenu(fileObject.file)
+  const showContextMenuOnDirOrFile = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.stopPropagation()
+    if (isDirectory) showContextMenu(event, 'DirectoryItem', { file: fileObject.file })
+    else showContextMenu(event, 'FileItem', { file: fileObject.file })
   }
 
   const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-neutral-700 h-full mt-0 mb-0 text-cyan-100 font-sans text-xs leading-relaxed rounded-md ${
@@ -80,7 +80,7 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
       <div
         draggable
         onDragStart={localHandleDragStart}
-        onContextMenu={handleContextMenu}
+        onContextMenu={showContextMenuOnDirOrFile}
         onDragOver={handleDragOver}
         onDrop={handleDrop}
         onDragLeave={handleDragLeave}
