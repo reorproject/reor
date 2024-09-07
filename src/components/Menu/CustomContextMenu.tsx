@@ -7,17 +7,20 @@ import { useWindowContentContext } from '@/contexts/WindowContentContext'
 
 export type ContextMenuLocations = 'FileSidebar' | 'FileItem' | 'ChatItem' | 'DirectoryItem' | 'None'
 
-export interface ContextMenuFocus {
-  currentSelection: ContextMenuLocations
-  locations: Position
+export interface AdditionalContextMenuData {
   file?: FileInfoNode
   chatMetadata?: ChatMetadata
 }
 
+export interface OnShowContextMenuData extends AdditionalContextMenuData {
+  currentSelection: ContextMenuLocations
+  position: Position
+}
+
 export type ShowContextMenuInputType = (
   event: React.MouseEvent<HTMLDivElement>,
-  focusedItem: ContextMenuLocations,
-  additionalData?: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>>,
+  locationOnScreen: ContextMenuLocations,
+  additionalData?: AdditionalContextMenuData,
 ) => void
 
 interface Position {
@@ -33,7 +36,7 @@ interface MenuItemType {
 
 const CustomContextMenu: React.FC = () => {
   const { focusedItem, hideFocusedItem } = useWindowContentContext()
-  const { currentSelection, locations, file, chatMetadata } = focusedItem
+  const { currentSelection, position, file, chatMetadata } = focusedItem
   const menuRef = useRef<HTMLDivElement>(null)
 
   const { setIsNewNoteModalOpen, setIsNewDirectoryModalOpen, setIsFlashcardModeOpen, setInitialFileToCreateFlashcard } =
@@ -54,7 +57,7 @@ const CustomContextMenu: React.FC = () => {
     const menuElement = menuRef.current
     if (menuElement) {
       const { height } = menuElement.getBoundingClientRect()
-      if (locations.y + height > window.innerHeight) {
+      if (position.y + height > window.innerHeight) {
         menuElement.style.top = `${window.innerHeight - height - 10}px`
       }
     }
@@ -62,7 +65,7 @@ const CustomContextMenu: React.FC = () => {
     return () => {
       document.removeEventListener('mousedown', handleOutsideClick)
     }
-  }, [hideFocusedItem, locations.y])
+  }, [hideFocusedItem, position.y])
 
   const handleMakeFlashcard = (noteName: string | null) => {
     if (!noteName) return
@@ -138,8 +141,8 @@ const CustomContextMenu: React.FC = () => {
           ref={menuRef}
           className="absolute z-[1020] overflow-y-auto rounded-md border-solid border-gray-700 bg-[#1E1E1E] px-1 py-2"
           style={{
-            left: locations.x,
-            top: locations.y,
+            left: position.x,
+            top: position.y,
             boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
           }}
         >

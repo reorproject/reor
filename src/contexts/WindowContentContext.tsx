@@ -2,11 +2,11 @@ import React, { createContext, useContext, useEffect, useMemo, ReactNode, useSta
 
 import { UNINITIALIZED_STATE, useChatContext } from './ChatContext'
 import { useFileContext } from './FileContext'
-import { ContextMenuFocus, ContextMenuLocations, ShowContextMenuInputType } from '@/components/Menu/CustomContextMenu'
+import { OnShowContextMenuData, ShowContextMenuInputType } from '@/components/Menu/CustomContextMenu'
 
 interface WindowContentContextType {
   openContent: (pathOrChatID: string, optionalContentToWriteOnCreate?: string) => void
-  focusedItem: ContextMenuFocus
+  focusedItem: OnShowContextMenuData
   showContextMenu: ShowContextMenuInputType
   hideFocusedItem: () => void
 }
@@ -26,9 +26,9 @@ interface WindowContentProviderProps {
 }
 
 export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ children }) => {
-  const [focusedItem, setFocusedItem] = useState<ContextMenuFocus>({
+  const [focusedItem, setFocusedItem] = useState<OnShowContextMenuData>({
     currentSelection: 'None',
-    locations: { x: 0, y: 0 },
+    position: { x: 0, y: 0 },
   })
 
   const { currentOpenChat, setCurrentOpenChat, allChatsMetadata, setShowChatbot, setSidebarShowing } = useChatContext()
@@ -57,16 +57,11 @@ export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ ch
   )
 
   const showContextMenu: ShowContextMenuInputType = React.useCallback(
-    (
-      event: React.MouseEvent<HTMLDivElement>,
-      locationOnScreen: ContextMenuLocations,
-      additionalData: Partial<Omit<ContextMenuFocus, 'currentSelection' | 'locations'>> = {},
-    ) => {
+    (event, locationOnScreen, additionalData = {}) => {
       event.preventDefault()
-
       setFocusedItem({
         currentSelection: locationOnScreen,
-        locations: { x: event.clientX, y: event.clientY },
+        position: { x: event.clientX, y: event.clientY },
         ...additionalData,
       })
     },
@@ -74,9 +69,9 @@ export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ ch
   )
 
   const hideFocusedItem = React.useCallback(() => {
-    setFocusedItem((prevItem: ContextMenuFocus) => ({
+    setFocusedItem((prevItem: OnShowContextMenuData) => ({
       currentSelection: 'None',
-      locations: { x: 0, y: 0 },
+      position: { x: 0, y: 0 },
       file: prevItem.file,
       chatMetadata: prevItem.chatMetadata,
     }))
