@@ -146,16 +146,6 @@ button {
   background-color: #ddd;
 }
 
-
-/**
- * TAKEN FROM: https://tiptap.dev/docs/editor/extensions/nodes/table
- */
-/* Basic editor styles */
-.ProseMirror .save-content::after {
-  content: "\00A0";
-  display: inline-block;
-}
-
 .tiptap :first-child {
   margin-top: 0;
 }

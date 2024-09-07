@@ -143,11 +143,7 @@ const useFileByFilepath = () => {
     extensions: [
       StarterKit,
       Document,
-      Paragraph.configure({
-        HTMLAttributes: {
-          class: 'save-content min-h-[1rem]',
-        },
-      }),
+      Paragraph,
       HardBreak.extend({
         renderText() {
           return '\n'
