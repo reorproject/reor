@@ -36,7 +36,6 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
       setLLMConfigs(LLMConfigs)
       const defaultLLM = await window.llm.getDefaultLLMName()
       setSelectedLLM(defaultLLM)
-      console.log('fetched defaultLLM', defaultLLM)
     }
     fetchLLMModels()
   }, [])

@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState, useRef } from 'react'
 import posthog from 'posthog-js'
 
 import { streamText } from 'ai'
-import { anonymizeChatFiltersForPosthog, resolveLLMClient, resolveRAGContext } from './utils'
+import { anonymizeChatFiltersForPosthog, resolveLLMClient, generateRAGMessages } from './utils'
 
 import '../../styles/chat.css'
 import ChatMessages from './ChatMessages'
@@ -102,7 +102,7 @@ const ChatComponent: React.FC = () => {
         }
       }
       if (outputChat.messages.length === 0 && chatFilters) {
-        outputChat.messages.push(await resolveRAGContext(userTextFieldInput ?? '', chatFilters))
+        outputChat.messages.push(...(await generateRAGMessages(userTextFieldInput ?? '', chatFilters)))
       } else {
         outputChat.messages.push({
           role: 'user',

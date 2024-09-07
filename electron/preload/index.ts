@@ -8,8 +8,8 @@ import {
   LLMGenerationParameters,
   Tab,
 } from 'electron/main/electron-store/storeConfig'
-import { FileInfoTree, RenameFileProps, WriteFileProps } from 'electron/main/filesystem/types'
-import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema'
+import { FileInfoTree, FileInfoWithContent, RenameFileProps, WriteFileProps } from 'electron/main/filesystem/types'
+import { DBQueryResult } from 'electron/main/vector-database/schema'
 
 import { Chat } from '@/components/Chat/types'
 
@@ -102,10 +102,10 @@ const fileSystem = {
   checkFileExists: createIPCHandler<(filePath: string) => Promise<boolean>>('check-file-exists'),
   deleteFile: createIPCHandler<(filePath: string) => Promise<void>>('delete-file'),
   moveFileOrDir: createIPCHandler<(sourcePath: string, destinationPath: string) => Promise<void>>('move-file-or-dir'),
-  getFilesystemPathsAsDBItems: createIPCHandler<(paths: string[]) => Promise<DBEntry[]>>(
-    'get-filesystem-paths-as-db-items',
-  ),
   getAllFilenamesInDirectory: createIPCHandler<(dirName: string) => Promise<string[]>>('get-files-in-directory'),
+  getFileInfoWithContentsForPaths: createIPCHandler<(filePaths: string[]) => Promise<FileInfoWithContent[]>>(
+    'get-files-info-and-content-for-paths',
+  ),
 }
 
 const path = {

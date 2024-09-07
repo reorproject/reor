@@ -1,6 +1,7 @@
 import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema'
 import { createOpenAI } from '@ai-sdk/openai'
 import { createAnthropic } from '@ai-sdk/anthropic'
+import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { AnonymizedChatFilters, Chat, ChatFilters, ReorChatMessage } from './types'
 
 export const appendTextContentToMessages = (messages: ReorChatMessage[], text: string): ReorChatMessage[] => {
@@ -67,22 +68,35 @@ export const generateTimeStampFilter = (minDate?: Date, maxDate?: Date): string 
   return filter
 }
 
-export const resolveRAGContext = async (query: string, chatFilters: ChatFilters): Promise<ReorChatMessage> => {
-  let results: DBEntry[] = []
+const fetchResults = async (query: string, chatFilters: ChatFilters): Promise<DBEntry[] | FileInfoWithContent[]> => {
   if (chatFilters.files.length > 0) {
-    results = await window.fileSystem.getFilesystemPathsAsDBItems(chatFilters.files)
-  } else if (chatFilters.numberOfChunksToFetch > 0) {
+    return window.fileSystem.getFileInfoWithContentsForPaths(chatFilters.files)
+  }
+
+  if (chatFilters.numberOfChunksToFetch > 0) {
     const timeStampFilter = generateTimeStampFilter(chatFilters.minDate, chatFilters.maxDate)
-    results = await window.database.search(query, chatFilters.numberOfChunksToFetch, timeStampFilter)
+    const dbSearchResults = await window.database.search(query, chatFilters.numberOfChunksToFetch, timeStampFilter)
+
+    if (chatFilters.passFullNoteIntoContext) {
+      return window.fileSystem.getFileInfoWithContentsForPaths(dbSearchResults.map((result) => result.notepath))
+    }
+    return dbSearchResults
   }
-  return {
-    role: 'user',
-    context: results,
-    content: `Based on the following context answer the question down below. \n\n\nContext: \n${results
-      .map((dbItem) => dbItem.content)
-      .join('\n\n')}\n\n\nQuery:\n${query}`,
-    visibleContent: query,
-  }
+  return []
+}
+
+export const generateRAGMessages = async (query: string, chatFilters: ChatFilters): Promise<ReorChatMessage[]> => {
+  const results = await fetchResults(query, chatFilters)
+  return [
+    {
+      role: 'user',
+      context: results,
+      content: `Based on the following context answer the question down below. \n\n\nContext: \n${results
+        .map((dbItem) => dbItem.content)
+        .join('\n\n')}\n\n\nQuery:\n${query}`,
+      visibleContent: query,
+    },
+  ]
 }
 
 export const getChatHistoryContext = (chatHistory: Chat | undefined): DBQueryResult[] => {

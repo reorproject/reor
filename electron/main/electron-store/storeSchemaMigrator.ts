@@ -50,7 +50,7 @@ export function setupDefaultStoreValues(store: Store<StoreSchema>) {
   }
 
   if (!store.get(StoreKeys.ChunkSize)) {
-    store.set(StoreKeys.ChunkSize, 500)
+    store.set(StoreKeys.ChunkSize, 1000)
   }
 
   setupDefaultAnalyticsValue(store)

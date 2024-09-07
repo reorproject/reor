@@ -41,16 +41,17 @@ const AddContextFiltersModal: React.FC<Props> = ({ isOpen, onClose, chatFilters,
     { label: 'Past year', value: 'lastYear' },
   ]
 
-  // useEffect(() => {
-  //   const updatedChatFilters: ChatFilters = {
-  //     ...chatFilters,
-  //     files: [...new Set([...chatFilters.files, ...internalFilesSelected])],
-  //     numberOfChunksToFetch,
-  //     minDate: minDate || undefined,
-  //     maxDate: maxDate || undefined,
-  //   }
-  //   setChatFilters(updatedChatFilters)
-  // }, [internalFilesSelected, numberOfChunksToFetch, minDate, maxDate, setChatFilters])
+  useEffect(() => {
+    const updatedChatFilters: ChatFilters = {
+      ...chatFilters,
+      files: [...new Set([...chatFilters.files, ...internalFilesSelected])],
+      numberOfChunksToFetch,
+      minDate: minDate || undefined,
+      maxDate: maxDate || undefined,
+      passFullNoteIntoContext: true,
+    }
+    setChatFilters(updatedChatFilters)
+  }, [internalFilesSelected, numberOfChunksToFetch, minDate, maxDate, setChatFilters, chatFilters])
 
   const handleNumberOfChunksChange = (event: Event, value: number | number[]) => {
     const newValue = Array.isArray(value) ? value[0] : value

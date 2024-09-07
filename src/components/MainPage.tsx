@@ -18,7 +18,7 @@ import CustomContextMenu from './Menu/CustomContextMenu'
 import CommonModals from './Common/CommonModals'
 
 const MainPageContent: React.FC = () => {
-  const [showSimilarFiles, setShowSimilarFiles] = useState(true)
+  const [showSimilarFiles, setShowSimilarFiles] = useState(false)
 
   const { currentlyOpenFilePath } = useFileContext()
 

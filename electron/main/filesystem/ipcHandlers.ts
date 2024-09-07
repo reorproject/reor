@@ -6,12 +6,7 @@ import Store from 'electron-store'
 
 import WindowsManager from '../common/windowManager'
 import { StoreSchema } from '../electron-store/storeConfig'
-import { DBEntry } from '../vector-database/schema'
-import {
-  convertFileInfoListToDBItems,
-  orchestrateEntryMove,
-  updateFileInTable,
-} from '../vector-database/tableHelperFunctions'
+import { orchestrateEntryMove, updateFileInTable } from '../vector-database/tableHelperFunctions'
 
 import {
   GetFilesInfoTree,
@@ -21,7 +16,7 @@ import {
   startWatchingDirectory,
   updateFileListForRenderer,
 } from './filesystem'
-import { FileInfoTree, WriteFileProps, RenameFileProps } from './types'
+import { FileInfoTree, WriteFileProps, RenameFileProps, FileInfoWithContent } from './types'
 
 const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: WindowsManager) => {
   const windowsManager = _windowsManager
@@ -164,13 +159,14 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
     orchestrateEntryMove(windowInfo.dbTableClient, sourcePath, destinationPath)
   })
 
-  ipcMain.handle('get-filesystem-paths-as-db-items', async (_event, filePaths: string[]): Promise<DBEntry[]> => {
-    const fileItems = GetFilesInfoListForListOfPaths(filePaths)
-
-    const dbItems = await convertFileInfoListToDBItems(fileItems)
-
-    return dbItems.flat()
-  })
+  ipcMain.handle(
+    'get-file-info-and-content-for-paths',
+    async (_event, filePaths: string[]): Promise<FileInfoWithContent[]> => {
+      const fileItems = GetFilesInfoListForListOfPaths(filePaths)
+      const fileContents = fileItems.map((fileItem) => fs.readFileSync(fileItem.path, 'utf-8'))
+      return fileItems.map((fileItem, index) => ({ ...fileItem, content: fileContents[index] }))
+    },
+  )
 
   ipcMain.handle('get-files-in-directory', (event, dirName: string) => {
     const itemsInDir = fs.readdirSync(dirName).filter((item) => !isHidden(item))

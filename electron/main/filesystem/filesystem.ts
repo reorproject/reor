@@ -97,11 +97,9 @@ export function GetFilesInfoList(directory: string): FileInfo[] {
 }
 
 export function GetFilesInfoListForListOfPaths(paths: string[]): FileInfo[] {
-  // so perhaps for this function, all we maybe need to do is remove
   const fileInfoTree = paths.map((_path) => GetFilesInfoTree(_path)).flat()
   const fileInfoList = flattenFileInfoTree(fileInfoTree)
 
-  // remove duplicates:
   const uniquePaths = new Set()
   const fileInfoListWithoutDuplicates = fileInfoList.filter((fileInfo) => {
     if (uniquePaths.has(fileInfo.path)) {

@@ -1,8 +1,9 @@
 import { CoreMessage } from 'ai'
+import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { DBEntry } from 'electron/main/vector-database/schema'
 
 export type ReorChatMessage = CoreMessage & {
-  context?: DBEntry[]
+  context?: DBEntry[] | FileInfoWithContent[]
   visibleContent?: string
 }
 
@@ -17,6 +18,7 @@ export interface ChatFilters {
   files: string[]
   minDate?: Date
   maxDate?: Date
+  passFullNoteIntoContext?: boolean
 }
 
 export interface AnonymizedChatFilters {
