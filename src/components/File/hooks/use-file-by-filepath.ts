@@ -115,7 +115,6 @@ const useFileByFilepath = () => {
   }
 
   const openRelativePathRef = useRef<(newFilePath: string) => Promise<void>>()
-  // openRelativePathRef.current = openOrCreateFile
 
   // Check if we should display markdown or not
   useEffect(() => {
@@ -146,8 +145,8 @@ const useFileByFilepath = () => {
       Document,
       Paragraph.configure({
         HTMLAttributes: {
-          class: 'save-content min-h-[1rem]'
-        }
+          class: 'save-content min-h-[1rem]',
+        },
       }),
       HardBreak.extend({
         renderText() {
@@ -175,7 +174,7 @@ const useFileByFilepath = () => {
         tightLists: true, // No <p> inside <li> in markdown output
         tightListClass: 'tight', // Add class to <ul> allowing you to remove <p> margins when tight
         bulletListMarker: '-', // <li> prefix in markdown output
-        breaks: true,   // New lines (\n) in markdown input are converted to <br>
+        breaks: true, // New lines (\n) in markdown input are converted to <br>
         linkify: true, // Create links from "https://..." text
         transformPastedText: true, // Allow to paste markdown text in the editor
         transformCopiedText: false, // Copied text is transformed to markdown
@@ -207,7 +206,6 @@ const useFileByFilepath = () => {
   const [debouncedEditor] = useDebounce(editor?.state.doc.content, 4000)
 
   useEffect(() => {
-    console.log("Content:", editor?.state.doc.content)
     if (debouncedEditor && !currentlyChangingFilePath) {
       writeEditorContentToDisk(editor, currentlyOpenedFilePath)
     }
@@ -219,7 +217,6 @@ const useFileByFilepath = () => {
 
   const writeEditorContentToDisk = async (_editor: Editor | null, filePath: string | null) => {
     if (filePath !== null && needToWriteEditorContentToDisk && _editor) {
-      // const markdownContent = getMarkdown(_editor)
       const htmlContent = editor?.getHTML()
       if (htmlContent !== undefined) {
         await window.fileSystem.writeFile({
@@ -295,11 +292,10 @@ const useFileByFilepath = () => {
   useEffect(() => {
     const handleWindowClose = async () => {
       if (currentlyOpenedFilePath !== null && editor && editor.getHTML() !== null) {
-        console.log("Writing file!!")
-        const markdown = getMarkdown(editor)
+        const html = editor.getHTML()
         await window.fileSystem.writeFile({
           filePath: currentlyOpenedFilePath,
-          content: markdown,
+          content: html,
         })
         await window.fileSystem.indexFileInDatabase(currentlyOpenedFilePath)
       }
@@ -331,17 +327,6 @@ const useFileByFilepath = () => {
     setSuggestionsState,
     setSpellCheckEnabled,
   }
-}
-
-function getMarkdown(editor: Editor) {
-  // Fetch the current markdown content from the editor
-  const originalMarkdown = editor.storage.markdown.getMarkdown()
-  // Replace the escaped square brackets with unescaped ones
-  // const modifiedMarkdown = originalMarkdown
-  //   .replace(/\\\[/g, '[') // Replaces \[ with [
-  //   .replace(/\\\]/g, ']') // Replaces \] wi ]
-  console.log("HTML:", editor.getHTML())
-  return originalMarkdown
 }
 
 export default useFileByFilepath
