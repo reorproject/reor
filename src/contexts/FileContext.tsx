@@ -220,17 +220,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }
 
-  // useEffect(() => {
-  //   const deleteFile = async (path: string) => {
-  //     await window.fileSystem.deleteFile(path)
-  //     window.electronStore.removeOpenTabsByPath(path)
-  //     if (currentlyOpenFilePath === path) {
-  //       editor?.commands.setContent('')
-  //       setCurrentlyOpenFilePath(null)
-  //     }
-  //   }
-  // }, [currentlyOpenFilePath, editor])
-
   useEffect(() => {
     async function checkAppUsage() {
       if (!editor || currentlyOpenFilePath) return
@@ -258,21 +247,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setCurrentlyOpenFilePath(newFilePath)
     }
   }
-
-  // useEffect(() => {
-  //   const renameFileListener = window.ipcRenderer.receive('rename-file-listener', (noteName: string) =>
-  //     setFileNodeToBeRenamed(noteName),
-  //   )
-  // open a new file rename dialog
-  // useEffect(() => {
-  //   const renameFileListener = window.ipcRenderer.receive('rename-file-listener', (noteName: string) =>
-  //     setFileNodeToBeRenamed(noteName),
-  //   )
-
-  //   return () => {
-  //     renameFileListener()
-  //   }
-  // }, [])
 
   useEffect(() => {
     const handleWindowClose = async () => {

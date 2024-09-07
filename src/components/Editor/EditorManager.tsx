@@ -7,7 +7,7 @@ import { useFileContext } from '@/contexts/FileContext'
 
 const EditorManager: React.FC = () => {
   const [showSearchBar, setShowSearchBar] = useState(false)
-  const [menuVisible, setMenuVisible] = useState(false)
+  const [contextMenuVisible, setContextMenuVisible] = useState(false)
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
   const [editorFlex, setEditorFlex] = useState(true)
   const [showPlaceholder, setShowPlaceholder] = useState(false)
@@ -21,11 +21,11 @@ const EditorManager: React.FC = () => {
       x: event.pageX,
       y: event.pageY,
     })
-    setMenuVisible(true)
+    setContextMenuVisible(true)
   }
 
   const hideMenu = () => {
-    if (menuVisible) setMenuVisible(false)
+    if (contextMenuVisible) setContextMenuVisible(false)
   }
 
   useEffect(() => {
@@ -98,11 +98,11 @@ const EditorManager: React.FC = () => {
       onClick={() => editor?.commands.focus()}
     >
       <SearchBar editor={editor} showSearch={showSearchBar} setShowSearch={setShowSearchBar} />
-      {menuVisible && (
+      {contextMenuVisible && (
         <EditorContextMenu
           editor={editor}
           menuPosition={menuPosition}
-          setMenuVisible={setMenuVisible}
+          setMenuVisible={setContextMenuVisible}
           hideMenu={hideMenu}
         />
       )}

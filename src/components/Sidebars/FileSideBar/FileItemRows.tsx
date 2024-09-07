@@ -65,12 +65,6 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
     handleDragFile(e, fileObject.file)
   }
 
-  // const handleContextMenu = (e: React.MouseEvent) => {
-  //   e.preventDefault()
-  //   e.stopPropagation()
-  //   // window.electronUtils.showFileItemContextMenu(fileObject.file)
-  // }
-
   const showContextMenuOnDirOrFile = (event: React.MouseEvent<HTMLDivElement>) => {
     event.stopPropagation()
     if (isDirectory) showContextMenu(event, 'DirectoryItem', { file: fileObject.file })
