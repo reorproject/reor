@@ -27,7 +27,6 @@ const HighlightExtension = (setHighlightData: (data: HighlightData) => void) =>
                   const buttonTop = top - 35 // Adjust the vertical offset as needed
                   const buttonLeft = (left + right) / 2 - 190 // Position the button horizontally centered
 
-                  console.log('calling sethighlight data: ', highlightedText)
                   setHighlightData({
                     text: highlightedText,
                     position: { top: buttonTop, left: buttonLeft },
