@@ -45,7 +45,7 @@ class LanceDBTableWrapper {
     await this.deleteDBItemsByFilePaths(data.map((x) => x.notepath))
 
     const recordEntry: Record<string, unknown>[] = data as unknown as Record<string, unknown>[]
-    const numberOfChunksToIndexAtOnce = 50
+    const numberOfChunksToIndexAtOnce = process.platform === 'darwin' ? 50 : 40
     const chunks = []
     for (let i = 0; i < recordEntry.length; i += numberOfChunksToIndexAtOnce) {
       chunks.push(recordEntry.slice(i, i + numberOfChunksToIndexAtOnce))
@@ -54,15 +54,16 @@ class LanceDBTableWrapper {
     if (chunks.length === 0) return
 
     const totalChunks = chunks.length
-    chunks.forEach(async (chunk, index) => {
+
+    await chunks.reduce(async (previousPromise, chunk, index) => {
+      await previousPromise
       const arrowTableOfChunk = makeArrowTable(chunk)
       await this.lanceTable.add(arrowTableOfChunk)
-
       const progress = (index + 1) / totalChunks
       if (onProgress) {
         onProgress(progress)
       }
-    })
+    }, Promise.resolve())
   }
 
   async deleteDBItemsByFilePaths(filePaths: string[]): Promise<void> {
