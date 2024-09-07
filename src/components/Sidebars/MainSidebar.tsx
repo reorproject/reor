@@ -2,22 +2,24 @@ import React, { useState } from 'react'
 
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 
-import { ChatsSidebar } from '../Chat/ChatsSidebar'
+import { ChatSidebar } from '../Chat/ChatSidebar'
 
 import SearchComponent from './FileSidebarSearch'
-import FileSidebar from './FileSideBar'
 import { useChatContext } from '@/contexts/ChatContext'
+import FileExplorer from './FileSideBar/FileExplorer'
 
 export type SidebarAbleToShow = 'files' | 'search' | 'chats'
 
 const SidebarManager: React.FC = () => {
   const { sidebarShowing } = useChatContext()
+
   const [searchQuery, setSearchQuery] = useState<string>('')
   const [searchResults, setSearchResults] = useState<DBQueryResult[]>([])
 
   return (
     <div className="size-full overflow-y-hidden">
-      {sidebarShowing === 'files' && <FileSidebar />}
+      {sidebarShowing === 'files' && <FileExplorer />}
+
       {sidebarShowing === 'search' && (
         <SearchComponent
           searchQuery={searchQuery}
@@ -27,7 +29,7 @@ const SidebarManager: React.FC = () => {
         />
       )}
 
-      {sidebarShowing === 'chats' && <ChatsSidebar />}
+      {sidebarShowing === 'chats' && <ChatSidebar />}
     </div>
   )
 }

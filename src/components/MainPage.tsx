@@ -9,11 +9,13 @@ import IconsSidebar from './Sidebars/IconsSidebar'
 import SidebarManager from './Sidebars/MainSidebar'
 import SimilarFilesSidebarComponent from './Sidebars/SimilarFilesSidebar'
 import EmptyPage from './Common/EmptyPage'
-import { TabProvider } from '../contexts/TabContext'
+import { WindowContentProvider } from '../contexts/WindowContentContext'
 import WritingAssistant from './WritingAssistant/WritingAssistant'
 import { ChatProvider, useChatContext } from '@/contexts/ChatContext'
 import { FileProvider, useFileContext } from '@/contexts/FileContext'
 import ModalProvider from '@/contexts/ModalContext'
+import CustomContextMenu from './Menu/CustomContextMenu'
+import CommonModals from './Common/CommonModals'
 
 const MainPageContent: React.FC = () => {
   const [showSimilarFiles, setShowSimilarFiles] = useState(true)
@@ -31,6 +33,7 @@ const MainPageContent: React.FC = () => {
           setShowSimilarFiles(!showSimilarFiles)
         }}
       />
+      <CustomContextMenu />
 
       <div className="flex h-below-titlebar">
         <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5">
@@ -65,9 +68,10 @@ const MainPageContent: React.FC = () => {
 
         {showChatbot && (
           <div className="h-below-titlebar w-full">
-            <ChatComponent showSimilarFiles={showSimilarFiles} />
+            <ChatComponent />
           </div>
         )}
+        <CommonModals />
       </div>
     </div>
   )
@@ -77,11 +81,11 @@ const MainPageComponent: React.FC = () => {
   return (
     <FileProvider>
       <ChatProvider>
-        <TabProvider>
+        <WindowContentProvider>
           <ModalProvider>
             <MainPageContent />
           </ModalProvider>
-        </TabProvider>
+        </WindowContentProvider>
       </ChatProvider>
     </FileProvider>
   )

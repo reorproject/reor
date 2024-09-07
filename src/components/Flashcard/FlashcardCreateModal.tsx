@@ -7,8 +7,7 @@ import { TypeAnimation } from 'react-type-animation'
 
 import { generateObject } from 'ai'
 import ReorModal from '../Common/Modal'
-import FilesSuggestionsDisplay from '../Editor/BacklinkSuggestionsDisplay'
-import useFileByFilepath from '../File/hooks/use-file-by-filepath'
+import FilesSuggestionsDisplay, { SuggestionsState } from '../Editor/BacklinkSuggestionsDisplay'
 
 import FlashcardCore from './FlashcardsCore'
 import { FlashcardQAPairSchema, FlashcardQAPairUI } from './types'
@@ -30,7 +29,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({ isOpen, onC
   const [vaultDirectory, setVaultDirectory] = useState<string>('')
 
   const { flattenedFiles } = useFileInfoTreeHook(vaultDirectory)
-  const { suggestionsState, setSuggestionsState } = useFileByFilepath()
+  const [suggestionsState, setSuggestionsState] = useState<SuggestionsState | null>()
 
   const [searchText, setSearchText] = useState<string>(initialFlashcardFile)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -104,7 +103,7 @@ Make sure you generate the flashcards in the correct format and that are relevan
 
   return (
     <ReorModal isOpen={isOpen} onClose={onClose}>
-      <div className="mx-6 mb-6 mt-2 h-full w-[800px]">
+      <div className="mx-6 mb-6 mt-2 h-full w-[60vw] lg:w-[40vw]">
         <h2 className="mb-3 text-xl font-semibold text-white">
           Select a file to generate flashcards for:
           <input

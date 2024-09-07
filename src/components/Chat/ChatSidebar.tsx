@@ -3,36 +3,33 @@ import React, { useEffect, useRef, useState } from 'react'
 import { RiChatNewFill, RiArrowDownSLine } from 'react-icons/ri'
 import { IoChatbubbles } from 'react-icons/io5'
 import posthog from 'posthog-js'
-import { ChatHistoryMetadata } from './hooks/use-chat-history'
-import { useChatContext } from '@/contexts/ChatContext'
+import { ChatMetadata, useChatContext } from '@/contexts/ChatContext'
+import { useWindowContentContext } from '@/contexts/WindowContentContext'
 
 export interface ChatItemProps {
-  chatMetadata: ChatHistoryMetadata
+  chatMetadata: ChatMetadata
 }
 
 export const ChatItem: React.FC<ChatItemProps> = ({ chatMetadata }) => {
-  const { setCurrentChatHistory, currentChatHistory } = useChatContext()
+  const { currentOpenChat } = useChatContext()
+  const { openContent, showContextMenu } = useWindowContentContext()
 
   const itemClasses = `
     flex items-center cursor-pointer py-2 px-3 rounded-md
     transition-colors duration-150 ease-in-out
-    ${chatMetadata.id === currentChatHistory?.id ? 'bg-neutral-700 text-white' : 'text-gray-300 hover:bg-neutral-800'}
+    ${chatMetadata.id === currentOpenChat?.id ? 'bg-neutral-700 text-white' : 'text-gray-300 hover:bg-neutral-800'}
   `
-
-  const handleContextMenu = (e: React.MouseEvent) => {
-    e.preventDefault()
-    window.electronUtils.showChatItemContext(chatMetadata)
-  }
-
   return (
     <div>
       <div
         onClick={async () => {
-          const chat = await window.electronStore.getChatHistory(chatMetadata.id)
-          setCurrentChatHistory(chat)
+          openContent(chatMetadata.id)
         }}
         className={itemClasses}
-        onContextMenu={handleContextMenu}
+        onContextMenu={(e) => {
+          e.stopPropagation()
+          showContextMenu(e, 'ChatItem', { chatMetadata })
+        }}
       >
         <IoChatbubbles />
         <span className="ml-2 flex-1 truncate text-[11px] font-medium">{chatMetadata.displayName}</span>
@@ -41,27 +38,27 @@ export const ChatItem: React.FC<ChatItemProps> = ({ chatMetadata }) => {
   )
 }
 
-export const ChatsSidebar: React.FC = () => {
+export const ChatSidebar: React.FC = () => {
   const [isRecentsOpen, setIsRecentsOpen] = useState(true)
-  const dropdownAnimationDelay = 0.2
+  const dropdownAnimationDelay = 0.02
 
-  const { setShowChatbot, chatHistoriesMetadata, setCurrentChatHistory, setChatFilters } = useChatContext()
+  const { setShowChatbot, allChatsMetadata, setCurrentOpenChat } = useChatContext()
 
   const toggleRecents = () => setIsRecentsOpen((prev) => !prev)
-
   const currentSelectedChatID = useRef<string | undefined>()
+
   useEffect(() => {
-    const deleteChatRow = window.ipcRenderer.receive('remove-chat-at-id', (chatID) => {
+    const deleteChatRow = window.ipcRenderer.receive('delete-chat-at-id', (chatID) => {
       if (chatID === currentSelectedChatID.current) {
         setShowChatbot(false)
       }
-      window.electronStore.removeChatHistoryAtID(chatID)
+      window.electronStore.deleteChatAtID(chatID)
     })
 
     return () => {
       deleteChatRow()
     }
-  }, [chatHistoriesMetadata, setShowChatbot])
+  }, [allChatsMetadata, setShowChatbot])
 
   return (
     <div className="flex h-full flex-col overflow-y-auto bg-neutral-800 px-2 pb-4 pt-2.5">
@@ -76,14 +73,8 @@ export const ChatsSidebar: React.FC = () => {
               type="button"
               onClick={() => {
                 posthog.capture('create_new_chat')
-                setCurrentChatHistory(undefined)
-
-                setChatFilters({
-                  files: [],
-                  numberOfChunksToFetch: 15,
-                  minDate: new Date(0),
-                  maxDate: new Date(),
-                })
+                setShowChatbot(true)
+                setCurrentOpenChat(undefined)
               }}
             >
               <RiChatNewFill className="text-xl" />
@@ -101,7 +92,7 @@ export const ChatsSidebar: React.FC = () => {
             </div>
             {isRecentsOpen && (
               <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
-                {chatHistoriesMetadata
+                {allChatsMetadata
                   .slice()
                   .reverse()
                   .map((chatMetadata, index) => (

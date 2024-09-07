@@ -8,10 +8,9 @@ import {
   LLMGenerationParameters,
   Tab,
 } from 'electron/main/electron-store/storeConfig'
-import { FileInfoNode, FileInfoTree, RenameFileProps, WriteFileProps } from 'electron/main/filesystem/types'
+import { FileInfoTree, RenameFileProps, WriteFileProps } from 'electron/main/filesystem/types'
 import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema'
 
-import { ChatHistoryMetadata } from '@/components/Chat/hooks/use-chat-history'
 import { Chat } from '@/components/Chat/types'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -40,8 +39,6 @@ const electronUtils = {
   getPlatform: createIPCHandler<() => Promise<string>>('get-platform'),
   openNewWindow: createIPCHandler<() => Promise<void>>('open-new-window'),
   getReorAppVersion: createIPCHandler<() => Promise<string>>('get-reor-app-version'),
-  showFileItemContextMenu: createIPCHandler<(file: FileInfoNode) => Promise<void>>('show-context-menu-file-item'),
-  showChatItemContext: createIPCHandler<(chatRow: ChatHistoryMetadata) => Promise<void>>('show-chat-menu-item'),
 }
 
 const electronStore = {
@@ -71,10 +68,10 @@ const electronStore = {
   setSpellCheckMode: createIPCHandler<(isSpellCheck: boolean) => Promise<void>>('set-spellcheck-mode'),
   getHasUserOpenedAppBefore: createIPCHandler<() => Promise<boolean>>('has-user-opened-app-before'),
   setHasUserOpenedAppBefore: createIPCHandler<() => Promise<void>>('set-user-has-opened-app-before'),
-  getAllChatHistories: createIPCHandler<() => Promise<Chat[]>>('get-all-chat-histories'),
-  updateChatHistory: createIPCHandler<(chatHistory: Chat) => Promise<void>>('update-chat-history'),
-  removeChatHistoryAtID: createIPCHandler<(chatID: string) => Promise<void>>('remove-chat-history-at-id'),
-  getChatHistory: createIPCHandler<(chatID: string) => Promise<Chat>>('get-chat-history'),
+  getAllChats: createIPCHandler<() => Promise<Chat[]>>('get-all-chats'),
+  updateChat: createIPCHandler<(chat: Chat) => Promise<void>>('update-chat'),
+  deleteChatAtID: createIPCHandler<(chatID: string) => Promise<void>>('delete-chat-at-id'),
+  getChat: createIPCHandler<(chatID: string) => Promise<Chat>>('get-chat'),
   getSBCompact: createIPCHandler<() => Promise<boolean>>('get-sb-compact'),
   setSBCompact: createIPCHandler<(isSBCompact: boolean) => Promise<void>>('set-sb-compact'),
   getEditorFlexCenter: createIPCHandler<() => Promise<boolean>>('get-editor-flex-center'),

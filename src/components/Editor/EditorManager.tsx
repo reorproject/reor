@@ -7,7 +7,7 @@ import { useFileContext } from '@/contexts/FileContext'
 
 const EditorManager: React.FC = () => {
   const [showSearchBar, setShowSearchBar] = useState(false)
-  const [menuVisible, setMenuVisible] = useState(false)
+  const [contextMenuVisible, setContextMenuVisible] = useState(false)
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
   const [editorFlex, setEditorFlex] = useState(true)
   const [showPlaceholder, setShowPlaceholder] = useState(false)
@@ -21,11 +21,11 @@ const EditorManager: React.FC = () => {
       x: event.pageX,
       y: event.pageY,
     })
-    setMenuVisible(true)
+    setContextMenuVisible(true)
   }
 
   const hideMenu = () => {
-    if (menuVisible) setMenuVisible(false)
+    if (contextMenuVisible) setContextMenuVisible(false)
   }
 
   useEffect(() => {
@@ -98,7 +98,15 @@ const EditorManager: React.FC = () => {
       onClick={() => editor?.commands.focus()}
     >
       <SearchBar editor={editor} showSearch={showSearchBar} setShowSearch={setShowSearchBar} />
-      {menuVisible && <EditorContextMenu editor={editor} menuPosition={menuPosition} setMenuVisible={setMenuVisible} />}
+      {contextMenuVisible && (
+        <EditorContextMenu
+          editor={editor}
+          menuPosition={menuPosition}
+          setMenuVisible={setContextMenuVisible}
+          hideMenu={hideMenu}
+        />
+      )}
+
       <div className={`relative h-full overflow-y-auto ${editorFlex ? 'flex justify-center py-4 pl-4' : ''}`}>
         <EditorContent
           className={`relative size-full bg-dark-gray-c-eleven ${editorFlex ? 'max-w-xl' : ''}`}

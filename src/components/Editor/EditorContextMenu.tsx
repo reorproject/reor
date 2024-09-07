@@ -3,11 +3,6 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import { EditorState } from '@tiptap/pm/state'
 import { Dispatch, Editor } from '@tiptap/react'
-import { AiOutlineDelete } from 'react-icons/ai'
-import { CiViewTable } from 'react-icons/ci'
-import { FaRegCopy } from 'react-icons/fa'
-import { IoMdCut } from 'react-icons/io'
-import { MdContentPaste } from 'react-icons/md'
 
 import '../../styles/global.css'
 
@@ -109,11 +104,11 @@ const TableSizeSelector: React.FC<TableSizeSelectorProps> = ({ onSelect }) => {
   }
 
   return (
-    <div className="table-size-selector flex flex-col items-center justify-center">
+    <div className="table-size-selector flex flex-col items-center justify-center bg-[#1E1E1E]">
       {generateCells()}
       <div className="flex w-full justify-center pt-2">
         <div className="text-white">
-          {hoveredRows} x{hoveredCols}
+          {hoveredRows} x {hoveredCols}
         </div>
       </div>
     </div>
@@ -124,7 +119,9 @@ interface EditorContextMenuProps {
   editor: Editor | null
   menuPosition: MenuPosition
   setMenuVisible: (visible: boolean) => void
+  hideMenu: () => void
 }
+
 /**
  *
  * Options:
@@ -141,14 +138,12 @@ interface EditorContextMenuProps {
  * @returns Dropdown menu to perform actions on selected text
  *
  */
-const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosition, setMenuVisible }) => {
+const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosition, setMenuVisible, hideMenu }) => {
   const [showTableSelector, setShowTableSelector] = useState<boolean>(false)
-  /**
-   * We use useRef instead of state's because we are changing the style of our DOM but DO NOT
-   * want to re-render. This style gets applied once and does not change so no re-render is needed.
-   */
+
   const tableButtonRef = useRef<HTMLLIElement>(null)
   const tableSelectorRef = useRef<HTMLDivElement>(null)
+  const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     // Checks if we hover outside the table. In that case, do not display table selector
@@ -164,11 +159,19 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
       }
     }
 
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        hideMenu()
+      }
+    }
+
     document.addEventListener('mouseover', checkIfOutside)
+    document.addEventListener('mousedown', handleOutsideClick)
     return () => {
       document.removeEventListener('mouseover', checkIfOutside)
+      document.removeEventListener('mousedown', handleOutsideClick)
     }
-  }, [])
+  }, [hideMenu])
 
   if (!editor) return null
 
@@ -200,13 +203,13 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
     setMenuVisible(false)
   }
 
+  const itemClass = 'text-[12px] text-white cursor-pointer hover:rounded-md px-2 py-1'
   return (
-    <div>
+    <div ref={menuRef}>
       <ul
-        className="bubble-menu"
+        className="absolute z-[1020] w-[150px] overflow-y-auto rounded-lg border-solid border-gray-700 bg-[#1E1E1E] px-1 py-2"
         style={{
-          position: 'absolute',
-          top: `${menuPosition.y - 30}px`,
+          top: `${menuPosition.y - 60}px`,
           left: `${menuPosition.x - 190}px`,
           zIndex: 1000,
           boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
@@ -217,16 +220,14 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
           onClick={() => {
             handleCommand('copy')
           }}
-          className={`bubble-menu-item ${!isTextCurrentlySelected() ? 'disabled opacity-50' : ''}`}
+          className={`${itemClass}  ${!isTextCurrentlySelected() ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-500'}`}
         >
-          <FaRegCopy className="icon" />
           <span className="text">Copy</span>
         </li>
         <li
           onClick={() => handleCommand('cut')}
-          className={`bubble-menu-item ${!isTextCurrentlySelected() ? 'disabled opacity-50' : ''}`}
+          className={`${itemClass} ${!isTextCurrentlySelected() ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-500'}`}
         >
-          <IoMdCut className="icon" />
           <span className="text">Cut</span>
         </li>
         <li
@@ -234,21 +235,18 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
             pasteCommand(editor)
             setMenuVisible(false)
           }}
-          className="bubble-menu-item"
+          className={`${itemClass} hover:bg-blue-500`}
         >
-          <MdContentPaste className="icon" />
           <span className="text">Paste</span>
         </li>
         <li
           onClick={() => handleCommand('delete')}
-          className={`bubble-menu-item ${!isTextCurrentlySelected() ? 'disabled opacity-50' : ''}`}
+          className={`${itemClass} ${!isTextCurrentlySelected() ? 'cursor-not-allowed opacity-50' : 'hover:bg-blue-500'}`}
         >
-          <AiOutlineDelete className="icon" />
           <span className="text">Delete</span>
         </li>
-        <div className="h-px w-full bg-gray-500" />
-        <li ref={tableButtonRef} onMouseEnter={() => setShowTableSelector(true)} className="bubble-menu-item">
-          <CiViewTable className="icon" />
+        <div className="my-1 h-px w-full bg-gray-700" />
+        <li ref={tableButtonRef} onMouseEnter={() => setShowTableSelector(true)} className={`${itemClass}`}>
           <span className="text">Table</span>
         </li>
       </ul>
@@ -257,8 +255,8 @@ const EditorContextMenu: React.FC<EditorContextMenuProps> = ({ editor, menuPosit
           ref={tableSelectorRef}
           style={{
             position: 'absolute',
-            top: `${menuPosition.y + 120}px`,
-            left: `${menuPosition.x}px`,
+            top: `${menuPosition.y + 70}px`,
+            left: `${menuPosition.x - 100}px`,
             zIndex: 1002,
           }}
         >

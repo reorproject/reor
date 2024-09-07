@@ -6,7 +6,7 @@ import posthog from 'posthog-js'
 import ReorModal from '../Common/Modal'
 import { getInvalidCharacterInFileName } from '@/utils/strings'
 import { useFileContext } from '@/contexts/FileContext'
-import { useTabsContext } from '@/contexts/TabContext'
+import { useWindowContentContext } from '@/contexts/WindowContentContext'
 
 interface NewNoteComponentProps {
   isOpen: boolean
@@ -14,7 +14,8 @@ interface NewNoteComponentProps {
 }
 
 const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose }) => {
-  const { openTabContent } = useTabsContext()
+  const { openContent: openTabContent } = useWindowContentContext()
+
   const [fileName, setFileName] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -31,9 +32,10 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose }) 
     const invalidCharacters = await getInvalidCharacterInFileName(name)
     if (invalidCharacters) {
       setErrorMessage(`Cannot put ${invalidCharacters} in file name`)
-      throw new Error(`Cannot put ${invalidCharacters} in file name`)
+      return false
     }
     setErrorMessage(null)
+    return true
   }
 
   const handleNameChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -43,12 +45,13 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose }) 
   }
 
   const sendNewNoteMsg = async () => {
-    await handleValidName(fileName)
-    if (!fileName || errorMessage) return
+    const validName = await handleValidName(fileName)
+    if (!fileName || errorMessage || !validName) return
 
     let finalPath = fileName
     if (currentlyOpenFilePath !== '' && currentlyOpenFilePath !== null) {
       const directoryName = await window.path.dirname(currentlyOpenFilePath)
+
       finalPath = await window.path.join(directoryName, fileName)
     }
     const basename = await window.path.basename(finalPath)

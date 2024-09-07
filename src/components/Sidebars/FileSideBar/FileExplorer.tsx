@@ -6,6 +6,7 @@ import { FixedSizeList as List } from 'react-window'
 import { isFileNodeDirectory } from './utils'
 import { useFileContext } from '@/contexts/FileContext'
 import FileItemRows from './FileItemRows'
+import { useWindowContentContext } from '@/contexts/WindowContentContext'
 
 interface FileExplorerProps {
   lheight?: number
@@ -14,6 +15,7 @@ interface FileExplorerProps {
 const FileExplorer: React.FC<FileExplorerProps> = ({ lheight }) => {
   const [listHeight, setListHeight] = useState(lheight ?? window.innerHeight - 50)
   const { files, expandedDirectories } = useFileContext()
+  const { showContextMenu: handleFocusedItem } = useWindowContentContext()
 
   useEffect(() => {
     const updateHeight = () => {
@@ -50,7 +52,7 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ lheight }) => {
   const itemCount = visibleItems.length
 
   return (
-    <div className="h-full grow px-1 pt-2 opacity-70">
+    <div onContextMenu={(e) => handleFocusedItem(e, 'FileSidebar')} className="h-full grow px-1 pt-2 opacity-70">
       <List
         height={listHeight}
         itemCount={itemCount}
