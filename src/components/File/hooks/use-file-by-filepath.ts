@@ -8,7 +8,6 @@ import Paragraph from '@tiptap/extension-paragraph'
 import Table from '@tiptap/extension-table'
 import TableCell from '@tiptap/extension-table-cell'
 import TableHeader from '@tiptap/extension-table-header'
-import HardBreak from '@tiptap/extension-hard-break'
 import TableRow from '@tiptap/extension-table-row'
 import TaskItem from '@tiptap/extension-task-item'
 import TaskList from '@tiptap/extension-task-list'
@@ -144,11 +143,6 @@ const useFileByFilepath = () => {
       StarterKit,
       Document,
       Paragraph,
-      HardBreak.extend({
-        renderText() {
-          return '\n'
-        },
-      }),
       Text,
       TaskList,
       MathExtension.configure({
