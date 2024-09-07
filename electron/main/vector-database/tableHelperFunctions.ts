@@ -146,9 +146,6 @@ export const RepopulateTableWithMissingItems = async (
     return
   }
 
-  const filePathsToDelete = dbItemsToAdd.map((x) => x[0].notepath)
-  await table.deleteDBItemsByFilePaths(filePathsToDelete)
-
   const flattenedItemsToAdd = dbItemsToAdd.flat()
   await table.add(flattenedItemsToAdd, onProgress)
 
