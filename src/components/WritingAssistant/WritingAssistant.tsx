@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
-import { Editor } from '@tiptap/react'
 import { FaMagic } from 'react-icons/fa'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
@@ -9,16 +8,11 @@ import posthog from 'posthog-js'
 import { streamText } from 'ai'
 import { appendTextContentToMessages, convertMessageToString, resolveLLMClient } from '../Chat/utils'
 import useOutsideClick from '../Chat/hooks/use-outside-click'
-import { HighlightData } from '../Editor/HighlightExtension'
 import getClassNames, { generatePromptString, getLastMessage } from './utils'
 import { ReorChatMessage } from '../Chat/types'
+import { useFileContext } from '@/contexts/FileContext'
 
-interface WritingAssistantProps {
-  editor: Editor | null
-  highlightData: HighlightData
-}
-
-const WritingAssistant: React.FC<WritingAssistantProps> = ({ editor, highlightData }) => {
+const WritingAssistant: React.FC = () => {
   const [messages, setMessages] = useState<ReorChatMessage[]>([])
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false)
   const [customPrompt, setCustomPrompt] = useState<string>('')
@@ -34,6 +28,8 @@ const WritingAssistant: React.FC<WritingAssistantProps> = ({ editor, highlightDa
   const textFieldRef = useRef<HTMLInputElement>(null)
   const lastAssistantMessage = getLastMessage(messages, 'assistant')
   const hasValidMessages = !!lastAssistantMessage
+
+  const { editor, highlightData } = useFileContext()
 
   useOutsideClick(markdownContainerRef, () => {
     setMessages([])

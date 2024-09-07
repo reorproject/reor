@@ -4,9 +4,9 @@ import { createPortal } from 'react-dom'
 import { Tab } from 'electron/main/electron-store/storeConfig'
 import { removeFileExtension } from '@/utils/strings'
 import '../../styles/tab.css'
-import { useTabs } from '../../providers/TabProvider'
+import { useTabsContext } from '../../contexts/TabContext'
 import NewNoteComponent from '../File/NewNote'
-import { useModalOpeners } from '../../providers/ModalProvider'
+import { useModalOpeners } from '../../contexts/ModalContext'
 
 interface TooltipProps {
   filepath: string
@@ -40,14 +40,9 @@ const Tooltip: React.FC<TooltipProps> = ({ filepath, position }) => {
     document.getElementById('tooltip-container') as HTMLElement,
   )
 }
-interface DraggableTabsProps {
-  currentTab: string
-  openTabContent: (path: string) => void
-  openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => void
-}
 
-const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentTab, openTabContent, openFileAndOpenEditor }) => {
-  const { openTabs, addTab, selectTab, removeTabByID, updateTabOrder } = useTabs()
+const DraggableTabs: React.FC = () => {
+  const { currentTab, openTabContent, openTabs, addTab, selectTab, removeTabByID, updateTabOrder } = useTabsContext()
   const [isLastTabAccessed, setIsLastTabAccessed] = useState<boolean>(false)
 
   const [hoveredTab, setHoveredTab] = useState<string | null>(null)
@@ -181,12 +176,7 @@ const DraggableTabs: React.FC<DraggableTabsProps> = ({ currentTab, openTabConten
           <FaPlus size={13} />
         </div>
       )}
-      <NewNoteComponent
-        isOpen={isNewNoteModalOpen}
-        onClose={() => setIsNewNoteModalOpen(false)}
-        openFileAndOpenEditor={openFileAndOpenEditor}
-        currentOpenFilePath={currentTab}
-      />
+      <NewNoteComponent isOpen={isNewNoteModalOpen} onClose={() => setIsNewNoteModalOpen(false)} />
     </div>
   )
 }

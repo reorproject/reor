@@ -11,15 +11,14 @@ import SimilarEntriesComponent from '../Sidebars/SemanticSidebar/SimilarEntriesC
 import '../../styles/chat.css'
 import ChatMessages, { AskOptions } from './ChatMessages'
 import { Chat } from './types'
-import { useChatContext } from '@/providers/ChatContext'
+import { useChatContext } from '@/contexts/ChatContext'
+import { useTabsContext } from '@/contexts/TabContext'
 
-interface ChatWrapperProps {
-  vaultDirectory: string
-  openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => Promise<void>
+interface ChatComponentProps {
   showSimilarFiles: boolean
 }
 
-const ChatWrapper: React.FC<ChatWrapperProps> = ({ vaultDirectory, openFileAndOpenEditor, showSimilarFiles }) => {
+const ChatComponent: React.FC<ChatComponentProps> = ({ showSimilarFiles }) => {
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
   const [askText] = useState<AskOptions>(AskOptions.Ask)
   const [loadingResponse, setLoadingResponse] = useState<boolean>(false)
@@ -32,6 +31,7 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({ vaultDirectory, openFileAndOp
   const chatContainerRef = useRef<HTMLDivElement>(null)
 
   const { setCurrentChatHistory, currentChatHistory, chatFilters } = useChatContext()
+  const { openTabContent } = useTabsContext()
 
   useEffect(() => {
     const fetchDefaultLLM = async () => {
@@ -181,11 +181,9 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({ vaultDirectory, openFileAndOp
       <div className="mx-auto flex size-full flex-col overflow-hidden border-y-0 border-l-[0.001px] border-r-0 border-solid border-neutral-700 bg-dark-gray-c-eleven">
         <ChatMessages
           chatContainerRef={chatContainerRef}
-          openFileAndOpenEditor={openFileAndOpenEditor}
           isAddContextFiltersModalOpen={isAddContextFiltersModalOpen}
           setUserTextFieldInput={setUserTextFieldInput}
           defaultModelName={defaultModelName}
-          vaultDirectory={vaultDirectory}
           setIsAddContextFiltersModalOpen={setIsAddContextFiltersModalOpen}
           handlePromptSelection={handleNewChatMessage}
           askText={askText}
@@ -205,11 +203,10 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({ vaultDirectory, openFileAndOp
         <SimilarEntriesComponent
           similarEntries={currentContext}
           titleText="Context used in chat"
-          onFileSelect={(path: string) => {
-            openFileAndOpenEditor(path)
+          onSelect={(path: string) => {
+            openTabContent(path)
             posthog.capture('open_file_from_chat_context')
           }}
-          saveCurrentFile={() => Promise.resolve()}
           isLoadingSimilarEntries={false}
         />
       )}
@@ -217,4 +214,4 @@ const ChatWrapper: React.FC<ChatWrapperProps> = ({ vaultDirectory, openFileAndOp
   )
 }
 
-export default ChatWrapper
+export default ChatComponent

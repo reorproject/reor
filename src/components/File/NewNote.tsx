@@ -5,22 +5,20 @@ import posthog from 'posthog-js'
 
 import ReorModal from '../Common/Modal'
 import { getInvalidCharacterInFileName } from '@/utils/strings'
+import { useFileContext } from '@/contexts/FileContext'
+import { useTabsContext } from '@/contexts/TabContext'
 
 interface NewNoteComponentProps {
   isOpen: boolean
   onClose: () => void
-  openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => void
-  currentOpenFilePath: string | null
 }
 
-const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
-  isOpen,
-  onClose,
-  openFileAndOpenEditor,
-  currentOpenFilePath,
-}) => {
+const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose }) => {
+  const { openTabContent } = useTabsContext()
   const [fileName, setFileName] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const { currentlyOpenFilePath } = useFileContext()
 
   useEffect(() => {
     if (!isOpen) {
@@ -49,12 +47,12 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({
     if (!fileName || errorMessage) return
 
     let finalPath = fileName
-    if (currentOpenFilePath !== '' && currentOpenFilePath !== null) {
-      const directoryName = await window.path.dirname(currentOpenFilePath)
+    if (currentlyOpenFilePath !== '' && currentlyOpenFilePath !== null) {
+      const directoryName = await window.path.dirname(currentlyOpenFilePath)
       finalPath = await window.path.join(directoryName, fileName)
     }
     const basename = await window.path.basename(finalPath)
-    openFileAndOpenEditor(finalPath, `# ${basename}\n`)
+    openTabContent(finalPath, `# ${basename}\n`)
     posthog.capture('created_new_note_from_new_note_modal')
     onClose()
   }

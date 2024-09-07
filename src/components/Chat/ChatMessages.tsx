@@ -12,7 +12,8 @@ import PromptSuggestion from './ChatPrompts'
 import LoadingDots from '@/utils/animations'
 import '../../styles/chat.css'
 import { ReorChatMessage } from './types'
-import { useChatContext } from '@/providers/ChatContext'
+import { useChatContext } from '@/contexts/ChatContext'
+import { useTabsContext } from '@/contexts/TabContext'
 
 export enum AskOptions {
   Ask = 'Ask',
@@ -28,11 +29,9 @@ export const EXAMPLE_PROMPTS: { [key: string]: string[] } = {
 
 interface ChatMessagesProps {
   chatContainerRef: MutableRefObject<HTMLDivElement | null>
-  openFileAndOpenEditor: (path: string, optionalContentToWriteOnCreate?: string) => Promise<void>
   isAddContextFiltersModalOpen: boolean
   setUserTextFieldInput: Dispatch<SetStateAction<string>>
   defaultModelName: string
-  vaultDirectory: string
   setIsAddContextFiltersModalOpen: Dispatch<SetStateAction<boolean>>
   handlePromptSelection: (prompt: string | undefined) => void
   askText: AskOptions
@@ -41,20 +40,16 @@ interface ChatMessagesProps {
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({
   chatContainerRef,
-  openFileAndOpenEditor,
-  // currentChatHistory,
   isAddContextFiltersModalOpen,
-  // chatFilters,
-  // setChatFilters,
   setUserTextFieldInput,
   defaultModelName,
-  vaultDirectory,
   setIsAddContextFiltersModalOpen,
   handlePromptSelection,
   askText,
   loadAnimation,
 }) => {
   const { currentChatHistory, chatFilters, setChatFilters } = useChatContext()
+  const { openTabContent } = useTabsContext()
   const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([])
   const [selectedLlm, setSelectedLlm] = useState<string>(defaultModelName)
 
@@ -73,7 +68,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 
   const createNewNote = async (message: ReorChatMessage) => {
     const title = `${(getDisplayMessage(message) ?? `${new Date().toDateString()}`).substring(0, 20)}...`
-    openFileAndOpenEditor(title, getDisplayMessage(message))
+    openTabContent(title, getDisplayMessage(message))
   }
 
   useEffect(() => {
@@ -216,7 +211,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 
         {isAddContextFiltersModalOpen && (
           <AddContextFiltersModal
-            vaultDirectory={vaultDirectory}
             isOpen={isAddContextFiltersModalOpen}
             onClose={() => setIsAddContextFiltersModalOpen(false)}
             chatFilters={chatFilters}

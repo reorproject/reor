@@ -4,7 +4,7 @@ import { FileInfo, FileInfoTree } from 'electron/main/filesystem/types'
 
 import flattenFileInfoTree, { sortFilesAndDirectories } from '../utils'
 
-const useFileInfoTree = (currentFilePath: string | null) => {
+const useFileInfoTreeHook = (filePath: string | null) => {
   const [fileInfoTree, setFileInfoTree] = useState<FileInfoTree>([])
   const [flattenedFiles, setFlattenedFiles] = useState<FileInfo[]>([])
   const [expandedDirectories, setExpandedDirectories] = useState<Map<string, boolean>>(new Map())
@@ -20,29 +20,39 @@ const useFileInfoTree = (currentFilePath: string | null) => {
 
   // upon indexing, update the file info tree and expand relevant directories
   useEffect(() => {
-    const findRelevantDirectoriesToBeOpened = () => {
-      if (currentFilePath === null) {
+    const findRelevantDirectoriesToBeOpened = async () => {
+      if (filePath === null) {
         return expandedDirectories
       }
-      const pathSegments = currentFilePath.split('/').filter((segment) => segment !== '')
-      pathSegments.pop() // Remove the file name from the path
 
-      let currentPath = ''
+      const pathSep = await window.path.pathSep()
+      const isAbsolute = await window.path.isAbsolute(filePath)
+
+      const currentPath = isAbsolute ? '' : '.'
       const newExpandedDirectories = new Map(expandedDirectories)
-      pathSegments.forEach((segment) => {
-        currentPath += `/${segment}`
-        newExpandedDirectories.set(currentPath, true)
-      })
+
+      const pathSegments = filePath.split(pathSep).filter((segment) => segment !== '')
+
+      pathSegments.pop()
+
+      const updatedPath = pathSegments.reduce(async (pathPromise, segment) => {
+        const path = await pathPromise
+        const newPath = await window.path.join(path, segment)
+        newExpandedDirectories.set(newPath, true)
+        return newPath
+      }, Promise.resolve(currentPath))
+
+      await updatedPath
 
       return newExpandedDirectories
     }
 
-    const handleFileUpdate = (updatedFiles: FileInfoTree) => {
+    const handleFileUpdate = async (updatedFiles: FileInfoTree) => {
       const sortedFiles = sortFilesAndDirectories(updatedFiles, null)
       setFileInfoTree(sortedFiles)
       const updatedFlattenedFiles = flattenFileInfoTree(sortedFiles)
       setFlattenedFiles(updatedFlattenedFiles)
-      const directoriesToBeExpanded = findRelevantDirectoriesToBeOpened()
+      const directoriesToBeExpanded = await findRelevantDirectoriesToBeOpened()
       setExpandedDirectories(directoriesToBeExpanded)
     }
 
@@ -51,7 +61,7 @@ const useFileInfoTree = (currentFilePath: string | null) => {
     return () => {
       removeFilesListListener()
     }
-  }, [currentFilePath, expandedDirectories])
+  }, [filePath, expandedDirectories])
 
   // initial load of files
   useEffect(() => {
@@ -74,4 +84,4 @@ const useFileInfoTree = (currentFilePath: string | null) => {
   }
 }
 
-export default useFileInfoTree
+export default useFileInfoTreeHook

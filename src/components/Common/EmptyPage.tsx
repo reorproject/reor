@@ -1,14 +1,10 @@
 import React from 'react'
 import { ImFileEmpty } from 'react-icons/im'
-import { useModalOpeners } from '../../providers/ModalProvider'
+import { useModalOpeners } from '../../contexts/ModalContext'
 import NewNoteComponent from '../File/NewNote'
 import NewDirectoryComponent from '../File/NewDirectory'
 
-interface EmptyPageProps {
-  openFileAndOpenEditor: (filePath: string, optionalContentToWriteOnCreate?: string) => Promise<void>
-}
-
-const EmptyPage: React.FC<EmptyPageProps> = ({ openFileAndOpenEditor }) => {
+const EmptyPage: React.FC = () => {
   const { isNewNoteModalOpen, setIsNewNoteModalOpen, isNewDirectoryModalOpen, setIsNewDirectoryModalOpen } =
     useModalOpeners()
 
@@ -35,17 +31,8 @@ const EmptyPage: React.FC<EmptyPageProps> = ({ openFileAndOpenEditor }) => {
           Create a Folder
         </button>
       </div>
-      <NewNoteComponent
-        isOpen={isNewNoteModalOpen}
-        onClose={() => setIsNewNoteModalOpen(false)}
-        openFileAndOpenEditor={openFileAndOpenEditor}
-        currentOpenFilePath=""
-      />
-      <NewDirectoryComponent
-        isOpen={isNewDirectoryModalOpen}
-        onClose={() => setIsNewDirectoryModalOpen(false)}
-        currentOpenFilePath=""
-      />
+      <NewNoteComponent isOpen={isNewNoteModalOpen} onClose={() => setIsNewNoteModalOpen(false)} />
+      <NewDirectoryComponent isOpen={isNewDirectoryModalOpen} onClose={() => setIsNewDirectoryModalOpen(false)} />
     </div>
   )
 }

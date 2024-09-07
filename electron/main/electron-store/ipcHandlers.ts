@@ -95,13 +95,6 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     return store.get(StoreKeys.LLMGenerationParameters)
   })
 
-  ipcMain.handle('set-display-markdown', (event, displayMarkdown) => {
-    store.set(StoreKeys.DisplayMarkdown, displayMarkdown)
-    event.sender.send('display-markdown-changed', displayMarkdown)
-  })
-
-  ipcMain.handle('get-display-markdown', () => store.get(StoreKeys.DisplayMarkdown))
-
   ipcMain.handle('set-sb-compact', (event, isSBCompact) => {
     store.set(StoreKeys.IsSBCompact, isSBCompact)
     event.sender.send('sb-compact-changed', isSBCompact)

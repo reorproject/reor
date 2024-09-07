@@ -6,20 +6,10 @@ import { toast } from 'react-toastify'
 import ReorModal from '../Common/Modal'
 
 import { getInvalidCharacterInFileName } from '@/utils/strings'
+import { useFileContext } from '@/contexts/FileContext'
 
-export interface RenameDirFuncProps {
-  path: string
-  newDirName: string
-}
-
-interface RenameDirModalProps {
-  isOpen: boolean
-  fullDirName: string
-  onClose: () => void
-  renameDir: (props: RenameDirFuncProps) => Promise<void>
-}
-
-const RenameDirModal: React.FC<RenameDirModalProps> = ({ isOpen, fullDirName, onClose, renameDir }) => {
+const RenameDirModal: React.FC = () => {
+  const { fileDirToBeRenamed, setFileDirToBeRenamed, renameFile } = useFileContext()
   const [isUpdatingDirName, setIsUpdatingDirName] = useState<boolean>(false)
 
   const [dirPrefix, setDirPrefix] = useState<string>('')
@@ -28,14 +18,14 @@ const RenameDirModal: React.FC<RenameDirModalProps> = ({ isOpen, fullDirName, on
 
   useEffect(() => {
     const setDirectoryUponNoteChange = async () => {
-      const initialDirPathPrefix = await window.path.dirname(fullDirName)
+      const initialDirPathPrefix = await window.path.dirname(fileDirToBeRenamed)
       setDirPrefix(initialDirPathPrefix)
-      const trimmedInitialDirName = await window.path.basename(fullDirName)
+      const trimmedInitialDirName = await window.path.basename(fileDirToBeRenamed)
       setDirName(trimmedInitialDirName)
     }
 
     setDirectoryUponNoteChange()
-  }, [fullDirName])
+  }, [fileDirToBeRenamed])
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value
@@ -48,6 +38,10 @@ const RenameDirModal: React.FC<RenameDirModalProps> = ({ isOpen, fullDirName, on
         setErrorMessage(null)
       }
     })
+  }
+
+  const onClose = () => {
+    setFileDirToBeRenamed('')
   }
 
   const sendDirRename = async () => {
@@ -65,10 +59,11 @@ const RenameDirModal: React.FC<RenameDirModalProps> = ({ isOpen, fullDirName, on
     setIsUpdatingDirName(true)
     // get full path of new directory
 
-    await renameDir({
-      path: `${fullDirName}`,
-      newDirName: `${dirPrefix}${dirName}`,
-    })
+    // await renameDir({
+    //   path: `${fileDirToBeRenamed}`,
+    //   newDirName: `${dirPrefix}${dirName}`,
+    // })
+    await renameFile(fileDirToBeRenamed, `${dirPrefix}${dirName}`)
     onClose()
     setIsUpdatingDirName(false)
   }
@@ -80,7 +75,7 @@ const RenameDirModal: React.FC<RenameDirModalProps> = ({ isOpen, fullDirName, on
   }
 
   return (
-    <ReorModal isOpen={isOpen} onClose={onClose}>
+    <ReorModal isOpen={!!fileDirToBeRenamed} onClose={onClose}>
       <div className="my-2 ml-3 mr-6 h-full min-w-[400px]">
         <h2 className="mb-3 text-xl font-semibold text-white">Rename Directory</h2>
         <input
