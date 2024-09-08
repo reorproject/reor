@@ -2,6 +2,7 @@ import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema'
 import { createOpenAI } from '@ai-sdk/openai'
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
+import getDisplayableChatName from '@shared/utils'
 import { AnonymizedChatFilters, Chat, ChatFilters, ReorChatMessage } from './types'
 
 export const appendTextContentToMessages = (messages: ReorChatMessage[], text: string): ReorChatMessage[] => {
@@ -68,7 +69,10 @@ export const generateTimeStampFilter = (minDate?: Date, maxDate?: Date): string 
   return filter
 }
 
-const fetchResults = async (query: string, chatFilters: ChatFilters): Promise<DBEntry[] | FileInfoWithContent[]> => {
+const fetchResultsFromDB = async (
+  query: string,
+  chatFilters: ChatFilters,
+): Promise<DBEntry[] | FileInfoWithContent[]> => {
   if (chatFilters.files.length > 0) {
     return window.fileSystem.getFileInfoWithContentsForPaths(chatFilters.files)
   }
@@ -91,7 +95,7 @@ const generateStringOfContextItems = (contextItems: DBEntry[] | FileInfoWithCont
 }
 
 export const generateRAGMessages = async (query: string, chatFilters: ChatFilters): Promise<ReorChatMessage[]> => {
-  const results = await fetchResults(query, chatFilters)
+  const results = await fetchResultsFromDB(query, chatFilters)
   const contextString = generateStringOfContextItems(results)
   return [
     {
@@ -102,6 +106,59 @@ export const generateRAGMessages = async (query: string, chatFilters: ChatFilter
     },
   ]
 }
+
+export const prepareOutputChat = async (
+  currentChat: Chat | undefined,
+  userTextFieldInput: string,
+  chatFilters?: ChatFilters,
+): Promise<Chat> => {
+  let outputChat = currentChat
+
+  if (!outputChat || !outputChat.id) {
+    const newID = Date.now().toString()
+    outputChat = {
+      id: newID,
+      messages: [],
+      displayName: '',
+      timeOfLastMessage: Date.now(),
+      tools: {},
+    }
+  }
+
+  if (outputChat.messages.length === 0 && chatFilters) {
+    const ragMessages = await generateRAGMessages(userTextFieldInput ?? '', chatFilters)
+    outputChat.messages.push(...ragMessages)
+    outputChat.displayName = getDisplayableChatName(outputChat.messages)
+  } else {
+    outputChat.messages.push({
+      role: 'user',
+      content: userTextFieldInput,
+      context: [],
+    })
+  }
+
+  return outputChat
+}
+
+// const tools: Record<string, CoreTool> = {
+//   search: tool({
+//     description: "Semantically search the user's personal knowledge base",
+//     parameters: z.object({
+//       query: z.string().describe('The query to search for'),
+//       limit: z.number().default(10).describe('The number of results to return'),
+//       filter: z
+//         .string()
+//         .optional()
+//         .describe(
+//           `The filter to apply to the search. The columns available are: ${dbFields.FILE_MODIFIED} and ${dbFields.FILE_CREATED} which are both timestamps. An example filter would be ${dbFields.FILE_MODIFIED} > "2024-01-01" and ${dbFields.FILE_CREATED} < "2024-01-01".`,
+//         ),
+//     }),
+//     execute: async ({ query, limit }) => {
+//       const results = await window.database.search(query, limit)
+//       return results
+//     },
+//   }),
+// }
 
 export const getChatHistoryContext = (chatHistory: Chat | undefined): DBQueryResult[] => {
   if (!chatHistory || !chatHistory.messages) return []

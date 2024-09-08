@@ -1,4 +1,4 @@
-import { CoreMessage } from 'ai'
+import { CoreMessage, CoreTool } from 'ai'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { DBEntry } from 'electron/main/vector-database/schema'
 
@@ -13,6 +13,7 @@ export type Chat = {
   messages: ReorChatMessage[]
   displayName: string
   timeOfLastMessage: number
+  tools: Record<string, CoreTool>
 }
 
 export type ChatMetadata = Omit<Chat, 'messages'>

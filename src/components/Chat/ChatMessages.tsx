@@ -12,14 +12,14 @@ import { getClassNameBasedOnMessageRole, getDisplayMessage } from './utils'
 import LoadingDots from '@/utils/animations'
 
 interface ChatMessagesProps {
-  currentChatHistory: Chat | undefined
+  currentChat: Chat | undefined
   chatContainerRef: MutableRefObject<HTMLDivElement | null>
   loadingState: LoadingState
-  handleNewChatMessage: (userTextFieldInput: string, chatFilters?: ChatFilters) => void
+  handleNewChatMessage: (chat: Chat | undefined, userTextFieldInput: string, chatFilters?: ChatFilters) => void
 }
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({
-  currentChatHistory,
+  currentChat,
   chatContainerRef,
   handleNewChatMessage,
   loadingState,
@@ -42,10 +42,10 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
       <div ref={chatContainerRef} className="grow overflow-auto">
         <div className="flex flex-col items-center gap-3 p-4">
           <div className="w-full max-w-3xl">
-            {currentChatHistory &&
-              currentChatHistory.messages &&
-              currentChatHistory.messages.length > 0 &&
-              currentChatHistory.messages
+            {currentChat &&
+              currentChat.messages &&
+              currentChat.messages.length > 0 &&
+              currentChat.messages
                 .filter((msg) => msg.role !== 'system')
                 .map((message, index) => (
                   // eslint-disable-next-line react/no-array-index-key
@@ -93,14 +93,14 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
         </div>
       </div>
 
-      {currentChatHistory && (
+      {currentChat && (
         <div className="w-full p-4">
           <ChatInput
             userTextFieldInput={userTextFieldInput ?? ''}
             setUserTextFieldInput={setUserTextFieldInput}
             handleSubmitNewMessage={() => {
               if (userTextFieldInput) {
-                handleNewChatMessage(userTextFieldInput)
+                handleNewChatMessage(currentChat, userTextFieldInput)
               }
             }}
             loadingState={loadingState}
