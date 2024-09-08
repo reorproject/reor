@@ -40,8 +40,8 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   }, [])
 
   const sendMessageHandler = async () => {
-    handleNewChatMessage(userTextFieldInput, chatFilters)
     await window.llm.setDefaultLLM(selectedLLM)
+    handleNewChatMessage(userTextFieldInput, chatFilters)
   }
 
   return (
