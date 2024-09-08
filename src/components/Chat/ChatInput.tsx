@@ -1,19 +1,20 @@
 import React from 'react'
 
 import { PiPaperPlaneRight } from 'react-icons/pi'
+import { LoadingState } from './types'
 
 interface ChatInputProps {
   userTextFieldInput: string
   setUserTextFieldInput: (value: string) => void
   handleSubmitNewMessage: () => void
-  loadingResponse: boolean
+  loadingState: LoadingState
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({
   userTextFieldInput,
   setUserTextFieldInput,
   handleSubmitNewMessage,
-  loadingResponse,
+  loadingState,
 }) => (
   <div className="flex h-titlebar w-full items-center justify-center bg-dark-gray-c-eleven p-10">
     <div className="  relative bottom-5 flex w-full max-w-3xl">
@@ -45,7 +46,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           />
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
             <PiPaperPlaneRight
-              color={userTextFieldInput && !loadingResponse ? 'white' : 'gray'}
+              color={userTextFieldInput && loadingState !== 'idle' ? 'white' : 'gray'}
               onClick={userTextFieldInput ? handleSubmitNewMessage : undefined}
               className={userTextFieldInput ? 'cursor-pointer' : ''}
             />

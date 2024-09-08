@@ -31,3 +31,5 @@ export interface AnonymizedChatFilters {
   minDate?: Date
   maxDate?: Date
 }
+
+export type LoadingState = 'idle' | 'generating' | 'waiting-for-first-token'

@@ -5,7 +5,7 @@ import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 import { FaRegUserCircle } from 'react-icons/fa'
 import '../../styles/chat.css'
-import { Chat, ChatFilters, ReorChatMessage } from './types'
+import { Chat, ChatFilters, LoadingState, ReorChatMessage } from './types'
 import { useWindowContentContext } from '@/contexts/WindowContentContext'
 import ChatInput from './ChatInput'
 import { getClassNameBasedOnMessageRole, getDisplayMessage } from './utils'
@@ -14,17 +14,15 @@ import LoadingDots from '@/utils/animations'
 interface ChatMessagesProps {
   currentChatHistory: Chat | undefined
   chatContainerRef: MutableRefObject<HTMLDivElement | null>
-  loadAnimation: boolean
+  loadingState: LoadingState
   handleNewChatMessage: (userTextFieldInput: string, chatFilters?: ChatFilters) => void
-  loadingResponse: boolean
 }
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({
   currentChatHistory,
   chatContainerRef,
   handleNewChatMessage,
-  loadAnimation,
-  loadingResponse,
+  loadingState,
 }) => {
   const { openContent: openTabContent } = useWindowContentContext()
   const [userTextFieldInput, setUserTextFieldInput] = useState<string | undefined>()
@@ -86,7 +84,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
                 ))}
           </div>
 
-          {loadAnimation && (
+          {loadingState === 'waiting-for-first-token' && (
             <div className="mt-4 flex w-full max-w-3xl items-start gap-6">
               <img src="icon.png" style={{ width: '22px', height: '22px' }} alt="ReorImage" />
               <LoadingDots />
@@ -105,7 +103,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
                 handleNewChatMessage(userTextFieldInput)
               }
             }}
-            loadingResponse={loadingResponse}
+            loadingState={loadingState}
           />
         </div>
       )}

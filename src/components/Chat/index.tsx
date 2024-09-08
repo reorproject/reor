@@ -9,13 +9,12 @@ import { anonymizeChatFiltersForPosthog, resolveLLMClient, generateRAGMessages }
 
 import '../../styles/chat.css'
 import ChatMessages from './ChatMessages'
-import { Chat, ChatFilters } from './types'
+import { Chat, ChatFilters, LoadingState } from './types'
 import { useChatContext } from '@/contexts/ChatContext'
 import StartChat from './StartChat'
 
 const ChatComponent: React.FC = () => {
-  const [loadingResponse, setLoadingResponse] = useState<boolean>(false)
-  const [loadAnimation, setLoadAnimation] = useState<boolean>(false)
+  const [loadingState, setLoadingState] = useState<LoadingState>('idle')
   const [readyToSave, setReadyToSave] = useState<boolean>(false)
   const [defaultModelName, setDefaultLLMName] = useState<string>('')
   const chatContainerRef = useRef<HTMLDivElement>(null)
@@ -34,7 +33,7 @@ const ChatComponent: React.FC = () => {
     const fetchChat = async () => {
       const chat = await window.electronStore.getChat(currentOpenChatID)
       setCurrentChat(chat)
-      setLoadingResponse(false)
+      setLoadingState('idle')
     }
     fetchChat()
   }, [currentOpenChatID])
@@ -82,10 +81,7 @@ const ChatComponent: React.FC = () => {
 
   const handleSubmitNewMessage = useCallback(
     async (userTextFieldInput: string, chatFilters?: ChatFilters) => {
-      if (loadingResponse || !userTextFieldInput?.trim()) return
-
-      setLoadingResponse(true)
-      setLoadAnimation(true)
+      if (loadingState !== 'idle' || !userTextFieldInput?.trim()) return
 
       const defaultLLMName = await window.llm.getDefaultLLMName()
       let outputChat = currentChat
@@ -146,13 +142,14 @@ const ChatComponent: React.FC = () => {
           console.log('tool results', event.toolResults)
         },
       })
+      setLoadingState('waiting-for-first-token')
 
       // eslint-disable-next-line no-restricted-syntax
       for await (const text of textStream) {
-        setLoadAnimation(false)
+        setLoadingState('generating')
         appendNewContentToMessageHistory(outputChat.id, text)
       }
-      setLoadingResponse(false)
+      setLoadingState('idle')
       setReadyToSave(true)
       posthog.capture('chat_message_submitted', {
         chatId: currentChat?.id,
@@ -160,7 +157,7 @@ const ChatComponent: React.FC = () => {
         chatFilters: anonymizeChatFiltersForPosthog(chatFilters),
       })
     },
-    [currentChat, loadingResponse, setCurrentOpenChatID, updateChat, appendNewContentToMessageHistory],
+    [loadingState, currentChat, setCurrentOpenChatID, updateChat, appendNewContentToMessageHistory],
   )
 
   return (
@@ -170,9 +167,8 @@ const ChatComponent: React.FC = () => {
           <ChatMessages
             currentChatHistory={currentChat}
             chatContainerRef={chatContainerRef}
-            loadAnimation={loadAnimation}
+            loadingState={loadingState}
             handleNewChatMessage={handleSubmitNewMessage}
-            loadingResponse={loadingResponse}
           />
         ) : (
           <StartChat defaultModelName={defaultModelName} handleNewChatMessage={handleSubmitNewMessage} />
