@@ -15,7 +15,7 @@ interface ChatMessagesProps {
   currentChat: Chat | undefined
   chatContainerRef: MutableRefObject<HTMLDivElement | null>
   loadingState: LoadingState
-  handleNewChatMessage: (chat: Chat | undefined, userTextFieldInput: string, chatFilters?: ChatFilters) => void
+  handleNewChatMessage: (userTextFieldInput: string, chatFilters?: ChatFilters) => void
 }
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({
@@ -100,7 +100,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
             setUserTextFieldInput={setUserTextFieldInput}
             handleSubmitNewMessage={() => {
               if (userTextFieldInput) {
-                handleNewChatMessage(currentChat, userTextFieldInput)
+                handleNewChatMessage(userTextFieldInput)
               }
             }}
             loadingState={loadingState}

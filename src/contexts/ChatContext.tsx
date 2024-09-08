@@ -13,7 +13,7 @@ interface ChatContextType {
   setCurrentOpenChatID: (chatID: string | undefined) => void
   allChatsMetadata: ChatMetadata[]
   deleteChat: (chatID: string | undefined) => Promise<boolean>
-  updateChat: (updatedChat: Chat) => Promise<void>
+  saveChat: (updatedChat: Chat) => Promise<void>
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined)
@@ -32,8 +32,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     fetchChatHistories()
   }, [])
 
-  const updateChat = useCallback(async (updatedChat: Chat) => {
-    await window.electronStore.updateChat(updatedChat)
+  const saveChat = useCallback(async (updatedChat: Chat) => {
+    await window.electronStore.saveChat(updatedChat)
 
     const retrievedChatsMetadata = await window.electronStore.getAllChatsMetadata()
     setAllChatsMetadata(retrievedChatsMetadata)
@@ -63,7 +63,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       currentOpenChatID,
       setCurrentOpenChatID,
       deleteChat,
-      updateChat,
+      saveChat,
     }),
     [
       allChatsMetadata,
@@ -74,7 +74,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       currentOpenChatID,
       setCurrentOpenChatID,
       deleteChat,
-      updateChat,
+      saveChat,
     ],
   )
 

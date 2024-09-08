@@ -142,7 +142,7 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     return chatHistoriesCorrespondingToVault.map(({ messages, ...rest }) => rest) as ChatMetadata[]
   })
 
-  ipcMain.handle('update-chat', (event, newChat: Chat) => {
+  ipcMain.handle('save-chat', (event, newChat: Chat) => {
     const vaultDir = windowsManager.getVaultDirectoryForWinContents(event.sender)
     if (!vaultDir) {
       return

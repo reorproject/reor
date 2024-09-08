@@ -21,7 +21,7 @@ const ChatComponent: React.FC = () => {
   const [defaultModelName, setDefaultLLMName] = useState<string>('')
   const chatContainerRef = useRef<HTMLDivElement>(null)
   const [currentChat, setCurrentChat] = useState<Chat | undefined>(undefined)
-  const { updateChat, currentOpenChatID, setCurrentOpenChatID } = useChatContext()
+  const { saveChat: updateChat, currentOpenChatID, setCurrentOpenChatID } = useChatContext()
 
   useEffect(() => {
     const fetchDefaultLLM = async () => {
@@ -41,17 +41,15 @@ const ChatComponent: React.FC = () => {
   }, [currentOpenChatID])
 
   const handleSubmitNewMessage = useCallback(
-    async (chat: Chat | undefined, userTextFieldInput: string, chatFilters?: ChatFilters) => {
+    async (userTextFieldInput: string, chatFilters?: ChatFilters) => {
       if (!userTextFieldInput?.trim()) return
       try {
         const defaultLLMName = await window.llm.getDefaultLLMName()
-        const outputChat = await prepareOutputChat(chat, userTextFieldInput, chatFilters)
+        let outputChat = await prepareOutputChat(currentChat, userTextFieldInput, chatFilters)
 
         setCurrentChat(outputChat)
         setCurrentOpenChatID(outputChat.id)
-
         await updateChat(outputChat)
-        // const dbFields = await window.database.getDatabaseFields()
 
         const client = await resolveLLMClient(defaultLLMName)
 
@@ -66,16 +64,17 @@ const ChatComponent: React.FC = () => {
 
         // eslint-disable-next-line no-restricted-syntax
         for await (const text of textStream) {
-          setCurrentChat((prev) => {
-            if (outputChat.id !== prev?.id) return prev
-            return {
-              ...prev,
-              messages: appendTextContentToMessages(prev.messages || [], text),
-            }
-          })
+          outputChat = {
+            ...outputChat,
+            messages: appendTextContentToMessages(outputChat.messages || [], text),
+          }
+          setCurrentChat(outputChat)
           setLoadingState('generating')
         }
+
+        console.log('current chat to save:', outputChat)
         await updateChat(outputChat)
+
         setLoadingState('idle')
         posthog.capture('chat_message_submitted', {
           chatId: outputChat?.id,
@@ -87,7 +86,7 @@ const ChatComponent: React.FC = () => {
         throw error
       }
     },
-    [setCurrentOpenChatID, updateChat],
+    [setCurrentOpenChatID, updateChat, currentChat],
   )
 
   return (

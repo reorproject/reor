@@ -4,7 +4,7 @@ import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import PromptSuggestion from './ChatPrompts'
 import '../../styles/chat.css'
 import AddContextFiltersModal from './AddContextFiltersModal'
-import { Chat, ChatFilters } from './types'
+import { ChatFilters } from './types'
 
 const EXAMPLE_PROMPT_OPTIONS = [
   'What have I written about Philosophy?',
@@ -14,7 +14,7 @@ const EXAMPLE_PROMPT_OPTIONS = [
 
 interface StartChatProps {
   defaultModelName: string
-  handleNewChatMessage: (chat: Chat | undefined, userTextFieldInput: string, chatFilters: ChatFilters) => void
+  handleNewChatMessage: (userTextFieldInput: string, chatFilters: ChatFilters) => void
 }
 
 const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMessage }) => {
@@ -41,7 +41,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
 
   const sendMessageHandler = async () => {
     await window.llm.setDefaultLLM(selectedLLM)
-    handleNewChatMessage(undefined, userTextFieldInput, chatFilters)
+    handleNewChatMessage(userTextFieldInput, chatFilters)
   }
 
   return (
