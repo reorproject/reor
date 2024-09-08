@@ -3,7 +3,6 @@ import path from 'path'
 import { ipcMain } from 'electron'
 import Store from 'electron-store'
 import {
-  Tab,
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
@@ -14,7 +13,7 @@ import {
 import WindowsManager from '../common/windowManager'
 
 import { initializeAndMaybeMigrateStore } from './storeSchemaMigrator'
-import { Chat } from '@/components/Chat/types'
+import { Chat, ChatMetadata } from '@/components/Chat/types'
 
 export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager: WindowsManager) => {
   initializeAndMaybeMigrateStore(store)
@@ -131,7 +130,7 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     store.set(StoreKeys.hasUserOpenedAppBefore, true)
   })
 
-  ipcMain.handle('get-all-chats', (event) => {
+  ipcMain.handle('get-all-chats-metadata', (event) => {
     const vaultDir = windowsManager.getVaultDirectoryForWinContents(event.sender)
 
     if (!vaultDir) {
@@ -140,33 +139,34 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
 
     const allHistories = store.get(StoreKeys.ChatHistories)
     const chatHistoriesCorrespondingToVault = allHistories?.[vaultDir] ?? []
-    return chatHistoriesCorrespondingToVault
+    return chatHistoriesCorrespondingToVault.map(({ messages, ...rest }) => rest) as ChatMetadata[]
   })
 
   ipcMain.handle('update-chat', (event, newChat: Chat) => {
     const vaultDir = windowsManager.getVaultDirectoryForWinContents(event.sender)
-    const allChatHistories = store.get(StoreKeys.ChatHistories)
     if (!vaultDir) {
       return
     }
+
+    const allChatHistories = store.get(StoreKeys.ChatHistories)
     const chatHistoriesCorrespondingToVault = allChatHistories?.[vaultDir] ?? []
-    // check if chat history already exists. if it does, update it. if it doesn't append it
+
     const existingChatIndex = chatHistoriesCorrespondingToVault.findIndex((chat) => chat.id === newChat.id)
     if (existingChatIndex !== -1) {
       chatHistoriesCorrespondingToVault[existingChatIndex] = newChat
     } else {
       chatHistoriesCorrespondingToVault.push(newChat)
     }
-    // store.set(StoreKeys.ChatHistories, allChatHistories);
     store.set(StoreKeys.ChatHistories, {
       ...allChatHistories,
       [vaultDir]: chatHistoriesCorrespondingToVault,
     })
-
-    event.sender.send('update-chat-histories', chatHistoriesCorrespondingToVault)
   })
 
-  ipcMain.handle('get-chat', (event, chatId: string) => {
+  ipcMain.handle('get-chat', (event, chatId: string | undefined) => {
+    if (!chatId) {
+      return undefined
+    }
     const vaultDir = windowsManager.getVaultDirectoryForWinContents(event.sender)
     if (!vaultDir) {
       return null
@@ -176,7 +176,7 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     return vaultChatHistories.find((chat) => chat.id === chatId)
   })
 
-  ipcMain.handle('delete-chat-at-id', (event, chatID: string | undefined) => {
+  ipcMain.handle('delete-chat', (event, chatID: string | undefined) => {
     if (!chatID) return
     const vaultDir = windowsManager.getVaultDirectoryForWinContents(event.sender)
 
@@ -188,55 +188,8 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     const allChatHistories = chatHistoriesMap[vaultDir] || []
     const filteredChatHistories = allChatHistories.filter((item) => item.id !== chatID)
 
-    chatHistoriesMap[vaultDir] = filteredChatHistories.reverse()
+    chatHistoriesMap[vaultDir] = filteredChatHistories
     store.set(StoreKeys.ChatHistories, chatHistoriesMap)
-  })
-
-  ipcMain.handle('get-current-open-files', () => store.get(StoreKeys.OpenTabs) || [])
-
-  ipcMain.handle('add-current-open-files', (event, tab: Tab) => {
-    if (tab === null) return
-    const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || []
-    const existingTab = openTabs.findIndex((item) => item.path === tab.path)
-
-    /* If tab is already open, do not do anything */
-    if (existingTab !== -1) return
-    openTabs.push(tab)
-    store.set(StoreKeys.OpenTabs, openTabs)
-  })
-
-  ipcMain.handle('remove-current-open-files', (event, tabId: string, idx: number, newIndex: number) => {
-    // Ensure indices are within range
-    const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || []
-    if (idx < 0 || idx >= openTabs.length || newIndex < 0 || newIndex >= openTabs.length) return
-    openTabs[idx].lastAccessed = false
-    openTabs[newIndex].lastAccessed = true
-    const updatedTabs = openTabs.filter((tab) => tab.id !== tabId)
-    store.set(StoreKeys.OpenTabs, updatedTabs)
-  })
-
-  ipcMain.handle('clear-current-open-files', () => {
-    store.set(StoreKeys.OpenTabs, [])
-  })
-
-  ipcMain.handle('update-current-open-files', (event, draggedIndex: number, targetIndex: number) => {
-    const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || []
-    if (draggedIndex < 0 || draggedIndex >= openTabs.length || targetIndex < 0 || targetIndex >= openTabs.length) return
-    ;[openTabs[draggedIndex], openTabs[targetIndex]] = [openTabs[targetIndex], openTabs[draggedIndex]]
-    store.set(StoreKeys.OpenTabs, openTabs)
-  })
-
-  ipcMain.handle('set-current-open-files', (event, tabs: Tab[]) => {
-    if (tabs) store.set(StoreKeys.OpenTabs, tabs)
-  })
-
-  ipcMain.handle('remove-current-open-files-by-path', (event, filePath: string) => {
-    if (!filePath) return
-    const openTabs: Tab[] = store.get(StoreKeys.OpenTabs) || []
-    // Filter out selected tab
-    const updatedTabs = openTabs.filter((tab) => tab.path !== filePath)
-    store.set(StoreKeys.OpenTabs, updatedTabs)
-    event.sender.send('remove-tab-after-deletion', updatedTabs)
   })
 }
 

@@ -35,16 +35,13 @@ const SimilarFilesSidebarComponent: React.FC = () => {
   const performSearchOnChunk = async (
     sanitizedText: string,
     fileToBeExcluded: string | null,
-    withReranking = false,
   ): Promise<DBQueryResult[]> => {
     try {
       const databaseFields = await window.database.getDatabaseFields()
       const filterString = `${databaseFields.NOTE_PATH} != '${fileToBeExcluded}'`
 
       setIsLoadingSimilarEntries(true)
-      const searchResults: DBQueryResult[] = withReranking
-        ? await window.database.searchWithReranking(sanitizedText, 20, filterString)
-        : await window.database.search(sanitizedText, 20, filterString)
+      const searchResults: DBQueryResult[] = await window.database.search(sanitizedText, 20, filterString)
 
       setIsLoadingSimilarEntries(false)
       return searchResults
@@ -65,7 +62,7 @@ const SimilarFilesSidebarComponent: React.FC = () => {
       if (!sanitizedText) {
         return
       }
-      const searchResults = await performSearchOnChunk(sanitizedText, path, false)
+      const searchResults = await performSearchOnChunk(sanitizedText, path)
 
       if (searchResults.length > 0) {
         setSimilarEntries(searchResults)
@@ -78,7 +75,7 @@ const SimilarFilesSidebarComponent: React.FC = () => {
     }
   }, [currentlyOpenFilePath])
 
-  const updateSimilarEntries = async (isRefined?: boolean) => {
+  const updateSimilarEntries = async () => {
     const sanitizedText = await getChunkForInitialSearchFromFile(currentlyOpenFilePath)
 
     if (!sanitizedText) {
@@ -86,7 +83,7 @@ const SimilarFilesSidebarComponent: React.FC = () => {
       return
     }
 
-    const searchResults = await performSearchOnChunk(sanitizedText, currentlyOpenFilePath, isRefined)
+    const searchResults = await performSearchOnChunk(sanitizedText, currentlyOpenFilePath)
     setSimilarEntries(searchResults)
   }
 

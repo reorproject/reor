@@ -14,14 +14,13 @@ const EXAMPLE_PROMPT_OPTIONS = [
 
 interface StartChatProps {
   defaultModelName: string
-  handleNewChatMessage: (userTextFieldInput: string | undefined, chatFilters?: ChatFilters) => void
+  handleNewChatMessage: (userTextFieldInput: string, chatFilters: ChatFilters) => void
 }
 
 const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMessage }) => {
   const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([])
   const [selectedLLM, setSelectedLLM] = useState<string>(defaultModelName)
-  //   text input state:
-  const [userTextFieldInput, setUserTextFieldInput] = useState<string | undefined>()
+  const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
   const [chatFilters, setChatFilters] = useState<ChatFilters>({
     files: [],
     numberOfChunksToFetch: 15,

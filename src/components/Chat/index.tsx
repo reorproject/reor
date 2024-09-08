@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react'
 
 import posthog from 'posthog-js'
+import { z } from 'zod'
 
-import { streamText } from 'ai'
+import { streamText, tool } from 'ai'
+import getDisplayableChatName from '@shared/utils'
 import { anonymizeChatFiltersForPosthog, resolveLLMClient, generateRAGMessages } from './utils'
 
 import '../../styles/chat.css'
@@ -17,8 +19,8 @@ const ChatComponent: React.FC = () => {
   const [readyToSave, setReadyToSave] = useState<boolean>(false)
   const [defaultModelName, setDefaultLLMName] = useState<string>('')
   const chatContainerRef = useRef<HTMLDivElement>(null)
-
-  const { setCurrentOpenChat, currentOpenChat } = useChatContext()
+  const [currentChat, setCurrentChat] = useState<Chat | undefined>(undefined)
+  const { updateChat, currentOpenChatID, setCurrentOpenChatID } = useChatContext()
 
   useEffect(() => {
     const fetchDefaultLLM = async () => {
@@ -28,44 +30,40 @@ const ChatComponent: React.FC = () => {
     fetchDefaultLLM()
   }, [])
 
-  // useEffect(() => {
-  //   const setContextOnFileAdded = async () => {
-  //     if (chatFilters.files.length > 0) {
-  //       const results = await window.fileSystem.getFilesystemPathsAsDBItems(chatFilters.files)
-  //       setCurrentContext(results as DBQueryResult[])
-  //     } else if (!currentChatHistory?.id) {
-  //       // if there is no prior history, set current context to empty
-  //       setCurrentContext([])
-  //     }
-  //   }
-  //   setContextOnFileAdded()
-  // }, [chatFilters.files, currentChatHistory?.id])
+  useEffect(() => {
+    const fetchChat = async () => {
+      const chat = await window.electronStore.getChat(currentOpenChatID)
+      setCurrentChat(chat)
+      setLoadingResponse(false)
+    }
+    fetchChat()
+  }, [currentOpenChatID])
 
   useEffect(() => {
-    if (readyToSave && currentOpenChat) {
-      window.electronStore.updateChat(currentOpenChat)
+    if (readyToSave && currentChat) {
+      updateChat(currentChat)
       setReadyToSave(false)
     }
-  }, [readyToSave, currentOpenChat])
+  }, [readyToSave, currentChat, updateChat])
 
   const appendNewContentToMessageHistory = useCallback(
     (chatID: string, newContent: string) => {
-      setCurrentOpenChat((prev) => {
-        if (chatID !== prev?.id) return prev
-        const newDisplayableHistory = prev?.messages || []
-        if (newDisplayableHistory.length > 0) {
-          const lastMessage = newDisplayableHistory[newDisplayableHistory.length - 1]
+      setCurrentChat((prev) => {
+        if (chatID !== prev?.id) throw new Error('Chat ID does not match')
+        const outputMessages = prev?.messages || []
+        if (outputMessages.length > 0) {
+          const lastMessage = outputMessages[outputMessages.length - 1]
           if (lastMessage.role === 'assistant') {
             lastMessage.content += newContent
           } else {
-            newDisplayableHistory.push({
+            outputMessages.push({
               role: 'assistant',
               content: newContent,
               context: [],
             })
           }
         } else {
-          newDisplayableHistory.push({
+          outputMessages.push({
             role: 'assistant',
             content: newContent,
             context: [],
@@ -73,36 +71,38 @@ const ChatComponent: React.FC = () => {
         }
         return {
           id: prev!.id,
-          messages: newDisplayableHistory,
+          messages: outputMessages,
+          displayName: getDisplayableChatName(outputMessages),
+          timeOfLastMessage: prev.timeOfLastMessage,
         }
       })
     },
-    [setCurrentOpenChat],
+    [setCurrentChat],
   )
 
   const handleSubmitNewMessage = useCallback(
-    async (currentChat: Chat | undefined, userTextFieldInput: string | undefined, chatFilters?: ChatFilters) => {
-      posthog.capture('chat_message_submitted', {
-        chatId: currentChat?.id,
-        chatLength: currentChat?.messages.length,
-        chatFilters: anonymizeChatFiltersForPosthog(chatFilters),
-      })
-      let outputChat = currentChat
-
+    async (userTextFieldInput: string, chatFilters?: ChatFilters) => {
       if (loadingResponse || !userTextFieldInput?.trim()) return
 
       setLoadingResponse(true)
       setLoadAnimation(true)
 
       const defaultLLMName = await window.llm.getDefaultLLMName()
+      let outputChat = currentChat
+
       if (!outputChat || !outputChat.id) {
+        const newID = Date.now().toString()
         outputChat = {
-          id: Date.now().toString(),
+          id: newID,
           messages: [],
+          displayName: '',
+          timeOfLastMessage: Date.now(),
         }
       }
       if (outputChat.messages.length === 0 && chatFilters) {
-        outputChat.messages.push(...(await generateRAGMessages(userTextFieldInput ?? '', chatFilters)))
+        const ragMessages = await generateRAGMessages(userTextFieldInput ?? '', chatFilters)
+        outputChat.messages.push(...ragMessages)
+        outputChat.displayName = getDisplayableChatName(outputChat.messages)
       } else {
         outputChat.messages.push({
           role: 'user',
@@ -110,92 +110,74 @@ const ChatComponent: React.FC = () => {
           context: [],
         })
       }
-      // setUserTextFieldInput('')
 
-      setCurrentOpenChat(outputChat)
+      setCurrentChat(outputChat)
+      setCurrentOpenChatID(outputChat.id)
 
-      if (!outputChat) return
-
-      await window.electronStore.updateChat(outputChat)
+      await updateChat(outputChat)
+      const dbFields = await window.database.getDatabaseFields()
 
       const client = await resolveLLMClient(defaultLLMName)
+
       const { textStream } = await streamText({
         model: client,
         messages: outputChat.messages,
+        tools: {
+          weather: tool({
+            description: "Semnatically Search the user's notes",
+            parameters: z.object({
+              query: z.string().describe('The query to search for'),
+              limit: z.number().default(10).describe('The number of results to return'),
+              filter: z
+                .string()
+                .optional()
+                .describe(
+                  `The filter to apply to the search. The columns available are: ${dbFields.FILE_MODIFIED} and ${dbFields.FILE_CREATED} which are both timestamps. An example filter would be ${dbFields.FILE_MODIFIED} > "2024-01-01" and ${dbFields.FILE_CREATED} < "2024-01-01".`,
+                ),
+            }),
+            // execute: async ({ query, limit }) => {
+            //   const results = await window.database.search(query, limit)
+            //   return results
+            // },
+          }),
+        },
+        onFinish: (event) => {
+          console.log('tool calls', event.toolCalls)
+          console.log('tool results', event.toolResults)
+        },
       })
 
       // eslint-disable-next-line no-restricted-syntax
-      for await (const textPart of textStream) {
+      for await (const text of textStream) {
         setLoadAnimation(false)
-        appendNewContentToMessageHistory(outputChat.id, textPart)
+        appendNewContentToMessageHistory(outputChat.id, text)
       }
       setLoadingResponse(false)
       setReadyToSave(true)
+      posthog.capture('chat_message_submitted', {
+        chatId: currentChat?.id,
+        chatLength: currentChat?.messages.length,
+        chatFilters: anonymizeChatFiltersForPosthog(chatFilters),
+      })
     },
-    [loadingResponse, setCurrentOpenChat, appendNewContentToMessageHistory],
-  )
-
-  // useEffect(() => {
-  //   // Update context when the chat history changes
-  //   const context = getChatHistoryContext(currentChatHistory)
-  //   setCurrentContext(context)
-
-  //   if (!promptSelected) {
-  //     setLoadAnimation(false)
-  //     setLoadingResponse(false)
-  //   } else {
-  //     setPromptSelected(false)
-  //   }
-  // }, [currentChatHistory, currentChatHistory?.id, promptSelected])
-
-  // useEffect(() => {
-  //   // Handle prompt selection and message submission separately
-  //   if (promptSelected) {
-  //     handleSubmitNewMessage(undefined)
-  //   }
-  //   /* eslint-disable-next-line react-hooks/exhaustive-deps */
-  // }, [promptSelected])
-
-  // const handleNewChatMessage = useCallback(
-  //   (prompt: string | undefined) => {
-  //     setUserTextFieldInput(prompt)
-  //   },
-  //   [setUserTextFieldInput],
-  // )
-
-  const handleNewChatMessage = useCallback(
-    (userTextFieldInput: string | undefined, chatFilters?: ChatFilters) => {
-      handleSubmitNewMessage(currentOpenChat, userTextFieldInput, chatFilters)
-    },
-    [currentOpenChat, handleSubmitNewMessage],
+    [currentChat, loadingResponse, setCurrentOpenChatID, updateChat, appendNewContentToMessageHistory],
   )
 
   return (
     <div className="flex size-full items-center justify-center">
       <div className="mx-auto flex size-full flex-col overflow-hidden border-y-0 border-l-[0.001px] border-r-0 border-solid border-neutral-700 bg-dark-gray-c-eleven">
-        {currentOpenChat && currentOpenChat.messages && currentOpenChat.messages.length > 0 ? (
+        {currentChat && currentChat.messages && currentChat.messages.length > 0 ? (
           <ChatMessages
-            currentChatHistory={currentOpenChat}
+            currentChatHistory={currentChat}
             chatContainerRef={chatContainerRef}
             loadAnimation={loadAnimation}
-            handleNewChatMessage={handleNewChatMessage}
+            handleNewChatMessage={handleSubmitNewMessage}
             loadingResponse={loadingResponse}
           />
         ) : (
-          <StartChat defaultModelName={defaultModelName} handleNewChatMessage={handleNewChatMessage} />
+          <StartChat defaultModelName={defaultModelName} handleNewChatMessage={handleSubmitNewMessage} />
         )}
       </div>
-      {/* {showSimilarFiles && (
-        <SimilarEntriesComponent
-          similarEntries={currentContext}
-          titleText="Context used in chat"
-          onSelect={(path: string) => {
-            openTabContent(path)
-            posthog.capture('open_file_from_chat_context')
-          }}
-          isLoadingSimilarEntries={false}
-        />
-      )} */}
     </div>
   )
 }

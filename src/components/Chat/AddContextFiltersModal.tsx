@@ -17,8 +17,8 @@ import { ChatFilters } from './types'
 interface Props {
   isOpen: boolean
   onClose: () => void
-  setChatFilters: (chatFilters: ChatFilters) => void
   chatFilters: ChatFilters
+  setChatFilters: React.Dispatch<React.SetStateAction<ChatFilters>>
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -42,16 +42,15 @@ const AddContextFiltersModal: React.FC<Props> = ({ isOpen, onClose, chatFilters,
   ]
 
   useEffect(() => {
-    const updatedChatFilters: ChatFilters = {
-      ...chatFilters,
-      files: [...new Set([...chatFilters.files, ...internalFilesSelected])],
+    setChatFilters((currentFilters) => ({
+      ...currentFilters,
+      files: [...new Set([...currentFilters.files, ...internalFilesSelected])],
       numberOfChunksToFetch,
-      minDate: minDate || undefined,
-      maxDate: maxDate || undefined,
+      minDate,
+      maxDate,
       passFullNoteIntoContext: true,
-    }
-    setChatFilters(updatedChatFilters)
-  }, [internalFilesSelected, numberOfChunksToFetch, minDate, maxDate, setChatFilters, chatFilters])
+    }))
+  }, [internalFilesSelected, numberOfChunksToFetch, minDate, maxDate, setChatFilters])
 
   const handleNumberOfChunksChange = (event: Event, value: number | number[]) => {
     const newValue = Array.isArray(value) ? value[0] : value

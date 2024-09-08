@@ -1,23 +1,24 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 
 import { RiChatNewFill, RiArrowDownSLine } from 'react-icons/ri'
 import { IoChatbubbles } from 'react-icons/io5'
 import posthog from 'posthog-js'
-import { ChatMetadata, useChatContext } from '@/contexts/ChatContext'
+import { useChatContext } from '@/contexts/ChatContext'
 import { useWindowContentContext } from '@/contexts/WindowContentContext'
+import { ChatMetadata } from './types'
 
 export interface ChatItemProps {
   chatMetadata: ChatMetadata
 }
 
 export const ChatItem: React.FC<ChatItemProps> = ({ chatMetadata }) => {
-  const { currentOpenChat } = useChatContext()
+  const { currentOpenChatID } = useChatContext()
   const { openContent, showContextMenu } = useWindowContentContext()
 
   const itemClasses = `
     flex items-center cursor-pointer py-2 px-3 rounded-md
     transition-colors duration-150 ease-in-out
-    ${chatMetadata.id === currentOpenChat?.id ? 'bg-neutral-700 text-white' : 'text-gray-300 hover:bg-neutral-800'}
+    ${chatMetadata.id === currentOpenChatID ? 'bg-neutral-700 text-white' : 'text-gray-300 hover:bg-neutral-800'}
   `
   return (
     <div>
@@ -42,23 +43,9 @@ export const ChatSidebar: React.FC = () => {
   const [isRecentsOpen, setIsRecentsOpen] = useState(true)
   const dropdownAnimationDelay = 0.02
 
-  const { setShowChatbot, allChatsMetadata, setCurrentOpenChat } = useChatContext()
+  const { setShowChatbot, allChatsMetadata, setCurrentOpenChatID } = useChatContext()
 
   const toggleRecents = () => setIsRecentsOpen((prev) => !prev)
-  const currentSelectedChatID = useRef<string | undefined>()
-
-  useEffect(() => {
-    const deleteChatRow = window.ipcRenderer.receive('delete-chat-at-id', (chatID) => {
-      if (chatID === currentSelectedChatID.current) {
-        setShowChatbot(false)
-      }
-      window.electronStore.deleteChatAtID(chatID)
-    })
-
-    return () => {
-      deleteChatRow()
-    }
-  }, [allChatsMetadata, setShowChatbot])
 
   return (
     <div className="flex h-full flex-col overflow-y-auto bg-neutral-800 px-2 pb-4 pt-2.5">
@@ -74,7 +61,7 @@ export const ChatSidebar: React.FC = () => {
               onClick={() => {
                 posthog.capture('create_new_chat')
                 setShowChatbot(true)
-                setCurrentOpenChat(undefined)
+                setCurrentOpenChatID(undefined)
               }}
             >
               <RiChatNewFill className="text-xl" />
@@ -94,7 +81,7 @@ export const ChatSidebar: React.FC = () => {
               <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
                 {allChatsMetadata
                   .slice()
-                  .reverse()
+                  .sort((a, b) => b.timeOfLastMessage - a.timeOfLastMessage)
                   .map((chatMetadata, index) => (
                     <li
                       key={chatMetadata.id}

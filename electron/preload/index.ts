@@ -6,12 +6,11 @@ import {
   LLMConfig,
   LLMAPIConfig,
   LLMGenerationParameters,
-  Tab,
 } from 'electron/main/electron-store/storeConfig'
 import { FileInfoTree, FileInfoWithContent, RenameFileProps, WriteFileProps } from 'electron/main/filesystem/types'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 
-import { Chat } from '@/components/Chat/types'
+import { Chat, ChatMetadata } from '@/components/Chat/types'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type IPCHandler<T extends (...args: any[]) => any> = (...args: Parameters<T>) => Promise<ReturnType<T>>
@@ -23,10 +22,6 @@ function createIPCHandler<T extends (...args: any[]) => any>(channel: string): I
 
 const database = {
   search: createIPCHandler<(query: string, limit: number, filter?: string) => Promise<DBQueryResult[]>>('search'),
-  searchWithReranking:
-    createIPCHandler<(query: string, limit: number, filter?: string) => Promise<DBQueryResult[]>>(
-      'search-with-reranking',
-    ),
   deleteLanceDBEntriesByFilePath: createIPCHandler<(filePath: string) => Promise<void>>(
     'delete-lance-db-entries-by-filepath',
   ),
@@ -68,24 +63,14 @@ const electronStore = {
   setSpellCheckMode: createIPCHandler<(isSpellCheck: boolean) => Promise<void>>('set-spellcheck-mode'),
   getHasUserOpenedAppBefore: createIPCHandler<() => Promise<boolean>>('has-user-opened-app-before'),
   setHasUserOpenedAppBefore: createIPCHandler<() => Promise<void>>('set-user-has-opened-app-before'),
-  getAllChats: createIPCHandler<() => Promise<Chat[]>>('get-all-chats'),
+  getAllChatsMetadata: createIPCHandler<() => Promise<ChatMetadata[]>>('get-all-chats-metadata'),
   updateChat: createIPCHandler<(chat: Chat) => Promise<void>>('update-chat'),
-  deleteChatAtID: createIPCHandler<(chatID: string) => Promise<void>>('delete-chat-at-id'),
-  getChat: createIPCHandler<(chatID: string) => Promise<Chat>>('get-chat'),
+  deleteChat: createIPCHandler<(chatID: string) => Promise<void>>('delete-chat'),
+  getChat: createIPCHandler<(chatID: string | undefined) => Promise<Chat | undefined>>('get-chat'),
   getSBCompact: createIPCHandler<() => Promise<boolean>>('get-sb-compact'),
   setSBCompact: createIPCHandler<(isSBCompact: boolean) => Promise<void>>('set-sb-compact'),
   getEditorFlexCenter: createIPCHandler<() => Promise<boolean>>('get-editor-flex-center'),
   setEditorFlexCenter: createIPCHandler<(editorFlexCenter: boolean) => Promise<void>>('set-editor-flex-center'),
-  getCurrentOpenTabs: createIPCHandler<() => Promise<Tab[]>>('get-current-open-files'),
-  setCurrentOpenTabs: createIPCHandler<(action: string, args: any) => Promise<void>>('set-current-open-files'),
-  addOpenTabs: createIPCHandler<(tab: Tab) => Promise<void>>('add-current-open-files'),
-  removeOpenTabs:
-    createIPCHandler<(tabId: string, idx: number, newIndex: number) => Promise<void>>('remove-current-open-files'),
-  clearOpenTabs: createIPCHandler<() => Promise<void>>('clear-current-open-files'),
-  updateOpenTabs:
-    createIPCHandler<(draggedIndex: number, targetIndex: number) => Promise<void>>('update-current-open-files'),
-  selectOpenTabs: createIPCHandler<(tabs: Tab[]) => Promise<void>>('set-current-open-files'),
-  removeOpenTabsByPath: createIPCHandler<(path: string) => Promise<void>>('remove-current-open-files-by-path'),
 }
 
 const fileSystem = {

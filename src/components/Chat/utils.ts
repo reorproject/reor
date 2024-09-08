@@ -85,15 +85,19 @@ const fetchResults = async (query: string, chatFilters: ChatFilters): Promise<DB
   return []
 }
 
+const generateStringOfContextItems = (contextItems: DBEntry[] | FileInfoWithContent[]): string => {
+  // properties: name, relativePath, dateModified, dateCreated
+  return contextItems.map((item) => item.content).join('\n\n')
+}
+
 export const generateRAGMessages = async (query: string, chatFilters: ChatFilters): Promise<ReorChatMessage[]> => {
   const results = await fetchResults(query, chatFilters)
+  const contextString = generateStringOfContextItems(results)
   return [
     {
       role: 'user',
       context: results,
-      content: `Based on the following context answer the question down below. \n\n\nContext: \n${results
-        .map((dbItem) => dbItem.content)
-        .join('\n\n')}\n\n\nQuery:\n${query}`,
+      content: `Based on the following context answer the question down below. \n\n\nContext: \n${contextString}\n\n\nQuery:\n${query}`,
       visibleContent: query,
     },
   ]
@@ -103,24 +107,6 @@ export const getChatHistoryContext = (chatHistory: Chat | undefined): DBQueryRes
   if (!chatHistory || !chatHistory.messages) return []
   const contextForChat = chatHistory.messages.map((message) => message.context).flat()
   return contextForChat as DBQueryResult[]
-}
-
-export const getDisplayableChatName = (chat: Chat): string => {
-  if (!chat.messages || chat.messages.length === 0 || !chat.messages[chat.messages.length - 1].content) {
-    return 'Empty Chat'
-  }
-
-  const lastMsg = chat.messages[0]
-
-  if (lastMsg.visibleContent) {
-    return lastMsg.visibleContent.slice(0, 30)
-  }
-
-  const lastMessage = lastMsg.content
-  if (!lastMessage || lastMessage === '' || typeof lastMessage !== 'string') {
-    return 'Empty Chat'
-  }
-  return lastMessage.slice(0, 30)
 }
 
 export function anonymizeChatFiltersForPosthog(
