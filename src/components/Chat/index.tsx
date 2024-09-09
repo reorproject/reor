@@ -8,6 +8,7 @@ import {
   resolveLLMClient,
   prepareOutputChat,
   appendTextContentToMessages,
+  convertToolToZodSchema,
 } from './utils'
 
 import '../../styles/chat.css'
@@ -21,7 +22,7 @@ const ChatComponent: React.FC = () => {
   const [defaultModelName, setDefaultLLMName] = useState<string>('')
   const chatContainerRef = useRef<HTMLDivElement>(null)
   const [currentChat, setCurrentChat] = useState<Chat | undefined>(undefined)
-  const { saveChat: updateChat, currentOpenChatID, setCurrentOpenChatID } = useChatContext()
+  const { saveChat, currentOpenChatID, setCurrentOpenChatID } = useChatContext()
 
   useEffect(() => {
     const fetchDefaultLLM = async () => {
@@ -46,22 +47,19 @@ const ChatComponent: React.FC = () => {
       try {
         const defaultLLMName = await window.llm.getDefaultLLMName()
         let outputChat = await prepareOutputChat(currentChat, userTextFieldInput, chatFilters)
-
         setCurrentChat(outputChat)
         setCurrentOpenChatID(outputChat.id)
-        await updateChat(outputChat)
-
+        await saveChat(outputChat)
         const client = await resolveLLMClient(defaultLLMName)
 
-        const { textStream } = await streamText({
+        const { textStream, toolCalls } = await streamText({
           model: client,
           messages: outputChat.messages,
-          tools: outputChat.tools,
-          onFinish: (event) => {
-            console.log('tool results', event.toolResults)
-          },
+          tools: Object.assign({}, ...outputChat.tools.map(convertToolToZodSchema)),
+          // onFinish: (event) => {
+          //   console.log('tool results', event.toolResults)
+          // },
         })
-
         // eslint-disable-next-line no-restricted-syntax
         for await (const text of textStream) {
           outputChat = {
@@ -71,9 +69,8 @@ const ChatComponent: React.FC = () => {
           setCurrentChat(outputChat)
           setLoadingState('generating')
         }
-
-        console.log('current chat to save:', outputChat)
-        await updateChat(outputChat)
+        outputChat.messages = appendTextContentToMessages(outputChat.messages, await toolCalls)
+        await saveChat(outputChat)
 
         setLoadingState('idle')
         posthog.capture('chat_message_submitted', {
@@ -86,7 +83,7 @@ const ChatComponent: React.FC = () => {
         throw error
       }
     },
-    [setCurrentOpenChatID, updateChat, currentChat],
+    [setCurrentOpenChatID, saveChat, currentChat],
   )
 
   return (

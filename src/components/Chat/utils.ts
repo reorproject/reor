@@ -3,20 +3,39 @@ import { createOpenAI } from '@ai-sdk/openai'
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import getDisplayableChatName from '@shared/utils'
-import { AnonymizedChatFilters, Chat, ChatFilters, ReorChatMessage } from './types'
+import { z } from 'zod'
+import { AssistantContent, ToolCallPart } from 'ai'
+import { AnonymizedChatFilters, Chat, ChatFilters, ReorChatMessage, ToolSchema } from './types'
 
-export const appendTextContentToMessages = (messages: ReorChatMessage[], text: string): ReorChatMessage[] => {
-  if (text === '') {
+export const appendTextContentToMessages = (
+  messages: ReorChatMessage[],
+  content: string | ToolCallPart[],
+): ReorChatMessage[] => {
+  if (content === '' || (Array.isArray(content) && content.length === 0)) {
     return messages
   }
+
+  const appendContent = (existingContent: AssistantContent, newContent: string | ToolCallPart[]): AssistantContent => {
+    if (typeof existingContent === 'string') {
+      return typeof newContent === 'string'
+        ? existingContent + newContent
+        : [{ type: 'text' as const, text: existingContent }, ...newContent]
+    }
+    return [
+      ...existingContent,
+      ...(typeof newContent === 'string' ? [{ type: 'text' as const, text: newContent }] : newContent),
+    ]
+  }
+
   if (messages.length === 0) {
     return [
       {
         role: 'assistant',
-        content: text,
+        content: typeof content === 'string' ? content : content,
       },
     ]
   }
+
   const lastMessage = messages[messages.length - 1]
 
   if (lastMessage.role === 'assistant') {
@@ -24,15 +43,16 @@ export const appendTextContentToMessages = (messages: ReorChatMessage[], text: s
       ...messages.slice(0, -1),
       {
         ...lastMessage,
-        content: lastMessage.content + text,
+        content: appendContent(lastMessage.content, content),
       },
     ]
   }
+
   return [
     ...messages,
     {
       role: 'assistant',
-      content: text,
+      content: typeof content === 'string' ? content : content,
     },
   ]
 }
@@ -107,6 +127,67 @@ export const generateRAGMessages = async (query: string, chatFilters: ChatFilter
   ]
 }
 
+export const searchTool: ToolSchema = {
+  name: 'search',
+  description: "Semantically search the user's personal knowledge base",
+  parameters: [
+    {
+      name: 'query',
+      type: 'string',
+      defaultValue: '',
+      description: 'The query to search for',
+    },
+    {
+      name: 'limit',
+      type: 'number',
+      defaultValue: 10,
+      description: 'The number of results to return',
+    },
+  ],
+}
+
+// so basically each tool just has a name, description, and parameters
+// and then each parameter has a name, a type, a default value and a description
+
+export function convertToolToZodSchema(tool: ToolSchema) {
+  const parameterSchema = z.object(
+    tool.parameters.reduce((acc, param) => {
+      let zodType: z.ZodType<any>
+
+      switch (param.type) {
+        case 'string':
+          zodType = z.string()
+          break
+        case 'number':
+          zodType = z.number()
+          break
+        case 'boolean':
+          zodType = z.boolean()
+          break
+        default:
+          throw new Error(`Unsupported parameter type: ${param.type}`)
+      }
+
+      // Apply default value if it exists
+      if (param.defaultValue !== undefined) {
+        zodType = zodType.default(param.defaultValue)
+      }
+
+      // Apply description
+      zodType = zodType.describe(param.description)
+
+      return { ...acc, [param.name]: zodType }
+    }, {}),
+  )
+
+  return {
+    [tool.name]: {
+      description: tool.description,
+      parameters: parameterSchema,
+    },
+  }
+}
+
 export const prepareOutputChat = async (
   currentChat: Chat | undefined,
   userTextFieldInput: string,
@@ -121,7 +202,7 @@ export const prepareOutputChat = async (
       messages: [],
       displayName: '',
       timeOfLastMessage: Date.now(),
-      tools: {},
+      tools: [],
     }
   }
 
@@ -129,6 +210,7 @@ export const prepareOutputChat = async (
     const ragMessages = await generateRAGMessages(userTextFieldInput ?? '', chatFilters)
     outputChat.messages.push(...ragMessages)
     outputChat.displayName = getDisplayableChatName(outputChat.messages)
+    outputChat.tools = [searchTool]
   } else {
     outputChat.messages.push({
       role: 'user',
@@ -139,26 +221,6 @@ export const prepareOutputChat = async (
 
   return outputChat
 }
-
-// const tools: Record<string, CoreTool> = {
-//   search: tool({
-//     description: "Semantically search the user's personal knowledge base",
-//     parameters: z.object({
-//       query: z.string().describe('The query to search for'),
-//       limit: z.number().default(10).describe('The number of results to return'),
-//       filter: z
-//         .string()
-//         .optional()
-//         .describe(
-//           `The filter to apply to the search. The columns available are: ${dbFields.FILE_MODIFIED} and ${dbFields.FILE_CREATED} which are both timestamps. An example filter would be ${dbFields.FILE_MODIFIED} > "2024-01-01" and ${dbFields.FILE_CREATED} < "2024-01-01".`,
-//         ),
-//     }),
-//     execute: async ({ query, limit }) => {
-//       const results = await window.database.search(query, limit)
-//       return results
-//     },
-//   }),
-// }
 
 export const getChatHistoryContext = (chatHistory: Chat | undefined): DBQueryResult[] => {
   if (!chatHistory || !chatHistory.messages) return []

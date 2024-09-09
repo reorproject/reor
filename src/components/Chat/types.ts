@@ -1,4 +1,4 @@
-import { CoreMessage, CoreTool } from 'ai'
+import { CoreMessage } from 'ai'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { DBEntry } from 'electron/main/vector-database/schema'
 
@@ -7,13 +7,29 @@ export type ReorChatMessage = CoreMessage & {
   visibleContent?: string // what to display in the chat bubble
 }
 
+// core tool with execute omitted
+type ParameterType = 'string' | 'number' | 'boolean'
+
+type Parameter = {
+  name: string
+  type: ParameterType
+  defaultValue: string | number | boolean
+  description: string
+}
+
+export type ToolSchema = {
+  name: string
+  description: string
+  parameters: Parameter[]
+}
+
 export type Chat = {
   [x: string]: any // used to delete legacy properties in store migrator.
   id: string
   messages: ReorChatMessage[]
   displayName: string
   timeOfLastMessage: number
-  tools: Record<string, CoreTool>
+  tools: ToolSchema[]
 }
 
 export type ChatMetadata = Omit<Chat, 'messages'>
