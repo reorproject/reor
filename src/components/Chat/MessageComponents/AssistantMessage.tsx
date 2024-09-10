@@ -1,10 +1,10 @@
+/* eslint-disable react/no-array-index-key */
 import React from 'react'
 import { HiOutlineClipboardCopy, HiOutlinePencilAlt } from 'react-icons/hi'
 import { toast } from 'react-toastify'
-import ReactMarkdown from 'react-markdown'
-import rehypeRaw from 'rehype-raw'
 import { ReorChatMessage } from '../types'
 import { getClassNameBasedOnMessageRole, getDisplayMessage } from '../utils'
+import { TextPart, ToolCallPart } from './ToolCalls'
 
 interface AssistantMessageProps {
   message: ReorChatMessage
@@ -13,13 +13,33 @@ interface AssistantMessageProps {
 
 const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, openTabContent }) => {
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(getDisplayMessage(message) ?? '')
+    const content = typeof message.content === 'string' ? message.content : JSON.stringify(message.content, null, 2)
+    navigator.clipboard.writeText(content)
     toast.success('Copied to clipboard!')
   }
 
   const createNewNoteFromMessage = async () => {
-    const title = `${(getDisplayMessage(message) ?? `${new Date().toDateString()}`).substring(0, 20)}...`
-    openTabContent(title, getDisplayMessage(message))
+    const content = typeof message.content === 'string' ? message.content : JSON.stringify(message.content, null, 2)
+    const title = `${content.substring(0, 20)}...`
+    openTabContent(title, content)
+  }
+
+  const renderContent = () => {
+    if (typeof message.content === 'string') {
+      return <TextPart text={getDisplayMessage(message) || ''} />
+    }
+    if (Array.isArray(message.content)) {
+      return message.content.map((part, index) => {
+        if ('text' in part) {
+          return <TextPart key={index} text={part.text} />
+        }
+        if (part.type === 'tool-call') {
+          return <ToolCallPart key={index} toolCallId={part.toolCallId} toolName={part.toolName} args={part.args} />
+        }
+        return null
+      })
+    }
+    return null
   }
 
   return (
@@ -29,9 +49,7 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, openTabCon
       </div>
       <div className="w-full flex-col gap-1">
         <div className="flex grow flex-col px-5 py-2.5">
-          <ReactMarkdown rehypePlugins={[rehypeRaw]} className="max-w-[95%] break-words">
-            {getDisplayMessage(message)}
-          </ReactMarkdown>
+          {renderContent()}
           <div className="mt-2 flex">
             <div
               className="cursor-pointer items-center justify-center rounded p-1 hover:bg-neutral-700"

@@ -67,6 +67,7 @@ const ChatComponent: React.FC = () => {
           setLoadingState('generating')
         }
         outputChat.messages = appendTextContentToMessages(outputChat.messages, await toolCalls)
+        setCurrentChat(outputChat)
         await saveChat(outputChat)
 
         setLoadingState('idle')
