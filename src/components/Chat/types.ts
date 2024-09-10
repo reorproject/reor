@@ -7,20 +7,20 @@ export type ReorChatMessage = CoreMessage & {
   visibleContent?: string // what to display in the chat bubble
 }
 
-// core tool with execute omitted
 type ParameterType = 'string' | 'number' | 'boolean'
 
-type Parameter = {
+type ToolParameter = {
   name: string
   type: ParameterType
   defaultValue: string | number | boolean
   description: string
 }
 
-export type ToolSchema = {
+export type ToolConfig = {
   name: string
   description: string
-  parameters: Parameter[]
+  parameters: ToolParameter[]
+  autoRun?: boolean
 }
 
 export type Chat = {
@@ -29,7 +29,7 @@ export type Chat = {
   messages: ReorChatMessage[]
   displayName: string
   timeOfLastMessage: number
-  tools: ToolSchema[]
+  tools: ToolConfig[]
 }
 
 export type ChatMetadata = Omit<Chat, 'messages'>

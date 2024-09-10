@@ -8,7 +8,7 @@ import {
   resolveLLMClient,
   prepareOutputChat,
   appendTextContentToMessages,
-  convertToolToZodSchema,
+  convertToolConfigToZodSchema,
 } from './utils'
 
 import '../../styles/chat.css'
@@ -55,10 +55,7 @@ const ChatComponent: React.FC = () => {
         const { textStream, toolCalls } = await streamText({
           model: client,
           messages: outputChat.messages,
-          tools: Object.assign({}, ...outputChat.tools.map(convertToolToZodSchema)),
-          // onFinish: (event) => {
-          //   console.log('tool results', event.toolResults)
-          // },
+          tools: Object.assign({}, ...outputChat.tools.map(convertToolConfigToZodSchema)),
         })
         // eslint-disable-next-line no-restricted-syntax
         for await (const text of textStream) {

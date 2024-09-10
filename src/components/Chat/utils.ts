@@ -5,7 +5,8 @@ import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import getDisplayableChatName from '@shared/utils'
 import { z } from 'zod'
 import { AssistantContent, ToolCallPart } from 'ai'
-import { AnonymizedChatFilters, Chat, ChatFilters, ReorChatMessage, ToolSchema } from './types'
+import { AnonymizedChatFilters, Chat, ChatFilters, ReorChatMessage, ToolConfig } from './types'
+import { searchTool } from './tools'
 
 export const appendTextContentToMessages = (
   messages: ReorChatMessage[],
@@ -127,29 +128,7 @@ export const generateRAGMessages = async (query: string, chatFilters: ChatFilter
   ]
 }
 
-export const searchTool: ToolSchema = {
-  name: 'search',
-  description: "Semantically search the user's personal knowledge base",
-  parameters: [
-    {
-      name: 'query',
-      type: 'string',
-      defaultValue: '',
-      description: 'The query to search for',
-    },
-    {
-      name: 'limit',
-      type: 'number',
-      defaultValue: 10,
-      description: 'The number of results to return',
-    },
-  ],
-}
-
-// so basically each tool just has a name, description, and parameters
-// and then each parameter has a name, a type, a default value and a description
-
-export function convertToolToZodSchema(tool: ToolSchema) {
+export function convertToolConfigToZodSchema(tool: ToolConfig) {
   const parameterSchema = z.object(
     tool.parameters.reduce((acc, param) => {
       let zodType: z.ZodType<any>
