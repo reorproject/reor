@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import posthog from 'posthog-js'
 
@@ -20,7 +20,6 @@ import StartChat from './StartChat'
 const ChatComponent: React.FC = () => {
   const [loadingState, setLoadingState] = useState<LoadingState>('idle')
   const [defaultModelName, setDefaultLLMName] = useState<string>('')
-  const chatContainerRef = useRef<HTMLDivElement>(null)
   const [currentChat, setCurrentChat] = useState<Chat | undefined>(undefined)
   const { saveChat, currentOpenChatID, setCurrentOpenChatID } = useChatContext()
 
@@ -90,7 +89,7 @@ const ChatComponent: React.FC = () => {
         {currentChat && currentChat.messages && currentChat.messages.length > 0 ? (
           <ChatMessages
             currentChat={currentChat}
-            chatContainerRef={chatContainerRef}
+            setCurrentChat={setCurrentChat}
             loadingState={loadingState}
             handleNewChatMessage={handleSubmitNewMessage}
           />

@@ -6,6 +6,7 @@ import chokidar from 'chokidar'
 import { BrowserWindow } from 'electron'
 
 import { FileInfo, FileInfoTree, isFileNodeDirectory } from './types'
+import addExtensionToFilenameIfNoExtensionPresent from '../path/path'
 
 export const markdownExtensions = ['.md', '.markdown', '.mdown', '.mkdn', '.mkd']
 
@@ -121,8 +122,9 @@ export function createFileRecursive(filePath: string, content: string, charset?:
   if (fs.existsSync(filePath)) {
     return
   }
+  const filePathWithExtension = addExtensionToFilenameIfNoExtensionPresent(filePath, markdownExtensions, '.md')
 
-  fs.writeFileSync(filePath, content, charset)
+  fs.writeFileSync(filePathWithExtension, content, charset)
 }
 
 export function updateFileListForRenderer(win: BrowserWindow, directory: string): void {

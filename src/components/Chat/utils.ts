@@ -6,7 +6,7 @@ import getDisplayableChatName from '@shared/utils'
 import { z } from 'zod'
 import { AssistantContent, ToolCallPart } from 'ai'
 import { AnonymizedChatFilters, Chat, ChatFilters, ReorChatMessage, ToolConfig } from './types'
-import { searchTool } from './tools'
+import { createNoteTool, searchTool } from './tools'
 
 export const appendTextContentToMessages = (
   messages: ReorChatMessage[],
@@ -189,7 +189,7 @@ export const prepareOutputChat = async (
     const ragMessages = await generateRAGMessages(userTextFieldInput ?? '', chatFilters)
     outputChat.messages.push(...ragMessages)
     outputChat.displayName = getDisplayableChatName(outputChat.messages)
-    outputChat.tools = [searchTool]
+    outputChat.tools = [searchTool, createNoteTool]
   } else {
     outputChat.messages.push({
       role: 'user',

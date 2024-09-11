@@ -1,7 +1,6 @@
-import React, { MutableRefObject, useState } from 'react'
+import React, { useState } from 'react'
 import '../../styles/chat.css'
 import { Chat, ChatFilters, LoadingState, ReorChatMessage } from './types'
-import { useWindowContentContext } from '@/contexts/WindowContentContext'
 import ChatInput from './ChatInput'
 import LoadingDots from '@/utils/animations'
 import UserMessage from './MessageComponents/UserMessage'
@@ -10,18 +9,17 @@ import SystemMessage from './MessageComponents/SystemMessage'
 
 interface ChatMessagesProps {
   currentChat: Chat | undefined
-  chatContainerRef: MutableRefObject<HTMLDivElement | null>
+  setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
   loadingState: LoadingState
   handleNewChatMessage: (userTextFieldInput: string, chatFilters?: ChatFilters) => void
 }
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({
   currentChat,
-  chatContainerRef,
+  setCurrentChat,
   handleNewChatMessage,
   loadingState,
 }) => {
-  const { openContent: openTabContent } = useWindowContentContext()
   const [userTextFieldInput, setUserTextFieldInput] = useState<string | undefined>()
 
   const renderMessage = (message: ReorChatMessage, index: number) => {
@@ -29,7 +27,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
       case 'user':
         return <UserMessage key={index} message={message} />
       case 'assistant':
-        return <AssistantMessage key={index} message={message} openTabContent={openTabContent} />
+        return <AssistantMessage key={index} message={message} setCurrentChat={setCurrentChat} />
       case 'system':
         return <SystemMessage key={index} message={message} />
       default:
@@ -40,7 +38,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 
   return (
     <div className="flex h-full flex-col">
-      <div ref={chatContainerRef} className="grow overflow-auto">
+      <div className="grow overflow-auto">
         <div className="flex flex-col items-center gap-3 p-4">
           <div className="w-full max-w-3xl">
             {currentChat?.messages?.length > 0 &&

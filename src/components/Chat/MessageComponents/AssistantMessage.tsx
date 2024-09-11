@@ -2,16 +2,18 @@
 import React from 'react'
 import { HiOutlineClipboardCopy, HiOutlinePencilAlt } from 'react-icons/hi'
 import { toast } from 'react-toastify'
-import { ReorChatMessage } from '../types'
+import { Chat, ReorChatMessage } from '../types'
 import { getClassNameBasedOnMessageRole, getDisplayMessage } from '../utils'
-import { TextPart, ToolCallPart } from './ToolCalls'
+import { TextPart, ToolCallPartComponent } from './ToolCalls'
+import { useWindowContentContext } from '@/contexts/WindowContentContext'
 
 interface AssistantMessageProps {
   message: ReorChatMessage
-  openTabContent: (title: string, content: string | undefined) => void
+  setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
 }
 
-const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, openTabContent }) => {
+const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrentChat }) => {
+  const { openContent } = useWindowContentContext()
   const copyToClipboard = () => {
     const content = typeof message.content === 'string' ? message.content : JSON.stringify(message.content, null, 2)
     navigator.clipboard.writeText(content)
@@ -21,7 +23,7 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, openTabCon
   const createNewNoteFromMessage = async () => {
     const content = typeof message.content === 'string' ? message.content : JSON.stringify(message.content, null, 2)
     const title = `${content.substring(0, 20)}...`
-    openTabContent(title, content)
+    openContent(title, content)
   }
 
   const renderContent = () => {
@@ -34,7 +36,7 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, openTabCon
           return <TextPart key={index} text={part.text} />
         }
         if (part.type === 'tool-call') {
-          return <ToolCallPart key={index} toolCallId={part.toolCallId} toolName={part.toolName} args={part.args} />
+          return <ToolCallPartComponent key={index} part={part} setCurrentChat={setCurrentChat} />
         }
         return null
       })
