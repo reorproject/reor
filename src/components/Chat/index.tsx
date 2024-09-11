@@ -34,11 +34,16 @@ const ChatComponent: React.FC = () => {
   useEffect(() => {
     const fetchChat = async () => {
       const chat = await window.electronStore.getChat(currentOpenChatID)
-      setCurrentChat(chat)
+      setCurrentChat((oldChat) => {
+        if (oldChat) {
+          saveChat(oldChat)
+        }
+        return chat
+      })
       setLoadingState('idle')
     }
     fetchChat()
-  }, [currentOpenChatID])
+  }, [currentOpenChatID, saveChat])
 
   const handleSubmitNewMessage = useCallback(
     async (userTextFieldInput: string, chatFilters?: ChatFilters) => {

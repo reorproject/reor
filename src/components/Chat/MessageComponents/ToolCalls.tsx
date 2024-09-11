@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 import { Chat } from '../types'
 import { createToolResult } from '../tools'
+import { useChatContext } from '@/contexts/ChatContext'
 
 interface TextPartProps {
   text: string
@@ -21,6 +22,7 @@ interface ToolCallPartProps {
 }
 
 export const ToolCallPartComponent: React.FC<ToolCallPartProps> = ({ part, setCurrentChat }) => {
+  const { saveChat } = useChatContext()
   const handleToolCall = async () => {
     const toolResult = await createToolResult(part.toolName, part.args as any, part.toolCallId)
     const toolMessage: CoreToolMessage = {
@@ -29,10 +31,12 @@ export const ToolCallPartComponent: React.FC<ToolCallPartProps> = ({ part, setCu
     }
     setCurrentChat((prevChat) => {
       if (!prevChat) return prevChat
-      return {
+      const updatedChat = {
         ...prevChat,
         messages: [...prevChat.messages, toolMessage],
       }
+      saveChat(updatedChat)
+      return updatedChat
     })
   }
 
