@@ -1,5 +1,7 @@
 import { ToolResultPart } from 'ai'
+import { z } from 'zod'
 import { ToolConfig } from './types'
+import { retreiveFromVectorDB } from '@/utils/db'
 
 export const searchTool: ToolConfig = {
   name: 'search',
@@ -44,7 +46,7 @@ type ToolFunctionMap = {
 
 export const toolNamesToFunctions: ToolFunctionMap = {
   search: async (query: string, limit: number): Promise<any[]> => {
-    const results = await window.database.search(query, limit)
+    const results = await retreiveFromVectorDB(query, { limit, passFullNoteIntoContext: true })
     return results
   },
   createNote: async (filename: string, content: string): Promise<string> => {
@@ -62,7 +64,7 @@ export async function executeTool(toolName: ToolName, args: unknown[]): Promise<
   if (!tool) {
     throw new Error(`Unknown tool: ${toolName}`)
   }
-  const out = await tool(...Object.values(args)) // TODO: make this better quizas.
+  const out = await tool(...Object.values(args)) // TODO: make this cleaner quizas.
   return out
 }
 
@@ -83,5 +85,44 @@ export async function createToolResult(toolName: string, args: unknown[], toolCa
       result: error,
       isError: true,
     }
+  }
+}
+
+export function convertToolConfigToZodSchema(tool: ToolConfig) {
+  const parameterSchema = z.object(
+    tool.parameters.reduce((acc, param) => {
+      let zodType: z.ZodType<any>
+
+      switch (param.type) {
+        case 'string':
+          zodType = z.string()
+          break
+        case 'number':
+          zodType = z.number()
+          break
+        case 'boolean':
+          zodType = z.boolean()
+          break
+        default:
+          throw new Error(`Unsupported parameter type: ${param.type}`)
+      }
+
+      // Apply default value if it exists
+      if (param.defaultValue !== undefined) {
+        zodType = zodType.default(param.defaultValue)
+      }
+
+      // Apply description
+      zodType = zodType.describe(param.description)
+
+      return { ...acc, [param.name]: zodType }
+    }, {}),
+  )
+
+  return {
+    [tool.name]: {
+      description: tool.description,
+      parameters: parameterSchema,
+    },
   }
 }

@@ -1,12 +1,12 @@
-import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema'
+import { DBEntry } from 'electron/main/vector-database/schema'
 import { createOpenAI } from '@ai-sdk/openai'
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import getDisplayableChatName from '@shared/utils'
-import { z } from 'zod'
 import { AssistantContent, ToolCallPart } from 'ai'
-import { AnonymizedChatFilters, Chat, ChatFilters, ReorChatMessage, ToolConfig } from './types'
+import { AnonymizedChatFilters, Chat, ChatFilters, ReorChatMessage } from './types'
 import { createNoteTool, searchTool } from './tools'
+import { retreiveFromVectorDB } from '@/utils/db'
 
 export const appendTextContentToMessages = (
   messages: ReorChatMessage[],
@@ -71,53 +71,18 @@ export const convertMessageToString = (message: ReorChatMessage | undefined): st
   return ''
 }
 
-export const generateTimeStampFilter = (minDate?: Date, maxDate?: Date): string => {
-  let filter = ''
-
-  if (minDate) {
-    const minDateStr = minDate.toISOString().slice(0, 19).replace('T', ' ')
-    filter += `filemodified > timestamp '${minDateStr}'`
-  }
-
-  if (maxDate) {
-    const maxDateStr = maxDate.toISOString().slice(0, 19).replace('T', ' ')
-    if (filter) {
-      filter += ' AND '
-    }
-    filter += `filemodified < timestamp '${maxDateStr}'`
-  }
-
-  return filter
-}
-
-const fetchResultsFromDB = async (
-  query: string,
-  chatFilters: ChatFilters,
-): Promise<DBEntry[] | FileInfoWithContent[]> => {
-  if (chatFilters.files.length > 0) {
-    return window.fileSystem.getFileInfoWithContentsForPaths(chatFilters.files)
-  }
-
-  if (chatFilters.numberOfChunksToFetch > 0) {
-    const timeStampFilter = generateTimeStampFilter(chatFilters.minDate, chatFilters.maxDate)
-    const dbSearchResults = await window.database.search(query, chatFilters.numberOfChunksToFetch, timeStampFilter)
-
-    if (chatFilters.passFullNoteIntoContext) {
-      return window.fileSystem.getFileInfoWithContentsForPaths(dbSearchResults.map((result) => result.notepath))
-    }
-    return dbSearchResults
-  }
-  return []
-}
-
-const generateStringOfContextItems = (contextItems: DBEntry[] | FileInfoWithContent[]): string => {
-  // properties: name, relativePath, dateModified, dateCreated
+const generateStringOfContextItemsForPrompt = (contextItems: DBEntry[] | FileInfoWithContent[]): string => {
   return contextItems.map((item) => item.content).join('\n\n')
 }
 
 export const generateRAGMessages = async (query: string, chatFilters: ChatFilters): Promise<ReorChatMessage[]> => {
-  const results = await fetchResultsFromDB(query, chatFilters)
-  const contextString = generateStringOfContextItems(results)
+  let results: DBEntry[] | FileInfoWithContent[] = []
+  if (chatFilters.files.length > 0) {
+    results = await window.fileSystem.getFiles(chatFilters.files)
+  } else {
+    results = await retreiveFromVectorDB(query, chatFilters)
+  }
+  const contextString = generateStringOfContextItemsForPrompt(results)
   return [
     {
       role: 'user',
@@ -126,45 +91,6 @@ export const generateRAGMessages = async (query: string, chatFilters: ChatFilter
       visibleContent: query,
     },
   ]
-}
-
-export function convertToolConfigToZodSchema(tool: ToolConfig) {
-  const parameterSchema = z.object(
-    tool.parameters.reduce((acc, param) => {
-      let zodType: z.ZodType<any>
-
-      switch (param.type) {
-        case 'string':
-          zodType = z.string()
-          break
-        case 'number':
-          zodType = z.number()
-          break
-        case 'boolean':
-          zodType = z.boolean()
-          break
-        default:
-          throw new Error(`Unsupported parameter type: ${param.type}`)
-      }
-
-      // Apply default value if it exists
-      if (param.defaultValue !== undefined) {
-        zodType = zodType.default(param.defaultValue)
-      }
-
-      // Apply description
-      zodType = zodType.describe(param.description)
-
-      return { ...acc, [param.name]: zodType }
-    }, {}),
-  )
-
-  return {
-    [tool.name]: {
-      description: tool.description,
-      parameters: parameterSchema,
-    },
-  }
 }
 
 export const prepareOutputChat = async (
@@ -201,11 +127,11 @@ export const prepareOutputChat = async (
   return outputChat
 }
 
-export const getChatHistoryContext = (chatHistory: Chat | undefined): DBQueryResult[] => {
-  if (!chatHistory || !chatHistory.messages) return []
-  const contextForChat = chatHistory.messages.map((message) => message.context).flat()
-  return contextForChat as DBQueryResult[]
-}
+// export const getChatHistoryContext = (chatHistory: Chat | undefined): DBQueryResult[] => {
+//   if (!chatHistory || !chatHistory.messages) return []
+//   const contextForChat = chatHistory.messages.map((message) => message.context).flat()
+//   return contextForChat as DBQueryResult[]
+// }
 
 export function anonymizeChatFiltersForPosthog(
   chatFilters: ChatFilters | undefined,
@@ -213,7 +139,7 @@ export function anonymizeChatFiltersForPosthog(
   if (!chatFilters) {
     return undefined
   }
-  const { numberOfChunksToFetch, files, minDate, maxDate } = chatFilters
+  const { limit: numberOfChunksToFetch, files, minDate, maxDate } = chatFilters
   return {
     numberOfChunksToFetch,
     filesLength: files.length,

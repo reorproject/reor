@@ -26,7 +26,7 @@ const AddContextFiltersModal: React.FC<Props> = ({ isOpen, onClose, chatFilters,
   const [internalFilesSelected, setInternalFilesSelected] = useState<string[]>(chatFilters?.files || [])
   const [searchText, setSearchText] = useState<string>('')
   const [suggestionsState, setSuggestionsState] = useState<SuggestionsState | null>(null)
-  const [numberOfChunksToFetch, setNumberOfChunksToFetch] = useState<number>(chatFilters.numberOfChunksToFetch || 15)
+  const [numberOfChunksToFetch, setNumberOfChunksToFetch] = useState<number>(chatFilters.limit || 15)
   const [minDate, setMinDate] = useState<Date | undefined>(chatFilters.minDate)
   const [maxDate, setMaxDate] = useState<Date | undefined>(chatFilters.maxDate)
   const [showAdvanced, setShowAdvanced] = useState<boolean>(false)
@@ -45,7 +45,7 @@ const AddContextFiltersModal: React.FC<Props> = ({ isOpen, onClose, chatFilters,
     setChatFilters((currentFilters) => ({
       ...currentFilters,
       files: [...new Set([...currentFilters.files, ...internalFilesSelected])],
-      numberOfChunksToFetch,
+      limit: numberOfChunksToFetch,
       minDate,
       maxDate,
       passFullNoteIntoContext: true,

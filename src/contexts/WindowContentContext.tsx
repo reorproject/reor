@@ -2,7 +2,7 @@ import React, { createContext, useContext, useMemo, ReactNode, useState } from '
 
 import { useChatContext } from './ChatContext'
 import { useFileContext } from './FileContext'
-import { OnShowContextMenuData, ShowContextMenuInputType } from '@/components/Menu/CustomContextMenu'
+import { OnShowContextMenuData, ShowContextMenuInputType } from '@/components/Common/CustomContextMenu'
 
 interface WindowContentContextType {
   openContent: (pathOrChatID: string, optionalContentToWriteOnCreate?: string) => void

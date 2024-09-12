@@ -14,7 +14,7 @@ import WritingAssistant from './WritingAssistant/WritingAssistant'
 import { ChatProvider, useChatContext } from '@/contexts/ChatContext'
 import { FileProvider, useFileContext } from '@/contexts/FileContext'
 import ModalProvider from '@/contexts/ModalContext'
-import CustomContextMenu from './Menu/CustomContextMenu'
+import CustomContextMenu from './Common/CustomContextMenu'
 import CommonModals from './Common/CommonModals'
 
 const MainPageContent: React.FC = () => {

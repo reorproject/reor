@@ -8,7 +8,6 @@ import {
   resolveLLMClient,
   prepareOutputChat,
   appendTextContentToMessages,
-  convertToolConfigToZodSchema,
 } from './utils'
 
 import '../../styles/chat.css'
@@ -16,6 +15,7 @@ import ChatMessages from './ChatMessages'
 import { Chat, ChatFilters, LoadingState } from './types'
 import { useChatContext } from '@/contexts/ChatContext'
 import StartChat from './StartChat'
+import { convertToolConfigToZodSchema } from './tools'
 
 const ChatComponent: React.FC = () => {
   const [loadingState, setLoadingState] = useState<LoadingState>('idle')

@@ -88,9 +88,7 @@ const fileSystem = {
   deleteFile: createIPCHandler<(filePath: string) => Promise<void>>('delete-file'),
   moveFileOrDir: createIPCHandler<(sourcePath: string, destinationPath: string) => Promise<void>>('move-file-or-dir'),
   getAllFilenamesInDirectory: createIPCHandler<(dirName: string) => Promise<string[]>>('get-files-in-directory'),
-  getFileInfoWithContentsForPaths: createIPCHandler<(filePaths: string[]) => Promise<FileInfoWithContent[]>>(
-    'get-files-info-and-content-for-paths',
-  ),
+  getFiles: createIPCHandler<(filePaths: string[]) => Promise<FileInfoWithContent[]>>('get-files'),
 }
 
 const path = {

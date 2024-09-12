@@ -23,7 +23,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
   const [chatFilters, setChatFilters] = useState<ChatFilters>({
     files: [],
-    numberOfChunksToFetch: 15,
+    limit: 15,
     minDate: new Date(0),
     maxDate: new Date(),
   })

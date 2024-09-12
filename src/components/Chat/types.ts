@@ -34,12 +34,16 @@ export type Chat = {
 
 export type ChatMetadata = Omit<Chat, 'messages'>
 
-export interface ChatFilters {
-  numberOfChunksToFetch: number
-  files: string[]
+export interface SearchFilters {
+  limit: number
   minDate?: Date
   maxDate?: Date
   passFullNoteIntoContext?: boolean
+}
+
+export type ChatFilters = SearchFilters & {
+  files: string[]
+  propertiesToIncludeInContext?: string[]
 }
 
 export interface AnonymizedChatFilters {

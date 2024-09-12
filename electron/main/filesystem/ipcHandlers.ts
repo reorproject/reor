@@ -159,14 +159,11 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
     orchestrateEntryMove(windowInfo.dbTableClient, sourcePath, destinationPath)
   })
 
-  ipcMain.handle(
-    'get-file-info-and-content-for-paths',
-    async (_event, filePaths: string[]): Promise<FileInfoWithContent[]> => {
-      const fileItems = GetFilesInfoListForListOfPaths(filePaths)
-      const fileContents = fileItems.map((fileItem) => fs.readFileSync(fileItem.path, 'utf-8'))
-      return fileItems.map((fileItem, index) => ({ ...fileItem, content: fileContents[index] }))
-    },
-  )
+  ipcMain.handle('get-files', async (_event, filePaths: string[]): Promise<FileInfoWithContent[]> => {
+    const fileItems = GetFilesInfoListForListOfPaths(filePaths)
+    const fileContents = fileItems.map((fileItem) => fs.readFileSync(fileItem.path, 'utf-8'))
+    return fileItems.map((fileItem, index) => ({ ...fileItem, content: fileContents[index] }))
+  })
 
   ipcMain.handle('get-files-in-directory', (event, dirName: string) => {
     const itemsInDir = fs.readdirSync(dirName).filter((item) => !isHidden(item))
