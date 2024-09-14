@@ -1,11 +1,11 @@
 import { CoreToolMessage, ToolCallPart } from 'ai'
 import React from 'react'
+import { toast } from 'react-toastify'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
-import { toast } from 'react-toastify'
+import { useChatContext } from '@/contexts/ChatContext'
 import { Chat } from '../types'
 import { createToolResult } from '../tools'
-import { useChatContext } from '@/contexts/ChatContext'
 
 interface TextPartProps {
   text: string
@@ -23,11 +23,86 @@ interface ToolCallComponentProps {
   setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
 }
 
-interface ToolCallComponentProps {
+interface ToolRendererProps {
   toolCallPart: ToolCallPart
-  currentChat: Chat
-  setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
+  existingToolResult: CoreToolMessage | undefined
+  executeToolCall: () => Promise<void>
 }
+
+const SearchToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existingToolResult, executeToolCall }) => (
+  <div className="mt-0 rounded border border-gray-600 p-0">
+    <h4 className="font-bold">Search Tool Call</h4>
+    <pre className="mt-2 overflow-x-auto bg-gray-700 p-2">
+      <code>{JSON.stringify(toolCallPart.args, null, 2)}</code>
+    </pre>
+    {existingToolResult ? (
+      <div className="mt-2 bg-gray-100 p-2">
+        <h5 className="font-semibold">Search Results:</h5>
+        <pre className="mt-1 overflow-x-auto bg-gray-600 p-2">
+          <code>{JSON.stringify(existingToolResult.content[0].result, null, 2)}</code>
+        </pre>
+      </div>
+    ) : (
+      <button
+        type="button"
+        onClick={executeToolCall}
+        className="mt-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+      >
+        Execute Search
+      </button>
+    )}
+  </div>
+)
+
+const CreateFileToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existingToolResult, executeToolCall }) => (
+  <div className="mt-0 rounded border border-gray-600 p-0">
+    <h4 className="font-bold">Create File Tool Call</h4>
+    <pre className="mt-2 overflow-x-auto bg-gray-700 p-2">
+      <code>{JSON.stringify(toolCallPart.args, null, 2)}</code>
+    </pre>
+    {existingToolResult ? (
+      <div className="mt-2 bg-gray-100 p-2">
+        <h5 className="font-semibold">File Creation Result:</h5>
+        <pre className="mt-1 overflow-x-auto bg-gray-600 p-2">
+          <code>{JSON.stringify(existingToolResult.content[0].result, null, 2)}</code>
+        </pre>
+      </div>
+    ) : (
+      <button
+        type="button"
+        onClick={executeToolCall}
+        className="mt-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+      >
+        Create File
+      </button>
+    )}
+  </div>
+)
+
+const DefaultToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existingToolResult, executeToolCall }) => (
+  <div className="mt-0 rounded border border-gray-600 p-0">
+    <h4 className="font-bold">Tool Call: {toolCallPart.toolName}</h4>
+    <pre className="mt-2 overflow-x-auto bg-gray-700 p-2">
+      <code>{JSON.stringify(toolCallPart.args, null, 2)}</code>
+    </pre>
+    {existingToolResult ? (
+      <div className="mt-2 bg-gray-100 p-2">
+        <h5 className="font-semibold">Tool Result:</h5>
+        <pre className="mt-1 overflow-x-auto bg-gray-600 p-2">
+          <code>{JSON.stringify(existingToolResult.content[0].result, null, 2)}</code>
+        </pre>
+      </div>
+    ) : (
+      <button
+        type="button"
+        onClick={executeToolCall}
+        className="mt-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+      >
+        Execute Tool Call
+      </button>
+    )}
+  </div>
+)
 
 export const ToolCallComponent: React.FC<ToolCallComponentProps> = ({ toolCallPart, currentChat, setCurrentChat }) => {
   const { saveChat } = useChatContext()
@@ -66,36 +141,30 @@ export const ToolCallComponent: React.FC<ToolCallComponentProps> = ({ toolCallPa
   const existingToolResult = findToolResultMatchingToolCall(toolCallPart.toolCallId)
 
   return (
-    <div className="mt-0 rounded border border-gray-600 p-0">
-      <h4 className="font-bold">Tool Call: {toolCallPart.toolName}</h4>
-      <pre className="mt-2 overflow-x-auto bg-gray-700 p-2">
-        <code>{JSON.stringify(toolCallPart.args, null, 2)}</code>
-      </pre>
-      {existingToolResult ? (
-        <div className="mt-2 bg-gray-100 p-2">
-          <h5 className="font-semibold">Tool Result:</h5>
-          <pre className="mt-1 overflow-x-auto bg-gray-600 p-2">
-            <code>{JSON.stringify(existingToolResult.content[0].result, null, 2)}</code>
-          </pre>
-        </div>
-      ) : (
-        <button
-          type="button"
-          onClick={executeToolCall}
-          className="mt-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-        >
-          Execute Tool Call
-        </button>
+    <>
+      {toolCallPart.toolName === 'search' && (
+        <SearchToolRenderer
+          toolCallPart={toolCallPart}
+          existingToolResult={existingToolResult}
+          executeToolCall={executeToolCall}
+        />
       )}
-    </div>
+      {toolCallPart.toolName === 'create-file' && (
+        <CreateFileToolRenderer
+          toolCallPart={toolCallPart}
+          existingToolResult={existingToolResult}
+          executeToolCall={executeToolCall}
+        />
+      )}
+      {toolCallPart.toolName !== 'search' && toolCallPart.toolName !== 'create-file' && (
+        <DefaultToolRenderer
+          toolCallPart={toolCallPart}
+          existingToolResult={existingToolResult}
+          executeToolCall={executeToolCall}
+        />
+      )}
+    </>
   )
 }
 
-// useEffect(async () => {
-//   const toolDefinition = currentChat.toolDefinitions.find((tool) => tool.name === part.toolName)
-//   if (toolDefinition?.autoRun) {
-//     await handleToolCall()
-//     // TODO: if all tool calls have corresponding tool results,
-//     // a regeneration should be run
-//   }
-// }, [currentChat.toolDefinitions, handleToolCall, part])
+export default ToolCallComponent
