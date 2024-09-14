@@ -2,7 +2,6 @@ import { Schema, Field, Utf8, FixedSizeList, Float32, Float64, DateUnit, Date_ a
 
 export interface DBEntry {
   notepath: string
-  vector?: Float32Array
   content: string
   subnoteindex: number
   timeadded: Date

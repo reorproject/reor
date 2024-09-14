@@ -28,14 +28,10 @@ export const retreiveFromVectorDB = async (
   if (searchFilters.limit > 0) {
     const timeStampFilter = generateTimeStampFilter(searchFilters.minDate, searchFilters.maxDate)
     const dbSearchResults = await window.database.search(query, searchFilters.limit, timeStampFilter)
-
     if (searchFilters.passFullNoteIntoContext) {
       return window.fileSystem.getFiles(dbSearchResults.map((result) => result.notepath))
     }
-    return dbSearchResults.map((result) => {
-      const { vector, ...rest } = result
-      return rest
-    })
+    return dbSearchResults
   }
   return []
 }
