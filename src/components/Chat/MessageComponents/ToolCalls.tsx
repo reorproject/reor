@@ -23,13 +23,20 @@ interface ToolCallComponentProps {
   setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
 }
 
+interface ToolCallComponentProps {
+  toolCallPart: ToolCallPart
+  currentChat: Chat
+  setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
+}
+
 export const ToolCallComponent: React.FC<ToolCallComponentProps> = ({ toolCallPart, currentChat, setCurrentChat }) => {
   const { saveChat } = useChatContext()
 
-  const findToolResultMatchingToolCall = (toolCallId: string) => {
-    return currentChat.messages.find(
+  const findToolResultMatchingToolCall = (toolCallId: string): CoreToolMessage | undefined => {
+    const toolMessage = currentChat.messages.find(
       (message) => message.role === 'tool' && message.content.some((content) => content.toolCallId === toolCallId),
     )
+    return toolMessage as CoreToolMessage | undefined
   }
 
   const executeToolCall = async () => {
@@ -56,19 +63,30 @@ export const ToolCallComponent: React.FC<ToolCallComponentProps> = ({ toolCallPa
     })
   }
 
+  const existingToolResult = findToolResultMatchingToolCall(toolCallPart.toolCallId)
+
   return (
-    <div className="mt-0 rounded border border-gray-300 p-0">
+    <div className="mt-0 rounded border border-gray-600 p-0">
       <h4 className="font-bold">Tool Call: {toolCallPart.toolName}</h4>
       <pre className="mt-2 overflow-x-auto bg-gray-700 p-2">
         <code>{JSON.stringify(toolCallPart.args, null, 2)}</code>
       </pre>
-      <button
-        type="button"
-        onClick={executeToolCall}
-        className="mt-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-      >
-        Execute Tool Call
-      </button>
+      {existingToolResult ? (
+        <div className="mt-2 bg-gray-100 p-2">
+          <h5 className="font-semibold">Tool Result:</h5>
+          <pre className="mt-1 overflow-x-auto bg-gray-600 p-2">
+            <code>{JSON.stringify(existingToolResult.content[0].result, null, 2)}</code>
+          </pre>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={executeToolCall}
+          className="mt-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+        >
+          Execute Tool Call
+        </button>
+      )}
     </div>
   )
 }
