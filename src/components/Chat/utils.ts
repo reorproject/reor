@@ -107,7 +107,7 @@ export const prepareOutputChat = async (
       messages: [],
       displayName: '',
       timeOfLastMessage: Date.now(),
-      tools: [],
+      toolDefinitions: [],
     }
   }
 
@@ -115,7 +115,7 @@ export const prepareOutputChat = async (
     const ragMessages = await generateRAGMessages(userTextFieldInput ?? '', chatFilters)
     outputChat.messages.push(...ragMessages)
     outputChat.displayName = getDisplayableChatName(outputChat.messages)
-    outputChat.tools = [searchTool, createNoteTool]
+    outputChat.toolDefinitions = [searchTool, createNoteTool]
   } else {
     outputChat.messages.push({
       role: 'user',

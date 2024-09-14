@@ -16,7 +16,7 @@ type ToolParameter = {
   description: string
 }
 
-export type ToolConfig = {
+export type ToolDefinition = {
   name: string
   description: string
   parameters: ToolParameter[]
@@ -29,7 +29,7 @@ export type Chat = {
   messages: ReorChatMessage[]
   displayName: string
   timeOfLastMessage: number
-  tools: ToolConfig[]
+  toolDefinitions: ToolDefinition[]
 }
 
 export type ChatMetadata = Omit<Chat, 'messages'>

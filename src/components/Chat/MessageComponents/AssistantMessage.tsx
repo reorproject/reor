@@ -4,15 +4,16 @@ import { HiOutlineClipboardCopy, HiOutlinePencilAlt } from 'react-icons/hi'
 import { toast } from 'react-toastify'
 import { Chat, ReorChatMessage } from '../types'
 import { getClassNameBasedOnMessageRole, getDisplayMessage } from '../utils'
-import { TextPart, ToolCallPartComponent } from './ToolCalls'
+import { TextPart, ToolCallComponent } from './ToolCalls'
 import { useWindowContentContext } from '@/contexts/WindowContentContext'
 
 interface AssistantMessageProps {
   message: ReorChatMessage
   setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
+  currentChat: Chat
 }
 
-const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrentChat }) => {
+const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrentChat, currentChat }) => {
   const { openContent } = useWindowContentContext()
   const copyToClipboard = () => {
     const content = typeof message.content === 'string' ? message.content : JSON.stringify(message.content, null, 2)
@@ -36,7 +37,14 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
           return <TextPart key={index} text={part.text} />
         }
         if (part.type === 'tool-call') {
-          return <ToolCallPartComponent key={index} part={part} setCurrentChat={setCurrentChat} />
+          return (
+            <ToolCallComponent
+              key={index}
+              toolCallPart={part}
+              currentChat={currentChat}
+              setCurrentChat={setCurrentChat}
+            />
+          )
         }
         return null
       })

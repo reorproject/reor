@@ -59,7 +59,7 @@ const ChatComponent: React.FC = () => {
         const { textStream, toolCalls } = await streamText({
           model: client,
           messages: outputChat.messages,
-          tools: Object.assign({}, ...outputChat.tools.map(convertToolConfigToZodSchema)),
+          tools: Object.assign({}, ...outputChat.toolDefinitions.map(convertToolConfigToZodSchema)),
         })
         // eslint-disable-next-line no-restricted-syntax
         for await (const text of textStream) {

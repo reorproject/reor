@@ -1,9 +1,9 @@
 import { ToolResultPart } from 'ai'
 import { z } from 'zod'
-import { ToolConfig } from './types'
+import { ToolDefinition } from './types'
 import { retreiveFromVectorDB } from '@/utils/db'
 
-export const searchTool: ToolConfig = {
+export const searchTool: ToolDefinition = {
   name: 'search',
   description: "Semantically search the user's personal knowledge base",
   parameters: [
@@ -21,7 +21,7 @@ export const searchTool: ToolConfig = {
   ],
 }
 
-export const createNoteTool: ToolConfig = {
+export const createNoteTool: ToolDefinition = {
   name: 'createNote',
   description: "Create a new note in the user's personal knowledge base",
   parameters: [
@@ -88,7 +88,7 @@ export async function createToolResult(toolName: string, args: unknown[], toolCa
   }
 }
 
-export function convertToolConfigToZodSchema(tool: ToolConfig) {
+export function convertToolConfigToZodSchema(tool: ToolDefinition) {
   const parameterSchema = z.object(
     tool.parameters.reduce((acc, param) => {
       let zodType: z.ZodType<any>

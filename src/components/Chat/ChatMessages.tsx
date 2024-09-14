@@ -8,7 +8,7 @@ import AssistantMessage from './MessageComponents/AssistantMessage'
 import SystemMessage from './MessageComponents/SystemMessage'
 
 interface ChatMessagesProps {
-  currentChat: Chat | undefined
+  currentChat: Chat
   setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
   loadingState: LoadingState
   handleNewChatMessage: (userTextFieldInput: string, chatFilters?: ChatFilters) => void
@@ -27,14 +27,15 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
       case 'user':
         return <UserMessage key={index} message={message} />
       case 'assistant':
-        return <AssistantMessage key={index} message={message} setCurrentChat={setCurrentChat} />
+        return (
+          <AssistantMessage key={index} message={message} setCurrentChat={setCurrentChat} currentChat={currentChat} />
+        )
       case 'system':
         return <SystemMessage key={index} message={message} />
       default:
         return null
     }
   }
-  if (!currentChat) return null
 
   return (
     <div className="flex h-full flex-col">
