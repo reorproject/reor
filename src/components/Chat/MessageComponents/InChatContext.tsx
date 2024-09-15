@@ -1,6 +1,5 @@
 import React from 'react'
-import { CardContent } from '@mui/material'
-import { Card } from '@/components/ui/card'
+import { Card, CardDescription } from '@/components/ui/card'
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/components/ui/hover-card'
 import { useWindowContentContext } from '@/contexts/WindowContentContext'
 import MarkdownRenderer from '@/components/Common/MarkdownRenderer'
@@ -35,7 +34,9 @@ const InChatContextComponent: React.FC<InChatContextComponentProps> = ({ context
                 className="h-10 w-28 shrink-0 cursor-pointer bg-secondary p-0"
                 onClick={() => openContent(contextItem.path)}
               >
-                <CardContent className="m-0 break-all text-xs">{truncateName(contextItem.name, 15)}</CardContent>
+                <CardDescription className="m-0 ml-5 break-all p-3 text-xs">
+                  {truncateName(contextItem.name, 30)}
+                </CardDescription>
               </Card>
             </HoverCardTrigger>
             <HoverCardContent>
