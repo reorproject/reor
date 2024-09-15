@@ -19,8 +19,8 @@ export default defineConfig(({ command }) => {
   return {
     resolve: {
       alias: {
-        '@': path.join(__dirname, 'src'),
-        '@shared': path.join(__dirname, 'shared'),
+        '@': path.join(__dirname, './src'),
+        '@shared': path.join(__dirname, './shared'),
       },
     },
     plugins: [
