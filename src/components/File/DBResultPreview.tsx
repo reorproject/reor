@@ -1,7 +1,7 @@
 import React from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
-import ReactMarkdown from 'react-markdown'
+import MarkdownRenderer from '../Common/MarkdownRenderer'
 
 const cosineDistanceToPercentage = (similarity: number) => ((1 - similarity) * 100).toFixed(2)
 
@@ -15,38 +15,6 @@ const formatModifiedDate = (date: Date) => {
     return ''
   }
   return formatDistanceToNow(new Date(date), { addSuffix: true })
-}
-
-// eslint-disable-next-line jsx-a11y/heading-has-content, react/jsx-props-no-spreading
-const CustomH1 = (props: React.ComponentPropsWithoutRef<'h1'>) => <h1 className="leading-relaxed" {...props} />
-
-const CustomPre = (props: React.ComponentPropsWithoutRef<'pre'>) => (
-  // eslint-disable-next-line react/jsx-props-no-spreading
-  <pre className="whitespace-pre-wrap break-all" {...props} />
-)
-
-const CustomCode = (props: React.ComponentPropsWithoutRef<'code'>) => (
-  // eslint-disable-next-line react/jsx-props-no-spreading
-  <code className="whitespace-pre-wrap break-all" {...props} />
-)
-
-interface MarkdownContentProps {
-  content: string
-}
-
-export const MarkdownContent: React.FC<MarkdownContentProps> = ({ content }) => {
-  return (
-    <ReactMarkdown
-      className="break-words "
-      components={{
-        h1: CustomH1,
-        pre: CustomPre,
-        code: CustomCode,
-      }}
-    >
-      {content}
-    </ReactMarkdown>
-  )
 }
 
 interface DBResultPreviewProps {
@@ -64,7 +32,7 @@ export const DBResultPreview: React.FC<DBResultPreviewProps> = ({ dbResult: entr
       onClick={() => onSelect(entry.notepath)}
     >
       <div className="text-sm text-gray-200">
-        <MarkdownContent content={entry.content} />
+        <MarkdownRenderer content={entry.content} />
       </div>
       <div className="mt-2 text-xs text-gray-400">
         {fileName && <span className="text-xs text-gray-400">{fileName} </span>} | Similarity:{' '}
@@ -91,7 +59,7 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({ dbResult: entr
       onClick={() => onSelect(entry.notepath)}
     >
       <div className="text-sm text-gray-200">
-        <MarkdownContent content={entry.content} />
+        <MarkdownRenderer content={entry.content} />
       </div>
       <div className="mt-2 text-xs text-gray-400">
         {fileName && <span className="text-xs text-gray-400">{fileName} </span>} | Similarity:{' '}
