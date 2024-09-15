@@ -1,5 +1,6 @@
 import Store from 'electron-store'
 
+import getDisplayableChatName from '../../../shared/utils'
 import { StoreKeys, StoreSchema } from './storeConfig'
 import { defaultEmbeddingModelRepos } from '../vector-database/embeddings'
 import { defaultOllamaAPI } from '../llm/models/ollama'
@@ -50,7 +51,7 @@ export function setupDefaultStoreValues(store: Store<StoreSchema>) {
   }
 
   if (!store.get(StoreKeys.ChunkSize)) {
-    store.set(StoreKeys.ChunkSize, 500)
+    store.set(StoreKeys.ChunkSize, 1000)
   }
 
   setupDefaultAnalyticsValue(store)
@@ -84,6 +85,29 @@ function ensureChatHistoryIsCorrectProperty(store: Store<StoreSchema>) {
   store.set(StoreKeys.ChatHistories, chatHistories)
 }
 
+function ensureChatHistoryHasDisplayNameAndTimestamp(store: Store<StoreSchema>) {
+  const chatHistories = store.get(StoreKeys.ChatHistories)
+  if (!chatHistories) {
+    return
+  }
+
+  Object.keys(chatHistories).forEach((vaultDir) => {
+    const chats = chatHistories[vaultDir]
+    chats.map((chat) => {
+      const outputChat = chat
+      if (!outputChat.displayName || outputChat.displayName === chat.id) {
+        outputChat.displayName = getDisplayableChatName(chat.messages)
+      }
+      if (!outputChat.timeOfLastMessage) {
+        outputChat.timeOfLastMessage = Date.now()
+      }
+      return outputChat
+    })
+  })
+
+  store.set(StoreKeys.ChatHistories, chatHistories)
+}
+
 export const initializeAndMaybeMigrateStore = (store: Store<StoreSchema>) => {
   const storeSchemaVersion = store.get(StoreKeys.SchemaVersion)
   if (storeSchemaVersion !== currentSchemaVersion) {
@@ -93,6 +117,6 @@ export const initializeAndMaybeMigrateStore = (store: Store<StoreSchema>) => {
   }
 
   ensureChatHistoryIsCorrectProperty(store)
-
+  ensureChatHistoryHasDisplayNameAndTimestamp(store)
   setupDefaultStoreValues(store)
 }

@@ -1,8 +1,8 @@
-import React, { createContext, useContext, useEffect, useMemo, ReactNode, useState } from 'react'
+import React, { createContext, useContext, useMemo, ReactNode, useState } from 'react'
 
-import { UNINITIALIZED_STATE, useChatContext } from './ChatContext'
+import { useChatContext } from './ChatContext'
 import { useFileContext } from './FileContext'
-import { OnShowContextMenuData, ShowContextMenuInputType } from '@/components/Menu/CustomContextMenu'
+import { OnShowContextMenuData, ShowContextMenuInputType } from '@/components/Common/CustomContextMenu'
 
 interface WindowContentContextType {
   openContent: (pathOrChatID: string, optionalContentToWriteOnCreate?: string) => void
@@ -31,29 +31,23 @@ export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ ch
     position: { x: 0, y: 0 },
   })
 
-  const { currentOpenChat, setCurrentOpenChat, allChatsMetadata, setShowChatbot, setSidebarShowing } = useChatContext()
-  const { currentlyOpenFilePath, openOrCreateFile } = useFileContext()
-
-  const filePathRef = React.useRef<string>('')
-  const chatIDRef = React.useRef<string>('')
+  const { setCurrentOpenChatID, allChatsMetadata, setShowChatbot, setSidebarShowing } = useChatContext()
+  const { openOrCreateFile } = useFileContext()
 
   const openContent = React.useCallback(
     async (pathOrChatID: string, optionalContentToWriteOnCreate?: string) => {
       if (!pathOrChatID) return
       const chatMetadata = allChatsMetadata.find((chat) => chat.id === pathOrChatID)
       if (chatMetadata) {
-        const chatID = chatMetadata.id
-        if (chatID === UNINITIALIZED_STATE) return
-        const chat = await window.electronStore.getChat(chatID)
         setShowChatbot(true)
-        setCurrentOpenChat(chat)
+        setCurrentOpenChatID(pathOrChatID)
       } else {
         setShowChatbot(false)
         setSidebarShowing('files')
         openOrCreateFile(pathOrChatID, optionalContentToWriteOnCreate)
       }
     },
-    [allChatsMetadata, setShowChatbot, setCurrentOpenChat, setSidebarShowing, openOrCreateFile],
+    [allChatsMetadata, setShowChatbot, setCurrentOpenChatID, setSidebarShowing, openOrCreateFile],
   )
 
   const showContextMenu: ShowContextMenuInputType = React.useCallback(
@@ -76,17 +70,6 @@ export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ ch
       chatMetadata: prevItem.chatMetadata,
     }))
   }, [setFocusedItem])
-
-  useEffect(() => {
-    if (currentlyOpenFilePath != null && filePathRef.current !== currentlyOpenFilePath) {
-      filePathRef.current = currentlyOpenFilePath
-    }
-
-    const currentChatHistoryId = currentOpenChat?.id ?? ''
-    if (chatIDRef.current !== currentChatHistoryId) {
-      chatIDRef.current = currentChatHistoryId
-    }
-  }, [currentOpenChat, allChatsMetadata, currentlyOpenFilePath])
 
   const WindowContentContextMemo = useMemo(
     () => ({

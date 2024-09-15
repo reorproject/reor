@@ -14,17 +14,16 @@ const EXAMPLE_PROMPT_OPTIONS = [
 
 interface StartChatProps {
   defaultModelName: string
-  handleNewChatMessage: (userTextFieldInput: string | undefined, chatFilters?: ChatFilters) => void
+  handleNewChatMessage: (userTextFieldInput?: string, chatFilters?: ChatFilters) => void
 }
 
 const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMessage }) => {
   const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([])
   const [selectedLLM, setSelectedLLM] = useState<string>(defaultModelName)
-  //   text input state:
-  const [userTextFieldInput, setUserTextFieldInput] = useState<string | undefined>()
+  const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
   const [chatFilters, setChatFilters] = useState<ChatFilters>({
     files: [],
-    numberOfChunksToFetch: 15,
+    limit: 15,
     minDate: new Date(0),
     maxDate: new Date(),
   })
@@ -36,14 +35,13 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
       setLLMConfigs(LLMConfigs)
       const defaultLLM = await window.llm.getDefaultLLMName()
       setSelectedLLM(defaultLLM)
-      console.log('fetched defaultLLM', defaultLLM)
     }
     fetchLLMModels()
   }, [])
 
   const sendMessageHandler = async () => {
-    handleNewChatMessage(userTextFieldInput, chatFilters)
     await window.llm.setDefaultLLM(selectedLLM)
+    handleNewChatMessage(userTextFieldInput, chatFilters)
   }
 
   return (

@@ -1,25 +1,19 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react'
-import { Chat } from '@/components/Chat/types'
+import { Chat, ChatMetadata } from '@/components/Chat/types'
 import { SidebarAbleToShow } from '@/components/Sidebars/MainSidebar'
-import { getDisplayableChatName } from '@/components/Chat/utils'
 
 export const UNINITIALIZED_STATE = 'UNINITIALIZED_STATE'
-export interface ChatMetadata {
-  id: string
-  displayName: string
-}
 
 interface ChatContextType {
   sidebarShowing: SidebarAbleToShow
   setSidebarShowing: (option: SidebarAbleToShow) => void
-  getChatIdFromPath: (path: string) => string
   showChatbot: boolean
   setShowChatbot: (show: boolean) => void
-  currentOpenChat: Chat | undefined
-  setCurrentOpenChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
+  currentOpenChatID: string | undefined
+  setCurrentOpenChatID: (chatID: string | undefined) => void
   allChatsMetadata: ChatMetadata[]
-  openChatSidebarAndChat: (chat: Chat | undefined) => void
-  handleDeleteChat: (chatID: string | undefined) => Promise<boolean>
+  deleteChat: (chatID: string | undefined) => Promise<boolean>
+  saveChat: (updatedChat: Chat) => Promise<void>
 }
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined)
@@ -27,115 +21,60 @@ const ChatContext = createContext<ChatContextType | undefined>(undefined)
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [showChatbot, setShowChatbot] = useState<boolean>(false)
   const [sidebarShowing, setSidebarShowing] = useState<SidebarAbleToShow>('files')
-
-  const [currentOpenChat, setCurrentOpenChat] = useState<Chat>()
+  const [currentOpenChatID, setCurrentOpenChatID] = useState<string | undefined>(undefined)
   const [allChatsMetadata, setAllChatsMetadata] = useState<ChatMetadata[]>([])
 
-  const fetchChatHistories = async () => {
-    let allChats = await window.electronStore.getAllChats()
-    if (!allChats) {
-      allChats = []
-    }
-    setAllChatsMetadata(
-      allChats.map((chat) => ({
-        id: chat.id,
-        displayName: getDisplayableChatName(chat),
-      })),
-    )
-
-    setCurrentOpenChat(undefined)
-  }
-
   useEffect(() => {
-    const updateChatHistoriesMetadata = window.ipcRenderer.receive(
-      'update-chat-histories',
-      (retrievedChatHistoriesMetadata: Chat[]) => {
-        setAllChatsMetadata(
-          retrievedChatHistoriesMetadata.map((chat: Chat) => ({
-            id: chat.id,
-            displayName: getDisplayableChatName(chat),
-          })),
-        )
-      },
-    )
-
-    return () => {
-      updateChatHistoriesMetadata()
+    const fetchChatHistories = async () => {
+      const allChatsMetadataResponse = await window.electronStore.getAllChatsMetadata()
+      setAllChatsMetadata(allChatsMetadataResponse)
     }
-  }, [])
-
-  useEffect(() => {
     fetchChatHistories()
   }, [])
 
-  const openChatSidebarAndChat = useCallback(
-    (chat: Chat | undefined) => {
-      setShowChatbot(true)
-      setCurrentOpenChat(chat)
-    },
-    [setCurrentOpenChat],
-  )
+  const saveChat = useCallback(async (updatedChat: Chat) => {
+    await window.electronStore.saveChat(updatedChat)
 
-  const getChatIdFromPath = useCallback(
-    (path: string) => {
-      if (allChatsMetadata.length === 0) return UNINITIALIZED_STATE
-      const metadata = allChatsMetadata.find((chat) => chat.displayName === path)
-      if (metadata) return metadata.id
-      return ''
-    },
-    [allChatsMetadata],
-  )
-
-  useEffect(() => {
-    const handleAddFileToChatFilters = () => {
-      // setSidebarShowing('chats')
-      // setShowChatbot(true)
-      // setCurrentChatHistory(undefined)
-      // setChatFilters((prevChatFilters) => ({
-      //   ...prevChatFilters,
-      //   files: [...prevChatFilters.files, file],
-      // }))
-      // TODO: CALL START CONVERSATION FUNCTION
-    }
-    const removeAddChatToFileListener = window.ipcRenderer.receive('add-file-to-chat-listener', () => {
-      handleAddFileToChatFilters()
-    })
-
-    return () => {
-      removeAddChatToFileListener()
-    }
+    const retrievedChatsMetadata = await window.electronStore.getAllChatsMetadata()
+    setAllChatsMetadata(retrievedChatsMetadata)
   }, [])
 
-  const handleDeleteChat = useCallback(async (chatID: string | undefined) => {
-    if (!chatID) return false
-    await window.electronStore.deleteChatAtID(chatID)
-    return true
-  }, [])
+  const deleteChat = useCallback(
+    async (chatID: string | undefined) => {
+      if (!chatID) return false
+      await window.electronStore.deleteChat(chatID)
+      const retrievedChatsMetadata = await window.electronStore.getAllChatsMetadata()
+      setAllChatsMetadata(retrievedChatsMetadata)
+      if (currentOpenChatID === chatID) {
+        setCurrentOpenChatID(undefined)
+      }
+      return true
+    },
+    [currentOpenChatID],
+  )
 
   const value = React.useMemo(
     () => ({
-      currentOpenChat,
-      setCurrentOpenChat,
       allChatsMetadata,
       sidebarShowing,
       setSidebarShowing,
-      getChatIdFromPath,
       showChatbot,
       setShowChatbot,
-      openChatSidebarAndChat,
-      handleDeleteChat,
+      currentOpenChatID,
+      setCurrentOpenChatID,
+      deleteChat,
+      saveChat,
     }),
     [
       allChatsMetadata,
       sidebarShowing,
       setSidebarShowing,
-      getChatIdFromPath,
       showChatbot,
       setShowChatbot,
-      currentOpenChat,
-      setCurrentOpenChat,
-      openChatSidebarAndChat,
-      handleDeleteChat,
+      currentOpenChatID,
+      setCurrentOpenChatID,
+      deleteChat,
+      saveChat,
     ],
   )
 

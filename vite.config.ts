@@ -19,7 +19,8 @@ export default defineConfig(({ command }) => {
   return {
     resolve: {
       alias: {
-        '@': path.join(__dirname, 'src'),
+        '@': path.join(__dirname, './src'),
+        '@shared': path.join(__dirname, './shared'),
       },
     },
     plugins: [
@@ -41,7 +42,15 @@ export default defineConfig(({ command }) => {
               minify: isBuild,
               outDir: 'dist-electron/main',
               rollupOptions: {
-                external: Object.keys('dependencies' in pkg ? pkg.dependencies : {}),
+                external: [
+                  ...Object.keys('dependencies' in pkg ? pkg.dependencies : {}),
+                  '@shared/utils',
+                ],
+              },
+            },
+            resolve: {
+              alias: {
+                '@shared': path.join(__dirname, 'shared'),
               },
             },
           },
@@ -49,23 +58,28 @@ export default defineConfig(({ command }) => {
         {
           entry: 'electron/preload/index.ts',
           onstart(options) {
-            // Notify the Renderer-Process to reload the page when the Preload-Scripts build is complete,
-            // instead of restarting the entire Electron App.
             options.reload()
           },
           vite: {
             build: {
-              sourcemap: sourcemap ? 'inline' : undefined, // #332
+              sourcemap: sourcemap ? 'inline' : undefined,
               minify: isBuild,
               outDir: 'dist-electron/preload',
               rollupOptions: {
-                external: Object.keys('dependencies' in pkg ? pkg.dependencies : {}),
+                external: [
+                  ...Object.keys('dependencies' in pkg ? pkg.dependencies : {}),
+                  '@shared/utils',
+                ],
+              },
+            },
+            resolve: {
+              alias: {
+                '@shared': path.join(__dirname, 'shared'),
               },
             },
           },
         },
       ]),
-      // Use Node.js API in the Renderer-process
       renderer(),
     ],
     css: {

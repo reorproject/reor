@@ -6,6 +6,10 @@ export type FileInfo = {
   dateCreated: Date
 }
 
+export type FileInfoWithContent = FileInfo & {
+  content: string
+}
+
 export type FileInfoNode = FileInfo & {
   children?: FileInfoNode[]
 }

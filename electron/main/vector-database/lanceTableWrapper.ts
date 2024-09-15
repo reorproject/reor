@@ -11,7 +11,8 @@ export function unsanitizePathForFileSystem(dbPath: string): string {
 }
 
 export function convertRecordToDBType<T extends DBEntry | DBQueryResult>(record: Record<string, unknown>): T | null {
-  const recordWithType = record as T
+  const { vector, ...recordWithoutVector } = record
+  const recordWithType = recordWithoutVector as unknown as T
   recordWithType.notepath = unsanitizePathForFileSystem(recordWithType.notepath)
   return recordWithType
 }
@@ -100,12 +101,7 @@ class LanceDBTableWrapper {
     }
   }
 
-  async search(
-    query: string,
-    //   metricType: string,
-    limit: number,
-    filter?: string,
-  ): Promise<DBQueryResult[]> {
+  async search(query: string, limit: number, filter?: string): Promise<DBQueryResult[]> {
     const lanceQuery = await this.lanceTable.search(query).metricType(MetricType.Cosine).limit(limit)
 
     if (filter) {

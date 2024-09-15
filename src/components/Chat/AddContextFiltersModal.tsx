@@ -17,8 +17,8 @@ import { ChatFilters } from './types'
 interface Props {
   isOpen: boolean
   onClose: () => void
-  setChatFilters: (chatFilters: ChatFilters) => void
   chatFilters: ChatFilters
+  setChatFilters: React.Dispatch<React.SetStateAction<ChatFilters>>
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -26,7 +26,7 @@ const AddContextFiltersModal: React.FC<Props> = ({ isOpen, onClose, chatFilters,
   const [internalFilesSelected, setInternalFilesSelected] = useState<string[]>(chatFilters?.files || [])
   const [searchText, setSearchText] = useState<string>('')
   const [suggestionsState, setSuggestionsState] = useState<SuggestionsState | null>(null)
-  const [numberOfChunksToFetch, setNumberOfChunksToFetch] = useState<number>(chatFilters.numberOfChunksToFetch || 15)
+  const [numberOfChunksToFetch, setNumberOfChunksToFetch] = useState<number>(chatFilters.limit || 15)
   const [minDate, setMinDate] = useState<Date | undefined>(chatFilters.minDate)
   const [maxDate, setMaxDate] = useState<Date | undefined>(chatFilters.maxDate)
   const [showAdvanced, setShowAdvanced] = useState<boolean>(false)
@@ -41,16 +41,16 @@ const AddContextFiltersModal: React.FC<Props> = ({ isOpen, onClose, chatFilters,
     { label: 'Past year', value: 'lastYear' },
   ]
 
-  // useEffect(() => {
-  //   const updatedChatFilters: ChatFilters = {
-  //     ...chatFilters,
-  //     files: [...new Set([...chatFilters.files, ...internalFilesSelected])],
-  //     numberOfChunksToFetch,
-  //     minDate: minDate || undefined,
-  //     maxDate: maxDate || undefined,
-  //   }
-  //   setChatFilters(updatedChatFilters)
-  // }, [internalFilesSelected, numberOfChunksToFetch, minDate, maxDate, setChatFilters])
+  useEffect(() => {
+    setChatFilters((currentFilters) => ({
+      ...currentFilters,
+      files: [...new Set([...currentFilters.files, ...internalFilesSelected])],
+      limit: numberOfChunksToFetch,
+      minDate,
+      maxDate,
+      passFullNoteIntoContext: true,
+    }))
+  }, [internalFilesSelected, numberOfChunksToFetch, minDate, maxDate, setChatFilters])
 
   const handleNumberOfChunksChange = (event: Event, value: number | number[]) => {
     const newValue = Array.isArray(value) ? value[0] : value

@@ -24,6 +24,11 @@ const App: React.FC<AppProps> = () => {
   }, [])
 
   useEffect(() => {
+    const root = window.document.documentElement
+    root.classList.add('dark')
+  }, [])
+
+  useEffect(() => {
     const initialisePosthog = async () => {
       if (await window.electronStore.getAnalyticsMode()) {
         posthog.init('phc_xi4hFToX1cZU657yzge1VW0XImaaRzuvnFUdbAKI8fu', {

@@ -1,20 +1,42 @@
-import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema'
+import { DBEntry } from 'electron/main/vector-database/schema'
 import { createOpenAI } from '@ai-sdk/openai'
 import { createAnthropic } from '@ai-sdk/anthropic'
+import { FileInfoWithContent } from 'electron/main/filesystem/types'
+import getDisplayableChatName from '@shared/utils'
+import { AssistantContent, CoreToolMessage, ToolCallPart } from 'ai'
 import { AnonymizedChatFilters, Chat, ChatFilters, ReorChatMessage } from './types'
+import { createNoteTool, searchTool } from './tools'
+import { retreiveFromVectorDB } from '@/utils/db'
 
-export const appendTextContentToMessages = (messages: ReorChatMessage[], text: string): ReorChatMessage[] => {
-  if (text === '') {
+export const appendTextContentToMessages = (
+  messages: ReorChatMessage[],
+  content: string | ToolCallPart[],
+): ReorChatMessage[] => {
+  if (content === '' || (Array.isArray(content) && content.length === 0)) {
     return messages
   }
+
+  const appendContent = (existingContent: AssistantContent, newContent: string | ToolCallPart[]): AssistantContent => {
+    if (typeof existingContent === 'string') {
+      return typeof newContent === 'string'
+        ? existingContent + newContent
+        : [{ type: 'text' as const, text: existingContent }, ...newContent]
+    }
+    return [
+      ...existingContent,
+      ...(typeof newContent === 'string' ? [{ type: 'text' as const, text: newContent }] : newContent),
+    ]
+  }
+
   if (messages.length === 0) {
     return [
       {
         role: 'assistant',
-        content: text,
+        content: typeof content === 'string' ? content : content,
       },
     ]
   }
+
   const lastMessage = messages[messages.length - 1]
 
   if (lastMessage.role === 'assistant') {
@@ -22,15 +44,16 @@ export const appendTextContentToMessages = (messages: ReorChatMessage[], text: s
       ...messages.slice(0, -1),
       {
         ...lastMessage,
-        content: lastMessage.content + text,
+        content: appendContent(lastMessage.content, content),
       },
     ]
   }
+
   return [
     ...messages,
     {
       role: 'assistant',
-      content: text,
+      content: typeof content === 'string' ? content : content,
     },
   ]
 }
@@ -48,66 +71,67 @@ export const convertMessageToString = (message: ReorChatMessage | undefined): st
   return ''
 }
 
-export const generateTimeStampFilter = (minDate?: Date, maxDate?: Date): string => {
-  let filter = ''
-
-  if (minDate) {
-    const minDateStr = minDate.toISOString().slice(0, 19).replace('T', ' ')
-    filter += `filemodified > timestamp '${minDateStr}'`
-  }
-
-  if (maxDate) {
-    const maxDateStr = maxDate.toISOString().slice(0, 19).replace('T', ' ')
-    if (filter) {
-      filter += ' AND '
-    }
-    filter += `filemodified < timestamp '${maxDateStr}'`
-  }
-
-  return filter
+const generateStringOfContextItemsForPrompt = (contextItems: DBEntry[] | FileInfoWithContent[]): string => {
+  return contextItems.map((item) => item.content).join('\n\n')
 }
 
-export const resolveRAGContext = async (query: string, chatFilters: ChatFilters): Promise<ReorChatMessage> => {
-  let results: DBEntry[] = []
+export const generateRAGMessages = async (query: string, chatFilters: ChatFilters): Promise<ReorChatMessage[]> => {
+  let results: DBEntry[] | FileInfoWithContent[] = []
   if (chatFilters.files.length > 0) {
-    results = await window.fileSystem.getFilesystemPathsAsDBItems(chatFilters.files)
-  } else if (chatFilters.numberOfChunksToFetch > 0) {
-    const timeStampFilter = generateTimeStampFilter(chatFilters.minDate, chatFilters.maxDate)
-    results = await window.database.search(query, chatFilters.numberOfChunksToFetch, timeStampFilter)
+    results = await window.fileSystem.getFiles(chatFilters.files)
+  } else {
+    results = await retreiveFromVectorDB(query, chatFilters)
   }
-  return {
-    role: 'user',
-    context: results,
-    content: `Based on the following context answer the question down below. \n\n\nContext: \n${results
-      .map((dbItem) => dbItem.content)
-      .join('\n\n')}\n\n\nQuery:\n${query}`,
-    visibleContent: query,
-  }
+  const contextString = generateStringOfContextItemsForPrompt(results)
+  return [
+    {
+      role: 'user',
+      context: results,
+      content: `Based on the following context answer the question down below. \n\n\nContext: \n${contextString}\n\n\nQuery:\n${query}`,
+      visibleContent: query,
+    },
+  ]
 }
 
-export const getChatHistoryContext = (chatHistory: Chat | undefined): DBQueryResult[] => {
-  if (!chatHistory || !chatHistory.messages) return []
-  const contextForChat = chatHistory.messages.map((message) => message.context).flat()
-  return contextForChat as DBQueryResult[]
+export const appendNewMessageToChat = async (
+  currentChat: Chat | undefined,
+  userTextFieldInput: string,
+  chatFilters?: ChatFilters,
+): Promise<Chat> => {
+  let outputChat = currentChat
+
+  if (!outputChat || !outputChat.id) {
+    const newID = Date.now().toString()
+    outputChat = {
+      id: newID,
+      messages: [],
+      displayName: '',
+      timeOfLastMessage: Date.now(),
+      toolDefinitions: [],
+    }
+  }
+
+  if (outputChat.messages.length === 0 && chatFilters) {
+    const ragMessages = await generateRAGMessages(userTextFieldInput ?? '', chatFilters)
+    outputChat.messages.push(...ragMessages)
+    outputChat.displayName = getDisplayableChatName(outputChat.messages)
+    outputChat.toolDefinitions = [searchTool, createNoteTool]
+  } else {
+    outputChat.messages.push({
+      role: 'user',
+      content: userTextFieldInput,
+      context: [],
+    })
+  }
+
+  return outputChat
 }
 
-export const getDisplayableChatName = (chat: Chat): string => {
-  if (!chat.messages || chat.messages.length === 0 || !chat.messages[chat.messages.length - 1].content) {
-    return 'Empty Chat'
-  }
-
-  const lastMsg = chat.messages[0]
-
-  if (lastMsg.visibleContent) {
-    return lastMsg.visibleContent.slice(0, 30)
-  }
-
-  const lastMessage = lastMsg.content
-  if (!lastMessage || lastMessage === '' || typeof lastMessage !== 'string') {
-    return 'Empty Chat'
-  }
-  return lastMessage.slice(0, 30)
-}
+// export const getChatHistoryContext = (chatHistory: Chat | undefined): DBQueryResult[] => {
+//   if (!chatHistory || !chatHistory.messages) return []
+//   const contextForChat = chatHistory.messages.map((message) => message.context).flat()
+//   return contextForChat as DBQueryResult[]
+// }
 
 export function anonymizeChatFiltersForPosthog(
   chatFilters: ChatFilters | undefined,
@@ -115,7 +139,7 @@ export function anonymizeChatFiltersForPosthog(
   if (!chatFilters) {
     return undefined
   }
-  const { numberOfChunksToFetch, files, minDate, maxDate } = chatFilters
+  const { limit: numberOfChunksToFetch, files, minDate, maxDate } = chatFilters
   return {
     numberOfChunksToFetch,
     filesLength: files.length,
@@ -166,4 +190,10 @@ export const getClassNameBasedOnMessageRole = (message: ReorChatMessage): string
 
 export const getDisplayMessage = (message: ReorChatMessage): string | undefined => {
   return message.visibleContent || typeof message.content !== 'string' ? message.visibleContent : message.content
+}
+
+export const findToolResultMatchingToolCall = (toolCallId: string, currentChat: Chat): CoreToolMessage | undefined => {
+  return currentChat.messages.find(
+    (message) => message.role === 'tool' && message.content.some((content) => content.toolCallId === toolCallId),
+  ) as CoreToolMessage | undefined
 }

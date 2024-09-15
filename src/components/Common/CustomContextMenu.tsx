@@ -1,9 +1,10 @@
 import { FileInfoNode } from 'electron/main/filesystem/types'
 import React, { useEffect, useRef } from 'react'
 import { useFileContext } from '@/contexts/FileContext'
-import { ChatMetadata, useChatContext } from '@/contexts/ChatContext'
+import { useChatContext } from '@/contexts/ChatContext'
 import { useModalOpeners } from '@/contexts/ModalContext'
 import { useWindowContentContext } from '@/contexts/WindowContentContext'
+import { ChatMetadata } from '../Chat/types'
 
 export type ContextMenuLocations = 'FileSidebar' | 'FileItem' | 'ChatItem' | 'DirectoryItem' | 'None'
 
@@ -43,7 +44,7 @@ const CustomContextMenu: React.FC = () => {
     useModalOpeners()
 
   const { deleteFile, setNoteToBeRenamed } = useFileContext()
-  const { handleDeleteChat } = useChatContext()
+  const { deleteChat } = useChatContext()
 
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent) => {
@@ -106,7 +107,7 @@ const CustomContextMenu: React.FC = () => {
       break
     }
     case 'ChatItem': {
-      displayList = [{ title: 'Delete Chat', onSelect: () => handleDeleteChat(chatMetadata?.id), icon: '' }]
+      displayList = [{ title: 'Delete Chat', onSelect: () => deleteChat(chatMetadata?.id), icon: '' }]
       break
     }
     case 'DirectoryItem': {

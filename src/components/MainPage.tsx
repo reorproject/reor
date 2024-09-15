@@ -14,11 +14,11 @@ import WritingAssistant from './WritingAssistant/WritingAssistant'
 import { ChatProvider, useChatContext } from '@/contexts/ChatContext'
 import { FileProvider, useFileContext } from '@/contexts/FileContext'
 import ModalProvider from '@/contexts/ModalContext'
-import CustomContextMenu from './Menu/CustomContextMenu'
+import CustomContextMenu from './Common/CustomContextMenu'
 import CommonModals from './Common/CommonModals'
 
 const MainPageContent: React.FC = () => {
-  const [showSimilarFiles, setShowSimilarFiles] = useState(true)
+  const [showSimilarFiles, setShowSimilarFiles] = useState(false)
 
   const { currentlyOpenFilePath } = useFileContext()
 
@@ -26,7 +26,6 @@ const MainPageContent: React.FC = () => {
 
   return (
     <div className="relative overflow-x-hidden">
-      <div id="tooltip-container" />
       <TitleBar
         similarFilesOpen={showSimilarFiles}
         toggleSimilarFiles={() => {
@@ -34,7 +33,6 @@ const MainPageContent: React.FC = () => {
         }}
       />
       <CustomContextMenu />
-
       <div className="flex h-below-titlebar">
         <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5">
           <IconsSidebar />
