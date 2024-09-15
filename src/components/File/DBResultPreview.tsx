@@ -1,11 +1,10 @@
-/* eslint-disable react/jsx-props-no-spreading */
 import React from 'react'
-
-import { formatDistanceToNow } from 'date-fns' // for human-readable time format
+import { formatDistanceToNow } from 'date-fns'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 import ReactMarkdown from 'react-markdown'
 
 const cosineDistanceToPercentage = (similarity: number) => ((1 - similarity) * 100).toFixed(2)
+
 export function getFileName(filePath: string): string {
   const parts = filePath.split(/[/\\]/)
   return parts.pop() || ''
@@ -17,16 +16,38 @@ const formatModifiedDate = (date: Date) => {
   }
   return formatDistanceToNow(new Date(date), { addSuffix: true })
 }
-// eslint-disable-next-line jsx-a11y/heading-has-content
+
+// eslint-disable-next-line jsx-a11y/heading-has-content, react/jsx-props-no-spreading
 const CustomH1 = (props: React.ComponentPropsWithoutRef<'h1'>) => <h1 className="leading-relaxed" {...props} />
 
 const CustomPre = (props: React.ComponentPropsWithoutRef<'pre'>) => (
+  // eslint-disable-next-line react/jsx-props-no-spreading
   <pre className="whitespace-pre-wrap break-all" {...props} />
 )
 
 const CustomCode = (props: React.ComponentPropsWithoutRef<'code'>) => (
+  // eslint-disable-next-line react/jsx-props-no-spreading
   <code className="whitespace-pre-wrap break-all" {...props} />
 )
+
+interface MarkdownContentProps {
+  content: string
+}
+
+export const MarkdownContent: React.FC<MarkdownContentProps> = ({ content }) => {
+  return (
+    <ReactMarkdown
+      className="break-words "
+      components={{
+        h1: CustomH1,
+        pre: CustomPre,
+        code: CustomCode,
+      }}
+    >
+      {content}
+    </ReactMarkdown>
+  )
+}
 
 interface DBResultPreviewProps {
   dbResult: DBQueryResult
@@ -42,17 +63,8 @@ export const DBResultPreview: React.FC<DBResultPreviewProps> = ({ dbResult: entr
       className="mt-0 max-w-full cursor-pointer overflow-hidden rounded border-[0.1px] border-solid border-gray-600 bg-neutral-800 px-2 py-1 text-slate-300 shadow-md transition-transform duration-300 hover:bg-neutral-700 hover:shadow-lg"
       onClick={() => onSelect(entry.notepath)}
     >
-      <div className="">
-        <ReactMarkdown
-          className="break-words text-sm text-gray-200"
-          components={{
-            h1: CustomH1,
-            pre: CustomPre,
-            code: CustomCode,
-          }}
-        >
-          {entry.content}
-        </ReactMarkdown>
+      <div className="text-sm text-gray-200">
+        <MarkdownContent content={entry.content} />
       </div>
       <div className="mt-2 text-xs text-gray-400">
         {fileName && <span className="text-xs text-gray-400">{fileName} </span>} | Similarity:{' '}
@@ -63,6 +75,7 @@ export const DBResultPreview: React.FC<DBResultPreviewProps> = ({ dbResult: entr
     </div>
   )
 }
+
 interface DBSearchPreviewProps {
   dbResult: DBQueryResult
   onSelect: (path: string) => void
@@ -77,17 +90,8 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({ dbResult: entr
       className="mb-4 mt-0 max-w-full cursor-pointer overflow-hidden rounded border border-gray-600 bg-neutral-800 p-2 shadow-md transition-transform duration-300 hover:bg-neutral-500 hover:shadow-lg"
       onClick={() => onSelect(entry.notepath)}
     >
-      <div className="">
-        <ReactMarkdown
-          className="break-words text-sm text-gray-200"
-          components={{
-            h1: CustomH1,
-            pre: CustomPre,
-            code: CustomCode,
-          }}
-        >
-          {entry.content}
-        </ReactMarkdown>
+      <div className="text-sm text-gray-200">
+        <MarkdownContent content={entry.content} />
       </div>
       <div className="mt-2 text-xs text-gray-400">
         {fileName && <span className="text-xs text-gray-400">{fileName} </span>} | Similarity:{' '}

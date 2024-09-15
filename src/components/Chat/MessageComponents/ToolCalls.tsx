@@ -66,15 +66,9 @@ const SearchToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existin
           )}
         </div>
       ) : (
-        <Button onClick={executeToolCall}>Button</Button>
-
-        // <button
-        //   type="button"
-        //   onClick={executeToolCall}
-        //   className="mt-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-        // >
-        //   Execute Search
-        // </button>
+        <Button variant="outline" onClick={executeToolCall}>
+          Button
+        </Button>
       )}
     </div>
   )
