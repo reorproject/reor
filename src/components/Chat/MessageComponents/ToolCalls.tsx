@@ -8,6 +8,7 @@ import { useChatContext } from '@/contexts/ChatContext'
 import { Chat } from '../types'
 import { createToolResult } from '../tools'
 import ToolCallCards from './InChatContext'
+import { Button } from '@/components/ui/button'
 
 interface TextPartProps {
   text: string
@@ -41,7 +42,6 @@ const SearchToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existin
       if (!Array.isArray(result)) throw new Error('Result is not an array')
       return result
     } catch (error) {
-      console.error('Failed to parse result as FileInfoWithContent[]:', error)
       return null
     }
   }
@@ -49,7 +49,7 @@ const SearchToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existin
   const parsedResult = parseResult()
 
   return (
-    <div className="mt-0 rounded border border-gray-600 p-0">
+    <div className="mt-0 rounded border p-0">
       <h4 className="font-bold">Search Tool Call</h4>
       <pre className="mt-2 overflow-x-auto bg-gray-700 p-2">
         <code>{JSON.stringify(toolCallPart.args, null, 2)}</code>
@@ -66,13 +66,15 @@ const SearchToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existin
           )}
         </div>
       ) : (
-        <button
-          type="button"
-          onClick={executeToolCall}
-          className="mt-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-        >
-          Execute Search
-        </button>
+        <Button onClick={executeToolCall}>Button</Button>
+
+        // <button
+        //   type="button"
+        //   onClick={executeToolCall}
+        //   className="mt-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
+        // >
+        //   Execute Search
+        // </button>
       )}
     </div>
   )
