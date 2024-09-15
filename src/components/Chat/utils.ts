@@ -93,7 +93,7 @@ export const generateRAGMessages = async (query: string, chatFilters: ChatFilter
   ]
 }
 
-export const prepareOutputChat = async (
+export const appendNewMessageToChat = async (
   currentChat: Chat | undefined,
   userTextFieldInput: string,
   chatFilters?: ChatFilters,

@@ -6,7 +6,7 @@ import { streamText } from 'ai'
 import {
   anonymizeChatFiltersForPosthog,
   resolveLLMClient,
-  prepareOutputChat,
+  appendNewMessageToChat,
   appendTextContentToMessages,
 } from './utils'
 
@@ -45,15 +45,27 @@ const ChatComponent: React.FC = () => {
     fetchChat()
   }, [currentOpenChatID, saveChat])
 
-  const handleSubmitNewMessage = useCallback(
-    async (userTextFieldInput: string, chatFilters?: ChatFilters) => {
-      if (!userTextFieldInput?.trim()) return
+  const handleNewChatMessage = useCallback(
+    async (userTextFieldInput?: string, chatFilters?: ChatFilters) => {
       try {
         const defaultLLMName = await window.llm.getDefaultLLMName()
-        let outputChat = await prepareOutputChat(currentChat, userTextFieldInput, chatFilters)
+
+        if (!userTextFieldInput?.trim() && (!currentChat || currentChat.messages.length === 0)) {
+          return
+        }
+
+        let outputChat = userTextFieldInput?.trim()
+          ? await appendNewMessageToChat(currentChat, userTextFieldInput, chatFilters)
+          : currentChat
+
+        if (!outputChat) {
+          return
+        }
+
         setCurrentChat(outputChat)
         setCurrentOpenChatID(outputChat.id)
         await saveChat(outputChat)
+
         const client = await resolveLLMClient(defaultLLMName)
 
         const { textStream, toolCalls } = await streamText({
@@ -96,10 +108,10 @@ const ChatComponent: React.FC = () => {
             currentChat={currentChat}
             setCurrentChat={setCurrentChat}
             loadingState={loadingState}
-            handleNewChatMessage={handleSubmitNewMessage}
+            handleNewChatMessage={handleNewChatMessage}
           />
         ) : (
-          <StartChat defaultModelName={defaultModelName} handleNewChatMessage={handleSubmitNewMessage} />
+          <StartChat defaultModelName={defaultModelName} handleNewChatMessage={handleNewChatMessage} />
         )}
       </div>
     </div>

@@ -11,7 +11,7 @@ interface ChatMessagesProps {
   currentChat: Chat
   setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
   loadingState: LoadingState
-  handleNewChatMessage: (userTextFieldInput: string, chatFilters?: ChatFilters) => void
+  handleNewChatMessage: (userTextFieldInput?: string, chatFilters?: ChatFilters) => void
 }
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({
@@ -28,7 +28,14 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
         return <UserMessage key={index} message={message} />
       case 'assistant':
         return (
-          <AssistantMessage key={index} message={message} setCurrentChat={setCurrentChat} currentChat={currentChat} />
+          <AssistantMessage
+            key={index}
+            messageIndex={index}
+            message={message}
+            setCurrentChat={setCurrentChat}
+            currentChat={currentChat}
+            handleNewChatMessage={handleNewChatMessage}
+          />
         )
       case 'system':
         return <SystemMessage key={index} message={message} />

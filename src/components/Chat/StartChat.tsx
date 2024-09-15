@@ -14,7 +14,7 @@ const EXAMPLE_PROMPT_OPTIONS = [
 
 interface StartChatProps {
   defaultModelName: string
-  handleNewChatMessage: (userTextFieldInput: string, chatFilters: ChatFilters) => void
+  handleNewChatMessage: (userTextFieldInput?: string, chatFilters?: ChatFilters) => void
 }
 
 const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMessage }) => {

@@ -118,20 +118,6 @@ const DefaultToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existi
 )
 
 export const ToolCallComponent: React.FC<ToolCallComponentProps> = ({ toolCallPart, currentChat, executeToolCall }) => {
-  // useEffect(() => {
-  //   const toolDefinition = currentChat.toolDefinitions.find((definition) => definition.name === toolCallPart.toolName)
-  //   const existingToolCall = findToolResultMatchingToolCall(toolCallPart.toolCallId, currentChat)
-  //   if (toolDefinition && toolDefinition.autoExecute && !existingToolCall) {
-  //     executeToolCall()
-  //   }
-  // }, [
-  //   currentChat.toolDefinitions,
-  //   executeToolCall,
-  //   toolCallPart.toolName,
-  //   findToolResultMatchingToolCall,
-  //   toolCallPart.toolCallId,
-  // ])
-
   const existingToolResult = findToolResultMatchingToolCall(toolCallPart.toolCallId, currentChat)
 
   return (

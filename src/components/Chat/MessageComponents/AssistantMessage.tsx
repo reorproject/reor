@@ -1,9 +1,10 @@
 /* eslint-disable react/no-array-index-key */
 import React, { useCallback, useEffect, useMemo } from 'react'
-import { HiOutlineClipboardCopy, HiOutlinePencilAlt } from 'react-icons/hi'
+import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { toast } from 'react-toastify'
 import { CoreToolMessage, ToolCallPart } from 'ai'
-import { Chat, ReorChatMessage } from '../types'
+import { FaRegCopy } from 'react-icons/fa'
+import { Chat, ChatFilters, ReorChatMessage } from '../types'
 import { findToolResultMatchingToolCall, getClassNameBasedOnMessageRole, getDisplayMessage } from '../utils'
 import { TextPart, ToolCallComponent } from './ToolCalls'
 import { useWindowContentContext } from '@/contexts/WindowContentContext'
@@ -14,9 +15,17 @@ interface AssistantMessageProps {
   message: ReorChatMessage
   setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
   currentChat: Chat
+  messageIndex: number
+  handleNewChatMessage: (userTextFieldInput?: string, chatFilters?: ChatFilters) => void
 }
 
-const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrentChat, currentChat }) => {
+const AssistantMessage: React.FC<AssistantMessageProps> = ({
+  message,
+  setCurrentChat,
+  currentChat,
+  messageIndex,
+  handleNewChatMessage,
+}) => {
   const { openContent } = useWindowContentContext()
   const { saveChat } = useChatContext()
 
@@ -80,7 +89,12 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
     [currentChat, setCurrentChat, saveChat],
   )
 
+  const isLatestAssistantMessage = (index: number, messages: ReorChatMessage[]) => {
+    return messages.slice(index + 1).every((msg) => msg.role !== 'assistant')
+  }
+
   useEffect(() => {
+    if (!isLatestAssistantMessage(messageIndex, currentChat.messages)) return
     toolCalls.forEach((toolCall) => {
       // TODO: Add condition to check this is the latest message.
       const existingToolCall = findToolResultMatchingToolCall(toolCall.toolCallId, currentChat)
@@ -89,7 +103,23 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
         executeToolCall(toolCall)
       }
     })
-  }, [currentChat, currentChat.toolDefinitions, executeToolCall, toolCalls])
+  }, [currentChat, currentChat.toolDefinitions, executeToolCall, toolCalls, messageIndex])
+
+  useEffect(() => {
+    if (!isLatestAssistantMessage(messageIndex, currentChat.messages)) return
+
+    const shouldLLMRespondToToolResults =
+      toolCalls.length > 0 &&
+      toolCalls.every((toolCall) => {
+        const existingToolResult = findToolResultMatchingToolCall(toolCall.toolCallId, currentChat)
+        const toolDefinition = currentChat.toolDefinitions.find((definition) => definition.name === toolCall.toolName)
+        return existingToolResult && toolDefinition?.autoExecute
+      })
+
+    if (shouldLLMRespondToToolResults) {
+      handleNewChatMessage()
+    }
+  }, [currentChat, currentChat.toolDefinitions, executeToolCall, toolCalls, messageIndex, handleNewChatMessage])
 
   const renderContent = () => {
     return (
@@ -122,7 +152,7 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
               className="cursor-pointer items-center justify-center rounded p-1 hover:bg-neutral-700"
               onClick={copyToClipboard}
             >
-              <HiOutlineClipboardCopy color="gray" size={18} className="text-gray-200" title="Copy" />
+              <FaRegCopy color="gray" size={16} className="text-gray-200" title="Copy" />
             </div>
             <div
               className="cursor-pointer items-center justify-center rounded p-1 hover:bg-neutral-700"
