@@ -20,7 +20,7 @@ export type ToolDefinition = {
   name: string
   description: string
   parameters: ToolParameter[]
-  autoRun?: boolean
+  autoExecute?: boolean
 }
 
 export type Chat = {

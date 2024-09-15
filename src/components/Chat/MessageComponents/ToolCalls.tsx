@@ -1,14 +1,11 @@
 import { CoreToolMessage, ToolCallPart } from 'ai'
 import React from 'react'
-import { toast } from 'react-toastify'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
-import { useChatContext } from '@/contexts/ChatContext'
 import { Chat } from '../types'
-import { createToolResult } from '../tools'
-import ToolCallCards from './InChatContext'
-import { Button } from '@/components/ui/button'
+import InChatContextComponent from './InChatContext'
+import { findToolResultMatchingToolCall } from '../utils'
 
 interface TextPartProps {
   text: string
@@ -23,16 +20,18 @@ export const TextPart: React.FC<TextPartProps> = ({ text }) => (
 interface ToolCallComponentProps {
   toolCallPart: ToolCallPart
   currentChat: Chat
-  setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
+  executeToolCall: (toolCall: ToolCallPart) => Promise<void>
 }
 
 interface ToolRendererProps {
+  // eslint-disable-next-line react/no-unused-prop-types
   toolCallPart: ToolCallPart
   existingToolResult: CoreToolMessage | undefined
-  executeToolCall: () => Promise<void>
+  // eslint-disable-next-line react/no-unused-prop-types
+  executeToolCall: (toolCall: ToolCallPart) => Promise<void>
 }
 
-const SearchToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existingToolResult, executeToolCall }) => {
+const SearchToolRenderer: React.FC<ToolRendererProps> = ({ existingToolResult }) => {
   const parseResult = (): FileInfoWithContent[] | null => {
     if (!existingToolResult || !existingToolResult.content[0].result) return null
 
@@ -50,25 +49,19 @@ const SearchToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existin
 
   return (
     <div className="mt-0 rounded border p-0">
-      <h4 className="font-bold">Search Tool Call</h4>
-      <pre className="mt-2 overflow-x-auto bg-gray-700 p-2">
+      {/* <pre className="mt-2 overflow-x-auto bg-gray-700 p-2">
         <code>{JSON.stringify(toolCallPart.args, null, 2)}</code>
-      </pre>
-      {existingToolResult ? (
-        <div className="mt-2 bg-gray-100 p-2">
-          <h5 className="font-semibold">Search Results:</h5>
+      </pre> */}
+      {existingToolResult && (
+        <div className="mt-2  p-2">
           {parsedResult ? (
-            <ToolCallCards toolCalls={parsedResult} />
+            <InChatContextComponent contextList={parsedResult} />
           ) : (
             <pre className="mt-1 overflow-x-auto bg-gray-600 p-2">
               <code>{JSON.stringify(existingToolResult.content[0].result, null, 2)}</code>
             </pre>
           )}
         </div>
-      ) : (
-        <Button variant="outline" onClick={executeToolCall}>
-          Button
-        </Button>
       )}
     </div>
   )
@@ -90,7 +83,7 @@ const CreateFileToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, exi
     ) : (
       <button
         type="button"
-        onClick={executeToolCall}
+        onClick={() => executeToolCall(toolCallPart)}
         className="mt-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
       >
         Create File
@@ -115,7 +108,7 @@ const DefaultToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existi
     ) : (
       <button
         type="button"
-        onClick={executeToolCall}
+        onClick={() => executeToolCall(toolCallPart)}
         className="mt-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
       >
         Execute Tool Call
@@ -124,41 +117,22 @@ const DefaultToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existi
   </div>
 )
 
-export const ToolCallComponent: React.FC<ToolCallComponentProps> = ({ toolCallPart, currentChat, setCurrentChat }) => {
-  const { saveChat } = useChatContext()
+export const ToolCallComponent: React.FC<ToolCallComponentProps> = ({ toolCallPart, currentChat, executeToolCall }) => {
+  // useEffect(() => {
+  //   const toolDefinition = currentChat.toolDefinitions.find((definition) => definition.name === toolCallPart.toolName)
+  //   const existingToolCall = findToolResultMatchingToolCall(toolCallPart.toolCallId, currentChat)
+  //   if (toolDefinition && toolDefinition.autoExecute && !existingToolCall) {
+  //     executeToolCall()
+  //   }
+  // }, [
+  //   currentChat.toolDefinitions,
+  //   executeToolCall,
+  //   toolCallPart.toolName,
+  //   findToolResultMatchingToolCall,
+  //   toolCallPart.toolCallId,
+  // ])
 
-  const findToolResultMatchingToolCall = (toolCallId: string): CoreToolMessage | undefined => {
-    const toolMessage = currentChat.messages.find(
-      (message) => message.role === 'tool' && message.content.some((content) => content.toolCallId === toolCallId),
-    )
-    return toolMessage as CoreToolMessage | undefined
-  }
-
-  const executeToolCall = async () => {
-    const existingToolResult = findToolResultMatchingToolCall(toolCallPart.toolCallId)
-    if (existingToolResult) {
-      toast.error('Tool call id already exists')
-      return
-    }
-
-    const toolResult = await createToolResult(toolCallPart.toolName, toolCallPart.args as any, toolCallPart.toolCallId)
-    const toolMessage: CoreToolMessage = {
-      role: 'tool',
-      content: [toolResult],
-    }
-
-    setCurrentChat((prevChat) => {
-      if (!prevChat) return prevChat
-      const updatedChat = {
-        ...prevChat,
-        messages: [...prevChat.messages, toolMessage],
-      }
-      saveChat(updatedChat)
-      return updatedChat
-    })
-  }
-
-  const existingToolResult = findToolResultMatchingToolCall(toolCallPart.toolCallId)
+  const existingToolResult = findToolResultMatchingToolCall(toolCallPart.toolCallId, currentChat)
 
   return (
     <>

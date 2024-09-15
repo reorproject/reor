@@ -3,7 +3,7 @@ import { createOpenAI } from '@ai-sdk/openai'
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import getDisplayableChatName from '@shared/utils'
-import { AssistantContent, ToolCallPart } from 'ai'
+import { AssistantContent, CoreToolMessage, ToolCallPart } from 'ai'
 import { AnonymizedChatFilters, Chat, ChatFilters, ReorChatMessage } from './types'
 import { createNoteTool, searchTool } from './tools'
 import { retreiveFromVectorDB } from '@/utils/db'
@@ -190,4 +190,10 @@ export const getClassNameBasedOnMessageRole = (message: ReorChatMessage): string
 
 export const getDisplayMessage = (message: ReorChatMessage): string | undefined => {
   return message.visibleContent || typeof message.content !== 'string' ? message.visibleContent : message.content
+}
+
+export const findToolResultMatchingToolCall = (toolCallId: string, currentChat: Chat): CoreToolMessage | undefined => {
+  return currentChat.messages.find(
+    (message) => message.role === 'tool' && message.content.some((content) => content.toolCallId === toolCallId),
+  ) as CoreToolMessage | undefined
 }

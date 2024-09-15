@@ -1,17 +1,20 @@
 import React from 'react'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { MarkdownContent } from '@/components/File/DBResultPreview'
+import { useWindowContentContext } from '@/contexts/WindowContentContext'
 
-interface ToolCall {
+interface RenderableContextType {
   content: string
   name: string
+  path: string
 }
 
-interface ToolCallCardsProps {
-  toolCalls: ToolCall[]
+interface InChatContextComponentProps {
+  contextList: RenderableContextType[]
 }
 
-const ToolCallCards: React.FC<ToolCallCardsProps> = ({ toolCalls }) => {
+const InChatContextComponent: React.FC<InChatContextComponentProps> = ({ contextList }) => {
+  const { openContent } = useWindowContentContext()
   const truncateContent = (content: string, maxLength: number) => {
     if (content.length <= maxLength) return content
     return `${content.slice(0, maxLength)}...`
@@ -19,13 +22,17 @@ const ToolCallCards: React.FC<ToolCallCardsProps> = ({ toolCalls }) => {
 
   return (
     <div className="flex space-x-4 overflow-x-auto pb-4">
-      {toolCalls.map((toolCall) => (
-        <Card key={`${toolCall.name}-${toolCall.content}`} className="w-64 shrink-0">
-          <CardContent className="p-4 text-xs">
-            <MarkdownContent content={truncateContent(toolCall.content, 75)} />
+      {contextList.map((contextItem) => (
+        <Card
+          key={`${contextItem.name}-${contextItem.content}`}
+          className="w-64 shrink-0 cursor-pointer bg-secondary"
+          onClick={() => openContent(contextItem.path)}
+        >
+          <CardContent className="p-4 text-xs text-foreground">
+            <MarkdownContent content={truncateContent(contextItem.content, 75)} />
           </CardContent>
           <CardFooter className="text-xs">
-            <p>{toolCall.name}</p>
+            <p>{contextItem.name}</p>
           </CardFooter>
         </Card>
       ))}
@@ -33,4 +40,4 @@ const ToolCallCards: React.FC<ToolCallCardsProps> = ({ toolCalls }) => {
   )
 }
 
-export default ToolCallCards
+export default InChatContextComponent

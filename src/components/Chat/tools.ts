@@ -19,6 +19,7 @@ export const searchTool: ToolDefinition = {
       description: 'The number of results to return',
     },
   ],
+  autoExecute: true,
 }
 
 export const createNoteTool: ToolDefinition = {
