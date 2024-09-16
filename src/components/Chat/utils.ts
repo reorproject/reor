@@ -1,6 +1,4 @@
 import { DBEntry } from 'electron/main/vector-database/schema'
-import { createOpenAI } from '@ai-sdk/openai'
-import { createAnthropic } from '@ai-sdk/anthropic'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import getDisplayableChatName from '@shared/utils'
 import { AssistantContent, CoreToolMessage, ToolCallPart } from 'ai'
@@ -85,9 +83,18 @@ export const generateRAGMessages = async (query: string, chatFilters: ChatFilter
   const contextString = generateStringOfContextItemsForPrompt(results)
   return [
     {
+      role: 'system',
+      content: `You are a helpful assistant helping a user organize and manage their personal knowledge and notes. 
+You will answer the user's question and help them with their request. 
+You can search the knowledge base by using the search tool and create new notes by using the create note tool.
+
+An initial query has been made and the context is already provided for you (so please do not call the search tool initially).`,
+      hideMessageInChat: true,
+    },
+    {
       role: 'user',
       context: results,
-      content: `Based on the following context answer the question down below. \n\n\nContext: \n${contextString}\n\n\nQuery:\n${query}`,
+      content: `Context retrieved from your knowledge base for the query below: \n${contextString}\n\n\nQuery for context above:\n${query}`,
       visibleContent: query,
     },
   ]
@@ -148,48 +155,21 @@ export function anonymizeChatFiltersForPosthog(
   }
 }
 
-export const resolveLLMClient = async (llmName: string) => {
-  const llmConfigs = await window.llm.getLLMConfigs()
-  const apiConfigs = await window.llm.getLLMAPIConfigs()
-
-  const llmConfig = llmConfigs.find((llm) => llm.modelName === llmName)
-
-  if (!llmConfig) {
-    throw new Error(`LLM ${llmName} not found.`)
-  }
-
-  const apiConfig = apiConfigs.find((api) => api.name === llmConfig.apiName)
-
-  if (!apiConfig) {
-    throw new Error(`API ${llmConfig.apiName} not found.`)
-  }
-
-  if (apiConfig.apiInterface === 'openai') {
-    const openai = createOpenAI({
-      apiKey: apiConfig.apiKey || '',
-      baseURL: apiConfig.apiURL,
-    })
-    return openai(llmName)
-  }
-  if (apiConfig.apiInterface === 'anthropic') {
-    const anthropic = createAnthropic({
-      apiKey: apiConfig.apiKey || '',
-      baseURL: apiConfig.apiURL,
-      headers: {
-        'anthropic-dangerous-direct-browser-access': 'true',
-      },
-    })
-    return anthropic(llmName)
-  }
-  throw new Error(`API interface ${apiConfig.apiInterface} not supported.`)
-}
-
 export const getClassNameBasedOnMessageRole = (message: ReorChatMessage): string => {
   return `markdown-content ${message.role}-chat-message`
 }
 
 export const getDisplayMessage = (message: ReorChatMessage): string | undefined => {
-  return message.visibleContent || typeof message.content !== 'string' ? message.visibleContent : message.content
+  if (message.hideMessageInChat) {
+    return undefined
+  }
+  if (message.visibleContent !== null && message.visibleContent !== undefined && message.visibleContent !== '') {
+    return message.visibleContent
+  }
+  if (typeof message.content === 'string') {
+    return message.content
+  }
+  return undefined
 }
 
 export const findToolResultMatchingToolCall = (toolCallId: string, currentChat: Chat): CoreToolMessage | undefined => {

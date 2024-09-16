@@ -3,12 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import posthog from 'posthog-js'
 
 import { streamText } from 'ai'
-import {
-  anonymizeChatFiltersForPosthog,
-  resolveLLMClient,
-  appendNewMessageToChat,
-  appendTextContentToMessages,
-} from './utils'
+import { anonymizeChatFiltersForPosthog, appendNewMessageToChat, appendTextContentToMessages } from './utils'
 
 import '../../styles/chat.css'
 import ChatMessages from './ChatMessages'
@@ -16,6 +11,7 @@ import { Chat, ChatFilters, LoadingState } from './types'
 import { useChatContext } from '@/contexts/ChatContext'
 import StartChat from './StartChat'
 import { convertToolConfigToZodSchema } from './tools'
+import resolveLLMClient from '@/utils/llm'
 
 const ChatComponent: React.FC = () => {
   const [loadingState, setLoadingState] = useState<LoadingState>('idle')
@@ -66,10 +62,10 @@ const ChatComponent: React.FC = () => {
         setCurrentOpenChatID(outputChat.id)
         await saveChat(outputChat)
 
-        const client = await resolveLLMClient(defaultLLMName)
+        const llmClient = await resolveLLMClient(defaultLLMName)
 
         const { textStream, toolCalls } = await streamText({
-          model: client,
+          model: llmClient,
           messages: outputChat.messages,
           tools: Object.assign({}, ...outputChat.toolDefinitions.map(convertToolConfigToZodSchema)),
         })

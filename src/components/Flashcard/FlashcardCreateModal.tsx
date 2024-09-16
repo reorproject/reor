@@ -12,8 +12,8 @@ import FilesSuggestionsDisplay, { SuggestionsState } from '../Editor/BacklinkSug
 import FlashcardCore from './FlashcardsCore'
 import { FlashcardQAPairSchema, FlashcardQAPairUI } from './types'
 import { storeFlashcardPairsAsJSON } from './utils'
-import { resolveLLMClient } from '../Chat/utils'
 import useFileInfoTreeHook from '../Sidebars/FileSideBar/hooks/use-file-info-tree'
+import resolveLLMClient from '@/utils/llm'
 
 interface FlashcardCreateModalProps {
   isOpen: boolean
