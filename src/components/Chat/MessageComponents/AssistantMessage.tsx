@@ -6,10 +6,11 @@ import { CoreToolMessage, ToolCallPart } from 'ai'
 import { FaRegCopy } from 'react-icons/fa'
 import { Chat, ChatFilters, ReorChatMessage } from '../types'
 import { findToolResultMatchingToolCall, getClassNameBasedOnMessageRole, getDisplayMessage } from '../utils'
-import { TextPart, ToolCallComponent } from './ToolCalls'
+import { ToolCallComponent } from './ToolCalls'
 import { useWindowContentContext } from '@/contexts/WindowContentContext'
 import { createToolResult } from '../tools'
 import { useChatContext } from '@/contexts/ChatContext'
+import MarkdownRenderer from '@/components/Common/MarkdownRenderer'
 
 interface AssistantMessageProps {
   message: ReorChatMessage
@@ -96,7 +97,6 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({
   useEffect(() => {
     if (!isLatestAssistantMessage(messageIndex, currentChat.messages)) return
     toolCalls.forEach((toolCall) => {
-      // TODO: Add condition to check this is the latest message.
       const existingToolCall = findToolResultMatchingToolCall(toolCall.toolCallId, currentChat)
       const toolDefinition = currentChat.toolDefinitions.find((definition) => definition.name === toolCall.toolName)
       if (toolDefinition && toolDefinition.autoExecute && !existingToolCall) {
@@ -125,7 +125,7 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({
     return (
       <>
         {textParts.map((text, index) => (
-          <TextPart key={index} text={text} />
+          <MarkdownRenderer key={index} content={text} />
         ))}
         {toolCalls.map((toolCall, index) => (
           <ToolCallComponent

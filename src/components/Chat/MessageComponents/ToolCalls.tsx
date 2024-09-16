@@ -1,21 +1,9 @@
 import { CoreToolMessage, ToolCallPart } from 'ai'
 import React from 'react'
-import ReactMarkdown from 'react-markdown'
-import rehypeRaw from 'rehype-raw'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { Chat } from '../types'
 import InChatContextComponent from './InChatContext'
 import { findToolResultMatchingToolCall } from '../utils'
-
-interface TextPartProps {
-  text: string
-}
-
-export const TextPart: React.FC<TextPartProps> = ({ text }) => (
-  <ReactMarkdown rehypePlugins={[rehypeRaw]} className="max-w-[95%] break-words">
-    {text}
-  </ReactMarkdown>
-)
 
 interface ToolCallComponentProps {
   toolCallPart: ToolCallPart
