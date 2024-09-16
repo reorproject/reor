@@ -43,7 +43,7 @@ const SearchToolRenderer: React.FC<ToolRendererProps> = ({ existingToolResult })
       {existingToolResult && (
         <div className="">
           {parsedResult ? (
-            <InChatContextComponent contextList={parsedResult} />
+            <InChatContextComponent contextItems={parsedResult} />
           ) : (
             <pre className="mt-1 overflow-x-auto bg-gray-600 p-2">
               <code>{JSON.stringify(existingToolResult.content[0].result, null, 2)}</code>

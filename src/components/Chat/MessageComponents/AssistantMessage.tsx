@@ -141,11 +141,8 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({
 
   return (
     <div className={`w-full ${getClassNameBasedOnMessageRole(message)} mb-4 flex`}>
-      <div className="relative items-start pl-4 pt-3">
-        <img src="icon.png" style={{ width: '22px', height: '22px' }} alt="ReorImage" />
-      </div>
       <div className="w-full flex-col gap-1">
-        <div className="flex grow flex-col px-5 py-2.5">
+        <div className="flex grow flex-col ">
           {renderContent()}
           <div className="mt-2 flex">
             <div
