@@ -1,9 +1,8 @@
 import { DBEntry } from 'electron/main/vector-database/schema'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
-import getDisplayableChatName from '@shared/utils'
+import generateChatName from '@shared/utils'
 import { AssistantContent, CoreToolMessage, ToolCallPart } from 'ai'
 import { AnonymizedChatFilters, Chat, ChatFilters, ReorChatMessage } from './types'
-import { createNoteTool, searchTool } from './tools'
 import { retreiveFromVectorDB } from '@/utils/db'
 
 export const appendTextContentToMessages = (
@@ -73,7 +72,7 @@ const generateStringOfContextItemsForPrompt = (contextItems: DBEntry[] | FileInf
   return contextItems.map((item) => item.content).join('\n\n')
 }
 
-export const generateRAGMessages = async (query: string, chatFilters: ChatFilters): Promise<ReorChatMessage[]> => {
+export const doInitialRAG = async (query: string, chatFilters: ChatFilters): Promise<ReorChatMessage[]> => {
   let results: DBEntry[] | FileInfoWithContent[] = []
   if (chatFilters.files.length > 0) {
     results = await window.fileSystem.getFiles(chatFilters.files)
@@ -100,29 +99,28 @@ An initial query has been made and the context is already provided for you (so p
   ]
 }
 
-export const appendNewMessageToChat = async (
+export const generateInitialChat = async (userTextFieldInput: string, chatFilters: ChatFilters): Promise<Chat> => {
+  const ragMessages = await doInitialRAG(userTextFieldInput ?? '', chatFilters)
+  return {
+    id: Date.now().toString(),
+    messages: ragMessages,
+    displayName: generateChatName(ragMessages),
+    timeOfLastMessage: Date.now(),
+    toolDefinitions: chatFilters.toolDefinitions,
+  }
+}
+export const appendToOrCreateChat = async (
   currentChat: Chat | undefined,
   userTextFieldInput: string,
   chatFilters?: ChatFilters,
 ): Promise<Chat> => {
   let outputChat = currentChat
 
-  if (!outputChat || !outputChat.id) {
-    const newID = Date.now().toString()
-    outputChat = {
-      id: newID,
-      messages: [],
-      displayName: '',
-      timeOfLastMessage: Date.now(),
-      toolDefinitions: [],
-    }
-  }
-
-  if (outputChat.messages.length === 0 && chatFilters) {
-    const ragMessages = await generateRAGMessages(userTextFieldInput ?? '', chatFilters)
-    outputChat.messages.push(...ragMessages)
-    outputChat.displayName = getDisplayableChatName(outputChat.messages)
-    outputChat.toolDefinitions = [searchTool, createNoteTool]
+  if (!outputChat || !outputChat.id || outputChat.messages.length === 0) {
+    outputChat = await generateInitialChat(
+      userTextFieldInput ?? '',
+      chatFilters || { toolDefinitions: [], limit: 15, files: [] },
+    ) // TODO: probably split into an initial chat function and an append to chat function
   } else {
     outputChat.messages.push({
       role: 'user',
@@ -133,12 +131,6 @@ export const appendNewMessageToChat = async (
 
   return outputChat
 }
-
-// export const getChatHistoryContext = (chatHistory: Chat | undefined): DBQueryResult[] => {
-//   if (!chatHistory || !chatHistory.messages) return []
-//   const contextForChat = chatHistory.messages.map((message) => message.context).flat()
-//   return contextForChat as DBQueryResult[]
-// }
 
 export function anonymizeChatFiltersForPosthog(
   chatFilters: ChatFilters | undefined,

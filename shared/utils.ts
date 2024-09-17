@@ -1,6 +1,6 @@
 import { ReorChatMessage } from '@/components/Chat/types'
 
-const getDisplayableChatName = (messages: ReorChatMessage[]): string => {
+const generateChatName = (messages: ReorChatMessage[]): string => {
   if (!messages || messages.length === 0 || !messages[0].content) {
     return 'Empty Chat'
   }
@@ -18,4 +18,4 @@ const getDisplayableChatName = (messages: ReorChatMessage[]): string => {
   return firstMessage.slice(0, 30)
 }
 
-export default getDisplayableChatName
+export default generateChatName

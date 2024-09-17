@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import posthog from 'posthog-js'
 
 import { streamText } from 'ai'
-import { anonymizeChatFiltersForPosthog, appendNewMessageToChat, appendTextContentToMessages } from './utils'
+import { anonymizeChatFiltersForPosthog, appendToOrCreateChat, appendTextContentToMessages } from './utils'
 
 import '../../styles/chat.css'
 import ChatMessages from './ChatMessages'
@@ -51,7 +51,7 @@ const ChatComponent: React.FC = () => {
         }
 
         let outputChat = userTextFieldInput?.trim()
-          ? await appendNewMessageToChat(currentChat, userTextFieldInput, chatFilters)
+          ? await appendToOrCreateChat(currentChat, userTextFieldInput, chatFilters)
           : currentChat
 
         if (!outputChat) {

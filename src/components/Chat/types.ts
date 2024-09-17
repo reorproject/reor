@@ -45,6 +45,7 @@ export interface SearchFilters {
 export type ChatFilters = SearchFilters & {
   files: string[]
   propertiesToIncludeInContext?: string[]
+  toolDefinitions: ToolDefinition[]
 }
 
 export interface AnonymizedChatFilters {

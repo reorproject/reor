@@ -3,8 +3,8 @@ import { PiPaperPlaneRight } from 'react-icons/pi'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import PromptSuggestion from './ChatPrompts'
 import '../../styles/chat.css'
-import AddContextFiltersModal from './AddContextFiltersModal'
 import { ChatFilters } from './types'
+import { createNoteToolDefinition, searchToolDefinition } from './tools'
 
 const EXAMPLE_PROMPT_OPTIONS = [
   'What have I written about Philosophy?',
@@ -21,13 +21,15 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([])
   const [selectedLLM, setSelectedLLM] = useState<string>(defaultModelName)
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [chatFilters, setChatFilters] = useState<ChatFilters>({
     files: [],
     limit: 15,
     minDate: new Date(0),
     maxDate: new Date(),
+    toolDefinitions: [searchToolDefinition, createNoteToolDefinition],
   })
-  const [isAddContextFiltersModalOpen, setIsAddContextFiltersModalOpen] = useState<boolean>(false)
+  // const [isAddContextFiltersModalOpen, setIsAddContextFiltersModalOpen] = useState<boolean>(false)
 
   useEffect(() => {
     const fetchLLMModels = async () => {
@@ -80,7 +82,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                 ))}
               </select>
             </div>
-            <button
+            {/* <button
               className="m-1 cursor-pointer rounded-md border-0 bg-blue-600 px-4 py-2 text-white hover:bg-blue-500"
               onClick={() => {
                 setIsAddContextFiltersModalOpen(true)
@@ -88,7 +90,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               type="button"
             >
               Customise context
-            </button>
+            </button> */}
             <button
               className="m-1 flex cursor-pointer items-center justify-center rounded-md border-0 bg-blue-600 p-2 text-white hover:bg-blue-500"
               onClick={sendMessageHandler}
@@ -111,14 +113,14 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
           ))}
         </div>
       </div>
-      {isAddContextFiltersModalOpen && (
+      {/* {isAddContextFiltersModalOpen && (
         <AddContextFiltersModal
           isOpen={isAddContextFiltersModalOpen}
           onClose={() => setIsAddContextFiltersModalOpen(false)}
           chatFilters={chatFilters}
           setChatFilters={setChatFilters}
         />
-      )}
+      )} */}
     </div>
   )
 }

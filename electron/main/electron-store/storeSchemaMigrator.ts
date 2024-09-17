@@ -1,6 +1,6 @@
 import Store from 'electron-store'
 
-import getDisplayableChatName from '../../../shared/utils'
+import generateChatName from '../../../shared/utils'
 import { StoreKeys, StoreSchema } from './storeConfig'
 import { defaultEmbeddingModelRepos } from '../vector-database/embeddings'
 import { defaultOllamaAPI } from '../llm/models/ollama'
@@ -96,7 +96,7 @@ function ensureChatHistoryHasDisplayNameAndTimestamp(store: Store<StoreSchema>) 
     chats.map((chat) => {
       const outputChat = chat
       if (!outputChat.displayName || outputChat.displayName === chat.id) {
-        outputChat.displayName = getDisplayableChatName(chat.messages)
+        outputChat.displayName = generateChatName(chat.messages)
       }
       if (!outputChat.timeOfLastMessage) {
         outputChat.timeOfLastMessage = Date.now()
