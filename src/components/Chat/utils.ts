@@ -2,6 +2,7 @@ import { DBEntry } from 'electron/main/vector-database/schema'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import generateChatName from '@shared/utils'
 import { AssistantContent, CoreToolMessage, ToolCallPart } from 'ai'
+import posthog from 'posthog-js'
 import { AnonymizedAgentConfig, Chat, AgentConfig, PromptTemplate, ReorChatMessage } from './types'
 import { retreiveFromVectorDB } from '@/utils/db'
 
@@ -67,6 +68,22 @@ export const convertMessageToString = (message: ReorChatMessage | undefined): st
   }
   return ''
 }
+export function anonymizeAgentConfigForPosthog(
+  agentConfig: AgentConfig | undefined,
+): AnonymizedAgentConfig | undefined {
+  if (!agentConfig) {
+    return undefined
+  }
+  const { limit: numberOfChunksToFetch, files, minDate, maxDate } = agentConfig
+  return {
+    name: agentConfig.name,
+    numberOfChunksToFetch,
+    filesLength: files.length,
+    minDate,
+    maxDate,
+    toolNames: agentConfig.toolDefinitions.map((tool) => tool.name),
+  }
+}
 
 const generateStringOfContextItemsForPrompt = (contextItems: DBEntry[] | FileInfoWithContent[]): string => {
   return contextItems.map((item) => item.content).join('\n\n')
@@ -121,52 +138,48 @@ export const doInitialRAG = async (query: string, chatFilters: AgentConfig): Pro
   return applyPromptTemplate(promptTemplate, contextString, query, results)
 }
 
-export const generateInitialChat = async (userTextFieldInput: string, chatFilters: AgentConfig): Promise<Chat> => {
-  const ragMessages = await doInitialRAG(userTextFieldInput ?? '', chatFilters)
+export const generateInitialChat = async (userTextFieldInput: string, agentConfig: AgentConfig): Promise<Chat> => {
+  const ragMessages = await doInitialRAG(userTextFieldInput ?? '', agentConfig)
+
   return {
     id: Date.now().toString(),
     messages: ragMessages,
     displayName: generateChatName(ragMessages),
     timeOfLastMessage: Date.now(),
-    toolDefinitions: chatFilters.toolDefinitions,
+    toolDefinitions: agentConfig.toolDefinitions,
   }
 }
 export const appendToOrCreateChat = async (
   currentChat: Chat | undefined,
   userTextFieldInput: string,
-  chatFilters?: AgentConfig,
+  agentConfig?: AgentConfig,
 ): Promise<Chat> => {
   let outputChat = currentChat
 
   if (!outputChat || !outputChat.id || outputChat.messages.length === 0) {
     outputChat = await generateInitialChat(
       userTextFieldInput ?? '',
-      chatFilters || { name: '', toolDefinitions: [], limit: 15, files: [], promptTemplate: [] },
+      agentConfig || { name: '', toolDefinitions: [], limit: 15, files: [], promptTemplate: [] },
     ) // TODO: probably split into an initial chat function and an append to chat function
+    const anonymizedAgentConfig = anonymizeAgentConfigForPosthog(agentConfig)
+    posthog.capture('chat_message_submitted', {
+      chatId: outputChat?.id,
+      chatLength: outputChat?.messages.length,
+      ...anonymizedAgentConfig,
+    })
   } else {
     outputChat.messages.push({
       role: 'user',
       content: userTextFieldInput,
       context: [],
     })
+    posthog.capture('follow_up_chat_message_submitted', {
+      chatId: outputChat?.id,
+      chatLength: outputChat?.messages.length,
+    })
   }
 
   return outputChat
-}
-
-export function anonymizeChatFiltersForPosthog(
-  chatFilters: AgentConfig | undefined,
-): AnonymizedAgentConfig | undefined {
-  if (!chatFilters) {
-    return undefined
-  }
-  const { limit: numberOfChunksToFetch, files, minDate, maxDate } = chatFilters
-  return {
-    numberOfChunksToFetch,
-    filesLength: files.length,
-    minDate,
-    maxDate,
-  }
 }
 
 export const getClassNameBasedOnMessageRole = (message: ReorChatMessage): string => {

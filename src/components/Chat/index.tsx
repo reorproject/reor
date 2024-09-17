@@ -1,9 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
-import posthog from 'posthog-js'
-
 import { streamText } from 'ai'
-import { anonymizeChatFiltersForPosthog, appendToOrCreateChat, appendTextContentToMessages } from './utils'
+import { appendToOrCreateChat, appendTextContentToMessages } from './utils'
 
 import '../../styles/chat.css'
 import ChatMessages from './ChatMessages'
@@ -83,11 +81,12 @@ const ChatComponent: React.FC = () => {
         await saveChat(outputChat)
 
         setLoadingState('idle')
-        posthog.capture('chat_message_submitted', {
-          chatId: outputChat?.id,
-          chatLength: outputChat?.messages.length,
-          chatFilters: anonymizeChatFiltersForPosthog(chatFilters),
-        })
+        // const anonymizedAgentConfig = anonymizeAgentConfigForPosthog(chatFilters)
+        // posthog.capture('chat_message_submitted', {
+        //   chatId: outputChat?.id,
+        //   chatLength: outputChat?.messages.length,
+        //   ...anonymizedAgentConfig,
+        // })
       } catch (error) {
         setLoadingState('idle')
         throw error

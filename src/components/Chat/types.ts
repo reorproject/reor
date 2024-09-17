@@ -56,10 +56,12 @@ export type AgentConfig = DatabaseSearchFilters & {
 }
 
 export interface AnonymizedAgentConfig {
+  name: string
   numberOfChunksToFetch: number
   filesLength: number
   minDate?: Date
   maxDate?: Date
+  toolNames: string[]
 }
 
 export type LoadingState = 'idle' | 'generating' | 'waiting-for-first-token'

@@ -1,4 +1,3 @@
-/* eslint-disable react/no-array-index-key */
 import React, { useCallback, useEffect, useMemo } from 'react'
 import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { toast } from 'react-toastify'
@@ -125,11 +124,12 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({
     return (
       <>
         {textParts.map((text, index) => (
+          // eslint-disable-next-line react/no-array-index-key
           <MarkdownRenderer key={index} content={text} />
         ))}
-        {toolCalls.map((toolCall, index) => (
+        {toolCalls.map((toolCall) => (
           <ToolCallComponent
-            key={index}
+            key={toolCall.toolCallId}
             toolCallPart={toolCall}
             currentChat={currentChat}
             executeToolCall={executeToolCall}

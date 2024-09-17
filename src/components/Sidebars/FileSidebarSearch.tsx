@@ -25,6 +25,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   const handleSearch = useCallback(
     async (query: string) => {
       const results: DBQueryResult[] = await window.database.search(query, 50)
+      console.log('results', results)
       setSearchResults(results)
     },
     [setSearchResults],

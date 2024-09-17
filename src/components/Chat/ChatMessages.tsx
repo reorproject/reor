@@ -26,10 +26,10 @@ interface MessageProps {
 const Message: React.FC<MessageProps> = ({ message, index, currentChat, setCurrentChat, handleNewChatMessage }) => {
   return (
     <>
-      {message.role === 'user' && <UserMessage key={index} message={message} />}
+      {message.role === 'user' && <UserMessage key={`user-${index}`} message={message} />}
       {message.role === 'assistant' && (
         <AssistantMessage
-          key={index}
+          key={`assistant-${index}`}
           messageIndex={index}
           message={message}
           setCurrentChat={setCurrentChat}
@@ -37,8 +37,8 @@ const Message: React.FC<MessageProps> = ({ message, index, currentChat, setCurre
           handleNewChatMessage={handleNewChatMessage}
         />
       )}
-      {message.role === 'system' && <SystemMessage key={index} message={message} />}
-      {message.context && <InChatContextComponent key={index} contextItems={message.context} />}
+      {message.role === 'system' && <SystemMessage key={`system-${index}`} message={message} />}
+      {message.context && <InChatContextComponent key={`context-${index}`} contextItems={message.context} />}
     </>
   )
 }

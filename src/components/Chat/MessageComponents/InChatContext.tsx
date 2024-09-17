@@ -46,8 +46,9 @@ const InChatContextComponent: React.FC<InChatContextComponentProps> = ({ context
       <div className="mb-1 text-sm text-muted-foreground">Sources:</div>
 
       <div className="flex space-x-4 overflow-x-auto p-0">
-        {contextItems.map((contextItem) => (
-          <HoverCard key={`${getItemName(contextItem)}-${getItemContent(contextItem)}`}>
+        {contextItems.map((contextItem, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <HoverCard key={index}>
             <HoverCardTrigger>
               <Card
                 className="h-10 w-28 shrink-0 cursor-pointer bg-secondary p-0"
