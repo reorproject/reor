@@ -8,7 +8,7 @@ interface MarkdownRendererProps {
 
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
   return (
-    <ReactMarkdown className="break-all" rehypePlugins={[rehypeRaw]}>
+    <ReactMarkdown className="overflow-hidden whitespace-normal break-words" rehypePlugins={[rehypeRaw]}>
       {content}
     </ReactMarkdown>
   )

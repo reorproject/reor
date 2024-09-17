@@ -75,12 +75,9 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
       <div className="mt-2 w-full">
         {searchResults.length > 0 && (
           <div className="w-full">
-            {searchResults.map((result) => (
-              <DBSearchPreview
-                key={`${result.notepath}-${result.subnoteindex}`}
-                dbResult={result}
-                onSelect={openFileSelectSearch}
-              />
+            {searchResults.map((result, index) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <DBSearchPreview key={index} dbResult={result} onSelect={openFileSelectSearch} />
             ))}
           </div>
         )}
