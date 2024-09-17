@@ -7,7 +7,7 @@ import { anonymizeChatFiltersForPosthog, appendToOrCreateChat, appendTextContent
 
 import '../../styles/chat.css'
 import ChatMessages from './ChatMessages'
-import { Chat, ChatFilters, LoadingState } from './types'
+import { Chat, AgentConfig, LoadingState } from './types'
 import { useChatContext } from '@/contexts/ChatContext'
 import StartChat from './StartChat'
 import { convertToolConfigToZodSchema } from './tools'
@@ -42,7 +42,7 @@ const ChatComponent: React.FC = () => {
   }, [currentOpenChatID, saveChat])
 
   const handleNewChatMessage = useCallback(
-    async (userTextFieldInput?: string, chatFilters?: ChatFilters) => {
+    async (userTextFieldInput?: string, chatFilters?: AgentConfig) => {
       try {
         const defaultLLMName = await window.llm.getDefaultLLMName()
 

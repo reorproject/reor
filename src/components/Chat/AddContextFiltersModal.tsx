@@ -12,13 +12,13 @@ import ReorModal from '../Common/Modal'
 import SearchBarWithFilesSuggestion from '../Common/SearchBarWithFilesSuggestion'
 import CustomSelect from '../Common/Select'
 import { SuggestionsState } from '../Editor/BacklinkSuggestionsDisplay'
-import { ChatFilters } from './types'
+import { AgentConfig } from './types'
 
 interface Props {
   isOpen: boolean
   onClose: () => void
-  chatFilters: ChatFilters
-  setChatFilters: React.Dispatch<React.SetStateAction<ChatFilters>>
+  chatFilters: AgentConfig
+  setChatFilters: React.Dispatch<React.SetStateAction<AgentConfig>>
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

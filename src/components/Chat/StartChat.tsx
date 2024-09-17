@@ -3,7 +3,7 @@ import { PiPaperPlaneRight } from 'react-icons/pi'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import PromptSuggestion from './ChatPrompts'
 import '../../styles/chat.css'
-import { ChatFilters, PromptTemplate } from './types'
+import { AgentConfig, PromptTemplate } from './types'
 import { createNoteToolDefinition, searchToolDefinition } from './tools'
 
 const EXAMPLE_PROMPT_OPTIONS = [
@@ -29,7 +29,7 @@ An initial query has been made and the context is already provided for you (so p
 
 interface StartChatProps {
   defaultModelName: string
-  handleNewChatMessage: (userTextFieldInput?: string, chatFilters?: ChatFilters) => void
+  handleNewChatMessage: (userTextFieldInput?: string, chatFilters?: AgentConfig) => void
 }
 
 const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMessage }) => {
@@ -37,7 +37,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   const [selectedLLM, setSelectedLLM] = useState<string>(defaultModelName)
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [chatFilters, setChatFilters] = useState<ChatFilters>({
+  const [chatFilters, setChatFilters] = useState<AgentConfig>({
     files: [],
     limit: 15,
     minDate: new Date(0),
@@ -129,14 +129,6 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
           ))}
         </div>
       </div>
-      {/* {isAddContextFiltersModalOpen && (
-        <AddContextFiltersModal
-          isOpen={isAddContextFiltersModalOpen}
-          onClose={() => setIsAddContextFiltersModalOpen(false)}
-          chatFilters={chatFilters}
-          setChatFilters={setChatFilters}
-        />
-      )} */}
     </div>
   )
 }

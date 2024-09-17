@@ -4,7 +4,7 @@ import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { toast } from 'react-toastify'
 import { CoreToolMessage, ToolCallPart } from 'ai'
 import { FaRegCopy } from 'react-icons/fa'
-import { Chat, ChatFilters, ReorChatMessage } from '../types'
+import { Chat, AgentConfig, ReorChatMessage } from '../types'
 import { findToolResultMatchingToolCall, getClassNameBasedOnMessageRole, getDisplayMessage } from '../utils'
 import { ToolCallComponent } from './ToolCalls'
 import { useWindowContentContext } from '@/contexts/WindowContentContext'
@@ -17,7 +17,7 @@ interface AssistantMessageProps {
   setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
   currentChat: Chat
   messageIndex: number
-  handleNewChatMessage: (userTextFieldInput?: string, chatFilters?: ChatFilters) => void
+  handleNewChatMessage: (userTextFieldInput?: string, chatFilters?: AgentConfig) => void
 }
 
 const AssistantMessage: React.FC<AssistantMessageProps> = ({

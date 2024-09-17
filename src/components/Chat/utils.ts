@@ -2,7 +2,7 @@ import { DBEntry } from 'electron/main/vector-database/schema'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import generateChatName from '@shared/utils'
 import { AssistantContent, CoreToolMessage, ToolCallPart } from 'ai'
-import { AnonymizedChatFilters, Chat, ChatFilters, PromptTemplate, ReorChatMessage } from './types'
+import { AnonymizedAgentConfig, Chat, AgentConfig, PromptTemplate, ReorChatMessage } from './types'
 import { retreiveFromVectorDB } from '@/utils/db'
 
 export const appendTextContentToMessages = (
@@ -97,7 +97,7 @@ const applyPromptTemplate = (
   }) as ReorChatMessage[]
 }
 
-export const doInitialRAG = async (query: string, chatFilters: ChatFilters): Promise<ReorChatMessage[]> => {
+export const doInitialRAG = async (query: string, chatFilters: AgentConfig): Promise<ReorChatMessage[]> => {
   let results: DBEntry[] | FileInfoWithContent[] = []
   if (chatFilters.files.length > 0) {
     results = await window.fileSystem.getFiles(chatFilters.files)
@@ -109,7 +109,7 @@ export const doInitialRAG = async (query: string, chatFilters: ChatFilters): Pro
   return applyPromptTemplate(chatFilters.promptTemplate, contextString, query, results)
 }
 
-export const generateInitialChat = async (userTextFieldInput: string, chatFilters: ChatFilters): Promise<Chat> => {
+export const generateInitialChat = async (userTextFieldInput: string, chatFilters: AgentConfig): Promise<Chat> => {
   const ragMessages = await doInitialRAG(userTextFieldInput ?? '', chatFilters)
   return {
     id: Date.now().toString(),
@@ -122,7 +122,7 @@ export const generateInitialChat = async (userTextFieldInput: string, chatFilter
 export const appendToOrCreateChat = async (
   currentChat: Chat | undefined,
   userTextFieldInput: string,
-  chatFilters?: ChatFilters,
+  chatFilters?: AgentConfig,
 ): Promise<Chat> => {
   let outputChat = currentChat
 
@@ -143,8 +143,8 @@ export const appendToOrCreateChat = async (
 }
 
 export function anonymizeChatFiltersForPosthog(
-  chatFilters: ChatFilters | undefined,
-): AnonymizedChatFilters | undefined {
+  chatFilters: AgentConfig | undefined,
+): AnonymizedAgentConfig | undefined {
   if (!chatFilters) {
     return undefined
   }

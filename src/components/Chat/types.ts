@@ -35,7 +35,7 @@ export type Chat = {
 
 export type ChatMetadata = Omit<Chat, 'messages'>
 
-export interface SearchFilters {
+export interface DatabaseSearchFilters {
   limit: number
   minDate?: Date
   maxDate?: Date
@@ -47,14 +47,14 @@ export type PromptTemplate = {
   content: string
 }[]
 
-export type ChatFilters = SearchFilters & {
+export type AgentConfig = DatabaseSearchFilters & {
   files: string[]
   propertiesToIncludeInContext?: string[]
   toolDefinitions: ToolDefinition[]
   promptTemplate: PromptTemplate
 }
 
-export interface AnonymizedChatFilters {
+export interface AnonymizedAgentConfig {
   numberOfChunksToFetch: number
   filesLength: number
   minDate?: Date

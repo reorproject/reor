@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import '../../styles/chat.css'
-import { Chat, ChatFilters, LoadingState, ReorChatMessage } from './types'
+import { Chat, AgentConfig, LoadingState, ReorChatMessage } from './types'
 import ChatInput from './ChatInput'
 import LoadingDots from '@/utils/animations'
 import UserMessage from './MessageComponents/UserMessage'
@@ -12,7 +12,7 @@ interface ChatMessagesProps {
   currentChat: Chat
   setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
   loadingState: LoadingState
-  handleNewChatMessage: (userTextFieldInput?: string, chatFilters?: ChatFilters) => void
+  handleNewChatMessage: (userTextFieldInput?: string, chatFilters?: AgentConfig) => void
 }
 
 interface MessageProps {
@@ -20,7 +20,7 @@ interface MessageProps {
   index: number
   currentChat: Chat
   setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
-  handleNewChatMessage: (userTextFieldInput?: string, chatFilters?: ChatFilters) => void
+  handleNewChatMessage: (userTextFieldInput?: string, chatFilters?: AgentConfig) => void
 }
 
 const Message: React.FC<MessageProps> = ({ message, index, currentChat, setCurrentChat, handleNewChatMessage }) => {
