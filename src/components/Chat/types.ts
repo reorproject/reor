@@ -48,6 +48,7 @@ export type PromptTemplate = {
 }[]
 
 export type AgentConfig = DatabaseSearchFilters & {
+  name: string
   files: string[]
   propertiesToIncludeInContext?: string[]
   toolDefinitions: ToolDefinition[]

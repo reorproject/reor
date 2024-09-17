@@ -3,29 +3,8 @@ import { PiPaperPlaneRight } from 'react-icons/pi'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import PromptSuggestion from './ChatPrompts'
 import '../../styles/chat.css'
-import { AgentConfig, PromptTemplate } from './types'
-import { createNoteToolDefinition, searchToolDefinition } from './tools'
-
-const EXAMPLE_PROMPT_OPTIONS = [
-  'What have I written about Philosophy?',
-  'Generate a study guide from my notes.',
-  'Which authors have I discussed positively about?',
-]
-
-const examplePromptTemplate: PromptTemplate = [
-  {
-    role: 'system',
-    content: `You are a helpful assistant helping a user organize and manage their personal knowledge and notes. 
-You will answer the user's question and help them with their request. 
-You can search the knowledge base by using the search tool and create new notes by using the create note tool.
-
-An initial query has been made and the context is already provided for you (so please do not call the search tool initially).`,
-  },
-  {
-    role: 'user',
-    content: `Context retrieved from your knowledge base for the query below: \n{CONTEXT}\n\n\nQuery for context above:\n{QUERY}`,
-  },
-]
+import { AgentConfig } from './types'
+import exampleAgents from './exampleAgents'
 
 interface StartChatProps {
   defaultModelName: string
@@ -36,16 +15,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([])
   const [selectedLLM, setSelectedLLM] = useState<string>(defaultModelName)
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [chatFilters, setChatFilters] = useState<AgentConfig>({
-    files: [],
-    limit: 15,
-    minDate: new Date(0),
-    maxDate: new Date(),
-    toolDefinitions: [searchToolDefinition, createNoteToolDefinition],
-    promptTemplate: examplePromptTemplate,
-  })
-  // const [isAddContextFiltersModalOpen, setIsAddContextFiltersModalOpen] = useState<boolean>(false)
+  const [chatFilters, setChatFilters] = useState<AgentConfig>(exampleAgents[0])
 
   useEffect(() => {
     const fetchLLMModels = async () => {
@@ -62,6 +32,11 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
     handleNewChatMessage(userTextFieldInput, chatFilters)
   }
 
+  const handleAgentSelection = (agent: AgentConfig) => {
+    setChatFilters(agent)
+    setUserTextFieldInput(`Using the ${agent.name} agent. How can I help you?`)
+  }
+
   return (
     <div className="relative flex w-full flex-col items-center">
       <div className="relative flex size-full flex-col text-center lg:top-10 lg:max-w-2xl">
@@ -73,6 +48,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
         </h1>
         <div className="flex flex-col rounded-md bg-bg-000 focus-within:ring-1 focus-within:ring-[#8c8c8c]">
           <textarea
+            value={userTextFieldInput}
             onKeyDown={(e) => {
               if (!e.shiftKey && e.key === 'Enter') {
                 e.preventDefault()
@@ -98,15 +74,6 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                 ))}
               </select>
             </div>
-            {/* <button
-              className="m-1 cursor-pointer rounded-md border-0 bg-blue-600 px-4 py-2 text-white hover:bg-blue-500"
-              onClick={() => {
-                setIsAddContextFiltersModalOpen(true)
-              }}
-              type="button"
-            >
-              Customise context
-            </button> */}
             <button
               className="m-1 flex cursor-pointer items-center justify-center rounded-md border-0 bg-blue-600 p-2 text-white hover:bg-blue-500"
               onClick={sendMessageHandler}
@@ -118,14 +85,8 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
           </div>
         </div>
         <div className="mt-4 size-full justify-center md:flex-row lg:flex">
-          {EXAMPLE_PROMPT_OPTIONS.map((option) => (
-            <PromptSuggestion
-              key={option}
-              promptText={option}
-              onClick={() => {
-                // todo: fix this
-              }}
-            />
+          {exampleAgents.map((agent) => (
+            <PromptSuggestion key={agent.name} promptText={agent.name} onClick={() => handleAgentSelection(agent)} />
           ))}
         </div>
       </div>

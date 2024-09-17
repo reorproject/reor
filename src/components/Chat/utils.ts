@@ -71,7 +71,6 @@ export const convertMessageToString = (message: ReorChatMessage | undefined): st
 const generateStringOfContextItemsForPrompt = (contextItems: DBEntry[] | FileInfoWithContent[]): string => {
   return contextItems.map((item) => item.content).join('\n\n')
 }
-
 const applyPromptTemplate = (
   promptTemplate: PromptTemplate,
   contextString: string,
@@ -79,9 +78,14 @@ const applyPromptTemplate = (
   results: DBEntry[] | FileInfoWithContent[],
 ): ReorChatMessage[] => {
   return promptTemplate.map((message) => {
+    const replacePlaceholders = (content: string) => {
+      return content.replace('{CONTEXT}', contextString).replace('{QUERY}', query)
+    }
+
     if (message.role === 'system') {
       return {
         ...message,
+        content: replacePlaceholders(message.content),
         hideMessageInChat: true,
       }
     }
@@ -89,7 +93,7 @@ const applyPromptTemplate = (
       return {
         ...message,
         context: results,
-        content: message.content.replace('{CONTEXT}', contextString).replace('{QUERY}', query),
+        content: replacePlaceholders(message.content),
         visibleContent: query,
       }
     }
@@ -98,15 +102,23 @@ const applyPromptTemplate = (
 }
 
 export const doInitialRAG = async (query: string, chatFilters: AgentConfig): Promise<ReorChatMessage[]> => {
-  let results: DBEntry[] | FileInfoWithContent[] = []
-  if (chatFilters.files.length > 0) {
-    results = await window.fileSystem.getFiles(chatFilters.files)
-  } else {
-    results = await retreiveFromVectorDB(query, chatFilters)
-  }
-  const contextString = generateStringOfContextItemsForPrompt(results)
+  const { promptTemplate, files } = chatFilters
 
-  return applyPromptTemplate(chatFilters.promptTemplate, contextString, query, results)
+  const needsContext = promptTemplate.some((message) => message.content.includes('{CONTEXT}'))
+
+  let results: DBEntry[] | FileInfoWithContent[] = []
+  let contextString = ''
+
+  if (needsContext) {
+    if (files.length > 0) {
+      results = await window.fileSystem.getFiles(files)
+    } else {
+      results = await retreiveFromVectorDB(query, chatFilters)
+    }
+    contextString = generateStringOfContextItemsForPrompt(results)
+  }
+
+  return applyPromptTemplate(promptTemplate, contextString, query, results)
 }
 
 export const generateInitialChat = async (userTextFieldInput: string, chatFilters: AgentConfig): Promise<Chat> => {
@@ -129,7 +141,7 @@ export const appendToOrCreateChat = async (
   if (!outputChat || !outputChat.id || outputChat.messages.length === 0) {
     outputChat = await generateInitialChat(
       userTextFieldInput ?? '',
-      chatFilters || { toolDefinitions: [], limit: 15, files: [], promptTemplate: [] },
+      chatFilters || { name: '', toolDefinitions: [], limit: 15, files: [], promptTemplate: [] },
     ) // TODO: probably split into an initial chat function and an append to chat function
   } else {
     outputChat.messages.push({
