@@ -3,13 +3,28 @@ import { PiPaperPlaneRight } from 'react-icons/pi'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import PromptSuggestion from './ChatPrompts'
 import '../../styles/chat.css'
-import { ChatFilters } from './types'
+import { ChatFilters, PromptTemplate } from './types'
 import { createNoteToolDefinition, searchToolDefinition } from './tools'
 
 const EXAMPLE_PROMPT_OPTIONS = [
   'What have I written about Philosophy?',
   'Generate a study guide from my notes.',
   'Which authors have I discussed positively about?',
+]
+
+const examplePromptTemplate: PromptTemplate = [
+  {
+    role: 'system',
+    content: `You are a helpful assistant helping a user organize and manage their personal knowledge and notes. 
+You will answer the user's question and help them with their request. 
+You can search the knowledge base by using the search tool and create new notes by using the create note tool.
+
+An initial query has been made and the context is already provided for you (so please do not call the search tool initially).`,
+  },
+  {
+    role: 'user',
+    content: `Context retrieved from your knowledge base for the query below: \n{CONTEXT}\n\n\nQuery for context above:\n{QUERY}`,
+  },
 ]
 
 interface StartChatProps {
@@ -28,6 +43,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
     minDate: new Date(0),
     maxDate: new Date(),
     toolDefinitions: [searchToolDefinition, createNoteToolDefinition],
+    promptTemplate: examplePromptTemplate,
   })
   // const [isAddContextFiltersModalOpen, setIsAddContextFiltersModalOpen] = useState<boolean>(false)
 

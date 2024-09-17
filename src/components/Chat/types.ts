@@ -42,10 +42,16 @@ export interface SearchFilters {
   passFullNoteIntoContext?: boolean
 }
 
+export type PromptTemplate = {
+  role: 'system' | 'user'
+  content: string
+}[]
+
 export type ChatFilters = SearchFilters & {
   files: string[]
   propertiesToIncludeInContext?: string[]
   toolDefinitions: ToolDefinition[]
+  promptTemplate: PromptTemplate
 }
 
 export interface AnonymizedChatFilters {

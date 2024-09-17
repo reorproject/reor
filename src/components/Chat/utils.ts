@@ -2,7 +2,7 @@ import { DBEntry } from 'electron/main/vector-database/schema'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import generateChatName from '@shared/utils'
 import { AssistantContent, CoreToolMessage, ToolCallPart } from 'ai'
-import { AnonymizedChatFilters, Chat, ChatFilters, ReorChatMessage } from './types'
+import { AnonymizedChatFilters, Chat, ChatFilters, PromptTemplate, ReorChatMessage } from './types'
 import { retreiveFromVectorDB } from '@/utils/db'
 
 export const appendTextContentToMessages = (
@@ -72,6 +72,31 @@ const generateStringOfContextItemsForPrompt = (contextItems: DBEntry[] | FileInf
   return contextItems.map((item) => item.content).join('\n\n')
 }
 
+const applyPromptTemplate = (
+  promptTemplate: PromptTemplate,
+  contextString: string,
+  query: string,
+  results: DBEntry[] | FileInfoWithContent[],
+): ReorChatMessage[] => {
+  return promptTemplate.map((message) => {
+    if (message.role === 'system') {
+      return {
+        ...message,
+        hideMessageInChat: true,
+      }
+    }
+    if (message.role === 'user') {
+      return {
+        ...message,
+        context: results,
+        content: message.content.replace('{CONTEXT}', contextString).replace('{QUERY}', query),
+        visibleContent: query,
+      }
+    }
+    return message
+  }) as ReorChatMessage[]
+}
+
 export const doInitialRAG = async (query: string, chatFilters: ChatFilters): Promise<ReorChatMessage[]> => {
   let results: DBEntry[] | FileInfoWithContent[] = []
   if (chatFilters.files.length > 0) {
@@ -80,23 +105,8 @@ export const doInitialRAG = async (query: string, chatFilters: ChatFilters): Pro
     results = await retreiveFromVectorDB(query, chatFilters)
   }
   const contextString = generateStringOfContextItemsForPrompt(results)
-  return [
-    {
-      role: 'system',
-      content: `You are a helpful assistant helping a user organize and manage their personal knowledge and notes. 
-You will answer the user's question and help them with their request. 
-You can search the knowledge base by using the search tool and create new notes by using the create note tool.
 
-An initial query has been made and the context is already provided for you (so please do not call the search tool initially).`,
-      hideMessageInChat: true,
-    },
-    {
-      role: 'user',
-      context: results,
-      content: `Context retrieved from your knowledge base for the query below: \n${contextString}\n\n\nQuery for context above:\n${query}`,
-      visibleContent: query,
-    },
-  ]
+  return applyPromptTemplate(chatFilters.promptTemplate, contextString, query, results)
 }
 
 export const generateInitialChat = async (userTextFieldInput: string, chatFilters: ChatFilters): Promise<Chat> => {
@@ -119,7 +129,7 @@ export const appendToOrCreateChat = async (
   if (!outputChat || !outputChat.id || outputChat.messages.length === 0) {
     outputChat = await generateInitialChat(
       userTextFieldInput ?? '',
-      chatFilters || { toolDefinitions: [], limit: 15, files: [] },
+      chatFilters || { toolDefinitions: [], limit: 15, files: [], promptTemplate: [] },
     ) // TODO: probably split into an initial chat function and an append to chat function
   } else {
     outputChat.messages.push({
