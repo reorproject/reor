@@ -5,6 +5,7 @@ import { AssistantContent, CoreAssistantMessage, CoreToolMessage, ToolCallPart }
 import posthog from 'posthog-js'
 import { AnonymizedAgentConfig, Chat, AgentConfig, PromptTemplate, ReorChatMessage } from './types'
 import { retreiveFromVectorDB } from '@/utils/db'
+import { createToolResult } from './tools'
 
 export const appendTextContentToMessages = (
   messages: ReorChatMessage[],
@@ -246,4 +247,24 @@ export const removeUncalledToolsFromMessages = (messages: ReorChatMessage[]): Re
     }
     return message
   })
+}
+
+export const addToolResultToMessages = async (
+  messages: ReorChatMessage[],
+  toolCallPart: ToolCallPart,
+  assistantMessage: ReorChatMessage,
+): Promise<ReorChatMessage[]> => {
+  const toolResult = await createToolResult(toolCallPart.toolName, toolCallPart.args as any, toolCallPart.toolCallId)
+
+  const toolMessage: CoreToolMessage = {
+    role: 'tool',
+    content: [toolResult],
+  }
+
+  const assistantIndex = messages.findIndex((msg) => msg === assistantMessage)
+  if (assistantIndex === -1) {
+    throw new Error('Assistant message not found')
+  }
+
+  return [...messages.slice(0, assistantIndex + 1), toolMessage, ...messages.slice(assistantIndex + 1)]
 }

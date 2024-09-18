@@ -1,17 +1,17 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { toast } from 'react-toastify'
-import { CoreToolMessage, ToolCallPart } from 'ai'
+import { ToolCallPart } from 'ai'
 import { FaRegCopy } from 'react-icons/fa'
 import { Chat, AgentConfig, ReorChatMessage } from '../types'
 import {
+  addToolResultToMessages,
   extractMessagePartsFromAssistantMessage,
   findToolResultMatchingToolCall,
   getClassNameBasedOnMessageRole,
 } from '../utils'
 import { ToolCallComponent } from './ToolCalls'
 import { useWindowContentContext } from '@/contexts/WindowContentContext'
-import { createToolResult } from '../tools'
 import { useChatContext } from '@/contexts/ChatContext'
 import MarkdownRenderer from '@/components/Common/MarkdownRenderer'
 
@@ -36,7 +36,9 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({
   const { openContent } = useWindowContentContext()
   const { saveChat } = useChatContext()
 
-  const { textParts, toolCalls } = extractMessagePartsFromAssistantMessage(message)
+  const { textParts, toolCalls } = useMemo(() => {
+    return extractMessagePartsFromAssistantMessage(message)
+  }, [message])
 
   const copyToClipboard = () => {
     const content = typeof message.content === 'string' ? message.content : JSON.stringify(message.content, null, 2)
@@ -57,25 +59,11 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({
         toast.error('Tool call id already exists')
         return
       }
-      const toolResult = await createToolResult(
-        toolCallPart.toolName,
-        toolCallPart.args as any,
-        toolCallPart.toolCallId,
-      )
-      const toolMessage: CoreToolMessage = {
-        role: 'tool',
-        content: [toolResult],
-      }
+
+      const updatedMessages = await addToolResultToMessages(currentChat.messages, toolCallPart, message)
 
       setCurrentChat((prevChat) => {
         if (!prevChat) return prevChat
-        const updatedMessages = [...prevChat.messages]
-        const currentMessageIndex = updatedMessages.findIndex((msg) => msg === message)
-        if (currentMessageIndex !== -1) {
-          updatedMessages.splice(currentMessageIndex + 1, 0, toolMessage)
-        } else {
-          updatedMessages.push(toolMessage)
-        }
         const updatedChat = {
           ...prevChat,
           messages: updatedMessages,
