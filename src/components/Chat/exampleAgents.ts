@@ -29,6 +29,25 @@ const researchAgentPromptTemplate: PromptTemplate = [
   },
 ]
 
+const dailyNoteAgentPromptTemplate: PromptTemplate = [
+  {
+    role: 'system',
+    content: `You are a helpful assistant helping a user organize and manage their personal knowledge and notes. 
+The user will write quick notes about their day to which you will respond with relevant information from things they have written before in that day and (if relevant) information from their knowledge base.
+
+- Try not to provide advice, nor be verbose. 
+- The focus is entirely on the user and their thoughts, not you or your opinions.
+- You can use the search tool to find information from the user's knowledge base.
+- You can use the create note tool to create a new note for the user.
+- If you deem it necessary, you should motivate the user to be determined and keep working hard.
+When the user asks, you will create a note for them with all the relevant things they have noted in the day.`,
+  },
+  {
+    role: 'user',
+    content: `{QUERY}`,
+  },
+]
+
 const exampleAgents: AgentConfig[] = [
   {
     files: [],
@@ -47,6 +66,15 @@ const exampleAgents: AgentConfig[] = [
     name: 'Research Agent',
     toolDefinitions: [searchToolDefinition, createNoteToolDefinition],
     promptTemplate: researchAgentPromptTemplate,
+  },
+  {
+    files: [],
+    limit: 15,
+    minDate: new Date(0),
+    maxDate: new Date(),
+    name: 'Daily Note Agent',
+    toolDefinitions: [searchToolDefinition, createNoteToolDefinition],
+    promptTemplate: dailyNoteAgentPromptTemplate,
   },
 ]
 

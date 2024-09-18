@@ -1,7 +1,7 @@
 import { DBEntry } from 'electron/main/vector-database/schema'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import generateChatName from '@shared/utils'
-import { AssistantContent, CoreToolMessage, ToolCallPart } from 'ai'
+import { AssistantContent, CoreAssistantMessage, CoreToolMessage, ToolCallPart } from 'ai'
 import posthog from 'posthog-js'
 import { AnonymizedAgentConfig, Chat, AgentConfig, PromptTemplate, ReorChatMessage } from './types'
 import { retreiveFromVectorDB } from '@/utils/db'
@@ -199,8 +199,51 @@ export const getDisplayMessage = (message: ReorChatMessage): string | undefined 
   return undefined
 }
 
-export const findToolResultMatchingToolCall = (toolCallId: string, currentChat: Chat): CoreToolMessage | undefined => {
-  return currentChat.messages.find(
+export const findToolResultMatchingToolCall = (
+  toolCallId: string,
+  messages: ReorChatMessage[],
+): CoreToolMessage | undefined => {
+  return messages.find(
     (message) => message.role === 'tool' && message.content.some((content) => content.toolCallId === toolCallId),
   ) as CoreToolMessage | undefined
+}
+
+export function extractMessagePartsFromAssistantMessage(message: CoreAssistantMessage) {
+  const outputTextParts: string[] = []
+  const outputToolCalls: ToolCallPart[] = []
+
+  if (typeof message.content === 'string') {
+    outputTextParts.push(getDisplayMessage(message) || '')
+  } else if (Array.isArray(message.content)) {
+    message.content.forEach((part) => {
+      if ('text' in part) {
+        outputTextParts.push(part.text)
+      } else if (part.type === 'tool-call') {
+        outputToolCalls.push(part)
+      }
+    })
+  }
+
+  return { textParts: outputTextParts, toolCalls: outputToolCalls }
+}
+
+export const removeUncalledToolsFromMessages = (messages: ReorChatMessage[]): ReorChatMessage[] => {
+  return messages.map((message) => {
+    if (message.role === 'assistant') {
+      const { textParts, toolCalls } = extractMessagePartsFromAssistantMessage(message)
+      const toolCallsWithResults: ToolCallPart[] = toolCalls.filter((toolCall) => {
+        return findToolResultMatchingToolCall(toolCall.toolCallId, messages)
+      })
+      const assistantContent: AssistantContent = [
+        ...textParts.map((textPart) => ({ type: 'text' as const, text: textPart })),
+        ...toolCallsWithResults,
+      ]
+      const msgOut: ReorChatMessage = {
+        ...message,
+        content: assistantContent,
+      }
+      return msgOut
+    }
+    return message
+  })
 }
