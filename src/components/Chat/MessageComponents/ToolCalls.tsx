@@ -106,7 +106,7 @@ const DefaultToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existi
 )
 
 export const ToolCallComponent: React.FC<ToolCallComponentProps> = ({ toolCallPart, currentChat, executeToolCall }) => {
-  const existingToolResult = findToolResultMatchingToolCall(toolCallPart.toolCallId, currentChat)
+  const existingToolResult = findToolResultMatchingToolCall(toolCallPart.toolCallId, currentChat.messages)
 
   return (
     <>

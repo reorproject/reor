@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
 import { streamText } from 'ai'
-import { appendToOrCreateChat, appendTextContentToMessages } from './utils'
+import { appendToOrCreateChat, appendTextContentToMessages, removeUncalledToolsFromMessages } from './utils'
 
 import '../../styles/chat.css'
 import ChatMessages from './ChatMessages'
@@ -64,7 +64,7 @@ const ChatComponent: React.FC = () => {
 
         const { textStream, toolCalls } = await streamText({
           model: llmClient,
-          messages: outputChat.messages,
+          messages: removeUncalledToolsFromMessages(outputChat.messages),
           tools: Object.assign({}, ...outputChat.toolDefinitions.map(convertToolConfigToZodSchema)),
         })
         // eslint-disable-next-line no-restricted-syntax
@@ -81,12 +81,6 @@ const ChatComponent: React.FC = () => {
         await saveChat(outputChat)
 
         setLoadingState('idle')
-        // const anonymizedAgentConfig = anonymizeAgentConfigForPosthog(chatFilters)
-        // posthog.capture('chat_message_submitted', {
-        //   chatId: outputChat?.id,
-        //   chatLength: outputChat?.messages.length,
-        //   ...anonymizedAgentConfig,
-        // })
       } catch (error) {
         setLoadingState('idle')
         throw error
