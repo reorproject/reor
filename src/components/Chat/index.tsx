@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useRef } from 'react'
 
 import { streamText } from 'ai'
 import { appendToOrCreateChat, appendTextContentToMessages, removeUncalledToolsFromMessages } from './utils'
@@ -16,6 +16,7 @@ const ChatComponent: React.FC = () => {
   const [defaultModelName, setDefaultLLMName] = useState<string>('')
   const [currentChat, setCurrentChat] = useState<Chat | undefined>(undefined)
   const { saveChat, currentOpenChatID, setCurrentOpenChatID } = useChatContext()
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
     const fetchDefaultLLM = async () => {
@@ -27,6 +28,10 @@ const ChatComponent: React.FC = () => {
 
   useEffect(() => {
     const fetchChat = async () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+
       const chat = await window.electronStore.getChat(currentOpenChatID)
       setCurrentChat((oldChat) => {
         if (oldChat) {
@@ -62,13 +67,21 @@ const ChatComponent: React.FC = () => {
 
         const llmClient = await resolveLLMClient(defaultLLMName)
 
+        abortControllerRef.current = new AbortController()
+
         const { textStream, toolCalls } = await streamText({
           model: llmClient,
           messages: removeUncalledToolsFromMessages(outputChat.messages),
           tools: Object.assign({}, ...outputChat.toolDefinitions.map(convertToolConfigToZodSchema)),
+          abortSignal: abortControllerRef.current.signal,
         })
+
         // eslint-disable-next-line no-restricted-syntax
         for await (const text of textStream) {
+          if (abortControllerRef.current.signal.aborted) {
+            return
+          }
+
           outputChat = {
             ...outputChat,
             messages: appendTextContentToMessages(outputChat.messages || [], text),
@@ -76,14 +89,20 @@ const ChatComponent: React.FC = () => {
           setCurrentChat(outputChat)
           setLoadingState('generating')
         }
-        outputChat.messages = appendTextContentToMessages(outputChat.messages, await toolCalls)
-        setCurrentChat(outputChat)
-        await saveChat(outputChat)
+
+        // Only process tool calls if the streaming wasn't aborted
+        if (!abortControllerRef.current.signal.aborted) {
+          outputChat.messages = appendTextContentToMessages(outputChat.messages, await toolCalls)
+          setCurrentChat(outputChat)
+          await saveChat(outputChat)
+        }
 
         setLoadingState('idle')
       } catch (error) {
         setLoadingState('idle')
         throw error
+      } finally {
+        abortControllerRef.current = null
       }
     },
     [setCurrentOpenChatID, saveChat, currentChat],
