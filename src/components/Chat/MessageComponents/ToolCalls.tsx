@@ -1,21 +1,9 @@
 import { CoreToolMessage, ToolCallPart } from 'ai'
 import React from 'react'
-import ReactMarkdown from 'react-markdown'
-import rehypeRaw from 'rehype-raw'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { Chat } from '../types'
 import InChatContextComponent from './InChatContext'
 import { findToolResultMatchingToolCall } from '../utils'
-
-interface TextPartProps {
-  text: string
-}
-
-export const TextPart: React.FC<TextPartProps> = ({ text }) => (
-  <ReactMarkdown rehypePlugins={[rehypeRaw]} className="max-w-[95%] break-words">
-    {text}
-  </ReactMarkdown>
-)
 
 interface ToolCallComponentProps {
   toolCallPart: ToolCallPart
@@ -53,9 +41,9 @@ const SearchToolRenderer: React.FC<ToolRendererProps> = ({ existingToolResult })
         <code>{JSON.stringify(toolCallPart.args, null, 2)}</code>
       </pre> */}
       {existingToolResult && (
-        <div className="mt-2  p-2">
+        <div className="">
           {parsedResult ? (
-            <InChatContextComponent contextList={parsedResult} />
+            <InChatContextComponent contextItems={parsedResult} />
           ) : (
             <pre className="mt-1 overflow-x-auto bg-gray-600 p-2">
               <code>{JSON.stringify(existingToolResult.content[0].result, null, 2)}</code>
@@ -118,7 +106,7 @@ const DefaultToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existi
 )
 
 export const ToolCallComponent: React.FC<ToolCallComponentProps> = ({ toolCallPart, currentChat, executeToolCall }) => {
-  const existingToolResult = findToolResultMatchingToolCall(toolCallPart.toolCallId, currentChat)
+  const existingToolResult = findToolResultMatchingToolCall(toolCallPart.toolCallId, currentChat.messages)
 
   return (
     <>

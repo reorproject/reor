@@ -1,21 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react'
 
-import posthog from 'posthog-js'
-
 import { streamText } from 'ai'
-import {
-  anonymizeChatFiltersForPosthog,
-  resolveLLMClient,
-  appendNewMessageToChat,
-  appendTextContentToMessages,
-} from './utils'
+import { appendToOrCreateChat, appendTextContentToMessages, removeUncalledToolsFromMessages } from './utils'
 
 import '../../styles/chat.css'
 import ChatMessages from './ChatMessages'
-import { Chat, ChatFilters, LoadingState } from './types'
+import { Chat, AgentConfig, LoadingState } from './types'
 import { useChatContext } from '@/contexts/ChatContext'
 import StartChat from './StartChat'
 import { convertToolConfigToZodSchema } from './tools'
+import resolveLLMClient from '@/utils/llm'
 
 const ChatComponent: React.FC = () => {
   const [loadingState, setLoadingState] = useState<LoadingState>('idle')
@@ -46,7 +40,7 @@ const ChatComponent: React.FC = () => {
   }, [currentOpenChatID, saveChat])
 
   const handleNewChatMessage = useCallback(
-    async (userTextFieldInput?: string, chatFilters?: ChatFilters) => {
+    async (userTextFieldInput?: string, chatFilters?: AgentConfig) => {
       try {
         const defaultLLMName = await window.llm.getDefaultLLMName()
 
@@ -55,7 +49,7 @@ const ChatComponent: React.FC = () => {
         }
 
         let outputChat = userTextFieldInput?.trim()
-          ? await appendNewMessageToChat(currentChat, userTextFieldInput, chatFilters)
+          ? await appendToOrCreateChat(currentChat, userTextFieldInput, chatFilters)
           : currentChat
 
         if (!outputChat) {
@@ -66,11 +60,11 @@ const ChatComponent: React.FC = () => {
         setCurrentOpenChatID(outputChat.id)
         await saveChat(outputChat)
 
-        const client = await resolveLLMClient(defaultLLMName)
+        const llmClient = await resolveLLMClient(defaultLLMName)
 
         const { textStream, toolCalls } = await streamText({
-          model: client,
-          messages: outputChat.messages,
+          model: llmClient,
+          messages: removeUncalledToolsFromMessages(outputChat.messages),
           tools: Object.assign({}, ...outputChat.toolDefinitions.map(convertToolConfigToZodSchema)),
         })
         // eslint-disable-next-line no-restricted-syntax
@@ -87,11 +81,6 @@ const ChatComponent: React.FC = () => {
         await saveChat(outputChat)
 
         setLoadingState('idle')
-        posthog.capture('chat_message_submitted', {
-          chatId: outputChat?.id,
-          chatLength: outputChat?.messages.length,
-          chatFilters: anonymizeChatFiltersForPosthog(chatFilters),
-        })
       } catch (error) {
         setLoadingState('idle')
         throw error

@@ -4,7 +4,8 @@ import { DBEntry } from 'electron/main/vector-database/schema'
 
 export type ReorChatMessage = CoreMessage & {
   context?: DBEntry[] | FileInfoWithContent[]
-  visibleContent?: string // what to display in the chat bubble
+  visibleContent?: string
+  hideMessageInChat?: boolean
 }
 
 type ParameterType = 'string' | 'number' | 'boolean'
@@ -34,23 +35,33 @@ export type Chat = {
 
 export type ChatMetadata = Omit<Chat, 'messages'>
 
-export interface SearchFilters {
+export interface DatabaseSearchFilters {
   limit: number
   minDate?: Date
   maxDate?: Date
   passFullNoteIntoContext?: boolean
 }
 
-export type ChatFilters = SearchFilters & {
+export type PromptTemplate = {
+  role: 'system' | 'user'
+  content: string
+}[]
+
+export type AgentConfig = DatabaseSearchFilters & {
+  name: string
   files: string[]
   propertiesToIncludeInContext?: string[]
+  toolDefinitions: ToolDefinition[]
+  promptTemplate: PromptTemplate
 }
 
-export interface AnonymizedChatFilters {
+export interface AnonymizedAgentConfig {
+  name: string
   numberOfChunksToFetch: number
   filesLength: number
   minDate?: Date
   maxDate?: Date
+  toolNames: string[]
 }
 
 export type LoadingState = 'idle' | 'generating' | 'waiting-for-first-token'

@@ -1,41 +1,70 @@
 import React from 'react'
-import { Card, CardContent, CardFooter } from '@/components/ui/card'
-import { MarkdownContent } from '@/components/File/DBResultPreview'
+import { FileInfoWithContent } from 'electron/main/filesystem/types'
+import { DBEntry } from 'electron/main/vector-database/schema'
+import { Card, CardDescription } from '@/components/ui/card'
+import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/components/ui/hover-card'
 import { useWindowContentContext } from '@/contexts/WindowContentContext'
-
-interface RenderableContextType {
-  content: string
-  name: string
-  path: string
-}
+import MarkdownRenderer from '@/components/Common/MarkdownRenderer'
 
 interface InChatContextComponentProps {
-  contextList: RenderableContextType[]
+  contextItems: FileInfoWithContent[] | DBEntry[]
 }
 
-const InChatContextComponent: React.FC<InChatContextComponentProps> = ({ contextList }) => {
+const truncateName = (name: string, maxLength: number) => {
+  if (name.length <= maxLength) return name
+  return `${name.slice(0, maxLength - 3)}...`
+}
+
+const InChatContextComponent: React.FC<InChatContextComponentProps> = ({ contextItems }) => {
   const { openContent } = useWindowContentContext()
-  const truncateContent = (content: string, maxLength: number) => {
-    if (content.length <= maxLength) return content
-    return `${content.slice(0, maxLength)}...`
+
+  const isDBEntry = (item: FileInfoWithContent | DBEntry): item is DBEntry => {
+    return 'notepath' in item
+  }
+
+  const getItemName = (item: FileInfoWithContent | DBEntry) => {
+    if (isDBEntry(item)) {
+      return item.notepath.split('/').pop() || ''
+    }
+    return item.name
+  }
+
+  const getItemPath = (item: FileInfoWithContent | DBEntry) => {
+    return isDBEntry(item) ? item.notepath : item.path
+  }
+
+  const getItemContent = (item: FileInfoWithContent | DBEntry) => {
+    return item.content
+  }
+
+  if (contextItems.length === 0) {
+    return null
   }
 
   return (
-    <div className="flex space-x-4 overflow-x-auto pb-4">
-      {contextList.map((contextItem) => (
-        <Card
-          key={`${contextItem.name}-${contextItem.content}`}
-          className="w-64 shrink-0 cursor-pointer bg-secondary"
-          onClick={() => openContent(contextItem.path)}
-        >
-          <CardContent className="p-4 text-xs text-foreground">
-            <MarkdownContent content={truncateContent(contextItem.content, 75)} />
-          </CardContent>
-          <CardFooter className="text-xs">
-            <p>{contextItem.name}</p>
-          </CardFooter>
-        </Card>
-      ))}
+    <div>
+      <div className="mb-1 text-sm text-muted-foreground">Sources:</div>
+
+      <div className="flex space-x-4 overflow-x-auto p-0">
+        {contextItems.map((contextItem, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <HoverCard key={index}>
+            <HoverCardTrigger>
+              <Card
+                className="h-10 w-28 shrink-0 cursor-pointer bg-secondary p-0"
+                onClick={() => openContent(getItemPath(contextItem))}
+              >
+                <CardDescription className="m-0 ml-5 break-all p-3 text-xs">
+                  {truncateName(getItemName(contextItem), 30)}
+                </CardDescription>
+              </Card>
+            </HoverCardTrigger>
+            <HoverCardContent>
+              <MarkdownRenderer content={getItemContent(contextItem)} />
+            </HoverCardContent>
+          </HoverCard>
+        ))}
+      </div>
     </div>
   )
 }

@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { ToolDefinition } from './types'
 import { retreiveFromVectorDB } from '@/utils/db'
 
-export const searchTool: ToolDefinition = {
+export const searchToolDefinition: ToolDefinition = {
   name: 'search',
   description: "Semantically search the user's personal knowledge base",
   parameters: [
@@ -22,7 +22,7 @@ export const searchTool: ToolDefinition = {
   autoExecute: true,
 }
 
-export const createNoteTool: ToolDefinition = {
+export const createNoteToolDefinition: ToolDefinition = {
   name: 'createNote',
   description: "Create a new note in the user's personal knowledge base",
   parameters: [

@@ -4,7 +4,7 @@ import { DBQueryResult } from 'electron/main/vector-database/schema'
 
 import { ChatSidebar } from '../Chat/ChatSidebar'
 
-import SearchComponent from './FileSidebarSearch'
+import SearchComponent from './SearchComponent'
 import { useChatContext } from '@/contexts/ChatContext'
 import FileExplorer from './FileSideBar/FileExplorer'
 

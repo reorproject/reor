@@ -1,6 +1,6 @@
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { DBEntry } from 'electron/main/vector-database/schema'
-import { SearchFilters } from '@/components/Chat/types'
+import { DatabaseSearchFilters } from '@/components/Chat/types'
 
 export const generateTimeStampFilter = (minDate?: Date, maxDate?: Date): string => {
   let filter = ''
@@ -23,7 +23,7 @@ export const generateTimeStampFilter = (minDate?: Date, maxDate?: Date): string 
 
 export const retreiveFromVectorDB = async (
   query: string,
-  searchFilters: SearchFilters,
+  searchFilters: DatabaseSearchFilters,
 ): Promise<DBEntry[] | FileInfoWithContent[]> => {
   if (searchFilters.limit > 0) {
     const timeStampFilter = generateTimeStampFilter(searchFilters.minDate, searchFilters.maxDate)
