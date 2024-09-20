@@ -109,12 +109,6 @@ const autoExecuteTools = async (
   messages: ReorChatMessage[],
   toolDefinitions: ToolDefinition[],
   toolCalls: ToolCallPart[],
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  handleNewChatMessage: (
-    chat: Chat | undefined,
-    userTextFieldInput?: string,
-    chatFilters?: AgentConfig,
-  ) => Promise<void>,
 ) => {
   const toolsThatNeedExecuting = toolCalls.filter((toolCall) => {
     const toolDefinition = toolDefinitions.find((definition) => definition.name === toolCall.toolName)
@@ -131,33 +125,24 @@ const autoExecuteTools = async (
     // eslint-disable-next-line no-await-in-loop
     outputMessages = await makeAndAddToolResultToMessages(outputMessages, toolCall, lastMessage)
   }
-  console.log('toolsThatNeedExecuting', toolsThatNeedExecuting)
-  console.log('toolCalls', toolCalls)
-  if (toolsThatNeedExecuting.length > 0 && toolsThatNeedExecuting.length === toolCalls.length) {
-    console.log('calling handleNewChatMessage')
-    // await handleNewChatMessage()
-  }
-  return outputMessages
+
+  const allToolCallsHaveBeenExecuted =
+    toolsThatNeedExecuting.length > 0 && toolsThatNeedExecuting.length === toolCalls.length
+  return { messages: outputMessages, allToolCallsHaveBeenExecuted }
 }
 
 export const appendToolCallsAndAutoExecuteTools = async (
   messages: ReorChatMessage[],
   toolDefinitions: ToolDefinition[],
   toolCalls: ToolCallPart[],
-  handleNewChatMessage: (
-    chat: Chat | undefined,
-    userTextFieldInput?: string,
-    chatFilters?: AgentConfig,
-  ) => Promise<void>,
-): Promise<ReorChatMessage[]> => {
+): Promise<{ messages: ReorChatMessage[]; allToolCallsHaveBeenExecuted: boolean }> => {
   const messagesWithToolCalls = appendToolCallPartsToMessages(messages, toolCalls)
-  const messagesWithToolResults = await autoExecuteTools(
+  const { messages: messagesWithToolResults, allToolCallsHaveBeenExecuted } = await autoExecuteTools(
     messagesWithToolCalls,
     toolDefinitions,
     toolCalls,
-    handleNewChatMessage,
   )
-  return messagesWithToolResults
+  return { messages: messagesWithToolResults, allToolCallsHaveBeenExecuted }
 }
 
 export const convertMessageToString = (message: ReorChatMessage | undefined): string => {

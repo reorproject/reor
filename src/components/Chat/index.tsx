@@ -55,7 +55,6 @@ const ChatComponent: React.FC = () => {
         const defaultLLMName = await window.llm.getDefaultLLMName()
 
         if (!userTextFieldInput?.trim() && (!chat || chat.messages.length === 0)) {
-          console.log('no userTextFieldInput and no chat messages')
           return
         }
 
@@ -64,7 +63,6 @@ const ChatComponent: React.FC = () => {
           : chat
 
         if (!outputChat) {
-          console.log('no outputChat')
           return
         }
 
@@ -98,16 +96,17 @@ const ChatComponent: React.FC = () => {
         }
 
         if (!abortControllerRef.current.signal.aborted) {
-          outputChat.messages = await appendToolCallsAndAutoExecuteTools(
+          const { messages: outputMessages, allToolCallsHaveBeenExecuted } = await appendToolCallsAndAutoExecuteTools(
             outputChat.messages,
             outputChat.toolDefinitions,
             await toolCalls,
-            // eslint-disable-next-line @typescript-eslint/no-shadow
-            (chat: Chat | undefined, userTextFieldInput?: string, chatFilters?: AgentConfig) =>
-              handleNewChatMessage(chat, userTextFieldInput, chatFilters),
           )
+          outputChat.messages = outputMessages
           setCurrentChat(outputChat)
           await saveChat(outputChat)
+          if (allToolCallsHaveBeenExecuted) {
+            handleNewChatMessage(outputChat, undefined, chatFilters)
+          }
         }
 
         setLoadingState('idle')
