@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { toast } from 'react-toastify'
 import { ToolCallPart } from 'ai'
 import { FaRegCopy } from 'react-icons/fa'
-import { Chat, AgentConfig, ReorChatMessage } from '../types'
+import { Chat, ReorChatMessage } from '../types'
 import {
-  addToolResultToMessages,
+  makeAndAddToolResultToMessages,
   extractMessagePartsFromAssistantMessage,
   findToolResultMatchingToolCall,
   getClassNameBasedOnMessageRole,
@@ -19,17 +19,9 @@ interface AssistantMessageProps {
   message: ReorChatMessage
   setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
   currentChat: Chat
-  messageIndex: number
-  handleNewChatMessage: (userTextFieldInput?: string, chatFilters?: AgentConfig) => void
 }
 
-const AssistantMessage: React.FC<AssistantMessageProps> = ({
-  message,
-  setCurrentChat,
-  currentChat,
-  messageIndex,
-  handleNewChatMessage,
-}) => {
+const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrentChat, currentChat }) => {
   if (message.role !== 'assistant') {
     throw new Error('Message is not an assistant message')
   }
@@ -60,7 +52,7 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({
         return
       }
 
-      const updatedMessages = await addToolResultToMessages(currentChat.messages, toolCallPart, message)
+      const updatedMessages = await makeAndAddToolResultToMessages(currentChat.messages, toolCallPart, message)
 
       setCurrentChat((prevChat) => {
         if (!prevChat) return prevChat
@@ -74,37 +66,6 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({
     },
     [currentChat, setCurrentChat, saveChat, message],
   )
-
-  const isLatestAssistantMessage = (index: number, messages: ReorChatMessage[]) => {
-    return messages.slice(index + 1).every((msg) => msg.role !== 'assistant')
-  }
-
-  useEffect(() => {
-    if (!isLatestAssistantMessage(messageIndex, currentChat.messages)) return
-    toolCalls.forEach((toolCall) => {
-      const existingToolCall = findToolResultMatchingToolCall(toolCall.toolCallId, currentChat.messages)
-      const toolDefinition = currentChat.toolDefinitions.find((definition) => definition.name === toolCall.toolName)
-      if (toolDefinition && toolDefinition.autoExecute && !existingToolCall) {
-        executeToolCall(toolCall)
-      }
-    })
-  }, [currentChat, currentChat.toolDefinitions, executeToolCall, toolCalls, messageIndex])
-
-  useEffect(() => {
-    if (!isLatestAssistantMessage(messageIndex, currentChat.messages)) return
-
-    const shouldLLMRespondToToolResults =
-      toolCalls.length > 0 &&
-      toolCalls.every((toolCall) => {
-        const existingToolResult = findToolResultMatchingToolCall(toolCall.toolCallId, currentChat.messages)
-        const toolDefinition = currentChat.toolDefinitions.find((definition) => definition.name === toolCall.toolName)
-        return existingToolResult && toolDefinition?.autoExecute
-      })
-
-    if (shouldLLMRespondToToolResults) {
-      handleNewChatMessage()
-    }
-  }, [currentChat, currentChat.toolDefinitions, executeToolCall, toolCalls, messageIndex, handleNewChatMessage])
 
   const renderContent = () => {
     return (

@@ -1,7 +1,12 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react'
 
 import { streamText } from 'ai'
-import { appendToOrCreateChat, appendTextContentToMessages, removeUncalledToolsFromMessages } from './utils'
+import {
+  appendToolCallsAndAutoExecuteTools,
+  appendStringContentToMessages,
+  appendToOrCreateChat,
+  removeUncalledToolsFromMessages,
+} from './utils'
 
 import '../../styles/chat.css'
 import ChatMessages from './ChatMessages'
@@ -84,15 +89,18 @@ const ChatComponent: React.FC = () => {
 
           outputChat = {
             ...outputChat,
-            messages: appendTextContentToMessages(outputChat.messages || [], text),
+            messages: appendStringContentToMessages(outputChat.messages || [], text),
           }
           setCurrentChat(outputChat)
           setLoadingState('generating')
         }
 
-        // Only process tool calls if the streaming wasn't aborted
         if (!abortControllerRef.current.signal.aborted) {
-          outputChat.messages = appendTextContentToMessages(outputChat.messages, await toolCalls)
+          outputChat.messages = await appendToolCallsAndAutoExecuteTools(
+            outputChat.messages,
+            outputChat.toolDefinitions,
+            await toolCalls,
+          )
           setCurrentChat(outputChat)
           await saveChat(outputChat)
         }

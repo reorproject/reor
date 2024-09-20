@@ -20,21 +20,18 @@ interface MessageProps {
   index: number
   currentChat: Chat
   setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
-  handleNewChatMessage: (userTextFieldInput?: string, chatFilters?: AgentConfig) => void
 }
 
-const Message: React.FC<MessageProps> = ({ message, index, currentChat, setCurrentChat, handleNewChatMessage }) => {
+const Message: React.FC<MessageProps> = ({ message, index, currentChat, setCurrentChat }) => {
   return (
     <>
       {message.role === 'user' && <UserMessage key={`user-${index}`} message={message} />}
       {message.role === 'assistant' && (
         <AssistantMessage
           key={`assistant-${index}`}
-          messageIndex={index}
           message={message}
           setCurrentChat={setCurrentChat}
           currentChat={currentChat}
-          handleNewChatMessage={handleNewChatMessage}
         />
       )}
       {message.role === 'system' && <SystemMessage key={`system-${index}`} message={message} />}
@@ -65,7 +62,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
                   index={index}
                   currentChat={currentChat}
                   setCurrentChat={setCurrentChat}
-                  handleNewChatMessage={handleNewChatMessage}
                 />
               ))}
           </div>

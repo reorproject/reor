@@ -3,35 +3,20 @@ import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import generateChatName from '@shared/utils'
 import { AssistantContent, CoreAssistantMessage, CoreToolMessage, ToolCallPart } from 'ai'
 import posthog from 'posthog-js'
-import { AnonymizedAgentConfig, Chat, AgentConfig, PromptTemplate, ReorChatMessage } from './types'
+import { AnonymizedAgentConfig, Chat, AgentConfig, PromptTemplate, ReorChatMessage, ToolDefinition } from './types'
 import { retreiveFromVectorDB } from '@/utils/db'
 import { createToolResult } from './tools'
 
-export const appendTextContentToMessages = (
-  messages: ReorChatMessage[],
-  content: string | ToolCallPart[],
-): ReorChatMessage[] => {
-  if (content === '' || (Array.isArray(content) && content.length === 0)) {
+export const appendStringContentToMessages = (messages: ReorChatMessage[], content: string): ReorChatMessage[] => {
+  if (content === '') {
     return messages
-  }
-
-  const appendContent = (existingContent: AssistantContent, newContent: string | ToolCallPart[]): AssistantContent => {
-    if (typeof existingContent === 'string') {
-      return typeof newContent === 'string'
-        ? existingContent + newContent
-        : [{ type: 'text' as const, text: existingContent }, ...newContent]
-    }
-    return [
-      ...existingContent,
-      ...(typeof newContent === 'string' ? [{ type: 'text' as const, text: newContent }] : newContent),
-    ]
   }
 
   if (messages.length === 0) {
     return [
       {
         role: 'assistant',
-        content: typeof content === 'string' ? content : content,
+        content,
       },
     ]
   }
@@ -43,7 +28,10 @@ export const appendTextContentToMessages = (
       ...messages.slice(0, -1),
       {
         ...lastMessage,
-        content: appendContent(lastMessage.content, content),
+        content:
+          typeof lastMessage.content === 'string'
+            ? lastMessage.content + content
+            : [...lastMessage.content, { type: 'text' as const, text: content }],
       },
     ]
   }
@@ -52,9 +40,102 @@ export const appendTextContentToMessages = (
     ...messages,
     {
       role: 'assistant',
-      content: typeof content === 'string' ? content : content,
+      content,
     },
   ]
+}
+
+export const appendToolCallPartsToMessages = (
+  messages: ReorChatMessage[],
+  toolCalls: ToolCallPart[],
+): ReorChatMessage[] => {
+  if (toolCalls.length === 0) {
+    return messages
+  }
+
+  if (messages.length === 0) {
+    return [
+      {
+        role: 'assistant',
+        content: toolCalls,
+      },
+    ]
+  }
+
+  const lastMessage = messages[messages.length - 1]
+
+  if (lastMessage.role === 'assistant') {
+    return [
+      ...messages.slice(0, -1),
+      {
+        ...lastMessage,
+        content: Array.isArray(lastMessage.content)
+          ? [...lastMessage.content, ...toolCalls]
+          : [{ type: 'text' as const, text: lastMessage.content }, ...toolCalls],
+      },
+    ]
+  }
+
+  return [
+    ...messages,
+    {
+      role: 'assistant',
+      content: toolCalls,
+    },
+  ]
+}
+
+export const makeAndAddToolResultToMessages = async (
+  messages: ReorChatMessage[],
+  toolCallPart: ToolCallPart,
+  assistantMessage: ReorChatMessage,
+): Promise<ReorChatMessage[]> => {
+  const toolResult = await createToolResult(toolCallPart.toolName, toolCallPart.args as any, toolCallPart.toolCallId)
+
+  const toolMessage: CoreToolMessage = {
+    role: 'tool',
+    content: [toolResult],
+  }
+
+  const assistantIndex = messages.findIndex((msg) => msg === assistantMessage)
+  if (assistantIndex === -1) {
+    throw new Error('Assistant message not found')
+  }
+
+  return [...messages.slice(0, assistantIndex + 1), toolMessage, ...messages.slice(assistantIndex + 1)]
+}
+
+const autoExecuteTools = async (
+  messages: ReorChatMessage[],
+  toolDefinitions: ToolDefinition[],
+  toolCalls: ToolCallPart[],
+) => {
+  const toolsThatNeedExecuting = toolCalls.filter((toolCall) => {
+    const toolDefinition = toolDefinitions.find((definition) => definition.name === toolCall.toolName)
+    return toolDefinition?.autoExecute
+  })
+  let outputMessages = messages
+  const lastMessage = messages[messages.length - 1]
+
+  if (lastMessage.role !== 'assistant') {
+    throw new Error('Last message is not an assistant message')
+  }
+  // eslint-disable-next-line no-restricted-syntax
+  for (const toolCall of toolsThatNeedExecuting) {
+    // eslint-disable-next-line no-await-in-loop
+    outputMessages = await makeAndAddToolResultToMessages(outputMessages, toolCall, lastMessage)
+  }
+  return outputMessages
+}
+
+export const appendToolCallsAndAutoExecuteTools = async (
+  messages: ReorChatMessage[],
+  toolDefinitions: ToolDefinition[],
+  toolCalls: ToolCallPart[],
+): Promise<ReorChatMessage[]> => {
+  const messagesWithToolCalls = appendToolCallPartsToMessages(messages, toolCalls)
+  const messagesWithToolResults = await autoExecuteTools(messagesWithToolCalls, toolDefinitions, toolCalls)
+  return messagesWithToolResults
 }
 
 export const convertMessageToString = (message: ReorChatMessage | undefined): string => {
@@ -247,24 +328,4 @@ export const removeUncalledToolsFromMessages = (messages: ReorChatMessage[]): Re
     }
     return message
   })
-}
-
-export const addToolResultToMessages = async (
-  messages: ReorChatMessage[],
-  toolCallPart: ToolCallPart,
-  assistantMessage: ReorChatMessage,
-): Promise<ReorChatMessage[]> => {
-  const toolResult = await createToolResult(toolCallPart.toolName, toolCallPart.args as any, toolCallPart.toolCallId)
-
-  const toolMessage: CoreToolMessage = {
-    role: 'tool',
-    content: [toolResult],
-  }
-
-  const assistantIndex = messages.findIndex((msg) => msg === assistantMessage)
-  if (assistantIndex === -1) {
-    throw new Error('Assistant message not found')
-  }
-
-  return [...messages.slice(0, assistantIndex + 1), toolMessage, ...messages.slice(assistantIndex + 1)]
 }
