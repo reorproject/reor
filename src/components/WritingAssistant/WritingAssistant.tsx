@@ -12,6 +12,7 @@ import getClassNames, { generatePromptString, getLastMessage } from './utils'
 import { ReorChatMessage } from '../Chat/types'
 import { useFileContext } from '@/contexts/FileContext'
 import resolveLLMClient from '@/utils/llm'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 const WritingAssistant: React.FC = () => {
   const [messages, setMessages] = useState<ReorChatMessage[]>([])
@@ -247,73 +248,127 @@ const WritingAssistant: React.FC = () => {
   }
 
   if (!isSpaceTrigger && !highlightData.position) return null
+  if (isSpaceTrigger && isOptionsVisible && !getLastMessage(messages, 'assistant'))
+    return (
+      <div
+        ref={optionsContainerRef}
+        style={{
+          top: positionStyle.top,
+          left: positionStyle.left,
+        }}
+        className="absolute z-50 w-96 rounded-md border border-gray-300 bg-white p-2.5"
+      >
+        <TextField
+          inputRef={textFieldRef}
+          autoFocus
+          type="text"
+          variant="outlined"
+          size="small"
+          value={customPrompt}
+          onChange={(e) => setCustomPrompt(e.target.value)}
+          placeholder="Ask AI anything..."
+          className="mb-2.5 w-full p-1"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              handleOption('custom', customPrompt)
+            }
+          }}
+        />
+        <div className="max-h-36 overflow-y-auto">
+          <Button
+            onClick={() => handleOption('simplify')}
+            className="mb-1 block w-full"
+            style={{ textTransform: 'none' }}
+          >
+            Simplify and condense the writing
+          </Button>
+          <Button
+            onClick={() => handleOption('copy-editor')}
+            className="mb-1 block w-full"
+            style={{ textTransform: 'none' }}
+          >
+            Fix spelling and grammar
+          </Button>
+          <Button
+            onClick={() => handleOption('takeaways')}
+            className="mb-1 block w-full"
+            style={{ textTransform: 'none' }}
+          >
+            List key Takeaways
+          </Button>
+        </div>
+      </div>
+    )
   return (
     <div>
       {!isSpaceTrigger && highlightData.position && (
-        <button
-          style={{
-            top: `${highlightData.position.top}px`,
-            left: `${highlightData.position.left + 30}px`,
-            zIndex: 50,
-          }}
-          className="absolute flex size-7 cursor-pointer items-center justify-center rounded-full border-none bg-gray-200 text-gray-600 shadow-md hover:bg-gray-300"
-          aria-label="Writing Assistant button"
-          onClick={() => setIsOptionsVisible(true)}
-          type="button"
-        >
-          <FaMagic />
-        </button>
-      )}
-      {isOptionsVisible && !getLastMessage(messages, 'assistant') && (
-        <div
-          ref={optionsContainerRef}
-          style={{
-            top: positionStyle.top,
-            left: positionStyle.left,
-          }}
-          className="absolute z-50 w-96 rounded-md border border-gray-300 bg-white p-2.5"
-        >
-          <TextField
-            inputRef={textFieldRef}
-            autoFocus
-            type="text"
-            variant="outlined"
-            size="small"
-            value={customPrompt}
-            onChange={(e) => setCustomPrompt(e.target.value)}
-            placeholder="Ask AI anything..."
-            className="mb-2.5 w-full p-1"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                handleOption('custom', customPrompt)
-              }
+        <Popover>
+          <PopoverTrigger
+            style={{
+              top: `${highlightData.position.top}px`,
+              left: `${highlightData.position.left + 30}px`,
+              zIndex: 50,
             }}
-          />
-          <div className="max-h-36 overflow-y-auto">
-            <Button
-              onClick={() => handleOption('simplify')}
-              className="mb-1 block w-full"
-              style={{ textTransform: 'none' }}
+            className="absolute flex size-7 cursor-pointer items-center justify-center rounded-full border-none bg-gray-200 text-gray-600 shadow-md hover:bg-gray-300"
+            aria-label="Writing Assistant button"
+            onClick={() => setIsOptionsVisible(true)}
+            type="button"
+          >
+            <FaMagic />
+          </PopoverTrigger>
+          {isOptionsVisible && !getLastMessage(messages, 'assistant') && (
+            <PopoverContent
+              ref={optionsContainerRef}
+              style={{
+                position: 'absolute',
+                transform: 'translate(-50%, -50%)',
+              }}
+              className="absolute z-50 w-96 rounded-md border border-gray-300 bg-white p-2.5"
             >
-              Simplify and condense the writing
-            </Button>
-            <Button
-              onClick={() => handleOption('copy-editor')}
-              className="mb-1 block w-full"
-              style={{ textTransform: 'none' }}
-            >
-              Fix spelling and grammar
-            </Button>
-            <Button
-              onClick={() => handleOption('takeaways')}
-              className="mb-1 block w-full"
-              style={{ textTransform: 'none' }}
-            >
-              List key Takeaways
-            </Button>
-          </div>
-        </div>
+              <TextField
+                inputRef={textFieldRef}
+                autoFocus
+                type="text"
+                variant="outlined"
+                size="small"
+                value={customPrompt}
+                onChange={(e) => setCustomPrompt(e.target.value)}
+                placeholder="Ask AI anything..."
+                className="mb-2.5 w-full p-1"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handleOption('custom', customPrompt)
+                  }
+                }}
+              />
+              <div className="max-h-36 overflow-y-auto">
+                <Button
+                  onClick={() => handleOption('simplify')}
+                  className="mb-1 block w-full"
+                  style={{ textTransform: 'none' }}
+                >
+                  Simplify and condense the writing
+                </Button>
+                <Button
+                  onClick={() => handleOption('copy-editor')}
+                  className="mb-1 block w-full"
+                  style={{ textTransform: 'none' }}
+                >
+                  Fix spelling and grammar
+                </Button>
+                <Button
+                  onClick={() => handleOption('takeaways')}
+                  className="mb-1 block w-full"
+                  style={{ textTransform: 'none' }}
+                >
+                  List key Takeaways
+                </Button>
+              </div>
+            </PopoverContent>
+          )}
+        </Popover>
       )}
+
       {getLastMessage(messages, 'assistant') && (
         <div
           ref={markdownContainerRef}
