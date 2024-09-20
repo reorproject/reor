@@ -6,7 +6,7 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import posthog from 'posthog-js'
 import { streamText } from 'ai'
-import { appendTextContentToMessages, convertMessageToString } from '../Chat/utils'
+import { appendStringContentToMessages, convertMessageToString } from '../Chat/utils'
 import useOutsideClick from './hooks/use-outside-click'
 import getClassNames, { generatePromptString, getLastMessage } from './utils'
 import { ReorChatMessage } from '../Chat/types'
@@ -232,7 +232,7 @@ const WritingAssistant: React.FC = () => {
     let updatedMessages = messages
     // eslint-disable-next-line no-restricted-syntax
     for await (const textPart of textStream) {
-      updatedMessages = appendTextContentToMessages(updatedMessages, textPart)
+      updatedMessages = appendStringContentToMessages(updatedMessages, textPart)
       setMessages(updatedMessages)
     }
 
