@@ -125,7 +125,6 @@ const autoExecuteTools = async (
     // eslint-disable-next-line no-await-in-loop
     outputMessages = await makeAndAddToolResultToMessages(outputMessages, toolCall, lastMessage)
   }
-
   const allToolCallsHaveBeenExecuted =
     toolsThatNeedExecuting.length > 0 && toolsThatNeedExecuting.length === toolCalls.length
   return { messages: outputMessages, allToolCallsHaveBeenExecuted }
