@@ -5,6 +5,7 @@ import PromptSuggestion from './ChatPrompts'
 import '../../styles/chat.css'
 import { AgentConfig } from './types'
 import exampleAgents from './exampleAgents'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface StartChatProps {
   defaultModelName: string
@@ -37,6 +38,10 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
     setUserTextFieldInput(`Using the ${agent.name} agent. How can I help you?`)
   }
 
+  const handleLLMChange = (value: string) => {
+    setSelectedLLM(value)
+  }
+
   return (
     <div className="relative flex w-full flex-col items-center">
       <div className="relative flex size-full flex-col text-center lg:top-10 lg:max-w-2xl">
@@ -61,18 +66,19 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
           />
           <div className="h-px w-[calc(100%-5%)] flex-col self-center bg-gray-600 md:flex-row" />
           <div className="flex flex-col items-center justify-between px-4 py-2 md:flex-row">
-            <div className="flex flex-col items-center justify-between rounded-md border-0 py-2 text-text-gen-100 md:flex-row">
-              <select
-                value={selectedLLM}
-                onChange={(e) => setSelectedLLM(e.target.value)}
-                className="h-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {llmConfigs.map((llm) => (
-                  <option key={llm.modelName} value={llm.modelName}>
-                    {llm.modelName}
-                  </option>
-                ))}
-              </select>
+            <div className="flex flex-col items-center justify-between rounded-md border-0 py-2 md:flex-row">
+              <Select value={selectedLLM} onValueChange={handleLLMChange}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select LLM" />
+                </SelectTrigger>
+                <SelectContent>
+                  {llmConfigs.map((llm) => (
+                    <SelectItem key={llm.modelName} value={llm.modelName}>
+                      {llm.modelName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <button
               className="m-1 flex cursor-pointer items-center justify-center rounded-md border-0 bg-blue-600 p-2 text-white hover:bg-blue-500"
