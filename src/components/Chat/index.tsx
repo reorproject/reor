@@ -50,17 +50,17 @@ const ChatComponent: React.FC = () => {
   }, [currentOpenChatID, saveChat])
 
   const handleNewChatMessage = useCallback(
-    async (userTextFieldInput?: string, chatFilters?: AgentConfig) => {
+    async (chat: Chat | undefined, userTextFieldInput?: string, chatFilters?: AgentConfig) => {
       try {
         const defaultLLMName = await window.llm.getDefaultLLMName()
 
-        if (!userTextFieldInput?.trim() && (!currentChat || currentChat.messages.length === 0)) {
+        if (!userTextFieldInput?.trim() && (!chat || chat.messages.length === 0)) {
           return
         }
 
         let outputChat = userTextFieldInput?.trim()
-          ? await appendToOrCreateChat(currentChat, userTextFieldInput, chatFilters)
-          : currentChat
+          ? await appendToOrCreateChat(chat, userTextFieldInput, chatFilters)
+          : chat
 
         if (!outputChat) {
           return
@@ -96,13 +96,17 @@ const ChatComponent: React.FC = () => {
         }
 
         if (!abortControllerRef.current.signal.aborted) {
-          outputChat.messages = await appendToolCallsAndAutoExecuteTools(
+          const { messages: outputMessages, allToolCallsHaveBeenExecuted } = await appendToolCallsAndAutoExecuteTools(
             outputChat.messages,
             outputChat.toolDefinitions,
             await toolCalls,
           )
+          outputChat.messages = outputMessages
           setCurrentChat(outputChat)
           await saveChat(outputChat)
+          if (allToolCallsHaveBeenExecuted) {
+            handleNewChatMessage(outputChat, undefined, chatFilters)
+          }
         }
 
         setLoadingState('idle')
@@ -113,7 +117,7 @@ const ChatComponent: React.FC = () => {
         abortControllerRef.current = null
       }
     },
-    [setCurrentOpenChatID, saveChat, currentChat],
+    [setCurrentOpenChatID, saveChat],
   )
 
   return (
@@ -124,10 +128,17 @@ const ChatComponent: React.FC = () => {
             currentChat={currentChat}
             setCurrentChat={setCurrentChat}
             loadingState={loadingState}
-            handleNewChatMessage={handleNewChatMessage}
+            handleNewChatMessage={(userTextFieldInput?: string, chatFilters?: AgentConfig) =>
+              handleNewChatMessage(currentChat, userTextFieldInput, chatFilters)
+            }
           />
         ) : (
-          <StartChat defaultModelName={defaultModelName} handleNewChatMessage={handleNewChatMessage} />
+          <StartChat
+            defaultModelName={defaultModelName}
+            handleNewChatMessage={(userTextFieldInput?: string, chatFilters?: AgentConfig) =>
+              handleNewChatMessage(undefined, userTextFieldInput, chatFilters)
+            }
+          />
         )}
       </div>
     </div>

@@ -125,17 +125,23 @@ const autoExecuteTools = async (
     // eslint-disable-next-line no-await-in-loop
     outputMessages = await makeAndAddToolResultToMessages(outputMessages, toolCall, lastMessage)
   }
-  return outputMessages
+  const allToolCallsHaveBeenExecuted =
+    toolsThatNeedExecuting.length > 0 && toolsThatNeedExecuting.length === toolCalls.length
+  return { messages: outputMessages, allToolCallsHaveBeenExecuted }
 }
 
 export const appendToolCallsAndAutoExecuteTools = async (
   messages: ReorChatMessage[],
   toolDefinitions: ToolDefinition[],
   toolCalls: ToolCallPart[],
-): Promise<ReorChatMessage[]> => {
+): Promise<{ messages: ReorChatMessage[]; allToolCallsHaveBeenExecuted: boolean }> => {
   const messagesWithToolCalls = appendToolCallPartsToMessages(messages, toolCalls)
-  const messagesWithToolResults = await autoExecuteTools(messagesWithToolCalls, toolDefinitions, toolCalls)
-  return messagesWithToolResults
+  const { messages: messagesWithToolResults, allToolCallsHaveBeenExecuted } = await autoExecuteTools(
+    messagesWithToolCalls,
+    toolDefinitions,
+    toolCalls,
+  )
+  return { messages: messagesWithToolResults, allToolCallsHaveBeenExecuted }
 }
 
 export const convertMessageToString = (message: ReorChatMessage | undefined): string => {
@@ -226,7 +232,7 @@ export const generateInitialChat = async (userTextFieldInput: string, agentConfi
   return {
     id: Date.now().toString(),
     messages: ragMessages,
-    displayName: generateChatName(ragMessages),
+    displayName: generateChatName(ragMessages, userTextFieldInput),
     timeOfLastMessage: Date.now(),
     toolDefinitions: agentConfig.toolDefinitions,
   }
