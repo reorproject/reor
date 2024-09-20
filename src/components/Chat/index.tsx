@@ -50,19 +50,21 @@ const ChatComponent: React.FC = () => {
   }, [currentOpenChatID, saveChat])
 
   const handleNewChatMessage = useCallback(
-    async (userTextFieldInput?: string, chatFilters?: AgentConfig) => {
+    async (chat: Chat | undefined, userTextFieldInput?: string, chatFilters?: AgentConfig) => {
       try {
         const defaultLLMName = await window.llm.getDefaultLLMName()
 
-        if (!userTextFieldInput?.trim() && (!currentChat || currentChat.messages.length === 0)) {
+        if (!userTextFieldInput?.trim() && (!chat || chat.messages.length === 0)) {
+          console.log('no userTextFieldInput and no chat messages')
           return
         }
 
         let outputChat = userTextFieldInput?.trim()
-          ? await appendToOrCreateChat(currentChat, userTextFieldInput, chatFilters)
-          : currentChat
+          ? await appendToOrCreateChat(chat, userTextFieldInput, chatFilters)
+          : chat
 
         if (!outputChat) {
+          console.log('no outputChat')
           return
         }
 
@@ -100,6 +102,9 @@ const ChatComponent: React.FC = () => {
             outputChat.messages,
             outputChat.toolDefinitions,
             await toolCalls,
+            // eslint-disable-next-line @typescript-eslint/no-shadow
+            (chat: Chat | undefined, userTextFieldInput?: string, chatFilters?: AgentConfig) =>
+              handleNewChatMessage(chat, userTextFieldInput, chatFilters),
           )
           setCurrentChat(outputChat)
           await saveChat(outputChat)
@@ -113,7 +118,7 @@ const ChatComponent: React.FC = () => {
         abortControllerRef.current = null
       }
     },
-    [setCurrentOpenChatID, saveChat, currentChat],
+    [setCurrentOpenChatID, saveChat],
   )
 
   return (
@@ -124,10 +129,17 @@ const ChatComponent: React.FC = () => {
             currentChat={currentChat}
             setCurrentChat={setCurrentChat}
             loadingState={loadingState}
-            handleNewChatMessage={handleNewChatMessage}
+            handleNewChatMessage={(userTextFieldInput?: string, chatFilters?: AgentConfig) =>
+              handleNewChatMessage(currentChat, userTextFieldInput, chatFilters)
+            }
           />
         ) : (
-          <StartChat defaultModelName={defaultModelName} handleNewChatMessage={handleNewChatMessage} />
+          <StartChat
+            defaultModelName={defaultModelName}
+            handleNewChatMessage={(userTextFieldInput?: string, chatFilters?: AgentConfig) =>
+              handleNewChatMessage(undefined, userTextFieldInput, chatFilters)
+            }
+          />
         )}
       </div>
     </div>
