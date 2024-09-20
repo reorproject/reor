@@ -1,6 +1,9 @@
 import { ReorChatMessage } from '@/components/Chat/types'
 
-const generateChatName = (messages: ReorChatMessage[]): string => {
+const generateChatName = (messages: ReorChatMessage[], userInput?: string): string => {
+  if (userInput) {
+    return userInput.slice(0, 50)
+  }
   if (!messages || messages.length === 0 || !messages[0].content) {
     return 'Empty Chat'
   }

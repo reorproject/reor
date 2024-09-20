@@ -233,7 +233,7 @@ export const generateInitialChat = async (userTextFieldInput: string, agentConfi
   return {
     id: Date.now().toString(),
     messages: ragMessages,
-    displayName: generateChatName(ragMessages),
+    displayName: generateChatName(ragMessages, userTextFieldInput),
     timeOfLastMessage: Date.now(),
     toolDefinitions: agentConfig.toolDefinitions,
   }
