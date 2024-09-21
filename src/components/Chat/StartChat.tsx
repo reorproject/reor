@@ -48,10 +48,10 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
         <div className="flex size-full justify-center">
           <img src="icon.png" style={{ width: '64px', height: '64px' }} alt="ReorImage" />
         </div>
-        <h1 className="mb-10 text-[28px] text-gray-300">
+        <h1 className="mb-10 text-[28px] text-foreground">
           Welcome to your AI-powered assistant! Start a conversation with your second brain!
         </h1>
-        <div className="flex flex-col rounded-md bg-bg-000 focus-within:ring-1 focus-within:ring-[#8c8c8c]">
+        <div className="flex flex-col rounded-md border-2 border-solid border-border bg-background focus-within:ring-1 focus-within:ring-ring">
           <textarea
             value={userTextFieldInput}
             onKeyDown={(e) => {
@@ -60,15 +60,15 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                 sendMessageHandler()
               }
             }}
-            className="h-[100px] w-full resize-none rounded-t-md border-0 bg-transparent p-4 text-text-gen-100 caret-white focus:outline-none"
+            className="h-[100px] w-full resize-none rounded-t-md border-0 bg-transparent p-4 text-primary caret-foreground focus:outline-none"
             placeholder="What can Reor help you with today?"
             onChange={(e) => setUserTextFieldInput(e.target.value)}
           />
-          <div className="h-px w-[calc(100%-5%)] flex-col self-center bg-gray-600 md:flex-row" />
+          <div className="h-px w-[calc(100%-5%)] flex-col self-center bg-border md:flex-row" />
           <div className="flex flex-col items-center justify-between px-4 py-2 md:flex-row">
             <div className="flex flex-col items-center justify-between rounded-md border-0 py-2 md:flex-row">
               <Select value={selectedLLM} onValueChange={handleLLMChange}>
-                <SelectTrigger className="w-[180px] border border-solid border-foreground">
+                <SelectTrigger className="w-[180px] border border-solid border-border">
                   <SelectValue placeholder="Select LLM" />
                 </SelectTrigger>
                 <SelectContent>
@@ -81,7 +81,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               </Select>
             </div>
             <button
-              className="m-1 flex cursor-pointer items-center justify-center rounded-md border-0 bg-blue-600 p-2 text-white hover:bg-blue-500"
+              className="m-1 flex cursor-pointer items-center justify-center rounded-md border-0 bg-primary p-2 text-primary-foreground hover:bg-accent hover:text-accent-foreground"
               onClick={sendMessageHandler}
               type="button"
               aria-label="Send message"
@@ -93,10 +93,13 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
         <div className="mt-4 size-full justify-center md:flex-row lg:flex">
           {exampleAgents.map((agent) => (
             <Card
-              className="m-4 size-28 cursor-pointer border border-solid border-border bg-transparent"
+              key={agent.name}
+              className={`m-4 size-28 cursor-pointer border-2 ${
+                chatFilters.name === agent.name ? 'border-primary text-primary' : 'border-border text-muted-foreground'
+              } bg-card transition-all duration-200 ease-in-out hover:border-accent hover:text-accent-foreground`}
               onClick={() => handleAgentSelection(agent)}
             >
-              <CardDescription className="text-primary">{agent.name}</CardDescription>
+              <CardDescription className="text-inherit">{agent.name}</CardDescription>
             </Card>
           ))}
         </div>
