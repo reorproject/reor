@@ -15,7 +15,7 @@ export default class MarkdownSerializerState extends BaseMarkdownSerializerState
 
   render(node, parent, index) {
     if (node.type.name === 'paragraph' && node.content.size === 0) {
-      this.out += '\n'
+      this.out += '<p></p>'
     } else {
       super.render(node, parent, index)
       const top = this.inlines[this.inlines.length - 1]
