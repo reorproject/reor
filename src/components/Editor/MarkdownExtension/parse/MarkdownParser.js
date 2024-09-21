@@ -1,6 +1,6 @@
 import markdownit from 'markdown-it'
 import { elementFromString, extractElement, unwrapElement } from '../util/dom'
-import { getMarkdownSpec } from '../util/extensions'
+import getMarkdownSpec from '../util/extensions'
 
 export default class MarkdownParser {
   /**

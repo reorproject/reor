@@ -1,7 +1,7 @@
 import MarkdownSerializerState from './state'
 import HTMLMark from '../extensions/marks/html'
 import HTMLNode from '../extensions/nodes/html'
-import { getMarkdownSpec } from '../util/extensions'
+import getMarkdownSpec from '../util/extensions'
 import HardBreak from '../extensions/nodes/hard-break'
 
 export default class MarkdownSerializer {
