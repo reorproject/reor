@@ -26,58 +26,63 @@ export class MarkdownParser {
 
   parse(content, { inline } = {}) {
     if (typeof content === 'string') {
+      // Preprocess the content to add empty <p> tags for empty newlines
+      content = this.preprocessEmptyLines(content)
+
       this.editor.extensionManager.extensions.forEach((extension) =>
         getMarkdownSpec(extension)?.parse?.setup?.call({ editor: this.editor, options: extension.options }, this.md),
       )
-
       const renderedHTML = this.md.render(content)
       const element = elementFromString(renderedHTML)
-
       this.editor.extensionManager.extensions.forEach((extension) =>
         getMarkdownSpec(extension)?.parse?.updateDOM?.call(
           { editor: this.editor, options: extension.options },
           element,
         ),
       )
-
       this.normalizeDOM(element, { inline, content })
-
       return element.innerHTML
     }
-
     return content
+  }
+
+  preprocessEmptyLines(content) {
+    // Split the content into lines
+    const lines = content.split('\n')
+    // Process each line
+    const processedLines = lines.map((line) => {
+      return line.trim() === '' ? '<p></p>' : line
+    })
+
+    // Join the processed lines back into a single string
+    const processedContent = processedLines.join('\n')
+    return processedContent
   }
 
   normalizeDOM(node, { inline, content }) {
     this.normalizeBlocks(node)
-
     // remove all \n appended by markdown-it
     node.querySelectorAll('*').forEach((el) => {
       if (el.nextSibling?.nodeType === Node.TEXT_NODE && !el.closest('pre')) {
         el.nextSibling.textContent = el.nextSibling.textContent.replace(/^\n/, '')
       }
     })
-
     if (inline) {
       this.normalizeInline(node, content)
     }
-
     return node
   }
 
   normalizeBlocks(node) {
     const blocks = Object.values(this.editor.schema.nodes).filter((node) => node.isBlock)
-
     const selector = blocks
       .map((block) => block.spec.parseDOM?.map((spec) => spec.tag))
       .flat()
       .filter(Boolean)
       .join(',')
-
     if (!selector) {
       return
     }
-
     ;[...node.querySelectorAll(selector)].forEach((el) => {
       if (el.parentElement.matches('p')) {
         extractElement(el)
@@ -91,14 +96,11 @@ export class MarkdownParser {
       const { nextElementSibling } = firstParagraph
       const startSpaces = content.match(/^\s+/)?.[0] ?? ''
       const endSpaces = !nextElementSibling ? (content.match(/\s+$/)?.[0] ?? '') : ''
-
       if (content.match(/^\n\n/)) {
         firstParagraph.innerHTML = `${firstParagraph.innerHTML}${endSpaces}`
         return
       }
-
       unwrapElement(firstParagraph)
-
       node.innerHTML = `${startSpaces}${node.innerHTML}${endSpaces}`
     }
   }
@@ -119,13 +121,11 @@ export class MarkdownParser {
         }
         return rendered
       }
-
     md.renderer.rules.hardbreak = withoutNewLine(md.renderer.rules.hardbreak)
     md.renderer.rules.softbreak = withoutNewLine(md.renderer.rules.softbreak)
     md.renderer.rules.fence = withoutNewLine(md.renderer.rules.fence)
     md.renderer.rules.code_block = withoutNewLine(md.renderer.rules.code_block)
     md.renderer.renderToken = withoutNewLine(md.renderer.renderToken.bind(md.renderer))
-
     return md
   }
 }

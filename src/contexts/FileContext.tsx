@@ -168,7 +168,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         tightListClass: 'tight',
         bulletListMarker: '-',
         linkify: true,
-        breaks: true,
+        breaks: false,
         transformPastedText: true,
         transformCopiedText: false,
       }),

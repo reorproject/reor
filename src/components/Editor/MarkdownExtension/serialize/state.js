@@ -1,22 +1,22 @@
 import { MarkdownSerializerState as BaseMarkdownSerializerState } from 'prosemirror-markdown'
 import { trimInline } from '../util/markdown'
 
-/**
- * Override default MarkdownSerializerState to:
- * - handle commonmark delimiters (https://spec.commonmark.org/0.29/#left-flanking-delimiter-run)
- */
 export class MarkdownSerializerState extends BaseMarkdownSerializerState {
   inTable = false
 
   constructor(nodes, marks, options) {
     super(nodes, marks, options ?? {})
     this.inlines = []
+    this.lastWasParagraph = false
   }
 
   render(node, parent, index) {
     if (node.type.name === 'paragraph' && node.content.size === 0) {
       this.out += '\n'
     } else {
+      if (this.lastWasParagraph && node.type.name === 'paragraph') {
+        this.out += '\n'
+      }
       super.render(node, parent, index)
       const top = this.inlines[this.inlines.length - 1]
       if (top?.start && top?.end) {
@@ -25,14 +25,11 @@ export class MarkdownSerializerState extends BaseMarkdownSerializerState {
         this.inlines.pop()
       }
     }
+    this.lastWasParagraph = node.type.name === 'paragraph'
   }
 
   renderContent(fragment) {
-    console.log('fragment', fragment)
     fragment.forEach((node, _, i) => {
-      if (i && node.type.name === 'paragraph') {
-        this.out += '\n'
-      }
       this.render(node)
     })
   }
@@ -65,5 +62,13 @@ export class MarkdownSerializerState extends BaseMarkdownSerializerState {
       ...inline,
       start,
     }
+  }
+
+  // Override the closeBlock method to control newline insertion
+  closeBlock(node) {
+    if (this.lastWasParagraph && node.type.name === 'paragraph') {
+      this.out += '\n'
+    }
+    this.lastWasParagraph = node.type.name === 'paragraph'
   }
 }
