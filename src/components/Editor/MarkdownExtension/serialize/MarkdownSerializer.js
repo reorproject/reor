@@ -1,9 +1,10 @@
-import { MarkdownSerializerState } from './state'
+import MarkdownSerializerState from './state'
 import HTMLMark from '../extensions/marks/html'
 import HTMLNode from '../extensions/nodes/html'
 import { getMarkdownSpec } from '../util/extensions'
+import HardBreak from '../extensions/nodes/hard-break'
 
-export class MarkdownSerializer {
+export default class MarkdownSerializer {
   /**
    * @type {import('@tiptap/core').Editor}
    */
@@ -15,12 +16,10 @@ export class MarkdownSerializer {
 
   serialize(content) {
     const state = new MarkdownSerializerState(this.nodes, this.marks, {
-      //   hardBreakNodeName: HardBreak.name,
+      hardBreakNodeName: HardBreak.name,
     })
 
     state.renderContent(content)
-
-    console.log('state.out', state.out)
 
     return state.out
   }
