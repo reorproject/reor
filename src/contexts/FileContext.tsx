@@ -27,7 +27,7 @@ import '@/styles/tiptap.scss'
 import SearchAndReplace from '@/components/Editor/Search/SearchAndReplaceExtension'
 import getMarkdown from '@/components/Editor/utils'
 import welcomeNote from '@/components/File/utils'
-import { mdToHtml } from '@/utils/markdown'
+import { Markdown } from '@/components/Editor/MarkdownExtension'
 
 type FileContextType = {
   currentlyOpenFilePath: string | null
@@ -122,8 +122,8 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setNeedToIndexEditorContent(false)
     }
     const fileContent = (await window.fileSystem.readFile(filePath)) ?? ''
-    const htmlContent = await mdToHtml(fileContent)
-    editor?.commands.setContent(htmlContent)
+    // const htmlContent = await mdToHtml(fileContent)
+    editor?.commands.setContent(fileContent)
     setCurrentlyOpenFilePath(filePath)
     setCurrentlyChangingFilePath(false)
   }
@@ -162,16 +162,16 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         searchResultClass: 'bg-yellow-400',
         disableRegex: false,
       }),
-      // Markdown.configure({
-      //   html: true,
-      //   tightLists: true,
-      //   tightListClass: 'tight',
-      //   bulletListMarker: '-',
-      //   linkify: true,
-      //   breaks: true,
-      //   transformPastedText: true,
-      //   transformCopiedText: false,
-      // }),
+      Markdown.configure({
+        html: true,
+        tightLists: true,
+        tightListClass: 'tight',
+        bulletListMarker: '-',
+        linkify: true,
+        breaks: true,
+        transformPastedText: true,
+        transformCopiedText: false,
+      }),
       TaskItem.configure({
         nested: true,
       }),
