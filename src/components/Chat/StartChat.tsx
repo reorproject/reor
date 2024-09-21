@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import { PiPaperPlaneRight } from 'react-icons/pi'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
-import PromptSuggestion from './ChatPrompts'
 import '../../styles/chat.css'
 import { AgentConfig } from './types'
 import exampleAgents from './exampleAgents'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Card, CardDescription } from '../ui/card'
 
 interface StartChatProps {
   defaultModelName: string
@@ -92,7 +92,12 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
         </div>
         <div className="mt-4 size-full justify-center md:flex-row lg:flex">
           {exampleAgents.map((agent) => (
-            <PromptSuggestion key={agent.name} promptText={agent.name} onClick={() => handleAgentSelection(agent)} />
+            <Card
+              className="m-4 size-28 cursor-pointer border border-solid border-border bg-transparent"
+              onClick={() => handleAgentSelection(agent)}
+            >
+              <CardDescription className="text-primary">{agent.name}</CardDescription>
+            </Card>
           ))}
         </div>
       </div>
