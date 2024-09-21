@@ -106,7 +106,7 @@
     "tailwind-merge": "^2.5.2",
     "tailwind-scrollbar": "^3.1.0",
     "tailwindcss-animate": "^1.0.7",
-    "tiptap-markdown": "^0.8.10",
+    "tiptap-markdown": "github:samlhuillier/tiptap-markdown-newline",
     "turndown": "^7.1.2",
     "use-debounce": "^10.0.1",
     "uuid": "^10.0.0",
