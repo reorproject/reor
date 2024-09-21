@@ -15,7 +15,6 @@ import TextStyle from '@tiptap/extension-text-style'
 import { Editor, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import { toast } from 'react-toastify'
-import { Markdown } from 'tiptap-markdown'
 import { useDebounce } from 'use-debounce'
 import useFileInfoTreeHook from '@/components/Sidebars/FileSideBar/hooks/use-file-info-tree'
 import { getInvalidCharacterInFilePath } from '@/utils/strings'
@@ -28,6 +27,7 @@ import '@/styles/tiptap.scss'
 import SearchAndReplace from '@/components/Editor/Search/SearchAndReplaceExtension'
 import getMarkdown from '@/components/Editor/utils'
 import welcomeNote from '@/components/File/utils'
+import { mdToHtml } from '@/utils/markdown'
 
 type FileContextType = {
   currentlyOpenFilePath: string | null
@@ -122,7 +122,8 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setNeedToIndexEditorContent(false)
     }
     const fileContent = (await window.fileSystem.readFile(filePath)) ?? ''
-    editor?.commands.setContent(fileContent)
+    const htmlContent = await mdToHtml(fileContent)
+    editor?.commands.setContent(htmlContent)
     setCurrentlyOpenFilePath(filePath)
     setCurrentlyChangingFilePath(false)
   }
@@ -161,16 +162,16 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         searchResultClass: 'bg-yellow-400',
         disableRegex: false,
       }),
-      Markdown.configure({
-        html: true,
-        tightLists: true,
-        tightListClass: 'tight',
-        bulletListMarker: '-',
-        linkify: true,
-        breaks: true,
-        transformPastedText: true,
-        transformCopiedText: false,
-      }),
+      // Markdown.configure({
+      //   html: true,
+      //   tightLists: true,
+      //   tightListClass: 'tight',
+      //   bulletListMarker: '-',
+      //   linkify: true,
+      //   breaks: true,
+      //   transformPastedText: true,
+      //   transformCopiedText: false,
+      // }),
       TaskItem.configure({
         nested: true,
       }),
@@ -209,7 +210,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const writeEditorContentToDisk = async (_editor: Editor | null, filePath: string | null) => {
     if (filePath !== null && needToWriteEditorContentToDisk && _editor) {
-      const markdownContent = getMarkdown(_editor)
+      const markdownContent = await getMarkdown(_editor)
       if (markdownContent !== null) {
         await window.fileSystem.writeFile({
           filePath,
@@ -251,7 +252,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   useEffect(() => {
     const handleWindowClose = async () => {
       if (currentlyOpenFilePath !== null && editor && editor.getHTML() !== null) {
-        const markdown = getMarkdown(editor)
+        const markdown = await getMarkdown(editor)
         await window.fileSystem.writeFile({
           filePath: currentlyOpenFilePath,
           content: markdown,
