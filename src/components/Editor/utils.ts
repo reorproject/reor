@@ -1,22 +1,14 @@
 import { Editor } from '@tiptap/core'
 
-export async function getMarkdown(editor: Editor) {
+function getMarkdown(editor: Editor) {
+  // Fetch the current markdown content from the editor
   const originalMarkdown = editor.storage.markdown.getMarkdown()
-  // console.log('CALLING THIS')
-  // console.log('editor.storage.markdown', editor.storage.markdown)
-  // const originalMarkdown = editor.storage.markdown.serializer.serialize(editor.state.doc)
-  // const html = editor.getHTML()
+  // Replace the escaped square brackets with unescaped ones
+  const modifiedMarkdown = originalMarkdown
+    .replace(/\\\[/g, '[') // Replaces \[ with [
+    .replace(/\\\]/g, ']') // Replaces \] wi ]
 
-  // console.time('htmlToMd')
-  // const startTime = performance.now()
-
-  // const markdown = await htmlToMd(html)
-
-  // const endTime = performance.now()
-  // console.timeEnd('htmlToMd')
-  // console.log(`htmlToMd operation took ${endTime - startTime} milliseconds`)
-
-  return originalMarkdown
+  return modifiedMarkdown
 }
 
 export default getMarkdown
