@@ -116,6 +116,8 @@
     "tiptap-markdown": "^0.8.10",
     "turndown": "^7.1.2",
     "unified": "^11.0.5",
+    "unist-builder": "^4.0.0",
+    "unist-util-visit": "^5.0.0",
     "use-debounce": "^10.0.1",
     "uuid": "^10.0.0",
     "uuidv4": "^6.2.13",
