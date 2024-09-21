@@ -122,7 +122,7 @@ const ChatComponent: React.FC = () => {
 
   return (
     <div className="flex size-full items-center justify-center">
-      <div className="mx-auto flex size-full flex-col overflow-hidden border-solid border-neutral-700 bg-background">
+      <div className="mx-auto flex size-full flex-col overflow-hidden  bg-background">
         {currentChat && currentChat.messages && currentChat.messages.length > 0 ? (
           <ChatMessages
             currentChat={currentChat}

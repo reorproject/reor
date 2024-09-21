@@ -68,7 +68,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
           <div className="flex flex-col items-center justify-between px-4 py-2 md:flex-row">
             <div className="flex flex-col items-center justify-between rounded-md border-0 py-2 md:flex-row">
               <Select value={selectedLLM} onValueChange={handleLLMChange}>
-                <SelectTrigger className="w-[180px]">
+                <SelectTrigger className="w-[180px] border border-solid border-foreground">
                   <SelectValue placeholder="Select LLM" />
                 </SelectTrigger>
                 <SelectContent>
