@@ -50,7 +50,7 @@ const ChatComponent: React.FC = () => {
   }, [currentOpenChatID, saveChat])
 
   const handleNewChatMessage = useCallback(
-    async (chat: Chat | undefined, userTextFieldInput?: string, chatFilters?: AgentConfig) => {
+    async (chat: Chat | undefined, userTextFieldInput?: string, agentConfig?: AgentConfig) => {
       try {
         const defaultLLMName = await window.llm.getDefaultLLMName()
 
@@ -59,7 +59,7 @@ const ChatComponent: React.FC = () => {
         }
 
         let outputChat = userTextFieldInput?.trim()
-          ? await appendToOrCreateChat(chat, userTextFieldInput, chatFilters)
+          ? await appendToOrCreateChat(chat, userTextFieldInput, agentConfig)
           : chat
 
         if (!outputChat) {
@@ -105,7 +105,7 @@ const ChatComponent: React.FC = () => {
           setCurrentChat(outputChat)
           await saveChat(outputChat)
           if (allToolCallsHaveBeenExecuted) {
-            handleNewChatMessage(outputChat, undefined, chatFilters)
+            handleNewChatMessage(outputChat, undefined, agentConfig)
           }
         }
 
@@ -135,8 +135,8 @@ const ChatComponent: React.FC = () => {
         ) : (
           <StartChat
             defaultModelName={defaultModelName}
-            handleNewChatMessage={(userTextFieldInput?: string, chatFilters?: AgentConfig) =>
-              handleNewChatMessage(undefined, userTextFieldInput, chatFilters)
+            handleNewChatMessage={(userTextFieldInput?: string, agentConfig?: AgentConfig) =>
+              handleNewChatMessage(undefined, userTextFieldInput, agentConfig)
             }
           />
         )}

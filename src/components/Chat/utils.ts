@@ -162,13 +162,13 @@ export function anonymizeAgentConfigForPosthog(
   if (!agentConfig) {
     return undefined
   }
-  const { limit: numberOfChunksToFetch, files, minDate, maxDate } = agentConfig
+  const { dbSearchFilters, files } = agentConfig
   return {
     name: agentConfig.name,
-    numberOfChunksToFetch,
+    numberOfChunksToFetch: dbSearchFilters?.limit ?? 0,
     filesLength: files.length,
-    minDate,
-    maxDate,
+    minDate: dbSearchFilters?.minDate,
+    maxDate: dbSearchFilters?.maxDate,
     toolNames: agentConfig.toolDefinitions.map((tool) => tool.name),
   }
 }
@@ -206,8 +206,8 @@ const applyPromptTemplate = (
   }) as ReorChatMessage[]
 }
 
-export const doInitialRAG = async (query: string, chatFilters: AgentConfig): Promise<ReorChatMessage[]> => {
-  const { promptTemplate, files } = chatFilters
+export const doInitialRAG = async (query: string, agentConfig: AgentConfig): Promise<ReorChatMessage[]> => {
+  const { promptTemplate, files } = agentConfig
 
   const needsContext = promptTemplate.some((message) => message.content.includes('{CONTEXT}'))
 
@@ -218,7 +218,10 @@ export const doInitialRAG = async (query: string, chatFilters: AgentConfig): Pro
     if (files.length > 0) {
       results = await window.fileSystem.getFiles(files)
     } else {
-      results = await retreiveFromVectorDB(query, chatFilters)
+      if (!agentConfig.dbSearchFilters) {
+        throw new Error('DB search filters are required')
+      }
+      results = await retreiveFromVectorDB(query, agentConfig.dbSearchFilters)
     }
     contextString = generateStringOfContextItemsForPrompt(results)
   }
@@ -245,10 +248,10 @@ export const appendToOrCreateChat = async (
   let outputChat = currentChat
 
   if (!outputChat || !outputChat.id || outputChat.messages.length === 0) {
-    outputChat = await generateInitialChat(
-      userTextFieldInput ?? '',
-      agentConfig || { name: '', toolDefinitions: [], limit: 15, files: [], promptTemplate: [] },
-    ) // TODO: probably split into an initial chat function and an append to chat function
+    if (!agentConfig) {
+      throw new Error('Agent config is required')
+    }
+    outputChat = await generateInitialChat(userTextFieldInput ?? '', agentConfig)
     const anonymizedAgentConfig = anonymizeAgentConfigForPosthog(agentConfig)
     posthog.capture('chat_message_submitted', {
       chatId: outputChat?.id,

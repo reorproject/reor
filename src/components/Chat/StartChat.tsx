@@ -52,18 +52,33 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
 
   const inverseLogScale = (value: number) => Math.round(Math.log(value + 1) * 25)
 
-  const handleSliderChange = useCallback(
-    (value: number[]) => {
-      const logScale = (_value: number) => Math.round(Math.exp(_value / 25) - 1)
-      const scaledValue = logScale(value[0])
-      setAgentConfig({ ...agentConfig, limit: scaledValue })
-    },
-    [agentConfig],
-  )
+  const handleSliderChange = useCallback((value: number[]) => {
+    const logScale = (_value: number) => Math.round(Math.exp(_value / 25) - 1)
+    const scaledValue = logScale(value[0])
+    setAgentConfig((prevConfig) => ({
+      ...prevConfig,
+      dbSearchFilters: {
+        ...prevConfig.dbSearchFilters,
+        limit: scaledValue,
+      },
+    }))
+  }, [])
 
   const handleToolsChange = (tools: ToolDefinition[]) => {
     setSelectedTools(tools)
-    setAgentConfig({ ...agentConfig, toolDefinitions: tools })
+    setAgentConfig((prevConfig) => ({ ...prevConfig, toolDefinitions: tools }))
+  }
+
+  const handleDateChange = (from: Date | undefined, to: Date | undefined) => {
+    setAgentConfig((prevConfig) => ({
+      ...prevConfig,
+      dbSearchFilters: {
+        ...prevConfig.dbSearchFilters,
+        limit: prevConfig.dbSearchFilters?.limit ?? 15,
+        minDate: from,
+        maxDate: to,
+      },
+    }))
   }
 
   return (
@@ -134,7 +149,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                   <PromptEditor
                     promptTemplate={agentConfig.promptTemplate}
                     onSave={(newPromptTemplate) => {
-                      setAgentConfig({ ...agentConfig, promptTemplate: newPromptTemplate })
+                      setAgentConfig((prevConfig) => ({ ...prevConfig, promptTemplate: newPromptTemplate }))
                     }}
                   />
                 </DialogContent>
@@ -147,20 +162,18 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               />
               <div className="mb-2 flex items-center space-x-2">
                 <Slider
-                  defaultValue={[inverseLogScale(33)]}
+                  defaultValue={[inverseLogScale(agentConfig.dbSearchFilters?.limit ?? 33)]}
                   min={0}
                   max={100}
                   step={1}
                   onValueChange={handleSliderChange}
                 />
-                <span>{agentConfig.limit}</span>
+                <span>{agentConfig.dbSearchFilters?.limit ?? 33}</span>
               </div>
               <DateRangePicker
-                from={agentConfig.minDate ?? new Date()}
-                to={agentConfig.maxDate ?? new Date()}
-                onDateChange={(from, to) => {
-                  setAgentConfig({ ...agentConfig, minDate: from, maxDate: to })
-                }}
+                from={agentConfig.dbSearchFilters?.minDate ?? new Date()}
+                to={agentConfig.dbSearchFilters?.maxDate ?? new Date()}
+                onDateChange={handleDateChange}
               />
             </div>
           </div>

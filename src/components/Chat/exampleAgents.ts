@@ -51,27 +51,28 @@ When the user asks, you will create a note for them with all the relevant things
 const exampleAgents: AgentConfig[] = [
   {
     files: [],
-    limit: 15,
-    minDate: new Date(0),
-    maxDate: new Date(),
+    dbSearchFilters: {
+      limit: 15,
+      minDate: new Date(0),
+      maxDate: new Date(),
+    },
     name: 'Default',
     toolDefinitions: [searchToolDefinition, createNoteToolDefinition],
     promptTemplate: defaultAgentPromptTemplate,
   },
   {
     files: [],
-    limit: 15,
-    minDate: new Date(0),
-    maxDate: new Date(),
     name: 'Research Agent',
     toolDefinitions: [searchToolDefinition, createNoteToolDefinition],
     promptTemplate: researchAgentPromptTemplate,
   },
   {
     files: [],
-    limit: 15,
-    minDate: new Date(0),
-    maxDate: new Date(),
+    dbSearchFilters: {
+      limit: 15,
+      minDate: new Date(0),
+      maxDate: new Date(),
+    },
     name: 'Daily Note Agent',
     toolDefinitions: [searchToolDefinition, createNoteToolDefinition],
     promptTemplate: dailyNoteAgentPromptTemplate,
