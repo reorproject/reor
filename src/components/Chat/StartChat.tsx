@@ -64,8 +64,8 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
             placeholder="What can Reor help you with today?"
             onChange={(e) => setUserTextFieldInput(e.target.value)}
           />
-          <div className="h-px w-[calc(100%-5%)] flex-col self-center bg-border md:flex-row" />
-          <div className="flex flex-col items-center justify-between px-4 py-2 md:flex-row">
+          <div className="h-px w-[calc(100%-2%)] flex-col self-center bg-border md:flex-row" />
+          <div className="flex flex-col items-center justify-between gap-2 px-4 py-2 md:flex-row md:gap-4">
             <div className="flex flex-col items-center justify-between rounded-md border-0 py-2 md:flex-row">
               <Select value={selectedLLM} onValueChange={handleLLMChange}>
                 <SelectTrigger className="w-[180px] border border-solid border-border">
@@ -79,6 +79,11 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="flex items-center justify-center">
+              <span className="text-sm font-medium text-muted-foreground">
+                <span className="text-primary">{chatFilters.name}</span>
+              </span>
             </div>
             <button
               className="m-1 flex cursor-pointer items-center justify-center rounded-md border-0 bg-primary p-2 text-primary-foreground hover:bg-accent hover:text-accent-foreground"
