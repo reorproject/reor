@@ -10,6 +10,9 @@ import { Slider } from '../ui/slider'
 import DateRangePicker from './DatePicker'
 import ToolSelector from './ToolSelector'
 import { allAvailableToolDefinitions } from './tools'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import PromptEditor from './PromptEditor'
 
 interface StartChatProps {
   defaultModelName: string
@@ -122,6 +125,21 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
 
           <div className="mx-auto mt-0 min-h-[80px] w-[96%] rounded-b border-t border-solid border-border bg-input px-4 py-2">
             <div className="space-y-4">
+              {/* New Prompt Editor Dialog */}
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="outline">Edit Prompt</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <PromptEditor
+                    promptTemplate={agentConfig.promptTemplate}
+                    onSave={(newPromptTemplate) => {
+                      setAgentConfig({ ...agentConfig, promptTemplate: newPromptTemplate })
+                    }}
+                  />
+                </DialogContent>
+              </Dialog>
+
               <ToolSelector
                 allTools={allAvailableToolDefinitions}
                 selectedTools={selectedTools}
