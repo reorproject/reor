@@ -7,6 +7,7 @@ import exampleAgents from './exampleAgents'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardDescription } from '../ui/card'
 import { Slider } from '../ui/slider'
+import DateRangePicker from './DatePicker'
 
 interface StartChatProps {
   defaultModelName: string
@@ -110,18 +111,20 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               </button>
             </div>
           </div>
-          {/* New Settings Container */}
-          <div className="mx-auto mt-0 h-[80px] w-[96%] rounded-b border-t border-solid border-border bg-input px-4 py-2">
-            {/* Add your settings content here */}
-            <div className="flex w-1/3 items-center space-x-2">
-              <Slider
-                defaultValue={[inverseLogScale(33)]}
-                min={0}
-                max={100}
-                step={1}
-                onValueChange={handleSliderChange}
-              />
-              <span>{agentConfig.limit}</span>
+
+          <div className="mx-auto mt-0 min-h-[80px] w-[96%] rounded-b border-t border-solid border-border bg-input px-4 py-2">
+            <div className="">
+              <div className="flex  items-center space-x-2">
+                <Slider
+                  defaultValue={[inverseLogScale(33)]}
+                  min={0}
+                  max={100}
+                  step={1}
+                  onValueChange={handleSliderChange}
+                />
+                <span>{agentConfig.limit}</span>
+              </div>
+              <DateRangePicker />
             </div>
           </div>
         </div>
