@@ -4,6 +4,7 @@ import { format, subDays, subHours, subWeeks, subMonths } from 'date-fns'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { cn } from '@/lib/utils'
 
 interface DateRange {
   from: Date
@@ -28,7 +29,6 @@ const DateRangePicker = () => {
   const updateDateRange = useCallback((newRange: DateRange, option: string) => {
     setDateRange(newRange)
     setActiveOption(option)
-    // You can add your logic here to use the new date range
     console.log('New date range:', newRange)
   }, [])
 
@@ -73,34 +73,40 @@ const DateRangePicker = () => {
             key={option.value}
             variant={activeOption === option.value ? 'default' : 'outline'}
             onClick={() => (option.value === 'custom' ? setActiveOption('custom') : quickSelectRange(option.value))}
-            className="grow sm:grow-0"
+            className={cn(
+              'grow sm:grow-0',
+              activeOption === option.value
+                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                : 'bg-background text-foreground hover:bg-secondary',
+            )}
           >
             {option.label}
           </Button>
         ))}
       </div>
       <Popover>
-        HELLO CUNT
         <PopoverTrigger asChild>
           <Button
             variant="outline"
-            className={`w-full justify-start text-left font-normal ${
-              activeOption !== 'custom' ? 'pointer-events-none opacity-50' : ''
-            }`}
+            className={cn(
+              'w-full justify-start text-left font-normal bg-background text-foreground hover:bg-secondary',
+              activeOption !== 'custom' && 'pointer-events-none opacity-50',
+            )}
           >
             <CalendarIcon className="mr-2 size-4" />
             {dateRange.from ? formatDateRange(dateRange) : <span>Pick a date range</span>}
             <ChevronDownIcon className="ml-auto size-4 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent className="w-auto bg-background p-0" align="start">
           <div className="flex flex-col sm:flex-row">
-            <div className="border-b p-4 sm:border-b-0 sm:border-r">
+            <div className="border-b border-border p-4 sm:border-b-0 sm:border-r">
               <Calendar
                 mode="single"
                 selected={dateRange.from}
                 onSelect={(date) => date && updateDateRange({ ...dateRange, from: date }, 'custom')}
                 initialFocus
+                className="bg-background text-foreground"
               />
             </div>
             <div className="p-4">
@@ -109,6 +115,7 @@ const DateRangePicker = () => {
                 selected={dateRange.to}
                 onSelect={(date) => date && updateDateRange({ ...dateRange, to: date }, 'custom')}
                 initialFocus
+                className="bg-background text-foreground"
               />
             </div>
           </div>
