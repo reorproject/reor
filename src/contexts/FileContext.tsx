@@ -14,6 +14,7 @@ import Text from '@tiptap/extension-text'
 import TextStyle from '@tiptap/extension-text-style'
 import { Editor, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
+import CharacterCount from '@tiptap/extension-character-count'
 import { toast } from 'react-toastify'
 import { Markdown } from 'tiptap-markdown'
 import { useDebounce } from 'use-debounce'
@@ -180,6 +181,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         openOnClick: true,
       }),
       BacklinkExtension(openRelativePathRef, setSuggestionsState),
+      CharacterCount,
     ],
   })
 

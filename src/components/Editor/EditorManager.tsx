@@ -94,7 +94,7 @@ const EditorManager: React.FC = () => {
 
   return (
     <div
-      className="relative size-full cursor-text overflow-y-auto bg-dark-gray-c-eleven py-4 text-slate-400 opacity-80"
+      className="relative size-full cursor-text overflow-hidden bg-dark-gray-c-eleven py-4 text-slate-400 opacity-80"
       onClick={() => editor?.commands.focus()}
     >
       <SearchBar editor={editor} showSearch={showSearchBar} setShowSearch={setShowSearchBar} />
@@ -107,31 +107,39 @@ const EditorManager: React.FC = () => {
         />
       )}
 
-      <div className={`relative h-full overflow-y-auto ${editorFlex ? 'flex justify-center py-4 pl-4' : ''}`}>
-        <EditorContent
-          className={`relative size-full bg-dark-gray-c-eleven ${editorFlex ? 'max-w-xl' : ''}`}
-          style={{
-            wordBreak: 'break-word',
-          }}
-          onContextMenu={handleContextMenu}
-          onClick={hideMenu}
-          onInput={handleInput}
-          editor={editor}
-        />
-        {showPlaceholder && (
-          <div
-            className="pointer-events-none absolute text-gray-500"
-            style={{ top: placeholderPosition.top, left: placeholderPosition.left }}
-          >
-            Press &apos;space&apos; for AI writing assistant
-          </div>
-        )}
+      <div className={`relative h-full pb-3 ${editorFlex ? 'flex justify-center py-4 pl-4' : ''}`}>
+        <div className="relative size-full overflow-y-auto">
+          <EditorContent
+            className={`relative size-full bg-dark-gray-c-eleven ${editorFlex ? 'max-w-xl' : ''}`}
+            style={{
+              wordBreak: 'break-word',
+            }}
+            onContextMenu={handleContextMenu}
+            onClick={hideMenu}
+            onInput={handleInput}
+            editor={editor}
+          />
+          {showPlaceholder && (
+            <div
+              className="pointer-events-none absolute text-gray-500"
+              style={{ top: placeholderPosition.top, left: placeholderPosition.left }}
+            >
+              Press &apos;space&apos; for AI writing assistant
+            </div>
+          )}
+        </div>
       </div>
       {suggestionsState && (
         <InEditorBacklinkSuggestionsDisplay
           suggestionsState={suggestionsState}
           suggestions={flattenedFiles.map((file) => file.relativePath)}
         />
+      )}
+      {editor && (
+        <div className="absolute bottom-2 right-2 flex gap-4 text-sm text-gray-500">
+          <div>Characters: {editor.storage.characterCount.characters()}</div>
+          <div>Words: {editor.storage.characterCount.words()}</div>
+        </div>
       )}
     </div>
   )
