@@ -35,7 +35,6 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
 
   const handleAgentSelection = (agent: AgentConfig) => {
     setChatFilters(agent)
-    setUserTextFieldInput(`Using the ${agent.name} agent. How can I help you?`)
   }
 
   const handleLLMChange = (value: string) => {
@@ -44,14 +43,14 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
 
   return (
     <div className="relative flex w-full flex-col items-center">
-      <div className="relative flex size-full flex-col text-center lg:top-10 lg:max-w-2xl">
+      <div className="relative flex size-full flex-col text-center lg:top-10 lg:max-w-2xl ">
         <div className="flex size-full justify-center">
           <img src="icon.png" style={{ width: '64px', height: '64px' }} alt="ReorImage" />
         </div>
         <h1 className="mb-10 text-[28px] text-foreground">
           Welcome to your AI-powered assistant! Start a conversation with your second brain!
         </h1>
-        <div className="flex flex-col rounded-md border-2 border-solid border-border bg-background focus-within:ring-1 focus-within:ring-ring">
+        <div className="flex flex-col rounded-md border-2 border-solid border-border bg-input focus-within:ring-1 focus-within:ring-ring">
           <textarea
             value={userTextFieldInput}
             onKeyDown={(e) => {
@@ -99,7 +98,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
           {exampleAgents.map((agent) => (
             <Card
               key={agent.name}
-              className={`m-4 size-28 cursor-pointer border-2 ${
+              className={`m-4 size-28 cursor-pointer border-2 border-solid ${
                 chatFilters.name === agent.name ? 'border-primary text-primary' : 'border-border text-muted-foreground'
               } bg-card transition-all duration-200 ease-in-out hover:border-accent hover:text-accent-foreground`}
               onClick={() => handleAgentSelection(agent)}
