@@ -124,7 +124,13 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                 />
                 <span>{agentConfig.limit}</span>
               </div>
-              <DateRangePicker />
+              <DateRangePicker
+                from={agentConfig.minDate ?? new Date()}
+                to={agentConfig.maxDate ?? new Date()}
+                onDateChange={(from, to) => {
+                  setAgentConfig({ ...agentConfig, minDate: from, maxDate: to })
+                }}
+              />
             </div>
           </div>
         </div>
