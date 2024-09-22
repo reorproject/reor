@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { PiPaperPlaneRight } from 'react-icons/pi'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import '../../styles/chat.css'
@@ -6,6 +6,7 @@ import { AgentConfig } from './types'
 import exampleAgents from './exampleAgents'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardDescription } from '../ui/card'
+import { Slider } from '../ui/slider'
 
 interface StartChatProps {
   defaultModelName: string
@@ -40,6 +41,18 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   const handleLLMChange = (value: string) => {
     setSelectedLLM(value)
   }
+
+  const inverseLogScale = (value: number) => Math.round(Math.log(value + 1) * 25)
+
+  const handleSliderChange = useCallback(
+    (value: number[]) => {
+      const logScale = (_value: number) => Math.round(Math.exp(_value / 25) - 1)
+
+      const scaledValue = logScale(value[0])
+      setAgentConfig({ ...agentConfig, limit: scaledValue })
+    },
+    [agentConfig],
+  )
 
   return (
     <div className="relative flex w-full flex-col items-center">
@@ -98,9 +111,18 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
             </div>
           </div>
           {/* New Settings Container */}
-          <div className="mx-auto mt-0 h-[80px] w-[85%] rounded border-t border-solid border-border bg-input px-4 py-2">
+          <div className="mx-auto mt-0 h-[80px] w-[96%] rounded-b border-t border-solid border-border bg-input px-4 py-2">
             {/* Add your settings content here */}
-            hello
+            <div className="flex w-1/3 items-center space-x-2">
+              <Slider
+                defaultValue={[inverseLogScale(33)]}
+                min={0}
+                max={100}
+                step={1}
+                onValueChange={handleSliderChange}
+              />
+              <span>{agentConfig.limit}</span>
+            </div>
           </div>
         </div>
 
