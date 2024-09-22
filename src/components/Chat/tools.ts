@@ -39,6 +39,8 @@ export const createNoteToolDefinition: ToolDefinition = {
   ],
 }
 
+export const allAvailableToolDefinitions: ToolDefinition[] = [searchToolDefinition, createNoteToolDefinition]
+
 type ToolFunction = (...args: any[]) => Promise<any>
 
 type ToolFunctionMap = {
