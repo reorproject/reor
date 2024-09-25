@@ -14,6 +14,7 @@ const EditorManager: React.FC = () => {
   const [placeholderPosition, setPlaceholderPosition] = useState({ top: 0, left: 0 })
 
   const { editor, suggestionsState, flattenedFiles } = useFileContext()
+  const [showDocumentStats, setShowDocumentStats] = useState(false)
 
   const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault()
@@ -40,6 +41,21 @@ const EditorManager: React.FC = () => {
 
     initEditorContentCenter()
     window.ipcRenderer.on('editor-flex-center-changed', handleEditorChange)
+  }, [])
+
+  useEffect(() => {
+    const initDocumentStats = async () => {
+      const showStats = await window.electronStore.getDocumentStats()
+      setShowDocumentStats(showStats)
+    }
+
+    initDocumentStats()
+
+    const handleDocStatsChange = (event: Electron.IpcRendererEvent, value: boolean) => {
+      setShowDocumentStats(value)
+    }
+
+    window.ipcRenderer.on('show-doc-stats-changed', handleDocStatsChange)
   }, [])
 
   useEffect(() => {
@@ -94,7 +110,7 @@ const EditorManager: React.FC = () => {
 
   return (
     <div
-      className="relative size-full cursor-text overflow-y-auto bg-dark-gray-c-eleven py-4 text-slate-400 opacity-80"
+      className="relative size-full cursor-text overflow-hidden bg-dark-gray-c-eleven py-4 text-slate-400 opacity-80"
       onClick={() => editor?.commands.focus()}
     >
       <SearchBar editor={editor} showSearch={showSearchBar} setShowSearch={setShowSearchBar} />
@@ -107,31 +123,41 @@ const EditorManager: React.FC = () => {
         />
       )}
 
-      <div className={`relative h-full overflow-y-auto ${editorFlex ? 'flex justify-center py-4 pl-4' : ''}`}>
-        <EditorContent
-          className={`relative size-full bg-dark-gray-c-eleven ${editorFlex ? 'max-w-xl' : ''}`}
-          style={{
-            wordBreak: 'break-word',
-          }}
-          onContextMenu={handleContextMenu}
-          onClick={hideMenu}
-          onInput={handleInput}
-          editor={editor}
-        />
-        {showPlaceholder && (
-          <div
-            className="pointer-events-none absolute text-gray-500"
-            style={{ top: placeholderPosition.top, left: placeholderPosition.left }}
-          >
-            Press &apos;space&apos; for AI writing assistant
-          </div>
-        )}
+      <div
+        className={`relative h-full ${editorFlex ? 'flex justify-center py-4 pl-4' : ''} ${showDocumentStats ? 'pb-3' : ''}`}
+      >
+        <div className="relative size-full overflow-y-auto">
+          <EditorContent
+            className={`relative size-full bg-dark-gray-c-eleven ${editorFlex ? 'max-w-xl' : ''}`}
+            style={{
+              wordBreak: 'break-word',
+            }}
+            onContextMenu={handleContextMenu}
+            onClick={hideMenu}
+            onInput={handleInput}
+            editor={editor}
+          />
+          {showPlaceholder && (
+            <div
+              className="pointer-events-none absolute text-gray-500"
+              style={{ top: placeholderPosition.top, left: placeholderPosition.left }}
+            >
+              Press &apos;space&apos; for AI writing assistant
+            </div>
+          )}
+        </div>
       </div>
       {suggestionsState && (
         <InEditorBacklinkSuggestionsDisplay
           suggestionsState={suggestionsState}
           suggestions={flattenedFiles.map((file) => file.relativePath)}
         />
+      )}
+      {editor && showDocumentStats && (
+        <div className="absolute bottom-2 right-2 flex gap-4 text-sm text-gray-500">
+          <div>Characters: {editor.storage.characterCount.characters()}</div>
+          <div>Words: {editor.storage.characterCount.words()}</div>
+        </div>
       )}
     </div>
   )

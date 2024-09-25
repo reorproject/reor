@@ -48,25 +48,35 @@ export const AppearanceSection = () => {
 export const EditorSection = () => {
   // const { spellCheckEnabled, setSpellCheckEnabled } = useFileByFilepath()
   const [tempSpellCheckEnabled, setTempSpellCheckEnabled] = useState(false)
+  const [documentStatsEnabled, setDocumentStatsEnabled] = useState(false)
   const [editorFlexCenter, setEditorFlexCenter] = useState<boolean>(true)
 
   useEffect(() => {
     const fetchParams = async () => {
       const isSpellCheckEnabled = await window.electronStore.getSpellCheckMode()
+      const isDocumentStatsCheckEnabled = await window.electronStore.getDocumentStats()
 
       if (isSpellCheckEnabled !== undefined) {
         // setSpellCheckEnabled(isSpellCheckEnabled)
         setTempSpellCheckEnabled(isSpellCheckEnabled)
+      }
+      if (isDocumentStatsCheckEnabled !== undefined) {
+        setDocumentStatsEnabled(isDocumentStatsCheckEnabled)
       }
     }
 
     fetchParams()
   }, [])
 
-  const handleSave = (setChecked: boolean) => {
+  const handleSaveSpellCheck = (setChecked: boolean) => {
     // Execute the save function here
     window.electronStore.setSpellCheckMode(setChecked)
     setTempSpellCheckEnabled(!tempSpellCheckEnabled)
+  }
+  const handleSaveDocStats = async (setChecked: boolean) => {
+    // Execute the save function here
+    await window.electronStore.setDocumentStats(setChecked)
+    setDocumentStatsEnabled(!documentStatsEnabled)
   }
 
   // Check if we should have flex center for our editor
@@ -120,7 +130,24 @@ export const EditorSection = () => {
         <Switch
           checked={tempSpellCheckEnabled}
           onChange={() => {
-            handleSave(!tempSpellCheckEnabled)
+            handleSaveSpellCheck(!tempSpellCheckEnabled)
+          }}
+          inputProps={{ 'aria-label': 'controlled' }}
+        />
+      </div>
+      <div className="flex w-full flex-wrap items-center justify-between">
+        <div className="flex w-[70%] flex-col justify-center">
+          <p className="xs:text-xs flex flex-col text-base text-gray-100 opacity-80 sm:text-sm">
+            Document Statistics
+            <span className="m-0 pt-1 text-xs text-gray-100">
+              Display real-time word and character statistics while editing your document
+            </span>
+          </p>
+        </div>
+        <Switch
+          checked={documentStatsEnabled}
+          onChange={() => {
+            handleSaveDocStats(!documentStatsEnabled)
           }}
           inputProps={{ 'aria-label': 'controlled' }}
         />
