@@ -138,7 +138,7 @@ export const EditorSection = () => {
       <div className="flex w-full flex-wrap items-center justify-between">
         <div className="flex w-[70%] flex-col justify-center">
           <p className="xs:text-xs flex flex-col text-base text-gray-100 opacity-80 sm:text-sm">
-            Document Stattistics
+            Document Statistics
             <span className="m-0 pt-1 text-xs text-gray-100">
               Display real-time word and character statistics while editing your document
             </span>
