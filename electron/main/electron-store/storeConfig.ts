@@ -65,6 +65,7 @@ export interface StoreSchema {
   spellCheck: string
   EditorFlexCenter: boolean
   OpenTabs: Tab[]
+  showDocumentStats: boolean
 }
 
 export enum StoreKeys {
@@ -85,4 +86,5 @@ export enum StoreKeys {
   SpellCheck = 'spellCheck',
   EditorFlexCenter = 'editorFlexCenter',
   OpenTabs = 'OpenTabs',
+  showDocumentStats = 'showDocumentStats',
 }
