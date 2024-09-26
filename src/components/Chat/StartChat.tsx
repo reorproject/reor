@@ -199,8 +199,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               </div>
 
               {agentConfig.dbSearchFilters && (
-                <div className="space-y-4 rounded-md border border-border p-4">
-                  <h3 className="text-sm font-medium">Database Search Filters</h3>
+                <div className="space-y-2 rounded-md border  border-foreground p-3">
                   <div className="flex items-center space-x-2">
                     <Slider
                       defaultValue={[inverseLogScale(agentConfig.dbSearchFilters.limit)]}

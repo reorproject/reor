@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback } from 'react'
 import { CalendarIcon, ChevronDownIcon } from 'lucide-react'
 import { format, subDays, subHours, subWeeks, subMonths } from 'date-fns'
 import { Button } from '@/components/ui/button'
@@ -22,36 +22,25 @@ const quickSelectOptions = [
 
 const DateRangePicker: React.FC<DateRangePickerProps> = ({ from, to, onDateChange }) => {
   const [activeOption, setActiveOption] = useState('custom')
-
-  useEffect(() => {
-    // Determine the active option based on the initial from and to props
-    const now = new Date()
-    if (from.getTime() === subHours(now, 1).getTime()) {
-      setActiveOption('last-hour')
-    } else if (from.getTime() === subDays(now, 1).getTime()) {
-      setActiveOption('last-day')
-    } else if (from.getTime() === subWeeks(now, 1).getTime()) {
-      setActiveOption('last-week')
-    } else if (from.getTime() === subMonths(now, 1).getTime()) {
-      setActiveOption('last-month')
-    } else {
-      setActiveOption('custom')
-    }
-  }, [from, to])
+  const [isOpen, setIsOpen] = useState(false)
 
   const updateDateRange = useCallback(
     (newFrom: Date, newTo: Date, option: string) => {
       onDateChange(newFrom, newTo)
       setActiveOption(option)
+      if (option !== 'custom') {
+        setIsOpen(false)
+      }
     },
     [onDateChange],
   )
 
-  const quickSelectRange = useCallback(
-    (value: string) => {
+  const handleOptionClick = (option: string) => {
+    setActiveOption(option)
+    if (option !== 'custom') {
       const now = new Date()
       let newFrom: Date
-      switch (value) {
+      switch (option) {
         case 'last-hour':
           newFrom = subHours(now, 1)
           break
@@ -67,10 +56,11 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ from, to, onDateChang
         default:
           return
       }
-      updateDateRange(newFrom, now, value)
-    },
-    [updateDateRange],
-  )
+      updateDateRange(newFrom, now, option)
+    } else {
+      setIsOpen(true)
+    }
+  }
 
   const formatDateRange = () => {
     if (activeOption === 'last-hour') {
@@ -86,7 +76,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ from, to, onDateChang
           <Button
             key={option.value}
             variant={activeOption === option.value ? 'default' : 'outline'}
-            onClick={() => (option.value === 'custom' ? setActiveOption('custom') : quickSelectRange(option.value))}
+            onClick={() => handleOptionClick(option.value)}
             className={cn(
               'grow sm:grow-0',
               activeOption === option.value
@@ -98,43 +88,42 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ from, to, onDateChang
           </Button>
         ))}
       </div>
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            className={cn(
-              'w-full justify-start text-left font-normal bg-background text-foreground hover:bg-secondary',
-              activeOption !== 'custom' && 'pointer-events-none opacity-50',
-            )}
-          >
-            <CalendarIcon className="mr-2 size-4" />
-            {from ? formatDateRange() : <span>Pick a date range</span>}
-            <ChevronDownIcon className="ml-auto size-4 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto bg-background p-0" align="start">
-          <div className="flex flex-col sm:flex-row">
-            <div className="border-b border-border p-4 sm:border-b-0 sm:border-r">
-              <Calendar
-                mode="single"
-                selected={from}
-                onSelect={(date) => date && updateDateRange(date, to, 'custom')}
-                initialFocus
-                className="bg-background text-foreground"
-              />
+      {activeOption === 'custom' && (
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-full justify-start bg-background text-left font-normal text-foreground hover:bg-secondary"
+            >
+              <CalendarIcon className="mr-2 size-4" />
+              {from ? formatDateRange() : <span>Pick a date range</span>}
+              <ChevronDownIcon className="ml-auto size-4 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto bg-background p-0" align="start">
+            <div className="flex flex-col sm:flex-row">
+              <div className="border-b border-border p-4 sm:border-b-0 sm:border-r">
+                <Calendar
+                  mode="single"
+                  selected={from}
+                  onSelect={(date) => date && updateDateRange(date, to, 'custom')}
+                  initialFocus
+                  className="bg-background text-foreground"
+                />
+              </div>
+              <div className="p-4">
+                <Calendar
+                  mode="single"
+                  selected={to}
+                  onSelect={(date) => date && updateDateRange(from, date, 'custom')}
+                  initialFocus
+                  className="bg-background text-foreground"
+                />
+              </div>
             </div>
-            <div className="p-4">
-              <Calendar
-                mode="single"
-                selected={to}
-                onSelect={(date) => date && updateDateRange(from, date, 'custom')}
-                initialFocus
-                className="bg-background text-foreground"
-              />
-            </div>
-          </div>
-        </PopoverContent>
-      </Popover>
+          </PopoverContent>
+        </Popover>
+      )}
     </div>
   )
 }
