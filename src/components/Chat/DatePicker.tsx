@@ -43,7 +43,6 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ from, to, onDateChang
     (newFrom: Date, newTo: Date, option: string) => {
       onDateChange(newFrom, newTo)
       setActiveOption(option)
-      console.log('New date range:', { from: newFrom, to: newTo })
     },
     [onDateChange],
   )

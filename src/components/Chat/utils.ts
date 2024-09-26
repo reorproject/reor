@@ -217,10 +217,7 @@ export const doInitialRAG = async (query: string, agentConfig: AgentConfig): Pro
   if (needsContext) {
     if (files.length > 0) {
       results = await window.fileSystem.getFiles(files)
-    } else {
-      if (!agentConfig.dbSearchFilters) {
-        throw new Error('DB search filters are required')
-      }
+    } else if (agentConfig.dbSearchFilters) {
       results = await retreiveFromVectorDB(query, agentConfig.dbSearchFilters)
     }
     contextString = generateStringOfContextItemsForPrompt(results)

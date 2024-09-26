@@ -4,11 +4,11 @@ import { AgentConfig, PromptTemplate } from './types'
 const defaultAgentPromptTemplate: PromptTemplate = [
   {
     role: 'system',
-    content: `You are a helpful assistant helping a user organize and manage their personal knowledge and notes. 
-  You will answer the user's question and help them with their request. 
-  You can search the knowledge base by using the search tool and create new notes by using the create note tool.
-  
-  An initial query has been made and the context is already provided for you (so please do not call the search tool initially).`,
+    content: `You are a helpful assistant helping a user organize and manage their personal knowledge and notes. Here are some guidelines:
+- You will answer the user's question and help them with their request. 
+- You can search the knowledge base by using the search tool and create new notes by using the create note tool.
+- Make sure you respond in the same language as the user's query.
+- An initial query has been made and the context is already provided for you (so please do not call the search tool initially).`,
   },
   {
     role: 'user',
@@ -48,6 +48,16 @@ When the user asks, you will create a note for them with all the relevant things
   },
 ]
 
+const reasoningAgentPromptTemplate: PromptTemplate = [
+  {
+    role: 'system',
+    content: `You an advanced reasoning agent. You think logically and critically and help the user think through their thoughts.`,
+  },
+  {
+    role: 'user',
+    content: `{QUERY}`,
+  },
+]
 const exampleAgents: AgentConfig[] = [
   {
     files: [],
@@ -76,6 +86,12 @@ const exampleAgents: AgentConfig[] = [
     name: 'Daily Note Agent',
     toolDefinitions: [searchToolDefinition, createNoteToolDefinition],
     promptTemplate: dailyNoteAgentPromptTemplate,
+  },
+  {
+    files: [],
+    name: 'Reasoning Agent',
+    toolDefinitions: [searchToolDefinition, createNoteToolDefinition],
+    promptTemplate: reasoningAgentPromptTemplate,
   },
 ]
 

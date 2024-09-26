@@ -13,6 +13,8 @@ import { allAvailableToolDefinitions } from './tools'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import PromptEditor from './PromptEditor'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
 
 interface StartChatProps {
   defaultModelName: string
@@ -57,10 +59,16 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
     const scaledValue = logScale(value[0])
     setAgentConfig((prevConfig) => ({
       ...prevConfig,
-      dbSearchFilters: {
-        ...prevConfig.dbSearchFilters,
-        limit: scaledValue,
-      },
+      dbSearchFilters: prevConfig.dbSearchFilters
+        ? {
+            ...prevConfig.dbSearchFilters,
+            limit: scaledValue,
+          }
+        : {
+            limit: scaledValue,
+            minDate: new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
+            maxDate: new Date(),
+          },
     }))
   }, [])
 
@@ -72,12 +80,30 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   const handleDateChange = (from: Date | undefined, to: Date | undefined) => {
     setAgentConfig((prevConfig) => ({
       ...prevConfig,
-      dbSearchFilters: {
-        ...prevConfig.dbSearchFilters,
-        limit: prevConfig.dbSearchFilters?.limit ?? 15,
-        minDate: from,
-        maxDate: to,
-      },
+      dbSearchFilters: prevConfig.dbSearchFilters
+        ? {
+            ...prevConfig.dbSearchFilters,
+            minDate: from,
+            maxDate: to,
+          }
+        : {
+            limit: 33,
+            minDate: from,
+            maxDate: to,
+          },
+    }))
+  }
+
+  const handleDbSearchToggle = (checked: boolean) => {
+    setAgentConfig((prevConfig) => ({
+      ...prevConfig,
+      dbSearchFilters: checked
+        ? {
+            limit: 33,
+            minDate: new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
+            maxDate: new Date(),
+          }
+        : undefined,
     }))
   }
 
@@ -160,21 +186,38 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                 selectedTools={selectedTools}
                 onToolsChange={handleToolsChange}
               />
-              <div className="mb-2 flex items-center space-x-2">
-                <Slider
-                  defaultValue={[inverseLogScale(agentConfig.dbSearchFilters?.limit ?? 33)]}
-                  min={0}
-                  max={100}
-                  step={1}
-                  onValueChange={handleSliderChange}
+
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="db-search-toggle"
+                  checked={!!agentConfig.dbSearchFilters}
+                  onCheckedChange={handleDbSearchToggle}
                 />
-                <span>{agentConfig.dbSearchFilters?.limit ?? 33}</span>
+                <Label htmlFor="db-search-toggle" className="text-sm text-muted-foreground">
+                  Include initial database search in context
+                </Label>
               </div>
-              <DateRangePicker
-                from={agentConfig.dbSearchFilters?.minDate ?? new Date()}
-                to={agentConfig.dbSearchFilters?.maxDate ?? new Date()}
-                onDateChange={handleDateChange}
-              />
+
+              {agentConfig.dbSearchFilters && (
+                <div className="space-y-4 rounded-md border border-border p-4">
+                  <h3 className="text-sm font-medium">Database Search Filters</h3>
+                  <div className="flex items-center space-x-2">
+                    <Slider
+                      defaultValue={[inverseLogScale(agentConfig.dbSearchFilters.limit)]}
+                      min={0}
+                      max={100}
+                      step={1}
+                      onValueChange={handleSliderChange}
+                    />
+                    <span className="text-sm">{agentConfig.dbSearchFilters.limit} results</span>
+                  </div>
+                  <DateRangePicker
+                    from={agentConfig.dbSearchFilters.minDate ?? new Date()}
+                    to={agentConfig.dbSearchFilters.maxDate ?? new Date()}
+                    onDateChange={handleDateChange}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
