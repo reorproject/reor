@@ -211,8 +211,8 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                     <span className="text-sm">{agentConfig.dbSearchFilters.limit} results</span>
                   </div>
                   <DateRangePicker
-                    from={agentConfig.dbSearchFilters.minDate ?? new Date()}
-                    to={agentConfig.dbSearchFilters.maxDate ?? new Date()}
+                    from={agentConfig.dbSearchFilters.minDate}
+                    to={agentConfig.dbSearchFilters.maxDate}
                     onDateChange={handleDateChange}
                   />
                 </div>

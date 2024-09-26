@@ -63,8 +63,8 @@ const exampleAgents: AgentConfig[] = [
     files: [],
     dbSearchFilters: {
       limit: 15,
-      minDate: new Date(0),
-      maxDate: new Date(),
+      minDate: undefined,
+      maxDate: undefined,
     },
     name: 'Default',
     toolDefinitions: [searchToolDefinition, createNoteToolDefinition],
@@ -80,8 +80,8 @@ const exampleAgents: AgentConfig[] = [
     files: [],
     dbSearchFilters: {
       limit: 15,
-      minDate: new Date(0),
-      maxDate: new Date(),
+      minDate: undefined,
+      maxDate: undefined,
     },
     name: 'Daily Note Agent',
     toolDefinitions: [searchToolDefinition, createNoteToolDefinition],

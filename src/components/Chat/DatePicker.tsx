@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react'
-import { CalendarIcon, ChevronDownIcon } from 'lucide-react'
+import React, { useState, useCallback, useEffect } from 'react'
+import { CalendarIcon, ChevronDownIcon, XIcon } from 'lucide-react'
 import { format, subDays, subHours, subWeeks, subMonths } from 'date-fns'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -7,9 +7,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { cn } from '@/lib/utils'
 
 interface DateRangePickerProps {
-  from: Date
-  to: Date
-  onDateChange: (from: Date, to: Date) => void
+  from: Date | undefined
+  to: Date | undefined
+  onDateChange: (from: Date | undefined, to: Date | undefined) => void
 }
 
 const quickSelectOptions = [
@@ -21,19 +21,26 @@ const quickSelectOptions = [
 ]
 
 const DateRangePicker: React.FC<DateRangePickerProps> = ({ from, to, onDateChange }) => {
-  const [activeOption, setActiveOption] = useState('custom')
-  const [isOpen, setIsOpen] = useState(false)
+  const [activeOption, setActiveOption] = useState<string | null>()
+  const [isDatePopoverOpen, setIsDatePopoverOpen] = useState(false)
 
   const updateDateRange = useCallback(
-    (newFrom: Date, newTo: Date, option: string) => {
+    (newFrom: Date | undefined, newTo: Date | undefined, option: string | null) => {
+      console.log('newFrom', newFrom)
+      console.log('newTo', newTo)
       onDateChange(newFrom, newTo)
       setActiveOption(option)
       if (option !== 'custom') {
-        setIsOpen(false)
+        setIsDatePopoverOpen(false)
       }
     },
     [onDateChange],
   )
+
+  useEffect(() => {
+    console.log('from', from)
+    console.log('to', to)
+  }, [from, to])
 
   const handleOptionClick = (option: string) => {
     setActiveOption(option)
@@ -58,11 +65,16 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ from, to, onDateChang
       }
       updateDateRange(newFrom, now, option)
     } else {
-      setIsOpen(true)
+      setIsDatePopoverOpen(true)
     }
   }
 
+  const handleClear = () => {
+    updateDateRange(undefined, undefined, null)
+  }
+
   const formatDateRange = () => {
+    if (!from || !to) return 'Select date range'
     if (activeOption === 'last-hour') {
       return `${format(from, 'HH:mm')} - ${format(to, 'HH:mm')}`
     }
@@ -87,16 +99,24 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ from, to, onDateChang
             {option.label}
           </Button>
         ))}
+        <Button
+          variant="outline"
+          onClick={handleClear}
+          className="grow bg-background text-foreground hover:bg-secondary sm:grow-0"
+        >
+          <XIcon className="mr-2 size-4" />
+          Clear
+        </Button>
       </div>
       {activeOption === 'custom' && (
-        <Popover open={isOpen} onOpenChange={setIsOpen}>
+        <Popover open={isDatePopoverOpen} onOpenChange={setIsDatePopoverOpen}>
           <PopoverTrigger asChild>
             <Button
               variant="outline"
               className="w-full justify-start bg-background text-left font-normal text-foreground hover:bg-secondary"
             >
               <CalendarIcon className="mr-2 size-4" />
-              {from ? formatDateRange() : <span>Pick a date range</span>}
+              {formatDateRange()}
               <ChevronDownIcon className="ml-auto size-4 opacity-50" />
             </Button>
           </PopoverTrigger>
@@ -106,7 +126,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ from, to, onDateChang
                 <Calendar
                   mode="single"
                   selected={from}
-                  onSelect={(date) => date && updateDateRange(date, to, 'custom')}
+                  onSelect={(date) => updateDateRange(date || undefined, to, 'custom')}
                   initialFocus
                   className="bg-background text-foreground"
                 />
@@ -115,7 +135,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ from, to, onDateChang
                 <Calendar
                   mode="single"
                   selected={to}
-                  onSelect={(date) => date && updateDateRange(from, date, 'custom')}
+                  onSelect={(date) => updateDateRange(from, date || undefined, 'custom')}
                   initialFocus
                   className="bg-background text-foreground"
                 />
