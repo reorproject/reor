@@ -18,7 +18,7 @@ const OllamaServeType = {
 
 export const defaultOllamaAPI: LLMAPIConfig = {
   name: 'Ollama',
-  apiInterface: 'openai',
+  apiInterface: 'ollama',
   apiURL: 'http://localhost:11434/v1/',
 }
 

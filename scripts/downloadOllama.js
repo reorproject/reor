@@ -7,17 +7,17 @@ const AdmZip = require("adm-zip");
 // Mapping of OS to binary info
 const binariesInfo = {
   darwin: {
-    url: "https://github.com/ollama/ollama/releases/download/v0.3.6/ollama-darwin",
+    url: "https://github.com/ollama/ollama/releases/download/v0.3.12/ollama-darwin",
     path: "../binaries/darwin/",
     binaryName: "ollama-darwin",
   },
   linux: {
-    url: "https://github.com/ollama/ollama/releases/download/v0.3.6/ollama-linux-amd64",
+    url: "https://github.com/ollama/ollama/releases/download/v0.3.12/ollama-linux-amd64",
     path: "../binaries/linux/",
     binaryName: "ollama-linux-amd64",
   },
   win32: {
-    url: "https://github.com/ollama/ollama/releases/download/v0.3.6/ollama-windows-amd64.zip",
+    url: "https://github.com/ollama/ollama/releases/download/v0.3.12/ollama-windows-amd64.zip",
     path: "../binaries/win32/",
     binaryName: "ollama.exe",
   },

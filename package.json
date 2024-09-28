@@ -94,6 +94,7 @@
     "marked": "^12.0.1",
     "npm": "^10.3.0",
     "ollama": "^0.4.9",
+    "ollama-ai-provider": "^0.15.1",
     "openai": "^4.20.0",
     "posthog-js": "^1.130.2",
     "prosemirror-utils": "^1.2.2",

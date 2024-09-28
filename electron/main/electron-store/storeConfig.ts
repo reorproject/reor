@@ -1,6 +1,6 @@
 import { Chat } from '@/components/Chat/types'
 
-export type APIInterface = 'openai' | 'anthropic'
+export type APIInterface = 'openai' | 'anthropic' | 'ollama'
 
 export interface LLMAPIConfig {
   name: string

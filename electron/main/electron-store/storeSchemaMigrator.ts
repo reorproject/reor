@@ -42,6 +42,9 @@ export const setupDefaultLLMAPIs = (store: Store<StoreSchema>) => {
   const existingOllamaAPI = llmAPIs?.find((api) => api.name === defaultOllamaAPI.name)
   if (!existingOllamaAPI) {
     store.set(StoreKeys.LLMAPIs, [defaultOllamaAPI])
+  } else if (existingOllamaAPI.apiInterface !== 'ollama') {
+    const updatedLLMAPIs = llmAPIs.filter((api) => api.name !== defaultOllamaAPI.name)
+    store.set(StoreKeys.LLMAPIs, [...updatedLLMAPIs, defaultOllamaAPI])
   }
 }
 
