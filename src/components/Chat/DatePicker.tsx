@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { CalendarIcon, ChevronDownIcon, XIcon } from 'lucide-react'
-import { format, subDays, subHours, subWeeks, subMonths } from 'date-fns'
+import { subDays, subHours, subWeeks, subMonths } from 'date-fns'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -74,11 +74,19 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ from, to, onDateChang
   }
 
   const formatDateRange = () => {
-    if (!from || !to) return 'Select date range'
-    if (activeOption === 'last-hour') {
-      return `${format(from, 'HH:mm')} - ${format(to, 'HH:mm')}`
-    }
-    return `${format(from, 'LLL dd, y')} - ${format(to, 'LLL dd, y')}`
+    if (!from && !to) return 'Select date range'
+    if (from && to) return `${from.toDateString()} - ${to.toDateString()}`
+    if (from) return `From ${from.toDateString()}`
+    if (to) return `To ${to.toDateString()}`
+    return '' // Default case
+  }
+
+  const handleFromDateSelect = (date: Date | undefined) => {
+    updateDateRange(date, to, 'custom')
+  }
+
+  const handleToDateSelect = (date: Date | undefined) => {
+    updateDateRange(from, date, 'custom')
   }
 
   return (
@@ -123,22 +131,10 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ from, to, onDateChang
           <PopoverContent className="w-auto bg-background p-0" align="start">
             <div className="flex flex-col sm:flex-row">
               <div className="border-b border-border p-4 sm:border-b-0 sm:border-r">
-                <Calendar
-                  mode="single"
-                  selected={from}
-                  onSelect={(date) => updateDateRange(date || undefined, to, 'custom')}
-                  initialFocus
-                  className="bg-background text-foreground"
-                />
+                <Calendar mode="single" selected={from} onSelect={handleFromDateSelect} initialFocus />
               </div>
               <div className="p-4">
-                <Calendar
-                  mode="single"
-                  selected={to}
-                  onSelect={(date) => updateDateRange(from, date || undefined, 'custom')}
-                  initialFocus
-                  className="bg-background text-foreground"
-                />
+                <Calendar mode="single" selected={to} onSelect={handleToDateSelect} initialFocus />
               </div>
             </div>
           </PopoverContent>
