@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback } from 'react'
 import { CalendarIcon, ChevronDownIcon, XIcon } from 'lucide-react'
 import { subDays, subHours, subWeeks, subMonths } from 'date-fns'
 import { Button } from '@/components/ui/button'
@@ -26,8 +26,6 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ from, to, onDateChang
 
   const updateDateRange = useCallback(
     (newFrom: Date | undefined, newTo: Date | undefined, option: string | null) => {
-      console.log('newFrom', newFrom)
-      console.log('newTo', newTo)
       onDateChange(newFrom, newTo)
       setActiveOption(option)
       if (option !== 'custom') {
@@ -36,11 +34,6 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ from, to, onDateChang
     },
     [onDateChange],
   )
-
-  useEffect(() => {
-    console.log('from', from)
-    console.log('to', to)
-  }, [from, to])
 
   const handleOptionClick = (option: string) => {
     setActiveOption(option)
@@ -90,15 +83,15 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ from, to, onDateChang
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap gap-2">
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-1">
         {quickSelectOptions.map((option) => (
           <Button
             key={option.value}
             variant={activeOption === option.value ? 'default' : 'outline'}
             onClick={() => handleOptionClick(option.value)}
             className={cn(
-              'grow sm:grow-0',
+              'grow px-2 py-1 text-sm sm:grow-0',
               activeOption === option.value
                 ? 'bg-primary text-primary-foreground hover:bg-primary/90'
                 : 'bg-background text-foreground hover:bg-secondary',
@@ -110,9 +103,9 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ from, to, onDateChang
         <Button
           variant="outline"
           onClick={handleClear}
-          className="grow bg-background text-foreground hover:bg-secondary sm:grow-0"
+          className="grow bg-background px-2 py-1 text-xs text-foreground hover:bg-secondary sm:grow-0"
         >
-          <XIcon className="mr-2 size-4" />
+          <XIcon className="mr-1 size-3" />
           Clear
         </Button>
       </div>
@@ -121,11 +114,11 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ from, to, onDateChang
           <PopoverTrigger asChild>
             <Button
               variant="outline"
-              className="w-full justify-start bg-background text-left font-normal text-foreground hover:bg-secondary"
+              className="w-full justify-start bg-background px-2 py-1 text-left text-xs font-normal text-foreground hover:bg-secondary"
             >
-              <CalendarIcon className="mr-2 size-4" />
+              <CalendarIcon className="mr-1 size-3" />
               {formatDateRange()}
-              <ChevronDownIcon className="ml-auto size-4 opacity-50" />
+              <ChevronDownIcon className="ml-auto size-3 opacity-50" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-auto bg-background p-0" align="start">
