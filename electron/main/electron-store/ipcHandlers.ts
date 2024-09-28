@@ -124,6 +124,15 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     return store.get(StoreKeys.SpellCheck)
   })
 
+  ipcMain.handle('set-document-stats', (event, showDocumentStats: boolean) => {
+    store.set(StoreKeys.showDocumentStats, showDocumentStats)
+    event.sender.send('show-doc-stats-changed', showDocumentStats)
+  })
+
+  ipcMain.handle('get-document-stats', () => {
+    return store.get(StoreKeys.showDocumentStats, false)
+  })
+
   ipcMain.handle('has-user-opened-app-before', () => store.get(StoreKeys.hasUserOpenedAppBefore))
 
   ipcMain.handle('set-user-has-opened-app-before', () => {

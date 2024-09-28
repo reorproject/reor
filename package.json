@@ -57,6 +57,7 @@
     "@tailwindcss/typography": "^0.5.10",
     "@tiptap/core": "^2.5.0",
     "@tiptap/extension-bubble-menu": "^2.4.0",
+    "@tiptap/extension-character-count": "^2.7.2",
     "@tiptap/extension-document": "^2.5.0",
     "@tiptap/extension-link": "^2.2.4",
     "@tiptap/extension-paragraph": "^2.5.0",
