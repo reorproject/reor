@@ -169,7 +169,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               {/* New Prompt Editor Dialog */}
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="outline">Edit Prompt</Button>
+                  <Button>Edit Prompt</Button>
                 </DialogTrigger>
                 <DialogContent>
                   <PromptEditor

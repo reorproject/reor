@@ -17,19 +17,19 @@ const PromptEditor: React.FC<{
   }
 
   return (
-    <DialogContent className="bg-background text-foreground sm:max-w-[425px]">
+    <DialogContent className="w-full max-w-4xl bg-background text-foreground">
       <DialogHeader>
         <DialogTitle className="text-foreground">Edit Prompt Template</DialogTitle>
         <DialogDescription className="text-muted-foreground">
           Customize the prompt template for your AI assistant. Click done when you&apos;re done.
         </DialogDescription>
       </DialogHeader>
-      <div className="grid gap-4 py-4">
+      <div className="grid gap-6 py-4">
         {editedPrompt.map((prompt, index) => (
           // eslint-disable-next-line react/no-array-index-key
           <div key={index} className="grid gap-2">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor={`role-${index}`} className="text-right text-foreground">
+            <div className="flex items-center gap-4">
+              <Label htmlFor={`role-${index}`} className="w-20 text-foreground">
                 Role
               </Label>
               <Select
@@ -40,7 +40,7 @@ const PromptEditor: React.FC<{
                   )
                 }
               >
-                <SelectTrigger className="col-span-3 border-input bg-background text-foreground">
+                <SelectTrigger className="w-full border-input bg-background text-foreground">
                   <SelectValue placeholder="Select role" />
                 </SelectTrigger>
                 <SelectContent className="border-input bg-background text-foreground">
@@ -49,8 +49,8 @@ const PromptEditor: React.FC<{
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor={`content-${index}`} className="text-right text-foreground">
+            <div className="flex items-start gap-4">
+              <Label htmlFor={`content-${index}`} className="w-20 pt-2 text-foreground">
                 Content
               </Label>
               <Textarea
@@ -59,7 +59,7 @@ const PromptEditor: React.FC<{
                 onChange={(e) =>
                   setEditedPrompt(editedPrompt.map((p, i) => (i === index ? { ...p, content: e.target.value } : p)))
                 }
-                className="col-span-3 border-input bg-background text-foreground"
+                className="h-32 min-h-32 flex-1 border border-solid border-input bg-background text-foreground"
               />
             </div>
           </div>
