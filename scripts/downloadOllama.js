@@ -3,6 +3,7 @@ const https = require("https");
 const os = require("os");
 const path = require("path");
 const AdmZip = require("adm-zip");
+const tar = require('tar');
 
 // Mapping of OS to binary info
 const binariesInfo = {
@@ -12,9 +13,9 @@ const binariesInfo = {
     binaryName: "ollama-darwin",
   },
   linux: {
-    url: "https://github.com/ollama/ollama/releases/download/v0.3.12/ollama-linux-amd64",
+    url: "https://github.com/ollama/ollama/releases/download/v0.3.12/ollama-linux-amd64.tgz",
     path: "../binaries/linux/",
-    binaryName: "ollama-linux-amd64",
+    binaryName: "ollama",
   },
   win32: {
     url: "https://github.com/ollama/ollama/releases/download/v0.3.12/ollama-windows-amd64.zip",
@@ -56,15 +57,14 @@ function removeDirectory(dirPath) {
   }
 }
 
-
-function downloadAndExtractZip(url, extractPath, redirectCount = 0, timeout = 1000000) {
+function downloadAndExtractArchive(url, extractPath, archiveType, redirectCount = 0, timeout = 1000000) {
   return new Promise((resolve, reject) => {
     if (redirectCount > 5) {
       reject(new Error("Too many redirects"));
       return;
     }
 
-    const tempPath = path.join(os.tmpdir(), 'ollama-temp.zip');
+    const tempPath = path.join(os.tmpdir(), `ollama-temp.${archiveType}`);
     const file = fs.createWriteStream(tempPath);
     let fileStream = null;
 
@@ -85,8 +85,23 @@ function downloadAndExtractZip(url, extractPath, redirectCount = 0, timeout = 10
           fileStream.close(() => {
             console.log('Download completed, extracting...');
             try {
-              const zip = new AdmZip(tempPath);
-              zip.extractAllTo(extractPath, true);
+              if (archiveType === 'zip') {
+                const zip = new AdmZip(tempPath);
+                zip.extractAllTo(extractPath, true);
+              } else if (archiveType === 'tgz') {
+                fs.createReadStream(tempPath)
+                  .pipe(tar.x({ C: extractPath }))
+                  .on('finish', () => {
+                    console.log('Extraction completed');
+                    fs.unlink(tempPath, (unlinkError) => {
+                      if (unlinkError) {
+                        console.error(`Failed to delete temporary file ${tempPath}: ${unlinkError.message}`);
+                      }
+                      resolve();
+                    });
+                  });
+                return;
+              }
               fs.unlink(tempPath, (unlinkError) => {
                 if (unlinkError) {
                   console.error(`Failed to delete temporary file ${tempPath}: ${unlinkError.message}`);
@@ -108,7 +123,7 @@ function downloadAndExtractZip(url, extractPath, redirectCount = 0, timeout = 10
                 resolve();
               });
             } catch (error) {
-              cleanupAndReject(new Error(`Failed to extract zip file: ${error.message}`));
+              cleanupAndReject(new Error(`Failed to extract archive: ${error.message}`));
             }
           });
         });
@@ -119,7 +134,7 @@ function downloadAndExtractZip(url, extractPath, redirectCount = 0, timeout = 10
               console.error(`Failed to delete temporary file ${tempPath}: ${unlinkError.message}`);
             }
             console.log(`Following redirect to: ${response.headers.location}`);
-            downloadAndExtractZip(response.headers.location, extractPath, redirectCount + 1, timeout)
+            downloadAndExtractArchive(response.headers.location, extractPath, archiveType, redirectCount + 1, timeout)
               .then(resolve)
               .catch(reject);
           });
@@ -146,70 +161,6 @@ function downloadAndExtractZip(url, extractPath, redirectCount = 0, timeout = 10
   });
 }
 
-function downloadFile(url, filePath, redirectCount = 0, timeout = 500000) {
-  return new Promise((resolve, reject) => {
-    if (redirectCount > 5) {
-      reject(new Error("Too many redirects"));
-      return;
-    }
-
-    const file = fs.createWriteStream(filePath);
-    let fileStream = null;
-
-    const cleanupAndReject = (error) => {
-      if (fileStream) fileStream.close();
-      fs.unlink(filePath, (unlinkError) => {
-        if (unlinkError) {
-          console.error(`Failed to delete incomplete file ${filePath}: ${unlinkError.message}`);
-        }
-        reject(error);
-      });
-    };
-
-    const request = https.get(url, (response) => {
-      console.log("making request to", url);
-      if (response.statusCode === 200) {
-        fileStream = response.pipe(file);
-        fileStream.on("finish", () => {
-          fileStream.close(() => {
-            console.log(`Downloaded to ${filePath}`);
-            resolve();
-          });
-        });
-      } else if (response.statusCode === 302 || response.statusCode === 301) {
-        file.close(() => {
-          fs.unlink(filePath, (unlinkError) => {
-            if (unlinkError) {
-              console.error(`Failed to delete redirect file ${filePath}: ${unlinkError.message}`);
-            }
-            console.log(`Following redirect to: ${response.headers.location}`);
-            downloadFile(response.headers.location, filePath, redirectCount + 1, timeout)
-              .then(resolve)
-              .catch(reject);
-          });
-        });
-      } else {
-        cleanupAndReject(new Error(`Failed to download: ${response.statusCode} ${response.statusMessage}`));
-      }
-    });
-
-    request.on("error", (error) => {
-      cleanupAndReject(new Error(`Network error during download: ${error.message}`));
-    });
-
-    request.on("timeout", () => {
-      request.destroy();
-      cleanupAndReject(new Error(`Download timed out after ${timeout}ms`));
-    });
-
-    request.setTimeout(timeout);
-
-    file.on("error", (error) => {
-      cleanupAndReject(new Error(`File system error: ${error.message}`));
-    });
-  });
-}
-
 async function downloadIfMissing(platformKey) {
   const info = binariesInfo[platformKey];
   const directoryPath = path.join(__dirname, info.path);
@@ -227,13 +178,17 @@ async function downloadIfMissing(platformKey) {
     console.log(`${platformKey} binary not found, downloading...`);
     try {
       if (platformKey === 'win32') {
-        await downloadAndExtractZip(info.url, directoryPath);
+        await downloadAndExtractArchive(info.url, directoryPath, 'zip');
         console.log('Windows binary downloaded and extracted');
+      } else if (platformKey === 'linux') {
+        await downloadAndExtractArchive(info.url, directoryPath, 'tgz');
+        console.log('Linux binary downloaded and extracted');
+        const extractedBinaryPath = path.join(directoryPath, 'bin', 'ollama');
+        await fs.promises.rename(extractedBinaryPath, filePath);
+        await setExecutable(filePath);
       } else {
-        await downloadFile(info.url, filePath);
-        if (platformKey !== "win32") {
-          await setExecutable(filePath);
-        }
+        await downloadAndExtractArchive(info.url, directoryPath, 'binary');
+        await setExecutable(filePath);
       }
     } catch (error) {
       console.error(`Error processing ${platformKey} binary:`, error.message);
