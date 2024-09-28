@@ -199,7 +199,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               </div>
 
               {agentConfig.dbSearchFilters && (
-                <div className="space-y-2 rounded-md border  border-foreground p-3">
+                <div className="space-y-2 rounded-md border border-foreground p-3">
                   <div className="flex items-center space-x-2">
                     <Slider
                       defaultValue={[inverseLogScale(agentConfig.dbSearchFilters.limit)]}
@@ -208,20 +208,25 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                       step={1}
                       onValueChange={handleSliderChange}
                     />
-                    <span className="text-sm">{agentConfig.dbSearchFilters.limit} results</span>
+                    <div className="flex flex-col">
+                      <span className="">{agentConfig.dbSearchFilters.limit} </span>
+                      <span className="text-xs">notes will be added to context window</span>
+                    </div>
                   </div>
-                  <DateRangePicker
-                    from={agentConfig.dbSearchFilters.minDate}
-                    to={agentConfig.dbSearchFilters.maxDate}
-                    onDateChange={handleDateChange}
-                  />
+                  <div className="flex flex-col items-start">
+                    <span className="mb-1 text-sm text-muted-foreground">Filter notes by date (last modified):</span>
+                    <DateRangePicker
+                      from={agentConfig.dbSearchFilters.minDate}
+                      to={agentConfig.dbSearchFilters.maxDate}
+                      onDateChange={handleDateChange}
+                    />
+                  </div>
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Agent Selector Cards */}
         <div className="mt-4 w-full justify-center md:flex-row lg:flex">
           {exampleAgents.map((agent) => (
             <Card
