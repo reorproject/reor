@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { PiPaperPlaneRight } from 'react-icons/pi'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import '../../styles/chat.css'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 import { AgentConfig, ToolDefinition } from './types'
 import exampleAgents from './exampleAgents'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -15,6 +16,7 @@ import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import PromptEditor from './PromptEditor'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 
 interface StartChatProps {
   defaultModelName: string
@@ -27,6 +29,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
   const [agentConfig, setAgentConfig] = useState<AgentConfig>(exampleAgents[0])
   const [selectedTools, setSelectedTools] = useState<ToolDefinition[]>(agentConfig.toolDefinitions)
+  const [isExtraSettingsOpen, setIsExtraSettingsOpen] = useState(false)
 
   useEffect(() => {
     const fetchLLMModels = async () => {
@@ -117,7 +120,6 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
           Welcome to your AI-powered assistant! Start a conversation with your second brain!
         </h1>
 
-        {/* Text Input Field and Controls */}
         <div className="flex flex-col">
           <div className="flex flex-col rounded-md border-2 border-solid border-border bg-secondary focus-within:ring-1 focus-within:ring-ring">
             <textarea
@@ -164,67 +166,77 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
             </div>
           </div>
 
-          <div className="mx-auto mt-0 min-h-[80px] w-[96%] rounded-b border-t border-solid border-border bg-background px-4 py-2">
-            <div className="space-y-4">
-              {/* New Prompt Editor Dialog */}
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button>Edit Prompt</Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <PromptEditor
-                    promptTemplate={agentConfig.promptTemplate}
-                    onSave={(newPromptTemplate) => {
-                      setAgentConfig((prevConfig) => ({ ...prevConfig, promptTemplate: newPromptTemplate }))
-                    }}
-                  />
-                </DialogContent>
-              </Dialog>
-
-              <ToolSelector
-                allTools={allAvailableToolDefinitions}
-                selectedTools={selectedTools}
-                onToolsChange={handleToolsChange}
-              />
-
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="db-search-toggle"
-                  checked={!!agentConfig.dbSearchFilters}
-                  onCheckedChange={handleDbSearchToggle}
-                />
-                <Label htmlFor="db-search-toggle" className="text-sm text-muted-foreground">
-                  Include initial database search in context
-                </Label>
-              </div>
-
-              {agentConfig.dbSearchFilters && (
-                <div className="space-y-2 rounded-md border border-foreground p-3">
-                  <div className="flex items-center space-x-2">
-                    <Slider
-                      defaultValue={[inverseLogScale(agentConfig.dbSearchFilters.limit)]}
-                      min={0}
-                      max={100}
-                      step={1}
-                      onValueChange={handleSliderChange}
+          <Collapsible open={isExtraSettingsOpen} onOpenChange={setIsExtraSettingsOpen} className="w-full">
+            <CollapsibleTrigger asChild>
+              <Button
+                variant="secondary"
+                className="flex w-full items-center justify-between px-4 py-2 text-sm font-medium "
+              >
+                Customise Agent
+                {isExtraSettingsOpen ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mx-auto  w-[96%] rounded-b border border-solid border-border bg-background px-4 py-2">
+              <div className="space-y-4">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button>Edit Prompt</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <PromptEditor
+                      promptTemplate={agentConfig.promptTemplate}
+                      onSave={(newPromptTemplate) => {
+                        setAgentConfig((prevConfig) => ({ ...prevConfig, promptTemplate: newPromptTemplate }))
+                      }}
                     />
-                    <div className="flex flex-col">
-                      <span className="">{agentConfig.dbSearchFilters.limit} </span>
-                      <span className="text-xs">notes will be added to context window</span>
+                  </DialogContent>
+                </Dialog>
+
+                <ToolSelector
+                  allTools={allAvailableToolDefinitions}
+                  selectedTools={selectedTools}
+                  onToolsChange={handleToolsChange}
+                />
+
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="db-search-toggle"
+                    checked={!!agentConfig.dbSearchFilters}
+                    onCheckedChange={handleDbSearchToggle}
+                  />
+                  <Label htmlFor="db-search-toggle" className="text-sm text-muted-foreground">
+                    Include initial database search in context
+                  </Label>
+                </div>
+
+                {agentConfig.dbSearchFilters && (
+                  <div className="space-y-2 rounded-md border border-foreground p-3">
+                    <div className="flex items-center space-x-2">
+                      <Slider
+                        defaultValue={[inverseLogScale(agentConfig.dbSearchFilters.limit)]}
+                        min={0}
+                        max={100}
+                        step={1}
+                        onValueChange={handleSliderChange}
+                      />
+                      <div className="flex flex-col">
+                        <span className="">{agentConfig.dbSearchFilters.limit} </span>
+                        <span className="text-xs">notes will be added to context window</span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-start">
+                      <span className="mb-1 text-sm text-muted-foreground">Filter search by date (last modified):</span>
+                      <DateRangePicker
+                        from={agentConfig.dbSearchFilters.minDate}
+                        to={agentConfig.dbSearchFilters.maxDate}
+                        onDateChange={handleDateChange}
+                      />
                     </div>
                   </div>
-                  <div className="flex flex-col items-start">
-                    <span className="mb-1 text-sm text-muted-foreground">Filter search by date (last modified):</span>
-                    <DateRangePicker
-                      from={agentConfig.dbSearchFilters.minDate}
-                      to={agentConfig.dbSearchFilters.maxDate}
-                      onDateChange={handleDateChange}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
+                )}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         </div>
 
         <div className="mt-4 w-full justify-center md:flex-row lg:flex">
