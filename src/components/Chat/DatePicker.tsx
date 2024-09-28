@@ -14,9 +14,9 @@ interface DateRangePickerProps {
 
 const quickSelectOptions = [
   { label: 'Last hour', value: 'last-hour' },
-  { label: 'Last 24 hours', value: 'last-day' },
-  { label: 'Last 7 days', value: 'last-week' },
-  { label: 'Last 30 days', value: 'last-month' },
+  { label: 'Today', value: 'today' },
+  { label: 'This week', value: 'this-week' },
+  { label: 'This month', value: 'this-month' },
   { label: 'Custom', value: 'custom' },
 ]
 

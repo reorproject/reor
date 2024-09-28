@@ -214,7 +214,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                     </div>
                   </div>
                   <div className="flex flex-col items-start">
-                    <span className="mb-1 text-sm text-muted-foreground">Filter notes by date (last modified):</span>
+                    <span className="mb-1 text-sm text-muted-foreground">Filter search by date (last modified):</span>
                     <DateRangePicker
                       from={agentConfig.dbSearchFilters.minDate}
                       to={agentConfig.dbSearchFilters.maxDate}

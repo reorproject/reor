@@ -20,8 +20,10 @@ const PromptEditor: React.FC<{
     <DialogContent className="w-full max-w-4xl bg-background text-foreground">
       <DialogHeader>
         <DialogTitle className="text-foreground">Edit Prompt Template</DialogTitle>
-        <DialogDescription className="text-muted-foreground">
-          Customize the prompt template for your AI assistant. Click done when you&apos;re done.
+        <DialogDescription className="text-foreground">
+          Customize the prompt template for your AI assistant. Use the variables {`{QUERY}`} and {`{CONTEXT}`} to
+          reference the user&apos;s query and the context searched (if you toggle the &quot;make initial search&quot;
+          option in settings).
         </DialogDescription>
       </DialogHeader>
       <div className="grid gap-6 py-4">
@@ -59,7 +61,7 @@ const PromptEditor: React.FC<{
                 onChange={(e) =>
                   setEditedPrompt(editedPrompt.map((p, i) => (i === index ? { ...p, content: e.target.value } : p)))
                 }
-                className="h-32 min-h-32 flex-1 border border-solid border-input bg-background text-foreground"
+                className="h-64 flex-1 border border-solid border-input bg-background text-muted-foreground"
               />
             </div>
           </div>
