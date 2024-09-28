@@ -29,6 +29,7 @@ import '@/styles/tiptap.scss'
 import SearchAndReplace from '@/components/Editor/Search/SearchAndReplaceExtension'
 import getMarkdown from '@/components/Editor/utils'
 import welcomeNote from '@/components/File/utils'
+import useOrderedSet from './hooks/use-ordered-set'
 
 type FileContextType = {
   currentlyOpenFilePath: string | null
@@ -36,7 +37,7 @@ type FileContextType = {
   saveCurrentlyOpenedFile: () => Promise<void>
   editor: Editor | null
   navigationHistory: string[]
-  setNavigationHistory: React.Dispatch<React.SetStateAction<string[]>>
+  addToNavigationHistory: (value: string) => void
   openOrCreateFile: (filePath: string, optionalContentToWriteOnCreate?: string) => Promise<void>
   suggestionsState: SuggestionsState | null | undefined
   spellCheckEnabled: boolean
@@ -69,12 +70,18 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [spellCheckEnabled, setSpellCheckEnabled] = useState<boolean>(false)
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>('')
   const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>('')
-  const [navigationHistory, setNavigationHistory] = useState<string[]>([])
+  // const [navigationHistory, setNavigationHistory] = useState<Set<string>>(new Set())
   const [currentlyChangingFilePath, setCurrentlyChangingFilePath] = useState(false)
   const [highlightData, setHighlightData] = useState<HighlightData>({
     text: '',
     position: null,
   })
+
+  const {
+    add: addToNavigationHistory,
+    remove: removeFromNavigationHistory,
+    values: navigationHistory,
+  } = useOrderedSet()
 
   useEffect(() => {
     const fetchSpellCheckMode = async () => {
@@ -241,9 +248,8 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       oldFilePath,
       newFilePath,
     })
-    const navigationHistoryUpdated = [...navigationHistory].map((path) => path.replace(oldFilePath, newFilePath))
-
-    setNavigationHistory(navigationHistoryUpdated)
+    removeFromNavigationHistory(oldFilePath)
+    addToNavigationHistory(newFilePath)
 
     if (currentlyOpenFilePath === oldFilePath) {
       setCurrentlyOpenFilePath(newFilePath)
@@ -285,7 +291,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     saveCurrentlyOpenedFile,
     editor,
     navigationHistory,
-    setNavigationHistory,
+    addToNavigationHistory,
     openOrCreateFile,
     suggestionsState,
     spellCheckEnabled,
