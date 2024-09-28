@@ -93,8 +93,8 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ from, to, onDateChang
             className={cn(
               'grow px-2 py-1 text-sm sm:grow-0',
               activeOption === option.value
-                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                : 'bg-background text-foreground hover:bg-secondary',
+                ? 'bg-bg-primary/90 text-primary-foreground hover:bg-primary/90'
+                : 'bg-secondary text-foreground hover:bg-secondary',
             )}
           >
             {option.label}
