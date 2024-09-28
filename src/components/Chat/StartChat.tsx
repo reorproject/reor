@@ -29,7 +29,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
   const [agentConfig, setAgentConfig] = useState<AgentConfig>(exampleAgents[0])
   const [selectedTools, setSelectedTools] = useState<ToolDefinition[]>(agentConfig.toolDefinitions)
-  const [isExtraSettingsOpen, setIsExtraSettingsOpen] = useState(false)
+  const [isExtraSettingsOpen, setIsExtraSettingsOpen] = useState(true)
 
   useEffect(() => {
     const fetchLLMModels = async () => {

@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React from 'react'
 import { ToolDefinition } from './types'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
 
 interface ToolSelectorProps {
@@ -11,15 +11,11 @@ interface ToolSelectorProps {
 }
 
 const ToolSelector: React.FC<ToolSelectorProps> = ({ allTools = [], selectedTools = [], onToolsChange }) => {
-  const handleToolChange = (value: string) => {
-    const tool = allTools.find((t) => t.name === value)
-    if (tool) {
-      const isSelected = selectedTools.some((t) => t.name === tool.name)
-      if (isSelected) {
-        onToolsChange(selectedTools.filter((t) => t.name !== tool.name))
-      } else {
-        onToolsChange([...selectedTools, tool])
-      }
+  const handleToolChange = (checked: boolean, tool: ToolDefinition) => {
+    if (checked) {
+      onToolsChange([...selectedTools, tool])
+    } else {
+      onToolsChange(selectedTools.filter((t) => t.name !== tool.name))
     }
   }
 
@@ -35,18 +31,23 @@ const ToolSelector: React.FC<ToolSelectorProps> = ({ allTools = [], selectedTool
   return (
     <div className="flex flex-col space-y-2">
       <label className="text-sm font-medium text-muted-foreground">Select Tools</label>
-      <Select onValueChange={handleToolChange}>
-        <SelectTrigger className="w-full">
-          <SelectValue placeholder="Select a tool" />
-        </SelectTrigger>
-        <SelectContent>
-          {allTools.map((tool) => (
-            <SelectItem key={tool.name} value={tool.name}>
+      <div className="flex flex-col space-y-2">
+        {allTools.map((tool) => (
+          <div key={tool.name} className="flex items-center space-x-2">
+            <Checkbox
+              id={`tool-${tool.name}`}
+              checked={selectedTools.some((t) => t.name === tool.name)}
+              onCheckedChange={(checked) => handleToolChange(checked as boolean, tool)}
+            />
+            <label
+              htmlFor={`tool-${tool.name}`}
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
               {tool.name}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+            </label>
+          </div>
+        ))}
+      </div>
       <div className="flex flex-wrap gap-2">
         {selectedTools.map((tool) => (
           <Badge key={tool.name} variant="secondary" className="cursor-pointer" onClick={() => toggleTool(tool)}>
