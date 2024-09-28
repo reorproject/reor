@@ -119,7 +119,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
 
         {/* Text Input Field and Controls */}
         <div className="flex flex-col">
-          <div className="flex flex-col rounded-md border-2 border-solid border-border bg-input focus-within:ring-1 focus-within:ring-ring">
+          <div className="flex flex-col rounded-md border-2 border-solid border-border bg-secondary focus-within:ring-1 focus-within:ring-ring">
             <textarea
               value={userTextFieldInput}
               onKeyDown={(e) => {
@@ -164,7 +164,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
             </div>
           </div>
 
-          <div className="mx-auto mt-0 min-h-[80px] w-[96%] rounded-b border-t border-solid border-border bg-input px-4 py-2">
+          <div className="mx-auto mt-0 min-h-[80px] w-[96%] rounded-b border-t border-solid border-border bg-background px-4 py-2">
             <div className="space-y-4">
               {/* New Prompt Editor Dialog */}
               <Dialog>
