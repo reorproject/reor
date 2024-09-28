@@ -57,7 +57,7 @@ function removeDirectory(dirPath) {
   }
 }
 
-function downloadAndExtractArchive(url, extractPath, archiveType, redirectCount = 0, timeout = 1000000) {
+function downloadAndExtractArchive(fileUrl, extractPath, archiveType, binaryName, redirectCount = 0, timeout = 1000000) {
   return new Promise((resolve, reject) => {
     if (redirectCount > 5) {
       reject(new Error("Too many redirects"));
@@ -78,7 +78,7 @@ function downloadAndExtractArchive(url, extractPath, archiveType, redirectCount 
       });
     };
 
-    const request = https.get(url, (response) => {
+    const request = https.get(fileUrl, (response) => {
       if (response.statusCode === 200) {
         fileStream = response.pipe(file);
         fileStream.on('finish', () => {
@@ -100,6 +100,12 @@ function downloadAndExtractArchive(url, extractPath, archiveType, redirectCount 
                       resolve();
                     });
                   });
+                return;
+              } else if (archiveType === 'binary') {
+                const destinationPath = path.join(extractPath, binaryName);
+                fs.renameSync(tempPath, destinationPath);
+                console.log(`Binary file moved to ${destinationPath}`);
+                resolve();
                 return;
               }
               fs.unlink(tempPath, (unlinkError) => {
@@ -134,7 +140,7 @@ function downloadAndExtractArchive(url, extractPath, archiveType, redirectCount 
               console.error(`Failed to delete temporary file ${tempPath}: ${unlinkError.message}`);
             }
             console.log(`Following redirect to: ${response.headers.location}`);
-            downloadAndExtractArchive(response.headers.location, extractPath, archiveType, redirectCount + 1, timeout)
+            downloadAndExtractArchive(response.headers.location, extractPath, archiveType, binaryName, redirectCount + 1, timeout)
               .then(resolve)
               .catch(reject);
           });
@@ -178,16 +184,17 @@ async function downloadIfMissing(platformKey) {
     console.log(`${platformKey} binary not found, downloading...`);
     try {
       if (platformKey === 'win32') {
-        await downloadAndExtractArchive(info.url, directoryPath, 'zip');
+        await downloadAndExtractArchive(info.url, directoryPath, 'zip', info.binaryName);
         console.log('Windows binary downloaded and extracted');
       } else if (platformKey === 'linux') {
-        await downloadAndExtractArchive(info.url, directoryPath, 'tgz');
+        await downloadAndExtractArchive(info.url, directoryPath, 'tgz', info.binaryName);
         console.log('Linux binary downloaded and extracted');
         const extractedBinaryPath = path.join(directoryPath, 'bin', 'ollama');
         await fs.promises.rename(extractedBinaryPath, filePath);
         await setExecutable(filePath);
-      } else {
-        await downloadAndExtractArchive(info.url, directoryPath, 'binary');
+      } else if (platformKey === 'darwin') {
+        await downloadAndExtractArchive(info.url, directoryPath, 'binary', info.binaryName);
+        console.log('macOS binary downloaded');
         await setExecutable(filePath);
       }
     } catch (error) {
