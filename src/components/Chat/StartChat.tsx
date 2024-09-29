@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { PiPaperPlaneRight } from 'react-icons/pi'
+import { FiSettings } from 'react-icons/fi'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import '../../styles/chat.css'
 import { AgentConfig, ToolDefinition, DatabaseSearchFilters } from './types'
@@ -85,9 +86,6 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
           }
         : undefined,
     }))
-    if (checked) {
-      setIsDrawerOpen(true)
-    }
   }
 
   return (
@@ -167,21 +165,28 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                 onToolsChange={handleToolsChange}
               />
 
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="db-search-toggle"
-                  checked={!!agentConfig.dbSearchFilters}
-                  onCheckedChange={handleDbSearchToggle}
-                />
-                <Label htmlFor="db-search-toggle" className="text-sm text-muted-foreground">
-                  Include initial database search in context
-                </Label>
-              </div>
-
               <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-                <DrawerTrigger asChild>
-                  <Button disabled={!agentConfig.dbSearchFilters}>Configure DB Search</Button>
-                </DrawerTrigger>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="db-search-toggle"
+                    checked={!!agentConfig.dbSearchFilters}
+                    onCheckedChange={handleDbSearchToggle}
+                  />
+                  <Label htmlFor="db-search-toggle" className="text-sm text-muted-foreground">
+                    Include initial database search in context
+                  </Label>
+                  <DrawerTrigger asChild>
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="size-8 rounded-full"
+                      disabled={!agentConfig.dbSearchFilters}
+                    >
+                      <FiSettings className="size-4" />
+                      <span className="sr-only">Open DB search settings</span>
+                    </Button>
+                  </DrawerTrigger>
+                </div>
                 <DrawerContent>
                   <DrawerHeader>
                     <DrawerTitle>Database Search Filters</DrawerTitle>
