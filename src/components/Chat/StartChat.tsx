@@ -14,6 +14,16 @@ import DbSearchFilters from './ChatConfigComponents/DBSearchFilters'
 import exampleAgents from './ChatConfigComponents/exampleAgents'
 import PromptEditor from './ChatConfigComponents/PromptEditor'
 import ToolSelector from './ChatConfigComponents/ToolSelector'
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer'
 
 interface StartChatProps {
   defaultModelName: string
@@ -26,6 +36,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
   const [agentConfig, setAgentConfig] = useState<AgentConfig>(exampleAgents[0])
   const [selectedTools, setSelectedTools] = useState<ToolDefinition[]>(agentConfig.toolDefinitions)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   useEffect(() => {
     const fetchLLMModels = async () => {
@@ -74,6 +85,9 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
           }
         : undefined,
     }))
+    if (checked) {
+      setIsDrawerOpen(true)
+    }
   }
 
   return (
@@ -164,12 +178,29 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                 </Label>
               </div>
 
-              {agentConfig.dbSearchFilters && (
-                <DbSearchFilters
-                  dbSearchFilters={agentConfig.dbSearchFilters}
-                  onFiltersChange={handleDbSearchFiltersChange}
-                />
-              )}
+              <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+                <DrawerTrigger asChild>
+                  <Button disabled={!agentConfig.dbSearchFilters}>Configure DB Search</Button>
+                </DrawerTrigger>
+                <DrawerContent>
+                  <DrawerHeader>
+                    <DrawerTitle>Database Search Filters</DrawerTitle>
+                    <DrawerDescription>Configure your database search filters</DrawerDescription>
+                  </DrawerHeader>
+                  {agentConfig.dbSearchFilters && (
+                    <DbSearchFilters
+                      dbSearchFilters={agentConfig.dbSearchFilters}
+                      onFiltersChange={handleDbSearchFiltersChange}
+                    />
+                  )}
+                  <DrawerFooter>
+                    <Button onClick={() => setIsDrawerOpen(false)}>Save Changes</Button>
+                    <DrawerClose asChild>
+                      <Button variant="outline">Cancel</Button>
+                    </DrawerClose>
+                  </DrawerFooter>
+                </DrawerContent>
+              </Drawer>
             </div>
           </div>
         </div>
