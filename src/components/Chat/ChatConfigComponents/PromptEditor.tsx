@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { PromptTemplate } from './types'
+import { PromptTemplate } from '../types'
 import { DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
