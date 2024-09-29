@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { PiPaperPlaneRight } from 'react-icons/pi'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import '../../styles/chat.css'
-import { AgentConfig, ToolDefinition } from './types'
+import { AgentConfig, ToolDefinition, DatabaseSearchFilters } from './types'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardDescription } from '../ui/card'
 import { allAvailableToolDefinitions } from './tools'
@@ -51,45 +51,17 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
     setSelectedLLM(value)
   }
 
-  const handleSliderChange = useCallback((value: number[]) => {
-    const logScale = (_value: number) => Math.round(Math.exp(_value / 25) - 1)
-    const scaledValue = logScale(value[0])
-    setAgentConfig((prevConfig) => ({
-      ...prevConfig,
-      dbSearchFilters: prevConfig.dbSearchFilters
-        ? {
-            ...prevConfig.dbSearchFilters,
-            limit: scaledValue,
-          }
-        : {
-            limit: scaledValue,
-            minDate: new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
-            maxDate: new Date(),
-          },
-    }))
-  }, [])
-
   const handleToolsChange = (tools: ToolDefinition[]) => {
     setSelectedTools(tools)
     setAgentConfig((prevConfig) => ({ ...prevConfig, toolDefinitions: tools }))
   }
 
-  const handleDateChange = (from: Date | undefined, to: Date | undefined) => {
+  const handleDbSearchFiltersChange = useCallback((newFilters: DatabaseSearchFilters) => {
     setAgentConfig((prevConfig) => ({
       ...prevConfig,
-      dbSearchFilters: prevConfig.dbSearchFilters
-        ? {
-            ...prevConfig.dbSearchFilters,
-            minDate: from,
-            maxDate: to,
-          }
-        : {
-            limit: 33,
-            minDate: from,
-            maxDate: to,
-          },
+      dbSearchFilters: newFilters,
     }))
-  }
+  }, [])
 
   const handleDbSearchToggle = (checked: boolean) => {
     setAgentConfig((prevConfig) => ({
@@ -195,8 +167,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               {agentConfig.dbSearchFilters && (
                 <DbSearchFilters
                   dbSearchFilters={agentConfig.dbSearchFilters}
-                  onSliderChange={handleSliderChange}
-                  onDateChange={handleDateChange}
+                  onFiltersChange={handleDbSearchFiltersChange}
                 />
               )}
             </div>
