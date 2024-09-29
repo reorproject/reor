@@ -28,11 +28,7 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
   const [isReviewFlashcardMode, setIsReviewFlashcardMode] = useState<boolean>(!!initialFileToReviewFlashcard)
 
   return (
-    <ReorModal
-      isOpen={isOpen}
-      onClose={onClose}
-      // tailwindStylesOnBackground="bg-gradient-to-r from-orange-900 to-yellow-900"
-    >
+    <ReorModal isOpen={isOpen} onClose={onClose}>
       <div className=" mx-6 mb-6 mt-2 w-[65vw] flex-col justify-center lg:w-[45vw]">
         <h2 className="mb-3 text-center text-xl font-semibold text-white">Flashcard Mode</h2>
         {isReviewFlashcardMode && (
@@ -59,8 +55,6 @@ const FlashcardMenuModal: React.FC<FlashcardMenuModalProps> = ({
               posthog.capture('open_create_flashcard_mode')
               setIsCreateFlashcardMode(true)
             }}
-            // Write to the flashcards directory if the flashcards generated are valid
-            // onClick={async () => await storeFlashcardPairsAsJSON(flashcardQAPairs, fileToGenerateFlashcardsFor)}
             placeholder=""
           >
             <BsPencilSquare className="mt-6" size={55} />

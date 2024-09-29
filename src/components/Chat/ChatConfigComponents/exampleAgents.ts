@@ -1,5 +1,5 @@
-import { createNoteToolDefinition, searchToolDefinition } from './tools'
-import { AgentConfig, PromptTemplate } from './types'
+import { AgentConfig, PromptTemplate } from '../types'
+import { createNoteToolDefinition, searchToolDefinition } from '../tools'
 
 const defaultAgentPromptTemplate: PromptTemplate = [
   {
