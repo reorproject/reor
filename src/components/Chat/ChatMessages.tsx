@@ -8,13 +8,6 @@ import AssistantMessage from './MessageComponents/AssistantMessage'
 import SystemMessage from './MessageComponents/SystemMessage'
 import InChatContextComponent from './MessageComponents/InChatContext'
 
-interface ChatMessagesProps {
-  currentChat: Chat
-  setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
-  loadingState: LoadingState
-  handleNewChatMessage: (userTextFieldInput?: string, chatFilters?: AgentConfig) => void
-}
-
 interface MessageProps {
   message: ReorChatMessage
   index: number
@@ -38,6 +31,13 @@ const Message: React.FC<MessageProps> = ({ message, index, currentChat, setCurre
       {message.context && <InChatContextComponent key={`context-${index}`} contextItems={message.context} />}
     </>
   )
+}
+
+interface ChatMessagesProps {
+  currentChat: Chat
+  setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
+  loadingState: LoadingState
+  handleNewChatMessage: (userTextFieldInput?: string, agentConfig?: AgentConfig) => void
 }
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({

@@ -47,8 +47,9 @@ export type PromptTemplate = {
   content: string
 }[]
 
-export type AgentConfig = DatabaseSearchFilters & {
+export type AgentConfig = {
   name: string
+  dbSearchFilters?: DatabaseSearchFilters
   files: string[]
   propertiesToIncludeInContext?: string[]
   toolDefinitions: ToolDefinition[]
@@ -57,7 +58,7 @@ export type AgentConfig = DatabaseSearchFilters & {
 
 export interface AnonymizedAgentConfig {
   name: string
-  numberOfChunksToFetch: number
+  numberOfChunksToFetch?: number
   filesLength: number
   minDate?: Date
   maxDate?: Date

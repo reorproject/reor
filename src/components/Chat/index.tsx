@@ -50,7 +50,7 @@ const ChatComponent: React.FC = () => {
   }, [currentOpenChatID, saveChat])
 
   const handleNewChatMessage = useCallback(
-    async (chat: Chat | undefined, userTextFieldInput?: string, chatFilters?: AgentConfig) => {
+    async (chat: Chat | undefined, userTextFieldInput?: string, agentConfig?: AgentConfig) => {
       try {
         const defaultLLMName = await window.llm.getDefaultLLMName()
 
@@ -59,7 +59,7 @@ const ChatComponent: React.FC = () => {
         }
 
         let outputChat = userTextFieldInput?.trim()
-          ? await appendToOrCreateChat(chat, userTextFieldInput, chatFilters)
+          ? await appendToOrCreateChat(chat, userTextFieldInput, agentConfig)
           : chat
 
         if (!outputChat) {
@@ -105,7 +105,7 @@ const ChatComponent: React.FC = () => {
           setCurrentChat(outputChat)
           await saveChat(outputChat)
           if (allToolCallsHaveBeenExecuted) {
-            handleNewChatMessage(outputChat, undefined, chatFilters)
+            handleNewChatMessage(outputChat, undefined, agentConfig)
           }
         }
 
@@ -122,7 +122,7 @@ const ChatComponent: React.FC = () => {
 
   return (
     <div className="flex size-full items-center justify-center">
-      <div className="mx-auto flex size-full flex-col overflow-hidden border-y-0 border-l-[0.001px] border-r-0 border-solid border-neutral-700 bg-background">
+      <div className="mx-auto flex size-full flex-col overflow-hidden  bg-background">
         {currentChat && currentChat.messages && currentChat.messages.length > 0 ? (
           <ChatMessages
             currentChat={currentChat}
@@ -135,8 +135,8 @@ const ChatComponent: React.FC = () => {
         ) : (
           <StartChat
             defaultModelName={defaultModelName}
-            handleNewChatMessage={(userTextFieldInput?: string, chatFilters?: AgentConfig) =>
-              handleNewChatMessage(undefined, userTextFieldInput, chatFilters)
+            handleNewChatMessage={(userTextFieldInput?: string, agentConfig?: AgentConfig) =>
+              handleNewChatMessage(undefined, userTextFieldInput, agentConfig)
             }
           />
         )}

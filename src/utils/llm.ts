@@ -1,7 +1,9 @@
+import { createOllama } from 'ollama-ai-provider'
 import { createOpenAI } from '@ai-sdk/openai'
 import { createAnthropic } from '@ai-sdk/anthropic'
+import { LanguageModel } from 'ai'
 
-const resolveLLMClient = async (llmName: string) => {
+const resolveLLMClient = async (llmName: string): Promise<LanguageModel> => {
   const llmConfigs = await window.llm.getLLMConfigs()
   const apiConfigs = await window.llm.getLLMAPIConfigs()
 
@@ -33,6 +35,11 @@ const resolveLLMClient = async (llmName: string) => {
       },
     })
     return anthropic(llmName)
+  }
+  if (apiConfig.apiInterface === 'ollama') {
+    const ollama = createOllama()
+    const model = ollama(llmName)
+    return model as LanguageModel
   }
   throw new Error(`API interface ${apiConfig.apiInterface} not supported.`)
 }

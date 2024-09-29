@@ -10,52 +10,56 @@ import { useWindowContentContext } from '@/contexts/WindowContentContext'
 
 const FileHistoryNavigator: React.FC = () => {
   const [showMenu, setShowMenu] = useState<string>('')
-  const [currentIndex, setCurrentIndex] = useState<number>(-1)
   const longPressTimer = useRef<NodeJS.Timeout | null>(null)
   const buttonRefBack = useRef<HTMLButtonElement>(null)
   const buttonRefForward = useRef<HTMLButtonElement>(null)
 
-  const { openContent: openTabContent } = useWindowContentContext()
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { navigationHistory, setNavigationHistory } = useFileContext()
+  const { openContent, currentOpenFileOrChatID } = useWindowContentContext()
+  const { navigationHistory } = useFileContext()
 
-  // useEffect(() => {
-  //   const handleFileSelect = (path: string) => {
-  //     const updatedHistory = [...navigationHistory.filter((val) => val !== path).slice(0, currentIndex + 1), path]
-  //     setNavigationHistory(updatedHistory)
-  //     setCurrentIndex(updatedHistory.length - 1)
-  //   }
-  //   if (currentTabID && currentTabID !== navigationHistory[currentIndex]) {
-  //     handleFileSelect(currentTabID)
-  //   }
-  // }, [currentTabID, navigationHistory, currentIndex, setNavigationHistory])
+  const ref = useRef<HTMLDivElement>(null)
 
-  const canGoBack = currentIndex > 0
-  const canGoForward = currentIndex < navigationHistory.length - 1
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent): void {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setShowMenu('')
+      }
+    }
+    // Bind the event listener
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      // Unbind the event listener
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  })
+
+  if (!currentOpenFileOrChatID) {
+    return null
+  }
+
+  const canGoBack = navigationHistory.length > 1
+  const indexOfCurrentOpenFileOrChat = navigationHistory.indexOf(currentOpenFileOrChatID)
+  const canGoForward = indexOfCurrentOpenFileOrChat < navigationHistory.length - 1
 
   const goBack = () => {
     if (canGoBack && showMenu === '') {
-      const newIndex = currentIndex - 1
-      setCurrentIndex(newIndex)
-      openTabContent(navigationHistory[newIndex])
+      const newIndex = indexOfCurrentOpenFileOrChat - 1
+      openContent(navigationHistory[newIndex], undefined, true)
       posthog.capture('file_history_navigator_back')
     }
   }
 
   const goForward = () => {
     if (canGoForward && showMenu === '') {
-      const newIndex = currentIndex + 1
-      setCurrentIndex(newIndex)
-      openTabContent(navigationHistory[newIndex])
+      const newIndex = indexOfCurrentOpenFileOrChat + 1
+      openContent(navigationHistory[newIndex], undefined, true)
       posthog.capture('file_history_navigator_forward')
     }
   }
 
-  const goSelected = (path: string): void => {
-    if (path) {
-      const newIndex = navigationHistory.indexOf(path)
-      setCurrentIndex(newIndex)
-      openTabContent(path)
+  const goSelected = (pathOrChatID: string): void => {
+    if (pathOrChatID) {
+      openContent(pathOrChatID, undefined, true)
       posthog.capture('file_history_navigator_go_to_selected_file')
     }
     setShowMenu('')
@@ -74,22 +78,6 @@ const FileHistoryNavigator: React.FC = () => {
     }
   }
 
-  const ref = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent): void {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
-        setShowMenu('')
-      }
-    }
-    // Bind the event listener
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => {
-      // Unbind the event listener
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  })
-
   const handleHistoryContext = (currentRef: React.RefObject<HTMLButtonElement>) => {
     const offsetTop = currentRef.current?.offsetTop || 0
     const offsetLeft = currentRef.current?.offsetLeft || 0
@@ -97,8 +85,8 @@ const FileHistoryNavigator: React.FC = () => {
 
     const menuChild =
       currentRef.current?.id === 'back'
-        ? navigationHistory.slice(0, currentIndex)
-        : navigationHistory.slice(currentIndex + 1)
+        ? navigationHistory.slice(0, indexOfCurrentOpenFileOrChat)
+        : navigationHistory.slice(indexOfCurrentOpenFileOrChat + 1)
 
     return (
       showMenu !== '' &&
@@ -115,10 +103,10 @@ const FileHistoryNavigator: React.FC = () => {
           }}
         >
           <ul>
-            {menuChild.map((path) => (
-              <li key={path}>
-                <div key={path} onClick={() => goSelected(path)}>
-                  {removeFileExtension(path.replace(/\\/g, '/').split('/').pop() || '')}
+            {menuChild.map((pathOrChatID) => (
+              <li key={pathOrChatID}>
+                <div key={pathOrChatID} onClick={() => goSelected(pathOrChatID)}>
+                  {removeFileExtension(pathOrChatID.replace(/\\/g, '/').split('/').pop() || '')}
                 </div>
               </li>
             ))}
