@@ -90,9 +90,9 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({ isOpen, onClo
           className=" mt-1 box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
           value={modelNameBeingInputted}
           onChange={(e) => setModelNameBeingInputted(e.target.value)}
-          placeholder="mistral"
+          placeholder="llama3.2"
         />
-        <p className="my-2 text-xs italic text-white"> We recommended either mistral, llama3, or phi3.</p>
+        <p className="my-2 text-xs italic text-white"> We recommended either nemotron-mini, llama3.2, or qwen2.5.</p>
 
         <div className="flex justify-end pb-2">
           <Button

@@ -61,11 +61,6 @@ const reasoningAgentPromptTemplate: PromptTemplate = [
 const exampleAgents: AgentConfig[] = [
   {
     files: [],
-    dbSearchFilters: {
-      limit: 15,
-      minDate: undefined,
-      maxDate: undefined,
-    },
     name: 'Default',
     toolDefinitions: [searchToolDefinition, createNoteToolDefinition],
     promptTemplate: defaultAgentPromptTemplate,

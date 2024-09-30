@@ -15,7 +15,7 @@ export const searchToolDefinition: ToolDefinition = {
     {
       name: 'limit',
       type: 'number',
-      defaultValue: 10,
+      defaultValue: 20,
       description: 'The number of results to return',
     },
   ],

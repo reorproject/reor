@@ -1,10 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
+import { debounce } from 'lodash'
 import { PromptTemplate } from '../types'
-import { DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
-import { Button } from '@/components/ui/button'
 
 const PromptEditor: React.FC<{
   promptTemplate: PromptTemplate
@@ -12,20 +11,42 @@ const PromptEditor: React.FC<{
 }> = ({ promptTemplate, onSave }) => {
   const [editedPrompt, setEditedPrompt] = useState<PromptTemplate>(promptTemplate)
 
-  const handleSave = () => {
-    onSave(editedPrompt)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const debouncedSave = useCallback(
+    debounce((newPromptTemplate: PromptTemplate) => {
+      onSave(newPromptTemplate)
+    }, 500),
+    [onSave],
+  )
+
+  useEffect(() => {
+    debouncedSave(editedPrompt)
+  }, [editedPrompt, debouncedSave])
+
+  const updateRole = (index: number, newRole: 'system' | 'user') => {
+    setEditedPrompt((prevPrompt) => {
+      const updatedPrompt = [...prevPrompt]
+      updatedPrompt[index] = { ...updatedPrompt[index], role: newRole }
+      return updatedPrompt
+    })
+  }
+
+  const updateContent = (index: number, newContent: string) => {
+    setEditedPrompt((prevPrompt) => {
+      const updatedPrompt = [...prevPrompt]
+      updatedPrompt[index] = { ...updatedPrompt[index], content: newContent }
+      return updatedPrompt
+    })
   }
 
   return (
-    <DialogContent className="w-full max-w-4xl bg-background text-foreground">
-      <DialogHeader>
-        <DialogTitle className="text-foreground">Edit Prompt Template</DialogTitle>
-        <DialogDescription className="text-foreground">
-          Customize the prompt template for your AI assistant. Use the variables {`{QUERY}`} and {`{CONTEXT}`} to
-          reference the user&apos;s query and the context searched (if you toggle the &quot;make initial search&quot;
-          option in settings).
-        </DialogDescription>
-      </DialogHeader>
+    <div className="w-full max-w-4xl bg-background text-foreground">
+      <h3 className="text-foreground">Edit Prompt Template</h3>
+      <p className="text-muted-foreground">
+        Customize the prompt template for your AI assistant. Use the variables {`{QUERY}`} and {`{CONTEXT}`} to
+        reference the user&apos;s query and the context searched (if you toggle the &quot;make initial search&quot;
+        option in settings).
+      </p>
       <div className="grid gap-6 py-4">
         {editedPrompt.map((prompt, index) => (
           // eslint-disable-next-line react/no-array-index-key
@@ -34,14 +55,7 @@ const PromptEditor: React.FC<{
               <Label htmlFor={`role-${index}`} className="w-20 text-foreground">
                 Role
               </Label>
-              <Select
-                value={prompt.role}
-                onValueChange={(value) =>
-                  setEditedPrompt(
-                    editedPrompt.map((p, i) => (i === index ? { ...p, role: value as 'system' | 'user' } : p)),
-                  )
-                }
-              >
+              <Select value={prompt.role} onValueChange={(value: 'system' | 'user') => updateRole(index, value)}>
                 <SelectTrigger className="w-full border-input bg-background text-foreground">
                   <SelectValue placeholder="Select role" />
                 </SelectTrigger>
@@ -58,21 +72,14 @@ const PromptEditor: React.FC<{
               <Textarea
                 id={`content-${index}`}
                 value={prompt.content}
-                onChange={(e) =>
-                  setEditedPrompt(editedPrompt.map((p, i) => (i === index ? { ...p, content: e.target.value } : p)))
-                }
-                className="h-64 flex-1 border border-solid border-input bg-background text-muted-foreground"
+                onChange={(e) => updateContent(index, e.target.value)}
+                className="h-64 flex-1 border border-solid border-input bg-background text-sm text-muted-foreground"
               />
             </div>
           </div>
         ))}
       </div>
-      <DialogFooter>
-        <Button type="submit" onClick={handleSave} className="bg-primary text-primary-foreground hover:bg-primary/90">
-          Done
-        </Button>
-      </DialogFooter>
-    </DialogContent>
+    </div>
   )
 }
 

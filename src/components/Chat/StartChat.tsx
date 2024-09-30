@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardDescription } from '../ui/card'
 import { allAvailableToolDefinitions } from './tools'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import DbSearchFilters from './ChatConfigComponents/DBSearchFilters'
@@ -89,7 +88,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   }
 
   return (
-    <div className="relative flex w-full flex-col items-center">
+    <div className="relative flex w-full flex-col items-center overflow-y-auto">
       <div className="relative flex w-full flex-col text-center lg:top-10 lg:max-w-2xl">
         <div className="flex w-full justify-center">
           <img src="icon.png" style={{ width: '64px', height: '64px' }} alt="ReorImage" />
@@ -145,7 +144,13 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
 
           <div className="mx-auto w-[96%] rounded-b border border-solid border-border bg-background px-4 py-2">
             <div className="space-y-4">
-              <Dialog>
+              <PromptEditor
+                promptTemplate={agentConfig.promptTemplate}
+                onSave={(newPromptTemplate) => {
+                  setAgentConfig((prevConfig) => ({ ...prevConfig, promptTemplate: newPromptTemplate }))
+                }}
+              />
+              {/* <Dialog>
                 <DialogTrigger asChild>
                   <Button>Edit Prompt</Button>
                 </DialogTrigger>
@@ -157,7 +162,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                     }}
                   />
                 </DialogContent>
-              </Dialog>
+              </Dialog> */}
 
               <ToolSelector
                 allTools={allAvailableToolDefinitions}
