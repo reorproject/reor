@@ -2,42 +2,15 @@ import React, { useState } from 'react'
 
 import { Button } from '@material-tailwind/react'
 
-import { APIInterface, LLMConfig, LLMAPIConfig } from 'electron/main/electron-store/storeConfig'
+import { APIInterface, LLMAPIConfig } from 'electron/main/electron-store/storeConfig'
+import {
+  anthropicDefaultAPIName,
+  anthropicDefaultLLMs,
+  openAIDefaultAPIName,
+  openAIDefaultLLMs,
+} from '@shared/defaultLLMs'
 import ReorModal from '../../../Common/Modal'
 
-export const openAIDefaultAPIName = 'OpenAI'
-export const anthropicDefaultAPIName = 'Anthropic'
-
-export const openAIDefaultModels: LLMConfig[] = [
-  {
-    contextLength: 128000,
-    modelName: 'gpt-4o',
-    apiName: openAIDefaultAPIName,
-  },
-  {
-    contextLength: 128000,
-    modelName: 'gpt-4o-mini',
-    apiName: openAIDefaultAPIName,
-  },
-  {
-    contextLength: 16385,
-    modelName: 'gpt-3.5-turbo',
-    apiName: openAIDefaultAPIName,
-  },
-  {
-    contextLength: 128000,
-    modelName: 'gpt-4-turbo',
-    apiName: openAIDefaultAPIName,
-  },
-]
-
-export const anthropicDefaultModels: LLMConfig[] = [
-  {
-    contextLength: 180000,
-    modelName: 'claude-3-5-sonnet-20240620',
-    apiName: anthropicDefaultAPIName,
-  },
-]
 export interface CloudLLMSetupModalProps {
   isOpen: boolean
   onClose: () => void
@@ -59,7 +32,7 @@ const DefaultLLMAPISetupModal: React.FC<CloudLLMSetupModalProps> = ({ isOpen, on
           name: openAIDefaultAPIName,
         }
         await window.llm.addOrUpdateLLMAPIConfig(api)
-        openAIDefaultModels.forEach(async (model) => {
+        openAIDefaultLLMs.forEach(async (model) => {
           await window.llm.addOrUpdateLLMConfig(model)
         })
       } else if (apiInterface === 'anthropic') {
@@ -69,7 +42,7 @@ const DefaultLLMAPISetupModal: React.FC<CloudLLMSetupModalProps> = ({ isOpen, on
           name: anthropicDefaultAPIName,
         }
         await window.llm.addOrUpdateLLMAPIConfig(api)
-        anthropicDefaultModels.forEach(async (model) => {
+        anthropicDefaultLLMs.forEach(async (model) => {
           await window.llm.addOrUpdateLLMConfig(model)
         })
       }
