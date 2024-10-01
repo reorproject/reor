@@ -1,19 +1,29 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { PiPaperPlaneRight } from 'react-icons/pi'
+import { FiSettings } from 'react-icons/fi'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import '../../styles/chat.css'
-import { AgentConfig, ToolDefinition } from './types'
+import { AgentConfig, ToolDefinition, DatabaseSearchFilters } from './types'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Card, CardDescription } from '../ui/card'
 import { allAvailableToolDefinitions } from './tools'
 import { Button } from '@/components/ui/button'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import DbSearchFilters from './ChatConfigComponents/DBSearchFilters'
 import exampleAgents from './ChatConfigComponents/exampleAgents'
 import PromptEditor from './ChatConfigComponents/PromptEditor'
 import ToolSelector from './ChatConfigComponents/ToolSelector'
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '@/components/ui/drawer'
 
 interface StartChatProps {
   defaultModelName: string
@@ -26,6 +36,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
   const [agentConfig, setAgentConfig] = useState<AgentConfig>(exampleAgents[0])
   const [selectedTools, setSelectedTools] = useState<ToolDefinition[]>(agentConfig.toolDefinitions)
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
 
   useEffect(() => {
     const fetchLLMModels = async () => {
@@ -51,45 +62,17 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
     setSelectedLLM(value)
   }
 
-  const handleSliderChange = useCallback((value: number[]) => {
-    const logScale = (_value: number) => Math.round(Math.exp(_value / 25) - 1)
-    const scaledValue = logScale(value[0])
-    setAgentConfig((prevConfig) => ({
-      ...prevConfig,
-      dbSearchFilters: prevConfig.dbSearchFilters
-        ? {
-            ...prevConfig.dbSearchFilters,
-            limit: scaledValue,
-          }
-        : {
-            limit: scaledValue,
-            minDate: new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
-            maxDate: new Date(),
-          },
-    }))
-  }, [])
-
   const handleToolsChange = (tools: ToolDefinition[]) => {
     setSelectedTools(tools)
     setAgentConfig((prevConfig) => ({ ...prevConfig, toolDefinitions: tools }))
   }
 
-  const handleDateChange = (from: Date | undefined, to: Date | undefined) => {
+  const handleDbSearchFiltersChange = useCallback((newFilters: DatabaseSearchFilters) => {
     setAgentConfig((prevConfig) => ({
       ...prevConfig,
-      dbSearchFilters: prevConfig.dbSearchFilters
-        ? {
-            ...prevConfig.dbSearchFilters,
-            minDate: from,
-            maxDate: to,
-          }
-        : {
-            limit: 33,
-            minDate: from,
-            maxDate: to,
-          },
+      dbSearchFilters: newFilters,
     }))
-  }
+  }, [])
 
   const handleDbSearchToggle = (checked: boolean) => {
     setAgentConfig((prevConfig) => ({
@@ -105,7 +88,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   }
 
   return (
-    <div className="relative flex w-full flex-col items-center">
+    <div className="relative flex w-full flex-col items-center overflow-y-auto">
       <div className="relative flex w-full flex-col text-center lg:top-10 lg:max-w-2xl">
         <div className="flex w-full justify-center">
           <img src="icon.png" style={{ width: '64px', height: '64px' }} alt="ReorImage" />
@@ -161,7 +144,13 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
 
           <div className="mx-auto w-[96%] rounded-b border border-solid border-border bg-background px-4 py-2">
             <div className="space-y-4">
-              <Dialog>
+              <PromptEditor
+                promptTemplate={agentConfig.promptTemplate}
+                onSave={(newPromptTemplate) => {
+                  setAgentConfig((prevConfig) => ({ ...prevConfig, promptTemplate: newPromptTemplate }))
+                }}
+              />
+              {/* <Dialog>
                 <DialogTrigger asChild>
                   <Button>Edit Prompt</Button>
                 </DialogTrigger>
@@ -173,7 +162,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                     }}
                   />
                 </DialogContent>
-              </Dialog>
+              </Dialog> */}
 
               <ToolSelector
                 allTools={allAvailableToolDefinitions}
@@ -181,24 +170,47 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                 onToolsChange={handleToolsChange}
               />
 
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="db-search-toggle"
-                  checked={!!agentConfig.dbSearchFilters}
-                  onCheckedChange={handleDbSearchToggle}
-                />
-                <Label htmlFor="db-search-toggle" className="text-sm text-muted-foreground">
-                  Include initial database search in context
-                </Label>
-              </div>
-
-              {agentConfig.dbSearchFilters && (
-                <DbSearchFilters
-                  dbSearchFilters={agentConfig.dbSearchFilters}
-                  onSliderChange={handleSliderChange}
-                  onDateChange={handleDateChange}
-                />
-              )}
+              <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="db-search-toggle"
+                    checked={!!agentConfig.dbSearchFilters}
+                    onCheckedChange={handleDbSearchToggle}
+                  />
+                  <Label htmlFor="db-search-toggle" className="text-sm text-muted-foreground">
+                    Include initial database search in context
+                  </Label>
+                  <DrawerTrigger asChild>
+                    <Button
+                      variant="secondary"
+                      size="icon"
+                      className="size-8 rounded-full"
+                      disabled={!agentConfig.dbSearchFilters}
+                    >
+                      <FiSettings className="size-4" />
+                      <span className="sr-only">Open DB search settings</span>
+                    </Button>
+                  </DrawerTrigger>
+                </div>
+                <DrawerContent>
+                  <DrawerHeader>
+                    <DrawerTitle>Database Search Filters</DrawerTitle>
+                    <DrawerDescription>Configure your database search filters</DrawerDescription>
+                  </DrawerHeader>
+                  {agentConfig.dbSearchFilters && (
+                    <DbSearchFilters
+                      dbSearchFilters={agentConfig.dbSearchFilters}
+                      onFiltersChange={handleDbSearchFiltersChange}
+                    />
+                  )}
+                  <DrawerFooter>
+                    <Button onClick={() => setIsDrawerOpen(false)}>Save Changes</Button>
+                    <DrawerClose asChild>
+                      <Button variant="outline">Cancel</Button>
+                    </DrawerClose>
+                  </DrawerFooter>
+                </DrawerContent>
+              </Drawer>
             </div>
           </div>
         </div>
