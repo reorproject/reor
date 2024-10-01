@@ -2,18 +2,18 @@ import React from 'react'
 
 interface ExternalLinkProps {
   href: string
-  children: React.ReactNode // Now using children prop for link text
+  children: React.ReactNode
+  className?: string // Add optional className prop
 }
 
-// Open link in browser:
-const ExternalLink: React.FC<ExternalLinkProps> = ({ href: url, children }) => {
+const ExternalLink: React.FC<ExternalLinkProps> = ({ href: url, children, className = '' }) => {
   const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault()
     window.electronUtils.openExternal(url)
   }
 
   return (
-    <a href={url} onClick={handleLinkClick} className="text-blue-300">
+    <a href={url} onClick={handleLinkClick} className={className}>
       {children}
     </a>
   )
