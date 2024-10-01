@@ -5,7 +5,6 @@ import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import '../../styles/chat.css'
 import { AgentConfig, ToolDefinition, DatabaseSearchFilters } from './types'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Card, CardDescription } from '../ui/card'
 import { allAvailableToolDefinitions } from './tools'
 import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
@@ -24,6 +23,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer'
+import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog'
 
 interface StartChatProps {
   defaultModelName: string
@@ -53,10 +53,10 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
     handleNewChatMessage(userTextFieldInput, agentConfig)
   }
 
-  const handleAgentSelection = (agent: AgentConfig) => {
-    setAgentConfig(agent)
-    setSelectedTools(agent.toolDefinitions)
-  }
+  // const handleAgentSelection = (agent: AgentConfig) => {
+  //   setAgentConfig(agent)
+  //   setSelectedTools(agent.toolDefinitions)
+  // }
 
   const handleLLMChange = (value: string) => {
     setSelectedLLM(value)
@@ -144,13 +144,13 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
 
           <div className="mx-auto w-[96%] rounded-b border border-solid border-border bg-background px-4 py-2">
             <div className="space-y-4">
-              <PromptEditor
+              {/* <PromptEditor
                 promptTemplate={agentConfig.promptTemplate}
                 onSave={(newPromptTemplate) => {
                   setAgentConfig((prevConfig) => ({ ...prevConfig, promptTemplate: newPromptTemplate }))
                 }}
-              />
-              {/* <Dialog>
+              /> */}
+              <Dialog>
                 <DialogTrigger asChild>
                   <Button>Edit Prompt</Button>
                 </DialogTrigger>
@@ -162,7 +162,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                     }}
                   />
                 </DialogContent>
-              </Dialog> */}
+              </Dialog>
 
               <ToolSelector
                 allTools={allAvailableToolDefinitions}
@@ -215,7 +215,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
           </div>
         </div>
 
-        <div className="mt-4 w-full justify-center md:flex-row lg:flex">
+        {/* <div className="mt-4 w-full justify-center md:flex-row lg:flex">
           {exampleAgents.map((agent) => (
             <Card
               key={agent.name}
@@ -227,7 +227,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               <CardDescription className="text-inherit">{agent.name}</CardDescription>
             </Card>
           ))}
-        </div>
+        </div> */}
       </div>
     </div>
   )
