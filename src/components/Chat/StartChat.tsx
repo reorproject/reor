@@ -77,6 +77,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
             limit: 33,
             minDate: new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
             maxDate: new Date(),
+            passFullNoteIntoContext: true,
           }
         : undefined,
     }))
