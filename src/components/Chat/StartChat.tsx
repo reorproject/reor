@@ -1,7 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { PiPaperPlaneRight } from 'react-icons/pi'
+import { PiPaperPlaneRight, PiCaretDown } from 'react-icons/pi'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import '../../styles/chat.css'
+import { FiSettings } from 'react-icons/fi'
 import { AgentConfig, ToolDefinition, DatabaseSearchFilters } from './types'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { allAvailableToolDefinitions } from './tools'
@@ -18,8 +19,12 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
+  DrawerTrigger,
 } from '@/components/ui/drawer'
 import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Label } from '../ui/label'
+import { Switch } from '../ui/switch'
 
 interface StartChatProps {
   defaultModelName: string
@@ -33,6 +38,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   const [agentConfig, setAgentConfig] = useState<AgentConfig>(exampleAgents[0])
   const [selectedTools, setSelectedTools] = useState<ToolDefinition[]>(agentConfig.toolDefinitions)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
+  const [sendPriority, setSendPriority] = useState('normal')
 
   useEffect(() => {
     const fetchLLMModels = async () => {
@@ -46,13 +52,8 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
 
   const sendMessageHandler = async () => {
     await window.llm.setDefaultLLM(selectedLLM)
-    handleNewChatMessage(userTextFieldInput, agentConfig)
+    handleNewChatMessage(userTextFieldInput, { ...agentConfig })
   }
-
-  // const handleAgentSelection = (agent: AgentConfig) => {
-  //   setAgentConfig(agent)
-  //   setSelectedTools(agent.toolDefinitions)
-  // }
 
   const handleLLMChange = (value: string) => {
     setSelectedLLM(value)
@@ -69,19 +70,18 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
       dbSearchFilters: newFilters,
     }))
   }, [])
-
-  // const handleDbSearchToggle = (checked: boolean) => {
-  //   setAgentConfig((prevConfig) => ({
-  //     ...prevConfig,
-  //     dbSearchFilters: checked
-  //       ? {
-  //           limit: 33,
-  //           minDate: new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
-  //           maxDate: new Date(),
-  //         }
-  //       : undefined,
-  //   }))
-  // }
+  const handleDbSearchToggle = (checked: boolean) => {
+    setAgentConfig((prevConfig) => ({
+      ...prevConfig,
+      dbSearchFilters: checked
+        ? {
+            limit: 33,
+            minDate: new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
+            maxDate: new Date(),
+          }
+        : undefined,
+    }))
+  }
 
   return (
     <div className="relative flex size-full flex-col items-center overflow-y-auto">
@@ -107,7 +107,6 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               placeholder="What can Reor help you with today?"
               onChange={(e) => setUserTextFieldInput(e.target.value)}
             />
-            {/* add a separator line */}
             <div className="mx-auto h-px w-[96%] bg-muted-foreground/20" />
             <div className="flex flex-col items-center justify-between gap-2 px-4 py-2 md:flex-row md:gap-4">
               <div className="flex flex-col items-center justify-between rounded-md border-0 py-2 md:flex-row">
@@ -124,37 +123,34 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                   </SelectContent>
                 </Select>
               </div>
-              {/* <div className="flex items-center justify-center">
-                <span className="text-sm font-medium text-muted-foreground">
-                  <span className="text-primary">{agentConfig.name}</span>
-                </span>
-              </div> */}
-              {/* <Dialog>
-                <DialogTrigger asChild>
-                  <Button>Prompt</Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <PromptEditor
-                    promptTemplate={agentConfig.promptTemplate}
-                    onSave={(newPromptTemplate) => {
-                      setAgentConfig((prevConfig) => ({ ...prevConfig, promptTemplate: newPromptTemplate }))
-                    }}
-                  />
-                </DialogContent>
-              </Dialog> */}
-              {/* <ToolSelector
-                allTools={allAvailableToolDefinitions}
-                selectedTools={selectedTools}
-                onToolsChange={handleToolsChange}
-              /> */}
-              <button
-                className="m-1 flex cursor-pointer items-center justify-center rounded-md bg-primary p-2 text-primary-foreground hover:bg-accent hover:text-accent-foreground"
-                onClick={sendMessageHandler}
-                type="button"
-                aria-label="Send message"
-              >
-                <PiPaperPlaneRight aria-hidden="true" />
-              </button>
+              <div className="flex items-center">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      className="flex items-center justify-between gap-2 bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground"
+                      onClick={sendMessageHandler}
+                    >
+                      <PiPaperPlaneRight className="size-4" />
+                      Send
+                      <PiCaretDown className="size-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-48">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium">Send options</p>
+                      <select
+                        value={sendPriority}
+                        onChange={(e) => setSendPriority(e.target.value)}
+                        className="w-full rounded-md border p-1 text-sm"
+                      >
+                        <option value="normal">Normal priority</option>
+                        <option value="high">High priority</option>
+                        <option value="urgent">Urgent</option>
+                      </select>
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
           </div>
 
@@ -183,7 +179,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                 />
               </div>
               <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-                {/* <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2">
                   <Switch
                     id="db-search-toggle"
                     checked={!!agentConfig.dbSearchFilters}
@@ -203,7 +199,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                       <span className="sr-only">Open DB search settings</span>
                     </Button>
                   </DrawerTrigger>
-                </div> */}
+                </div>
                 <DrawerContent>
                   <DrawerHeader>
                     <DrawerTitle>Database Search Filters</DrawerTitle>
@@ -226,20 +222,6 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
             </div>
           </div>
         </div>
-
-        {/* <div className="mt-4 w-full justify-center md:flex-row lg:flex">
-          {exampleAgents.map((agent) => (
-            <Card
-              key={agent.name}
-              className={`m-4 w-28 cursor-pointer border-2 border-solid ${
-                agentConfig.name === agent.name ? 'border-primary text-primary' : 'border-border text-muted-foreground'
-              } bg-card transition-all duration-200 ease-in-out hover:border-accent hover:text-accent-foreground`}
-              onClick={() => handleAgentSelection(agent)}
-            >
-              <CardDescription className="text-inherit">{agent.name}</CardDescription>
-            </Card>
-          ))}
-        </div> */}
       </div>
     </div>
   )
