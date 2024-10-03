@@ -2,7 +2,7 @@ import { CoreToolMessage, ToolCallPart } from 'ai'
 import React from 'react'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { Chat } from '../types'
-import InChatContextComponent from './InChatContext'
+import InChatContextComponent from './ChatSources'
 import { findToolResultMatchingToolCall } from '../utils'
 
 interface ToolCallComponentProps {

@@ -37,8 +37,6 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
   const [agentConfig, setAgentConfig] = useState<AgentConfig>(exampleAgents[0])
   const [selectedTools, setSelectedTools] = useState<ToolDefinition[]>(agentConfig.toolDefinitions)
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false)
-  const [sendPriority, setSendPriority] = useState('normal')
 
   useEffect(() => {
     const fetchLLMModels = async () => {
@@ -70,6 +68,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
       dbSearchFilters: newFilters,
     }))
   }, [])
+
   const handleDbSearchToggle = (checked: boolean) => {
     setAgentConfig((prevConfig) => ({
       ...prevConfig,
@@ -137,7 +136,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                   </PopoverTrigger>
                   <PopoverContent className="w-48">
                     <div className="space-y-2">
-                      <p className="text-sm font-medium">Send options</p>
+                      {/* <p className="text-sm font-medium">Send options</p>
                       <select
                         value={sendPriority}
                         onChange={(e) => setSendPriority(e.target.value)}
@@ -146,7 +145,13 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                         <option value="normal">Normal priority</option>
                         <option value="high">High priority</option>
                         <option value="urgent">Urgent</option>
-                      </select>
+                      </select> */}
+                      {agentConfig.dbSearchFilters && (
+                        <DbSearchFilters
+                          dbSearchFilters={agentConfig.dbSearchFilters}
+                          onFiltersChange={handleDbSearchFiltersChange}
+                        />
+                      )}
                     </div>
                   </PopoverContent>
                 </Popover>
@@ -155,22 +160,24 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
           </div>
 
           <div className="mx-auto w-[96%] rounded-b border border-solid border-border bg-background px-4 py-2">
-            <div className="flex space-y-4">
-              Edit prompt:
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button>Prompt</Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <PromptEditor
-                    promptTemplate={agentConfig.promptTemplate}
-                    onSave={(newPromptTemplate) => {
-                      setAgentConfig((prevConfig) => ({ ...prevConfig, promptTemplate: newPromptTemplate }))
-                    }}
-                  />
-                </DialogContent>
-              </Dialog>
-              <div className="flex">
+            <div className="flex flex-col space-y-4">
+              <div className="flex items-center space-x-2">
+                Edit prompt:
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button>Prompt</Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <PromptEditor
+                      promptTemplate={agentConfig.promptTemplate}
+                      onSave={(newPromptTemplate) => {
+                        setAgentConfig((prevConfig) => ({ ...prevConfig, promptTemplate: newPromptTemplate }))
+                      }}
+                    />
+                  </DialogContent>
+                </Dialog>
+              </div>
+              <div className="flex items-center space-x-2">
                 Add tools for the LLM to call:{' '}
                 <ToolSelector
                   allTools={allAvailableToolDefinitions}
@@ -178,16 +185,16 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                   onToolsChange={handleToolsChange}
                 />
               </div>
-              <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="db-search-toggle"
-                    checked={!!agentConfig.dbSearchFilters}
-                    onCheckedChange={handleDbSearchToggle}
-                  />
-                  <Label htmlFor="db-search-toggle" className="text-sm text-muted-foreground">
-                    Include initial database search in context
-                  </Label>
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="db-search-toggle"
+                  checked={!!agentConfig.dbSearchFilters}
+                  onCheckedChange={handleDbSearchToggle}
+                />
+                <Label htmlFor="db-search-toggle" className="text-sm text-muted-foreground">
+                  Include initial database search in context
+                </Label>
+                <Drawer>
                   <DrawerTrigger asChild>
                     <Button
                       variant="secondary"
@@ -199,26 +206,30 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                       <span className="sr-only">Open DB search settings</span>
                     </Button>
                   </DrawerTrigger>
-                </div>
-                <DrawerContent>
-                  <DrawerHeader>
-                    <DrawerTitle>Database Search Filters</DrawerTitle>
-                    <DrawerDescription>Configure your database search filters</DrawerDescription>
-                  </DrawerHeader>
-                  {agentConfig.dbSearchFilters && (
-                    <DbSearchFilters
-                      dbSearchFilters={agentConfig.dbSearchFilters}
-                      onFiltersChange={handleDbSearchFiltersChange}
-                    />
-                  )}
-                  <DrawerFooter>
-                    <Button onClick={() => setIsDrawerOpen(false)}>Save Changes</Button>
-                    <DrawerClose asChild>
-                      <Button variant="outline">Cancel</Button>
-                    </DrawerClose>
-                  </DrawerFooter>
-                </DrawerContent>
-              </Drawer>
+                  <DrawerContent>
+                    <DrawerHeader>
+                      <DrawerTitle>Database Search Filters</DrawerTitle>
+                      <DrawerDescription>Configure your database search filters</DrawerDescription>
+                    </DrawerHeader>
+                    {agentConfig.dbSearchFilters && (
+                      <DbSearchFilters
+                        dbSearchFilters={agentConfig.dbSearchFilters}
+                        onFiltersChange={handleDbSearchFiltersChange}
+                      />
+                    )}
+                    <DrawerFooter>
+                      <Button
+                        onClick={() => setAgentConfig((prev) => ({ ...prev, dbSearchFilters: prev.dbSearchFilters }))}
+                      >
+                        Save Changes
+                      </Button>
+                      <DrawerClose asChild>
+                        <Button variant="outline">Cancel</Button>
+                      </DrawerClose>
+                    </DrawerFooter>
+                  </DrawerContent>
+                </Drawer>
+              </div>
             </div>
           </div>
         </div>

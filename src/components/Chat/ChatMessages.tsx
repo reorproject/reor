@@ -6,7 +6,7 @@ import LoadingDots from '@/utils/animations'
 import UserMessage from './MessageComponents/UserMessage'
 import AssistantMessage from './MessageComponents/AssistantMessage'
 import SystemMessage from './MessageComponents/SystemMessage'
-import InChatContextComponent from './MessageComponents/InChatContext'
+import InChatContextComponent from './MessageComponents/ChatSources'
 
 interface MessageProps {
   message: ReorChatMessage
