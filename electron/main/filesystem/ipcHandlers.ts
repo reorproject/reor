@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 
+import { logInfo, logErr } from '@shared/logger'
 import { ipcMain, BrowserWindow, dialog } from 'electron'
 import Store from 'electron-store'
 
@@ -34,6 +35,7 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
     try {
       // Attempt to access the file to check existence
       await fs.promises.access(filePath, fs.constants.F_OK)
+      logInfo(`File exists: ${filePath}`)
       // If access is successful, return true
       return true
     } catch (error) {
@@ -56,6 +58,7 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
 
         const windowInfo = windowsManager.getWindowInfoForContents(event.sender)
         if (!windowInfo) {
+          logErr('Window info not found.')
           throw new Error('Window info not found.')
         }
         await windowInfo.dbTableClient.deleteDBItemsByFilePaths([filePath])
@@ -66,6 +69,7 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
 
         const windowInfo = windowsManager.getWindowInfoForContents(event.sender)
         if (!windowInfo) {
+          logErr('Window info not found.')
           throw new Error('Window info not found.')
         }
         await windowInfo.dbTableClient.deleteDBItemsByFilePaths([filePath])
