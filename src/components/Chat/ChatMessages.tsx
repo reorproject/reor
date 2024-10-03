@@ -6,7 +6,7 @@ import LoadingDots from '@/utils/animations'
 import UserMessage from './MessageComponents/UserMessage'
 import AssistantMessage from './MessageComponents/AssistantMessage'
 import SystemMessage from './MessageComponents/SystemMessage'
-import InChatContextComponent from './MessageComponents/ChatSources'
+import ChatSources from './MessageComponents/ChatSources'
 
 interface MessageProps {
   message: ReorChatMessage
@@ -28,7 +28,7 @@ const Message: React.FC<MessageProps> = ({ message, index, currentChat, setCurre
         />
       )}
       {message.role === 'system' && <SystemMessage key={`system-${index}`} message={message} />}
-      {message.context && <InChatContextComponent key={`context-${index}`} contextItems={message.context} />}
+      {message.context && <ChatSources key={`context-${index}`} contextItems={message.context} />}
     </>
   )
 }
