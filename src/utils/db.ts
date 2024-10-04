@@ -29,7 +29,8 @@ export const retreiveFromVectorDB = async (
     const timeStampFilter = generateTimeStampFilter(searchFilters.minDate, searchFilters.maxDate)
     const dbSearchResults = await window.database.search(query, searchFilters.limit, timeStampFilter)
     if (searchFilters.passFullNoteIntoContext) {
-      return window.fileSystem.getFiles(dbSearchResults.map((result) => result.notepath))
+      const uniqueNotepaths = Array.from(new Set(dbSearchResults.map((result) => result.notepath)))
+      return window.fileSystem.getFiles(uniqueNotepaths)
     }
     return dbSearchResults
   }

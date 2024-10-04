@@ -2,7 +2,7 @@ import { CoreToolMessage, ToolCallPart } from 'ai'
 import React from 'react'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { Chat } from '../types'
-import InChatContextComponent from './InChatContext'
+import ChatSources from './ChatSources'
 import { findToolResultMatchingToolCall } from '../utils'
 
 interface ToolCallComponentProps {
@@ -43,7 +43,7 @@ const SearchToolRenderer: React.FC<ToolRendererProps> = ({ existingToolResult })
       {existingToolResult && (
         <div className="">
           {parsedResult ? (
-            <InChatContextComponent contextItems={parsedResult} />
+            <ChatSources contextItems={parsedResult} />
           ) : (
             <pre className="mt-1 overflow-x-auto bg-gray-600 p-2">
               <code>{JSON.stringify(existingToolResult.content[0].result, null, 2)}</code>

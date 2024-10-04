@@ -40,7 +40,7 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = () => {
         description="Attach a local LLM. Reor will download the model for you."
         onClick={() => openModal('newLocalModel')}
       />
-      <SettingsRow title="Setup OpenAI/Anthropic" description="Add your API key">
+      <SettingsRow title="Setup OpenAI or Anthropic" description="Add your API key">
         <CustomSelect
           options={modalOptions}
           selectedValue="Attach Cloud LLM"

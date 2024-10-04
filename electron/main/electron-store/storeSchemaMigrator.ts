@@ -1,9 +1,16 @@
 import Store from 'electron-store'
 
+import {
+  anthropicDefaultAPIName,
+  anthropicDefaultLLMs,
+  openAIDefaultAPIName,
+  openAIDefaultLLMs,
+} from '@shared/defaultLLMs'
 import generateChatName from '../../../shared/utils'
 import { StoreKeys, StoreSchema } from './storeConfig'
 import { defaultEmbeddingModelRepos } from '../vector-database/embeddings'
 import { defaultOllamaAPI } from '../llm/models/ollama'
+import { addOrUpdateLLMInStore } from '../llm/llmConfig'
 
 const currentSchemaVersion = 2
 
@@ -36,15 +43,29 @@ const setupDefaultEmbeddingModels = (store: Store<StoreSchema>) => {
   }
 }
 
-export const setupDefaultLLMAPIs = (store: Store<StoreSchema>) => {
+const setupDefaultLLMAPIs = (store: Store<StoreSchema>) => {
   const llmAPIs = store.get(StoreKeys.LLMAPIs)
 
   const existingOllamaAPI = llmAPIs?.find((api) => api.name === defaultOllamaAPI.name)
   if (!existingOllamaAPI) {
     store.set(StoreKeys.LLMAPIs, [defaultOllamaAPI])
-  } else if (existingOllamaAPI.apiInterface !== 'ollama') {
+  } else if (existingOllamaAPI.apiInterface !== defaultOllamaAPI.name) {
     const updatedLLMAPIs = llmAPIs.filter((api) => api.name !== defaultOllamaAPI.name)
     store.set(StoreKeys.LLMAPIs, [...updatedLLMAPIs, defaultOllamaAPI])
+  }
+
+  const existingOpenAIAPI = llmAPIs?.find((api) => api.name === openAIDefaultAPIName)
+  if (existingOpenAIAPI) {
+    openAIDefaultLLMs.forEach((llm) => {
+      addOrUpdateLLMInStore(store, llm)
+    })
+  }
+
+  const existingAnthropicAPI = llmAPIs?.find((api) => api.name === anthropicDefaultAPIName)
+  if (existingAnthropicAPI) {
+    anthropicDefaultLLMs.forEach((llm) => {
+      addOrUpdateLLMInStore(store, llm)
+    })
   }
 }
 

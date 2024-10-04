@@ -24,7 +24,6 @@ body {
 }
 
 a {
-  color: #0f82af;
   cursor: pointer;
 }
 
@@ -34,20 +33,12 @@ a {
 
 }
 
-#customTitleBar {
+.electron-drag {
   -webkit-app-region: drag;
-  height: 32px;
 }
 
-#customTitleBar #titleBarFileNavigator, 
-#titleBarSimilarFiles {
+.electron-no-drag {
   -webkit-app-region: no-drag;
-}
-
-#titleBarSingleTab {
-  -webkit-app-region: no-drag;
-  padding-top: 25px;
-  padding-bottom: 25px;
 }
 
 button {
