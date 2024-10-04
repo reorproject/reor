@@ -1,8 +1,6 @@
-import { FileInfo, FileInfoTree, FileInfoNode } from 'electron/main/filesystem/types'
+import { isFileNodeDirectory } from '@shared/utils'
+import { FileInfo, FileInfoTree } from 'electron/main/filesystem/types'
 
-export const isFileNodeDirectory = (fileInfo: FileInfoNode): boolean => fileInfo.children !== undefined
-
-// Duplicate function in the main process. It'll be faster to call this function here rahter than sending an IPC message to the main process.
 function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
   return tree.reduce((flatList: FileInfo[], node) => {
     if (!isFileNodeDirectory(node)) {

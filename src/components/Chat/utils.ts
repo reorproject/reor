@@ -1,6 +1,6 @@
 import { DBEntry } from 'electron/main/vector-database/schema'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
-import generateChatName from '@shared/utils'
+import { generateChatName } from '@shared/utils'
 import { AssistantContent, CoreAssistantMessage, CoreToolMessage, ToolCallPart } from 'ai'
 import posthog from 'posthog-js'
 import { AnonymizedAgentConfig, Chat, AgentConfig, PromptTemplate, ReorChatMessage, ToolDefinition } from './types'

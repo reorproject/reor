@@ -6,7 +6,7 @@ import {
   openAIDefaultAPIName,
   openAIDefaultLLMs,
 } from '@shared/defaultLLMs'
-import generateChatName from '../../../shared/utils'
+import { generateChatName } from '../../../shared/utils'
 import { StoreKeys, StoreSchema } from './storeConfig'
 import { defaultEmbeddingModelRepos } from '../vector-database/embeddings'
 import { defaultOllamaAPI } from '../llm/models/ollama'
