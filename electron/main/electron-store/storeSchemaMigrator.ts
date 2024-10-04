@@ -5,7 +5,7 @@ import {
   anthropicDefaultLLMs,
   openAIDefaultAPIName,
   openAIDefaultLLMs,
-} from '@shared/defaultLLMs'
+} from '../../../shared/defaultLLMs'
 import { generateChatName } from '../../../shared/utils'
 import { StoreKeys, StoreSchema } from './storeConfig'
 import { defaultEmbeddingModelRepos } from '../vector-database/embeddings'
