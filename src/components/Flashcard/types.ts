@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import {Card} from 'ts-fsrs'
 
 export const FlashcardQAPairSchema = z.object({
   question: z.string().describe('The question or prompt for the flashcard.'),
@@ -9,4 +10,5 @@ export type FlashcardQAPair = z.infer<typeof FlashcardQAPairSchema>
 
 export interface FlashcardQAPairUI extends FlashcardQAPair {
   isFlipped: boolean
+  fsrsState: Card
 }

@@ -14,6 +14,7 @@ import { FlashcardQAPairSchema, FlashcardQAPairUI } from './types'
 import { storeFlashcardPairsAsJSON } from './utils'
 import useFileInfoTreeHook from '../Sidebars/FileSideBar/hooks/use-file-info-tree'
 import resolveLLMClient from '@/utils/llm'
+import { createEmptyCard, Card } from 'ts-fsrs'
 
 interface FlashcardCreateModalProps {
   isOpen: boolean
@@ -84,12 +85,19 @@ Make sure you generate the flashcards in the correct format and that are relevan
       ],
     })
 
-    // so we'll need to display the error here if there is one:
     const flashcardUIPairs = FlashcardQAPairSchema.array().parse(object) as FlashcardQAPairUI[]
-    setFlashcardQAPairs(flashcardUIPairs)
+
+    const newCard: Card = createEmptyCard()
+    const initializedFlashcards = flashcardUIPairs.map((card) => ({
+      ...card,
+      fsrsState: newCard,
+      isFlipped: false,
+    }))
+
+    setFlashcardQAPairs(initializedFlashcards)
     setIsLoadingFlashcards(false)
 
-    storeFlashcardPairsAsJSON(flashcardUIPairs, selectedFile)
+    storeFlashcardPairsAsJSON(initializedFlashcards, selectedFile)
   }
 
   // find all available files
@@ -158,6 +166,7 @@ Make sure you generate the flashcards in the correct format and that are relevan
           setFlashcardQAPairs={setFlashcardQAPairs}
           currentSelectedFlashcard={currentSelectedFlashcard}
           setCurrentSelectedFlashcard={setCurrentSelectedFlashcard}
+          selectedFlashcardFile={selectedFile}
         />
         <div className="flex justify-end">
           {selectedFile && (

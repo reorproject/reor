@@ -118,6 +118,7 @@
     "tailwind-scrollbar": "^3.1.0",
     "tailwindcss-animate": "^1.0.7",
     "tiptap-markdown": "github:samlhuillier/tiptap-markdown-newline",
+    "ts-fsrs": "^4.3.1",
     "turndown": "^7.1.2",
     "use-debounce": "^10.0.1",
     "uuid": "^10.0.0",
