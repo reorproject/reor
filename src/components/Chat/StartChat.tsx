@@ -8,7 +8,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { allAvailableToolDefinitions } from './tools'
 import { Button } from '@/components/ui/button'
 import DbSearchFilters from './ChatConfigComponents/DBSearchFilters'
-import exampleAgents from './ChatConfigComponents/exampleAgents'
 import PromptEditor from './ChatConfigComponents/PromptEditor'
 import ToolSelector from './ChatConfigComponents/ToolSelector'
 import {
@@ -25,6 +24,7 @@ import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Label } from '../ui/label'
 import { Switch } from '../ui/switch'
+import exampleAgents from './ChatConfigComponents/exampleAgents'
 
 interface StartChatProps {
   defaultModelName: string
@@ -35,8 +35,19 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([])
   const [selectedLLM, setSelectedLLM] = useState<string>(defaultModelName)
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
-  const [agentConfig, setAgentConfig] = useState<AgentConfig>(exampleAgents[0])
-  const [selectedTools, setSelectedTools] = useState<ToolDefinition[]>(agentConfig.toolDefinitions)
+  const [agentConfig, setAgentConfig] = useState<AgentConfig>()
+
+  useEffect(() => {
+    const fetchAgentConfigs = async () => {
+      const agentConfigs = await window.electronStore.getAgentConfigs()
+      if (agentConfigs && agentConfigs.length > 0) {
+        setAgentConfig(agentConfigs[0])
+      } else {
+        setAgentConfig(exampleAgents[0])
+      }
+    }
+    fetchAgentConfigs()
+  }, [])
 
   useEffect(() => {
     const fetchLLMModels = async () => {
@@ -50,7 +61,11 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
 
   const sendMessageHandler = async () => {
     await window.llm.setDefaultLLM(selectedLLM)
+    if (!agentConfig) {
+      throw new Error('No agent config found')
+    }
     handleNewChatMessage(userTextFieldInput, { ...agentConfig })
+    window.electronStore.setAgentConfig(agentConfig)
   }
 
   const handleLLMChange = (value: string) => {
@@ -58,30 +73,37 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   }
 
   const handleToolsChange = (tools: ToolDefinition[]) => {
-    setSelectedTools(tools)
-    setAgentConfig((prevConfig) => ({ ...prevConfig, toolDefinitions: tools }))
+    setAgentConfig((prevConfig) => {
+      if (!prevConfig) throw new Error('Agent config must be initialized before setting tools')
+      return { ...prevConfig, toolDefinitions: tools }
+    })
   }
 
   const handleDbSearchFiltersChange = useCallback((newFilters: DatabaseSearchFilters) => {
-    setAgentConfig((prevConfig) => ({
-      ...prevConfig,
-      dbSearchFilters: newFilters,
-    }))
+    setAgentConfig((prevConfig) => {
+      if (!prevConfig) throw new Error('Agent config must be initialized before setting db search filters')
+      return { ...prevConfig, dbSearchFilters: newFilters }
+    })
   }, [])
 
   const handleDbSearchToggle = (checked: boolean) => {
-    setAgentConfig((prevConfig) => ({
-      ...prevConfig,
-      dbSearchFilters: checked
-        ? {
-            limit: 33,
-            minDate: new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
-            maxDate: new Date(),
-            passFullNoteIntoContext: true,
-          }
-        : undefined,
-    }))
+    setAgentConfig((prevConfig) => {
+      if (!prevConfig) throw new Error('Agent config must be initialized before setting db search filters')
+      return {
+        ...prevConfig,
+        dbSearchFilters: checked
+          ? {
+              limit: 33,
+              minDate: new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
+              maxDate: new Date(),
+              passFullNoteIntoContext: true,
+            }
+          : undefined,
+      }
+    })
   }
+
+  if (!agentConfig) return <div>Loading...</div>
 
   return (
     <div className="relative flex size-full flex-col items-center overflow-y-auto">
@@ -172,7 +194,11 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                     <PromptEditor
                       promptTemplate={agentConfig.promptTemplate}
                       onSave={(newPromptTemplate) => {
-                        setAgentConfig((prevConfig) => ({ ...prevConfig, promptTemplate: newPromptTemplate }))
+                        setAgentConfig((prevConfig) => {
+                          if (!prevConfig)
+                            throw new Error('Agent config must be initialized before setting prompt template')
+                          return { ...prevConfig, promptTemplate: newPromptTemplate }
+                        })
                       }}
                     />
                   </DialogContent>
@@ -182,7 +208,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                 Add tools for the LLM to call:{' '}
                 <ToolSelector
                   allTools={allAvailableToolDefinitions}
-                  selectedTools={selectedTools}
+                  selectedTools={agentConfig.toolDefinitions}
                   onToolsChange={handleToolsChange}
                 />
               </div>
@@ -220,7 +246,12 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                     )}
                     <DrawerFooter>
                       <Button
-                        onClick={() => setAgentConfig((prev) => ({ ...prev, dbSearchFilters: prev.dbSearchFilters }))}
+                        onClick={() =>
+                          setAgentConfig((prev) => {
+                            if (!prev) throw new Error('Agent config must be initialized')
+                            return { ...prev, dbSearchFilters: prev.dbSearchFilters }
+                          })
+                        }
                       >
                         Save Changes
                       </Button>
