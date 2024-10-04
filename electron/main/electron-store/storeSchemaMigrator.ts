@@ -87,15 +87,19 @@ export function setupDefaultStoreValues(store: Store<StoreSchema>) {
   setupDefaultLLMAPIs(store)
 }
 
-function ensureChatHistoryIsCorrectProperty(store: Store<StoreSchema>) {
-  const chatHistories = store.get(StoreKeys.ChatHistories)
-  if (!chatHistories) {
+function ensureChatsIsCorrectProperty(store: Store<StoreSchema>) {
+  const oldChatHistories = store.get('chatHistories')
+  if (oldChatHistories) {
+    store.set(StoreKeys.Chats, oldChatHistories)
+  }
+  const chats = store.get(StoreKeys.Chats)
+  if (!chats) {
     return
   }
 
-  Object.keys(chatHistories).forEach((vaultDir) => {
-    const chats = chatHistories[vaultDir]
-    chats.map((chat) => {
+  Object.keys(chats).forEach((vaultDir) => {
+    const chatsForVault = chats[vaultDir]
+    chatsForVault.map((chat) => {
       const outputChat = chat
       if (chat.displayableChatHistory) {
         outputChat.messages = chat.displayableChatHistory
@@ -103,14 +107,14 @@ function ensureChatHistoryIsCorrectProperty(store: Store<StoreSchema>) {
       }
       return outputChat
     })
-    chatHistories[vaultDir] = chats
+    chats[vaultDir] = chatsForVault
   })
 
-  store.set(StoreKeys.ChatHistories, chatHistories)
+  store.set(StoreKeys.Chats, chats)
 }
 
-function ensureChatHistoryHasDisplayNameAndTimestamp(store: Store<StoreSchema>) {
-  const chatHistories = store.get(StoreKeys.ChatHistories)
+function ensureChatsHasDisplayNameAndTimestamp(store: Store<StoreSchema>) {
+  const chatHistories = store.get(StoreKeys.Chats)
   if (!chatHistories) {
     return
   }
@@ -129,7 +133,7 @@ function ensureChatHistoryHasDisplayNameAndTimestamp(store: Store<StoreSchema>) 
     })
   })
 
-  store.set(StoreKeys.ChatHistories, chatHistories)
+  store.set(StoreKeys.Chats, chatHistories)
 }
 
 export const initializeAndMaybeMigrateStore = (store: Store<StoreSchema>) => {
@@ -140,7 +144,7 @@ export const initializeAndMaybeMigrateStore = (store: Store<StoreSchema>) => {
     store.set(StoreKeys.DefaultLLM, '')
   }
 
-  ensureChatHistoryIsCorrectProperty(store)
-  ensureChatHistoryHasDisplayNameAndTimestamp(store)
+  ensureChatsIsCorrectProperty(store)
+  ensureChatsHasDisplayNameAndTimestamp(store)
   setupDefaultStoreValues(store)
 }

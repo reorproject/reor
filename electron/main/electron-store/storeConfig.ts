@@ -56,7 +56,7 @@ export interface StoreSchema {
   defaultLLM: string
   defaultEmbedFuncRepo: string
   llmGenerationParameters: LLMGenerationParameters
-  chatHistories: {
+  chats: {
     [vaultDir: string]: Chat[]
   }
   analytics?: boolean
@@ -80,7 +80,7 @@ export enum StoreKeys {
   DefaultEmbeddingModelAlias = 'defaultEmbeddingModelAlias',
   MaxRAGExamples = 'RAG.maxRAGExamples',
   LLMGenerationParameters = 'llmGenerationParameters',
-  ChatHistories = 'chatHistories',
+  Chats = 'chats',
   ChunkSize = 'chunkSize',
   IsSBCompact = 'isSBCompact',
   SpellCheck = 'spellCheck',

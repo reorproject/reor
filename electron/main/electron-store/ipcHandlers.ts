@@ -146,7 +146,7 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
       return []
     }
 
-    const allHistories = store.get(StoreKeys.ChatHistories)
+    const allHistories = store.get(StoreKeys.Chats)
     const chatHistoriesCorrespondingToVault = allHistories?.[vaultDir] ?? []
     return chatHistoriesCorrespondingToVault.map(({ messages, ...rest }) => rest) as ChatMetadata[]
   })
@@ -157,7 +157,7 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
       return
     }
 
-    const allChatHistories = store.get(StoreKeys.ChatHistories)
+    const allChatHistories = store.get(StoreKeys.Chats)
     const chatHistoriesCorrespondingToVault = allChatHistories?.[vaultDir] ?? []
 
     const existingChatIndex = chatHistoriesCorrespondingToVault.findIndex((chat) => chat.id === newChat.id)
@@ -166,7 +166,7 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     } else {
       chatHistoriesCorrespondingToVault.push(newChat)
     }
-    store.set(StoreKeys.ChatHistories, {
+    store.set(StoreKeys.Chats, {
       ...allChatHistories,
       [vaultDir]: chatHistoriesCorrespondingToVault,
     })
@@ -180,7 +180,7 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     if (!vaultDir) {
       return null
     }
-    const allChatHistories = store.get(StoreKeys.ChatHistories)
+    const allChatHistories = store.get(StoreKeys.Chats)
     const vaultChatHistories = allChatHistories[vaultDir] || []
     return vaultChatHistories.find((chat) => chat.id === chatId)
   })
@@ -193,12 +193,12 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
       return
     }
 
-    const chatHistoriesMap = store.get(StoreKeys.ChatHistories)
+    const chatHistoriesMap = store.get(StoreKeys.Chats)
     const allChatHistories = chatHistoriesMap[vaultDir] || []
     const filteredChatHistories = allChatHistories.filter((item) => item.id !== chatID)
 
     chatHistoriesMap[vaultDir] = filteredChatHistories
-    store.set(StoreKeys.ChatHistories, chatHistoriesMap)
+    store.set(StoreKeys.Chats, chatHistoriesMap)
   })
 }
 
