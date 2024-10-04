@@ -6,6 +6,7 @@ import posthog from 'posthog-js'
 import { TypeAnimation } from 'react-type-animation'
 
 import { generateObject } from 'ai'
+import { createEmptyCard, Card } from 'ts-fsrs'
 import ReorModal from '../Common/Modal'
 import FilesSuggestionsDisplay, { SuggestionsState } from '../Editor/BacklinkSuggestionsDisplay'
 
@@ -14,7 +15,6 @@ import { FlashcardQAPairSchema, FlashcardQAPairUI } from './types'
 import { storeFlashcardPairsAsJSON } from './utils'
 import useFileInfoTreeHook from '../Sidebars/FileSideBar/hooks/use-file-info-tree'
 import resolveLLMClient from '@/utils/llm'
-import { createEmptyCard, Card } from 'ts-fsrs'
 
 interface FlashcardCreateModalProps {
   isOpen: boolean

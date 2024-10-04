@@ -1,6 +1,6 @@
 import { toast } from 'react-toastify'
 
-import { FlashcardQAPair, FlashcardQAPairUI } from './types'
+import { FlashcardQAPairUI } from './types'
 
 import { removeFileExtension } from '@/utils/strings'
 
@@ -31,7 +31,7 @@ export const storeFlashcardPairsAsJSON = async (qnaPairs: FlashcardQAPairUI[], c
           ...pair,
           fsrsState: {
             ...pair.fsrsState,
-            due: pair.fsrsState.due.toISOString(), 
+            due: pair.fsrsState.due.toISOString(),
           },
         })),
       },
@@ -64,7 +64,7 @@ export const getFlashcardQnaPairsFromJsonFile = async (selectedFlashcardFile: st
     ...pair,
     fsrsState: {
       ...pair.fsrsState,
-      due: new Date(pair.fsrsState.due), 
+      due: new Date(pair.fsrsState.due),
     },
     isFlipped: false,
   }))
@@ -91,17 +91,18 @@ export const storeFlashcardPairAsJSON = async (updatedPair: FlashcardQAPairUI, c
   const fileData = await window.fileSystem.readFile(filePath)
   const existingData = JSON.parse(fileData)
 
-  const updatedQnaPairs = existingData.qnaPairs.map((pair: FlashcardQAPairUI) => 
-    pair.question === updatedPair.question ? {
-      ...updatedPair,
-      fsrsState: {
-        ...updatedPair.fsrsState,
-        due: updatedPair.fsrsState.due.toISOString(), // Convert Date to string for JSON storage
-      },
-    } : pair
+  const updatedQnaPairs = existingData.qnaPairs.map((pair: FlashcardQAPairUI) =>
+    pair.question === updatedPair.question
+      ? {
+          ...updatedPair,
+          fsrsState: {
+            ...updatedPair.fsrsState,
+            due: updatedPair.fsrsState.due.toISOString(), // Convert Date to string for JSON storage
+          },
+        }
+      : pair,
   )
 
- 
   await window.fileSystem.writeFile({
     filePath,
     content: JSON.stringify(

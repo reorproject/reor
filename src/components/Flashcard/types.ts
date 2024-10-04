@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import {Card} from 'ts-fsrs'
+import { Card } from 'ts-fsrs'
 
 export const FlashcardQAPairSchema = z.object({
   question: z.string().describe('The question or prompt for the flashcard.'),

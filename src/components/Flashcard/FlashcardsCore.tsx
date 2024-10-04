@@ -29,13 +29,11 @@ const FlashcardCore: React.FC<FlashcardCoreProps> = ({
     const updatedPairs = [...flashcardQAPairs]
     updatedPairs[flashcardSelected] = updatedFlashcard
     setFlashcardQAPairs(updatedPairs)
-    
   }
 
   const handleRating = (rating: Grade) => {
     const currentCard = flashcardQAPairs[currentSelectedFlashcard]
     const now = new Date()
-
 
     const result = f.next(currentCard.fsrsState, now, rating)
 
@@ -74,7 +72,7 @@ const FlashcardCore: React.FC<FlashcardCoreProps> = ({
               <p>{flashcardQAPairs[currentSelectedFlashcard].question}</p>
             </div>
           </Button>
-          
+
           {/* Back of the card */}
           {flashcardQAPairs[currentSelectedFlashcard].isFlipped && (
             <div>
@@ -93,10 +91,18 @@ const FlashcardCore: React.FC<FlashcardCoreProps> = ({
                 </div>
               </Button>
               <div className="mt-4 flex justify-around">
-                <Button onClick={() => handleRating(Rating.Again)} className="bg-red-500" placeholder="">Again</Button>
-                <Button onClick={() => handleRating(Rating.Hard)} className="bg-yellow-500" placeholder="">Hard</Button>
-                <Button onClick={() => handleRating(Rating.Good)} className="bg-green-500" placeholder="">Good</Button>
-                <Button onClick={() => handleRating(Rating.Easy)} className="bg-blue-500" placeholder="">Easy</Button>
+                <Button onClick={() => handleRating(Rating.Again)} className="bg-red-500" placeholder="">
+                  Again
+                </Button>
+                <Button onClick={() => handleRating(Rating.Hard)} className="bg-yellow-500" placeholder="">
+                  Hard
+                </Button>
+                <Button onClick={() => handleRating(Rating.Good)} className="bg-green-500" placeholder="">
+                  Good
+                </Button>
+                <Button onClick={() => handleRating(Rating.Easy)} className="bg-blue-500" placeholder="">
+                  Easy
+                </Button>
               </div>
             </div>
           )}
