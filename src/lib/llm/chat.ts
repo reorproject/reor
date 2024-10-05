@@ -81,22 +81,23 @@ const generateStringOfContextItemsForPrompt = (contextItems: DBEntry[] | FileInf
 
 const generateMessagesFromTemplate = (
   promptTemplate: PromptTemplate,
-  // contextString: string,
   query: string,
   contextItems: DBEntry[] | FileInfoWithContent[],
+  contextString: string,
 ): ReorChatMessage[] => {
   return promptTemplate.map((message) => {
     const replacePlaceholders = (content: string) => {
-      return content.replace('{QUERY}', query) // .replace('{CONTEXT}', contextString)
+      return content.replace('{QUERY}', query)
     }
 
     if (message.role === 'system') {
       return {
         ...message,
-        content: replacePlaceholders(message.content),
+        content: `${replacePlaceholders(message.content)}\n\n${contextString}`,
         hideMessage: true,
       }
     }
+
     if (message.role === 'user') {
       return {
         ...message,
@@ -105,25 +106,13 @@ const generateMessagesFromTemplate = (
         visibleContent: query,
       }
     }
+
     return message
   }) as ReorChatMessage[]
 }
 
-const injectContextIntoMessages = (messages: ReorChatMessage[], contextString: string): ReorChatMessage[] => {
-  const indexOfFirstSystemMessage = messages.findIndex((message) => message.role === 'system')
-  if (indexOfFirstSystemMessage !== -1) {
-    messages.splice(indexOfFirstSystemMessage + 1, 0, {
-      role: 'user',
-      content: contextString,
-      hideMessage: true,
-    })
-  }
-  return messages
-}
-
 export const doInitialRAG = async (query: string, agentConfig: AgentConfig): Promise<ReorChatMessage[]> => {
   const { promptTemplate, files } = agentConfig
-
   let contextItems: DBEntry[] | FileInfoWithContent[] = []
 
   if (files.length > 0) {
@@ -131,10 +120,11 @@ export const doInitialRAG = async (query: string, agentConfig: AgentConfig): Pro
   } else if (agentConfig.dbSearchFilters) {
     contextItems = await retreiveFromVectorDB(query, agentConfig.dbSearchFilters)
   }
+
   const contextString = generateStringOfContextItemsForPrompt(contextItems)
-  const messages = generateMessagesFromTemplate(promptTemplate, query, contextItems)
-  const messagesWithContext = injectContextIntoMessages(messages, contextString)
-  return messagesWithContext
+  const messages = generateMessagesFromTemplate(promptTemplate, query, contextItems, contextString)
+
+  return messages
 }
 
 export const generateInitialChat = async (userTextFieldInput: string, agentConfig: AgentConfig): Promise<Chat> => {
