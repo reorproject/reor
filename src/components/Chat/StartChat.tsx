@@ -20,7 +20,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer'
-import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Label } from '../ui/label'
 import { Switch } from '../ui/switch'
@@ -185,11 +184,11 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
             <div className="flex flex-col space-y-4">
               <div className="flex items-center space-x-2">
                 Edit prompt:
-                <Dialog>
-                  <DialogTrigger asChild>
+                <Popover>
+                  <PopoverTrigger asChild>
                     <Button>Prompt</Button>
-                  </DialogTrigger>
-                  <DialogContent>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full border border-solid border-muted-foreground bg-border">
                     <PromptEditor
                       promptTemplate={agentConfig.promptTemplate}
                       onSave={(newPromptTemplate) => {
@@ -200,8 +199,8 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                         })
                       }}
                     />
-                  </DialogContent>
-                </Dialog>
+                  </PopoverContent>
+                </Popover>
               </div>
               <div className="flex items-center space-x-2">
                 Add tools for the LLM to call:{' '}
