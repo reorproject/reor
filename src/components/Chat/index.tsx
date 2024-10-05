@@ -6,15 +6,15 @@ import {
   appendStringContentToMessages,
   appendToOrCreateChat as updateOrCreateChat,
   removeUncalledToolsFromMessages,
-} from './utils/utils'
+} from '../../lib/llm/chat'
 
 import '../../styles/chat.css'
 import ChatMessages from './ChatMessages'
-import { Chat, AgentConfig, LoadingState } from './utils/types'
+import { Chat, AgentConfig, LoadingState } from '../../lib/llm/types'
 import { useChatContext } from '@/contexts/ChatContext'
 import StartChat from './StartChat'
 import resolveLLMClient from '@/lib/llm/client'
-import { appendToolCallsAndAutoExecuteTools, convertToolConfigToZodSchema } from './utils/tools/utils'
+import { appendToolCallsAndAutoExecuteTools, convertToolConfigToZodSchema } from '../../lib/llm/tools/utils'
 
 const ChatComponent: React.FC = () => {
   const [loadingState, setLoadingState] = useState<LoadingState>('idle')

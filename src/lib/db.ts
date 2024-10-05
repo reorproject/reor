@@ -1,6 +1,6 @@
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { DBEntry } from 'electron/main/vector-database/schema'
-import { DatabaseSearchFilters } from '@/components/Chat/utils/types'
+import { DatabaseSearchFilters } from '@/lib/llm/types'
 
 export const generateTimeStampFilter = (minDate?: Date, maxDate?: Date): string => {
   let filter = ''

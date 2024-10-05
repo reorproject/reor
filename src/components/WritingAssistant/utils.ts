@@ -1,4 +1,4 @@
-import { ReorChatMessage } from '../Chat/utils/types'
+import { ReorChatMessage } from '../../lib/llm/types'
 
 function getClassNames(message: ReorChatMessage | undefined): string {
   if (!message) {

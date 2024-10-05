@@ -10,7 +10,7 @@ import {
 import { FileInfoTree, FileInfoWithContent, RenameFileProps, WriteFileProps } from 'electron/main/filesystem/types'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 
-import { AgentConfig, ChatMetadata, Chat } from '@/components/Chat/utils/types'
+import { AgentConfig, ChatMetadata, Chat } from '@/lib/llm/types'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type IPCHandler<T extends (...args: any[]) => any> = (...args: Parameters<T>) => Promise<ReturnType<T>>

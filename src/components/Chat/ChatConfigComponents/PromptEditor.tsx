@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { debounce } from 'lodash'
-import { PromptTemplate } from '../utils/types'
+import { PromptTemplate } from '../../../lib/llm/types'
 import { Textarea } from '@/components/ui/textarea'
 
 const PromptEditor: React.FC<{
