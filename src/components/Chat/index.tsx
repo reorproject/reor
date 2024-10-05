@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 import {
   appendToolCallsAndAutoExecuteTools,
   appendStringContentToMessages,
-  appendToOrCreateChat,
+  appendToOrCreateChat as updateOrCreateChat,
   removeUncalledToolsFromMessages,
 } from './utils'
 
@@ -52,16 +52,14 @@ const ChatComponent: React.FC = () => {
 
   const handleNewChatMessage = useCallback(
     async (chat: Chat | undefined, userTextFieldInput?: string, agentConfig?: AgentConfig) => {
+      let outputChat: Chat | undefined
       try {
         const defaultLLMName = await window.llm.getDefaultLLMName()
-
         if (!userTextFieldInput?.trim() && (!chat || chat.messages.length === 0)) {
           return
         }
 
-        let outputChat = userTextFieldInput?.trim()
-          ? await appendToOrCreateChat(chat, userTextFieldInput, agentConfig)
-          : chat
+        outputChat = userTextFieldInput?.trim() ? await updateOrCreateChat(chat, userTextFieldInput, agentConfig) : chat
 
         if (!outputChat) {
           return
@@ -117,14 +115,14 @@ const ChatComponent: React.FC = () => {
         setLoadingState('idle')
       } catch (error) {
         if (error instanceof Error && error.name === 'AI_APICallError' && error.message.includes('Bad Request')) {
-          if (agentConfig && agentConfig?.toolDefinitions.length > 0) {
-            // console.log('')
-            toast.info('Disabling tools as this model does not support them.')
-            // set new agent config to the same but with no tools:
+          if (agentConfig && agentConfig?.toolDefinitions.length > 0 && outputChat) {
+            toast.info(
+              'Disabling tools as this model does not support them. If you want to use tools, please select a different model. If you want to retrieve from your knowledge base, select "make initial search" option.',
+            )
             const agentWithoutTools = { ...agentConfig, toolDefinitions: [] }
-            handleNewChatMessage(chat, userTextFieldInput, agentWithoutTools)
+            outputChat.toolDefinitions = []
+            handleNewChatMessage(outputChat, undefined, agentWithoutTools)
             return
-            // window.electronStore.setAgentConfig(agentWithoutTools)
           }
         }
         // so here we could check the error message
