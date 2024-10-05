@@ -92,8 +92,8 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
         dbSearchFilters: checked
           ? {
               limit: 33,
-              minDate: new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
-              maxDate: new Date(),
+              minDate: undefined,
+              maxDate: undefined,
               passFullNoteIntoContext: true,
             }
           : undefined,
@@ -126,6 +126,8 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               className="h-[100px] w-full resize-none rounded-t-md border-0 bg-transparent p-4 text-primary caret-foreground focus:outline-none"
               placeholder="What can Reor help you with today?"
               onChange={(e) => setUserTextFieldInput(e.target.value)}
+              // eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus
             />
             <div className="mx-auto h-px w-[96%] bg-muted-foreground/20" />
             <div className="flex flex-col items-center justify-between gap-2 px-4 py-2 md:flex-row md:gap-4">

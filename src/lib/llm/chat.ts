@@ -75,30 +75,32 @@ export function anonymizeAgentConfigForPosthog(
 }
 
 const generateStringOfContextItemsForPrompt = (contextItems: DBEntry[] | FileInfoWithContent[]): string => {
-  return contextItems.map((item) => item.content).join('\n\n')
+  const contextString = contextItems.map((item) => JSON.stringify(item, null, 2)).join('\n\n')
+  return `<context>${contextString}</context>`
 }
-const applyPromptTemplate = (
+
+const generateMessagesFromTemplate = (
   promptTemplate: PromptTemplate,
-  contextString: string,
+  // contextString: string,
   query: string,
-  results: DBEntry[] | FileInfoWithContent[],
+  contextItems: DBEntry[] | FileInfoWithContent[],
 ): ReorChatMessage[] => {
   return promptTemplate.map((message) => {
     const replacePlaceholders = (content: string) => {
-      return content.replace('{CONTEXT}', contextString).replace('{QUERY}', query)
+      return content.replace('{QUERY}', query) // .replace('{CONTEXT}', contextString)
     }
 
     if (message.role === 'system') {
       return {
         ...message,
         content: replacePlaceholders(message.content),
-        hideMessageInChat: true,
+        hideMessage: true,
       }
     }
     if (message.role === 'user') {
       return {
         ...message,
-        context: results,
+        context: contextItems,
         content: replacePlaceholders(message.content),
         visibleContent: query,
       }
@@ -107,24 +109,32 @@ const applyPromptTemplate = (
   }) as ReorChatMessage[]
 }
 
+const injectContextIntoMessages = (messages: ReorChatMessage[], contextString: string): ReorChatMessage[] => {
+  const indexOfFirstSystemMessage = messages.findIndex((message) => message.role === 'system')
+  if (indexOfFirstSystemMessage !== -1) {
+    messages.splice(indexOfFirstSystemMessage + 1, 0, {
+      role: 'user',
+      content: contextString,
+      hideMessage: true,
+    })
+  }
+  return messages
+}
+
 export const doInitialRAG = async (query: string, agentConfig: AgentConfig): Promise<ReorChatMessage[]> => {
   const { promptTemplate, files } = agentConfig
 
-  const needsContext = promptTemplate.some((message) => message.content.includes('{CONTEXT}'))
+  let contextItems: DBEntry[] | FileInfoWithContent[] = []
 
-  let results: DBEntry[] | FileInfoWithContent[] = []
-  let contextString = ''
-
-  if (needsContext) {
-    if (files.length > 0) {
-      results = await window.fileSystem.getFiles(files)
-    } else if (agentConfig.dbSearchFilters) {
-      results = await retreiveFromVectorDB(query, agentConfig.dbSearchFilters)
-    }
-    contextString = generateStringOfContextItemsForPrompt(results)
+  if (files.length > 0) {
+    contextItems = await window.fileSystem.getFiles(files)
+  } else if (agentConfig.dbSearchFilters) {
+    contextItems = await retreiveFromVectorDB(query, agentConfig.dbSearchFilters)
   }
-
-  return applyPromptTemplate(promptTemplate, contextString, query, results)
+  const contextString = generateStringOfContextItemsForPrompt(contextItems)
+  const messages = generateMessagesFromTemplate(promptTemplate, query, contextItems)
+  const messagesWithContext = injectContextIntoMessages(messages, contextString)
+  return messagesWithContext
 }
 
 export const generateInitialChat = async (userTextFieldInput: string, agentConfig: AgentConfig): Promise<Chat> => {
@@ -176,7 +186,7 @@ export const getClassNameBasedOnMessageRole = (message: ReorChatMessage): string
 }
 
 export const getDisplayMessage = (message: ReorChatMessage): string | undefined => {
-  if (message.hideMessageInChat) {
+  if (message.hideMessage) {
     return undefined
   }
   if (message.visibleContent !== null && message.visibleContent !== undefined && message.visibleContent !== '') {

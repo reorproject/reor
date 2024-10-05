@@ -4,8 +4,8 @@ import { DBEntry } from 'electron/main/vector-database/schema'
 
 export type ReorChatMessage = CoreMessage & {
   context?: DBEntry[] | FileInfoWithContent[]
+  hideMessage?: boolean
   visibleContent?: string
-  hideMessageInChat?: boolean
 }
 
 type ParameterType = 'string' | 'number' | 'boolean'
