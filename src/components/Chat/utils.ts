@@ -156,6 +156,7 @@ export const convertMessageToString = (message: ReorChatMessage | undefined): st
   }
   return ''
 }
+
 export function anonymizeAgentConfigForPosthog(
   agentConfig: AgentConfig | undefined,
 ): AnonymizedAgentConfig | undefined {

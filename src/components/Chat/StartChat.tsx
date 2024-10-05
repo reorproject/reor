@@ -114,7 +114,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
         </h1>
 
         <div className="flex flex-col">
-          <div className="flex flex-col rounded-md border-2 border-solid border-border bg-secondary focus-within:ring-1 focus-within:ring-ring">
+          <div className="z-50 flex flex-col rounded-md border-2 border-solid border-border bg-secondary focus-within:ring-1 focus-within:ring-ring">
             <textarea
               value={userTextFieldInput}
               onKeyDown={(e) => {
