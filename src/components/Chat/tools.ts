@@ -143,7 +143,7 @@ export const toolNamesToFunctions: ToolFunctionMap = {
     const vault = await window.electronStore.getVaultDirectoryForWindow()
     const path = await window.path.join(vault, filename)
     await window.fileSystem.createFile(path, content)
-    return `Note ${filename} created successfully`
+    return `Note ${path} created successfully`
   },
   createDirectory: async (directoryName: string): Promise<string> => {
     const vault = await window.electronStore.getVaultDirectoryForWindow()

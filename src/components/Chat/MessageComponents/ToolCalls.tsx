@@ -1,9 +1,12 @@
 import { CoreToolMessage, ToolCallPart } from 'ai'
-import React from 'react'
+import React, { useState } from 'react'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
+import { ChevronDown, ChevronUp } from 'lucide-react'
 import { Chat } from '../types'
 import ChatSources from './ChatSources'
 import { findToolResultMatchingToolCall } from '../utils'
+import { Button } from '@/components/ui/button'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 
 interface ToolCallComponentProps {
   toolCallPart: ToolCallPart
@@ -55,55 +58,48 @@ const SearchToolRenderer: React.FC<ToolRendererProps> = ({ existingToolResult })
   )
 }
 
-const CreateFileToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existingToolResult, executeToolCall }) => (
-  <div className="mt-0 rounded border border-gray-600 p-0">
-    <h4 className="font-bold">Create File Tool Call</h4>
-    <pre className="mt-2 overflow-x-auto bg-gray-700 p-2">
-      <code>{JSON.stringify(toolCallPart.args, null, 2)}</code>
-    </pre>
-    {existingToolResult ? (
-      <div className="mt-2 bg-gray-100 p-2">
-        <h5 className="font-semibold">File Creation Result:</h5>
-        <pre className="mt-1 overflow-x-auto bg-gray-600 p-2">
-          <code>{JSON.stringify(existingToolResult.content[0].result, null, 2)}</code>
-        </pre>
-      </div>
-    ) : (
-      <button
-        type="button"
-        onClick={() => executeToolCall(toolCallPart)}
-        className="mt-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-      >
-        Create File
-      </button>
-    )}
-  </div>
-)
+const DefaultToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existingToolResult, executeToolCall }) => {
+  const [isOpen, setIsOpen] = useState(false)
 
-const DefaultToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existingToolResult, executeToolCall }) => (
-  <div className="mt-0 rounded border border-gray-600 p-0">
-    <h4 className="font-bold">Tool Call: {toolCallPart.toolName}</h4>
-    <pre className="mt-2 overflow-x-auto bg-gray-700 p-2">
-      <code>{JSON.stringify(toolCallPart.args, null, 2)}</code>
-    </pre>
-    {existingToolResult ? (
-      <div className="mt-2 bg-gray-100 p-2">
-        <h5 className="font-semibold">Tool Result:</h5>
-        <pre className="mt-1 overflow-x-auto bg-gray-600 p-2">
-          <code>{JSON.stringify(existingToolResult.content[0].result, null, 2)}</code>
-        </pre>
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen} className="mt-2 rounded-md border border-border bg-secondary">
+      <div className="flex items-center justify-between px-3 py-2">
+        <h4 className="text-sm font-medium text-secondary-foreground">Tool Call: {toolCallPart.toolName}</h4>
+        <CollapsibleTrigger asChild>
+          <Button variant="ghost" size="sm" className="size-6 p-0">
+            {isOpen ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
+          </Button>
+        </CollapsibleTrigger>
       </div>
-    ) : (
-      <button
-        type="button"
-        onClick={() => executeToolCall(toolCallPart)}
-        className="mt-2 rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600"
-      >
-        Execute Tool Call
-      </button>
-    )}
-  </div>
-)
+      <CollapsibleContent>
+        <div className="border-t border-border px-3 py-2">
+          <h5 className="mb-1 text-xs font-medium text-muted-foreground">Arguments:</h5>
+          {Object.entries(toolCallPart.args as Record<string, unknown>).map(([key, value]) => (
+            <div key={key} className="text-xs">
+              <span className="font-medium text-secondary-foreground">{key}:</span>{' '}
+              <span className="text-muted-foreground">{JSON.stringify(value)}</span>
+            </div>
+          ))}
+        </div>
+        {existingToolResult && (
+          <div className="border-t border-border px-3 py-2">
+            <h5 className="mb-1 text-xs font-medium text-muted-foreground">Result:</h5>
+            <div className="text-xs text-secondary-foreground">
+              {JSON.stringify(existingToolResult.content[0].result)}
+            </div>
+          </div>
+        )}
+        {!existingToolResult && (
+          <div className="border-t border-border px-3 py-2">
+            <Button onClick={() => executeToolCall(toolCallPart)} size="sm" className="w-full text-xs">
+              Execute Tool Call
+            </Button>
+          </div>
+        )}
+      </CollapsibleContent>
+    </Collapsible>
+  )
+}
 
 export const ToolCallComponent: React.FC<ToolCallComponentProps> = ({ toolCallPart, currentChat, executeToolCall }) => {
   const existingToolResult = findToolResultMatchingToolCall(toolCallPart.toolCallId, currentChat.messages)
@@ -117,14 +113,7 @@ export const ToolCallComponent: React.FC<ToolCallComponentProps> = ({ toolCallPa
           executeToolCall={executeToolCall}
         />
       )}
-      {toolCallPart.toolName === 'create-file' && (
-        <CreateFileToolRenderer
-          toolCallPart={toolCallPart}
-          existingToolResult={existingToolResult}
-          executeToolCall={executeToolCall}
-        />
-      )}
-      {toolCallPart.toolName !== 'search' && toolCallPart.toolName !== 'create-file' && (
+      {toolCallPart.toolName !== 'search' && (
         <DefaultToolRenderer
           toolCallPart={toolCallPart}
           existingToolResult={existingToolResult}
