@@ -39,3 +39,11 @@ export const getInvalidCharacterInFileName = async (filename: string): Promise<s
   const match = filename.match(invalidCharacters)
   return match ? match[0] : null
 }
+
+export const generateFileName = (filename: string): string => {
+  return `${filename
+    .split('\n')[0]
+    .replace(/[^a-zA-Z0-9-_ ]/g, '')
+    .trim()
+    .substring(0, 20)}.md`
+}

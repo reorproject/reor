@@ -19,7 +19,7 @@ import { toast } from 'react-toastify'
 import { Markdown } from 'tiptap-markdown'
 import { useDebounce } from 'use-debounce'
 import useFileInfoTreeHook from '@/components/Sidebars/FileSideBar/hooks/use-file-info-tree'
-import { getInvalidCharacterInFilePath } from '@/lib/strings'
+import { generateFileName, getInvalidCharacterInFilePath } from '@/lib/strings'
 import { BacklinkExtension } from '@/components/Editor/BacklinkExtension'
 import { SuggestionsState } from '@/components/Editor/BacklinkSuggestionsDisplay'
 import HighlightExtension, { HighlightData } from '@/components/Editor/HighlightExtension'
@@ -220,23 +220,27 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (filePath !== null && needToWriteEditorContentToDisk && _editor) {
       const markdownContent = getMarkdown(_editor)
       if (markdownContent !== null) {
-        const firstLine = markdownContent.split('\n')[0]
-        const newFileName = `${firstLine
-          .replace(/[^a-zA-Z0-9-_ ]/g, '')
-          .trim()
-          .substring(0, 20)}.md`
-        const newFilePath = await window.path.join(await window.path.dirname(filePath), newFileName)
-        await window.fileSystem.renameFileRecursive({
-          oldFilePath: filePath,
-          newFilePath,
-        })
-        await window.fileSystem.writeFile({
-          filePath: newFilePath,
-          content: markdownContent,
-        })
-        removeFromNavigationHistory(filePath)
-        addToNavigationHistory(newFilePath)
-        setCurrentlyOpenFilePath(newFilePath)
+        const newFileName = generateFileName(markdownContent)
+        const oldFileName = await window.path.basename(filePath)
+        if (oldFileName === newFileName) {
+          await window.fileSystem.writeFile({
+            filePath,
+            content: markdownContent,
+          })
+        } else {
+          const newFilePath = await window.path.join(await window.path.dirname(filePath), newFileName)
+          await window.fileSystem.renameFileRecursive({
+            oldFilePath: filePath,
+            newFilePath,
+          })
+          await window.fileSystem.writeFile({
+            filePath: newFilePath,
+            content: markdownContent,
+          })
+          removeFromNavigationHistory(filePath)
+          addToNavigationHistory(newFilePath)
+          setCurrentlyOpenFilePath(newFilePath)
+        }
         setNeedToWriteEditorContentToDisk(false)
       }
     }
