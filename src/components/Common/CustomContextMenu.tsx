@@ -4,7 +4,7 @@ import { useFileContext } from '@/contexts/FileContext'
 import { useChatContext } from '@/contexts/ChatContext'
 import { useModalOpeners } from '@/contexts/ModalContext'
 import { useWindowContentContext } from '@/contexts/WindowContentContext'
-import { ChatMetadata } from '../Chat/types'
+import { ChatMetadata } from '../Chat/utils/types'
 
 export type ContextMenuLocations = 'FileSidebar' | 'FileItem' | 'ChatItem' | 'DirectoryItem' | 'None'
 

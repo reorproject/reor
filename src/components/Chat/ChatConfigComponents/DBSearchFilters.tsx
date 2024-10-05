@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react'
 import { Slider } from '@/components/ui/slider'
 import DateRangePicker from '../../ui/date-picker'
-import { DatabaseSearchFilters } from '../types'
+import { DatabaseSearchFilters } from '../utils/types'
 
 interface DbSearchFiltersProps {
   dbSearchFilters: DatabaseSearchFilters

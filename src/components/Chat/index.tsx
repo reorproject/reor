@@ -7,14 +7,14 @@ import {
   appendStringContentToMessages,
   appendToOrCreateChat as updateOrCreateChat,
   removeUncalledToolsFromMessages,
-} from './utils'
+} from './utils/utils'
 
 import '../../styles/chat.css'
 import ChatMessages from './ChatMessages'
-import { Chat, AgentConfig, LoadingState } from './types'
+import { Chat, AgentConfig, LoadingState } from './utils/types'
 import { useChatContext } from '@/contexts/ChatContext'
 import StartChat from './StartChat'
-import { convertToolConfigToZodSchema } from './tools'
+import { convertToolConfigToZodSchema } from './utils/tools'
 import resolveLLMClient from '@/utils/llm'
 
 const ChatComponent: React.FC = () => {

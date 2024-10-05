@@ -3,13 +3,13 @@ import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { toast } from 'react-toastify'
 import { ToolCallPart } from 'ai'
 import { FaRegCopy } from 'react-icons/fa'
-import { Chat, ReorChatMessage } from '../types'
+import { Chat, ReorChatMessage } from '../utils/types'
 import {
   makeAndAddToolResultToMessages,
   extractMessagePartsFromAssistantMessage,
   findToolResultMatchingToolCall,
   getClassNameBasedOnMessageRole,
-} from '../utils'
+} from '../utils/utils'
 import { ToolCallComponent } from './ToolCalls'
 import { useWindowContentContext } from '@/contexts/WindowContentContext'
 import { useChatContext } from '@/contexts/ChatContext'

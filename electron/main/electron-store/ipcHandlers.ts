@@ -13,7 +13,7 @@ import {
 import WindowsManager from '../common/windowManager'
 
 import { initializeAndMaybeMigrateStore } from './storeSchemaMigrator'
-import { AgentConfig, Chat, ChatMetadata } from '@/components/Chat/types'
+import { Chat, AgentConfig, ChatMetadata } from '@/components/Chat/utils/types'
 
 export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager: WindowsManager) => {
   initializeAndMaybeMigrateStore(store)

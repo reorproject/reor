@@ -1,4 +1,4 @@
-import { AgentConfig, Chat } from '@/components/Chat/types'
+import { AgentConfig, Chat } from '@/components/Chat/utils/types'
 
 export type APIInterface = 'openai' | 'anthropic' | 'ollama'
 

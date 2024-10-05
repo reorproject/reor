@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import '../../styles/chat.css'
-import { Chat, AgentConfig, LoadingState, ReorChatMessage } from './types'
+import { Chat, AgentConfig, LoadingState, ReorChatMessage } from './utils/types'
 import ChatInput from './ChatInput'
 import LoadingDots from '@/utils/animations'
 import UserMessage from './MessageComponents/UserMessage'

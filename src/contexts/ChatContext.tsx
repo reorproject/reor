@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react'
-import { Chat, ChatMetadata } from '@/components/Chat/types'
 import { SidebarAbleToShow } from '@/components/Sidebars/MainSidebar'
+import { Chat, ChatMetadata } from '@/components/Chat/utils/types'
 
 export const UNINITIALIZED_STATE = 'UNINITIALIZED_STATE'
 

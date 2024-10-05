@@ -1,8 +1,8 @@
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
-import { ReorChatMessage } from '../types'
-import { getClassNameBasedOnMessageRole, getDisplayMessage } from '../utils'
+import { ReorChatMessage } from '../utils/types'
+import { getClassNameBasedOnMessageRole, getDisplayMessage } from '../utils/utils'
 
 interface SystemMessageProps {
   message: ReorChatMessage
