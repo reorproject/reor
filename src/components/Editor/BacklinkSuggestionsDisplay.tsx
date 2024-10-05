@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useState, useMemo } from 'react'
 
 import posthog from 'posthog-js'
 
-import { removeFileExtension } from '@/utils/strings'
+import { removeFileExtension } from '@/lib/strings'
 
 export interface SuggestionsState {
   textWithinBrackets: string

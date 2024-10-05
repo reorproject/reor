@@ -1,5 +1,5 @@
 import { FileInfoNode } from 'electron/main/filesystem/types'
-import { ReorChatMessage } from '@/components/Chat/types'
+import { ReorChatMessage } from '@/lib/llm/types'
 
 export const generateChatName = (messages: ReorChatMessage[], userInput?: string): string => {
   if (userInput) {

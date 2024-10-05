@@ -3,19 +3,18 @@ import React, { useCallback, useEffect, useState, useRef } from 'react'
 import { streamText } from 'ai'
 import { toast } from 'react-toastify'
 import {
-  appendToolCallsAndAutoExecuteTools,
   appendStringContentToMessages,
   appendToOrCreateChat as updateOrCreateChat,
   removeUncalledToolsFromMessages,
-} from './utils'
+} from '../../lib/llm/chat'
 
 import '../../styles/chat.css'
 import ChatMessages from './ChatMessages'
-import { Chat, AgentConfig, LoadingState } from './types'
+import { Chat, AgentConfig, LoadingState } from '../../lib/llm/types'
 import { useChatContext } from '@/contexts/ChatContext'
 import StartChat from './StartChat'
-import { convertToolConfigToZodSchema } from './tools'
-import resolveLLMClient from '@/utils/llm'
+import resolveLLMClient from '@/lib/llm/client'
+import { appendToolCallsAndAutoExecuteTools, convertToolConfigToZodSchema } from '../../lib/llm/tools/utils'
 
 const ChatComponent: React.FC = () => {
   const [loadingState, setLoadingState] = useState<LoadingState>('idle')

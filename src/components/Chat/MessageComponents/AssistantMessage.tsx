@@ -3,17 +3,17 @@ import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { toast } from 'react-toastify'
 import { ToolCallPart } from 'ai'
 import { FaRegCopy } from 'react-icons/fa'
-import { Chat, ReorChatMessage } from '../types'
+import { Chat, ReorChatMessage } from '../../../lib/llm/types'
 import {
-  makeAndAddToolResultToMessages,
   extractMessagePartsFromAssistantMessage,
   findToolResultMatchingToolCall,
   getClassNameBasedOnMessageRole,
-} from '../utils'
+} from '../../../lib/llm/chat'
 import { ToolCallComponent } from './ToolCalls'
 import { useWindowContentContext } from '@/contexts/WindowContentContext'
 import { useChatContext } from '@/contexts/ChatContext'
 import MarkdownRenderer from '@/components/Common/MarkdownRenderer'
+import { makeAndAddToolResultToMessages } from '../../../lib/llm/tools/utils'
 
 interface AssistantMessageProps {
   message: ReorChatMessage

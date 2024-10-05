@@ -3,9 +3,9 @@ import { PiPaperPlaneRight, PiCaretDown } from 'react-icons/pi'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import '../../styles/chat.css'
 import { FiSettings } from 'react-icons/fi'
-import { AgentConfig, ToolDefinition, DatabaseSearchFilters } from './types'
+import { AgentConfig, ToolDefinition, DatabaseSearchFilters } from '../../lib/llm/types'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { allAvailableToolDefinitions } from './tools'
+import { allAvailableToolDefinitions } from '../../lib/llm/tools/tool-definitions'
 import { Button } from '@/components/ui/button'
 import DbSearchFilters from './ChatConfigComponents/DBSearchFilters'
 import PromptEditor from './ChatConfigComponents/PromptEditor'
@@ -20,7 +20,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer'
-import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Label } from '../ui/label'
 import { Switch } from '../ui/switch'
@@ -115,7 +114,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
         </h1>
 
         <div className="flex flex-col">
-          <div className="flex flex-col rounded-md border-2 border-solid border-border bg-secondary focus-within:ring-1 focus-within:ring-ring">
+          <div className="z-50 flex flex-col rounded-md border-2 border-solid border-border bg-secondary focus-within:ring-1 focus-within:ring-ring">
             <textarea
               value={userTextFieldInput}
               onKeyDown={(e) => {
@@ -185,11 +184,11 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
             <div className="flex flex-col space-y-4">
               <div className="flex items-center space-x-2">
                 Edit prompt:
-                <Dialog>
-                  <DialogTrigger asChild>
+                <Popover>
+                  <PopoverTrigger asChild>
                     <Button>Prompt</Button>
-                  </DialogTrigger>
-                  <DialogContent>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full border border-solid border-muted-foreground bg-border">
                     <PromptEditor
                       promptTemplate={agentConfig.promptTemplate}
                       onSave={(newPromptTemplate) => {
@@ -200,8 +199,8 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                         })
                       }}
                     />
-                  </DialogContent>
-                </Dialog>
+                  </PopoverContent>
+                </Popover>
               </div>
               <div className="flex items-center space-x-2">
                 Add tools for the LLM to call:{' '}

@@ -6,13 +6,13 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import posthog from 'posthog-js'
 import { streamText } from 'ai'
-import { appendStringContentToMessages, convertMessageToString } from '../Chat/utils'
+import { appendStringContentToMessages, convertMessageToString } from '../../lib/llm/chat'
 import useOutsideClick from './hooks/use-outside-click'
 import getClassNames, { generatePromptString, getLastMessage } from './utils'
-import { ReorChatMessage } from '../Chat/types'
+import { ReorChatMessage } from '../../lib/llm/types'
 import { useFileContext } from '@/contexts/FileContext'
-import resolveLLMClient from '@/utils/llm'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import resolveLLMClient from '@/lib/llm/client'
 
 const WritingAssistant: React.FC = () => {
   const [messages, setMessages] = useState<ReorChatMessage[]>([])

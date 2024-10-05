@@ -2,8 +2,8 @@ import React from 'react'
 import { FaRegUserCircle } from 'react-icons/fa'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
-import { ReorChatMessage } from '../types'
-import { getClassNameBasedOnMessageRole, getDisplayMessage } from '../utils'
+import { ReorChatMessage } from '../../../lib/llm/types'
+import { getClassNameBasedOnMessageRole, getDisplayMessage } from '../../../lib/llm/chat'
 
 interface UserMessageProps {
   message: ReorChatMessage

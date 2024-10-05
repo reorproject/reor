@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { PiPaperPlaneRight } from 'react-icons/pi'
-import { LoadingState } from './types'
+import { LoadingState } from '../../lib/llm/types'
 
 interface ChatInputProps {
   userTextFieldInput: string

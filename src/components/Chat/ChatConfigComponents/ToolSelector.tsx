@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useMemo } from 'react'
-import { ToolDefinition } from '../types'
+import { ToolDefinition } from '../../../lib/llm/types'
 import MultiSelect from '@/components/ui/multi-select'
 
 interface ToolSelectorProps {
