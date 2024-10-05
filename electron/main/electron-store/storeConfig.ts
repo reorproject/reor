@@ -1,4 +1,4 @@
-import { Chat } from '@/components/Chat/types'
+import { AgentConfig, Chat } from '@/components/Chat/types'
 
 export type APIInterface = 'openai' | 'anthropic' | 'ollama'
 
@@ -56,9 +56,10 @@ export interface StoreSchema {
   defaultLLM: string
   defaultEmbedFuncRepo: string
   llmGenerationParameters: LLMGenerationParameters
-  chatHistories: {
+  chats: {
     [vaultDir: string]: Chat[]
   }
+  agentConfigs: AgentConfig[]
   analytics?: boolean
   chunkSize: number
   isSBCompact: boolean
@@ -80,7 +81,8 @@ export enum StoreKeys {
   DefaultEmbeddingModelAlias = 'defaultEmbeddingModelAlias',
   MaxRAGExamples = 'RAG.maxRAGExamples',
   LLMGenerationParameters = 'llmGenerationParameters',
-  ChatHistories = 'chatHistories',
+  Chats = 'chats',
+  AgentConfigs = 'agentConfigs',
   ChunkSize = 'chunkSize',
   IsSBCompact = 'isSBCompact',
   SpellCheck = 'spellCheck',

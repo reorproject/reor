@@ -5,8 +5,9 @@ import * as path from 'path'
 import chokidar from 'chokidar'
 import { BrowserWindow } from 'electron'
 
-import { FileInfo, FileInfoTree, isFileNodeDirectory } from './types'
+import { FileInfo, FileInfoTree } from './types'
 import addExtensionToFilenameIfNoExtensionPresent from '../path/path'
+import { isFileNodeDirectory } from '../../../shared/utils'
 
 export const markdownExtensions = ['.md', '.markdown', '.mdown', '.mkdn', '.mkd']
 

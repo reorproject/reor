@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { FileInfoNode, FileInfoTree } from 'electron/main/filesystem/types'
 import { FixedSizeList as List } from 'react-window'
 
-import { isFileNodeDirectory } from './utils'
+import { isFileNodeDirectory } from '@shared/utils'
 import { useFileContext } from '@/contexts/FileContext'
 import FileItemRows from './FileItemRows'
 import { useWindowContentContext } from '@/contexts/WindowContentContext'

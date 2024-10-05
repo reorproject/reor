@@ -71,8 +71,24 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
     return (
       <>
         {textParts.map((text, index) => (
-          // eslint-disable-next-line react/no-array-index-key
-          <MarkdownRenderer key={index} content={text} />
+          <div>
+            {/* eslint-disable-next-line react/no-array-index-key */}
+            <MarkdownRenderer key={index} content={text} />
+            <div className="mt-2 flex">
+              <div
+                className="cursor-pointer items-center justify-center rounded p-1 hover:bg-neutral-700"
+                onClick={copyToClipboard}
+              >
+                <FaRegCopy color="gray" size={16} className="text-gray-200" title="Copy" />
+              </div>
+              <div
+                className="cursor-pointer items-center justify-center rounded p-1 hover:bg-neutral-700"
+                onClick={createNewNoteFromMessage}
+              >
+                <HiOutlinePencilAlt color="gray" size={18} className="text-gray-200" title="New Note" />
+              </div>
+            </div>
+          </div>
         ))}
         {toolCalls.map((toolCall) => (
           <ToolCallComponent
@@ -89,23 +105,7 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
   return (
     <div className={`w-full ${getClassNameBasedOnMessageRole(message)} mb-4 flex`}>
       <div className="w-full flex-col gap-1">
-        <div className="flex grow flex-col ">
-          {renderContent()}
-          <div className="mt-2 flex">
-            <div
-              className="cursor-pointer items-center justify-center rounded p-1 hover:bg-neutral-700"
-              onClick={copyToClipboard}
-            >
-              <FaRegCopy color="gray" size={16} className="text-gray-200" title="Copy" />
-            </div>
-            <div
-              className="cursor-pointer items-center justify-center rounded p-1 hover:bg-neutral-700"
-              onClick={createNewNoteFromMessage}
-            >
-              <HiOutlinePencilAlt color="gray" size={18} className="text-gray-200" title="New Note" />
-            </div>
-          </div>
-        </div>
+        <div className="flex grow flex-col ">{renderContent()}</div>
       </div>
     </div>
   )

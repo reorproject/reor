@@ -10,7 +10,7 @@ import {
 import { FileInfoTree, FileInfoWithContent, RenameFileProps, WriteFileProps } from 'electron/main/filesystem/types'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 
-import { Chat, ChatMetadata } from '@/components/Chat/types'
+import { AgentConfig, Chat, ChatMetadata } from '@/components/Chat/types'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type IPCHandler<T extends (...args: any[]) => any> = (...args: Parameters<T>) => Promise<ReturnType<T>>
@@ -73,6 +73,8 @@ const electronStore = {
   setSBCompact: createIPCHandler<(isSBCompact: boolean) => Promise<void>>('set-sb-compact'),
   getEditorFlexCenter: createIPCHandler<() => Promise<boolean>>('get-editor-flex-center'),
   setEditorFlexCenter: createIPCHandler<(editorFlexCenter: boolean) => Promise<void>>('set-editor-flex-center'),
+  getAgentConfigs: createIPCHandler<() => Promise<AgentConfig[]>>('get-agent-configs'),
+  setAgentConfig: createIPCHandler<(agentConfig: AgentConfig) => Promise<void>>('set-agent-config'),
 }
 
 const fileSystem = {

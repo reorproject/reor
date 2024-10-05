@@ -1,6 +1,7 @@
+import { FileInfoNode } from 'electron/main/filesystem/types'
 import { ReorChatMessage } from '@/components/Chat/types'
 
-const generateChatName = (messages: ReorChatMessage[], userInput?: string): string => {
+export const generateChatName = (messages: ReorChatMessage[], userInput?: string): string => {
   if (userInput) {
     return userInput.slice(0, 50)
   }
@@ -21,4 +22,4 @@ const generateChatName = (messages: ReorChatMessage[], userInput?: string): stri
   return firstMessage.slice(0, 30)
 }
 
-export default generateChatName
+export const isFileNodeDirectory = (fileInfo: FileInfoNode): boolean => fileInfo.children !== undefined
