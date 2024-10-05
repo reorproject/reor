@@ -65,7 +65,6 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
       throw new Error('No agent config found')
     }
     handleNewChatMessage(userTextFieldInput, { ...agentConfig })
-    window.electronStore.setAgentConfig(agentConfig)
   }
 
   const handleLLMChange = (value: string) => {

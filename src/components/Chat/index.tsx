@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react'
 
 import { streamText } from 'ai'
+import { toast } from 'react-toastify'
 import {
   appendToolCallsAndAutoExecuteTools,
   appendStringContentToMessages,
@@ -96,6 +97,10 @@ const ChatComponent: React.FC = () => {
         }
 
         if (!abortControllerRef.current.signal.aborted) {
+          if (agentConfig) {
+            window.electronStore.setAgentConfig(agentConfig)
+          }
+
           const { messages: outputMessages, allToolCallsHaveBeenExecuted } = await appendToolCallsAndAutoExecuteTools(
             outputChat.messages,
             outputChat.toolDefinitions,
@@ -111,6 +116,18 @@ const ChatComponent: React.FC = () => {
 
         setLoadingState('idle')
       } catch (error) {
+        if (error instanceof Error && error.name === 'AI_APICallError' && error.message.includes('Bad Request')) {
+          if (agentConfig && agentConfig?.toolDefinitions.length > 0) {
+            // console.log('')
+            toast.info('Disabling tools as this model does not support them.')
+            // set new agent config to the same but with no tools:
+            const agentWithoutTools = { ...agentConfig, toolDefinitions: [] }
+            handleNewChatMessage(chat, userTextFieldInput, agentWithoutTools)
+            return
+            // window.electronStore.setAgentConfig(agentWithoutTools)
+          }
+        }
+        // so here we could check the error message
         setLoadingState('idle')
         throw error
       } finally {
