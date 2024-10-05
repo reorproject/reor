@@ -41,29 +41,42 @@ export const MultiSelect = ({
     onChange(newSelectedValues)
   }
 
+  const renderSelectedBadges = () => (
+    <div className="flex flex-wrap gap-1">
+      {selectedValues.map((value) => (
+        <Badge key={value} variant="secondary" className="mr-1">
+          {options.find((option) => option.value === value)?.label}
+          <X
+            className="ml-1 size-3 cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation()
+              removeValue(value)
+            }}
+          />
+        </Badge>
+      ))}
+    </div>
+  )
+
   return (
     <div className="relative">
       <Select onValueChange={handleSelect}>
         <SelectTrigger className="w-full">
-          <SelectValue placeholder={placeholder}>
-            {selectedValues.length > 0 ? (
-              <div className="flex flex-wrap gap-1">
-                {selectedValues.map((value) => (
-                  <Badge key={value} variant="secondary" className="mr-1">
-                    {options.find((option) => option.value === value)?.label}
-                    <X
-                      className="ml-1 size-3 cursor-pointer"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        removeValue(value)
-                      }}
-                    />
-                  </Badge>
-                ))}
-              </div>
-            ) : (
-              placeholder
-            )}
+          <SelectValue placeholder={selectedValues.length > 0 ? renderSelectedBadges() : placeholder}>
+            <div className="flex flex-wrap gap-1">
+              {selectedValues.map((value) => (
+                <Badge key={value} variant="secondary" className="mr-1">
+                  {options.find((option) => option.value === value)?.label}
+                  <X
+                    className="ml-1 size-3 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      removeValue(value)
+                    }}
+                  />
+                </Badge>
+              ))}
+            </div>
           </SelectValue>
         </SelectTrigger>
         <SelectContent>
