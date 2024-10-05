@@ -32,12 +32,10 @@ const NewNoteComponent: React.FC<NewNoteComponentProps> = ({ isOpen, onClose }) 
   const sendNewNoteMsg = async () => {
     const fileName = await createNewFile()
 
-    let finalPath
+    let finalPath = fileName
     if (currentlyOpenFilePath) {
       const directoryName = await window.path.dirname(currentlyOpenFilePath)
       finalPath = await window.path.join(directoryName, fileName)
-    } else {
-      finalPath = fileName
     }
 
     const basename = await window.path.basename(finalPath)
