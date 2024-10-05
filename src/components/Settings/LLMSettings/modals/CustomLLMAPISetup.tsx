@@ -4,7 +4,7 @@ import { LLMAPIConfig } from 'electron/main/electron-store/storeConfig'
 import posthog from 'posthog-js'
 import ExternalLink from '../../../Common/ExternalLink'
 import ReorModal from '../../../Common/Modal'
-import errorToStringRendererProcess from '@/utils/error'
+import errorToStringRendererProcess from '@/lib/error'
 
 interface RemoteLLMModalProps {
   isOpen: boolean

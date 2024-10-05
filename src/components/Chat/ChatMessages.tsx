@@ -2,11 +2,11 @@ import React, { useState } from 'react'
 import '../../styles/chat.css'
 import { Chat, AgentConfig, LoadingState, ReorChatMessage } from './utils/types'
 import ChatInput from './ChatInput'
-import LoadingDots from '@/utils/animations'
 import UserMessage from './MessageComponents/UserMessage'
 import AssistantMessage from './MessageComponents/AssistantMessage'
 import SystemMessage from './MessageComponents/SystemMessage'
 import ChatSources from './MessageComponents/ChatSources'
+import LoadingDots from '@/lib/animations'
 
 interface MessageProps {
   message: ReorChatMessage

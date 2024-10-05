@@ -6,7 +6,7 @@ import * as Sentry from '@sentry/electron/renderer'
 
 import App from './App'
 import './styles/global.css'
-import errorToStringRendererProcess from './utils/error'
+import errorToStringRendererProcess from './lib/error'
 
 Sentry.init({
   integrations: [],

@@ -1,5 +1,5 @@
 import { AgentConfig, PromptTemplate } from '../utils/types'
-import { allAvailableToolDefinitions } from '../utils/tools'
+import { allAvailableToolDefinitions } from '../utils/tools/tool-definitions'
 
 const defaultAgentPromptTemplate: PromptTemplate = [
   {

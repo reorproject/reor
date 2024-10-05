@@ -11,8 +11,8 @@ import useOutsideClick from './hooks/use-outside-click'
 import getClassNames, { generatePromptString, getLastMessage } from './utils'
 import { ReorChatMessage } from '../Chat/utils/types'
 import { useFileContext } from '@/contexts/FileContext'
-import resolveLLMClient from '@/utils/llm'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import resolveLLMClient from '@/lib/llm/client'
 
 const WritingAssistant: React.FC = () => {
   const [messages, setMessages] = useState<ReorChatMessage[]>([])

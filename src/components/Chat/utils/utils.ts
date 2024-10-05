@@ -3,9 +3,8 @@ import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { generateChatName } from '@shared/utils'
 import { AssistantContent, CoreAssistantMessage, CoreToolMessage, ToolCallPart } from 'ai'
 import posthog from 'posthog-js'
-import { AnonymizedAgentConfig, Chat, AgentConfig, PromptTemplate, ReorChatMessage, ToolDefinition } from './types'
-import { retreiveFromVectorDB } from '@/utils/db'
-import { createToolResult } from './tools'
+import { AnonymizedAgentConfig, Chat, AgentConfig, PromptTemplate, ReorChatMessage } from './types'
+import { retreiveFromVectorDB } from '@/lib/db'
 
 export const appendStringContentToMessages = (messages: ReorChatMessage[], content: string): ReorChatMessage[] => {
   if (content === '') {
@@ -43,105 +42,6 @@ export const appendStringContentToMessages = (messages: ReorChatMessage[], conte
       content,
     },
   ]
-}
-
-export const appendToolCallPartsToMessages = (
-  messages: ReorChatMessage[],
-  toolCalls: ToolCallPart[],
-): ReorChatMessage[] => {
-  if (toolCalls.length === 0) {
-    return messages
-  }
-
-  if (messages.length === 0) {
-    return [
-      {
-        role: 'assistant',
-        content: toolCalls,
-      },
-    ]
-  }
-
-  const lastMessage = messages[messages.length - 1]
-
-  if (lastMessage.role === 'assistant') {
-    return [
-      ...messages.slice(0, -1),
-      {
-        ...lastMessage,
-        content: Array.isArray(lastMessage.content)
-          ? [...lastMessage.content, ...toolCalls]
-          : [{ type: 'text' as const, text: lastMessage.content }, ...toolCalls],
-      },
-    ]
-  }
-
-  return [
-    ...messages,
-    {
-      role: 'assistant',
-      content: toolCalls,
-    },
-  ]
-}
-
-export const makeAndAddToolResultToMessages = async (
-  messages: ReorChatMessage[],
-  toolCallPart: ToolCallPart,
-  assistantMessage: ReorChatMessage,
-): Promise<ReorChatMessage[]> => {
-  const toolResult = await createToolResult(toolCallPart.toolName, toolCallPart.args as any, toolCallPart.toolCallId)
-
-  const toolMessage: CoreToolMessage = {
-    role: 'tool',
-    content: [toolResult],
-  }
-
-  const assistantIndex = messages.findIndex((msg) => msg === assistantMessage)
-  if (assistantIndex === -1) {
-    throw new Error('Assistant message not found')
-  }
-
-  return [...messages.slice(0, assistantIndex + 1), toolMessage, ...messages.slice(assistantIndex + 1)]
-}
-
-const autoExecuteTools = async (
-  messages: ReorChatMessage[],
-  toolDefinitions: ToolDefinition[],
-  toolCalls: ToolCallPart[],
-) => {
-  const toolsThatNeedExecuting = toolCalls.filter((toolCall) => {
-    const toolDefinition = toolDefinitions.find((definition) => definition.name === toolCall.toolName)
-    return toolDefinition?.autoExecute
-  })
-  let outputMessages = messages
-  const lastMessage = messages[messages.length - 1]
-
-  if (lastMessage.role !== 'assistant') {
-    throw new Error('Last message is not an assistant message')
-  }
-  // eslint-disable-next-line no-restricted-syntax
-  for (const toolCall of toolsThatNeedExecuting) {
-    // eslint-disable-next-line no-await-in-loop
-    outputMessages = await makeAndAddToolResultToMessages(outputMessages, toolCall, lastMessage)
-  }
-  const allToolCallsHaveBeenExecuted =
-    toolsThatNeedExecuting.length > 0 && toolsThatNeedExecuting.length === toolCalls.length
-  return { messages: outputMessages, allToolCallsHaveBeenExecuted }
-}
-
-export const appendToolCallsAndAutoExecuteTools = async (
-  messages: ReorChatMessage[],
-  toolDefinitions: ToolDefinition[],
-  toolCalls: ToolCallPart[],
-): Promise<{ messages: ReorChatMessage[]; allToolCallsHaveBeenExecuted: boolean }> => {
-  const messagesWithToolCalls = appendToolCallPartsToMessages(messages, toolCalls)
-  const { messages: messagesWithToolResults, allToolCallsHaveBeenExecuted } = await autoExecuteTools(
-    messagesWithToolCalls,
-    toolDefinitions,
-    toolCalls,
-  )
-  return { messages: messagesWithToolResults, allToolCallsHaveBeenExecuted }
 }
 
 export const convertMessageToString = (message: ReorChatMessage | undefined): string => {

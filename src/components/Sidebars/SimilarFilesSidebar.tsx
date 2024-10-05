@@ -7,7 +7,7 @@ import removeMd from 'remove-markdown'
 import '../../styles/global.css'
 
 import posthog from 'posthog-js'
-import errorToStringRendererProcess from '@/utils/error'
+import errorToStringRendererProcess from '@/lib/error'
 import SimilarEntriesComponent from './SemanticSidebar/SimilarEntriesComponent'
 import HighlightButton from './SemanticSidebar/HighlightButton'
 import { useFileContext } from '@/contexts/FileContext'

@@ -1,7 +1,5 @@
-import { ToolResultPart } from 'ai'
-import { z } from 'zod'
-import { ToolDefinition } from './types'
-import { retreiveFromVectorDB } from '@/utils/db'
+import { ToolDefinition } from '../types'
+import { retreiveFromVectorDB } from '@/lib/db'
 
 export const searchToolDefinition: ToolDefinition = {
   name: 'search',
@@ -115,8 +113,6 @@ export const listFilesToolDefinition: ToolDefinition = {
   parameters: [],
 }
 
-// here we could add like list files as well.
-
 export const allAvailableToolDefinitions: ToolDefinition[] = [
   searchToolDefinition,
   createNoteToolDefinition,
@@ -181,72 +177,4 @@ export const toolNamesToFunctions: ToolFunctionMap = {
   },
 }
 
-type ToolName = keyof typeof toolNamesToFunctions
-
-export async function executeTool(toolName: ToolName, args: unknown[]): Promise<any> {
-  const tool = toolNamesToFunctions[toolName]
-  if (!tool) {
-    throw new Error(`Unknown tool: ${toolName}`)
-  }
-  const out = await tool(...Object.values(args)) // TODO: make this cleaner quizas.
-  return out
-}
-
-export async function createToolResult(toolName: string, args: unknown[], toolCallId: string): Promise<ToolResultPart> {
-  try {
-    const result = await executeTool(toolName, args)
-    return {
-      type: 'tool-result',
-      toolCallId,
-      toolName,
-      result,
-    }
-  } catch (error) {
-    return {
-      type: 'tool-result',
-      toolCallId,
-      toolName,
-      result: error,
-      isError: true,
-    }
-  }
-}
-
-export function convertToolConfigToZodSchema(tool: ToolDefinition) {
-  const parameterSchema = z.object(
-    tool.parameters.reduce((acc, param) => {
-      let zodType: z.ZodType<any>
-
-      switch (param.type) {
-        case 'string':
-          zodType = z.string()
-          break
-        case 'number':
-          zodType = z.number()
-          break
-        case 'boolean':
-          zodType = z.boolean()
-          break
-        default:
-          throw new Error(`Unsupported parameter type: ${param.type}`)
-      }
-
-      // Apply default value if it exists
-      if (param.defaultValue !== undefined) {
-        zodType = zodType.default(param.defaultValue)
-      }
-
-      // Apply description
-      zodType = zodType.describe(param.description)
-
-      return { ...acc, [param.name]: zodType }
-    }, {}),
-  )
-
-  return {
-    [tool.name]: {
-      description: tool.description,
-      parameters: parameterSchema,
-    },
-  }
-}
+export type ToolName = keyof typeof toolNamesToFunctions

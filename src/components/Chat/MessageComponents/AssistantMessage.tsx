@@ -5,7 +5,6 @@ import { ToolCallPart } from 'ai'
 import { FaRegCopy } from 'react-icons/fa'
 import { Chat, ReorChatMessage } from '../utils/types'
 import {
-  makeAndAddToolResultToMessages,
   extractMessagePartsFromAssistantMessage,
   findToolResultMatchingToolCall,
   getClassNameBasedOnMessageRole,
@@ -14,6 +13,7 @@ import { ToolCallComponent } from './ToolCalls'
 import { useWindowContentContext } from '@/contexts/WindowContentContext'
 import { useChatContext } from '@/contexts/ChatContext'
 import MarkdownRenderer from '@/components/Common/MarkdownRenderer'
+import { makeAndAddToolResultToMessages } from '../utils/tools/utils'
 
 interface AssistantMessageProps {
   message: ReorChatMessage

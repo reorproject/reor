@@ -13,7 +13,7 @@ import FlashcardCore from './FlashcardsCore'
 import { FlashcardQAPairSchema, FlashcardQAPairUI } from './types'
 import { storeFlashcardPairsAsJSON } from './utils'
 import useFileInfoTreeHook from '../Sidebars/FileSideBar/hooks/use-file-info-tree'
-import resolveLLMClient from '@/utils/llm'
+import resolveLLMClient from '@/lib/llm/client'
 
 interface FlashcardCreateModalProps {
   isOpen: boolean
