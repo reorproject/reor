@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { PiPaperPlaneRight, PiCaretDown } from 'react-icons/pi'
+import { PiPaperPlaneRight } from 'react-icons/pi'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import '../../styles/chat.css'
 import { FiSettings } from 'react-icons/fi'
@@ -146,38 +146,12 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                 </Select>
               </div>
               <div className="flex items-center">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      className="flex items-center justify-between gap-2 bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground"
-                      onClick={sendMessageHandler}
-                    >
-                      <PiPaperPlaneRight className="size-4" />
-                      Send
-                      <PiCaretDown className="size-4" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-48">
-                    <div className="space-y-2">
-                      {/* <p className="text-sm font-medium">Send options</p>
-                      <select
-                        value={sendPriority}
-                        onChange={(e) => setSendPriority(e.target.value)}
-                        className="w-full rounded-md border p-1 text-sm"
-                      >
-                        <option value="normal">Normal priority</option>
-                        <option value="high">High priority</option>
-                        <option value="urgent">Urgent</option>
-                      </select> */}
-                      {agentConfig.dbSearchFilters && (
-                        <DbSearchFilters
-                          dbSearchFilters={agentConfig.dbSearchFilters}
-                          onFiltersChange={handleDbSearchFiltersChange}
-                        />
-                      )}
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                <Button
+                  className="flex items-center justify-between gap-2 bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground"
+                  onClick={sendMessageHandler}
+                >
+                  <PiPaperPlaneRight className="size-4" />
+                </Button>
               </div>
             </div>
           </div>
@@ -219,7 +193,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                   onCheckedChange={handleDbSearchToggle}
                 />
                 <Label htmlFor="db-search-toggle" className="text-sm text-muted-foreground">
-                  Include initial database search in context
+                  Make initial knowledge base search
                 </Label>
                 <Drawer>
                   <DrawerTrigger asChild>
