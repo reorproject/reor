@@ -220,10 +220,23 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (filePath !== null && needToWriteEditorContentToDisk && _editor) {
       const markdownContent = getMarkdown(_editor)
       if (markdownContent !== null) {
+        const firstLine = markdownContent.split('\n')[0]
+        const newFileName = `${firstLine
+          .replace(/[^a-zA-Z0-9-_ ]/g, '')
+          .trim()
+          .substring(0, 20)}.md`
+        const newFilePath = await window.path.join(await window.path.dirname(filePath), newFileName)
+        await window.fileSystem.renameFileRecursive({
+          oldFilePath: filePath,
+          newFilePath,
+        })
         await window.fileSystem.writeFile({
-          filePath,
+          filePath: newFilePath,
           content: markdownContent,
         })
+        removeFromNavigationHistory(filePath)
+        addToNavigationHistory(newFilePath)
+        setCurrentlyOpenFilePath(newFilePath)
         setNeedToWriteEditorContentToDisk(false)
       }
     }
