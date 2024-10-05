@@ -92,7 +92,7 @@ class OllamaService {
           : path.join(app.getAppPath(), 'binaries', 'darwin')
         break
       case 'linux':
-        exeName = 'ollama-linux-amd64'
+        exeName = 'ollama'
         exeDir = app.isPackaged
           ? path.join(process.resourcesPath, 'binaries')
           : path.join(app.getAppPath(), 'binaries', 'linux')
