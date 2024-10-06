@@ -1,5 +1,6 @@
 import { CoreToolMessage, ToolCallPart, ToolResultPart } from 'ai'
 import { z } from 'zod'
+import posthog from 'posthog-js'
 import { ToolName, toolNamesToFunctions } from './tool-definitions'
 import { ReorChatMessage, ToolDefinition } from '../types'
 
@@ -81,6 +82,10 @@ export const makeAndAddToolResultToMessages = async (
   assistantMessage: ReorChatMessage,
 ): Promise<ReorChatMessage[]> => {
   const toolResult = await createToolResult(toolCallPart.toolName, toolCallPart.args as any, toolCallPart.toolCallId)
+  posthog.capture('tool_executed', {
+    toolName: toolCallPart.toolName,
+    result: toolResult,
+  })
   const toolMessage: CoreToolMessage = {
     role: 'tool',
     content: [toolResult],
