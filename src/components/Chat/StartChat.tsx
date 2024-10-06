@@ -129,7 +129,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                     sendMessageHandler()
                   }
                 }}
-                className="h-[100px] w-[600px] resize-none border-0 bg-transparent p-4 text-background caret-current focus:outline-none"
+                className="h-[100px] w-[600px] resize-none border-0 bg-transparent p-4 text-foreground caret-current focus:outline-none"
                 placeholder="What can Reor help you with today?"
                 onChange={(e) => setUserTextFieldInput(e.target.value)}
                 // eslint-disable-next-line jsx-a11y/no-autofocus
@@ -178,15 +178,17 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                 </div>
               </button> */}
 
-              <div className="px-4 py-2">
-                <div className="flex space-y-4">
-                  <div className="flex items-center space-x-2 text-xs">
-                    Edit prompt:
+              <div className="px-4">
+                <div className="flex items-center justify-between px-2 py-1">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs text-muted-foreground">Edit prompt:</span>
                     <Popover>
                       <PopoverTrigger asChild>
-                        <Button>Prompt</Button>
+                        <Button size="sm" variant="outline" className="bg-border text-primary">
+                          Prompt
+                        </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-full border border-solid border-muted-foreground bg-border">
+                      <PopoverContent className="w-full border border-solid border-muted-foreground bg-background">
                         <PromptEditor
                           promptTemplate={agentConfig.promptTemplate}
                           onSave={(newPromptTemplate) => {
@@ -200,24 +202,29 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                       </PopoverContent>
                     </Popover>
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Switch
-                      id="db-search-toggle"
-                      checked={!!agentConfig.dbSearchFilters}
-                      onCheckedChange={handleDbSearchToggle}
-                    />
-                    <Label htmlFor="db-search-toggle" className="text-sm text-muted-foreground">
-                      Make initial knowledge base search
-                    </Label>
+
+                  <div className="flex items-center">
+                    <div className="flex items-center">
+                      <Switch
+                        id="db-search-toggle"
+                        checked={!!agentConfig.dbSearchFilters}
+                        onCheckedChange={handleDbSearchToggle}
+                        className="scale-75"
+                      />
+                      <Label htmlFor="db-search-toggle" className="ml-1 text-xs text-muted-foreground">
+                        Make initial knowledge base search
+                      </Label>
+                    </div>
                     <Drawer>
                       <DrawerTrigger asChild>
                         <Button
                           variant="secondary"
                           size="icon"
-                          className="size-8 rounded-full"
+                          className="ml-1 size-8 rounded-full"
                           disabled={!agentConfig.dbSearchFilters}
                         >
-                          <FiSettings className="size-4" />
+                          {' '}
+                          <FiSettings className="size-3" />
                           <span className="sr-only">Open DB search settings</span>
                         </Button>
                       </DrawerTrigger>

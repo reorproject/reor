@@ -31,7 +31,7 @@ const PromptEditor: React.FC<{
   }
 
   return (
-    <div className="w-full  text-foreground">
+    <div className="w-[32rem] text-foreground">
       <h3 className="text-foreground">Edit System Prompt</h3>
       <p className="text-muted-foreground">Customize the system prompt for your AI assistant.</p>
       <div className="grid gap-6 py-4">
