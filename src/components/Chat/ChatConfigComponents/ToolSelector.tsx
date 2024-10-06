@@ -36,8 +36,11 @@ const ToolSelector: React.FC<ToolSelectorProps> = ({ allTools, selectedTools, on
               <TooltipTrigger asChild>
                 <Info className="ml-1 size-3 text-muted-foreground" />
               </TooltipTrigger>
-              <TooltipContent side="top" className="bg-popover p-2 text-xs text-popover-foreground">
-                These are tools that will be available to the LLM to call. The search tool particularly powerful for
+              <TooltipContent
+                side="top"
+                className="max-w-[200px] whitespace-normal break-words bg-popover p-2 text-xs text-popover-foreground"
+              >
+                These are tools that will be available to the LLM to call. The search tool is particularly powerful for
                 allowing the LLM to investigate things agentically in your knowledge base.
               </TooltipContent>
             </Tooltip>
