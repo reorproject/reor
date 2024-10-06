@@ -39,7 +39,7 @@ const ChatComponent: React.FC = () => {
 
       const chat = await window.electronStore.getChat(currentOpenChatID)
       setCurrentChat((oldChat) => {
-        if (oldChat) {
+        if (oldChat && oldChat.id !== currentOpenChatID) {
           saveChat(oldChat)
         }
         return chat
