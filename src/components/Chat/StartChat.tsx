@@ -23,6 +23,7 @@ import { Switch } from '../ui/switch'
 import exampleAgents from './ChatConfigComponents/exampleAgents'
 import { allAvailableToolDefinitions } from '@/lib/llm/tools/tool-definitions'
 import ToolSelector from './ChatConfigComponents/ToolSelector'
+import SuggestionCard from '../ui/suggestion-card'
 
 interface StartChatProps {
   defaultModelName: string
@@ -34,6 +35,11 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   const [selectedLLM, setSelectedLLM] = useState<string>(defaultModelName)
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
   const [agentConfig, setAgentConfig] = useState<AgentConfig>()
+  const [promptSuggestions] = useState([
+    "What's the latest update on my project?",
+    'Summarize my recent notes on machine learning',
+    'Create a to-do list for today based on my calendar',
+  ])
 
   useEffect(() => {
     const fetchAgentConfigs = async () => {
@@ -166,18 +172,6 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               className="mx-auto w-full overflow-hidden rounded-b  border-0 border-solid border-border bg-background transition-all duration-300 ease-in-out"
               style={{ maxHeight: '500px' }}
             >
-              {/* <button
-                className="flex w-full cursor-pointer items-center justify-center bg-secondary/80 py-1 text-xs text-foreground transition-colors duration-200"
-                onClick={() => setShowExtraSettings(!showExtraSettings)}
-                type="button"
-              >
-                <div className="flex items-center">
-                  <div className="h-px w-16 bg-border" />
-                  {showExtraSettings ? <FiChevronUp className="mx-2" /> : <FiChevronDown className="mx-2" />}
-                  <div className="h-px w-16 bg-border" />
-                </div>
-              </button> */}
-
               <div className="px-4">
                 <div className="flex items-center justify-between px-2 py-1">
                   <div className="flex items-center space-x-2">
@@ -259,6 +253,21 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* New suggestion cards */}
+            <div className="mt-10 grid grid-cols-3 gap-4">
+              {promptSuggestions.map((suggestion, index) => (
+                <SuggestionCard
+                  // eslint-disable-next-line react/no-array-index-key
+                  key={index}
+                  suggestion={suggestion}
+                  onClick={() => {
+                    setUserTextFieldInput(suggestion)
+                    sendMessageHandler()
+                  }}
+                />
+              ))}
             </div>
           </div>
         </div>
