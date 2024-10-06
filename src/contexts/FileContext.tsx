@@ -126,7 +126,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setCurrentlyChangingFilePath(true)
     await writeEditorContentToDisk(editor, currentlyOpenFilePath)
     if (currentlyOpenFilePath && needToIndexEditorContent) {
-      window.fileSystem.indexFileInDatabase(currentlyOpenFilePath)
+      window.database.indexFileInDatabase(currentlyOpenFilePath)
       setNeedToIndexEditorContent(false)
     }
     const fileContent = (await window.fileSystem.readFile(filePath)) ?? ''
@@ -262,7 +262,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           filePath: currentlyOpenFilePath,
           content: markdown,
         })
-        await window.fileSystem.indexFileInDatabase(currentlyOpenFilePath)
+        await window.database.indexFileInDatabase(currentlyOpenFilePath)
       }
     }
 

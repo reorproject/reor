@@ -21,15 +21,13 @@ export const searchToolDefinition: ToolDefinition = {
       name: 'minDate',
       type: 'string',
       optional: true,
-      description:
-        'The minimum date of the notes to search for. Please provide the date in the format "YYYY-MM-DD HH:mm:ss',
+      description: 'The minimum date of the notes to search for. Please use ISO 8601 format: YYYY-MM-DDTHH:mm:ss.sssZ',
     },
     {
       name: 'maxDate',
       type: 'string',
       optional: true,
-      description:
-        'The maximum date of the notes to search for. Please provide the date in the format "YYYY-MM-DD HH:mm:ss',
+      description: 'The maximum date of the notes to search for. Please use ISO 8601 format: YYYY-MM-DDTHH:mm:ss.sssZ',
     },
   ],
   autoExecute: true,
