@@ -64,7 +64,7 @@ const exampleAgents: AgentConfig[] = [
     files: [],
     name: 'Default',
     dbSearchFilters: {
-      limit: 15,
+      limit: 20,
       minDate: undefined,
       maxDate: undefined,
       passFullNoteIntoContext: true,
