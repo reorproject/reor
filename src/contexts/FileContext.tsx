@@ -229,17 +229,22 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           })
         } else {
           const newFilePath = await window.path.join(await window.path.dirname(filePath), newFileName)
-          await window.fileSystem.renameFileRecursive({
-            oldFilePath: filePath,
-            newFilePath,
-          })
-          await window.fileSystem.writeFile({
-            filePath: newFilePath,
-            content: markdownContent,
-          })
-          removeFromNavigationHistory(filePath)
-          addToNavigationHistory(newFilePath)
-          setCurrentlyOpenFilePath(newFilePath)
+          const fileExists = await window.fileSystem.checkFileExists(newFilePath)
+          if (fileExists) {
+            toast.error(`A file with the name ${newFileName} already exists`)
+          } else {
+            await window.fileSystem.renameFileRecursive({
+              oldFilePath: filePath,
+              newFilePath,
+            })
+            await window.fileSystem.writeFile({
+              filePath: newFilePath,
+              content: markdownContent,
+            })
+            removeFromNavigationHistory(filePath)
+            addToNavigationHistory(newFilePath)
+            setCurrentlyOpenFilePath(newFilePath)
+          }
         }
         setNeedToWriteEditorContentToDisk(false)
       }
