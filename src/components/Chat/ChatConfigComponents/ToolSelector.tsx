@@ -37,7 +37,8 @@ const ToolSelector: React.FC<ToolSelectorProps> = ({ allTools, selectedTools, on
                 <Info className="ml-1 size-3 text-muted-foreground" />
               </TooltipTrigger>
               <TooltipContent side="top" className="bg-popover p-2 text-xs text-popover-foreground">
-                Select tools for LLM
+                These are tools that will be available to the LLM to call. The search tool particularly powerful for
+                allowing the LLM to investigate things agentically in your knowledge base.
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -51,26 +52,32 @@ const ToolSelector: React.FC<ToolSelectorProps> = ({ allTools, selectedTools, on
       {isOpen && (
         <div className="absolute mt-1 w-full rounded-md border bg-popover shadow-lg">
           <div className="py-1">
-            {allTools.map((tool) => (
-              <div
-                key={tool.name}
-                className={cn(
-                  'flex items-center px-4 py-2 text-xs cursor-pointer',
-                  'hover:bg-accent hover:text-accent-foreground',
-                  {
-                    'bg-accent text-accent-foreground': selectedTools.some((t) => t.name === tool.name),
-                    'text-blue-600 font-medium': tool.name.toLowerCase() === 'paper',
-                  },
-                )}
-                onClick={() => toggleTool(tool)}
-              >
-                {tool.name}
-              </div>
-            ))}
+            {allTools.map((tool) => {
+              const isSelected = selectedTools.some((t) => t.name === tool.name)
+              return (
+                <div
+                  key={tool.name}
+                  className={cn('px-4 py-2 text-xs cursor-pointer', 'hover:bg-accent hover:text-accent-foreground', {
+                    'bg-accent/10': isSelected,
+                  })}
+                  onClick={() => toggleTool(tool)}
+                >
+                  <span
+                    className={cn(
+                      'transition-all duration-200',
+                      isSelected ? 'font-bold underline' : '',
+                      tool.name.toLowerCase() === 'paper' ? 'text-blue-600' : '',
+                    )}
+                  >
+                    {tool.name}
+                  </span>
+                </div>
+              )
+            })}
           </div>
           <div className="flex items-center justify-between px-4 py-2">
             <span className="text-xs text-muted-foreground">
-              {selectedTools.length} tools will be available to the LLM.
+              {selectedTools.length} {selectedTools.length === 1 ? 'tool' : 'tools'} will be provided to the LLM.
             </span>
           </div>
         </div>

@@ -120,7 +120,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
             />
           </div>
           <div className="flex flex-col">
-            <div className="z-50 flex flex-col overflow-hidden rounded-t-md border-2 border-solid border-border bg-background focus-within:ring-1 focus-within:ring-ring">
+            <div className="z-50 flex flex-col overflow-hidden rounded border-2 border-solid border-border bg-background focus-within:ring-1 focus-within:ring-ring">
               <textarea
                 value={userTextFieldInput}
                 onKeyDown={(e) => {
@@ -139,7 +139,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               <div className="flex h-10 flex-col items-center justify-between gap-2  py-2 md:flex-row md:gap-4">
                 <div className="flex flex-col items-center justify-between rounded-md border-0 py-2 md:flex-row">
                   <Select value={selectedLLM} onValueChange={handleLLMChange}>
-                    <SelectTrigger className="m-2 w-32 border border-solid border-foreground bg-border">
+                    <SelectTrigger className="m-2 w-32 border border-solid border-muted-foreground bg-border">
                       <SelectValue placeholder="Select LLM" />
                     </SelectTrigger>
                     <SelectContent>
