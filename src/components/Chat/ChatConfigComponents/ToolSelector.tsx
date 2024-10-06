@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, Info } from 'lucide-react'
 import { ToolDefinition } from '../../../lib/llm/types'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface ToolSelectorProps {
   allTools: ToolDefinition[]
@@ -28,7 +29,19 @@ const ToolSelector: React.FC<ToolSelectorProps> = ({ allTools, selectedTools, on
         className="w-full justify-between bg-background text-foreground"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span>Tools</span>
+        <span className="flex items-center">
+          Tools
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="ml-1 size-3 text-muted-foreground" />
+              </TooltipTrigger>
+              <TooltipContent side="top" className="bg-popover p-2 text-xs text-popover-foreground">
+                Select tools for LLM
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </span>
         <ChevronDown
           className={cn('ml-2 h-4 w-4 shrink-0 transition-transform duration-200', {
             'transform rotate-180': isOpen,
@@ -59,7 +72,6 @@ const ToolSelector: React.FC<ToolSelectorProps> = ({ allTools, selectedTools, on
             <span className="text-xs text-muted-foreground">
               {selectedTools.length} tools will be available to the LLM.
             </span>
-            {/* <span className="text-sm font-medium"></span> */}
           </div>
         </div>
       )}
