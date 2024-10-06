@@ -130,10 +130,10 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               autoFocus
             />
             <div className="mx-auto h-px w-[96%] bg-muted-foreground/20" />
-            <div className="flex flex-col items-center justify-between gap-2 px-4 py-2 md:flex-row md:gap-4">
+            <div className="flex h-10 flex-col items-center justify-between gap-2 px-4 py-2 md:flex-row md:gap-4">
               <div className="flex flex-col items-center justify-between rounded-md border-0 py-2 md:flex-row">
                 <Select value={selectedLLM} onValueChange={handleLLMChange}>
-                  <SelectTrigger className="w-[180px] border border-solid border-border">
+                  <SelectTrigger className="m-2 w-32 border border-solid border-foreground">
                     <SelectValue placeholder="Select LLM" />
                   </SelectTrigger>
                   <SelectContent>
@@ -147,7 +147,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               </div>
               <div className="flex items-center">
                 <Button
-                  className="flex items-center justify-between gap-2 bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground"
+                  className="m-2 flex items-center justify-between gap-2 bg-primary text-primary-foreground hover:bg-accent hover:text-accent-foreground"
                   onClick={sendMessageHandler}
                 >
                   <PiPaperPlaneRight className="size-4" />
@@ -161,7 +161,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
             style={{ maxHeight: showExtraSettings ? '500px' : '24px' }}
           >
             <button
-              className="flex w-full items-center justify-center py-1 text-xs text-muted-foreground transition-colors duration-200 hover:bg-secondary/80"
+              className="flex w-full cursor-pointer items-center justify-center bg-secondary/80 py-1 text-xs text-foreground transition-colors duration-200"
               onClick={() => setShowExtraSettings(!showExtraSettings)}
               type="button"
             >
