@@ -88,9 +88,10 @@ export function setupDefaultStoreValues(store: Store<StoreSchema>) {
 }
 
 function ensureChatsIsCorrectProperty(store: Store<StoreSchema>) {
-  const oldChatHistories = store.get('chatHistories')
+  const oldChatHistories = store.get('chatHistories' as keyof StoreSchema)
   if (oldChatHistories) {
     store.set(StoreKeys.Chats, oldChatHistories)
+    store.delete('chatHistories' as keyof StoreSchema)
   }
   const chats = store.get(StoreKeys.Chats)
   if (!chats) {
