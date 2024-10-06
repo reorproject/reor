@@ -32,7 +32,7 @@ const ToolSelector: React.FC<ToolSelectorProps> = ({ allTools, selectedTools, on
         <span className="flex items-center">
           Tools
           <TooltipProvider>
-            <Tooltip>
+            <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>
                 <Info className="ml-1 size-3 text-muted-foreground" />
               </TooltipTrigger>
@@ -58,17 +58,32 @@ const ToolSelector: React.FC<ToolSelectorProps> = ({ allTools, selectedTools, on
             {allTools.map((tool) => {
               const isSelected = selectedTools.some((t) => t.name === tool.name)
               return (
-                <div
-                  key={tool.name}
-                  className={cn('px-4 py-2 text-xs cursor-pointer', 'hover:bg-accent hover:text-accent-foreground', {
-                    'bg-accent/10': isSelected,
-                  })}
-                  onClick={() => toggleTool(tool)}
-                >
-                  <span className={cn('transition-all duration-200', isSelected ? 'font-bold underline' : '')}>
-                    {tool.displayName || tool.name}
-                  </span>
-                </div>
+                <TooltipProvider key={tool.name}>
+                  <Tooltip delayDuration={0}>
+                    <TooltipTrigger asChild>
+                      <div
+                        className={cn(
+                          'px-4 py-2 text-xs cursor-pointer',
+                          'hover:bg-accent hover:text-accent-foreground',
+                          {
+                            'bg-accent/10': isSelected,
+                          },
+                        )}
+                        onClick={() => toggleTool(tool)}
+                      >
+                        <span className={cn('transition-all duration-200', isSelected ? 'font-bold underline' : '')}>
+                          {tool.displayName || tool.name}
+                        </span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent
+                      side="left"
+                      className="max-w-[200px] whitespace-normal break-words bg-popover p-2 text-xs text-popover-foreground"
+                    >
+                      {tool.description || 'No description available'}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               )
             })}
           </div>
