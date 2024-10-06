@@ -59,7 +59,7 @@ const SearchToolRenderer: React.FC<ToolRendererProps> = ({ existingToolResult })
 }
 
 const DefaultToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existingToolResult, executeToolCall }) => {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(true)
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="mt-2 rounded-md border border-border bg-secondary">

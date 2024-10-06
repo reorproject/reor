@@ -11,7 +11,7 @@ interface ToolSelectorProps {
 }
 
 const ToolSelector: React.FC<ToolSelectorProps> = ({ allTools, selectedTools, onToolsChange }) => {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(true)
 
   const toggleTool = (tool: ToolDefinition) => {
     const isSelected = selectedTools.some((t) => t.name === tool.name)
@@ -54,6 +54,12 @@ const ToolSelector: React.FC<ToolSelectorProps> = ({ allTools, selectedTools, on
                 {tool.name}
               </div>
             ))}
+          </div>
+          <div className="flex items-center justify-between px-4 py-2">
+            <span className="text-xs text-muted-foreground">
+              {selectedTools.length} tools will be available to the LLM.
+            </span>
+            {/* <span className="text-sm font-medium"></span> */}
           </div>
         </div>
       )}
