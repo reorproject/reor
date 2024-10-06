@@ -139,7 +139,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               <div className="flex h-10 flex-col items-center justify-between gap-2  py-2 md:flex-row md:gap-4">
                 <div className="flex flex-col items-center justify-between rounded-md border-0 py-2 md:flex-row">
                   <Select value={selectedLLM} onValueChange={handleLLMChange}>
-                    <SelectTrigger className="m-2 w-32 border border-solid border-muted-foreground bg-border">
+                    <SelectTrigger className="m-2 w-32 border border-solid border-muted-foreground bg-transparent">
                       <SelectValue placeholder="Select LLM" />
                     </SelectTrigger>
                     <SelectContent>
@@ -153,7 +153,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                 </div>
                 <div className="flex items-center">
                   <Button
-                    className="m-2 flex items-center justify-between gap-2 bg-border text-primary hover:bg-accent hover:text-accent-foreground"
+                    className="m-2 flex items-center justify-between gap-2 bg-transparent text-primary hover:bg-transparent hover:text-accent-foreground"
                     onClick={sendMessageHandler}
                   >
                     <PiPaperPlaneRight className="size-4" />

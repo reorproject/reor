@@ -19,6 +19,7 @@ type ToolParameter = {
 
 export type ToolDefinition = {
   name: string
+  displayName?: string
   description: string
   parameters: ToolParameter[]
   autoExecute?: boolean

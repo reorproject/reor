@@ -65,14 +65,8 @@ const ToolSelector: React.FC<ToolSelectorProps> = ({ allTools, selectedTools, on
                   })}
                   onClick={() => toggleTool(tool)}
                 >
-                  <span
-                    className={cn(
-                      'transition-all duration-200',
-                      isSelected ? 'font-bold underline' : '',
-                      tool.name.toLowerCase() === 'paper' ? 'text-blue-600' : '',
-                    )}
-                  >
-                    {tool.name}
+                  <span className={cn('transition-all duration-200', isSelected ? 'font-bold underline' : '')}>
+                    {tool.displayName || tool.name}
                   </span>
                 </div>
               )

@@ -3,6 +3,7 @@ import { retreiveFromVectorDB } from '@/lib/db'
 
 export const searchToolDefinition: ToolDefinition = {
   name: 'search',
+  displayName: 'Search',
   description: "Semantically search the user's personal knowledge base",
   parameters: [
     {
@@ -22,6 +23,7 @@ export const searchToolDefinition: ToolDefinition = {
 
 export const createNoteToolDefinition: ToolDefinition = {
   name: 'createNote',
+  displayName: 'Create Note',
   description: "Create a new note in the user's personal knowledge base.",
   parameters: [
     {
@@ -39,6 +41,7 @@ export const createNoteToolDefinition: ToolDefinition = {
 
 export const createDirectoryToolDefinition: ToolDefinition = {
   name: 'createDirectory',
+  displayName: 'Create Directory',
   description: "Create a new directory in the user's personal knowledge base",
   parameters: [
     {
@@ -51,6 +54,7 @@ export const createDirectoryToolDefinition: ToolDefinition = {
 
 const readFileToolDefinition: ToolDefinition = {
   name: 'readFile',
+  displayName: 'Read File',
   description: "Read a file from the user's personal knowledge base",
   parameters: [
     {
@@ -63,6 +67,7 @@ const readFileToolDefinition: ToolDefinition = {
 
 export const deleteNoteToolDefinition: ToolDefinition = {
   name: 'deleteNote',
+  displayName: 'Delete Note',
   description: "Delete a note from the user's personal knowledge base",
   parameters: [
     {
@@ -75,6 +80,7 @@ export const deleteNoteToolDefinition: ToolDefinition = {
 
 export const editNoteToolDefinition: ToolDefinition = {
   name: 'editNote',
+  displayName: 'Edit Note',
   description:
     "Edit a note in the user's personal knowledge base. You must provide the full note content as the new content.",
   parameters: [
@@ -93,6 +99,7 @@ export const editNoteToolDefinition: ToolDefinition = {
 
 export const appendToNoteToolDefinition: ToolDefinition = {
   name: 'appendToNote',
+  displayName: 'Append to Note',
   description: "Append to a note in the user's personal knowledge base",
   parameters: [
     {
@@ -110,6 +117,7 @@ export const appendToNoteToolDefinition: ToolDefinition = {
 
 export const listFilesToolDefinition: ToolDefinition = {
   name: 'listFiles',
+  displayName: 'List Files',
   description: "List all files in the user's personal knowledge base",
   parameters: [],
 }
