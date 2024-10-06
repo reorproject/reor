@@ -17,6 +17,20 @@ export const searchToolDefinition: ToolDefinition = {
       defaultValue: 20,
       description: 'The number of results to return',
     },
+    {
+      name: 'minDate',
+      type: 'string',
+      optional: true,
+      description:
+        'The minimum date of the notes to search for. Please provide the date in the format "YYYY-MM-DD HH:mm:ss',
+    },
+    {
+      name: 'maxDate',
+      type: 'string',
+      optional: true,
+      description:
+        'The maximum date of the notes to search for. Please provide the date in the format "YYYY-MM-DD HH:mm:ss',
+    },
   ],
   autoExecute: true,
 }
@@ -140,8 +154,8 @@ type ToolFunctionMap = {
 }
 
 export const toolNamesToFunctions: ToolFunctionMap = {
-  search: async (query: string, limit: number): Promise<any[]> => {
-    const results = await retreiveFromVectorDB(query, { limit, passFullNoteIntoContext: true })
+  search: async (query: string, limit: number, minDate: Date, maxDate: Date): Promise<any[]> => {
+    const results = await retreiveFromVectorDB(query, { limit, minDate, maxDate, passFullNoteIntoContext: true })
     return results
   },
   createNote: async (filename: string, content: string): Promise<string> => {

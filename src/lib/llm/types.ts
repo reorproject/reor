@@ -13,6 +13,7 @@ type ParameterType = 'string' | 'number' | 'boolean'
 type ToolParameter = {
   name: string
   type: ParameterType
+  optional?: boolean
   defaultValue?: string | number | boolean
   description: string
 }

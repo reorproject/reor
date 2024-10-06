@@ -56,6 +56,10 @@ export function convertToolConfigToZodSchema(tool: ToolDefinition) {
         zodType = zodType.default(param.defaultValue)
       }
 
+      if (param.optional) {
+        zodType = zodType.optional()
+      }
+
       // Apply description
       zodType = zodType.describe(param.description)
 
@@ -77,7 +81,6 @@ export const makeAndAddToolResultToMessages = async (
   assistantMessage: ReorChatMessage,
 ): Promise<ReorChatMessage[]> => {
   const toolResult = await createToolResult(toolCallPart.toolName, toolCallPart.args as any, toolCallPart.toolCallId)
-
   const toolMessage: CoreToolMessage = {
     role: 'tool',
     content: [toolResult],
