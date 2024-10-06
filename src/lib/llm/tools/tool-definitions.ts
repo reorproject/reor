@@ -22,12 +22,12 @@ export const searchToolDefinition: ToolDefinition = {
 
 export const createNoteToolDefinition: ToolDefinition = {
   name: 'createNote',
-  description: "Create a new note in the user's personal knowledge base",
+  description: "Create a new note in the user's personal knowledge base.",
   parameters: [
     {
       name: 'filename',
       type: 'string',
-      description: 'The filename of the note',
+      description: 'The filename of the note. Do not include the file extension.',
     },
     {
       name: 'content',
@@ -75,7 +75,8 @@ export const deleteNoteToolDefinition: ToolDefinition = {
 
 export const editNoteToolDefinition: ToolDefinition = {
   name: 'editNote',
-  description: "Edit a note in the user's personal knowledge base",
+  description:
+    "Edit a note in the user's personal knowledge base. You must provide the full note content as the new content.",
   parameters: [
     {
       name: 'filename',

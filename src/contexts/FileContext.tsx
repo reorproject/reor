@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import React, { createContext, useContext, ReactNode, useEffect, useRef, useState } from 'react'
+import React, { createContext, useContext, ReactNode, useEffect, useState } from 'react'
 import { MathExtension } from '@aarkue/tiptap-math-extension'
 import Document from '@tiptap/extension-document'
 import Paragraph from '@tiptap/extension-paragraph'
@@ -140,8 +140,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     await loadFileIntoEditor(absolutePath)
   }
 
-  const openRelativePathRef = useRef<(newFilePath: string) => Promise<void>>()
-
   const editor = useEditor({
     autofocus: true,
     onUpdate() {
@@ -187,7 +185,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         linkOnPaste: true,
         openOnClick: true,
       }),
-      BacklinkExtension(openRelativePathRef, setSuggestionsState),
+      BacklinkExtension(setSuggestionsState),
       CharacterCount,
     ],
   })

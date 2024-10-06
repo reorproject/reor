@@ -4,11 +4,7 @@ import { Decoration, DecorationSet } from '@tiptap/pm/view'
 
 import { SuggestionsState } from './BacklinkSuggestionsDisplay'
 
-const backlinkPlugin = (
-  openRelativePathRef: React.MutableRefObject<((newFilePath: string) => Promise<void>) | undefined>,
-  updateSuggestionsState: (state: SuggestionsState | null) => void,
-) => {
-  // Timeout to hide the suggestions after a certain amount of time. This is needed so that blur or focusout events don't hide the suggestions immediately.
+const backlinkPlugin = (updateSuggestionsState: (state: SuggestionsState | null) => void) => {
   let hideTimeout: NodeJS.Timeout | null = null
 
   return new Plugin({
@@ -137,15 +133,6 @@ const backlinkPlugin = (
 
           return false
         },
-        click: (view, event) => {
-          const { target } = event
-          if (target instanceof HTMLElement && target.getAttribute('data-backlink') === 'true') {
-            event.preventDefault()
-            const backlinkPath = target.textContent
-            if (backlinkPath) openRelativePathRef.current?.(backlinkPath)
-          }
-          return false // Not handled
-        },
         blur: () => {
           hideTimeout = setTimeout(() => {
             updateSuggestionsState(null)
@@ -157,15 +144,12 @@ const backlinkPlugin = (
   })
 }
 
-export const BacklinkExtension = (
-  openRelativePathRef: React.MutableRefObject<((newFilePath: string) => Promise<void>) | undefined>,
-  updateSuggestionsState: (state: SuggestionsState | null) => void,
-) =>
+export const BacklinkExtension = (updateSuggestionsState: (state: SuggestionsState | null) => void) =>
   Extension.create({
     name: 'backlink',
 
     addProseMirrorPlugins() {
-      return [backlinkPlugin(openRelativePathRef, updateSuggestionsState)]
+      return [backlinkPlugin(updateSuggestionsState)]
     },
   })
 

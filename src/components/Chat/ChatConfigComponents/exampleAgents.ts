@@ -12,7 +12,7 @@ const defaultAgentPromptTemplate: PromptTemplate = [
   },
   {
     role: 'user',
-    content: `Context retrieved from your knowledge base for the query below: \n{CONTEXT}\n\n\nQuery for context above:\n{QUERY}`,
+    content: `{QUERY}`,
   },
 ]
 

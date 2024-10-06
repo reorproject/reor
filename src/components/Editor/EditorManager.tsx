@@ -4,6 +4,7 @@ import InEditorBacklinkSuggestionsDisplay from './BacklinkSuggestionsDisplay'
 import EditorContextMenu from './EditorContextMenu'
 import SearchBar from './Search/SearchBar'
 import { useFileContext } from '@/contexts/FileContext'
+import { useWindowContentContext } from '@/contexts/WindowContentContext'
 
 const EditorManager: React.FC = () => {
   const [showSearchBar, setShowSearchBar] = useState(false)
@@ -15,7 +16,7 @@ const EditorManager: React.FC = () => {
 
   const { editor, suggestionsState, flattenedFiles } = useFileContext()
   const [showDocumentStats, setShowDocumentStats] = useState(false)
-
+  const { openContent } = useWindowContentContext()
   const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault()
     setMenuPosition({
@@ -27,6 +28,15 @@ const EditorManager: React.FC = () => {
 
   const hideMenu = () => {
     if (contextMenuVisible) setContextMenuVisible(false)
+  }
+
+  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const { target } = event
+    if (target instanceof HTMLElement && target.getAttribute('data-backlink') === 'true') {
+      event.preventDefault()
+      const backlinkPath = target.textContent
+      if (backlinkPath) openContent(backlinkPath)
+    }
   }
 
   useEffect(() => {
@@ -137,7 +147,7 @@ const EditorManager: React.FC = () => {
               wordBreak: 'break-word',
             }}
             onContextMenu={handleContextMenu}
-            onClick={hideMenu}
+            onClick={handleClick}
             onInput={handleInput}
             editor={editor}
           />
