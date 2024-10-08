@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { ChevronDown, Info } from 'lucide-react'
+import { ChevronDown, Info, Check } from 'lucide-react'
 import { ToolDefinition } from '../../../lib/llm/types'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -63,17 +63,18 @@ const ToolSelector: React.FC<ToolSelectorProps> = ({ allTools, selectedTools, on
                     <TooltipTrigger asChild>
                       <div
                         className={cn(
-                          'px-4 py-2 text-xs cursor-pointer',
+                          'flex items-center justify-between px-4 py-2 text-xs cursor-pointer',
                           'hover:bg-accent hover:text-accent-foreground',
                           {
-                            'bg-accent/10': isSelected,
+                            'bg-accent/20': isSelected,
                           },
                         )}
                         onClick={() => toggleTool(tool)}
                       >
-                        <span className={cn('transition-all duration-200', isSelected ? 'font-bold underline' : '')}>
+                        <span className={cn('transition-all duration-200', isSelected ? 'font-semibold' : '')}>
                           {tool.displayName || tool.name}
                         </span>
+                        {isSelected && <Check className="size-4 text-accent-foreground" />}
                       </div>
                     </TooltipTrigger>
                     <TooltipContent
