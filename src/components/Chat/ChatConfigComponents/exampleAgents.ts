@@ -8,7 +8,8 @@ const defaultAgentPromptTemplate: PromptTemplate = [
 - You will answer the user's question and help them with their request. 
 - You can search the knowledge base by using the search tool and create new notes by using the create note tool.
 - Make sure you respond in the same language as the user's query and context.
-- An initial query has been made and the context is already provided for you (so please do not call the search tool initially).`,
+- An initial query has been made and the context is already provided for you (so please do not call the search tool initially).
+- The date and time of the query is {TODAY}.`,
   },
   {
     role: 'user',
@@ -63,7 +64,7 @@ const exampleAgents: AgentConfig[] = [
     files: [],
     name: 'Default',
     dbSearchFilters: {
-      limit: 15,
+      limit: 20,
       minDate: undefined,
       maxDate: undefined,
       passFullNoteIntoContext: true,

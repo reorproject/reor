@@ -1,17 +1,31 @@
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { DBEntry } from 'electron/main/vector-database/schema'
+import { parse, isValid, format } from 'date-fns'
 import { DatabaseSearchFilters } from '@/lib/llm/types'
 
-export const generateTimeStampFilter = (minDate?: Date, maxDate?: Date): string => {
+export const generateTimeStampFilter = (minDate?: Date | string, maxDate?: Date | string): string => {
   let filter = ''
 
+  const parseDate = (date: Date | string): string => {
+    if (date instanceof Date) {
+      return format(date, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")
+    }
+    if (typeof date === 'string') {
+      const parsedDate = parse(date, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx", new Date())
+      if (isValid(parsedDate)) {
+        return format(parsedDate, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")
+      }
+    }
+    throw new Error('Invalid date format. Please use ISO 8601 format: YYYY-MM-DDTHH:mm:ss.sssZ')
+  }
+
   if (minDate) {
-    const minDateStr = minDate.toISOString().slice(0, 19).replace('T', ' ')
+    const minDateStr = parseDate(minDate)
     filter += `filemodified > timestamp '${minDateStr}'`
   }
 
   if (maxDate) {
-    const maxDateStr = maxDate.toISOString().slice(0, 19).replace('T', ' ')
+    const maxDateStr = parseDate(maxDate)
     if (filter) {
       filter += ' AND '
     }

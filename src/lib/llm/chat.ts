@@ -3,6 +3,7 @@ import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { generateChatName } from '@shared/utils'
 import { AssistantContent, CoreAssistantMessage, CoreToolMessage, ToolCallPart } from 'ai'
 import posthog from 'posthog-js'
+import { format } from 'date-fns'
 import { AnonymizedAgentConfig, Chat, AgentConfig, PromptTemplate, ReorChatMessage } from './types'
 import { retreiveFromVectorDB } from '@/lib/db'
 
@@ -87,7 +88,9 @@ const generateMessagesFromTemplate = (
 ): ReorChatMessage[] => {
   return promptTemplate.map((message) => {
     const replacePlaceholders = (content: string) => {
-      return content.replace('{QUERY}', query)
+      const now = new Date()
+      const today = format(now, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")
+      return content.replace('{QUERY}', query).replace('{TODAY}', today)
     }
 
     if (message.role === 'system') {

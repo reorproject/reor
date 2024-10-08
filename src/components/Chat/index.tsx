@@ -71,11 +71,11 @@ const ChatComponent: React.FC = () => {
         const llmClient = await resolveLLMClient(defaultLLMName)
 
         abortControllerRef.current = new AbortController()
-
+        const toolsZodSchema = Object.assign({}, ...outputChat.toolDefinitions.map(convertToolConfigToZodSchema))
         const { textStream, toolCalls } = await streamText({
           model: llmClient,
           messages: removeUncalledToolsFromMessages(outputChat.messages),
-          tools: Object.assign({}, ...outputChat.toolDefinitions.map(convertToolConfigToZodSchema)),
+          tools: toolsZodSchema,
           abortSignal: abortControllerRef.current.signal,
         })
 
@@ -97,7 +97,6 @@ const ChatComponent: React.FC = () => {
           if (agentConfig) {
             window.electronStore.setAgentConfig(agentConfig)
           }
-
           const { messages: outputMessages, allToolCallsHaveBeenExecuted } = await appendToolCallsAndAutoExecuteTools(
             outputChat.messages,
             outputChat.toolDefinitions,
