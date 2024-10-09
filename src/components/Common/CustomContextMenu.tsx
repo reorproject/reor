@@ -1,5 +1,5 @@
-import { FileInfoNode } from 'electron/main/filesystem/types'
 import React, { useEffect, useRef } from 'react'
+import { FileInfoNode } from 'electron/main/filesystem/types'
 import { useFileContext } from '@/contexts/FileContext'
 import { useChatContext } from '@/contexts/ChatContext'
 import { useModalOpeners } from '@/contexts/ModalContext'
@@ -73,62 +73,38 @@ const CustomContextMenu: React.FC = () => {
     setInitialFileToCreateFlashcard(noteName)
   }
 
-  const handleRenameFile = (name: string | undefined) => {
-    if (name) setNoteToBeRenamed(name)
+  const menuItems = {
+    newNote: { title: 'New Note', onSelect: createUntitledNote, icon: '' },
+    newDirectory: { title: 'New Directory', onSelect: () => setIsNewDirectoryModalOpen(true), icon: '' },
+    delete: { title: 'Delete', onSelect: () => deleteFile(file?.path), icon: '' },
+    rename: {
+      title: 'Rename',
+      onSelect: () => file?.path && setNoteToBeRenamed(file.path),
+      icon: '',
+    },
+    createFlashcard: {
+      title: 'Create flashcard set',
+      onSelect: () => handleMakeFlashcard(file?.path ?? null),
+      icon: '',
+    },
+    deleteChat: { title: 'Delete Chat', onSelect: () => deleteChat(chatMetadata?.id), icon: '' },
   }
 
-  let displayList: MenuItemType[] = []
-  switch (currentSelection) {
-    case 'FileSidebar': {
-      displayList = [
-        { title: 'New Note', onSelect: createUntitledNote, icon: '' },
-        { title: 'New Directory', onSelect: () => setIsNewDirectoryModalOpen(true), icon: '' },
-      ]
-      break
-    }
-    case 'FileItem': {
-      displayList = [
-        { title: 'Delete', onSelect: () => deleteFile(file?.path), icon: '' },
-        {
-          title: 'Rename',
-          onSelect: () => {
-            if (file?.path) setNoteToBeRenamed(file?.path)
-          },
-          icon: '',
-        },
-        { title: 'Create flashcard set', onSelect: () => handleMakeFlashcard(file ? file.path : null), icon: '' },
-        {
-          title: 'Add File to chat context',
-          onSelect: () => {}, // handleAddFileToChatFilters(file ? file.path : null),
-          icon: '',
-        },
-      ]
-      break
-    }
-    case 'ChatItem': {
-      displayList = [{ title: 'Delete Chat', onSelect: () => deleteChat(chatMetadata?.id), icon: '' }]
-      break
-    }
-    case 'DirectoryItem': {
-      displayList = [
-        { title: 'New Directory', onSelect: () => setIsNewDirectoryModalOpen(true), icon: '' },
-        { title: 'New Note', onSelect: createUntitledNote, icon: '' },
-        { title: 'Delete', onSelect: () => deleteFile(file?.path), icon: '' },
-        { title: 'Rename', onSelect: () => handleRenameFile(file?.path), icon: '' },
-        { title: 'Create flashcard set', onSelect: () => handleMakeFlashcard(file ? file.path : null), icon: '' },
-        {
-          title: 'Add file to chat context',
-          onSelect: () => {}, // handleAddFileToChatFilters(file ? file.path : null),
-          icon: '',
-        },
-      ]
-      break
-    }
-    default:
-      break
+  const menuConfigurations: Record<Exclude<ContextMenuLocations, 'None'>, MenuItemType[]> = {
+    FileSidebar: [menuItems.newNote, menuItems.newDirectory],
+    FileItem: [menuItems.delete, menuItems.rename, menuItems.createFlashcard],
+    ChatItem: [menuItems.deleteChat],
+    DirectoryItem: [
+      menuItems.newDirectory,
+      menuItems.newNote,
+      menuItems.delete,
+      menuItems.rename,
+      menuItems.createFlashcard,
+    ],
   }
 
-  // Selects the item then hides menu
+  const displayList = currentSelection !== 'None' ? menuConfigurations[currentSelection] : []
+
   const handleSubmit = (item: MenuItemType) => {
     if (item.onSelect) item.onSelect()
     hideFocusedItem()
@@ -147,8 +123,10 @@ const CustomContextMenu: React.FC = () => {
           }}
         >
           <div className="flex flex-col">
-            {displayList?.map((item) => (
+            {displayList.map((item, index) => (
               <div
+                // eslint-disable-next-line react/no-array-index-key
+                key={index}
                 className="cursor-pointer px-2 py-1 text-[12px] text-white/90 hover:rounded-md hover:bg-blue-500"
                 onClick={() => handleSubmit(item)}
               >

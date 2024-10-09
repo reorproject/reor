@@ -345,7 +345,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     fetchAndSetFiles()
   }, [])
 
-  const fileByFilepathValue = {
+  const contextValues = {
     vaultFilesTree,
     vaultFilesFlattened,
     expandedDirectories,
@@ -370,12 +370,12 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     deleteFile,
   }
 
-  const combinedContextValue: FileContextType = React.useMemo(
+  const contextValuesMemo: FileContextType = React.useMemo(
     () => ({
-      ...fileByFilepathValue,
+      ...contextValues,
     }),
-    [fileByFilepathValue],
+    [contextValues],
   )
 
-  return <FileContext.Provider value={combinedContextValue}>{children}</FileContext.Provider>
+  return <FileContext.Provider value={contextValuesMemo}>{children}</FileContext.Provider>
 }
