@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { ChevronDown, Info, Check } from 'lucide-react'
 import { ToolDefinition } from '../../../lib/llm/types'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/ui'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 interface ToolSelectorProps {

@@ -29,7 +29,7 @@ import SearchAndReplace from '@/components/Editor/Search/SearchAndReplaceExtensi
 import getMarkdown from '@/components/Editor/utils'
 import welcomeNote from '@/components/File/utils'
 import useOrderedSet from './hooks/use-ordered-set'
-import flattenFileInfoTree, { sortFilesAndDirectories } from '@/components/Sidebars/FileSideBar/utils'
+import flattenFileInfoTree, { sortFilesAndDirectories } from '@/lib/file'
 
 type FileContextType = {
   files: FileInfoTree
@@ -311,8 +311,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return true
   }
 
-  // const fileInfoTreeValue = useFileInfoTreeHook(currentlyOpenFilePath)
-
   const handleDirectoryToggle = (path: string) => {
     const isExpanded = expandedDirectories.get(path)
     const newExpandedDirectories = new Map(expandedDirectories)
@@ -320,7 +318,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setExpandedDirectories(newExpandedDirectories)
   }
 
-  // upon indexing, update the file info tree and expand relevant directories
   useEffect(() => {
     const findRelevantDirectoriesToBeOpened = async () => {
       if (currentlyOpenFilePath === null) {

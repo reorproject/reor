@@ -60,4 +60,24 @@ export const moveFile = async (sourcePath: string, destinationPath: string) => {
   await window.fileSystem.moveFileOrDir(sourcePath, destinationPath)
 }
 
+export const getFilesInDirectory = async (directoryPath: string, filesTree: FileInfo[]): Promise<FileInfo[]> => {
+  return filesTree.filter((file) => file.path.startsWith(directoryPath))
+}
+
+export function getNextUntitledFilename(existingFilenames: string[]): string {
+  console.log('existingFileNames: ', existingFilenames)
+  const untitledRegex = /^Untitled (\d+)\.md$/
+
+  const existingNumbers = existingFilenames
+    .filter((filename) => untitledRegex.test(filename))
+    .map((filename) => {
+      const match = filename.match(untitledRegex)
+      return match ? parseInt(match[1], 10) : 0
+    })
+
+  const maxNumber = Math.max(0, ...existingNumbers)
+
+  return `Untitled ${maxNumber + 1}.md`
+}
+
 export default flattenFileInfoTree

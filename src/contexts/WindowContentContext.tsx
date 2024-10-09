@@ -4,6 +4,7 @@ import posthog from 'posthog-js'
 import { useChatContext } from './ChatContext'
 import { useFileContext } from './FileContext'
 import { OnShowContextMenuData, ShowContextMenuInputType } from '@/components/Common/CustomContextMenu'
+import { getFilesInDirectory, getNextUntitledFilename } from '@/lib/file'
 
 interface WindowContentContextType {
   openContent: (pathOrChatID: string, optionalContentToWriteOnCreate?: string, dontUpdateChatHistory?: boolean) => void
@@ -36,7 +37,7 @@ export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ ch
   const [currentOpenFileOrChatID, setCurrentOpenFileOrChatID] = useState<string | null>(null)
 
   const { setCurrentOpenChatID, allChatsMetadata, setShowChatbot, setSidebarShowing } = useChatContext()
-  const { openOrCreateFile, addToNavigationHistory, currentlyOpenFilePath } = useFileContext()
+  const { flattenedFiles, openOrCreateFile, addToNavigationHistory, currentlyOpenFilePath } = useFileContext()
 
   const openContent = React.useCallback(
     async (pathOrChatID: string, optionalContentToWriteOnCreate?: string, dontUpdateChatHistory?: boolean) => {
@@ -87,25 +88,16 @@ export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ ch
   }, [setFocusedItem])
 
   const createAndOpenUntitledNote = useCallback(async () => {
-    let fileName = 'Untitled'
-    let index = 0
-    let directoryName = ''
+    const directoryToMakeFileIn = currentlyOpenFilePath
+      ? await window.path.dirname(currentlyOpenFilePath)
+      : await window.electronStore.getVaultDirectoryForWindow()
 
-    if (currentlyOpenFilePath) {
-      directoryName = await window.path.dirname(currentlyOpenFilePath)
-      const files = await window.fileSystem.getAllFilenamesInDirectory(directoryName)
-      while (files.includes(`${fileName}.md`)) {
-        index += 1
-        fileName = `Untitled ${index}`
-      }
-    }
-
-    const finalPath = currentlyOpenFilePath ? await window.path.join(directoryName, fileName) : fileName
-
-    const basename = await window.path.basename(finalPath)
-    openContent(finalPath, `# ${basename}\n`)
+    const filesInDirectory = await getFilesInDirectory(directoryToMakeFileIn, flattenedFiles)
+    const fileName = getNextUntitledFilename(filesInDirectory.map((file) => file.name))
+    const finalPath = await window.path.join(directoryToMakeFileIn, fileName)
+    openContent(finalPath, `# ${fileName}\n`)
     posthog.capture('created_new_note_from_new_note_modal')
-  }, [currentlyOpenFilePath, openContent])
+  }, [currentlyOpenFilePath, flattenedFiles, openContent])
 
   const WindowContentContextMemo = useMemo(
     () => ({

@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useCallback } from 'react'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 import posthog from 'posthog-js'
 import { FaSearch } from 'react-icons/fa'
+import { debounce } from 'lodash'
 import { DBSearchPreview } from '../File/DBResultPreview'
-import debounce from './utils'
 import { useWindowContentContext } from '@/contexts/WindowContentContext'
 
 interface SearchComponentProps {

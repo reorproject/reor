@@ -5,7 +5,7 @@ import { FaChevronDown, FaChevronRight } from 'react-icons/fa'
 import posthog from 'posthog-js'
 import { isFileNodeDirectory } from '@shared/utils'
 import { useFileContext } from '@/contexts/FileContext'
-import { moveFile } from './utils'
+import { moveFile } from '../../../lib/file'
 import { removeFileExtension } from '@/lib/strings'
 import { useWindowContentContext } from '@/contexts/WindowContentContext'
 
