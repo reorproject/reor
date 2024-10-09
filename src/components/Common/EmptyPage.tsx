@@ -1,7 +1,7 @@
 import React from 'react'
 import { ImFileEmpty } from 'react-icons/im'
 import { useModalOpeners } from '../../contexts/ModalContext'
-import { useWindowContentContext } from '@/contexts/WindowContentContext'
+import { useWindowContentContext } from '@/contexts/ContentContext'
 
 const EmptyPage: React.FC = () => {
   const { setIsNewDirectoryModalOpen } = useModalOpeners()

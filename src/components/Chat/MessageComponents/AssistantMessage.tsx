@@ -10,7 +10,7 @@ import {
   getClassNameBasedOnMessageRole,
 } from '../../../lib/llm/chat'
 import { ToolCallComponent } from './ToolCalls'
-import { useWindowContentContext } from '@/contexts/WindowContentContext'
+import { useWindowContentContext } from '@/contexts/ContentContext'
 import { useChatContext } from '@/contexts/ChatContext'
 import MarkdownRenderer from '@/components/Common/MarkdownRenderer'
 import { makeAndAddToolResultToMessages } from '../../../lib/llm/tools/utils'

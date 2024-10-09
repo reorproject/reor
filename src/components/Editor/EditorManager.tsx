@@ -4,7 +4,7 @@ import InEditorBacklinkSuggestionsDisplay from './BacklinkSuggestionsDisplay'
 import EditorContextMenu from './EditorContextMenu'
 import SearchBar from './Search/SearchBar'
 import { useFileContext } from '@/contexts/FileContext'
-import { useWindowContentContext } from '@/contexts/WindowContentContext'
+import { useWindowContentContext } from '@/contexts/ContentContext'
 
 const EditorManager: React.FC = () => {
   const [showSearchBar, setShowSearchBar] = useState(false)

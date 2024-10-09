@@ -3,7 +3,7 @@ import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { DBEntry } from 'electron/main/vector-database/schema'
 import { Card, CardDescription } from '@/components/ui/card'
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/components/ui/hover-card'
-import { useWindowContentContext } from '@/contexts/WindowContentContext'
+import { useWindowContentContext } from '@/contexts/ContentContext'
 import MarkdownRenderer from '@/components/Common/MarkdownRenderer'
 
 interface ChatSourcesProps {

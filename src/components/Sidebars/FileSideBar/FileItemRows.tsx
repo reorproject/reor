@@ -7,7 +7,7 @@ import { isFileNodeDirectory } from '@shared/utils'
 import { useFileContext } from '@/contexts/FileContext'
 import { moveFile } from '../../../lib/file'
 import { removeFileExtension } from '@/lib/strings'
-import { useWindowContentContext } from '@/contexts/WindowContentContext'
+import { useWindowContentContext } from '@/contexts/ContentContext'
 
 const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data }) => {
   const { visibleItems } = data

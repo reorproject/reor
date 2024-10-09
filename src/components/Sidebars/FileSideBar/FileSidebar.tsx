@@ -6,7 +6,7 @@ import { FixedSizeList as List } from 'react-window'
 import { isFileNodeDirectory } from '@shared/utils'
 import { useFileContext } from '@/contexts/FileContext'
 import FileItemRows from './FileItemRows'
-import { useWindowContentContext } from '@/contexts/WindowContentContext'
+import { useWindowContentContext } from '@/contexts/ContentContext'
 
 interface FileExplorerProps {
   lheight?: number

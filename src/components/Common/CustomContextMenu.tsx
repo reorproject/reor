@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react'
 import { useFileContext } from '@/contexts/FileContext'
 import { useChatContext } from '@/contexts/ChatContext'
 import { useModalOpeners } from '@/contexts/ModalContext'
-import { useWindowContentContext } from '@/contexts/WindowContentContext'
+import { useWindowContentContext } from '@/contexts/ContentContext'
 import { ChatMetadata } from '../../lib/llm/types'
 
 export type ContextMenuLocations = 'FileSidebar' | 'FileItem' | 'ChatItem' | 'DirectoryItem' | 'None'

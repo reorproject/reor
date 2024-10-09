@@ -10,7 +10,7 @@ import { HiOutlinePencilAlt } from 'react-icons/hi'
 
 import { useModalOpeners } from '../../contexts/ModalContext'
 import { useChatContext } from '@/contexts/ChatContext'
-import { useWindowContentContext } from '@/contexts/WindowContentContext'
+import { useWindowContentContext } from '@/contexts/ContentContext'
 
 const IconsSidebar: React.FC = () => {
   const { sidebarShowing, setSidebarShowing } = useChatContext()

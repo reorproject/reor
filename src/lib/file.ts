@@ -65,7 +65,6 @@ export const getFilesInDirectory = async (directoryPath: string, filesTree: File
 }
 
 export function getNextUntitledFilename(existingFilenames: string[]): string {
-  console.log('existingFileNames: ', existingFilenames)
   const untitledRegex = /^Untitled (\d+)\.md$/
 
   const existingNumbers = existingFilenames

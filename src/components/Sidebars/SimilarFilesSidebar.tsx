@@ -11,7 +11,7 @@ import errorToStringRendererProcess from '@/lib/error'
 import SimilarEntriesComponent from './SemanticSidebar/SimilarEntriesComponent'
 import HighlightButton from './SemanticSidebar/HighlightButton'
 import { useFileContext } from '@/contexts/FileContext'
-import { useWindowContentContext } from '@/contexts/WindowContentContext'
+import { useWindowContentContext } from '@/contexts/ContentContext'
 
 const SimilarFilesSidebarComponent: React.FC = () => {
   const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([])
