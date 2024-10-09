@@ -14,7 +14,7 @@ interface FileExplorerProps {
 
 const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
   const [listHeight, setListHeight] = useState(lheight ?? window.innerHeight - 50)
-  const { files, expandedDirectories } = useFileContext()
+  const { vaultFilesTree, expandedDirectories } = useFileContext()
   const { showContextMenu: handleFocusedItem } = useWindowContentContext()
 
   useEffect(() => {
@@ -48,7 +48,7 @@ const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
     return visibleItems
   }
 
-  const visibleItems = getVisibleFilesAndFlatten(files, expandedDirectories)
+  const visibleItems = getVisibleFilesAndFlatten(vaultFilesTree, expandedDirectories)
   const itemCount = visibleItems.length
 
   return (

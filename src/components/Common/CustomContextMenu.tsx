@@ -36,7 +36,7 @@ interface MenuItemType {
 }
 
 const CustomContextMenu: React.FC = () => {
-  const { focusedItem, hideFocusedItem, createAndOpenNewNote } = useWindowContentContext()
+  const { focusedItem, hideFocusedItem, createUntitledNote } = useWindowContentContext()
   const { currentSelection, position, file, chatMetadata } = focusedItem
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -81,7 +81,7 @@ const CustomContextMenu: React.FC = () => {
   switch (currentSelection) {
     case 'FileSidebar': {
       displayList = [
-        { title: 'New Note', onSelect: createAndOpenNewNote, icon: '' },
+        { title: 'New Note', onSelect: createUntitledNote, icon: '' },
         { title: 'New Directory', onSelect: () => setIsNewDirectoryModalOpen(true), icon: '' },
       ]
       break
@@ -112,7 +112,7 @@ const CustomContextMenu: React.FC = () => {
     case 'DirectoryItem': {
       displayList = [
         { title: 'New Directory', onSelect: () => setIsNewDirectoryModalOpen(true), icon: '' },
-        { title: 'New Note', onSelect: createAndOpenNewNote, icon: '' },
+        { title: 'New Note', onSelect: createUntitledNote, icon: '' },
         { title: 'Delete', onSelect: () => deleteFile(file?.path), icon: '' },
         { title: 'Rename', onSelect: () => handleRenameFile(file?.path), icon: '' },
         { title: 'Create flashcard set', onSelect: () => handleMakeFlashcard(file ? file.path : null), icon: '' },

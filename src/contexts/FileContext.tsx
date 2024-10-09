@@ -19,7 +19,7 @@ import { toast } from 'react-toastify'
 import { Markdown } from 'tiptap-markdown'
 import { useDebounce } from 'use-debounce'
 import { FileInfo, FileInfoTree } from 'electron/main/filesystem/types'
-import { generateFileName, getInvalidCharacterInFilePath } from '@/lib/strings'
+import { getInvalidCharacterInFilePath } from '@/lib/strings'
 import { BacklinkExtension } from '@/components/Editor/BacklinkExtension'
 import { SuggestionsState } from '@/components/Editor/BacklinkSuggestionsDisplay'
 import HighlightExtension, { HighlightData } from '@/components/Editor/HighlightExtension'
@@ -32,8 +32,8 @@ import useOrderedSet from './hooks/use-ordered-set'
 import flattenFileInfoTree, { sortFilesAndDirectories } from '@/lib/file'
 
 type FileContextType = {
-  files: FileInfoTree
-  flattenedFiles: FileInfo[]
+  vaultFilesTree: FileInfoTree
+  vaultFilesFlattened: FileInfo[]
   expandedDirectories: Map<string, boolean>
   handleDirectoryToggle: (path: string) => void
   currentlyOpenFilePath: string | null
@@ -67,8 +67,8 @@ export const useFileContext = () => {
 }
 
 export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [fileInfoTree, setFileInfoTree] = useState<FileInfoTree>([])
-  const [flattenedFiles, setFlattenedFiles] = useState<FileInfo[]>([])
+  const [vaultFilesTree, setVaultFilesTree] = useState<FileInfoTree>([])
+  const [vaultFilesFlattened, setVaultFilesFlattened] = useState<FileInfo[]>([])
   const [expandedDirectories, setExpandedDirectories] = useState<Map<string, boolean>>(new Map())
   const [currentlyOpenFilePath, setCurrentlyOpenFilePath] = useState<string | null>(null)
   const [suggestionsState, setSuggestionsState] = useState<SuggestionsState | null>()
@@ -96,15 +96,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
     fetchSpellCheckMode()
   }, [spellCheckEnabled])
-
-  const setFileNodeToBeRenamed = async (filePath: string) => {
-    const isDirectory = await window.fileSystem.isDirectory(filePath)
-    if (isDirectory) {
-      setFileDirToBeRenamed(filePath)
-    } else {
-      setNoteToBeRenamed(filePath)
-    }
-  }
 
   const createFileIfNotExists = async (filePath: string, optionalContent?: string): Promise<string> => {
     const invalidChars = await getInvalidCharacterInFilePath(filePath)
@@ -224,34 +215,13 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (filePath !== null && needToWriteEditorContentToDisk && _editor) {
       const markdownContent = getMarkdown(_editor)
       if (markdownContent !== null) {
-        const newFileName = generateFileName(markdownContent)
-        const oldFileName = await window.path.basename(filePath)
-        if (oldFileName === newFileName) {
-          await window.fileSystem.writeFile({
-            filePath,
-            content: markdownContent,
-          })
-        } else {
-          const newFilePath = await window.path.join(await window.path.dirname(filePath), newFileName)
-          const fileExists = await window.fileSystem.checkFileExists(newFilePath)
-          if (fileExists) {
-            toast.error(`A file with the name ${newFileName} already exists`)
-          } else {
-            await window.fileSystem.renameFileRecursive({
-              oldFilePath: filePath,
-              newFilePath,
-            })
-            await window.fileSystem.writeFile({
-              filePath: newFilePath,
-              content: markdownContent,
-            })
-            removeFromNavigationHistory(filePath)
-            addToNavigationHistory(newFilePath)
-            setCurrentlyOpenFilePath(newFilePath)
-          }
-        }
+        await window.fileSystem.writeFile({
+          filePath,
+          content: markdownContent,
+        })
         setNeedToWriteEditorContentToDisk(false)
       }
+      // interesting...Maybe after writing the content, we could rename the file...? If it meets the criteria for a rename...I.e. file modified in last minutes and contains Untitled...
     }
   }
 
@@ -270,7 +240,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [editor, currentlyOpenFilePath])
 
   const renameFile = async (oldFilePath: string, newFilePath: string) => {
-    await window.fileSystem.renameFileRecursive({
+    await window.fileSystem.renameFile({
       oldFilePath,
       newFilePath,
     })
@@ -348,9 +318,9 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
     const handleFileUpdate = async (updatedFiles: FileInfoTree) => {
       const sortedFiles = sortFilesAndDirectories(updatedFiles, null)
-      setFileInfoTree(sortedFiles)
+      setVaultFilesTree(sortedFiles)
       const updatedFlattenedFiles = flattenFileInfoTree(sortedFiles)
-      setFlattenedFiles(updatedFlattenedFiles)
+      setVaultFilesFlattened(updatedFlattenedFiles)
       const directoriesToBeExpanded = await findRelevantDirectoriesToBeOpened()
       setExpandedDirectories(directoriesToBeExpanded)
     }
@@ -367,17 +337,17 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const fetchAndSetFiles = async () => {
       const fetchedFiles = await window.fileSystem.getFilesTreeForWindow()
       const sortedFiles = sortFilesAndDirectories(fetchedFiles, null)
-      setFileInfoTree(sortedFiles)
+      setVaultFilesTree(sortedFiles)
       const updatedFlattenedFiles = flattenFileInfoTree(sortedFiles)
-      setFlattenedFiles(updatedFlattenedFiles)
+      setVaultFilesFlattened(updatedFlattenedFiles)
     }
 
     fetchAndSetFiles()
   }, [])
 
   const fileByFilepathValue = {
-    files: fileInfoTree,
-    flattenedFiles,
+    vaultFilesTree,
+    vaultFilesFlattened,
     expandedDirectories,
     handleDirectoryToggle,
     currentlyOpenFilePath,
@@ -395,7 +365,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     fileDirToBeRenamed,
     setFileDirToBeRenamed,
     renameFile,
-    setFileNodeToBeRenamed,
     setSuggestionsState,
     setSpellCheckEnabled,
     deleteFile,

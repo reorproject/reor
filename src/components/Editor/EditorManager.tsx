@@ -14,7 +14,7 @@ const EditorManager: React.FC = () => {
   const [showPlaceholder, setShowPlaceholder] = useState(false)
   const [writingAssistantTextPosition, setWritingAssistantTextPosition] = useState({ top: 0, left: 0 })
 
-  const { editor, suggestionsState, flattenedFiles, currentlyOpenFilePath } = useFileContext()
+  const { editor, suggestionsState, vaultFilesFlattened, currentlyOpenFilePath } = useFileContext()
   const [showDocumentStats, setShowDocumentStats] = useState(false)
   const { openContent } = useWindowContentContext()
 
@@ -170,7 +170,7 @@ const EditorManager: React.FC = () => {
       {suggestionsState && (
         <InEditorBacklinkSuggestionsDisplay
           suggestionsState={suggestionsState}
-          suggestions={flattenedFiles.map((file) => file.relativePath)}
+          suggestions={vaultFilesFlattened.map((file) => file.relativePath)}
         />
       )}
       {editor && showDocumentStats && (

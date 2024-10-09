@@ -84,7 +84,7 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
 
   ipcMain.handle('is-directory', (event, filepath: string) => fs.statSync(filepath).isDirectory())
 
-  ipcMain.handle('rename-file-recursive', async (event, renameFileProps: RenameFileProps) => {
+  ipcMain.handle('rename-file', async (event, renameFileProps: RenameFileProps) => {
     const windowInfo = windowsManager.getWindowInfoForContents(event.sender)
 
     if (!windowInfo) {

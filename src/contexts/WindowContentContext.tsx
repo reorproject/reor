@@ -12,7 +12,7 @@ interface WindowContentContextType {
   showContextMenu: ShowContextMenuInputType
   hideFocusedItem: () => void
   currentOpenFileOrChatID: string | null
-  createAndOpenNewNote: () => void
+  createUntitledNote: () => void
 }
 
 const WindowContentContext = createContext<WindowContentContextType | undefined>(undefined)
@@ -37,7 +37,12 @@ export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ ch
   const [currentOpenFileOrChatID, setCurrentOpenFileOrChatID] = useState<string | null>(null)
 
   const { setCurrentOpenChatID, allChatsMetadata, setShowChatbot, setSidebarShowing } = useChatContext()
-  const { flattenedFiles, openOrCreateFile, addToNavigationHistory, currentlyOpenFilePath } = useFileContext()
+  const {
+    vaultFilesFlattened: flattenedFiles,
+    openOrCreateFile,
+    addToNavigationHistory,
+    currentlyOpenFilePath,
+  } = useFileContext()
 
   const openContent = React.useCallback(
     async (pathOrChatID: string, optionalContentToWriteOnCreate?: string, dontUpdateChatHistory?: boolean) => {
@@ -87,7 +92,7 @@ export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ ch
     }))
   }, [setFocusedItem])
 
-  const createAndOpenUntitledNote = useCallback(async () => {
+  const createUntitledNote = useCallback(async () => {
     const directoryToMakeFileIn = currentlyOpenFilePath
       ? await window.path.dirname(currentlyOpenFilePath)
       : await window.electronStore.getVaultDirectoryForWindow()
@@ -95,7 +100,7 @@ export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ ch
     const filesInDirectory = await getFilesInDirectory(directoryToMakeFileIn, flattenedFiles)
     const fileName = getNextUntitledFilename(filesInDirectory.map((file) => file.name))
     const finalPath = await window.path.join(directoryToMakeFileIn, fileName)
-    openContent(finalPath, `# ${fileName}\n`)
+    openContent(finalPath, `## `)
     posthog.capture('created_new_note_from_new_note_modal')
   }, [currentlyOpenFilePath, flattenedFiles, openContent])
 
@@ -106,9 +111,9 @@ export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ ch
       showContextMenu,
       hideFocusedItem,
       currentOpenFileOrChatID,
-      createAndOpenNewNote: createAndOpenUntitledNote,
+      createUntitledNote,
     }),
-    [openContent, focusedItem, showContextMenu, hideFocusedItem, currentOpenFileOrChatID, createAndOpenUntitledNote],
+    [openContent, focusedItem, showContextMenu, hideFocusedItem, currentOpenFileOrChatID, createUntitledNote],
   )
 
   return <WindowContentContext.Provider value={WindowContentContextMemo}>{children}</WindowContentContext.Provider>

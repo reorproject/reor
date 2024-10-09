@@ -29,7 +29,7 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({ isOpen, onC
   const [suggestionsState, setSuggestionsState] = useState<SuggestionsState | null>()
   const [searchText, setSearchText] = useState<string>(initialFlashcardFile)
   const inputRef = useRef<HTMLInputElement>(null)
-  const { flattenedFiles } = useFileContext()
+  const { vaultFilesFlattened } = useFileContext()
 
   const initializeSuggestionsStateOnFocus = () => {
     const inputCoords = inputRef.current?.getBoundingClientRect()
@@ -112,7 +112,7 @@ Make sure you generate the flashcards in the correct format and that are relevan
           {suggestionsState && (
             <FilesSuggestionsDisplay
               suggestionsState={suggestionsState}
-              suggestions={flattenedFiles.map((file) => file.path)}
+              suggestions={vaultFilesFlattened.map((file) => file.path)}
               maxWidth="w-[800px]"
             />
           )}
