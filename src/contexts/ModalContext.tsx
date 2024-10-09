@@ -8,8 +8,6 @@ interface ModalProviderProps {
  * Every modal requires a setter and opener
  */
 interface ModalOpenContextType {
-  isNewNoteModalOpen: boolean
-  setIsNewNoteModalOpen: (newNote: boolean) => void
   isNewDirectoryModalOpen: boolean
   setIsNewDirectoryModalOpen: (newDir: boolean) => void
   isSettingsModalOpen: boolean
@@ -33,7 +31,6 @@ export const useModalOpeners = (): ModalOpenContextType => {
 }
 
 export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
-  const [isNewNoteModalOpen, setIsNewNoteModalOpen] = useState(false)
   const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
   const [isFlashcardModeOpen, setIsFlashcardModeOpen] = useState(false)
@@ -56,8 +53,6 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 
   const modalOpenContextValue = useMemo(
     () => ({
-      isNewNoteModalOpen,
-      setIsNewNoteModalOpen,
       isNewDirectoryModalOpen,
       setIsNewDirectoryModalOpen,
       isSettingsModalOpen,
@@ -70,7 +65,6 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
       setInitialFileToReviewFlashcard,
     }),
     [
-      isNewNoteModalOpen,
       isNewDirectoryModalOpen,
       isSettingsModalOpen,
       isFlashcardModeOpen,

@@ -10,18 +10,15 @@ import { HiOutlinePencilAlt } from 'react-icons/hi'
 
 import { useModalOpeners } from '../../contexts/ModalContext'
 import { useChatContext } from '@/contexts/ChatContext'
+import { useWindowContentContext } from '@/contexts/WindowContentContext'
 
 const IconsSidebar: React.FC = () => {
   const { sidebarShowing, setSidebarShowing } = useChatContext()
   const [sidebarWidth, setSidebarWidth] = useState<number>(40)
 
-  const {
-    setIsNewNoteModalOpen,
-    setIsNewDirectoryModalOpen,
-    isSettingsModalOpen,
-    setIsSettingsModalOpen,
-    setIsFlashcardModeOpen,
-  } = useModalOpeners()
+  const { setIsNewDirectoryModalOpen, isSettingsModalOpen, setIsSettingsModalOpen, setIsFlashcardModeOpen } =
+    useModalOpeners()
+  const { createAndOpenNewNote } = useWindowContentContext()
 
   useEffect(() => {
     const updateWidth = async () => {
@@ -84,7 +81,7 @@ const IconsSidebar: React.FC = () => {
       </div>
       <div
         className="flex h-8 w-full cursor-pointer items-center justify-center border-none bg-transparent "
-        onClick={() => setIsNewNoteModalOpen(true)}
+        onClick={createAndOpenNewNote}
       >
         <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
           <HiOutlinePencilAlt className="text-gray-200" color="gray" size={22} title="New Note" />

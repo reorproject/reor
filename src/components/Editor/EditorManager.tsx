@@ -14,9 +14,10 @@ const EditorManager: React.FC = () => {
   const [showPlaceholder, setShowPlaceholder] = useState(false)
   const [writingAssistantTextPosition, setWritingAssistantTextPosition] = useState({ top: 0, left: 0 })
 
-  const { editor, suggestionsState, flattenedFiles } = useFileContext()
+  const { editor, suggestionsState, flattenedFiles, currentlyOpenFilePath } = useFileContext()
   const [showDocumentStats, setShowDocumentStats] = useState(false)
   const { openContent } = useWindowContentContext()
+
   const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault()
     setMenuPosition({
@@ -121,6 +122,11 @@ const EditorManager: React.FC = () => {
       setShowPlaceholder(currentLineText === '')
     }
   }
+  useEffect(() => {
+    if (editor) {
+      editor.commands.focus()
+    }
+  }, [editor, currentlyOpenFilePath])
 
   return (
     <div

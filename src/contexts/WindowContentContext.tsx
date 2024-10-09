@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useMemo, ReactNode, useState } from 'react'
+import React, { createContext, useContext, useMemo, ReactNode, useState, useCallback } from 'react'
 
+import posthog from 'posthog-js'
 import { useChatContext } from './ChatContext'
 import { useFileContext } from './FileContext'
 import { OnShowContextMenuData, ShowContextMenuInputType } from '@/components/Common/CustomContextMenu'
@@ -10,6 +11,7 @@ interface WindowContentContextType {
   showContextMenu: ShowContextMenuInputType
   hideFocusedItem: () => void
   currentOpenFileOrChatID: string | null
+  createAndOpenNewNote: () => void
 }
 
 const WindowContentContext = createContext<WindowContentContextType | undefined>(undefined)
@@ -34,7 +36,7 @@ export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ ch
   const [currentOpenFileOrChatID, setCurrentOpenFileOrChatID] = useState<string | null>(null)
 
   const { setCurrentOpenChatID, allChatsMetadata, setShowChatbot, setSidebarShowing } = useChatContext()
-  const { openOrCreateFile, addToNavigationHistory } = useFileContext()
+  const { openOrCreateFile, addToNavigationHistory, currentlyOpenFilePath } = useFileContext()
 
   const openContent = React.useCallback(
     async (pathOrChatID: string, optionalContentToWriteOnCreate?: string, dontUpdateChatHistory?: boolean) => {
@@ -84,6 +86,27 @@ export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ ch
     }))
   }, [setFocusedItem])
 
+  const createAndOpenNewNote = useCallback(async () => {
+    let fileName = 'Untitled'
+    let index = 0
+    let directoryName = ''
+
+    if (currentlyOpenFilePath) {
+      directoryName = await window.path.dirname(currentlyOpenFilePath)
+      const files = await window.fileSystem.getAllFilenamesInDirectory(directoryName)
+      while (files.includes(`${fileName}.md`)) {
+        index += 1
+        fileName = `Untitled ${index}`
+      }
+    }
+
+    const finalPath = currentlyOpenFilePath ? await window.path.join(directoryName, fileName) : fileName
+
+    const basename = await window.path.basename(finalPath)
+    openContent(finalPath, `# ${basename}\n`)
+    posthog.capture('created_new_note_from_new_note_modal')
+  }, [currentlyOpenFilePath, openContent])
+
   const WindowContentContextMemo = useMemo(
     () => ({
       openContent,
@@ -91,8 +114,9 @@ export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ ch
       showContextMenu,
       hideFocusedItem,
       currentOpenFileOrChatID,
+      createAndOpenNewNote,
     }),
-    [openContent, focusedItem, showContextMenu, hideFocusedItem, currentOpenFileOrChatID],
+    [openContent, focusedItem, showContextMenu, hideFocusedItem, currentOpenFileOrChatID, createAndOpenNewNote],
   )
 
   return <WindowContentContext.Provider value={WindowContentContextMemo}>{children}</WindowContentContext.Provider>
