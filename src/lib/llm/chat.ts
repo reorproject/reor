@@ -3,6 +3,7 @@ import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { generateChatName } from '@shared/utils'
 import { AssistantContent, CoreAssistantMessage, CoreToolMessage, ToolCallPart } from 'ai'
 import posthog from 'posthog-js'
+import { format } from 'date-fns'
 import { AnonymizedAgentConfig, Chat, AgentConfig, PromptTemplate, ReorChatMessage } from './types'
 import { retreiveFromVectorDB } from '@/lib/db'
 
@@ -75,56 +76,58 @@ export function anonymizeAgentConfigForPosthog(
 }
 
 const generateStringOfContextItemsForPrompt = (contextItems: DBEntry[] | FileInfoWithContent[]): string => {
-  return contextItems.map((item) => item.content).join('\n\n')
+  const contextString = contextItems.map((item) => JSON.stringify(item, null, 2)).join('\n\n')
+  return `<context>${contextString}</context>`
 }
-const applyPromptTemplate = (
+
+const generateMessagesFromTemplate = (
   promptTemplate: PromptTemplate,
-  contextString: string,
   query: string,
-  results: DBEntry[] | FileInfoWithContent[],
+  contextItems: DBEntry[] | FileInfoWithContent[],
+  contextString: string,
 ): ReorChatMessage[] => {
   return promptTemplate.map((message) => {
     const replacePlaceholders = (content: string) => {
-      return content.replace('{CONTEXT}', contextString).replace('{QUERY}', query)
+      const now = new Date()
+      const today = format(now, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")
+      return content.replace('{QUERY}', query).replace('{TODAY}', today)
     }
 
     if (message.role === 'system') {
       return {
         ...message,
-        content: replacePlaceholders(message.content),
-        hideMessageInChat: true,
+        content: `${replacePlaceholders(message.content)}\n\n${contextString}`,
+        hideMessage: true,
       }
     }
+
     if (message.role === 'user') {
       return {
         ...message,
-        context: results,
+        context: contextItems,
         content: replacePlaceholders(message.content),
         visibleContent: query,
       }
     }
+
     return message
   }) as ReorChatMessage[]
 }
 
 export const doInitialRAG = async (query: string, agentConfig: AgentConfig): Promise<ReorChatMessage[]> => {
   const { promptTemplate, files } = agentConfig
+  let contextItems: DBEntry[] | FileInfoWithContent[] = []
 
-  const needsContext = promptTemplate.some((message) => message.content.includes('{CONTEXT}'))
-
-  let results: DBEntry[] | FileInfoWithContent[] = []
-  let contextString = ''
-
-  if (needsContext) {
-    if (files.length > 0) {
-      results = await window.fileSystem.getFiles(files)
-    } else if (agentConfig.dbSearchFilters) {
-      results = await retreiveFromVectorDB(query, agentConfig.dbSearchFilters)
-    }
-    contextString = generateStringOfContextItemsForPrompt(results)
+  if (files.length > 0) {
+    contextItems = await window.fileSystem.getFiles(files)
+  } else if (agentConfig.dbSearchFilters) {
+    contextItems = await retreiveFromVectorDB(query, agentConfig.dbSearchFilters)
   }
 
-  return applyPromptTemplate(promptTemplate, contextString, query, results)
+  const contextString = generateStringOfContextItemsForPrompt(contextItems)
+  const messages = generateMessagesFromTemplate(promptTemplate, query, contextItems, contextString)
+
+  return messages
 }
 
 export const generateInitialChat = async (userTextFieldInput: string, agentConfig: AgentConfig): Promise<Chat> => {
@@ -176,7 +179,7 @@ export const getClassNameBasedOnMessageRole = (message: ReorChatMessage): string
 }
 
 export const getDisplayMessage = (message: ReorChatMessage): string | undefined => {
-  if (message.hideMessageInChat) {
+  if (message.hideMessage) {
     return undefined
   }
   if (message.visibleContent !== null && message.visibleContent !== undefined && message.visibleContent !== '') {

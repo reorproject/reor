@@ -26,6 +26,7 @@ const database = {
     'delete-lance-db-entries-by-filepath',
   ),
   indexFilesInDirectory: createIPCHandler<() => Promise<void>>('index-files-in-directory'),
+  indexFileInDatabase: createIPCHandler<(filePath: string) => Promise<void>>('index-file-in-database'),
   getDatabaseFields: createIPCHandler<() => Promise<Record<string, string>>>('get-database-fields'),
 }
 
@@ -85,7 +86,6 @@ const fileSystem = {
   writeFile: createIPCHandler<(writeFileProps: WriteFileProps) => Promise<void>>('write-file'),
   isDirectory: createIPCHandler<(filePath: string) => Promise<boolean>>('is-directory'),
   renameFileRecursive: createIPCHandler<(renameFileProps: RenameFileProps) => Promise<void>>('rename-file-recursive'),
-  indexFileInDatabase: createIPCHandler<(filePath: string) => Promise<void>>('index-file-in-database'),
   createFile: createIPCHandler<(filePath: string, content: string) => Promise<void>>('create-file'),
   createDirectory: createIPCHandler<(dirPath: string) => Promise<void>>('create-directory'),
   checkFileExists: createIPCHandler<(filePath: string) => Promise<boolean>>('check-file-exists'),

@@ -18,16 +18,20 @@ interface MessageProps {
 const Message: React.FC<MessageProps> = ({ message, index, currentChat, setCurrentChat }) => {
   return (
     <>
-      {message.role === 'user' && <UserMessage key={`user-${index}`} message={message} />}
-      {message.role === 'assistant' && (
-        <AssistantMessage
-          key={`assistant-${index}`}
-          message={message}
-          setCurrentChat={setCurrentChat}
-          currentChat={currentChat}
-        />
+      {!message.hideMessage && (
+        <>
+          {message.role === 'user' && <UserMessage key={`user-${index}`} message={message} />}
+          {message.role === 'assistant' && (
+            <AssistantMessage
+              key={`assistant-${index}`}
+              message={message}
+              setCurrentChat={setCurrentChat}
+              currentChat={currentChat}
+            />
+          )}
+          {message.role === 'system' && <SystemMessage key={`system-${index}`} message={message} />}
+        </>
       )}
-      {message.role === 'system' && <SystemMessage key={`system-${index}`} message={message} />}
       {message.context && <ChatSources key={`context-${index}`} contextItems={message.context} />}
     </>
   )

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-use-before-define */
-import React, { createContext, useContext, ReactNode, useEffect, useRef, useState } from 'react'
+import React, { createContext, useContext, ReactNode, useEffect, useState } from 'react'
 import { MathExtension } from '@aarkue/tiptap-math-extension'
 import Document from '@tiptap/extension-document'
 import Paragraph from '@tiptap/extension-paragraph'
@@ -126,7 +126,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setCurrentlyChangingFilePath(true)
     await writeEditorContentToDisk(editor, currentlyOpenFilePath)
     if (currentlyOpenFilePath && needToIndexEditorContent) {
-      window.fileSystem.indexFileInDatabase(currentlyOpenFilePath)
+      window.database.indexFileInDatabase(currentlyOpenFilePath)
       setNeedToIndexEditorContent(false)
     }
     const fileContent = (await window.fileSystem.readFile(filePath)) ?? ''
@@ -139,8 +139,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const absolutePath = await createFileIfNotExists(filePath, optionalContentToWriteOnCreate)
     await loadFileIntoEditor(absolutePath)
   }
-
-  const openRelativePathRef = useRef<(newFilePath: string) => Promise<void>>()
 
   const editor = useEditor({
     autofocus: true,
@@ -187,7 +185,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         linkOnPaste: true,
         openOnClick: true,
       }),
-      BacklinkExtension(openRelativePathRef, setSuggestionsState),
+      BacklinkExtension(setSuggestionsState),
       CharacterCount,
     ],
   })
@@ -286,7 +284,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           filePath: currentlyOpenFilePath,
           content: markdown,
         })
-        await window.fileSystem.indexFileInDatabase(currentlyOpenFilePath)
+        await window.database.indexFileInDatabase(currentlyOpenFilePath)
       }
     }
 

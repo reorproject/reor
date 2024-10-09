@@ -4,8 +4,8 @@ import { DBEntry } from 'electron/main/vector-database/schema'
 
 export type ReorChatMessage = CoreMessage & {
   context?: DBEntry[] | FileInfoWithContent[]
+  hideMessage?: boolean
   visibleContent?: string
-  hideMessageInChat?: boolean
 }
 
 type ParameterType = 'string' | 'number' | 'boolean'
@@ -13,12 +13,14 @@ type ParameterType = 'string' | 'number' | 'boolean'
 type ToolParameter = {
   name: string
   type: ParameterType
+  optional?: boolean
   defaultValue?: string | number | boolean
   description: string
 }
 
 export type ToolDefinition = {
   name: string
+  displayName?: string
   description: string
   parameters: ToolParameter[]
   autoExecute?: boolean

@@ -3,6 +3,7 @@ import { retreiveFromVectorDB } from '@/lib/db'
 
 export const searchToolDefinition: ToolDefinition = {
   name: 'search',
+  displayName: 'Search',
   description: "Semantically search the user's personal knowledge base",
   parameters: [
     {
@@ -16,18 +17,31 @@ export const searchToolDefinition: ToolDefinition = {
       defaultValue: 20,
       description: 'The number of results to return',
     },
+    {
+      name: 'minDate',
+      type: 'string',
+      optional: true,
+      description: 'The minimum date of the notes to search for. Please use ISO 8601 format: YYYY-MM-DDTHH:mm:ss.sssZ',
+    },
+    {
+      name: 'maxDate',
+      type: 'string',
+      optional: true,
+      description: 'The maximum date of the notes to search for. Please use ISO 8601 format: YYYY-MM-DDTHH:mm:ss.sssZ',
+    },
   ],
   autoExecute: true,
 }
 
 export const createNoteToolDefinition: ToolDefinition = {
   name: 'createNote',
-  description: "Create a new note in the user's personal knowledge base",
+  displayName: 'Create Note',
+  description: "Create a new note in the user's personal knowledge base.",
   parameters: [
     {
       name: 'filename',
       type: 'string',
-      description: 'The filename of the note',
+      description: 'The filename of the note. Do not include the file extension.',
     },
     {
       name: 'content',
@@ -39,6 +53,7 @@ export const createNoteToolDefinition: ToolDefinition = {
 
 export const createDirectoryToolDefinition: ToolDefinition = {
   name: 'createDirectory',
+  displayName: 'Create Directory',
   description: "Create a new directory in the user's personal knowledge base",
   parameters: [
     {
@@ -51,6 +66,7 @@ export const createDirectoryToolDefinition: ToolDefinition = {
 
 const readFileToolDefinition: ToolDefinition = {
   name: 'readFile',
+  displayName: 'Read File',
   description: "Read a file from the user's personal knowledge base",
   parameters: [
     {
@@ -63,6 +79,7 @@ const readFileToolDefinition: ToolDefinition = {
 
 export const deleteNoteToolDefinition: ToolDefinition = {
   name: 'deleteNote',
+  displayName: 'Delete Note',
   description: "Delete a note from the user's personal knowledge base",
   parameters: [
     {
@@ -75,7 +92,9 @@ export const deleteNoteToolDefinition: ToolDefinition = {
 
 export const editNoteToolDefinition: ToolDefinition = {
   name: 'editNote',
-  description: "Edit a note in the user's personal knowledge base",
+  displayName: 'Edit Note',
+  description:
+    "Edit a note in the user's personal knowledge base. You must provide the full note content as the new content.",
   parameters: [
     {
       name: 'filename',
@@ -92,6 +111,7 @@ export const editNoteToolDefinition: ToolDefinition = {
 
 export const appendToNoteToolDefinition: ToolDefinition = {
   name: 'appendToNote',
+  displayName: 'Append to Note',
   description: "Append to a note in the user's personal knowledge base",
   parameters: [
     {
@@ -109,6 +129,7 @@ export const appendToNoteToolDefinition: ToolDefinition = {
 
 export const listFilesToolDefinition: ToolDefinition = {
   name: 'listFiles',
+  displayName: 'List Files',
   description: "List all files in the user's personal knowledge base",
   parameters: [],
 }
@@ -131,8 +152,8 @@ type ToolFunctionMap = {
 }
 
 export const toolNamesToFunctions: ToolFunctionMap = {
-  search: async (query: string, limit: number): Promise<any[]> => {
-    const results = await retreiveFromVectorDB(query, { limit, passFullNoteIntoContext: true })
+  search: async (query: string, limit: number, minDate: Date, maxDate: Date): Promise<any[]> => {
+    const results = await retreiveFromVectorDB(query, { limit, minDate, maxDate, passFullNoteIntoContext: true })
     return results
   },
   createNote: async (filename: string, content: string): Promise<string> => {
