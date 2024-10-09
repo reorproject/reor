@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import posthog from 'posthog-js'
 import { IoMdArrowRoundBack, IoMdArrowRoundForward } from 'react-icons/io'
 
-import { removeFileExtension } from '@/lib/strings'
+import { removeFileExtension } from '@/lib/file'
 import '../../styles/history.scss'
 import { useFileContext } from '@/contexts/FileContext'
 import { useContentContext } from '@/contexts/ContentContext'

@@ -19,7 +19,7 @@ import { toast } from 'react-toastify'
 import { Markdown } from 'tiptap-markdown'
 import { useDebounce } from 'use-debounce'
 import { FileInfo, FileInfoTree } from 'electron/main/filesystem/types'
-import { getInvalidCharacterInFilePath } from '@/lib/strings'
+import { flattenFileInfoTree, getInvalidCharacterInFilePath, sortFilesAndDirectories } from '@/lib/file'
 import { BacklinkExtension } from '@/components/Editor/BacklinkExtension'
 import { SuggestionsState } from '@/components/Editor/BacklinkSuggestionsDisplay'
 import HighlightExtension, { HighlightData } from '@/components/Editor/HighlightExtension'
@@ -29,7 +29,6 @@ import SearchAndReplace from '@/components/Editor/Search/SearchAndReplaceExtensi
 import getMarkdown from '@/components/Editor/utils'
 import welcomeNote from '@/components/File/utils'
 import useOrderedSet from './hooks/use-ordered-set'
-import flattenFileInfoTree, { sortFilesAndDirectories } from '@/lib/file'
 
 type FileContextType = {
   vaultFilesTree: FileInfoTree
@@ -240,6 +239,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [editor, currentlyOpenFilePath])
 
   const renameFile = async (oldFilePath: string, newFilePath: string) => {
+    // yeah so we could either have it be on the file itself or
     await window.fileSystem.renameFile({
       oldFilePath,
       newFilePath,

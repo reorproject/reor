@@ -106,6 +106,7 @@ const path = {
     'add-extension-if-no-extension-present',
   ),
   pathSep: createIPCHandler<() => Promise<string>>('path-sep'),
+  extName: createIPCHandler<(pathString: string) => Promise<string>>('path-ext-name'),
 }
 
 const llm = {
