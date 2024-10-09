@@ -5,7 +5,6 @@ const path = require("path");
 const AdmZip = require("adm-zip");
 const tar = require('tar');
 
-// Mapping of OS to binary info
 const binariesInfo = {
   darwin: {
     url: "https://github.com/ollama/ollama/releases/download/v0.3.12/ollama-darwin",
@@ -55,6 +54,28 @@ function removeDirectory(dirPath) {
     });
     fs.rmdirSync(dirPath);
   }
+}
+
+function cleanupNonGPUFiles(platformKey, extractPath) {
+  if (platformKey === 'win32') {
+    const filesToKeep = ['ollama.exe', path.join('lib', 'ollama', 'runners', 'cpu')];
+    fs.readdirSync(extractPath).forEach((file) => {
+      const filePath = path.join(extractPath, file);
+      if (!filesToKeep.some(keep => filePath.includes(keep))) {
+        if (fs.lstatSync(filePath).isDirectory()) {
+          removeDirectory(filePath);
+        } else {
+          fs.unlinkSync(filePath);
+        }
+      }
+    });
+  } else if (platformKey === 'linux') {
+    const binPath = path.join(extractPath, 'bin');
+    if (fs.existsSync(binPath)) {
+      removeDirectory(binPath);
+    }
+  }
+  console.log(`Cleaned up non-GPU files for ${platformKey}`);
 }
 
 function downloadAndExtractArchive(fileUrl, extractPath, archiveType, binaryName, redirectCount = 0, timeout = 1000000) {
@@ -113,19 +134,6 @@ function downloadAndExtractArchive(fileUrl, extractPath, archiveType, binaryName
                   console.error(`Failed to delete temporary file ${tempPath}: ${unlinkError.message}`);
                 }
                 console.log('Extraction completed');
-
-                // Windows-specific cleanup
-                if (process.platform === 'win32') {
-                  console.log('Performing Windows-specific cleanup...');
-                  const cudaPath = path.join(extractPath, 'cuda');
-                  const rocmPath = path.join(extractPath, 'rocm');
-                  
-                  removeDirectory(cudaPath);
-                  removeDirectory(rocmPath);
-                  
-                  console.log('Cleanup completed');
-                }
-
                 resolve();
               });
             } catch (error) {
@@ -199,23 +207,34 @@ async function downloadIfMissing(platformKey) {
       }
     } catch (error) {
       console.error(`Error processing ${platformKey} binary:`, error.message);
-      throw error; // Re-throw the error to be caught by the caller
+      throw error;
     }
   }
 }
 
 async function main() {
   const platform = os.platform();
+  const useGPU = process.argv.includes("--gpu");
   try {
-    if (process.argv[2] === "all") {
-      await Promise.all(Object.keys(binariesInfo).map(downloadIfMissing));
+    if (process.argv.includes("all")) {
+      await Promise.all(Object.keys(binariesInfo).map(key => downloadIfMissing(key)));
+      if (!useGPU) {
+        Object.keys(binariesInfo).forEach(key => {
+          const directoryPath = path.join(__dirname, binariesInfo[key].path);
+          cleanupNonGPUFiles(key, directoryPath);
+        });
+      }
     } else {
       await downloadIfMissing(platform);
+      if (!useGPU) {
+        const directoryPath = path.join(__dirname, binariesInfo[platform].path);
+        cleanupNonGPUFiles(platform, directoryPath);
+      }
     }
     console.log("All operations completed successfully");
   } catch (error) {
     console.error("An error occurred during the process:", error.message);
-    process.exit(1); // Exit with an error code
+    process.exit(1);
   }
 }
 
