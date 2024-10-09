@@ -4,7 +4,7 @@ import { RiChatNewFill, RiArrowDownSLine } from 'react-icons/ri'
 import { IoChatbubbles } from 'react-icons/io5'
 import posthog from 'posthog-js'
 import { useChatContext } from '@/contexts/ChatContext'
-import { useWindowContentContext } from '@/contexts/ContentContext'
+import { useContentContext } from '@/contexts/ContentContext'
 import { ChatMetadata } from '../../lib/llm/types'
 
 export interface ChatItemProps {
@@ -13,7 +13,7 @@ export interface ChatItemProps {
 
 export const ChatItem: React.FC<ChatItemProps> = ({ chatMetadata }) => {
   const { currentOpenChatID } = useChatContext()
-  const { openContent, showContextMenu } = useWindowContentContext()
+  const { openContent, showContextMenu } = useContentContext()
 
   const itemClasses = `
     flex items-center cursor-pointer py-2 px-3 rounded-md

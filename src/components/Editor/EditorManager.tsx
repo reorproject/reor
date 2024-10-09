@@ -4,7 +4,7 @@ import InEditorBacklinkSuggestionsDisplay from './BacklinkSuggestionsDisplay'
 import EditorContextMenu from './EditorContextMenu'
 import SearchBar from './Search/SearchBar'
 import { useFileContext } from '@/contexts/FileContext'
-import { useWindowContentContext } from '@/contexts/ContentContext'
+import { useContentContext } from '@/contexts/ContentContext'
 
 const EditorManager: React.FC = () => {
   const [showSearchBar, setShowSearchBar] = useState(false)
@@ -16,7 +16,7 @@ const EditorManager: React.FC = () => {
 
   const { editor, suggestionsState, vaultFilesFlattened, currentlyOpenFilePath } = useFileContext()
   const [showDocumentStats, setShowDocumentStats] = useState(false)
-  const { openContent } = useWindowContentContext()
+  const { openContent } = useContentContext()
 
   const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault()

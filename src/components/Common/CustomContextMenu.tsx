@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react'
 import { useFileContext } from '@/contexts/FileContext'
 import { useChatContext } from '@/contexts/ChatContext'
 import { useModalOpeners } from '@/contexts/ModalContext'
-import { useWindowContentContext } from '@/contexts/ContentContext'
+import { useContentContext } from '@/contexts/ContentContext'
 import { ChatMetadata } from '../../lib/llm/types'
 
 export type ContextMenuLocations = 'FileSidebar' | 'FileItem' | 'ChatItem' | 'DirectoryItem' | 'None'
@@ -36,7 +36,7 @@ interface MenuItemType {
 }
 
 const CustomContextMenu: React.FC = () => {
-  const { focusedItem, hideFocusedItem, createUntitledNote } = useWindowContentContext()
+  const { focusedItem, hideFocusedItem, createUntitledNote } = useContentContext()
   const { currentSelection, position, file, chatMetadata } = focusedItem
   const menuRef = useRef<HTMLDivElement>(null)
 

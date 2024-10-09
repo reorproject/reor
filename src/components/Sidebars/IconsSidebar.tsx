@@ -10,7 +10,7 @@ import { HiOutlinePencilAlt } from 'react-icons/hi'
 
 import { useModalOpeners } from '../../contexts/ModalContext'
 import { useChatContext } from '@/contexts/ChatContext'
-import { useWindowContentContext } from '@/contexts/ContentContext'
+import { useContentContext } from '@/contexts/ContentContext'
 
 const IconsSidebar: React.FC = () => {
   const { sidebarShowing, setSidebarShowing } = useChatContext()
@@ -18,7 +18,7 @@ const IconsSidebar: React.FC = () => {
 
   const { setIsNewDirectoryModalOpen, isSettingsModalOpen, setIsSettingsModalOpen, setIsFlashcardModeOpen } =
     useModalOpeners()
-  const { createUntitledNote } = useWindowContentContext()
+  const { createUntitledNote } = useContentContext()
 
   useEffect(() => {
     const updateWidth = async () => {

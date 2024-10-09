@@ -7,14 +7,14 @@ import { isFileNodeDirectory } from '@shared/utils'
 import { useFileContext } from '@/contexts/FileContext'
 import { moveFile } from '../../../lib/file'
 import { removeFileExtension } from '@/lib/strings'
-import { useWindowContentContext } from '@/contexts/ContentContext'
+import { useContentContext } from '@/contexts/ContentContext'
 
 const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data }) => {
   const { visibleItems } = data
   const fileObject = visibleItems[index]
 
   const { handleDirectoryToggle, expandedDirectories, currentlyOpenFilePath } = useFileContext()
-  const { openContent, showContextMenu } = useWindowContentContext()
+  const { openContent, showContextMenu } = useContentContext()
 
   const [isDragOver, setIsDragOver] = useState(false)
 

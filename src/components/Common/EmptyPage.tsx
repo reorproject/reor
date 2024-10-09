@@ -1,11 +1,11 @@
 import React from 'react'
 import { ImFileEmpty } from 'react-icons/im'
 import { useModalOpeners } from '../../contexts/ModalContext'
-import { useWindowContentContext } from '@/contexts/ContentContext'
+import { useContentContext } from '@/contexts/ContentContext'
 
 const EmptyPage: React.FC = () => {
   const { setIsNewDirectoryModalOpen } = useModalOpeners()
-  const { createUntitledNote } = useWindowContentContext()
+  const { createUntitledNote } = useContentContext()
 
   return (
     <div className="absolute flex size-full flex-col items-center justify-center overflow-hidden pb-40 text-white">
