@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef, useState } from 'react'
 
 import { Button } from '@material-tailwind/react'
 import { CircularProgress } from '@mui/material'
@@ -12,8 +12,8 @@ import FilesSuggestionsDisplay, { SuggestionsState } from '../Editor/BacklinkSug
 import FlashcardCore from './FlashcardsCore'
 import { FlashcardQAPairSchema, FlashcardQAPairUI } from './types'
 import { storeFlashcardPairsAsJSON } from './utils'
-import useFileInfoTreeHook from '../Sidebars/FileSideBar/hooks/use-file-info-tree'
 import resolveLLMClient from '@/lib/llm/client'
+import { useFileContext } from '@/contexts/FileContext'
 
 interface FlashcardCreateModalProps {
   isOpen: boolean
@@ -26,13 +26,10 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({ isOpen, onC
   const [isLoadingFlashcards, setIsLoadingFlashcards] = useState<boolean>(false)
   const [currentSelectedFlashcard, setCurrentSelectedFlashcard] = useState<number>(0)
   const [selectedFile, setSelectedFile] = useState<string>(initialFlashcardFile)
-  const [vaultDirectory, setVaultDirectory] = useState<string>('')
-
-  const { flattenedFiles } = useFileInfoTreeHook(vaultDirectory)
   const [suggestionsState, setSuggestionsState] = useState<SuggestionsState | null>()
-
   const [searchText, setSearchText] = useState<string>(initialFlashcardFile)
   const inputRef = useRef<HTMLInputElement>(null)
+  const { flattenedFiles } = useFileContext()
 
   const initializeSuggestionsStateOnFocus = () => {
     const inputCoords = inputRef.current?.getBoundingClientRect()
@@ -55,7 +52,6 @@ const FlashcardCreateModal: React.FC<FlashcardCreateModalProps> = ({ isOpen, onC
     })
   }
 
-  // handle the creation process
   const createFlashcardsFromFile = async (): Promise<void> => {
     posthog.capture('create_flashcard_from_file')
     const llmName = await window.llm.getDefaultLLMName()
@@ -91,15 +87,6 @@ Make sure you generate the flashcards in the correct format and that are relevan
 
     storeFlashcardPairsAsJSON(flashcardUIPairs, selectedFile)
   }
-
-  // find all available files
-  useEffect(() => {
-    const setFileDirectory = async () => {
-      const windowDirectory = await window.electronStore.getVaultDirectoryForWindow()
-      setVaultDirectory(windowDirectory)
-    }
-    setFileDirectory()
-  }, [])
 
   return (
     <ReorModal isOpen={isOpen} onClose={onClose}>

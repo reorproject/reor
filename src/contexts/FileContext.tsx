@@ -18,20 +18,24 @@ import CharacterCount from '@tiptap/extension-character-count'
 import { toast } from 'react-toastify'
 import { Markdown } from 'tiptap-markdown'
 import { useDebounce } from 'use-debounce'
-import useFileInfoTreeHook from '@/components/Sidebars/FileSideBar/hooks/use-file-info-tree'
+import { FileInfo, FileInfoTree } from 'electron/main/filesystem/types'
 import { generateFileName, getInvalidCharacterInFilePath } from '@/lib/strings'
 import { BacklinkExtension } from '@/components/Editor/BacklinkExtension'
 import { SuggestionsState } from '@/components/Editor/BacklinkSuggestionsDisplay'
 import HighlightExtension, { HighlightData } from '@/components/Editor/HighlightExtension'
 import { RichTextLink } from '@/components/Editor/RichTextLink'
-// import 'katex/dist/katex.min.css'
 import '@/styles/tiptap.scss'
 import SearchAndReplace from '@/components/Editor/Search/SearchAndReplaceExtension'
 import getMarkdown from '@/components/Editor/utils'
 import welcomeNote from '@/components/File/utils'
 import useOrderedSet from './hooks/use-ordered-set'
+import flattenFileInfoTree, { sortFilesAndDirectories } from '@/components/Sidebars/FileSideBar/utils'
 
 type FileContextType = {
+  files: FileInfoTree
+  flattenedFiles: FileInfo[]
+  expandedDirectories: Map<string, boolean>
+  handleDirectoryToggle: (path: string) => void
   currentlyOpenFilePath: string | null
   setCurrentlyOpenFilePath: React.Dispatch<React.SetStateAction<string | null>>
   saveCurrentlyOpenedFile: () => Promise<void>
@@ -50,7 +54,7 @@ type FileContextType = {
   setSuggestionsState: React.Dispatch<React.SetStateAction<SuggestionsState | null | undefined>>
   setSpellCheckEnabled: React.Dispatch<React.SetStateAction<boolean>>
   deleteFile: (path: string | undefined) => Promise<boolean>
-} & ReturnType<typeof useFileInfoTreeHook>
+}
 
 export const FileContext = createContext<FileContextType | undefined>(undefined)
 
@@ -63,6 +67,9 @@ export const useFileContext = () => {
 }
 
 export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [fileInfoTree, setFileInfoTree] = useState<FileInfoTree>([])
+  const [flattenedFiles, setFlattenedFiles] = useState<FileInfo[]>([])
+  const [expandedDirectories, setExpandedDirectories] = useState<Map<string, boolean>>(new Map())
   const [currentlyOpenFilePath, setCurrentlyOpenFilePath] = useState<string | null>(null)
   const [suggestionsState, setSuggestionsState] = useState<SuggestionsState | null>()
   const [needToWriteEditorContentToDisk, setNeedToWriteEditorContentToDisk] = useState<boolean>(false)
@@ -70,7 +77,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [spellCheckEnabled, setSpellCheckEnabled] = useState<boolean>(false)
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>('')
   const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>('')
-  // const [navigationHistory, setNavigationHistory] = useState<Set<string>>(new Set())
   const [currentlyChangingFilePath, setCurrentlyChangingFilePath] = useState(false)
   const [highlightData, setHighlightData] = useState<HighlightData>({
     text: '',
@@ -263,7 +269,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     checkAppUsage()
   }, [editor, currentlyOpenFilePath])
 
-  const renameFileNode = async (oldFilePath: string, newFilePath: string) => {
+  const renameFile = async (oldFilePath: string, newFilePath: string) => {
     await window.fileSystem.renameFileRecursive({
       oldFilePath,
       newFilePath,
@@ -305,7 +311,78 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return true
   }
 
+  // const fileInfoTreeValue = useFileInfoTreeHook(currentlyOpenFilePath)
+
+  const handleDirectoryToggle = (path: string) => {
+    const isExpanded = expandedDirectories.get(path)
+    const newExpandedDirectories = new Map(expandedDirectories)
+    newExpandedDirectories.set(path, !isExpanded)
+    setExpandedDirectories(newExpandedDirectories)
+  }
+
+  // upon indexing, update the file info tree and expand relevant directories
+  useEffect(() => {
+    const findRelevantDirectoriesToBeOpened = async () => {
+      if (currentlyOpenFilePath === null) {
+        return expandedDirectories
+      }
+
+      const pathSep = await window.path.pathSep()
+      const isAbsolute = await window.path.isAbsolute(currentlyOpenFilePath)
+
+      const currentPath = isAbsolute ? '' : '.'
+      const newExpandedDirectories = new Map(expandedDirectories)
+
+      const pathSegments = currentlyOpenFilePath.split(pathSep).filter((segment) => segment !== '')
+
+      pathSegments.pop()
+
+      const updatedPath = pathSegments.reduce(async (pathPromise, segment) => {
+        const path = await pathPromise
+        const newPath = await window.path.join(path, segment)
+        newExpandedDirectories.set(newPath, true)
+        return newPath
+      }, Promise.resolve(currentPath))
+
+      await updatedPath
+
+      return newExpandedDirectories
+    }
+
+    const handleFileUpdate = async (updatedFiles: FileInfoTree) => {
+      const sortedFiles = sortFilesAndDirectories(updatedFiles, null)
+      setFileInfoTree(sortedFiles)
+      const updatedFlattenedFiles = flattenFileInfoTree(sortedFiles)
+      setFlattenedFiles(updatedFlattenedFiles)
+      const directoriesToBeExpanded = await findRelevantDirectoriesToBeOpened()
+      setExpandedDirectories(directoriesToBeExpanded)
+    }
+
+    const removeFilesListListener = window.ipcRenderer.receive('files-list', handleFileUpdate)
+
+    return () => {
+      removeFilesListListener()
+    }
+  }, [currentlyOpenFilePath, expandedDirectories])
+
+  // initial load of files
+  useEffect(() => {
+    const fetchAndSetFiles = async () => {
+      const fetchedFiles = await window.fileSystem.getFilesTreeForWindow()
+      const sortedFiles = sortFilesAndDirectories(fetchedFiles, null)
+      setFileInfoTree(sortedFiles)
+      const updatedFlattenedFiles = flattenFileInfoTree(sortedFiles)
+      setFlattenedFiles(updatedFlattenedFiles)
+    }
+
+    fetchAndSetFiles()
+  }, [])
+
   const fileByFilepathValue = {
+    files: fileInfoTree,
+    flattenedFiles,
+    expandedDirectories,
+    handleDirectoryToggle,
     currentlyOpenFilePath,
     setCurrentlyOpenFilePath,
     saveCurrentlyOpenedFile,
@@ -320,21 +397,18 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setNoteToBeRenamed,
     fileDirToBeRenamed,
     setFileDirToBeRenamed,
-    renameFile: renameFileNode,
+    renameFile,
     setFileNodeToBeRenamed,
     setSuggestionsState,
     setSpellCheckEnabled,
     deleteFile,
   }
 
-  const fileInfoTreeValue = useFileInfoTreeHook(currentlyOpenFilePath)
-
   const combinedContextValue: FileContextType = React.useMemo(
     () => ({
       ...fileByFilepathValue,
-      ...fileInfoTreeValue,
     }),
-    [fileByFilepathValue, fileInfoTreeValue],
+    [fileByFilepathValue],
   )
 
   return <FileContext.Provider value={combinedContextValue}>{children}</FileContext.Provider>
