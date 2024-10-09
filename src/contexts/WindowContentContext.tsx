@@ -86,7 +86,7 @@ export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ ch
     }))
   }, [setFocusedItem])
 
-  const createAndOpenNewNote = useCallback(async () => {
+  const createAndOpenUntitledNote = useCallback(async () => {
     let fileName = 'Untitled'
     let index = 0
     let directoryName = ''
@@ -114,9 +114,9 @@ export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ ch
       showContextMenu,
       hideFocusedItem,
       currentOpenFileOrChatID,
-      createAndOpenNewNote,
+      createAndOpenNewNote: createAndOpenUntitledNote,
     }),
-    [openContent, focusedItem, showContextMenu, hideFocusedItem, currentOpenFileOrChatID, createAndOpenNewNote],
+    [openContent, focusedItem, showContextMenu, hideFocusedItem, currentOpenFileOrChatID, createAndOpenUntitledNote],
   )
 
   return <WindowContentContext.Provider value={WindowContentContextMemo}>{children}</WindowContentContext.Provider>

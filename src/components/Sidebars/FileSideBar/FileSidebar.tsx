@@ -12,7 +12,7 @@ interface FileExplorerProps {
   lheight?: number
 }
 
-const FileExplorer: React.FC<FileExplorerProps> = ({ lheight }) => {
+const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
   const [listHeight, setListHeight] = useState(lheight ?? window.innerHeight - 50)
   const { files, expandedDirectories } = useFileContext()
   const { showContextMenu: handleFocusedItem } = useWindowContentContext()
@@ -68,4 +68,4 @@ const FileExplorer: React.FC<FileExplorerProps> = ({ lheight }) => {
   )
 }
 
-export default FileExplorer
+export default FileSidebar
