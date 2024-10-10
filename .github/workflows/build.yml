@@ -16,8 +16,9 @@ jobs:
           - os: windows-latest
             build_type: [cpu, gpu]
           - os: ubuntu-latest
-            arch: x64
-            build_type: [cpu, gpu]
+            build_type: cpu
+          - os: ubuntu-latest
+            build_type: gpu
       fail-fast: false
     continue-on-error: true
     runs-on: ${{ matrix.os }}
