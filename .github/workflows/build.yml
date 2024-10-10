@@ -14,8 +14,10 @@ jobs:
           - os: macos-13
           - os: macos-latest
           - os: windows-latest
+            build_type: [cpu, gpu]
           - os: ubuntu-latest
             arch: x64
+            build_type: [cpu, gpu]
       fail-fast: false
     continue-on-error: true
     runs-on: ${{ matrix.os }}
@@ -54,10 +56,18 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           npm run build
-      - name: Build for non-macOS
-        if: matrix.os != 'macos-13' && matrix.os != 'macos-latest'
-        run: |
-          npm run build
+      - name: Build for Windows CPU
+        if: matrix.os == 'windows-latest' && matrix.build_type == 'cpu'
+        run: npm run build:win-cpu
+      - name: Build for Windows GPU
+        if: matrix.os == 'windows-latest' && matrix.build_type == 'gpu'
+        run: npm run build:win-gpu
+      - name: Build for Linux CPU
+        if: matrix.os == 'ubuntu-latest' && matrix.build_type == 'cpu'
+        run: npm run build:linux-cpu
+      - name: Build for Linux GPU
+        if: matrix.os == 'ubuntu-latest' && matrix.build_type == 'gpu'
+        run: npm run build:linux-gpu
       - name: Notarize macOS build
         if: (matrix.os == 'macos-13' || matrix.os == 'macos-latest') && github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         env:
@@ -86,7 +96,7 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.os }}-app
+          name: ${{ matrix.os }}-${{ matrix.build_type }}-app
           path: |
             ./release/*/*.exe
             ./release/${{ env.APP_VERSION }}/**/*.AppImage

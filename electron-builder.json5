@@ -18,7 +18,7 @@
     ],
   },
   win: {
-    artifactName: "${productName}_${version}.${ext}",
+    artifactName: "${productName}_${version}_${arch}_${env.BUILD_TYPE}.${ext}",
     asarUnpack: ["**/*.{node,dll,metal,exp,lib}"],
     target: [
       {
@@ -30,7 +30,7 @@
       {
         from: "./binaries/win32/",
         to: "binaries",
-        filter: ["**/*"],
+        filter: ["${env.WIN_BINARY_FILTER}"],
       },
     ],
   },
@@ -41,11 +41,12 @@
     deleteAppDataOnUninstall: false,
   },
   linux: {
-    artifactName: "${productName}_${version}.${ext}",
+    artifactName: "${productName}_${version}_${arch}_${env.BUILD_TYPE}.${ext}",
     asarUnpack: ["**/node_modules/sharp/**"],
     target: [
       {
         target: "AppImage",
+        arch: ["x64"]
       },
     ],
     category: "Utility",
@@ -55,7 +56,7 @@
       {
         from: "./binaries/linux/",
         to: "binaries",
-        filter: ["**/*"],
+        filter: ["${env.LINUX_BINARY_FILTER}"],
       },
     ],
   },
