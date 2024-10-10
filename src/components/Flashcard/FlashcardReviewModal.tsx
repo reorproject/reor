@@ -54,7 +54,6 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({ isOpen, onC
               setCurrentSelectedFlashcard(0)
               setSelectedFlashcardFile(value)
             }}
-            // className="w-full"
           />
         </div>
 
@@ -64,6 +63,7 @@ const FlashcardReviewModal: React.FC<FlashcardReviewModalProps> = ({ isOpen, onC
           setFlashcardQAPairs={setFlashcardQAPairs}
           currentSelectedFlashcard={currentSelectedFlashcard}
           setCurrentSelectedFlashcard={setCurrentSelectedFlashcard}
+          selectedFlashcardFile={selectedFlashcardFile}
         />
       </div>
     </ReorModal>

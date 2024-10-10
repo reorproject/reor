@@ -6,6 +6,7 @@ import posthog from 'posthog-js'
 import { TypeAnimation } from 'react-type-animation'
 
 import { generateObject } from 'ai'
+import { createEmptyCard, Card } from 'ts-fsrs'
 import ReorModal from '../Common/Modal'
 import FilesSuggestionsDisplay, { SuggestionsState } from '../Editor/BacklinkSuggestionsDisplay'
 
@@ -84,12 +85,19 @@ Make sure you generate the flashcards in the correct format and that are relevan
       ],
     })
 
-    // so we'll need to display the error here if there is one:
     const flashcardUIPairs = FlashcardQAPairSchema.array().parse(object) as FlashcardQAPairUI[]
-    setFlashcardQAPairs(flashcardUIPairs)
+
+    const newCard: Card = createEmptyCard()
+    const initializedFlashcards = flashcardUIPairs.map((card) => ({
+      ...card,
+      fsrsState: newCard,
+      isFlipped: false,
+    }))
+
+    setFlashcardQAPairs(initializedFlashcards)
     setIsLoadingFlashcards(false)
 
-    storeFlashcardPairsAsJSON(flashcardUIPairs, selectedFile)
+    storeFlashcardPairsAsJSON(initializedFlashcards, selectedFile)
   }
 
   // find all available files
@@ -158,6 +166,7 @@ Make sure you generate the flashcards in the correct format and that are relevan
           setFlashcardQAPairs={setFlashcardQAPairs}
           currentSelectedFlashcard={currentSelectedFlashcard}
           setCurrentSelectedFlashcard={setCurrentSelectedFlashcard}
+          selectedFlashcardFile={selectedFile}
         />
         <div className="flex justify-end">
           {selectedFile && (
