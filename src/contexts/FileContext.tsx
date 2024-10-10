@@ -19,7 +19,14 @@ import { toast } from 'react-toastify'
 import { Markdown } from 'tiptap-markdown'
 import { useDebounce } from 'use-debounce'
 import { FileInfo, FileInfoTree } from 'electron/main/filesystem/types'
-import { flattenFileInfoTree, getInvalidCharacterInFilePath, sortFilesAndDirectories } from '@/lib/file'
+import {
+  flattenFileInfoTree,
+  generateFileNameFromFileContent,
+  getFilesInDirectory,
+  getInvalidCharacterInFilePath,
+  getNextAvailableFileNameGivenBaseName,
+  sortFilesAndDirectories,
+} from '@/lib/file'
 import { BacklinkExtension } from '@/components/Editor/BacklinkExtension'
 import { SuggestionsState } from '@/components/Editor/BacklinkSuggestionsDisplay'
 import HighlightExtension, { HighlightData } from '@/components/Editor/HighlightExtension'
@@ -220,7 +227,28 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         })
         setNeedToWriteEditorContentToDisk(false)
       }
-      // interesting...Maybe after writing the content, we could rename the file...? If it meets the criteria for a rename...I.e. file modified in last minutes and contains Untitled...
+
+      const fileInfo = vaultFilesFlattened.find((f) => f.path === filePath)
+      if (
+        fileInfo &&
+        fileInfo.name.startsWith('Untitled') &&
+        new Date().getTime() - fileInfo.dateCreated.getTime() < 60000
+      ) {
+        const editorText = editor?.getText()
+        if (editorText) {
+          const newProposedFileName = generateFileNameFromFileContent(editorText)
+          if (newProposedFileName) {
+            const directoryToMakeFileIn = await window.path.dirname(filePath)
+            const filesInDirectory = await getFilesInDirectory(directoryToMakeFileIn, vaultFilesFlattened)
+            const fileName = getNextAvailableFileNameGivenBaseName(
+              filesInDirectory.map((file) => file.name),
+              newProposedFileName,
+            )
+            const newFilePath = await window.path.join(directoryToMakeFileIn, fileName)
+            await renameFile(filePath, newFilePath)
+          }
+        }
+      }
     }
   }
 
@@ -239,7 +267,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }, [editor, currentlyOpenFilePath])
 
   const renameFile = async (oldFilePath: string, newFilePath: string) => {
-    // yeah so we could either have it be on the file itself or
     await window.fileSystem.renameFile({
       oldFilePath,
       newFilePath,

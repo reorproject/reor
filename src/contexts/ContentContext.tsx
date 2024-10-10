@@ -4,7 +4,7 @@ import posthog from 'posthog-js'
 import { useChatContext } from './ChatContext'
 import { useFileContext } from './FileContext'
 import { OnShowContextMenuData, ShowContextMenuInputType } from '@/components/Common/CustomContextMenu'
-import { getFilesInDirectory, getNextUntitledFilename } from '@/lib/file'
+import { getFilesInDirectory, getNextAvailableFileNameGivenBaseName } from '@/lib/file'
 
 interface ContentContextType {
   openContent: (pathOrChatID: string, optionalContentToWriteOnCreate?: string, dontUpdateChatHistory?: boolean) => void
@@ -98,7 +98,10 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
       : await window.electronStore.getVaultDirectoryForWindow()
 
     const filesInDirectory = await getFilesInDirectory(directoryToMakeFileIn, flattenedFiles)
-    const fileName = getNextUntitledFilename(filesInDirectory.map((file) => file.name))
+    const fileName = getNextAvailableFileNameGivenBaseName(
+      filesInDirectory.map((file) => file.name),
+      'Untitled',
+    )
     const finalPath = await window.path.join(directoryToMakeFileIn, fileName)
     openContent(finalPath, `## `)
     posthog.capture('created_new_note_from_new_note_modal')

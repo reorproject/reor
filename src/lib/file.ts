@@ -1,5 +1,6 @@
 import { isFileNodeDirectory } from '@shared/utils'
 import { FileInfo, FileInfoTree } from 'electron/main/filesystem/types'
+import slugify from 'slugify'
 
 export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
   return tree.reduce((flatList: FileInfo[], node) => {
@@ -27,19 +28,27 @@ export const getFilesInDirectory = async (directoryPath: string, filesTree: File
   return filesTree.filter((file) => file.path.startsWith(directoryPath))
 }
 
-export function getNextUntitledFilename(existingFilenames: string[]): string {
-  const untitledRegex = /^Untitled (\d+)\.md$/
+export function getNextAvailableFileNameGivenBaseName(
+  existingFilenames: string[],
+  baseName: string,
+  extension: string = 'md',
+): string {
+  const filenameRegex = new RegExp(`^${baseName}( \\d+)?\\.${extension}$`)
 
   const existingNumbers = existingFilenames
-    .filter((filename) => untitledRegex.test(filename))
+    .filter((filename) => filenameRegex.test(filename))
     .map((filename) => {
-      const match = filename.match(untitledRegex)
-      return match ? parseInt(match[1], 10) : 0
+      const match = filename.match(filenameRegex)
+      return match && match[1] ? parseInt(match[1].trim(), 10) : 0
     })
 
-  const maxNumber = Math.max(0, ...existingNumbers)
+  if (existingNumbers.length === 0) {
+    return `${baseName}.${extension}`
+  }
 
-  return `Untitled ${maxNumber + 1}.md`
+  const maxNumber = Math.max(...existingNumbers)
+
+  return `${baseName} ${maxNumber + 1}.${extension}`
 }
 
 export function removeFileExtension(filename: string): string {
@@ -54,7 +63,7 @@ export function removeFileExtension(filename: string): string {
   return filename.substring(0, filename.lastIndexOf('.'))
 }
 
-export const getInvalidCharacterInFilePath = async (filename: string): Promise<string | null> => {
+export const getInvalidCharacterInFilePath = async (filePath: string): Promise<string | null> => {
   let invalidCharacters: RegExp
   const platform = await window.electronUtils.getPlatform()
 
@@ -70,26 +79,58 @@ export const getInvalidCharacterInFilePath = async (filename: string): Promise<s
       break
   }
 
-  const idx = filename.search(invalidCharacters)
+  const idx = filePath.search(invalidCharacters)
 
-  return idx === -1 ? null : filename[idx]
+  return idx === -1 ? null : filePath[idx]
 }
 
-export const getInvalidCharacterInFileName = async (filename: string): Promise<string | null> => {
-  // eslint-disable-next-line no-useless-escape
-  const invalidCharacters = /[<>:"\/\\|?*\.\[\]\{\}!@#$%^&()+=,;'`~]/
+// so we just want to remove
 
+// eslint-disable-next-line no-useless-escape
+const INVALID_FILENAME_CHARACTERS = /[<>:"\/\\|?*\.\[\]\{\}!@#$%^&()+=,;'`~]/
+
+export const getInvalidCharacterInFileName = (filename: string): string | null => {
   // Check if the filename contains any invalid characters
-  const match = filename.match(invalidCharacters)
+  const match = filename.match(INVALID_FILENAME_CHARACTERS)
   return match ? match[0] : null
 }
 
-export const generateFileName = (filename: string): string => {
-  return `${filename
-    .split('\n')[0]
-    .replace(/[^a-zA-Z0-9-_ ]/g, '')
-    .trim()
-    .substring(0, 20)}.md`
+export const removeInvalidCharactersFromFileName = (filename: string): string => {
+  return filename.replace(INVALID_FILENAME_CHARACTERS, '')
+}
+
+export const generateFileNameFromFileContent = (content: string, maxLength: number = 30): string | null => {
+  // Split the content into lines and get the first non-empty line
+  const firstLine = content.split('\n').find((line) => line.trim() !== '')
+
+  // If there's no content, return null
+  if (!firstLine) {
+    return null
+  }
+
+  // Extract potential title from markdown heading
+  const titleMatch = firstLine.match(/^#+\s*(.+)/)
+  const potentialTitle = titleMatch ? titleMatch[1] : firstLine
+
+  // Remove invalid characters before slugify
+  const cleanTitle = removeInvalidCharactersFromFileName(potentialTitle)
+
+  // Use slugify to generate a clean, URL-friendly slug
+  const slug = slugify(cleanTitle, {
+    lower: true, // convert to lower case
+    strict: true, // strip special characters except replacement
+    trim: true, // trim leading and trailing replacement chars
+  })
+
+  // Truncate the slug if it's longer than maxLength
+  const truncatedSlug = slug.substring(0, maxLength)
+
+  // If the slug is empty after all processing, return null
+  if (!truncatedSlug) {
+    return null
+  }
+
+  return `${truncatedSlug}`
 }
 
 export const sortFilesAndDirectories = (fileList: FileInfoTree, currentFilePath: string | null): FileInfoTree => {

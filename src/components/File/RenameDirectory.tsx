@@ -31,13 +31,12 @@ const RenameDirModal: React.FC = () => {
     const newName = e.target.value
     setDirName(newName)
 
-    getInvalidCharacterInFileName(newName).then((invalidCharacter) => {
-      if (invalidCharacter) {
-        setErrorMessage(`The character [${invalidCharacter}] cannot be included in directory name.`)
-      } else {
-        setErrorMessage(null)
-      }
-    })
+    const invalidCharacter = getInvalidCharacterInFileName(newName)
+    if (invalidCharacter) {
+      setErrorMessage(`The character [${invalidCharacter}] cannot be included in directory name.`)
+    } else {
+      setErrorMessage(null)
+    }
   }
 
   const onClose = () => {

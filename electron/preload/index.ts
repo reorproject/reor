@@ -91,7 +91,6 @@ const fileSystem = {
   checkFileExists: createIPCHandler<(filePath: string) => Promise<boolean>>('check-file-exists'),
   deleteFile: createIPCHandler<(filePath: string) => Promise<void>>('delete-file'),
   moveFileOrDir: createIPCHandler<(sourcePath: string, destinationPath: string) => Promise<void>>('move-file-or-dir'),
-  // we could get rid of this function tbf.
   getAllFilenamesInDirectory: createIPCHandler<(dirName: string) => Promise<string[]>>('get-files-in-directory'),
   getFiles: createIPCHandler<(filePaths: string[]) => Promise<FileInfoWithContent[]>>('get-files'),
 }

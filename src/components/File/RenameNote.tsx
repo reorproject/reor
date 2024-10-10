@@ -17,13 +17,12 @@ const RenameNoteModal: React.FC = () => {
     const newName = e.target.value
     setNewNoteName(newName)
 
-    getInvalidCharacterInFileName(newName).then((invalidCharacter) => {
-      if (invalidCharacter) {
-        setErrorMessage(`The character [${invalidCharacter}] cannot be included in note name.`)
-      } else {
-        setErrorMessage(null)
-      }
-    })
+    const invalidCharacter = getInvalidCharacterInFileName(newName)
+    if (invalidCharacter) {
+      setErrorMessage(`The character [${invalidCharacter}] cannot be included in note name.`)
+    } else {
+      setErrorMessage(null)
+    }
   }
   const onClose = () => {
     setNoteToBeRenamed('')
