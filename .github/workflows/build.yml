@@ -14,7 +14,9 @@ jobs:
           - os: macos-13
           - os: macos-latest
           - os: windows-latest
-            build_type: [cpu, gpu]
+            build_type: cpu
+          - os: windows-latest
+            build_type: gpu
           - os: ubuntu-latest
             build_type: cpu
           - os: ubuntu-latest
