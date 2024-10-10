@@ -10,7 +10,7 @@ import {
   getClassNameBasedOnMessageRole,
 } from '../../../lib/llm/chat'
 import { ToolCallComponent } from './ToolCalls'
-import { useWindowContentContext } from '@/contexts/WindowContentContext'
+import { useContentContext } from '@/contexts/ContentContext'
 import { useChatContext } from '@/contexts/ChatContext'
 import MarkdownRenderer from '@/components/Common/MarkdownRenderer'
 import { makeAndAddToolResultToMessages } from '../../../lib/llm/tools/utils'
@@ -25,7 +25,7 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
   if (message.role !== 'assistant') {
     throw new Error('Message is not an assistant message')
   }
-  const { openContent } = useWindowContentContext()
+  const { openContent } = useContentContext()
   const { saveChat } = useChatContext()
 
   const { textParts, toolCalls } = useMemo(() => {

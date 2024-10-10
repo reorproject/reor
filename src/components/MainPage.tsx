@@ -9,7 +9,7 @@ import IconsSidebar from './Sidebars/IconsSidebar'
 import SidebarManager from './Sidebars/MainSidebar'
 import SimilarFilesSidebarComponent from './Sidebars/SimilarFilesSidebar'
 import EmptyPage from './Common/EmptyPage'
-import { WindowContentProvider } from '../contexts/WindowContentContext'
+import { ContentProvider } from '../contexts/ContentContext'
 import WritingAssistant from './WritingAssistant/WritingAssistant'
 import { ChatProvider, useChatContext } from '@/contexts/ChatContext'
 import { FileProvider, useFileContext } from '@/contexts/FileContext'
@@ -79,11 +79,11 @@ const MainPageComponent: React.FC = () => {
   return (
     <FileProvider>
       <ChatProvider>
-        <WindowContentProvider>
+        <ContentProvider>
           <ModalProvider>
             <MainPageContent />
           </ModalProvider>
-        </WindowContentProvider>
+        </ContentProvider>
       </ChatProvider>
     </FileProvider>
   )

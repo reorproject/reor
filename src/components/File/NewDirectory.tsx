@@ -4,7 +4,7 @@ import { Button } from '@material-tailwind/react'
 import posthog from 'posthog-js'
 
 import ReorModal from '../Common/Modal'
-import { getInvalidCharacterInFileName } from '@/lib/strings'
+import { getInvalidCharacterInFileName } from '@/lib/file'
 import { useFileContext } from '@/contexts/FileContext'
 
 interface NewDirectoryComponentProps {

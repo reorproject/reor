@@ -1,6 +1,5 @@
 import React from 'react'
 
-import NewNoteComponent from '../File/NewNote'
 import { useModalOpeners } from '@/contexts/ModalContext'
 import NewDirectoryComponent from '../File/NewDirectory'
 import SettingsModal from '../Settings/Settings'
@@ -11,8 +10,6 @@ import RenameDirModal from '../File/RenameDirectory'
 
 const CommonModals: React.FC = () => {
   const {
-    isNewNoteModalOpen,
-    setIsNewNoteModalOpen,
     isNewDirectoryModalOpen,
     setIsNewDirectoryModalOpen,
     isSettingsModalOpen,
@@ -29,7 +26,6 @@ const CommonModals: React.FC = () => {
 
   return (
     <div>
-      <NewNoteComponent isOpen={isNewNoteModalOpen} onClose={() => setIsNewNoteModalOpen(false)} />
       <NewDirectoryComponent isOpen={isNewDirectoryModalOpen} onClose={() => setIsNewDirectoryModalOpen(false)} />
       {noteToBeRenamed && <RenameNoteModal />}
       {fileDirToBeRenamed && <RenameDirModal />}

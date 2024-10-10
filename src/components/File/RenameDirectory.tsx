@@ -5,7 +5,7 @@ import { toast } from 'react-toastify'
 
 import ReorModal from '../Common/Modal'
 
-import { getInvalidCharacterInFileName } from '@/lib/strings'
+import { getInvalidCharacterInFileName } from '@/lib/file'
 import { useFileContext } from '@/contexts/FileContext'
 
 const RenameDirModal: React.FC = () => {
@@ -31,13 +31,12 @@ const RenameDirModal: React.FC = () => {
     const newName = e.target.value
     setDirName(newName)
 
-    getInvalidCharacterInFileName(newName).then((invalidCharacter) => {
-      if (invalidCharacter) {
-        setErrorMessage(`The character [${invalidCharacter}] cannot be included in directory name.`)
-      } else {
-        setErrorMessage(null)
-      }
-    })
+    const invalidCharacter = getInvalidCharacterInFileName(newName)
+    if (invalidCharacter) {
+      setErrorMessage(`The character [${invalidCharacter}] cannot be included in directory name.`)
+    } else {
+      setErrorMessage(null)
+    }
   }
 
   const onClose = () => {

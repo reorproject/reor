@@ -1,32 +1,35 @@
-import React, { createContext, useContext, useMemo, ReactNode, useState } from 'react'
+import React, { createContext, useContext, useMemo, ReactNode, useState, useCallback } from 'react'
 
+import posthog from 'posthog-js'
 import { useChatContext } from './ChatContext'
 import { useFileContext } from './FileContext'
 import { OnShowContextMenuData, ShowContextMenuInputType } from '@/components/Common/CustomContextMenu'
+import { getFilesInDirectory, getNextAvailableFileNameGivenBaseName } from '@/lib/file'
 
-interface WindowContentContextType {
+interface ContentContextType {
   openContent: (pathOrChatID: string, optionalContentToWriteOnCreate?: string, dontUpdateChatHistory?: boolean) => void
   focusedItem: OnShowContextMenuData
   showContextMenu: ShowContextMenuInputType
   hideFocusedItem: () => void
   currentOpenFileOrChatID: string | null
+  createUntitledNote: () => void
 }
 
-const WindowContentContext = createContext<WindowContentContextType | undefined>(undefined)
+const ContentContext = createContext<ContentContextType | undefined>(undefined)
 
-export const useWindowContentContext = (): WindowContentContextType => {
-  const context = useContext(WindowContentContext)
+export const useContentContext = (): ContentContextType => {
+  const context = useContext(ContentContext)
   if (context === undefined) {
-    throw new Error('useWindowContent must be used within a WindowContentProvider')
+    throw new Error('useContentContext must be used within a ContentProvider')
   }
   return context
 }
 
-interface WindowContentProviderProps {
+interface ContentProviderProps {
   children: ReactNode
 }
 
-export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ children }) => {
+export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) => {
   const [focusedItem, setFocusedItem] = useState<OnShowContextMenuData>({
     currentSelection: 'None',
     position: { x: 0, y: 0 },
@@ -34,7 +37,12 @@ export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ ch
   const [currentOpenFileOrChatID, setCurrentOpenFileOrChatID] = useState<string | null>(null)
 
   const { setCurrentOpenChatID, allChatsMetadata, setShowChatbot, setSidebarShowing } = useChatContext()
-  const { openOrCreateFile, addToNavigationHistory } = useFileContext()
+  const {
+    vaultFilesFlattened: flattenedFiles,
+    openOrCreateFile,
+    addToNavigationHistory,
+    currentlyOpenFilePath,
+  } = useFileContext()
 
   const openContent = React.useCallback(
     async (pathOrChatID: string, optionalContentToWriteOnCreate?: string, dontUpdateChatHistory?: boolean) => {
@@ -84,16 +92,32 @@ export const WindowContentProvider: React.FC<WindowContentProviderProps> = ({ ch
     }))
   }, [setFocusedItem])
 
-  const WindowContentContextMemo = useMemo(
+  const createUntitledNote = useCallback(async () => {
+    const directoryToMakeFileIn = currentlyOpenFilePath
+      ? await window.path.dirname(currentlyOpenFilePath)
+      : await window.electronStore.getVaultDirectoryForWindow()
+
+    const filesInDirectory = await getFilesInDirectory(directoryToMakeFileIn, flattenedFiles)
+    const fileName = getNextAvailableFileNameGivenBaseName(
+      filesInDirectory.map((file) => file.name),
+      'Untitled',
+    )
+    const finalPath = await window.path.join(directoryToMakeFileIn, fileName)
+    openContent(finalPath, `## `)
+    posthog.capture('created_new_note_from_new_note_modal')
+  }, [currentlyOpenFilePath, flattenedFiles, openContent])
+
+  const ContentContextMemo = useMemo(
     () => ({
       openContent,
       focusedItem,
       showContextMenu,
       hideFocusedItem,
       currentOpenFileOrChatID,
+      createUntitledNote,
     }),
-    [openContent, focusedItem, showContextMenu, hideFocusedItem, currentOpenFileOrChatID],
+    [openContent, focusedItem, showContextMenu, hideFocusedItem, currentOpenFileOrChatID, createUntitledNote],
   )
 
-  return <WindowContentContext.Provider value={WindowContentContextMemo}>{children}</WindowContentContext.Provider>
+  return <ContentContext.Provider value={ContentContextMemo}>{children}</ContentContext.Provider>
 }

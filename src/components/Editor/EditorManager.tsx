@@ -4,7 +4,7 @@ import InEditorBacklinkSuggestionsDisplay from './BacklinkSuggestionsDisplay'
 import EditorContextMenu from './EditorContextMenu'
 import SearchBar from './Search/SearchBar'
 import { useFileContext } from '@/contexts/FileContext'
-import { useWindowContentContext } from '@/contexts/WindowContentContext'
+import { useContentContext } from '@/contexts/ContentContext'
 
 const EditorManager: React.FC = () => {
   const [showSearchBar, setShowSearchBar] = useState(false)
@@ -14,9 +14,10 @@ const EditorManager: React.FC = () => {
   const [showPlaceholder, setShowPlaceholder] = useState(false)
   const [writingAssistantTextPosition, setWritingAssistantTextPosition] = useState({ top: 0, left: 0 })
 
-  const { editor, suggestionsState, flattenedFiles } = useFileContext()
+  const { editor, suggestionsState, vaultFilesFlattened, currentlyOpenFilePath } = useFileContext()
   const [showDocumentStats, setShowDocumentStats] = useState(false)
-  const { openContent } = useWindowContentContext()
+  const { openContent } = useContentContext()
+
   const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault()
     setMenuPosition({
@@ -121,6 +122,11 @@ const EditorManager: React.FC = () => {
       setShowPlaceholder(currentLineText === '')
     }
   }
+  useEffect(() => {
+    if (editor) {
+      editor.commands.focus()
+    }
+  }, [editor, currentlyOpenFilePath])
 
   return (
     <div
@@ -164,7 +170,7 @@ const EditorManager: React.FC = () => {
       {suggestionsState && (
         <InEditorBacklinkSuggestionsDisplay
           suggestionsState={suggestionsState}
-          suggestions={flattenedFiles.map((file) => file.relativePath)}
+          suggestions={vaultFilesFlattened.map((file) => file.relativePath)}
         />
       )}
       {editor && showDocumentStats && (

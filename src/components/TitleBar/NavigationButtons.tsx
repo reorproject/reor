@@ -3,10 +3,10 @@ import React, { useEffect, useRef, useState } from 'react'
 import posthog from 'posthog-js'
 import { IoMdArrowRoundBack, IoMdArrowRoundForward } from 'react-icons/io'
 
-import { removeFileExtension } from '@/lib/strings'
+import { removeFileExtension } from '@/lib/file'
 import '../../styles/history.scss'
 import { useFileContext } from '@/contexts/FileContext'
-import { useWindowContentContext } from '@/contexts/WindowContentContext'
+import { useContentContext } from '@/contexts/ContentContext'
 
 const FileHistoryNavigator: React.FC = () => {
   const [showMenu, setShowMenu] = useState<string>('')
@@ -14,7 +14,7 @@ const FileHistoryNavigator: React.FC = () => {
   const buttonRefBack = useRef<HTMLButtonElement>(null)
   const buttonRefForward = useRef<HTMLButtonElement>(null)
 
-  const { openContent, currentOpenFileOrChatID } = useWindowContentContext()
+  const { openContent, currentOpenFileOrChatID } = useContentContext()
   const { navigationHistory } = useFileContext()
 
   const ref = useRef<HTMLDivElement>(null)

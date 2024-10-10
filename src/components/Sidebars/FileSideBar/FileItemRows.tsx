@@ -5,16 +5,16 @@ import { FaChevronDown, FaChevronRight } from 'react-icons/fa'
 import posthog from 'posthog-js'
 import { isFileNodeDirectory } from '@shared/utils'
 import { useFileContext } from '@/contexts/FileContext'
-import { moveFile } from './utils'
-import { removeFileExtension } from '@/lib/strings'
-import { useWindowContentContext } from '@/contexts/WindowContentContext'
+import { moveFile } from '../../../lib/file'
+import { removeFileExtension } from '@/lib/file'
+import { useContentContext } from '@/contexts/ContentContext'
 
 const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data }) => {
   const { visibleItems } = data
   const fileObject = visibleItems[index]
 
   const { handleDirectoryToggle, expandedDirectories, currentlyOpenFilePath } = useFileContext()
-  const { openContent, showContextMenu } = useWindowContentContext()
+  const { openContent, showContextMenu } = useContentContext()
 
   const [isDragOver, setIsDragOver] = useState(false)
 
