@@ -36,9 +36,9 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
   const [agentConfig, setAgentConfig] = useState<AgentConfig>()
   const [promptSuggestions] = useState([
-    "What's the latest update on my project?",
+    'Generate a list of all the thoughts I have written on the topic of AGI',
     'Summarize my recent notes on machine learning',
-    'Create a to-do list for today based on my calendar',
+    'Based on what I wrote last week, which tasks should I focus on this week?',
   ])
 
   useEffect(() => {
