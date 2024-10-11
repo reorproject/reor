@@ -114,9 +114,10 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
         <div className="flex w-full justify-center">
           <img src="icon.png" className="size-16" alt="ReorImage" />
         </div>
-        <h1 className="mb-10 text-[28px] text-foreground">
-          Welcome to your AI-powered assistant! Start a conversation with your second brain!
-        </h1>
+        <h1 className="mb-0 text-[28px] text-foreground">Welcome to your AI second brain.</h1>
+        <p className="mb-10 mt-1 text-muted-foreground">
+          Start a chat below. You can provide tools for the LLM to use and customize the system prompt below.{' '}
+        </p>
         <div className="flex w-full">
           <div className="mr-4">
             <ToolSelector
