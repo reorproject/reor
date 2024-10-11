@@ -1,6 +1,5 @@
 import { isFileNodeDirectory } from '@shared/utils'
 import { FileInfo, FileInfoTree } from 'electron/main/filesystem/types'
-import slugify from 'slugify'
 
 export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
   return tree.reduce((flatList: FileInfo[], node) => {
@@ -84,10 +83,8 @@ export const getInvalidCharacterInFilePath = async (filePath: string): Promise<s
   return idx === -1 ? null : filePath[idx]
 }
 
-// so we just want to remove
-
 // eslint-disable-next-line no-useless-escape
-const INVALID_FILENAME_CHARACTERS = /[<>:"\/\\|?*\.\[\]\{\}!@#$%^&()+=,;'`~]/
+const INVALID_FILENAME_CHARACTERS = /[<>:"\/\\|?*\.\[\]\{\}!@#$%^&()+=,;'`~]/g
 
 export const getInvalidCharacterInFileName = (filename: string): string | null => {
   // Check if the filename contains any invalid characters
@@ -100,37 +97,32 @@ export const removeInvalidCharactersFromFileName = (filename: string): string =>
 }
 
 export const generateFileNameFromFileContent = (content: string, maxLength: number = 30): string | null => {
-  // Split the content into lines and get the first non-empty line
   const firstLine = content.split('\n').find((line) => line.trim() !== '')
-
-  // If there's no content, return null
   if (!firstLine) {
     return null
   }
+  const cleanTitle = removeInvalidCharactersFromFileName(firstLine.trim())
+  const words = cleanTitle.split(/\s+/)
 
-  // Extract potential title from markdown heading
-  const titleMatch = firstLine.match(/^#+\s*(.+)/)
-  const potentialTitle = titleMatch ? titleMatch[1] : firstLine
+  const { resultString: finalResult } = words.reduce(
+    ({ resultString, currentLength }, word) => {
+      if (currentLength + word.length + (resultString ? 1 : 0) <= maxLength) {
+        return {
+          resultString: resultString + (resultString ? ' ' : '') + word,
+          currentLength: currentLength + word.length + (resultString ? 1 : 0),
+        }
+      }
+      return { resultString, currentLength }
+    },
+    { resultString: '', currentLength: 0 },
+  )
 
-  // Remove invalid characters before slugify
-  const cleanTitle = removeInvalidCharactersFromFileName(potentialTitle)
-
-  // Use slugify to generate a clean, URL-friendly slug
-  const slug = slugify(cleanTitle, {
-    lower: true, // convert to lower case
-    strict: true, // strip special characters except replacement
-    trim: true, // trim leading and trailing replacement chars
-  })
-
-  // Truncate the slug if it's longer than maxLength
-  const truncatedSlug = slug.substring(0, maxLength)
-
-  // If the slug is empty after all processing, return null
-  if (!truncatedSlug) {
-    return null
+  if (!finalResult) {
+    // Edge case: first word is longer than maxLength
+    return words[0] ? words[0].substring(0, maxLength) : null
   }
 
-  return `${truncatedSlug}`
+  return finalResult
 }
 
 export const sortFilesAndDirectories = (fileList: FileInfoTree, currentFilePath: string | null): FileInfoTree => {
