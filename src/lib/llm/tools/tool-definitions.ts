@@ -4,7 +4,8 @@ import { retreiveFromVectorDB } from '@/lib/db'
 export const searchToolDefinition: ToolDefinition = {
   name: 'search',
   displayName: 'Search',
-  description: "Semantically search the user's personal knowledge base",
+  description:
+    'The search tool allows the LLM to automatically search your knowledge base. It is the most powerful tool because it can do things like filter by date & time which means you can ask things like "what did I work on last week?"',
   parameters: [
     {
       name: 'query',
@@ -36,7 +37,8 @@ export const searchToolDefinition: ToolDefinition = {
 export const createNoteToolDefinition: ToolDefinition = {
   name: 'createNote',
   displayName: 'Create Note',
-  description: "Create a new note in the user's personal knowledge base.",
+  description:
+    'The create note tool allows the LLM to automatically create new notes for you. It will ask you to confirm before creating a new note.',
   parameters: [
     {
       name: 'filename',
@@ -54,7 +56,8 @@ export const createNoteToolDefinition: ToolDefinition = {
 export const createDirectoryToolDefinition: ToolDefinition = {
   name: 'createDirectory',
   displayName: 'Create Directory',
-  description: "Create a new directory in the user's personal knowledge base",
+  description:
+    'The create directory tool allows the LLM to automatically create new directories for you. It will ask you to confirm before creating a new directory.',
   parameters: [
     {
       name: 'directoryName',
@@ -67,7 +70,8 @@ export const createDirectoryToolDefinition: ToolDefinition = {
 const readFileToolDefinition: ToolDefinition = {
   name: 'readFile',
   displayName: 'Read File',
-  description: "Read a file from the user's personal knowledge base",
+  description:
+    'The read file tool allows the LLM to automatically read files from your knowledge base. It will ask you to confirm before reading a file.',
   parameters: [
     {
       name: 'filePath',
@@ -80,7 +84,8 @@ const readFileToolDefinition: ToolDefinition = {
 export const deleteNoteToolDefinition: ToolDefinition = {
   name: 'deleteNote',
   displayName: 'Delete Note',
-  description: "Delete a note from the user's personal knowledge base",
+  description:
+    'The delete note tool allows the LLM to automatically delete notes from your knowledge base. It will ask you to confirm before deleting a note.',
   parameters: [
     {
       name: 'filename',
@@ -94,7 +99,7 @@ export const editNoteToolDefinition: ToolDefinition = {
   name: 'editNote',
   displayName: 'Edit Note',
   description:
-    "Edit a note in the user's personal knowledge base. You must provide the full note content as the new content.",
+    'The edit note tool allows the LLM to automatically edit notes in your knowledge base. It will ask you to confirm before editing a note.',
   parameters: [
     {
       name: 'filename',
@@ -112,7 +117,8 @@ export const editNoteToolDefinition: ToolDefinition = {
 export const appendToNoteToolDefinition: ToolDefinition = {
   name: 'appendToNote',
   displayName: 'Append to Note',
-  description: "Append to a note in the user's personal knowledge base",
+  description:
+    'The append to note tool allows the LLM to automatically append to notes in your knowledge base. It will ask you to confirm before appending to a note.',
   parameters: [
     {
       name: 'filename',
@@ -130,7 +136,7 @@ export const appendToNoteToolDefinition: ToolDefinition = {
 export const listFilesToolDefinition: ToolDefinition = {
   name: 'listFiles',
   displayName: 'List Files',
-  description: "List all files in the user's personal knowledge base",
+  description: 'The list files tool allows the LLM to automatically list files from your knowledge base.',
   parameters: [],
 }
 
