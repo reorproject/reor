@@ -1,18 +1,16 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { FaMagic } from 'react-icons/fa'
-import ReactMarkdown from 'react-markdown'
-import rehypeRaw from 'rehype-raw'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import posthog from 'posthog-js'
 import { streamText } from 'ai'
-import { appendStringContentToMessages, convertMessageToString } from '../../lib/llm/chat'
 import useOutsideClick from './hooks/use-outside-click'
-import getClassNames, { generatePromptString, getLastMessage } from './utils'
+import { generatePromptString, getLastMessage } from './utils'
 import { ReorChatMessage } from '../../lib/llm/types'
 import { useFileContext } from '@/contexts/FileContext'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import resolveLLMClient from '@/lib/llm/client'
+import ConversationHistory from './ConversationHistory'
 
 const WritingAssistant: React.FC = () => {
   const [messages, setMessages] = useState<ReorChatMessage[]>([])
@@ -30,6 +28,7 @@ const WritingAssistant: React.FC = () => {
   const textFieldRef = useRef<HTMLInputElement>(null)
   const lastAssistantMessage = getLastMessage(messages, 'assistant')
   const hasValidMessages = !!lastAssistantMessage
+  const [streamingMessage, setStreamingMessage] = useState<string>('')
 
   const { editor, highlightData } = useFileContext()
 
@@ -224,24 +223,38 @@ const WritingAssistant: React.FC = () => {
     setLoadingResponse(true)
     posthog.capture('submitted_writing_assistant_message')
 
+    const newMessage: ReorChatMessage = { role: 'user', content: prompt }
+    const updatedMessages = [...messages, newMessage]
+    setMessages(updatedMessages)
+
+    setStreamingMessage('')
+
     const { textStream } = await streamText({
       model: await resolveLLMClient(defaultLLMName),
-      // messages: newChatHistory.messages,
-      prompt,
+      messages: updatedMessages,
     })
 
-    let updatedMessages = messages
+    let fullResponse = ''
     // eslint-disable-next-line no-restricted-syntax
     for await (const textPart of textStream) {
-      updatedMessages = appendStringContentToMessages(updatedMessages, textPart)
-      setMessages(updatedMessages)
+      fullResponse += textPart
+      setStreamingMessage(fullResponse)
     }
 
+    const assistantMessage: ReorChatMessage = { role: 'assistant', content: fullResponse }
+    setMessages((prev) => [...prev, assistantMessage])
+    setStreamingMessage('')
     setLoadingResponse(false)
   }
 
   const handleOption = async (option: string, customPromptInput?: string) => {
-    const selectedText = highlightData.text
+    let selectedText = highlightData.text
+    if (lastAssistantMessage) {
+      selectedText =
+        typeof lastAssistantMessage.content === 'string'
+          ? lastAssistantMessage.content
+          : JSON.stringify(lastAssistantMessage.content)
+    }
     const prompt = generatePromptString(option, selectedText, isSpaceTrigger, customPromptInput)
     setPrevPrompt(prompt)
     await getLLMResponse(prompt)
@@ -369,7 +382,7 @@ const WritingAssistant: React.FC = () => {
         </Popover>
       )}
 
-      {getLastMessage(messages, 'assistant') && (
+      {(messages.length > 0 || streamingMessage) && (
         <div
           ref={markdownContainerRef}
           className="absolute z-50 rounded-lg border border-gray-300 bg-white p-2.5 shadow-md"
@@ -379,19 +392,25 @@ const WritingAssistant: React.FC = () => {
             width: '385px',
           }}
         >
-          <div
-            style={{
-              maxHeight: markdownMaxHeight,
-              overflowY: 'auto',
+          <ConversationHistory
+            history={messages}
+            streamingMessage={streamingMessage}
+            markdownMaxHeight={markdownMaxHeight}
+          />
+          <TextField
+            type="text"
+            variant="outlined"
+            size="small"
+            value={customPrompt}
+            onChange={(e) => setCustomPrompt(e.target.value)}
+            placeholder="Follow up..."
+            className="mt-2 w-full p-1"
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleOption('custom', customPrompt)
+              }
             }}
-          >
-            <ReactMarkdown
-              rehypePlugins={[rehypeRaw]}
-              className={`markdown-content break-words rounded-md p-1 ${getClassNames(lastAssistantMessage)}`}
-            >
-              {convertMessageToString(getLastMessage(messages, 'assistant'))}
-            </ReactMarkdown>
-          </div>
+          />
           <div className="mt-2 flex justify-between">
             <button
               className="mr-1 flex cursor-pointer items-center rounded-md border-0 bg-blue-100 px-2.5 py-1"
