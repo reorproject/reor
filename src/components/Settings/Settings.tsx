@@ -22,12 +22,16 @@ enum SettingsTab {
   AnalyticsTab = 'analytics',
 }
 
-const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose: onCloseFromParent, initialTab = SettingsTab.GeneralSettingsTab  }) => {
+const SettingsModal: React.FC<ModalProps> = ({
+  isOpen,
+  onClose: onCloseFromParent,
+  initialTab = SettingsTab.GeneralSettingsTab,
+}) => {
   const [willNeedToReIndex, setWillNeedToReIndex] = useState(false)
-  const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab) 
+  const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab)
 
   useEffect(() => {
-    setActiveTab(initialTab) 
+    setActiveTab(initialTab)
   }, [initialTab])
 
   const handleSave = () => {

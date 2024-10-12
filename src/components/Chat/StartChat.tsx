@@ -24,8 +24,8 @@ import exampleAgents from './ChatConfigComponents/exampleAgents'
 import { allAvailableToolDefinitions } from '@/lib/llm/tools/tool-definitions'
 import ToolSelector from './ChatConfigComponents/ToolSelector'
 import SuggestionCard from '../ui/suggestion-card'
-import { useModalOpeners } from '@/contexts/ModalContext'
 import SettingsModal from '../Settings/Settings'
+import useModalState from '../Settings/LLMSettings/hooks/use-modal-state'
 
 interface StartChatProps {
   defaultModelName: string
@@ -39,6 +39,7 @@ enum SettingsTab {
   TextGenerationTab = 'textGeneration',
   AnalyticsTab = 'analytics',
 }
+
 const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMessage }) => {
   const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([])
   const [selectedLLM, setSelectedLLM] = useState<string>(defaultModelName)
@@ -49,14 +50,11 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
     'Summarize my recent notes on machine learning',
     'Based on what I wrote last week, which tasks should I focus on this week?',
   ])
-
-  const [isSettingsModalOpen, setSettingsModalOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<SettingsTab>(SettingsTab.GeneralSettingsTab)
+  const { isSettingsModalOpen, activeTab, openModalWithTab, closeModal } = useModalState();
 
   const openLLMSettings = () => {
-    setActiveTab(SettingsTab.LLMSettingsTab)
-    setSettingsModalOpen(true)
-  }
+    openModalWithTab(SettingsTab.LLMSettingsTab);
+  };
 
   useEffect(() => {
     const fetchAgentConfigs = async () => {
@@ -189,7 +187,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                       </SelectContent>
                     </Select>
                   )}
-                  <FiRefreshCw onClick={refreshLLMConfigs} className="cursor-pointer ml-2" />
+                  <FiRefreshCw onClick={refreshLLMConfigs} className="ml-2 cursor-pointer" />
                 </div>
                 <div className="flex items-center">
                   <Button
@@ -306,7 +304,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
           </div>
         </div>
       </div>
-      <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setSettingsModalOpen(false)} initialTab={activeTab} />
+      <SettingsModal isOpen={isSettingsModalOpen} onClose={closeModal} initialTab={activeTab} />
     </div>
   )
 }
