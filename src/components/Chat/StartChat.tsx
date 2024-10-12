@@ -3,7 +3,6 @@ import { PiPaperPlaneRight } from 'react-icons/pi'
 import { FiRefreshCw, FiSettings } from 'react-icons/fi'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import { AgentConfig, ToolDefinition, DatabaseSearchFilters } from '../../lib/llm/types'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import DbSearchFilters from './ChatConfigComponents/DBSearchFilters'
 import PromptEditor from './ChatConfigComponents/PromptEditor'
@@ -170,12 +169,12 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               <div className="mx-auto h-px w-[96%] bg-background/20" />
               <div className="flex h-10 flex-col items-center justify-between gap-2  py-2 md:flex-row md:gap-4">
                 <div className="flex flex-col items-center justify-between rounded-md border-0 py-2 md:flex-row">
-                <LLMSelectOrButton
-  llmConfigs={llmConfigs}
-  selectedLLM={selectedLLM}
-  handleLLMChange={handleLLMChange}
-  openLLMSettings={openLLMSettings}
-/>
+                  <LLMSelectOrButton
+                    llmConfigs={llmConfigs}
+                    selectedLLM={selectedLLM}
+                    handleLLMChange={handleLLMChange}
+                    openLLMSettings={openLLMSettings}
+                  />
                   <FiRefreshCw onClick={refreshLLMConfigs} className="ml-2 cursor-pointer" />
                 </div>
                 <div className="flex items-center">

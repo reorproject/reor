@@ -13,7 +13,7 @@ const LLMSelectOrButton: React.FC<LLMSelectOrButtonProps> = ({
   llmConfigs,
   selectedLLM,
   handleLLMChange,
-  openLLMSettings
+  openLLMSettings,
 }) => {
   return llmConfigs.length === 0 ? (
     <Button className="bg-transparent text-primary hover:bg-slate-700" onClick={openLLMSettings}>
