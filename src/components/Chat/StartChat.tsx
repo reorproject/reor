@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { PiPaperPlaneRight } from 'react-icons/pi'
-import { FiSettings } from 'react-icons/fi'
+import { FiRefreshCw, FiSettings } from 'react-icons/fi'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import { AgentConfig, ToolDefinition, DatabaseSearchFilters } from '../../lib/llm/types'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -24,12 +24,21 @@ import exampleAgents from './ChatConfigComponents/exampleAgents'
 import { allAvailableToolDefinitions } from '@/lib/llm/tools/tool-definitions'
 import ToolSelector from './ChatConfigComponents/ToolSelector'
 import SuggestionCard from '../ui/suggestion-card'
+import { useModalOpeners } from '@/contexts/ModalContext'
+import SettingsModal from '../Settings/Settings'
 
 interface StartChatProps {
   defaultModelName: string
   handleNewChatMessage: (userTextFieldInput?: string, chatFilters?: AgentConfig) => void
 }
 
+enum SettingsTab {
+  GeneralSettingsTab = 'generalSettings',
+  LLMSettingsTab = 'llmSettings',
+  EmbeddingModelTab = 'embeddingModel',
+  TextGenerationTab = 'textGeneration',
+  AnalyticsTab = 'analytics',
+}
 const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMessage }) => {
   const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([])
   const [selectedLLM, setSelectedLLM] = useState<string>(defaultModelName)
@@ -40,6 +49,14 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
     'Summarize my recent notes on machine learning',
     'Based on what I wrote last week, which tasks should I focus on this week?',
   ])
+
+  const [isSettingsModalOpen, setSettingsModalOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<SettingsTab>(SettingsTab.GeneralSettingsTab)
+
+  const openLLMSettings = () => {
+    setActiveTab(SettingsTab.LLMSettingsTab)
+    setSettingsModalOpen(true)
+  }
 
   useEffect(() => {
     const fetchAgentConfigs = async () => {
@@ -106,6 +123,15 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
     })
   }
 
+  const refreshLLMConfigs = async () => {
+    try {
+      const LLMConfigs = await window.llm.getLLMConfigs()
+      setLLMConfigs(LLMConfigs)
+    } catch (error) {
+      console.error('Failed to refresh LLM configs:', error)
+    }
+  }
+
   if (!agentConfig) return <div>Loading...</div>
 
   return (
@@ -145,18 +171,25 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               <div className="mx-auto h-px w-[96%] bg-background/20" />
               <div className="flex h-10 flex-col items-center justify-between gap-2  py-2 md:flex-row md:gap-4">
                 <div className="flex flex-col items-center justify-between rounded-md border-0 py-2 md:flex-row">
-                  <Select value={selectedLLM} onValueChange={handleLLMChange}>
-                    <SelectTrigger className="m-2 w-32 border border-solid border-muted-foreground bg-transparent">
-                      <SelectValue placeholder="Select LLM" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {llmConfigs.map((llm) => (
-                        <SelectItem key={llm.modelName} value={llm.modelName}>
-                          {llm.modelName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  {llmConfigs.length === 0 ? (
+                    <Button className="bg-transparent text-primary" onClick={openLLMSettings}>
+                      Attach LLM
+                    </Button>
+                  ) : (
+                    <Select value={selectedLLM} onValueChange={handleLLMChange}>
+                      <SelectTrigger className="w-32 border border-solid border-muted-foreground">
+                        <SelectValue placeholder="Select LLM" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {llmConfigs.map((llm) => (
+                          <SelectItem key={llm.modelName} value={llm.modelName}>
+                            {llm.modelName}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                  <FiRefreshCw onClick={refreshLLMConfigs} className="cursor-pointer ml-2" />
                 </div>
                 <div className="flex items-center">
                   <Button
@@ -273,6 +306,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
           </div>
         </div>
       </div>
+      <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setSettingsModalOpen(false)} initialTab={activeTab} />
     </div>
   )
 }

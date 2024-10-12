@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import ReorModal from '../Common/Modal'
 
@@ -11,6 +11,7 @@ import TextGenerationSettings from './TextGenerationSettings'
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
+  initialTab?: SettingsTab
 }
 
 enum SettingsTab {
@@ -21,9 +22,13 @@ enum SettingsTab {
   AnalyticsTab = 'analytics',
 }
 
-const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose: onCloseFromParent }) => {
+const SettingsModal: React.FC<ModalProps> = ({ isOpen, onClose: onCloseFromParent, initialTab = SettingsTab.GeneralSettingsTab  }) => {
   const [willNeedToReIndex, setWillNeedToReIndex] = useState(false)
-  const [activeTab, setActiveTab] = useState(SettingsTab.GeneralSettingsTab)
+  const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab) 
+
+  useEffect(() => {
+    setActiveTab(initialTab) 
+  }, [initialTab])
 
   const handleSave = () => {
     if (willNeedToReIndex) {
