@@ -33,7 +33,10 @@ const PromptEditor: React.FC<{
   return (
     <div className="w-[32rem] text-foreground">
       <h3 className="text-foreground">Edit System Prompt</h3>
-      <p className="text-muted-foreground">Customize the system prompt for your AI assistant.</p>
+      <p className="text-muted-foreground">
+        Customize the system prompt for your AI assistant. Use <code>{'{TODAY}'}</code> to feed the model today&apos;s
+        date.
+      </p>
       <div className="grid gap-6 py-4">
         <div className="flex items-start gap-4">
           <Textarea

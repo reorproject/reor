@@ -36,9 +36,9 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
   const [agentConfig, setAgentConfig] = useState<AgentConfig>()
   const [promptSuggestions] = useState([
-    "What's the latest update on my project?",
+    'Generate a list of all the thoughts I have written on the topic of AGI',
     'Summarize my recent notes on machine learning',
-    'Create a to-do list for today based on my calendar',
+    'Based on what I wrote last week, which tasks should I focus on this week?',
   ])
 
   useEffect(() => {
@@ -114,9 +114,10 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
         <div className="flex w-full justify-center">
           <img src="icon.png" className="size-16" alt="ReorImage" />
         </div>
-        <h1 className="mb-10 text-[28px] text-foreground">
-          Welcome to your AI-powered assistant! Start a conversation with your second brain!
-        </h1>
+        <h1 className="mb-0 text-[28px] text-foreground">Welcome to your AI second brain.</h1>
+        <p className="mb-10 mt-1 text-muted-foreground">
+          Start a chat below. You can provide tools for the LLM to use and customize the system prompt below.{' '}
+        </p>
         <div className="flex w-full">
           <div className="mr-4">
             <ToolSelector
