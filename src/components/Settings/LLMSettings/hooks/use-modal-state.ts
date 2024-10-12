@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 
 export enum SettingsTab {
   GeneralSettingsTab = 'generalSettings',
@@ -9,24 +9,24 @@ export enum SettingsTab {
 }
 
 const useModalState = () => {
-  const [isSettingsModalOpen, setSettingsModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<SettingsTab>(SettingsTab.GeneralSettingsTab);
+  const [isSettingsModalOpen, setSettingsModalOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<SettingsTab>(SettingsTab.GeneralSettingsTab)
 
   const openModalWithTab = (tab: SettingsTab) => {
-    setActiveTab(tab);
-    setSettingsModalOpen(true);
-  };
+    setActiveTab(tab)
+    setSettingsModalOpen(true)
+  }
 
   const closeModal = () => {
-    setSettingsModalOpen(false);
-  };
+    setSettingsModalOpen(false)
+  }
 
   return {
     isSettingsModalOpen,
     activeTab,
     openModalWithTab,
     closeModal,
-  };
-};
+  }
+}
 
-export default useModalState;
+export default useModalState

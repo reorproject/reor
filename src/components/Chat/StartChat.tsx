@@ -50,11 +50,11 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
     'Summarize my recent notes on machine learning',
     'Based on what I wrote last week, which tasks should I focus on this week?',
   ])
-  const { isSettingsModalOpen, activeTab, openModalWithTab, closeModal } = useModalState();
+  const { isSettingsModalOpen, activeTab, openModalWithTab, closeModal } = useModalState()
 
   const openLLMSettings = () => {
-    openModalWithTab(SettingsTab.LLMSettingsTab);
-  };
+    openModalWithTab(SettingsTab.LLMSettingsTab)
+  }
 
   useEffect(() => {
     const fetchAgentConfigs = async () => {
