@@ -26,6 +26,7 @@ import ToolSelector from './ChatConfigComponents/ToolSelector'
 import SuggestionCard from '../ui/suggestion-card'
 import SettingsModal from '../Settings/Settings'
 import useModalState from '../Settings/LLMSettings/hooks/use-modal-state'
+import LLMSelectOrButton from '../Settings/LLMSettings/LLMSelectOrButton'
 
 interface StartChatProps {
   defaultModelName: string
@@ -169,24 +170,12 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               <div className="mx-auto h-px w-[96%] bg-background/20" />
               <div className="flex h-10 flex-col items-center justify-between gap-2  py-2 md:flex-row md:gap-4">
                 <div className="flex flex-col items-center justify-between rounded-md border-0 py-2 md:flex-row">
-                  {llmConfigs.length === 0 ? (
-                    <Button className="bg-transparent text-primary" onClick={openLLMSettings}>
-                      Attach LLM
-                    </Button>
-                  ) : (
-                    <Select value={selectedLLM} onValueChange={handleLLMChange}>
-                      <SelectTrigger className="w-32 border border-solid border-muted-foreground">
-                        <SelectValue placeholder="Select LLM" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {llmConfigs.map((llm) => (
-                          <SelectItem key={llm.modelName} value={llm.modelName}>
-                            {llm.modelName}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
+                <LLMSelectOrButton
+  llmConfigs={llmConfigs}
+  selectedLLM={selectedLLM}
+  handleLLMChange={handleLLMChange}
+  openLLMSettings={openLLMSettings}
+/>
                   <FiRefreshCw onClick={refreshLLMConfigs} className="ml-2 cursor-pointer" />
                 </div>
                 <div className="flex items-center">
