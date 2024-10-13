@@ -81,7 +81,7 @@ const IconsSidebar: React.FC = () => {
       </div>
       <div
         className="flex h-8 w-full cursor-pointer items-center justify-center border-none bg-transparent "
-        onClick={createUntitledNote}
+        onClick={() => createUntitledNote()}
       >
         <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
           <HiOutlinePencilAlt className="text-gray-200" color="gray" size={22} title="New Note" />

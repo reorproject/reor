@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react'
+import ReactDOM from 'react-dom'
 
 interface ModalProps {
   isOpen: boolean
@@ -33,9 +34,9 @@ const ReorModal: React.FC<ModalProps> = ({
     return null
   }
 
-  return (
+  const modalContent = (
     <div
-      className={`fixed inset-0 z-50 flex h-full items-center justify-center bg-black/40 ${tailwindStylesOnBackground}`}
+      className={`fixed inset-0 z-[9999] flex h-screen w-screen items-center justify-center bg-black/40 ${tailwindStylesOnBackground}`}
     >
       <div
         ref={modalRef}
@@ -58,6 +59,8 @@ const ReorModal: React.FC<ModalProps> = ({
       </div>
     </div>
   )
+
+  return ReactDOM.createPortal(modalContent, document.body)
 }
 
 export default ReorModal

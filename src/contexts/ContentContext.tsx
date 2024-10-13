@@ -12,7 +12,7 @@ interface ContentContextType {
   showContextMenu: ShowContextMenuInputType
   hideFocusedItem: () => void
   currentOpenFileOrChatID: string | null
-  createUntitledNote: () => void
+  createUntitledNote: (parentFileOrDirectory?: string) => void
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined)
@@ -92,20 +92,23 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
     }))
   }, [setFocusedItem])
 
-  const createUntitledNote = useCallback(async () => {
-    const directoryToMakeFileIn = currentlyOpenFilePath
-      ? await window.path.dirname(currentlyOpenFilePath)
-      : await window.electronStore.getVaultDirectoryForWindow()
-
-    const filesInDirectory = await getFilesInDirectory(directoryToMakeFileIn, flattenedFiles)
-    const fileName = getNextAvailableFileNameGivenBaseName(
-      filesInDirectory.map((file) => file.name),
-      'Untitled',
-    )
-    const finalPath = await window.path.join(directoryToMakeFileIn, fileName)
-    openContent(finalPath, `## `)
-    posthog.capture('created_new_note_from_new_note_modal')
-  }, [currentlyOpenFilePath, flattenedFiles, openContent])
+  const createUntitledNote = useCallback(
+    async (parentDirectory?: string) => {
+      const directoryToMakeFileIn =
+        parentDirectory ||
+        (currentlyOpenFilePath && (await window.path.dirname(currentlyOpenFilePath))) ||
+        (await window.electronStore.getVaultDirectoryForWindow())
+      const filesInDirectory = await getFilesInDirectory(directoryToMakeFileIn, flattenedFiles)
+      const fileName = getNextAvailableFileNameGivenBaseName(
+        filesInDirectory.map((file) => file.name),
+        'Untitled',
+      )
+      const finalPath = await window.path.join(directoryToMakeFileIn, fileName)
+      openContent(finalPath, `## `)
+      posthog.capture('created_new_note_from_new_note_modal')
+    },
+    [currentlyOpenFilePath, flattenedFiles, openContent],
+  )
 
   const ContentContextMemo = useMemo(
     () => ({

@@ -10,9 +10,10 @@ import { useFileContext } from '@/contexts/FileContext'
 interface NewDirectoryComponentProps {
   isOpen: boolean
   onClose: () => void
+  parentDirectoryPath?: string
 }
 
-const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, onClose }) => {
+const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, onClose, parentDirectoryPath }) => {
   const [directoryName, setDirectoryName] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -45,10 +46,16 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
     const validName = await handleValidName(directoryName)
     if (!directoryName || errorMessage || !validName) return
 
-    const directoryPath =
-      currentlyOpenFilePath === '' || currentlyOpenFilePath === null
-        ? await window.electronStore.getVaultDirectoryForWindow()
-        : await window.path.dirname(currentlyOpenFilePath as string)
+    let directoryPath: string
+
+    if (parentDirectoryPath) {
+      directoryPath = parentDirectoryPath
+    } else if (currentlyOpenFilePath && currentlyOpenFilePath !== '') {
+      directoryPath = await window.path.dirname(currentlyOpenFilePath)
+    } else {
+      directoryPath = await window.electronStore.getVaultDirectoryForWindow()
+    }
+
     const finalPath = await window.path.join(directoryPath, directoryName)
     window.fileSystem.createDirectory(finalPath)
     posthog.capture('created_new_directory_from_new_directory_modal')
@@ -70,6 +77,8 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
             }
           }}
           placeholder="Directory Name"
+          // eslint-disable-next-line jsx-a11y/no-autofocus
+          autoFocus
         />
 
         <div className="flex items-center gap-3">

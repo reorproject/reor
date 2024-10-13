@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from 'react'
-
 import { FileInfoNode, FileInfoTree } from 'electron/main/filesystem/types'
-import { FixedSizeList as List } from 'react-window'
-
+import { FixedSizeList } from 'react-window'
 import { isFileNodeDirectory } from '@shared/utils'
 import { useFileContext } from '@/contexts/FileContext'
 import FileItemRows from './FileItemRows'
-import { useContentContext } from '@/contexts/ContentContext'
 
 interface FileExplorerProps {
   lheight?: number
@@ -15,7 +12,6 @@ interface FileExplorerProps {
 const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
   const [listHeight, setListHeight] = useState(lheight ?? window.innerHeight - 50)
   const { vaultFilesTree, expandedDirectories } = useFileContext()
-  const { showContextMenu: handleFocusedItem } = useContentContext()
 
   useEffect(() => {
     const updateHeight = () => {
@@ -52,8 +48,8 @@ const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
   const itemCount = visibleItems.length
 
   return (
-    <div onContextMenu={(e) => handleFocusedItem(e, 'FileSidebar')} className="h-full grow px-1 pt-2 opacity-70">
-      <List
+    <div className="h-full grow px-1 pt-2 opacity-70">
+      <FixedSizeList
         height={listHeight}
         itemCount={itemCount}
         itemSize={30}
@@ -63,7 +59,7 @@ const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
         }}
       >
         {FileItemRows}
-      </List>
+      </FixedSizeList>
     </div>
   )
 }

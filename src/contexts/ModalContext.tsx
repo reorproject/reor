@@ -51,6 +51,11 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     }
   }, [setIsFlashcardModeOpen, setInitialFileToCreateFlashcard])
 
+  // const renameDirectory = useCallback((parentDirectory?: string) => {
+  //   setIsNewDirectoryModalOpen(true)
+  //   setInitialFileToCreateFlashcard(parentDirectory)
+  // }, [])
+
   const modalOpenContextValue = useMemo(
     () => ({
       isNewDirectoryModalOpen,
