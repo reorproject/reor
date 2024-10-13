@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { PiPaperPlaneRight } from 'react-icons/pi'
-import { FiRefreshCw, FiSettings } from 'react-icons/fi'
+import { FiSettings } from 'react-icons/fi'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import { AgentConfig, ToolDefinition, DatabaseSearchFilters } from '../../lib/llm/types'
 import { Button } from '@/components/ui/button'
@@ -102,15 +102,6 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
     })
   }
 
-  const refreshLLMConfigs = async () => {
-    try {
-      const LLMConfigs = await window.llm.getLLMConfigs()
-      setLLMConfigs(LLMConfigs)
-    } catch (error) {
-      console.error('Failed to refresh LLM configs:', error)
-    }
-  }
-
   if (!agentConfig) return <div>Loading...</div>
 
   return (
@@ -154,8 +145,8 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                     llmConfigs={llmConfigs}
                     selectedLLM={selectedLLM}
                     setSelectedLLM={setSelectedLLM}
+                    setLLMConfigs={setLLMConfigs}
                   />
-                  <FiRefreshCw onClick={refreshLLMConfigs} className="ml-2 cursor-pointer" />
                 </div>
                 <div className="flex items-center">
                   <Button
