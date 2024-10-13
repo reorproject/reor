@@ -3,7 +3,7 @@ import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { DBEntry } from 'electron/main/vector-database/schema'
 import { Card, CardDescription } from '@/components/ui/card'
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/components/ui/hover-card'
-import { useWindowContentContext } from '@/contexts/WindowContentContext'
+import { useContentContext } from '@/contexts/ContentContext'
 import MarkdownRenderer from '@/components/Common/MarkdownRenderer'
 
 interface ChatSourcesProps {
@@ -16,7 +16,7 @@ const truncateName = (name: string, maxLength: number) => {
 }
 
 const ChatSources: React.FC<ChatSourcesProps> = ({ contextItems }) => {
-  const { openContent } = useWindowContentContext()
+  const { openContent } = useContentContext()
 
   const isDBEntry = (item: FileInfoWithContent | DBEntry): item is DBEntry => {
     return 'notepath' in item

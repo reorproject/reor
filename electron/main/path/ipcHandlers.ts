@@ -22,6 +22,8 @@ const registerPathHandlers = () => {
   ipcMain.handle('add-extension-if-no-extension-present', (event, pathString: string) =>
     addExtensionToFilenameIfNoExtensionPresent(pathString, markdownExtensions, '.md'),
   )
+
+  ipcMain.handle('path-ext-name', (event, pathString: string) => path.extname(pathString))
 }
 
 export default registerPathHandlers
