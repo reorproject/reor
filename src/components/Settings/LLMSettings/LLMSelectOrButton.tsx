@@ -10,7 +10,6 @@ interface LLMSelectOrButtonProps {
 }
 
 const LLMSelectOrButton: React.FC<LLMSelectOrButtonProps> = ({ llmConfigs, selectedLLM, setSelectedLLM }) => {
-  
   const handleLLMChange = (value: string) => {
     setSelectedLLM(value)
   }
