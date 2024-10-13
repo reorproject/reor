@@ -10,19 +10,18 @@ import { removeFileExtension } from '@/lib/file'
 import { useContentContext } from '@/contexts/ContentContext'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu'
 import NewDirectoryComponent from '@/components/File/NewDirectory'
-// import { useModalOpeners } from '@/contexts/ModalContext'
 
 const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data }) => {
   const { visibleItems } = data
   const fileOrDirectoryObject = visibleItems[index]
 
-  const { handleDirectoryToggle, expandedDirectories, currentlyOpenFilePath } = useFileContext()
+  const { handleDirectoryToggle, expandedDirectories, currentlyOpenFilePath, setNoteToBeRenamed, deleteFile } =
+    useFileContext()
   const { openContent, createUntitledNote } = useContentContext()
   const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false)
   const [parentDirectoryPathForNewDirectory, setParentDirectoryPathForNewDirectory] = useState<string | undefined>(
     undefined,
   )
-  // const { setIsNewDirectoryModalOpen } = useModalOpeners()
 
   const [isDragOver, setIsDragOver] = useState(false)
 
@@ -58,7 +57,6 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
       destinationPath = pathSegments.join('/')
     }
     moveFile(sourcePath, destinationPath)
-    // Refresh file list here or in moveFile function
   }
 
   const toggle = () => {
@@ -118,7 +116,7 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
               isOpen={isNewDirectoryModalOpen}
               onClose={() => setIsNewDirectoryModalOpen(false)}
               parentDirectoryPath={parentDirectoryPathForNewDirectory}
-            />{' '}
+            />
           </div>
         </ContextMenuTrigger>
         <ContextMenuContent>
@@ -128,8 +126,10 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
                 New File
               </ContextMenuItem>
               <ContextMenuItem onClick={openNewDirectoryModal}>New Folder</ContextMenuItem>
-              <ContextMenuItem>Rename</ContextMenuItem>
-              <ContextMenuItem>Delete</ContextMenuItem>
+              <ContextMenuItem onClick={() => setNoteToBeRenamed(fileOrDirectoryObject.file.path)}>
+                Rename
+              </ContextMenuItem>
+              <ContextMenuItem onClick={() => deleteFile(fileOrDirectoryObject.file.path)}>Delete</ContextMenuItem>
             </>
           ) : (
             <>
@@ -142,9 +142,10 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
                 New File
               </ContextMenuItem>
               <ContextMenuItem onClick={openNewDirectoryModal}>New Folder</ContextMenuItem>
-              <ContextMenuItem>Open</ContextMenuItem>
-              <ContextMenuItem>Rename</ContextMenuItem>
-              <ContextMenuItem>Delete</ContextMenuItem>
+              <ContextMenuItem onClick={() => setNoteToBeRenamed(fileOrDirectoryObject.file.path)}>
+                Rename
+              </ContextMenuItem>
+              <ContextMenuItem onClick={() => deleteFile(fileOrDirectoryObject.file.path)}>Delete</ContextMenuItem>
             </>
           )}
         </ContextMenuContent>
