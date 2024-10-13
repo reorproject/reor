@@ -23,21 +23,11 @@ import exampleAgents from './ChatConfigComponents/exampleAgents'
 import { allAvailableToolDefinitions } from '@/lib/llm/tools/tool-definitions'
 import ToolSelector from './ChatConfigComponents/ToolSelector'
 import SuggestionCard from '../ui/suggestion-card'
-import SettingsModal from '../Settings/Settings'
-import useModalState from '../Settings/LLMSettings/hooks/use-modal-state'
 import LLMSelectOrButton from '../Settings/LLMSettings/LLMSelectOrButton'
 
 interface StartChatProps {
   defaultModelName: string
   handleNewChatMessage: (userTextFieldInput?: string, chatFilters?: AgentConfig) => void
-}
-
-enum SettingsTab {
-  GeneralSettingsTab = 'generalSettings',
-  LLMSettingsTab = 'llmSettings',
-  EmbeddingModelTab = 'embeddingModel',
-  TextGenerationTab = 'textGeneration',
-  AnalyticsTab = 'analytics',
 }
 
 const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMessage }) => {
@@ -50,11 +40,6 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
     'Summarize my recent notes on machine learning',
     'Based on what I wrote last week, which tasks should I focus on this week?',
   ])
-  const { isSettingsModalOpen, activeTab, openModalWithTab, closeModal } = useModalState()
-
-  const openLLMSettings = () => {
-    openModalWithTab(SettingsTab.LLMSettingsTab)
-  }
 
   useEffect(() => {
     const fetchAgentConfigs = async () => {
@@ -84,10 +69,6 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
       throw new Error('No agent config found')
     }
     handleNewChatMessage(userTextFieldInput, { ...agentConfig })
-  }
-
-  const handleLLMChange = (value: string) => {
-    setSelectedLLM(value)
   }
 
   const handleToolsChange = (tools: ToolDefinition[]) => {
@@ -172,8 +153,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                   <LLMSelectOrButton
                     llmConfigs={llmConfigs}
                     selectedLLM={selectedLLM}
-                    handleLLMChange={handleLLMChange}
-                    openLLMSettings={openLLMSettings}
+                    setSelectedLLM={setSelectedLLM}
                   />
                   <FiRefreshCw onClick={refreshLLMConfigs} className="ml-2 cursor-pointer" />
                 </div>
@@ -292,7 +272,6 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
           </div>
         </div>
       </div>
-      <SettingsModal isOpen={isSettingsModalOpen} onClose={closeModal} initialTab={activeTab} />
     </div>
   )
 }

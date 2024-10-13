@@ -14,7 +14,7 @@ interface ModalProps {
   initialTab?: SettingsTab
 }
 
-enum SettingsTab {
+export enum SettingsTab {
   GeneralSettingsTab = 'generalSettings',
   LLMSettingsTab = 'llmSettings',
   EmbeddingModelTab = 'embeddingModel',
