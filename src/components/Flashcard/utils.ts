@@ -2,7 +2,7 @@ import { toast } from 'react-toastify'
 
 import { FlashcardQAPair, FlashcardQAPairUI } from './types'
 
-import { removeFileExtension } from '@/lib/strings'
+import { removeFileExtension } from '@/lib/file'
 
 export const QUESTION_FORMAT = 'Q:'
 export const ANSWER_FORMAT = 'A:'
