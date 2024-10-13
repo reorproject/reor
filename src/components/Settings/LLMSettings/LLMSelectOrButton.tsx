@@ -49,28 +49,28 @@ const LLMSelectOrButton: React.FC<LLMSelectOrButtonProps> = ({
 
   return (
     <div className="text-left">
-      {llmConfigs.length === 0 ? (
-        <div className="flex items-center">
+      <div className="flex items-center">
+        {llmConfigs.length === 0 ? (
           <Button className="bg-transparent text-primary hover:bg-slate-700" onClick={openLLMSettings}>
             Attach LLM
           </Button>
-          <FiRefreshCw onClick={refreshLLMConfigs} className="cursor-pointer text-xs text-gray-400" />
-        </div>
-      ) : (
-        <Select value={selectedLLM} onValueChange={(value) => handleLLMChange(value)}>
-          <SelectTrigger className="w-32 border border-solid border-muted-foreground">
-            <SelectValue placeholder="Select LLM" />
-          </SelectTrigger>
-          <SelectContent>
-            {llmConfigs.map((llm) => (
-              <SelectItem key={llm.modelName} value={llm.modelName}>
-                {llm.modelName}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      )}
-      <SettingsModal isOpen={isSettingsModalOpen} onClose={closeModal} initialTab={activeTab} />
+        ) : (
+          <Select value={selectedLLM} onValueChange={(value) => handleLLMChange(value)}>
+            <SelectTrigger className="w-32 border border-solid border-muted-foreground">
+              <SelectValue placeholder="Select LLM" />
+            </SelectTrigger>
+            <SelectContent>
+              {llmConfigs.map((llm) => (
+                <SelectItem key={llm.modelName} value={llm.modelName}>
+                  {llm.modelName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+        <FiRefreshCw onClick={refreshLLMConfigs} className="ml-1 cursor-pointer text-xs text-gray-400" />
+        <SettingsModal isOpen={isSettingsModalOpen} onClose={closeModal} initialTab={activeTab} />
+      </div>
     </div>
   )
 }
