@@ -36,11 +36,12 @@ const ModelNameInput: React.FC<ModelNameInputProps> = ({ modelNames, setModelNam
   }
 
   return (
-    <div className="space-y-2">
-      <h4 className="font-medium">Model Names</h4>
+    <div className="">
+      <h4 className="mb-1 font-medium">Model Names</h4>
       <div className="flex space-x-2">
         <Input
           type="text"
+          className="mt-0"
           placeholder="Add model name"
           value={newModelName}
           onChange={(e) => setNewModelName(e.target.value)}
@@ -120,8 +121,8 @@ const CustomLLMAPISetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose
             This is mainly for folks hosting their own models on other machines.
           </DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
+        <div className="grid gap-2 py-4">
+          <div className="grid gap-1">
             <label htmlFor="apiUrl">API URL</label>
             <Input
               id="apiUrl"
@@ -130,12 +131,12 @@ const CustomLLMAPISetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose
               value={apiURL}
               onChange={(e) => setApiURL(e.target.value)}
             />
-            <p className="text-xs text-muted-foreground">
+            <p className="mt-0 text-xs text-muted-foreground">
               (This must be an OpenAI compatible API endpoint. That typically is the part of the url before
               /chat/completions like for example http://127.0.0.1:1337/v1)
             </p>
           </div>
-          <div className="grid gap-2">
+          <div className="grid gap-1">
             <label htmlFor="apiName">API Name</label>
             <Input
               id="apiName"
@@ -144,9 +145,9 @@ const CustomLLMAPISetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose
               value={apiName}
               onChange={(e) => setApiName(e.target.value)}
             />
-            <p className="text-xs text-muted-foreground">(A name for your new api)</p>
+            <p className="mt-0 text-xs text-muted-foreground">(A name for your new api)</p>
           </div>
-          <div className="grid gap-2">
+          <div className="grid gap-1">
             <label htmlFor="apiKey">Optional API Key</label>
             <Input
               id="apiKey"
@@ -155,7 +156,7 @@ const CustomLLMAPISetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
             />
-            <p className="text-xs text-muted-foreground">(If your endpoint requires an API key.)</p>
+            <p className="mt-0 text-xs text-muted-foreground">(If your endpoint requires an API key.)</p>
           </div>
           <ModelNameInput modelNames={modelNames} setModelNames={setModelNames} />
           {currentError && <p className="text-xs text-destructive">{currentError}</p>}
