@@ -57,9 +57,10 @@ const NewRemoteEmbeddingModelModal: React.FC<NewRemoteEmbeddingModelModalProps> 
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Set up remote model</DialogTitle>
+          <DialogTitle>Custom embedding model</DialogTitle>
           <DialogDescription>
-            Provide the repo name from Hugging Face like &quot;Xenova/bge-base-en-v1.5&quot;.
+            If you don&apos;t want to use one of our default embedding models, you can choose a Hugging Face model and
+            attach it here.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -67,19 +68,19 @@ const NewRemoteEmbeddingModelModal: React.FC<NewRemoteEmbeddingModelModalProps> 
             value={huggingfaceRepo}
             onChange={(e) => setHuggingfaceRepo(e.target.value)}
             onKeyDown={handleKeyPress}
-            placeholder="Embedding Model Repo"
+            placeholder="Xenova/bge-base-en-v1.5"
           />
           <p className="text-xs italic text-muted-foreground">
             <ExternalLink href="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=downloads&search=xenova">
               This page on Hugging Face
             </ExternalLink>{' '}
             has models that are compatible with Reor. It must be a &quot;Xenova&quot; ONNX embedding model. Check out{' '}
-            <ExternalLink href="https://www.reorproject.org/docs/documentation/embedding">this guide</ExternalLink> for
+            <ExternalLink href="https://www.reorproject.org/docs/documentation/embedding">our guide</ExternalLink> for
             more info.
           </p>
         </div>
         <DialogFooter>
-          <Button onClick={saveModelConfigToElectronStore}>Attach Remote</Button>
+          <Button onClick={saveModelConfigToElectronStore}>Attach</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
