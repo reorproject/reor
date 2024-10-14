@@ -70,17 +70,10 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = () => {
     <div>
       <h2 className="mb-4 font-semibold text-white">LLM</h2>
       {llmConfigs.length > 0 && (
-        <div className="flex w-full flex-wrap items-center justify-between gap-5 pb-2">
-          <div className="flex-col">
-            <p className="mt-5 text-gray-100">Default LLM</p>
-          </div>{' '}
-          <div className="mb-1 flex w-[140px] min-w-[128px]">
-            <DefaultLLMSelector llmConfigs={llmConfigs} defaultLLM={defaultLLM} setDefaultLLM={setDefaultLLM} />
-          </div>
-        </div>
+        <SettingsRow title="Default LLM" description="Select your default language model">
+          <DefaultLLMSelector llmConfigs={llmConfigs} defaultLLM={defaultLLM} setDefaultLLM={setDefaultLLM} />
+        </SettingsRow>
       )}
-
-      <div className="h-[2px] w-full bg-neutral-700" />
 
       <SettingsRow
         title="Local LLM"
