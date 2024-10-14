@@ -1,9 +1,7 @@
 import React from 'react'
-
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import posthog from 'posthog-js'
-
-import CustomSelect from '../../Common/Select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface DefaultLLMSelectorProps {
   llmConfigs: LLMConfig[]
@@ -20,13 +18,19 @@ const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({ llmConfigs, def
     })
   }
 
-  const modelOptions = llmConfigs.map((config) => ({
-    label: config.modelName,
-    value: config.modelName,
-  }))
-
   return (
-    <CustomSelect options={modelOptions} selectedValue={defaultLLM} onChange={handleDefaultModelChange} centerText />
+    <Select onValueChange={handleDefaultModelChange} defaultValue={defaultLLM}>
+      <SelectTrigger className="w-[180px]">
+        <SelectValue placeholder="Select default LLM" />
+      </SelectTrigger>
+      <SelectContent>
+        {llmConfigs.map((config) => (
+          <SelectItem key={config.modelName} value={config.modelName}>
+            {config.modelName}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   )
 }
 

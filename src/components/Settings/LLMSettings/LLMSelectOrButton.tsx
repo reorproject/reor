@@ -56,7 +56,7 @@ const LLMSelectOrButton: React.FC<LLMSelectOrButtonProps> = ({
           </Button>
         ) : (
           <Select value={selectedLLM} onValueChange={(value) => handleLLMChange(value)}>
-            <SelectTrigger className="w-32 border border-solid border-muted-foreground">
+            <SelectTrigger className="w-32 ">
               <SelectValue placeholder="Select LLM" />
             </SelectTrigger>
             <SelectContent>

@@ -7,8 +7,8 @@ import DefaultLLMSelector from './DefaultLLMSelector'
 import useLLMConfigs from './hooks/use-llm-configs'
 import useModals from './hooks/use-modals'
 
-import CustomSelect from '@/components/Common/Select'
 import SettingsRow from '../Shared/SettingsRow'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface LLMSettingsContentProps {}
 
@@ -89,12 +89,18 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = () => {
         onClick={() => openModal('newLocalModel')}
       />
       <SettingsRow title="Setup OpenAI or Anthropic" description="Add your API key">
-        <CustomSelect
-          options={modalOptions}
-          selectedValue="Attach Cloud LLM"
-          onChange={(value) => openModal(value as 'openai' | 'anthropic')}
-          centerText
-        />
+        <Select onValueChange={(value) => openModal(value as 'openai' | 'anthropic')}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Attach Cloud LLM" />
+          </SelectTrigger>
+          <SelectContent>
+            {modalOptions.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </SettingsRow>
       <SettingsRow
         title="Setup remote LLMs"

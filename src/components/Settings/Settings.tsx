@@ -86,8 +86,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
             </div>
           </div>
 
-          {/* Right Content Area */}
-          <div className="w-full flex-1 overflow-y-auto rounded-r-lg bg-dark-gray-c-three px-4 lg:px-12">
+          <div className="w-full flex-1 overflow-y-auto rounded-r-lg bg-dark-gray-c-three px-4">
             {activeTab === SettingsTab.GeneralSettingsTab && <GeneralSettings />}
             {activeTab === SettingsTab.LLMSettingsTab && <LLMSettings />}
             {activeTab === SettingsTab.EmbeddingModelTab && (
