@@ -48,9 +48,9 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = () => {
         </Select>
       </SettingsRow>
       <SettingsRow
-        title="Setup remote LLMs"
-        description="Non-OpenAI/Anthropic LLMs"
-        buttonText="Remote LLM Setup"
+        title="Setup a custom LLM API"
+        description="I.e. a non-OpenAI/Anthropic LLM"
+        buttonText="Custom LLM Setup"
         onClick={() => openModal('remoteLLM')}
       />
 

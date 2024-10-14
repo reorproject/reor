@@ -61,7 +61,7 @@ const ModelNameInput: React.FC<ModelNameInputProps> = ({ modelNames, setModelNam
   )
 }
 
-const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose: parentOnClose }) => {
+const CustomLLMAPISetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose: parentOnClose }) => {
   const [apiName, setApiName] = useState<string>('')
   const [apiURL, setApiURL] = useState<string>('')
   const [apiKey, setApiKey] = useState<string>('')
@@ -107,7 +107,7 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose: p
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="sm:max-w-[525px]">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[525px]">
         <DialogHeader>
           <DialogTitle>Remote LLM Setup</DialogTitle>
           <DialogDescription>
@@ -168,4 +168,4 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose: p
   )
 }
 
-export default RemoteLLMSetupModal
+export default CustomLLMAPISetupModal

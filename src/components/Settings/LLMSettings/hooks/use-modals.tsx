@@ -2,12 +2,12 @@ import React, { useState } from 'react'
 
 import DefaultLLMAPISetupModal, { CloudLLMSetupModalProps } from '../modals/DefaultLLMAPISetupModal'
 import NewOllamaModelModal from '../modals/NewOllamaModel'
-import RemoteLLMSetupModal from '../modals/CustomLLMAPISetup'
+import CustomLLMAPISetupModal from '../modals/CustomLLMAPISetup'
 
 const useModals = () => {
   const [modals, setModals] = useState({
     newLocalModel: { isOpen: false, Component: NewOllamaModelModal },
-    remoteLLM: { isOpen: false, Component: RemoteLLMSetupModal },
+    remoteLLM: { isOpen: false, Component: CustomLLMAPISetupModal },
     openai: {
       isOpen: false,
       Component: ({ isOpen, onClose }: Omit<CloudLLMSetupModalProps, 'apiInterface'>) => (
