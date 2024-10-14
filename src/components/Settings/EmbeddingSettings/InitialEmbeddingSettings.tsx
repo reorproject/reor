@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react'
 
 import { EmbeddingModelConfig } from 'electron/main/electron-store/storeConfig'
 
-import NewEmbeddingModelModalBothTypes from './modals/NewEmbeddingModelBothTypes'
-
 import CustomSelect from '@/components/Common/Select'
+import NewRemoteEmbeddingModelModal from './modals/NewRemoteEmbeddingModel'
 
 // import { modelRepos } from "./EmbeddingSettings";
 
@@ -102,7 +101,7 @@ const InitialEmbeddingModelSettings: React.FC<InitialEmbeddingModelSettingsProps
           }}
         />
       </div>
-      <NewEmbeddingModelModalBothTypes
+      <NewRemoteEmbeddingModelModal
         isOpen={showNewEmbeddingModelModal}
         onClose={() => {
           setShowNewEmbeddingModelModal(false)

@@ -151,7 +151,7 @@ const CustomLLMAPISetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose
             <label htmlFor="apiKey">Optional API Key</label>
             <Input
               id="apiKey"
-              type="text"
+              type="password"
               placeholder="API Key"
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}

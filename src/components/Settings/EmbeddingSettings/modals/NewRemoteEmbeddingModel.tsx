@@ -1,11 +1,17 @@
-import React, { useState } from 'react'
-
-import { Button } from '@material-tailwind/react'
+import React, { useEffect, useState } from 'react'
 import { EmbeddingModelWithRepo } from 'electron/main/electron-store/storeConfig'
 import posthog from 'posthog-js'
-
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import ExternalLink from '../../../Common/ExternalLink'
-import ReorModal from '../../../Common/Modal'
 
 interface NewRemoteEmbeddingModelModalProps {
   isOpen: boolean
@@ -19,6 +25,10 @@ const NewRemoteEmbeddingModelModal: React.FC<NewRemoteEmbeddingModelModalProps> 
   handleUserHasChangedModel,
 }) => {
   const [huggingfaceRepo, setHuggingfaceRepo] = useState('')
+
+  useEffect(() => {
+    console.log('isopen: ', isOpen)
+  }, [isOpen])
 
   const saveModelConfigToElectronStore = async () => {
     if (!huggingfaceRepo) {
@@ -48,42 +58,35 @@ const NewRemoteEmbeddingModelModal: React.FC<NewRemoteEmbeddingModelModalProps> 
   }
 
   return (
-    <ReorModal isOpen={isOpen} onClose={saveModelConfigToElectronStore}>
-      <div className="mx-2 mb-2 w-[400px] pl-3">
-        <h2 className="mb-0  font-semibold text-white">Set up remote model</h2>
-        <p className="mb-6 mt-2 text-xs text-white">
-          Provide the repo name from Hugging Face like &quot;Xenova/roberta-base-squad2&quot;.
-        </p>
-
-        <input
-          type="text"
-          className=" box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
-          value={huggingfaceRepo}
-          onChange={(e) => setHuggingfaceRepo(e.target.value)}
-          onKeyDown={handleKeyPress}
-          placeholder="Embedding Model Repo"
-        />
-        <p className="my-2 text-xs italic text-white">
-          <ExternalLink href="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=downloads&search=xenova">
-            {' '}
-            This page on Hugging Face
-          </ExternalLink>{' '}
-          has most available models. It must be a &quot;Xenova&quot; ONNX embedding model. Check out{' '}
-          <ExternalLink href="https://www.reorproject.org/docs/documentation/embedding">this guide</ExternalLink> for
-          more info.{' '}
-        </p>
-
-        <div className="flex w-full justify-end pb-2">
-          <Button
-            className="mt-3 h-8 w-[120px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
-            onClick={saveModelConfigToElectronStore}
-            placeholder=""
-          >
-            Attach Remote
-          </Button>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Set up remote model</DialogTitle>
+          <DialogDescription>
+            Provide the repo name from Hugging Face like &quot;Xenova/bge-base-en-v1.5&quot;.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <Input
+            value={huggingfaceRepo}
+            onChange={(e) => setHuggingfaceRepo(e.target.value)}
+            onKeyDown={handleKeyPress}
+            placeholder="Embedding Model Repo"
+          />
+          <p className="text-xs italic text-muted-foreground">
+            <ExternalLink href="https://huggingface.co/models?pipeline_tag=feature-extraction&sort=downloads&search=xenova">
+              This page on Hugging Face
+            </ExternalLink>{' '}
+            has models that are compatible with Reor. It must be a &quot;Xenova&quot; ONNX embedding model. Check out{' '}
+            <ExternalLink href="https://www.reorproject.org/docs/documentation/embedding">this guide</ExternalLink> for
+            more info.
+          </p>
         </div>
-      </div>
-    </ReorModal>
+        <DialogFooter>
+          <Button onClick={saveModelConfigToElectronStore}>Attach Remote</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 

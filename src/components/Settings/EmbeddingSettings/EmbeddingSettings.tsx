@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react'
 
-import { Button } from '@material-tailwind/react'
 import { EmbeddingModelConfig } from 'electron/main/electron-store/storeConfig'
 import posthog from 'posthog-js'
 
 import CustomSelect from '../../Common/Select'
 import ChunkSizeSettings from '../ChunkSizeSettings'
 
-import NewLocalEmbeddingModelModal from './modals/NewLocalEmbeddingModel'
 import NewRemoteEmbeddingModelModal from './modals/NewRemoteEmbeddingModel'
+import { Button } from '@/components/ui/button'
 
 interface EmbeddingModelManagerProps {
   // userHasCompleted?: (completed: boolean) => void;
@@ -21,7 +20,6 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
   userTriedToSubmit,
 }) => {
   const [currentError, setCurrentError] = useState<string>('')
-  const [isNewLocalEmbeddingModelModalOpen, setIsNewLocalEmbeddingModelModalOpen] = useState<boolean>(false)
   const [isConextLengthModalOpen, setIsContextLengthModalOpen] = useState<boolean>(false)
   const [selectedModel, setSelectedModel] = useState<string>('')
   const [embeddingModels, setEmbeddingModels] = useState<Record<string, EmbeddingModelConfig>>({})
@@ -92,30 +90,11 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
         </div>
         <div className="flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2">
           <div className="flex-col">
-            <h4 className="mb-0 font-normal text-gray-200">Attach Local Model</h4>
-            <p className="text-xs text-gray-100">Attach a local HuggingFace model.</p>
-          </div>
-          <div className="flex">
-            <Button
-              className="flex w-[80px] cursor-pointer items-center justify-between rounded-md border border-none border-gray-300 bg-dark-gray-c-eight py-2 font-normal hover:bg-dark-gray-c-ten"
-              onClick={() => setIsNewLocalEmbeddingModelModalOpen(true)}
-              placeholder=""
-            >
-              Attach
-            </Button>
-          </div>
-        </div>
-        <div className="flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2">
-          <div className="flex-col">
-            <h4 className="mb-0 font-normal text-gray-200">Download Remote Model</h4>
+            <h4 className="mb-0 font-normal text-gray-200">Custom Embedding Model</h4>
             <p className="text-xs text-gray-100">Reor will download a HuggingFace embedding model for you.</p>
           </div>
           <div className="flex">
-            <Button
-              className="flex w-[80px] cursor-pointer items-center justify-between rounded-md border border-none border-gray-300 bg-dark-gray-c-eight py-2 font-normal hover:bg-dark-gray-c-ten"
-              onClick={() => setIsContextLengthModalOpen(true)}
-              placeholder=""
-            >
+            <Button variant="secondary" onClick={() => setIsContextLengthModalOpen(true)}>
               Attach
             </Button>
           </div>
@@ -132,20 +111,10 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
       </div>
       {/* Warning message at the bottom */}
       <p className="text-xs text-gray-100 opacity-50">
-        <i>Note: If you notice some lag in the editor it is likely because you chose too large of a model...</i>
+        <i>
+          Note: If you notice some lag in the editor it is likely because you chose too large of an embedding model...
+        </i>
       </p>{' '}
-      <NewLocalEmbeddingModelModal
-        isOpen={isNewLocalEmbeddingModelModalOpen}
-        onClose={() => {
-          setIsNewLocalEmbeddingModelModalOpen(false)
-        }}
-        handleUserHasChangedModel={() => {
-          updateEmbeddingModels()
-          if (handleUserHasChangedModel) {
-            handleUserHasChangedModel()
-          }
-        }}
-      />
       <NewRemoteEmbeddingModelModal
         isOpen={isConextLengthModalOpen}
         onClose={() => {
