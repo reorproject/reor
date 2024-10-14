@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 
 import AnalyticsSettings from './AnalyticsSettings'
@@ -9,18 +9,27 @@ import LLMSettings from './LLMSettings/LLMSettings'
 interface SettingsModalProps {
   isOpen: boolean
   onClose: () => void
+  initialTab?: SettingsTab
 }
 
-enum SettingsTab {
+export enum SettingsTab {
   GeneralSettingsTab = 'generalSettings',
   LLMSettingsTab = 'llmSettings',
   EmbeddingModelTab = 'embeddingModel',
   AnalyticsTab = 'analytics',
 }
 
-const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose: onCloseFromParent }) => {
+const SettingsModal: React.FC<SettingsModalProps> = ({
+  isOpen,
+  onClose: onCloseFromParent,
+  initialTab = SettingsTab.GeneralSettingsTab,
+}) => {
   const [willNeedToReIndex, setWillNeedToReIndex] = useState(false)
-  const [activeTab, setActiveTab] = useState(SettingsTab.GeneralSettingsTab)
+  const [activeTab, setActiveTab] = useState<SettingsTab>(initialTab)
+
+  useEffect(() => {
+    setActiveTab(initialTab)
+  }, [initialTab])
 
   const handleSave = () => {
     if (willNeedToReIndex) {
