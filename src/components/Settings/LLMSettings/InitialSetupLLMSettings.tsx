@@ -8,20 +8,11 @@ import LLMSettingsContent from './LLMSettingsContent'
 
 import ReorModal from '@/components/Common/Modal'
 
-interface InitialSetupLLMSettingsProps {
-  userHasCompleted?: (completed: boolean) => void
-  userTriedToSubmit?: boolean
-}
+interface InitialSetupLLMSettingsProps {}
 
-const InitialSetupLLMSettings: React.FC<InitialSetupLLMSettingsProps> = ({ userHasCompleted, userTriedToSubmit }) => {
+const InitialSetupLLMSettings: React.FC<InitialSetupLLMSettingsProps> = () => {
   const [isSetupModalOpen, setIsSetupModalOpen] = React.useState<boolean>(false)
   const { llmConfigs, fetchAndUpdateModelConfigs } = useLLMConfigs()
-
-  React.useEffect(() => {
-    if (llmConfigs.length > 0) {
-      userHasCompleted?.(true)
-    }
-  }, [llmConfigs, userHasCompleted])
 
   const isSetupComplete = llmConfigs.length > 0
 
@@ -62,9 +53,6 @@ const InitialSetupLLMSettings: React.FC<InitialSetupLLMSettingsProps> = ({ userH
           </div>
         </ReorModal>
       </div>
-      {userTriedToSubmit && llmConfigs.length === 0 && (
-        <p className="mt-1 text-sm text-red-500">Please set up at least one LLM.</p>
-      )}
     </div>
   )
 }

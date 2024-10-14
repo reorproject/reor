@@ -39,12 +39,8 @@ const LLMSelectOrButton: React.FC<LLMSelectOrButtonProps> = ({
   }
 
   const refreshLLMConfigs = async () => {
-    try {
-      const LLMConfigs = await window.llm.getLLMConfigs()
-      setLLMConfigs(LLMConfigs)
-    } catch (error) {
-      console.error('Failed to refresh LLM configs:', error)
-    }
+    const LLMConfigs = await window.llm.getLLMConfigs()
+    setLLMConfigs(LLMConfigs)
   }
 
   return (

@@ -5,46 +5,14 @@ import { EmbeddingModelConfig } from 'electron/main/electron-store/storeConfig'
 import CustomSelect from '@/components/Common/Select'
 import NewRemoteEmbeddingModelModal from './modals/NewRemoteEmbeddingModel'
 
-// import { modelRepos } from "./EmbeddingSettings";
-
-// export const modelRepos = [
-//   {
-//     label: "bge-base-en-v1.5 (medium, recommended)",
-//     value: "Xenova/bge-base-en-v1.5",
-//   },
-//   { label: "UAE-Large-V1 (large) ", value: "Xenova/UAE-Large-V1" },
-//   { label: "bge-small-en-v1.5 (small)", value: "Xenova/bge-small-en-v1.5" },
-// ];
 interface InitialEmbeddingModelSettingsProps {
-  // handleUserHasCompleted?: (completed: boolean) => void;
-  // handleUserHasChangedModel?: (bool: boolean) => void;
-  // userTriedToSubmit?: boolean;
   setErrorMsg: (msg: string) => void
 }
-const InitialEmbeddingModelSettings: React.FC<InitialEmbeddingModelSettingsProps> = ({
-  // handleUserHasCompleted,
-  // handleUserHasChangedModel,
-  // userTriedToSubmit,
-  setErrorMsg,
-}) => {
-  // const [currentError, setCurrentError] = useState<string>("");
-
+const InitialEmbeddingModelSettings: React.FC<InitialEmbeddingModelSettingsProps> = ({ setErrorMsg }) => {
   const [selectedModel, setSelectedModel] = useState<string>('')
   const [embeddingModels, setEmbeddingModels] = useState<Record<string, EmbeddingModelConfig>>({})
   const [showNewEmbeddingModelModal, setShowNewEmbeddingModelModal] = useState<boolean>(false)
-  // useEffect(() => {
-  //   const defaultModel = window.electronStore.getDefaultEmbeddingModel();
-  //   if (defaultModel) {
-  //     setSelectedModel(defaultModel);
-  //   }
-  //   // else {
-  //   //   setSelectedModel(modelRepos[0].value);
-  //   //   // window.electronStore.setDefaultEmbeddingModel(modelRepos[0].value);
-  //   //   if (handleUserHasChangedModel) {
-  //   //     handleUserHasChangedModel(true);
-  //   //   }
-  //   // }
-  // }, []);
+
   const updateEmbeddingModels = async () => {
     const storedEmbeddingModels = await window.electronStore.getEmbeddingModels()
 
@@ -74,19 +42,11 @@ const InitialEmbeddingModelSettings: React.FC<InitialEmbeddingModelSettingsProps
   const handleChangeOnModelSelect = (newSelectedModel: string) => {
     setSelectedModel(newSelectedModel)
     window.electronStore.setDefaultEmbeddingModel(newSelectedModel)
-    // if (handleUserHasChangedModel) {
-    //   handleUserHasChangedModel(true);
-    // }
   }
 
   return (
     <div className="flex w-full items-center justify-between rounded bg-dark-gray-c-three">
       <p className="mb-2 pb-3 text-gray-100">Embedding Model</p>{' '}
-      {/* <CustomSelect
-        options={modelRepos}
-        value={selectedModel}
-        onChange={handleChangeOnModelSelect}
-      /> */}
       <div className="w-[200px]">
         <CustomSelect
           options={Object.keys(embeddingModels).map((model) => ({

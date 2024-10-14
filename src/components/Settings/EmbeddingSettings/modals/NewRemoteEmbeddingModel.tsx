@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { EmbeddingModelWithRepo } from 'electron/main/electron-store/storeConfig'
 import posthog from 'posthog-js'
 import { Button } from '@/components/ui/button'
@@ -25,10 +25,6 @@ const NewRemoteEmbeddingModelModal: React.FC<NewRemoteEmbeddingModelModalProps> 
   handleUserHasChangedModel,
 }) => {
   const [huggingfaceRepo, setHuggingfaceRepo] = useState('')
-
-  useEffect(() => {
-    console.log('isopen: ', isOpen)
-  }, [isOpen])
 
   const saveModelConfigToElectronStore = async () => {
     if (!huggingfaceRepo) {

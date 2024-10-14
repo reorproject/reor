@@ -4,7 +4,8 @@ import { Dialog, DialogContent } from '@/components/ui/dialog'
 import AnalyticsSettings from './AnalyticsSettings'
 import EmbeddingModelSettings from './EmbeddingSettings/EmbeddingSettings'
 import GeneralSettings from './GeneralSettings'
-import LLMSettings from './LLMSettings/LLMSettings'
+
+import LLMSettingsContent from './LLMSettings/LLMSettingsContent'
 
 interface SettingsModalProps {
   isOpen: boolean
@@ -88,7 +89,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
 
           <div className="w-full flex-1 overflow-y-auto rounded-r-lg bg-dark-gray-c-three px-4">
             {activeTab === SettingsTab.GeneralSettingsTab && <GeneralSettings />}
-            {activeTab === SettingsTab.LLMSettingsTab && <LLMSettings />}
+            {activeTab === SettingsTab.LLMSettingsTab && <LLMSettingsContent />}
             {activeTab === SettingsTab.EmbeddingModelTab && (
               <EmbeddingModelSettings handleUserHasChangedModel={() => setWillNeedToReIndex(true)} />
             )}
