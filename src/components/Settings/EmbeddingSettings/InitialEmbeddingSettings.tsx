@@ -1,8 +1,9 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useState, useEffect } from 'react'
 
 import { EmbeddingModelConfig } from 'electron/main/electron-store/storeConfig'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
-import CustomSelect from '@/components/Common/Select'
 import NewRemoteEmbeddingModelModal from './modals/NewRemoteEmbeddingModel'
 
 interface InitialEmbeddingModelSettingsProps {
@@ -46,21 +47,30 @@ const InitialEmbeddingModelSettings: React.FC<InitialEmbeddingModelSettingsProps
 
   return (
     <div className="flex w-full items-center justify-between rounded bg-dark-gray-c-three">
-      <p className="mb-2 pb-3 text-gray-100">Embedding Model</p>{' '}
-      <div className="w-[200px]">
-        <CustomSelect
-          options={Object.keys(embeddingModels).map((model) => ({
-            label: model,
-            value: model,
-          }))}
-          selectedValue={selectedModel}
-          onChange={handleChangeOnModelSelect}
-          addButton={{
-            label: 'Attach a Custom Embedding Model',
-            onClick: () => setShowNewEmbeddingModelModal(true),
-          }}
-        />
+      <div className="flex flex-col">
+        <p className="mb-0 text-gray-100">Embedding Model</p>{' '}
+        <p className="text-xs text-gray-400">
+          Choose a recommended model or a{' '}
+          <a className="underline" onClick={() => setShowNewEmbeddingModelModal(true)}>
+            custom embedding model
+          </a>
+        </p>
       </div>
+      <div className="w-[200px]">
+        <Select value={selectedModel} onValueChange={handleChangeOnModelSelect}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select a model" />
+          </SelectTrigger>
+          <SelectContent>
+            {Object.keys(embeddingModels).map((model) => (
+              <SelectItem key={model} value={model}>
+                {model}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       <NewRemoteEmbeddingModelModal
         isOpen={showNewEmbeddingModelModal}
         onClose={() => {

@@ -24,7 +24,6 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = () => {
   const modalOptions = [
     { label: 'OpenAI Setup', value: 'openai' },
     { label: 'Anthropic Setup', value: 'anthropic' },
-    // Add more API providers here as needed
   ]
 
   return (
