@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-
 import DefaultLLMSelector from './DefaultLLMSelector'
 import useLLMConfigs from './hooks/use-llm-configs'
 import SettingsRow from '../Shared/SettingsRow'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Button } from '@/components/ui/button'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
 import DefaultLLMAPISetupModal from './modals/DefaultLLMAPISetupModal'
 import NewOllamaModelModal from './modals/NewOllamaModel'
@@ -24,6 +24,7 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = () => {
   const modalOptions = [
     { label: 'OpenAI Setup', value: 'openai' },
     { label: 'Anthropic Setup', value: 'anthropic' },
+    // Add more API providers here as needed
   ]
 
   return (
@@ -41,19 +42,23 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = () => {
         description="Attach a local LLM. Reor will download the model for you."
         onClick={() => setOpenModal('newLocalModel')}
       />
-      <SettingsRow title="Setup OpenAI or Anthropic" description="Add your API key">
-        <Select onValueChange={(value) => setOpenModal(value)}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Attach Cloud LLM" />
-          </SelectTrigger>
-          <SelectContent>
+      <SettingsRow title="Setup Cloud LLM API" description="Add your API key">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="secondary">Attach Cloud LLM</Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
             {modalOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
+              <DropdownMenuItem
+                key={option.value}
+                onClick={() => setOpenModal(option.value)}
+                className="cursor-pointer"
+              >
                 {option.label}
-              </SelectItem>
+              </DropdownMenuItem>
             ))}
-          </SelectContent>
-        </Select>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </SettingsRow>
       <SettingsRow
         title="Setup a custom LLM API"

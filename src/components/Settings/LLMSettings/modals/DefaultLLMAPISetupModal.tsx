@@ -68,15 +68,15 @@ const DefaultLLMAPISetupModal: React.FC<CloudLLMSetupModalProps> = ({ isOpen, on
           <DialogTitle>{LLMDisplayName} Setup</DialogTitle>
           <DialogDescription>Enter your {LLMDisplayName} API key below:</DialogDescription>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
+        <div className="grid gap-4">
           <Input
-            type="text"
+            type="password"
             value={apiKey}
             onChange={(e) => setAPIKey(e.target.value)}
             onKeyDown={handleKeyPress}
             placeholder={`${LLMDisplayName} API Key`}
           />
-          <p className="text-xs text-muted-foreground">
+          <p className="mt-0 text-xs text-muted-foreground">
             <i>You&apos;ll then be able to choose an {LLMDisplayName} model in the model dropdown...</i>
           </p>
         </div>
