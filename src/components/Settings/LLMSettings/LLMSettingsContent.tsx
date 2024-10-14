@@ -1,17 +1,25 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import DefaultLLMSelector from './DefaultLLMSelector'
 import useLLMConfigs from './hooks/use-llm-configs'
-import useModals from './hooks/use-modals'
-
 import SettingsRow from '../Shared/SettingsRow'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
+import DefaultLLMAPISetupModal from './modals/DefaultLLMAPISetupModal'
+import NewOllamaModelModal from './modals/NewOllamaModel'
+import CustomLLMAPISetupModal from './modals/CustomLLMAPISetup'
 
 interface LLMSettingsContentProps {}
 
 const LLMSettingsContent: React.FC<LLMSettingsContentProps> = () => {
   const { llmConfigs, defaultLLM, setDefaultLLM, fetchAndUpdateModelConfigs } = useLLMConfigs()
-  const { modals, openModal, closeModal } = useModals()
+
+  const [openModal, setOpenModal] = useState<string | null>(null)
+
+  const closeModal = () => {
+    setOpenModal(null)
+    fetchAndUpdateModelConfigs()
+  }
 
   const modalOptions = [
     { label: 'OpenAI Setup', value: 'openai' },
@@ -31,10 +39,10 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = () => {
         title="Local LLM"
         buttonText="Add New Local LLM"
         description="Attach a local LLM. Reor will download the model for you."
-        onClick={() => openModal('newLocalModel')}
+        onClick={() => setOpenModal('newLocalModel')}
       />
       <SettingsRow title="Setup OpenAI or Anthropic" description="Add your API key">
-        <Select onValueChange={(value) => openModal(value as 'openai' | 'anthropic')}>
+        <Select onValueChange={(value) => setOpenModal(value)}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Attach Cloud LLM" />
           </SelectTrigger>
@@ -51,19 +59,13 @@ const LLMSettingsContent: React.FC<LLMSettingsContentProps> = () => {
         title="Setup a custom LLM API"
         description="I.e. a non-OpenAI/Anthropic LLM"
         buttonText="Custom LLM Setup"
-        onClick={() => openModal('remoteLLM')}
+        onClick={() => setOpenModal('remoteLLM')}
       />
 
-      {Object.entries(modals).map(([key, { isOpen, Component }]) => (
-        <Component
-          key={key}
-          isOpen={isOpen}
-          onClose={() => {
-            closeModal(key as keyof typeof modals)
-            fetchAndUpdateModelConfigs()
-          }}
-        />
-      ))}
+      <NewOllamaModelModal isOpen={openModal === 'newLocalModel'} onClose={closeModal} />
+      <CustomLLMAPISetupModal isOpen={openModal === 'remoteLLM'} onClose={closeModal} />
+      <DefaultLLMAPISetupModal isOpen={openModal === 'openai'} onClose={closeModal} apiInterface="openai" />
+      <DefaultLLMAPISetupModal isOpen={openModal === 'anthropic'} onClose={closeModal} apiInterface="anthropic" />
     </div>
   )
 }
