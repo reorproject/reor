@@ -205,11 +205,14 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   }, [spellCheckEnabled, editor])
 
-  const [debouncedEditor] = useDebounce(editor?.state.doc.content, 4000)
+  const [debouncedEditor] = useDebounce(editor?.state.doc.content, 3000)
 
   useEffect(() => {
     if (debouncedEditor && !currentlyChangingFilePath) {
       writeEditorContentToDisk(editor, currentlyOpenFilePath)
+      if (editor && currentlyOpenFilePath) {
+        handleNewFileRenaming(editor, currentlyOpenFilePath)
+      }
     }
   }, [debouncedEditor, currentlyOpenFilePath, editor, currentlyChangingFilePath])
 
@@ -227,26 +230,29 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         })
         setNeedToWriteEditorContentToDisk(false)
       }
+    }
+  }
 
-      const fileInfo = vaultFilesFlattened.find((f) => f.path === filePath)
-      if (
-        fileInfo &&
-        fileInfo.name.startsWith('Untitled') &&
-        new Date().getTime() - fileInfo.dateCreated.getTime() < 60000
-      ) {
-        const editorText = editor?.getText()
-        if (editorText) {
-          const newProposedFileName = generateFileNameFromFileContent(editorText)
-          if (newProposedFileName) {
-            const directoryToMakeFileIn = await window.path.dirname(filePath)
-            const filesInDirectory = await getFilesInDirectory(directoryToMakeFileIn, vaultFilesFlattened)
-            const fileName = getNextAvailableFileNameGivenBaseName(
-              filesInDirectory.map((file) => file.name),
-              newProposedFileName,
-            )
-            const newFilePath = await window.path.join(directoryToMakeFileIn, fileName)
-            await renameFile(filePath, newFilePath)
-          }
+  const handleNewFileRenaming = async (_editor: Editor, filePath: string) => {
+    const fileInfo = vaultFilesFlattened.find((f) => f.path === filePath)
+    if (
+      fileInfo &&
+      fileInfo.name.startsWith('Untitled') &&
+      new Date().getTime() - fileInfo.dateCreated.getTime() < 60000
+    ) {
+      const editorText = _editor.getText()
+      if (editorText) {
+        const newProposedFileName = generateFileNameFromFileContent(editorText)
+        if (newProposedFileName) {
+          const directoryToMakeFileIn = await window.path.dirname(filePath)
+          const filesInDirectory = await getFilesInDirectory(directoryToMakeFileIn, vaultFilesFlattened)
+          const fileName = getNextAvailableFileNameGivenBaseName(
+            filesInDirectory.map((file) => file.name),
+            newProposedFileName,
+          )
+          const newFilePath = await window.path.join(directoryToMakeFileIn, fileName)
+          await renameFile(filePath, newFilePath)
+          // setCurrentlyOpenFilePath(newFilePath)
         }
       }
     }
