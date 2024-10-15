@@ -67,7 +67,7 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
           <div className="flex-col">
             <p className="mt-5 text-gray-100">
               Select Model
-              <p className="text-xs text-gray-100">If you change this your files will be re-indexed</p>
+              <p className="text-xs text-gray-100 opacity-50">If you change this your files will be re-indexed</p>
             </p>{' '}
           </div>
           <div className="flex w-[150px] items-end">
@@ -83,7 +83,9 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
         <div className="flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2">
           <div className="flex-col">
             <h4 className="mb-0 font-normal text-gray-200">Custom Embedding Model</h4>
-            <p className="text-xs text-gray-100">Reor will download a HuggingFace embedding model for you.</p>
+            <p className="text-xs text-gray-100 opacity-50">
+              Reor will download a HuggingFace embedding model for you.
+            </p>
           </div>
           <div className="flex">
             <Button variant="secondary" onClick={() => setIsContextLengthModalOpen(true)}>
@@ -94,7 +96,7 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
         <ChunkSizeSettings>
           <div className="flex-col">
             <h4 className="mb-0 font-normal text-gray-200">Change Chunk Size</h4>
-            <p className="text-xs text-gray-100">
+            <p className="text-xs text-gray-100 opacity-50">
               A larger chunk size means more context is fed to the model at the cost of &quot;needle in a haystack&quot;
               effects.
             </p>
