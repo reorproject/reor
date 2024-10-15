@@ -115,7 +115,17 @@ const ChatComponent: React.FC = () => {
         if (error instanceof Error && error.name === 'AI_APICallError' && error.message.includes('Bad Request')) {
           if (agentConfig && agentConfig?.toolDefinitions.length > 0 && outputChat) {
             toast.info(
-              'Disabling tools as this model does not support them. If you want to use tools, please select a different model. If you want to retrieve from your knowledge base, select "make initial search" option.',
+              <div>
+                This model does not support tool calling. To use tool calling, please download a model from this page:{' '}
+                <a href="https://ollama.com/search?c=tools" target="_blank" rel="noopener noreferrer">
+                  https://ollama.com/search?c=tools
+                </a>{' '}
+                or use a cloud LLM like GPT-4o or Claude.
+              </div>,
+              {
+                autoClose: false,
+                closeOnClick: false,
+              },
             )
             const agentWithoutTools = { ...agentConfig, toolDefinitions: [] }
             outputChat.toolDefinitions = []

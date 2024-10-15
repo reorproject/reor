@@ -15,15 +15,36 @@ import { splitDirectoryPathIntoBaseAndRepo } from '../filesystem/filesystem'
 import DownloadModelFilesFromHFRepo from './downloadModelsFromHF'
 import { DBEntry } from './schema'
 
-export const defaultEmbeddingModelRepos = {
-  'Xenova/UAE-Large-V1': { type: 'repo', repoName: 'Xenova/UAE-Large-V1' },
-  'Xenova/bge-base-en-v1.5': {
+export const defaultEmbeddingModelRepos: Record<string, EmbeddingModelConfig> = {
+  'Xenova/UAE-Large-V1': {
     type: 'repo',
-    repoName: 'Xenova/bge-base-en-v1.5',
+    repoName: 'Xenova/UAE-Large-V1',
+    readableName: 'UAE-Large-V1',
+    description: 'Recommended for English content',
   },
   'Xenova/bge-small-en-v1.5': {
     type: 'repo',
     repoName: 'Xenova/bge-small-en-v1.5',
+    readableName: 'bge-small-en-v1.5',
+    description: 'Recommended for low-power devices',
+  },
+  'Xenova/multilingual-e5-large': {
+    type: 'repo',
+    repoName: 'Xenova/multilingual-e5-large',
+    readableName: 'multilingual-e5-large',
+    description: 'Recommended for non-English content',
+  },
+  'Xenova/jina-embeddings-v2-base-zh': {
+    type: 'repo',
+    repoName: 'Xenova/jina-embeddings-v2-base-zh',
+    readableName: 'jina-embeddings-v2-base-zh',
+    description: 'Recommended for Chinese content',
+  },
+  'Xenova/jina-embeddings-v2-base-de': {
+    type: 'repo',
+    repoName: 'Xenova/jina-embeddings-v2-base-de',
+    readableName: 'jina-embeddings-v2-base-de',
+    description: 'Recommended for German content',
   },
 }
 

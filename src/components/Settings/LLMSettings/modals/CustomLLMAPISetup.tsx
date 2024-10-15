@@ -1,9 +1,18 @@
+/* eslint-disable jsx-a11y/label-has-associated-control */
 import React, { useState } from 'react'
-import { Button } from '@material-tailwind/react'
 import { LLMAPIConfig } from 'electron/main/electron-store/storeConfig'
 import posthog from 'posthog-js'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import ExternalLink from '../../../Common/ExternalLink'
-import ReorModal from '../../../Common/Modal'
 import errorToStringRendererProcess from '@/lib/error'
 
 interface RemoteLLMModalProps {
@@ -27,34 +36,33 @@ const ModelNameInput: React.FC<ModelNameInputProps> = ({ modelNames, setModelNam
   }
 
   return (
-    <div className="mt-4">
-      <h4 className="mb-1 text-white">Model Names</h4>
-      <div className="flex overflow-hidden rounded-md">
-        <input
+    <div className="">
+      <h4 className="mb-1 font-medium">Model Names</h4>
+      <div className="flex space-x-2">
+        <Input
           type="text"
+          className="mt-0"
           placeholder="Add model name"
           value={newModelName}
           onChange={(e) => setNewModelName(e.target.value)}
-          className="box-border grow border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
         />
-        <button
-          onClick={addModelName}
-          type="button"
-          className="cursor-pointer border-none bg-gray-700 px-4 py-2 text-white transition-colors hover:bg-gray-600 focus:outline-none"
-        >
-          +
-        </button>
+        <Button onClick={addModelName} type="button" variant="secondary">
+          Add
+        </Button>
       </div>
-      <div className="mt-2 flex flex-wrap gap-2">
-        {modelNames.map((name) => (
-          <span className="rounded bg-gray-700 px-2 py-1 text-sm text-white">{name}</span>
+      <div className="flex flex-wrap gap-2">
+        {modelNames.map((name, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <span key={index} className="rounded bg-secondary px-2 py-1 text-sm">
+            {name}
+          </span>
         ))}
       </div>
     </div>
   )
 }
 
-const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose: parentOnClose }) => {
+const CustomLLMAPISetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose: parentOnClose }) => {
   const [apiName, setApiName] = useState<string>('')
   const [apiURL, setApiURL] = useState<string>('')
   const [apiKey, setApiKey] = useState<string>('')
@@ -99,67 +107,66 @@ const RemoteLLMSetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose: p
   }
 
   return (
-    <ReorModal isOpen={isOpen} onClose={handleClose}>
-      <div className="mb-2 ml-3 mr-2 w-[400px]">
-        <h2 className="mb-0 font-semibold text-white">Remote LLM Setup</h2>
-        <p className="my-2 text-sm text-gray-100">
-          Connect with a custom OpenAI-like API endpoint like{' '}
-          <ExternalLink href="https://github.com/oobabooga/text-generation-webui/wiki/12-%E2%80%90-OpenAI-API">
-            Oobabooga
-          </ExternalLink>
-          . A guide to doing this is on the{' '}
-          <ExternalLink href="https://www.reorproject.org/docs/documentation/openai-like-api">docs</ExternalLink>. This
-          is mainly for folks hosting their own models on other machines.
-        </p>
-
-        <h4 className="mb-1 text-gray-100">API URL</h4>
-        <input
-          type="text"
-          placeholder="API URL"
-          value={apiURL}
-          onChange={(e) => setApiURL(e.target.value)}
-          className="mb-2 box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
-        />
-        <p className="mt-2 text-xs text-gray-100">
-          (This must be an OpenAI compatible API endpoint. That typically is the part of the url before
-          /chat/completions like for example http://127.0.0.1:1337/v1)
-        </p>
-
-        <h4 className="mb-1 text-gray-100">API Name</h4>
-        <input
-          type="text"
-          placeholder="API Name"
-          value={apiName}
-          onChange={(e) => setApiName(e.target.value)}
-          className="mb-2 box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
-        />
-        <p className="mt-2 text-xs text-gray-100">(A name for your new api)</p>
-
-        <h4 className="mb-1 text-gray-100">Optional API Key</h4>
-        <input
-          type="text"
-          placeholder="API Key"
-          value={apiKey}
-          onChange={(e) => setApiKey(e.target.value)}
-          className="mb-2 box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
-        />
-        <p className="mt-2 text-xs text-gray-100">(If your endpoint requires an API key.)</p>
-
-        <ModelNameInput modelNames={modelNames} setModelNames={setModelNames} />
-
-        <div className="flex justify-end pb-2">
-          <Button
-            className="mt-3 h-8 w-[80px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
-            onClick={handleSave}
-            placeholder=""
-          >
-            Save
-          </Button>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[525px]">
+        <DialogHeader>
+          <DialogTitle>Remote LLM Setup</DialogTitle>
+          <DialogDescription>
+            Connect with a custom OpenAI-like API endpoint like{' '}
+            <ExternalLink href="https://github.com/oobabooga/text-generation-webui/wiki/12-%E2%80%90-OpenAI-API">
+              Oobabooga
+            </ExternalLink>
+            . A guide to doing this is on the{' '}
+            <ExternalLink href="https://www.reorproject.org/docs/documentation/openai-like-api">docs</ExternalLink>.
+            This is mainly for folks hosting their own models on other machines.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-2 py-4">
+          <div className="grid gap-1">
+            <label htmlFor="apiUrl">API URL</label>
+            <Input
+              id="apiUrl"
+              type="text"
+              placeholder="API URL"
+              value={apiURL}
+              onChange={(e) => setApiURL(e.target.value)}
+            />
+            <p className="mt-0 text-xs text-muted-foreground">
+              (This must be an OpenAI compatible API endpoint. That typically is the part of the url before
+              /chat/completions like for example http://127.0.0.1:1337/v1)
+            </p>
+          </div>
+          <div className="grid gap-1">
+            <label htmlFor="apiName">API Name</label>
+            <Input
+              id="apiName"
+              type="text"
+              placeholder="API Name"
+              value={apiName}
+              onChange={(e) => setApiName(e.target.value)}
+            />
+            <p className="mt-0 text-xs text-muted-foreground">(A name for your new api)</p>
+          </div>
+          <div className="grid gap-1">
+            <label htmlFor="apiKey">Optional API Key</label>
+            <Input
+              id="apiKey"
+              type="password"
+              placeholder="API Key"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+            />
+            <p className="mt-0 text-xs text-muted-foreground">(If your endpoint requires an API key.)</p>
+          </div>
+          <ModelNameInput modelNames={modelNames} setModelNames={setModelNames} />
+          {currentError && <p className="text-xs text-destructive">{currentError}</p>}
         </div>
-        {currentError && <p className="mt-2 text-xs text-red-500">{currentError}</p>}
-      </div>
-    </ReorModal>
+        <DialogFooter>
+          <Button onClick={handleSave}>Save</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 
-export default RemoteLLMSetupModal
+export default CustomLLMAPISetupModal

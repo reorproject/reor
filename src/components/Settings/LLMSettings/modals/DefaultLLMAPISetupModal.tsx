@@ -1,7 +1,4 @@
 import React, { useState } from 'react'
-
-import { Button } from '@material-tailwind/react'
-
 import { APIInterface, LLMAPIConfig } from 'electron/main/electron-store/storeConfig'
 import {
   anthropicDefaultAPIName,
@@ -9,13 +6,21 @@ import {
   openAIDefaultAPIName,
   openAIDefaultLLMs,
 } from '@shared/defaultLLMs'
-import ReorModal from '../../../Common/Modal'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 
 export interface CloudLLMSetupModalProps {
   isOpen: boolean
   onClose: () => void
   apiInterface: APIInterface
-  // refreshLLMs?: () => void
 }
 
 const DefaultLLMAPISetupModal: React.FC<CloudLLMSetupModalProps> = ({ isOpen, onClose, apiInterface }) => {
@@ -49,6 +54,7 @@ const DefaultLLMAPISetupModal: React.FC<CloudLLMSetupModalProps> = ({ isOpen, on
     }
     onClose()
   }
+
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleSave()
@@ -56,31 +62,29 @@ const DefaultLLMAPISetupModal: React.FC<CloudLLMSetupModalProps> = ({ isOpen, on
   }
 
   return (
-    <ReorModal isOpen={isOpen} onClose={handleSave}>
-      <div className="mb-2 ml-3 mr-2 w-[300px]">
-        <h3 className="mb-0 font-semibold text-white">{LLMDisplayName} Setup</h3>
-        <p className="my-2 text-sm text-gray-100">Enter your {LLMDisplayName} API key below:</p>
-        <input
-          type="text"
-          className=" box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
-          value={apiKey}
-          onChange={(e) => setAPIKey(e.target.value)}
-          onKeyDown={handleKeyPress}
-          placeholder={`${LLMDisplayName} API Key`}
-        />
-        <p className="mt-2 text-xs text-gray-100">
-          <i>You&apos;ll then be able to choose an {LLMDisplayName} model in the model dropdown...</i>
-        </p>
-
-        <Button
-          className="mt-1  h-8 w-[80px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
-          onClick={handleSave}
-          placeholder=""
-        >
-          Save
-        </Button>
-      </div>
-    </ReorModal>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>{LLMDisplayName} Setup</DialogTitle>
+          <DialogDescription>Enter your {LLMDisplayName} API key below:</DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4">
+          <Input
+            type="password"
+            value={apiKey}
+            onChange={(e) => setAPIKey(e.target.value)}
+            onKeyDown={handleKeyPress}
+            placeholder={`${LLMDisplayName} API Key`}
+          />
+          <p className="mt-0 text-xs text-muted-foreground">
+            <i>You&apos;ll then be able to choose an {LLMDisplayName} model in the model dropdown...</i>
+          </p>
+        </div>
+        <DialogFooter>
+          <Button onClick={handleSave}>Save</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 

@@ -3,7 +3,6 @@ import { PiPaperPlaneRight } from 'react-icons/pi'
 import { FiSettings } from 'react-icons/fi'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import { AgentConfig, ToolDefinition, DatabaseSearchFilters } from '../../lib/llm/types'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Button } from '@/components/ui/button'
 import DbSearchFilters from './ChatConfigComponents/DBSearchFilters'
 import PromptEditor from './ChatConfigComponents/PromptEditor'
@@ -24,6 +23,7 @@ import exampleAgents from './ChatConfigComponents/exampleAgents'
 import { allAvailableToolDefinitions } from '@/lib/llm/tools/tool-definitions'
 import ToolSelector from './ChatConfigComponents/ToolSelector'
 import SuggestionCard from '../ui/suggestion-card'
+import LLMSelectOrButton from '../Settings/LLMSettings/LLMSelectOrButton'
 
 interface StartChatProps {
   defaultModelName: string
@@ -36,9 +36,9 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
   const [userTextFieldInput, setUserTextFieldInput] = useState<string>('')
   const [agentConfig, setAgentConfig] = useState<AgentConfig>()
   const [promptSuggestions] = useState([
-    "What's the latest update on my project?",
+    'Generate a list of all the thoughts I have written on the topic of AGI',
     'Summarize my recent notes on machine learning',
-    'Create a to-do list for today based on my calendar',
+    'Based on what I wrote last week, which tasks should I focus on this week?',
   ])
 
   useEffect(() => {
@@ -69,10 +69,6 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
       throw new Error('No agent config found')
     }
     handleNewChatMessage(userTextFieldInput, { ...agentConfig })
-  }
-
-  const handleLLMChange = (value: string) => {
-    setSelectedLLM(value)
   }
 
   const handleToolsChange = (tools: ToolDefinition[]) => {
@@ -114,9 +110,10 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
         <div className="flex w-full justify-center">
           <img src="icon.png" className="size-16" alt="ReorImage" />
         </div>
-        <h1 className="mb-10 text-[28px] text-foreground">
-          Welcome to your AI-powered assistant! Start a conversation with your second brain!
-        </h1>
+        <h1 className="mb-0 text-[28px] text-foreground">Welcome to your AI second brain.</h1>
+        <p className="mb-10 mt-1 text-muted-foreground">
+          Start a chat below. You can provide tools for the LLM to use and customize the system prompt below.{' '}
+        </p>
         <div className="flex w-full">
           <div className="mr-4">
             <ToolSelector
@@ -144,18 +141,12 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
               <div className="mx-auto h-px w-[96%] bg-background/20" />
               <div className="flex h-10 flex-col items-center justify-between gap-2  py-2 md:flex-row md:gap-4">
                 <div className="flex flex-col items-center justify-between rounded-md border-0 py-2 md:flex-row">
-                  <Select value={selectedLLM} onValueChange={handleLLMChange}>
-                    <SelectTrigger className="m-2 w-32 border border-solid border-muted-foreground bg-transparent">
-                      <SelectValue placeholder="Select LLM" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {llmConfigs.map((llm) => (
-                        <SelectItem key={llm.modelName} value={llm.modelName}>
-                          {llm.modelName}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <LLMSelectOrButton
+                    llmConfigs={llmConfigs}
+                    selectedLLM={selectedLLM}
+                    setSelectedLLM={setSelectedLLM}
+                    setLLMConfigs={setLLMConfigs}
+                  />
                 </div>
                 <div className="flex items-center">
                   <Button

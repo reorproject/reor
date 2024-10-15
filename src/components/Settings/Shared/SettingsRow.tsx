@@ -1,5 +1,5 @@
-import { Button } from '@material-tailwind/react'
 import React from 'react'
+import { Button } from '@/components/ui/button'
 
 const SettingsRow: React.FC<{
   title: string
@@ -17,11 +17,7 @@ const SettingsRow: React.FC<{
     </div>
     <div className="flex">
       {buttonText && (
-        <Button
-          className="flex min-w-[128px] max-w-full cursor-pointer items-center justify-between whitespace-normal break-words rounded-md border border-none border-gray-300 bg-dark-gray-c-eight py-2 font-normal hover:bg-dark-gray-c-ten"
-          onClick={onClick}
-          placeholder=""
-        >
+        <Button variant="secondary" onClick={onClick}>
           {buttonText}
         </Button>
       )}

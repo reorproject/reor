@@ -25,20 +25,15 @@ export type EmbeddingModelConfig = EmbeddingModelWithRepo | EmbeddingModelWithLo
 export interface EmbeddingModelWithRepo {
   type: 'repo'
   repoName: string
+  description?: string
+  readableName?: string
 }
 
 export interface EmbeddingModelWithLocalPath {
   type: 'local'
   localPath: string
-}
-
-export type Tab = {
-  id: string // Unique ID for the tab, useful for operations
-  path: string // Path to the content open in the tab
-  title: string // Title of the tab
-  lastAccessed: boolean
-  // timeOpened: Date; // Timestamp to preserve order
-  // isDirty: boolean; // Flag to indicate unsaved changes
+  description?: string
+  readableName?: string
 }
 
 export interface StoreSchema {
@@ -65,7 +60,6 @@ export interface StoreSchema {
   isSBCompact: boolean
   spellCheck: string
   EditorFlexCenter: boolean
-  OpenTabs: Tab[]
   showDocumentStats: boolean
 }
 
@@ -87,6 +81,5 @@ export enum StoreKeys {
   IsSBCompact = 'isSBCompact',
   SpellCheck = 'spellCheck',
   EditorFlexCenter = 'editorFlexCenter',
-  OpenTabs = 'OpenTabs',
   showDocumentStats = 'showDocumentStats',
 }
