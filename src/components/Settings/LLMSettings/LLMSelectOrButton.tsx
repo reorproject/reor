@@ -39,12 +39,8 @@ const LLMSelectOrButton: React.FC<LLMSelectOrButtonProps> = ({
   }
 
   const refreshLLMConfigs = async () => {
-    try {
-      const LLMConfigs = await window.llm.getLLMConfigs()
-      setLLMConfigs(LLMConfigs)
-    } catch (error) {
-      console.error('Failed to refresh LLM configs:', error)
-    }
+    const LLMConfigs = await window.llm.getLLMConfigs()
+    setLLMConfigs(LLMConfigs)
   }
 
   return (
@@ -56,7 +52,7 @@ const LLMSelectOrButton: React.FC<LLMSelectOrButtonProps> = ({
           </Button>
         ) : (
           <Select value={selectedLLM} onValueChange={(value) => handleLLMChange(value)}>
-            <SelectTrigger className="w-32 border border-solid border-muted-foreground">
+            <SelectTrigger className="w-32 ">
               <SelectValue placeholder="Select LLM" />
             </SelectTrigger>
             <SelectContent>

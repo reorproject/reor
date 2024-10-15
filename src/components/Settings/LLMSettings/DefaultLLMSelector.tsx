@@ -1,9 +1,7 @@
-import React from 'react'
-
+import React, { useState, useEffect } from 'react'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import posthog from 'posthog-js'
-
-import CustomSelect from '../../Common/Select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface DefaultLLMSelectorProps {
   llmConfigs: LLMConfig[]
@@ -12,7 +10,14 @@ interface DefaultLLMSelectorProps {
 }
 
 const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({ llmConfigs, defaultLLM, setDefaultLLM }) => {
+  const [selectedLLM, setSelectedLLM] = useState(defaultLLM)
+
+  useEffect(() => {
+    setSelectedLLM(defaultLLM)
+  }, [defaultLLM])
+
   const handleDefaultModelChange = (selectedModel: string) => {
+    setSelectedLLM(selectedModel)
     setDefaultLLM(selectedModel)
     window.llm.setDefaultLLM(selectedModel)
     posthog.capture('change_default_llm', {
@@ -20,13 +25,19 @@ const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({ llmConfigs, def
     })
   }
 
-  const modelOptions = llmConfigs.map((config) => ({
-    label: config.modelName,
-    value: config.modelName,
-  }))
-
   return (
-    <CustomSelect options={modelOptions} selectedValue={defaultLLM} onChange={handleDefaultModelChange} centerText />
+    <Select onValueChange={handleDefaultModelChange} value={selectedLLM}>
+      <SelectTrigger className="w-[180px]">
+        <SelectValue placeholder="Select default LLM" />
+      </SelectTrigger>
+      <SelectContent>
+        {llmConfigs.map((config) => (
+          <SelectItem key={config.modelName} value={config.modelName}>
+            {config.modelName}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   )
 }
 

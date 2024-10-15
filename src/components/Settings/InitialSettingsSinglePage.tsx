@@ -6,7 +6,7 @@ import ReorModal from '../Common/Modal'
 
 import DirectorySelector from './DirectorySelector'
 import InitialEmbeddingModelSettings from './EmbeddingSettings/InitialEmbeddingSettings'
-import LLMSettings from './LLMSettings/LLMSettings'
+import InitialSetupLLMSettings from './LLMSettings/InitialSetupLLMSettings'
 
 interface OldInitialSettingsProps {
   readyForIndexing: () => void
@@ -29,10 +29,10 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({ readyForInd
     <ReorModal isOpen onClose={() => {}} hideCloseButton>
       <div className="ml-2 mr-4 w-[620px] py-3">
         <div className="ml-2 mt-0 h-[450px]  ">
-          <h2 className="mb-0 text-center text-2xl font-semibold text-white">Welcome to the Reor Project.</h2>
+          <h2 className="mb-0 text-center text-2xl font-semibold text-white">Welcome to the Reor Project</h2>
           <p className="mt-2 text-center text-gray-100">
             Reor is a private AI personal knowledge management tool. Each note will be saved as a markdown file to a
-            &quot;vault&quot; directory on your machine.
+            vault directory on your machine.
           </p>
           <div className="mt-10 flex items-center justify-between border-0 border-b-2 border-solid border-neutral-700 pb-4">
             <div className="w-80 flex-col">
@@ -46,12 +46,11 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({ readyForInd
               {showError && directoryErrorMsg && <p className="text-xs text-red-500">{directoryErrorMsg}</p>}
             </div>
           </div>
-
           <div className="mt-2 border-0 border-b-2 border-solid border-neutral-700 pb-2">
             <InitialEmbeddingModelSettings setErrorMsg={setEmbeddingErrorMsg} />
             {showError && embeddingErrorMsg && <p className="text-xs text-red-500">{embeddingErrorMsg}</p>}
           </div>
-          <LLMSettings isInitialSetup />
+          <InitialSetupLLMSettings />
         </div>
         <div className="flex justify-end">
           <Button
