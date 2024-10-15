@@ -59,8 +59,8 @@ const NewRemoteEmbeddingModelModal: React.FC<NewRemoteEmbeddingModelModalProps> 
         <DialogHeader>
           <DialogTitle>Custom embedding model</DialogTitle>
           <DialogDescription>
-            If you don&apos;t want to use one of our default embedding models, you can choose a Hugging Face model and
-            attach it here.
+            If you don&apos;t want to use one of our recommended embedding models, you can choose a Hugging Face model
+            and attach it here.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
