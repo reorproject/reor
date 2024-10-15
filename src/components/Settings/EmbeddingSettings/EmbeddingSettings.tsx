@@ -3,19 +3,17 @@ import React, { useState, useEffect } from 'react'
 import { EmbeddingModelConfig } from 'electron/main/electron-store/storeConfig'
 import posthog from 'posthog-js'
 
-import CustomSelect from '../../Common/Select'
 import ChunkSizeSettings from '../ChunkSizeSettings'
-
+import EmbeddingModelSelect from './EmbeddingModelSelect'
 import NewRemoteEmbeddingModelModal from './modals/NewRemoteEmbeddingModel'
 import { Button } from '@/components/ui/button'
 
 interface EmbeddingModelManagerProps {
-  // userHasCompleted?: (completed: boolean) => void;
   handleUserHasChangedModel?: () => void
   userTriedToSubmit?: boolean
 }
+
 const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
-  // userHasCompleted,
   handleUserHasChangedModel,
   userTriedToSubmit,
 }) => {
@@ -42,13 +40,10 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
     updateEmbeddingModels()
   }, [])
 
-  // TODO: perhaps this can be removed as well...
   useEffect(() => {
     if (selectedModel) {
-      if (setCurrentError) {
-        setCurrentError('')
-      }
-    } else if (setCurrentError) {
+      setCurrentError('')
+    } else {
       setCurrentError('No model selected')
     }
   }, [selectedModel])
@@ -75,15 +70,12 @@ const EmbeddingModelSettings: React.FC<EmbeddingModelManagerProps> = ({
               <p className="text-xs text-gray-100">If you change this your files will be re-indexed</p>
             </p>{' '}
           </div>
-          <div className="flex items-end">
+          <div className="flex w-[150px] items-end">
             {Object.keys(embeddingModels).length > 0 && (
-              <CustomSelect
-                options={Object.keys(embeddingModels).map((model) => ({
-                  label: model,
-                  value: model,
-                }))}
-                selectedValue={selectedModel}
-                onChange={handleChangeOnModelSelect}
+              <EmbeddingModelSelect
+                selectedModel={selectedModel}
+                embeddingModels={embeddingModels}
+                onModelChange={handleChangeOnModelSelect}
               />
             )}
           </div>

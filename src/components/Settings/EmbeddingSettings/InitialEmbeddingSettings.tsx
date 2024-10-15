@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from 'react'
 
 import { EmbeddingModelConfig } from 'electron/main/electron-store/storeConfig'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 import NewRemoteEmbeddingModelModal from './modals/NewRemoteEmbeddingModel'
+import EmbeddingModelSelect from './EmbeddingModelSelect'
 
 interface InitialEmbeddingModelSettingsProps {
   setErrorMsg: (msg: string) => void
@@ -58,21 +58,11 @@ const InitialEmbeddingModelSettings: React.FC<InitialEmbeddingModelSettingsProps
         </p>
       </div>
       <div className="w-[150px]">
-        <Select value={selectedModel} onValueChange={handleChangeOnModelSelect}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select a model" />
-          </SelectTrigger>
-          <SelectContent>
-            {Object.entries(embeddingModels).map(([model, config]) => (
-              <SelectItem key={model} value={model}>
-                <div>
-                  <div>{config.readableName}</div>
-                  <div className="text-xs text-gray-400">{config.description}</div>
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <EmbeddingModelSelect
+          selectedModel={selectedModel}
+          embeddingModels={embeddingModels}
+          onModelChange={handleChangeOnModelSelect}
+        />
       </div>
 
       <NewRemoteEmbeddingModelModal
