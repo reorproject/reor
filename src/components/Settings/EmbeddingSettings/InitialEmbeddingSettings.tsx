@@ -9,6 +9,7 @@ import NewRemoteEmbeddingModelModal from './modals/NewRemoteEmbeddingModel'
 interface InitialEmbeddingModelSettingsProps {
   setErrorMsg: (msg: string) => void
 }
+
 const InitialEmbeddingModelSettings: React.FC<InitialEmbeddingModelSettingsProps> = ({ setErrorMsg }) => {
   const [selectedModel, setSelectedModel] = useState<string>('')
   const [embeddingModels, setEmbeddingModels] = useState<Record<string, EmbeddingModelConfig>>({})
@@ -56,15 +57,18 @@ const InitialEmbeddingModelSettings: React.FC<InitialEmbeddingModelSettingsProps
           </a>
         </p>
       </div>
-      <div className="w-[200px]">
+      <div className="w-[150px]">
         <Select value={selectedModel} onValueChange={handleChangeOnModelSelect}>
           <SelectTrigger>
             <SelectValue placeholder="Select a model" />
           </SelectTrigger>
           <SelectContent>
-            {Object.keys(embeddingModels).map((model) => (
+            {Object.entries(embeddingModels).map(([model, config]) => (
               <SelectItem key={model} value={model}>
-                {model}
+                <div>
+                  <div>{config.readableName}</div>
+                  <div className="text-xs text-gray-400">{config.description}</div>
+                </div>
               </SelectItem>
             ))}
           </SelectContent>
