@@ -19,7 +19,12 @@ class WindowsManager {
 
   watcher: chokidar.FSWatcher | undefined
 
-  async createWindow(store: Store<StoreSchema>, preload: string, url: string | undefined, indexHtml: string) {
+  async createWindow(
+    store: Store<StoreSchema>,
+    preload: string,
+    url: string | undefined,
+    indexHtml: string,
+  ): Promise<BrowserWindow> {
     const { x, y } = this.getNextWindowPosition()
     const { width, height } = this.getWindowSize()
 
@@ -68,6 +73,7 @@ class WindowsManager {
         win.webContents.send('error-to-display-in-window', errorStrToSendWindow)
       })
     })
+    return win
   }
 
   getAndSetupDirectoryForWindowFromPreviousAppSession(
