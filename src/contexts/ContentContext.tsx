@@ -3,14 +3,10 @@ import React, { createContext, useContext, useMemo, ReactNode, useState, useCall
 import posthog from 'posthog-js'
 import { useChatContext } from './ChatContext'
 import { useFileContext } from './FileContext'
-import { OnShowContextMenuData, ShowContextMenuInputType } from '@/components/Common/CustomContextMenu'
 import { getFilesInDirectory, getNextAvailableFileNameGivenBaseName } from '@/lib/file'
 
 interface ContentContextType {
   openContent: (pathOrChatID: string, optionalContentToWriteOnCreate?: string, dontUpdateChatHistory?: boolean) => void
-  focusedItem: OnShowContextMenuData
-  showContextMenu: ShowContextMenuInputType
-  hideFocusedItem: () => void
   currentOpenFileOrChatID: string | null
   createUntitledNote: (parentFileOrDirectory?: string) => void
 }
@@ -30,13 +26,9 @@ interface ContentProviderProps {
 }
 
 export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) => {
-  const [focusedItem, setFocusedItem] = useState<OnShowContextMenuData>({
-    currentSelection: 'None',
-    position: { x: 0, y: 0 },
-  })
   const [currentOpenFileOrChatID, setCurrentOpenFileOrChatID] = useState<string | null>(null)
 
-  const { setCurrentOpenChatID, allChatsMetadata, setShowChatbot, setSidebarShowing } = useChatContext()
+  const { allChatsMetadata, setShowChatbot, setSidebarShowing, openNewChat } = useChatContext()
   const {
     vaultFilesFlattened: flattenedFiles,
     openOrCreateFile,
@@ -50,7 +42,7 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
       const chatMetadata = allChatsMetadata.find((chat) => chat.id === pathOrChatID)
       if (chatMetadata) {
         setShowChatbot(true)
-        setCurrentOpenChatID(pathOrChatID)
+        openNewChat(pathOrChatID)
       } else {
         setShowChatbot(false)
         setSidebarShowing('files')
@@ -61,36 +53,8 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
         addToNavigationHistory(pathOrChatID)
       }
     },
-    [
-      allChatsMetadata,
-      setShowChatbot,
-      setCurrentOpenChatID,
-      setSidebarShowing,
-      openOrCreateFile,
-      addToNavigationHistory,
-      setCurrentOpenFileOrChatID,
-    ],
+    [allChatsMetadata, setShowChatbot, openNewChat, setSidebarShowing, openOrCreateFile, addToNavigationHistory],
   )
-  const showContextMenu: ShowContextMenuInputType = React.useCallback(
-    (event, locationOnScreen, additionalData = {}) => {
-      event.preventDefault()
-      setFocusedItem({
-        currentSelection: locationOnScreen,
-        position: { x: event.clientX, y: event.clientY },
-        ...additionalData,
-      })
-    },
-    [setFocusedItem],
-  )
-
-  const hideFocusedItem = React.useCallback(() => {
-    setFocusedItem((prevItem: OnShowContextMenuData) => ({
-      currentSelection: 'None',
-      position: { x: 0, y: 0 },
-      file: prevItem.file,
-      chatMetadata: prevItem.chatMetadata,
-    }))
-  }, [setFocusedItem])
 
   const createUntitledNote = useCallback(
     async (parentDirectory?: string) => {
@@ -113,13 +77,10 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
   const ContentContextMemo = useMemo(
     () => ({
       openContent,
-      focusedItem,
-      showContextMenu,
-      hideFocusedItem,
       currentOpenFileOrChatID,
       createUntitledNote,
     }),
-    [openContent, focusedItem, showContextMenu, hideFocusedItem, currentOpenFileOrChatID, createUntitledNote],
+    [openContent, currentOpenFileOrChatID, createUntitledNote],
   )
 
   return <ContentContext.Provider value={ContentContextMemo}>{children}</ContentContext.Provider>
