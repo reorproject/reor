@@ -29,6 +29,9 @@ const WritingAssistant: React.FC = () => {
   const lastAssistantMessage = getLastMessage(messages, 'assistant')
   const hasValidMessages = !!lastAssistantMessage
   const [streamingMessage, setStreamingMessage] = useState<string>('')
+  const [currentConversationIndex, setCurrentConversationIndex] = useState<number>(0)
+  const [isNewConversation, setIsNewConversation] = useState<boolean>(false)
+  const [prompts, setPrompts] = useState<{ option?: string; customPromptInput?: string }[]>([])
 
   const { editor, highlightData } = useFileContext()
 
@@ -224,7 +227,7 @@ const WritingAssistant: React.FC = () => {
     posthog.capture('submitted_writing_assistant_message')
 
     const newMessage: ReorChatMessage = { role: 'user', content: prompt }
-    const updatedMessages = [...messages, newMessage]
+    const updatedMessages = isNewConversation ? [newMessage] : [...messages, newMessage]
     setMessages(updatedMessages)
 
     setStreamingMessage('')
@@ -242,9 +245,14 @@ const WritingAssistant: React.FC = () => {
     }
 
     const assistantMessage: ReorChatMessage = { role: 'assistant', content: fullResponse }
-    setMessages((prev) => [...prev, assistantMessage])
+    setMessages((prev) => {
+      const newMessages = isNewConversation ? [newMessage, assistantMessage] : [...prev, assistantMessage]
+      setCurrentConversationIndex(newMessages.length - 2)
+      return newMessages
+    })
     setStreamingMessage('')
     setLoadingResponse(false)
+    setIsNewConversation(false)
   }
 
   const handleOption = async (option: string, customPromptInput?: string) => {
@@ -256,7 +264,9 @@ const WritingAssistant: React.FC = () => {
           : JSON.stringify(lastAssistantMessage.content)
     }
     const prompt = generatePromptString(option, selectedText, isSpaceTrigger, customPromptInput)
+    setPrompts((prev) => [...prev, { option, customPromptInput }])
     setPrevPrompt(prompt)
+    setIsNewConversation(true)
     await getLLMResponse(prompt)
   }
 
@@ -396,59 +406,25 @@ const WritingAssistant: React.FC = () => {
             history={messages}
             streamingMessage={streamingMessage}
             markdownMaxHeight={markdownMaxHeight}
-          />
-          <TextField
-            type="text"
-            variant="outlined"
-            size="small"
-            value={customPrompt}
-            onChange={(e) => setCustomPrompt(e.target.value)}
-            placeholder="Follow up..."
-            className="mt-2 w-full p-1"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                handleOption('custom', customPrompt)
+            customPrompt={customPrompt}
+            setCustomPrompt={setCustomPrompt}
+            handleCustomPrompt={() => handleOption('custom', customPrompt)}
+            displayPrompt={prevPrompt}
+            currentIndex={currentConversationIndex}
+            onNavigate={(direction) => {
+              if (direction === 'prev' && currentConversationIndex > 0) {
+                setCurrentConversationIndex(currentConversationIndex - 2)
+              } else if (direction === 'next' && currentConversationIndex < messages.length - 2) {
+                setCurrentConversationIndex(currentConversationIndex + 2)
               }
             }}
+            getLLMResponse={getLLMResponse}
+            insertAfterHighlightedText={insertAfterHighlightedText}
+            copyToClipboard={copyToClipboard}
+            replaceHighlightedText={replaceHighlightedText}
+            isNewConversation={isNewConversation}
+            prompts={prompts}
           />
-          <div className="mt-2 flex justify-between">
-            <button
-              className="mr-1 flex cursor-pointer items-center rounded-md border-0 bg-blue-100 px-2.5 py-1"
-              onClick={() => {
-                getLLMResponse(prevPrompt)
-              }}
-              type="button"
-            >
-              Re-run
-            </button>
-            <button
-              className="mr-1 flex cursor-pointer items-center rounded-md border-0 bg-blue-100 px-2.5 py-1"
-              onClick={() => {
-                insertAfterHighlightedText()
-              }}
-              type="button"
-            >
-              Insert
-            </button>
-            <button
-              className="mr-1 flex cursor-pointer items-center rounded-md border-0 bg-blue-100 px-2.5 py-1"
-              onClick={() => {
-                copyToClipboard()
-              }}
-              type="button"
-            >
-              Copy
-            </button>
-            <button
-              className="flex cursor-pointer items-center rounded-md border-0 bg-indigo-700 px-2.5 py-1 text-white"
-              onClick={() => {
-                replaceHighlightedText()
-              }}
-              type="button"
-            >
-              Replace
-            </button>
-          </div>
         </div>
       )}
     </div>
