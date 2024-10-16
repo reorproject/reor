@@ -34,8 +34,8 @@ import { RichTextLink } from '@/components/Editor/RichTextLink'
 import '@/styles/tiptap.scss'
 import SearchAndReplace from '@/components/Editor/Search/SearchAndReplaceExtension'
 import getMarkdown from '@/components/Editor/utils'
-import welcomeNote from '@/components/File/utils'
 import useOrderedSet from './hooks/use-ordered-set'
+import welcomeNote from '@/lib/welcome-note'
 
 type FileContextType = {
   vaultFilesTree: FileInfoTree

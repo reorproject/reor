@@ -84,7 +84,6 @@ export const makeAndAddToolResultToMessages = async (
   const toolResult = await createToolResult(toolCallPart.toolName, toolCallPart.args as any, toolCallPart.toolCallId)
   posthog.capture('tool_executed', {
     toolName: toolCallPart.toolName,
-    result: toolResult,
   })
   const toolMessage: CoreToolMessage = {
     role: 'tool',
