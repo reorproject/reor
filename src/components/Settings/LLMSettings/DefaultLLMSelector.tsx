@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import posthog from 'posthog-js'
+import { FiTrash2 } from 'react-icons/fi'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface DefaultLLMSelectorProps {
@@ -25,6 +26,10 @@ const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({ llmConfigs, def
     })
   }
 
+  const deleteLLM = async (modelName: string) => {
+    await window.llm.deleteLLM(modelName)
+  }
+
   return (
     <Select onValueChange={handleDefaultModelChange} value={selectedLLM}>
       <SelectTrigger className="w-[180px]">
@@ -32,9 +37,17 @@ const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({ llmConfigs, def
       </SelectTrigger>
       <SelectContent>
         {llmConfigs.map((config) => (
-          <SelectItem key={config.modelName} value={config.modelName}>
-            {config.modelName}
-          </SelectItem>
+          <div className="flex w-full items-center justify-end">
+            <SelectItem key={config.modelName} value={config.modelName}>
+              {config.modelName}
+            </SelectItem>
+            <FiTrash2
+              className="ml-2 cursor-pointer text-red-500"
+              onClick={() => {
+                deleteLLM(config.modelName)
+              }}
+            />
+          </div>
         ))}
       </SelectContent>
     </Select>

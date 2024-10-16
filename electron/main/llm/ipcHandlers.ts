@@ -38,4 +38,23 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
     }
     await ollamaService.pullModel(modelName, handleProgress)
   })
+
+  ipcMain.handle('delete-llm', async (event, modelName: string) => {
+    try {
+      const currentModels = store.get(StoreKeys.EmbeddingModels) || {}
+      if (!currentModels[modelName]) {
+        throw new Error(`Model ${modelName} not found in the store`)
+      }
+
+      await ollamaService.deleteModel(modelName)
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const { [modelName]: _, ...updatedModels } = currentModels
+      store.set(StoreKeys.EmbeddingModels, updatedModels)
+
+      return { success: true }
+    } catch (error: any) {
+      console.error(`Failed to delete model: ${modelName}`, error)
+      return { success: false, error: error.message }
+    }
+  })
 }
