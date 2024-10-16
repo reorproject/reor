@@ -52,7 +52,7 @@ const IconsSidebar: React.FC = () => {
             className="mx-auto text-gray-200"
             color={sidebarShowing === 'files' ? 'white' : 'gray'}
             size={18}
-            title={getShortcutDescription('open-files')}
+            title={getShortcutDescription('open-files') || 'Open Files'}
           />
         </div>
       </div>
@@ -65,7 +65,7 @@ const IconsSidebar: React.FC = () => {
             color={sidebarShowing === 'chats' ? 'white' : 'gray'}
             className="cursor-pointer text-gray-100 "
             size={18}
-            title={getShortcutDescription('open-chat-bot')}
+            title={getShortcutDescription('open-chat-bot') || 'Open Chatbot'}
           />
         </div>
       </div>
@@ -78,7 +78,7 @@ const IconsSidebar: React.FC = () => {
             color={sidebarShowing === 'search' ? 'white' : 'gray'}
             size={18}
             className="text-gray-200"
-            title={getShortcutDescription('open-search')}
+            title={getShortcutDescription('open-search') || 'Semantic Search'}
           />
         </div>
       </div>
@@ -91,7 +91,7 @@ const IconsSidebar: React.FC = () => {
             className="text-gray-200"
             color="gray"
             size={22}
-            title={getShortcutDescription('open-new-note')}
+            title={getShortcutDescription('open-new-note') || 'New Note'}
           />
         </div>
       </div>
@@ -104,7 +104,7 @@ const IconsSidebar: React.FC = () => {
             className="text-gray-200"
             color="gray"
             size={18}
-            title={getShortcutDescription('open-new-directory-modal')}
+            title={getShortcutDescription('open-new-directory-modal') || 'New Directory'}
           />
         </div>
       </div>
@@ -117,7 +117,7 @@ const IconsSidebar: React.FC = () => {
             className="text-gray-200"
             color="gray"
             size={19}
-            title={getShortcutDescription('open-flashcard-quiz-modal')}
+            title={getShortcutDescription('open-flashcard-quiz-modal') || 'Flashcard quiz'}
           />
         </div>
       </div>
@@ -139,7 +139,7 @@ const IconsSidebar: React.FC = () => {
           color="gray"
           size={18}
           className="mb-3 size-6 text-gray-100"
-          title={getShortcutDescription('open-settings-modal')}
+          title={getShortcutDescription('open-settings-modal') || 'Settings'}
         />
       </button>
     </div>

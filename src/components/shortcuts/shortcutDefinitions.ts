@@ -40,10 +40,10 @@ export const shortcuts: Shortcut[] = [
     displayValue: { mac: 'Cmd+D', other: 'Ctrl+D' },
   },
   {
-    key: 'CommandOrControl+Q',
+    key: 'CommandOrControl+L',
     action: 'open-flashcard-quiz-modal',
     description: 'Flashcard quiz',
-    displayValue: { mac: 'Cmd+Q', other: 'Ctrl+Q' },
+    displayValue: { mac: 'Cmd+L', other: 'Ctrl+L' },
   },
   {
     key: 'CommandOrControl+,',

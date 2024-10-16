@@ -1,10 +1,14 @@
-/* eslint-disable import/no-extraneous-dependencies */
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { BrowserWindow } from 'electron'
 import { shortcuts } from './shortcutDefinitions'
 
 function isShortcutMatch(input: Electron.Input, shortcutKey: string): boolean {
   const keys = shortcutKey.split('+')
   const mainKey = keys.pop()?.toLowerCase()
+
+  if (!mainKey) {
+    return false
+  }
 
   const modifiers = {
     control: keys.includes('Control') || keys.includes('CommandOrControl'),
@@ -22,7 +26,7 @@ function isShortcutMatch(input: Electron.Input, shortcutKey: string): boolean {
   )
 }
 
-export function registerGlobalShortcuts(mainWindow: BrowserWindow) {
+export function registerShortcuts(mainWindow: BrowserWindow) {
   mainWindow.webContents.on('before-input-event', (event, input) => {
     shortcuts.forEach((shortcut) => {
       if (input.type === 'keyDown' && isShortcutMatch(input, shortcut.key)) {
@@ -33,6 +37,6 @@ export function registerGlobalShortcuts(mainWindow: BrowserWindow) {
   })
 }
 
-export function unregisterGlobalShortcuts(mainWindow: BrowserWindow) {
+export function unregisterShortcuts(mainWindow: BrowserWindow) {
   mainWindow.webContents.removeAllListeners('before-input-event')
 }
