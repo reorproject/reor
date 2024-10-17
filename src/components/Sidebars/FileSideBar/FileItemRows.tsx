@@ -71,6 +71,17 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
     setIsNewDirectoryModalOpen(true)
   }, [file.path, isDirectory])
 
+  const handleDelete = useCallback(() => {
+    const itemType = isDirectory ? 'directory' : 'file'
+    const confirmMessage = `Are you sure you want to delete this ${itemType}?${
+      isDirectory ? ' This will delete all contents of the directory.' : ''
+    }`
+
+    if (window.confirm(confirmMessage)) {
+      deleteFile(file.path)
+    }
+  }, [deleteFile, file.path, isDirectory])
+
   const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-neutral-700 h-full mt-0 mb-0 text-cyan-100 font-sans text-xs leading-relaxed rounded-md ${
     isSelected ? 'bg-neutral-700 text-white font-semibold' : 'text-gray-200'
   } ${isDragOver ? 'bg-neutral-500' : ''}`
@@ -82,7 +93,7 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
       </ContextMenuItem>
       <ContextMenuItem onClick={openNewDirectoryModal}>New Folder</ContextMenuItem>
       <ContextMenuItem onClick={() => setNoteToBeRenamed(file.path)}>Rename</ContextMenuItem>
-      <ContextMenuItem onClick={() => deleteFile(file.path)}>Delete</ContextMenuItem>
+      <ContextMenuItem onClick={handleDelete}>Delete</ContextMenuItem>
     </>
   )
 
