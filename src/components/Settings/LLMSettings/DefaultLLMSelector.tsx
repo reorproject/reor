@@ -15,7 +15,6 @@ const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({ llmConfigs, def
   const [availableOllamaModels, setAvailableOllamaModels] = useState<LLMConfig[]>([])
 
   useEffect(() => {
-    // Initialize OllamaService instance and fetch models
     const fetchModels = async () => {
       try {
         const models = await window.llm.getAvailableModels()

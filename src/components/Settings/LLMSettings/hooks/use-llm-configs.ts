@@ -25,7 +25,6 @@ const useLLMConfigs = () => {
   return {
     llmConfigs,
     defaultLLM,
-    setLLMConfigs,
     setDefaultLLM,
     fetchAndUpdateModelConfigs,
   }
