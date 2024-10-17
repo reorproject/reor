@@ -45,7 +45,7 @@ const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
 app.whenReady().then(async () => {
   await ollamaService.init()
-  await windowsManager.createWindow(store, preload, url, indexHtml)
+  windowsManager.createWindow(store, preload, url, indexHtml)
 })
 
 app.on('window-all-closed', () => {
