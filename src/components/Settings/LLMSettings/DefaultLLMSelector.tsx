@@ -18,13 +18,13 @@ const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({ llmConfigs, def
     // Initialize OllamaService instance and fetch models
     const fetchModels = async () => {
       try {
-        const models = await window.llm.getAvailableModels()        
+        const models = await window.llm.getAvailableModels()
         setAvailableModels(models)
       } catch (error) {
         console.error('Error fetching models:', error)
       }
     }
-    
+
     fetchModels()
   }, [])
 

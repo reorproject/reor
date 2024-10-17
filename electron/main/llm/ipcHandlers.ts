@@ -48,7 +48,6 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       throw error
     }
   })
-  
 
   ipcMain.handle('delete-llm', async (event, modelName: string) => {
     try {
