@@ -39,6 +39,17 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
     await ollamaService.pullModel(modelName, handleProgress)
   })
 
+  ipcMain.handle('get-available-models', async () => {
+    try {
+      const models = await ollamaService.getAvailableModels()
+      return models
+    } catch (error) {
+      console.error('Error fetching available models:', error)
+      throw error
+    }
+  })
+  
+
   ipcMain.handle('delete-llm', async (event, modelName: string) => {
     try {
       const currentModels = store.get(StoreKeys.EmbeddingModels) || {}

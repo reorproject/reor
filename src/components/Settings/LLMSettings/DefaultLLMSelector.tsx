@@ -12,6 +12,21 @@ interface DefaultLLMSelectorProps {
 
 const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({ llmConfigs, defaultLLM, setDefaultLLM }) => {
   const [selectedLLM, setSelectedLLM] = useState(defaultLLM)
+  const [availableModels, setAvailableModels] = useState<LLMConfig[]>([])
+
+  useEffect(() => {
+    // Initialize OllamaService instance and fetch models
+    const fetchModels = async () => {
+      try {
+        const models = await window.llm.getAvailableModels()        
+        setAvailableModels(models)
+      } catch (error) {
+        console.error('Error fetching models:', error)
+      }
+    }
+    
+    fetchModels()
+  }, [])
 
   useEffect(() => {
     setSelectedLLM(defaultLLM)
@@ -41,12 +56,14 @@ const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({ llmConfigs, def
             <SelectItem key={config.modelName} value={config.modelName}>
               {config.modelName}
             </SelectItem>
-            <FiTrash2
-              className="ml-2 cursor-pointer text-red-500"
-              onClick={() => {
-                deleteLLM(config.modelName)
-              }}
-            />
+            {availableModels.some((model) => model.modelName === config.modelName) && (
+              <FiTrash2
+                className="ml-2 cursor-pointer text-red-500"
+                onClick={() => {
+                  deleteLLM(config.modelName)
+                }}
+              />
+            )}
           </div>
         ))}
       </SelectContent>
