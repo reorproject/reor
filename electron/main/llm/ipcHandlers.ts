@@ -59,12 +59,11 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
       const updatedModels = currentModels.filter((model) => model.modelName !== modelName)
       store.set(StoreKeys.LLMs, updatedModels)
       await ollamaService.deleteModel(modelName)
-  
+
       return { success: true }
     } catch (error: any) {
       console.error(`Failed to delete model: ${modelName}`, error)
       return { success: false, error: error.message }
     }
   })
-  
 }
