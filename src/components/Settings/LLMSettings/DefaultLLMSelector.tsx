@@ -62,7 +62,7 @@ const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({ llmConfigs, def
       </SelectTrigger>
       <SelectContent>
         {llmConfigs.map((config) => (
-          <div className="flex w-full items-center justify-end">
+          <div key={config.modelName} className="flex w-full items-center justify-end">
             <SelectItem key={config.modelName} value={config.modelName}>
               {config.modelName}
             </SelectItem>
