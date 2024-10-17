@@ -19,6 +19,14 @@ export const ChatItem: React.FC<ChatItemProps> = ({ chatMetadata }) => {
     transition-colors duration-150 ease-in-out
     ${chatMetadata.id === currentChat?.id ? 'bg-neutral-700 text-white' : 'text-gray-300 hover:bg-neutral-800'}
   `
+
+  const handleDeleteChat = () => {
+    const isConfirmed = window.confirm(`Are you sure you want to delete the chat "${chatMetadata.displayName}"?`)
+    if (isConfirmed) {
+      deleteChat(chatMetadata.id)
+    }
+  }
+
   return (
     <ContextMenu>
       <ContextMenuTrigger>
@@ -28,7 +36,7 @@ export const ChatItem: React.FC<ChatItemProps> = ({ chatMetadata }) => {
         </div>
       </ContextMenuTrigger>
       <ContextMenuContent>
-        <ContextMenuItem onClick={() => deleteChat(chatMetadata.id)}>Delete Chat</ContextMenuItem>
+        <ContextMenuItem onClick={handleDeleteChat}>Delete Chat</ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
   )

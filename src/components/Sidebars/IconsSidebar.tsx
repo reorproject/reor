@@ -122,7 +122,7 @@ const IconsSidebar: React.FC = () => {
       </button>
       <NewDirectoryComponent
         isOpen={isNewDirectoryModalOpen}
-        onOpenChange={setIsNewDirectoryModalOpen}
+        onClose={() => setIsNewDirectoryModalOpen(false)}
         // parentDirectoryPath={parentDirectoryPathForNewDirectory}
       />
     </div>

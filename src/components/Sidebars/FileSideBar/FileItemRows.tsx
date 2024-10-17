@@ -122,7 +122,7 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
             </div>
             <NewDirectoryComponent
               isOpen={isNewDirectoryModalOpen}
-              onOpenChange={setIsNewDirectoryModalOpen}
+              onClose={() => setIsNewDirectoryModalOpen(false)}
               parentDirectoryPath={parentDirectoryPathForNewDirectory}
             />
           </div>

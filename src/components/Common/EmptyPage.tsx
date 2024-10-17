@@ -29,7 +29,7 @@ const EmptyPage: React.FC = () => {
         >
           Create a Folder
         </button>
-        <NewDirectoryComponent isOpen={isNewDirectoryModalOpen} onOpenChange={setIsNewDirectoryModalOpen} />
+        <NewDirectoryComponent isOpen={isNewDirectoryModalOpen} onClose={() => setIsNewDirectoryModalOpen(false)} />
       </div>
     </div>
   )
