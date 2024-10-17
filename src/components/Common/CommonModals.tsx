@@ -6,12 +6,9 @@ import FlashcardMenuModal from '../Flashcard/FlashcardMenuModal'
 import { useFileContext } from '@/contexts/FileContext'
 import RenameNoteModal from '../File/RenameNote'
 import RenameDirModal from '../File/RenameDirectory'
-import NewDirectoryComponent from '../File/NewDirectory'
 
 const CommonModals: React.FC = () => {
   const {
-    isNewDirectoryModalOpen,
-    setIsNewDirectoryModalOpen,
     isSettingsModalOpen,
     setIsSettingsModalOpen,
     isFlashcardModeOpen,
@@ -26,7 +23,6 @@ const CommonModals: React.FC = () => {
 
   return (
     <div>
-      <NewDirectoryComponent isOpen={isNewDirectoryModalOpen} onClose={() => setIsNewDirectoryModalOpen(false)} />{' '}
       {noteToBeRenamed && <RenameNoteModal />}
       {fileDirToBeRenamed && <RenameDirModal />}
       <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} />

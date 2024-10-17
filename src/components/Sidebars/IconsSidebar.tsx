@@ -11,13 +11,14 @@ import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { useModalOpeners } from '../../contexts/ModalContext'
 import { useChatContext } from '@/contexts/ChatContext'
 import { useContentContext } from '@/contexts/ContentContext'
+import NewDirectoryComponent from '../File/NewDirectory'
 
 const IconsSidebar: React.FC = () => {
   const { sidebarShowing, setSidebarShowing } = useChatContext()
   const [sidebarWidth, setSidebarWidth] = useState<number>(40)
+  const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false)
 
-  const { setIsNewDirectoryModalOpen, isSettingsModalOpen, setIsSettingsModalOpen, setIsFlashcardModeOpen } =
-    useModalOpeners()
+  const { isSettingsModalOpen, setIsSettingsModalOpen, setIsFlashcardModeOpen } = useModalOpeners()
   const { createUntitledNote } = useContentContext()
 
   useEffect(() => {
@@ -119,6 +120,11 @@ const IconsSidebar: React.FC = () => {
       >
         <MdSettings color="gray" size={18} className="mb-3 size-6 text-gray-100" title="Settings" />
       </button>
+      <NewDirectoryComponent
+        isOpen={isNewDirectoryModalOpen}
+        onOpenChange={setIsNewDirectoryModalOpen}
+        // parentDirectoryPath={parentDirectoryPathForNewDirectory}
+      />
     </div>
   )
 }
