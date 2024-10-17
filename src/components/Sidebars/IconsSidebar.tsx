@@ -11,6 +11,7 @@ import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { useModalOpeners } from '../../contexts/ModalContext'
 import { useChatContext } from '@/contexts/ChatContext'
 import { useContentContext } from '@/contexts/ContentContext'
+import useShortcuts from '@/components/shortcuts/use-shortcut'
 
 const IconsSidebar: React.FC = () => {
   const { sidebarShowing, setSidebarShowing } = useChatContext()
@@ -35,6 +36,8 @@ const IconsSidebar: React.FC = () => {
     window.ipcRenderer.receive('sb-compact-changed', handleSettingsChange)
   }, [])
 
+  const { getShortcutDescription } = useShortcuts()
+
   return (
     <div
       className="flex size-full flex-col items-center justify-between gap-1 bg-neutral-800"
@@ -49,7 +52,7 @@ const IconsSidebar: React.FC = () => {
             className="mx-auto text-gray-200"
             color={sidebarShowing === 'files' ? 'white' : 'gray'}
             size={18}
-            title="Files"
+            title={getShortcutDescription('open-files')}
           />
         </div>
       </div>
@@ -62,7 +65,7 @@ const IconsSidebar: React.FC = () => {
             color={sidebarShowing === 'chats' ? 'white' : 'gray'}
             className="cursor-pointer text-gray-100 "
             size={18}
-            title={sidebarShowing === 'chats' ? 'Close Chatbot' : 'Open Chatbot'}
+            title={getShortcutDescription('open-chat-bot')}
           />
         </div>
       </div>
@@ -75,7 +78,7 @@ const IconsSidebar: React.FC = () => {
             color={sidebarShowing === 'search' ? 'white' : 'gray'}
             size={18}
             className="text-gray-200"
-            title="Semantic Search"
+            title={getShortcutDescription('open-search')}
           />
         </div>
       </div>
@@ -84,7 +87,12 @@ const IconsSidebar: React.FC = () => {
         onClick={() => createUntitledNote()}
       >
         <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
-          <HiOutlinePencilAlt className="text-gray-200" color="gray" size={22} title="New Note" />
+          <HiOutlinePencilAlt
+            className="text-gray-200"
+            color="gray"
+            size={22}
+            title={getShortcutDescription('open-new-note')}
+          />
         </div>
       </div>
       <div
@@ -92,7 +100,12 @@ const IconsSidebar: React.FC = () => {
         onClick={() => setIsNewDirectoryModalOpen(true)}
       >
         <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
-          <VscNewFolder className="text-gray-200" color="gray" size={18} title="New Directory" />
+          <VscNewFolder
+            className="text-gray-200"
+            color="gray"
+            size={18}
+            title={getShortcutDescription('open-new-directory-modal')}
+          />
         </div>
       </div>
       <div
@@ -100,7 +113,12 @@ const IconsSidebar: React.FC = () => {
         onClick={() => setIsFlashcardModeOpen(true)}
       >
         <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
-          <MdOutlineQuiz className="text-gray-200" color="gray" size={19} title="Flashcard quiz" />
+          <MdOutlineQuiz
+            className="text-gray-200"
+            color="gray"
+            size={19}
+            title={getShortcutDescription('open-flashcard-quiz-modal')}
+          />
         </div>
       </div>
 
@@ -117,7 +135,12 @@ const IconsSidebar: React.FC = () => {
         type="button"
         aria-label="Open Settings"
       >
-        <MdSettings color="gray" size={18} className="mb-3 size-6 text-gray-100" title="Settings" />
+        <MdSettings
+          color="gray"
+          size={18}
+          className="mb-3 size-6 text-gray-100"
+          title={getShortcutDescription('open-settings-modal')}
+        />
       </button>
     </div>
   )

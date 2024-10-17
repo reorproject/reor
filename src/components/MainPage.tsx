@@ -15,6 +15,7 @@ import { ChatProvider, useChatContext } from '@/contexts/ChatContext'
 import { FileProvider, useFileContext } from '@/contexts/FileContext'
 import ModalProvider from '@/contexts/ModalContext'
 import CommonModals from './Common/CommonModals'
+import useShortcuts from './shortcuts/use-shortcut'
 
 const MainPageContent: React.FC = () => {
   const [showSimilarFiles, setShowSimilarFiles] = useState(false)
@@ -23,6 +24,7 @@ const MainPageContent: React.FC = () => {
 
   const { showChatbot } = useChatContext()
 
+  useShortcuts()
   return (
     <div className="relative overflow-x-hidden">
       <TitleBar
