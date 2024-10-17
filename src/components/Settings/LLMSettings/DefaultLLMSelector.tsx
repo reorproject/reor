@@ -63,7 +63,7 @@ const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({ llmConfigs, def
       <SelectContent>
         {llmConfigs.map((config) => (
           <div key={config.modelName} className="flex w-full items-center justify-end">
-            <SelectItem className='cursor-pointer' key={config.modelName} value={config.modelName}>
+            <SelectItem className="cursor-pointer" key={config.modelName} value={config.modelName}>
               {config.modelName}
             </SelectItem>
             {availableOllamaModels.some((model) => model.modelName === config.modelName) && (
