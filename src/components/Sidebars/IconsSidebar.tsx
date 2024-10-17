@@ -11,9 +11,12 @@ import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { useModalOpeners } from '../../contexts/ModalContext'
 import { useChatContext } from '@/contexts/ChatContext'
 import { useContentContext } from '@/contexts/ContentContext'
-import useShortcuts from '@/components/shortcuts/use-shortcut'
 
-const IconsSidebar: React.FC = () => {
+interface IconsSidebarProps {
+  getShortcutDescription: (action: string) => string
+}
+
+const IconsSidebar: React.FC<IconsSidebarProps> = ({ getShortcutDescription }) => {
   const { sidebarShowing, setSidebarShowing } = useChatContext()
   const [sidebarWidth, setSidebarWidth] = useState<number>(40)
 
@@ -35,8 +38,6 @@ const IconsSidebar: React.FC = () => {
 
     window.ipcRenderer.receive('sb-compact-changed', handleSettingsChange)
   }, [])
-
-  const { getShortcutDescription } = useShortcuts()
 
   return (
     <div

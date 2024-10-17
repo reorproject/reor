@@ -16,6 +16,7 @@ import { FileProvider, useFileContext } from '@/contexts/FileContext'
 import ModalProvider from '@/contexts/ModalContext'
 import CustomContextMenu from './Common/CustomContextMenu'
 import CommonModals from './Common/CommonModals'
+import useAppShortcuts from './shortcuts/use-shortcut'
 
 const MainPageContent: React.FC = () => {
   const [showSimilarFiles, setShowSimilarFiles] = useState(false)
@@ -23,6 +24,8 @@ const MainPageContent: React.FC = () => {
   const { currentlyOpenFilePath } = useFileContext()
 
   const { showChatbot } = useChatContext()
+  const { getShortcutDescription } = useAppShortcuts()
+
   return (
     <div className="relative overflow-x-hidden">
       <TitleBar
@@ -34,7 +37,7 @@ const MainPageContent: React.FC = () => {
       <CustomContextMenu />
       <div className="flex h-below-titlebar">
         <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5">
-          <IconsSidebar />
+          <IconsSidebar getShortcutDescription={getShortcutDescription} />
         </div>
 
         <ResizableComponent resizeSide="right">

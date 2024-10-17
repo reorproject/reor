@@ -1,21 +1,19 @@
-import { useEffect, useState, useCallback, useRef } from 'react'
-import { shortcuts, Shortcut } from './shortcutDefinitions'
+import { useCallback, useEffect, useRef } from 'react'
 import { useModalOpeners } from '../../contexts/ModalContext'
 import { useChatContext } from '../../contexts/ChatContext'
 import { useContentContext } from '@/contexts/ContentContext'
+import { shortcuts } from './shortcutDefinitions'
 
-function useShortcuts() {
+function useAppShortcuts() {
   const { setIsNewDirectoryModalOpen, setIsFlashcardModeOpen, setIsSettingsModalOpen } = useModalOpeners()
   const { setSidebarShowing } = useChatContext()
   const { createUntitledNote } = useContentContext()
-  const [shortcutMap, setShortcutMap] = useState<Record<string, string>>({})
-  const listenersRef = useRef<(() => void)[]>([])
 
   const handleShortcut = useCallback(
-    async (action: string) => {
+    (action: string) => {
       switch (action) {
         case 'open-new-note':
-          await createUntitledNote()
+          createUntitledNote()
           break
         case 'open-new-directory-modal':
           setIsNewDirectoryModalOpen(true)
@@ -36,48 +34,55 @@ function useShortcuts() {
           setIsSettingsModalOpen(true)
           break
         default:
-          // Default do nothing
+          // No other cases
           break
       }
     },
-    [setSidebarShowing, setIsNewDirectoryModalOpen, setIsSettingsModalOpen, setIsFlashcardModeOpen, createUntitledNote],
+    [createUntitledNote, setIsNewDirectoryModalOpen, setSidebarShowing, setIsFlashcardModeOpen, setIsSettingsModalOpen],
   )
 
+  const handleShortcutRef = useRef(handleShortcut)
+  handleShortcutRef.current = handleShortcut
+  // shortcuts.forEach(shortcut => {
+  //   useHotkeys(shortcut.key, (event) => {
+  //     event.preventDefault()
+  //     handleShortcut(shortcut.action)
+  //   }, {
+  //     enableOnFormTags: true,
+  //     preventDefault: true,
+  //     enabled: true // Ensure the hotkey is always enabled
+  //   }, [handleShortcut]) // Add handleShortcut to the dependency array
+  // })
   useEffect(() => {
-    async function setupShortcuts() {
-      const platform = await window.electronUtils.getPlatform()
-      const map: Record<string, string> = {}
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const modifierPressed = event.ctrlKey || event.metaKey
+      const keyPressed = event.key.toLowerCase()
 
-      shortcuts.forEach((shortcut: Shortcut) => {
-        const displayValue = platform === 'darwin' ? shortcut.displayValue.mac : shortcut.displayValue.other
-        map[shortcut.action] = `${shortcut.description} (${displayValue})`
-
-        const handler = () => {
-          handleShortcut(shortcut.action)
-        }
-        const removeListener = window.ipcRenderer.receive(shortcut.action, handler)
-        listenersRef.current.push(removeListener)
+      const triggeredShortcut = shortcuts.find((s) => {
+        const [mod, key] = s.key.toLowerCase().split('+')
+        return mod === 'mod' && modifierPressed && key === keyPressed
       })
 
-      setShortcutMap(map)
+      if (triggeredShortcut) {
+        event.preventDefault()
+        handleShortcutRef.current(triggeredShortcut.action)
+      }
     }
 
-    setupShortcuts()
-
+    window.addEventListener('keydown', handleKeyDown)
     return () => {
-      listenersRef.current.forEach((removeListener) => removeListener())
-      listenersRef.current = []
+      window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [handleShortcut])
+  }, [])
 
-  const getShortcutDescription = useCallback(
-    (action: string) => {
-      return shortcutMap[action] || ''
-    },
-    [shortcutMap],
-  )
+  const getShortcutDescription = useCallback((action: string) => {
+    const shortcut = shortcuts.find((s) => s.action === action)
+    if (!shortcut) return ''
+    const platform = navigator.platform.toLowerCase().includes('mac') ? 'mac' : 'other'
+    return `${shortcut.description} (${shortcut.displayValue[platform]})`
+  }, [])
 
   return { getShortcutDescription }
 }
 
-export default useShortcuts
+export default useAppShortcuts

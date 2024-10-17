@@ -14,7 +14,6 @@ import registerFileHandlers from './filesystem/ipcHandlers'
 import { ollamaService, registerLLMSessionHandlers } from './llm/ipcHandlers'
 import registerPathHandlers from './path/ipcHandlers'
 import { registerDBSessionHandlers } from './vector-database/ipcHandlers'
-import { registerShortcuts, unregisterShortcuts } from '../../src/components/shortcuts/shortcutManager'
 
 Sentry.init({
   dsn: 'https://a764a6135d25ba91f0b25c0252be52f3@o4507840138903552.ingest.us.sentry.io/4507840140410880',
@@ -46,15 +45,7 @@ const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
 app.whenReady().then(async () => {
   await ollamaService.init()
-  const window = await windowsManager.createWindow(store, preload, url, indexHtml)
-  window.webContents.on('did-finish-load', () => {
-    registerShortcuts(window)
-  })
-})
-
-app.on('will-quit', () => {
-  const windows = BrowserWindow.getAllWindows()
-  windows.forEach((window) => unregisterShortcuts(window))
+  await windowsManager.createWindow(store, preload, url, indexHtml)
 })
 
 app.on('window-all-closed', () => {
