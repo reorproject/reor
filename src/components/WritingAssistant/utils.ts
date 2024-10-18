@@ -12,37 +12,37 @@ function getClassNames(message: ReorChatMessage | undefined): string {
 
 export const generatePromptString = (
   option: string,
-  selectedText: string,
+  contextText: string,
   isSpaceTrigger: boolean,
   customPromptInput?: string,
 ): string => {
-  let processedText = selectedText
-  if (!selectedText.trim() && isSpaceTrigger) {
+  let processedText = contextText
+  if (!contextText.trim() && isSpaceTrigger) {
     processedText = ''
   }
 
   switch (option) {
     case 'simplify':
-      return `The following text in triple quotes below has already been written:
+      return `The following text in triple quotes is either the original text or the previous response:
     """
     ${processedText}
     """
-    Simplify and condense the writing. Do not return anything other than the simplified writing. Do not wrap responses in quotes.`
+    Simplify and condense this writing further. Do not return anything other than the simplified writing. Do not wrap responses in quotes.`
     case 'copy-editor':
-      return `Act as a copy editor. Go through the text in triple quotes below. Edit it for spelling mistakes, grammar issues, punctuation, and generally for readability and flow. Format the text into appropriately sized paragraphs. Make your best effort.
+      return `Act as a copy editor. Go through the text in triple quotes below, which is either the original text or the previous response. Edit it for spelling mistakes, grammar issues, punctuation, and generally for readability and flow. Format the text into appropriately sized paragraphs. Make your best effort.
     
     """ ${processedText} """
     Return only the edited text. Do not wrap your response in quotes. Do not offer anything else other than the edited text in the response. Do not translate the text. If in doubt, or you can't make edits, just return the original text.`
     case 'takeaways':
-      return `My notes are below in triple quotes:
+      return `The following text in triple quotes is either the original text or the previous response:
     """ ${processedText} """
-    Write a markdown list (using dashes) of key takeaways from my notes. Write at least 3 items, but write more if the text requires it. Be very detailed and don't leave any information out. Do not wrap responses in quotes.`
+    Write a markdown list (using dashes) of key takeaways from this text. Write at least 3 items, but write more if the text requires it. Be very detailed and don't leave any information out. Do not wrap responses in quotes.`
     default:
       if (processedText.trim() === '') {
-        return `The user has given the following instructions(in triple #)  ### ${customPromptInput} ###`
+        return `The user has given the following instructions (in triple #) for a new task: ### ${customPromptInput} ###`
       }
       return (
-        'The user has given the following instructions(in triple #) for processing the text selected(in triple quotes): ' +
+        'The user has given the following instructions (in triple #) for processing the previous response or the original text (in triple quotes): ' +
         `### ${customPromptInput} ###` +
         '\n' +
         `  """ ${processedText} """`

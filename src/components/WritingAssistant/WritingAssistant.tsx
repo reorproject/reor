@@ -1,18 +1,16 @@
 import React, { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import { FaMagic } from 'react-icons/fa'
-import ReactMarkdown from 'react-markdown'
-import rehypeRaw from 'rehype-raw'
 import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import posthog from 'posthog-js'
 import { streamText } from 'ai'
-import { appendStringContentToMessages, convertMessageToString } from '../../lib/llm/chat'
 import useOutsideClick from './hooks/use-outside-click'
-import getClassNames, { generatePromptString, getLastMessage } from './utils'
+import { generatePromptString, getLastMessage } from './utils'
 import { ReorChatMessage } from '../../lib/llm/types'
 import { useFileContext } from '@/contexts/FileContext'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import resolveLLMClient from '@/lib/llm/client'
+import ConversationHistory from './ConversationHistory'
 
 const WritingAssistant: React.FC = () => {
   const [messages, setMessages] = useState<ReorChatMessage[]>([])
@@ -30,6 +28,10 @@ const WritingAssistant: React.FC = () => {
   const textFieldRef = useRef<HTMLInputElement>(null)
   const lastAssistantMessage = getLastMessage(messages, 'assistant')
   const hasValidMessages = !!lastAssistantMessage
+  const [streamingMessage, setStreamingMessage] = useState<string>('')
+  const [currentConversationIndex, setCurrentConversationIndex] = useState<number>(0)
+  const [isNewConversation, setIsNewConversation] = useState<boolean>(false)
+  const [prompts, setPrompts] = useState<{ option?: string; customPromptInput?: string }[]>([])
 
   const { editor, highlightData } = useFileContext()
 
@@ -224,26 +226,47 @@ const WritingAssistant: React.FC = () => {
     setLoadingResponse(true)
     posthog.capture('submitted_writing_assistant_message')
 
+    const newMessage: ReorChatMessage = { role: 'user', content: prompt }
+    const updatedMessages = isNewConversation ? [newMessage] : [...messages, newMessage]
+    setMessages(updatedMessages)
+
+    setStreamingMessage('')
+
     const { textStream } = await streamText({
       model: await resolveLLMClient(defaultLLMName),
-      // messages: newChatHistory.messages,
-      prompt,
+      messages: updatedMessages,
     })
 
-    let updatedMessages = messages
+    let fullResponse = ''
     // eslint-disable-next-line no-restricted-syntax
     for await (const textPart of textStream) {
-      updatedMessages = appendStringContentToMessages(updatedMessages, textPart)
-      setMessages(updatedMessages)
+      fullResponse += textPart
+      setStreamingMessage(fullResponse)
     }
 
+    const assistantMessage: ReorChatMessage = { role: 'assistant', content: fullResponse }
+    setMessages((prev) => {
+      const newMessages = isNewConversation ? [newMessage, assistantMessage] : [...prev, assistantMessage]
+      setCurrentConversationIndex(newMessages.length - 2)
+      return newMessages
+    })
+    setStreamingMessage('')
     setLoadingResponse(false)
+    setIsNewConversation(false)
   }
 
   const handleOption = async (option: string, customPromptInput?: string) => {
-    const selectedText = highlightData.text
+    let selectedText = highlightData.text
+    if (lastAssistantMessage) {
+      selectedText =
+        typeof lastAssistantMessage.content === 'string'
+          ? lastAssistantMessage.content
+          : JSON.stringify(lastAssistantMessage.content)
+    }
     const prompt = generatePromptString(option, selectedText, isSpaceTrigger, customPromptInput)
+    setPrompts((prev) => [...prev, { option, customPromptInput }])
     setPrevPrompt(prompt)
+    setIsNewConversation(true)
     await getLLMResponse(prompt)
   }
 
@@ -369,7 +392,7 @@ const WritingAssistant: React.FC = () => {
         </Popover>
       )}
 
-      {getLastMessage(messages, 'assistant') && (
+      {(messages.length > 0 || streamingMessage) && (
         <div
           ref={markdownContainerRef}
           className="absolute z-50 rounded-lg border border-gray-300 bg-white p-2.5 shadow-md"
@@ -379,57 +402,29 @@ const WritingAssistant: React.FC = () => {
             width: '385px',
           }}
         >
-          <div
-            style={{
-              maxHeight: markdownMaxHeight,
-              overflowY: 'auto',
+          <ConversationHistory
+            history={messages}
+            streamingMessage={streamingMessage}
+            markdownMaxHeight={markdownMaxHeight}
+            customPrompt={customPrompt}
+            setCustomPrompt={setCustomPrompt}
+            handleCustomPrompt={() => handleOption('custom', customPrompt)}
+            displayPrompt={prevPrompt}
+            currentIndex={currentConversationIndex}
+            onNavigate={(direction) => {
+              if (direction === 'prev' && currentConversationIndex > 0) {
+                setCurrentConversationIndex(currentConversationIndex - 2)
+              } else if (direction === 'next' && currentConversationIndex < messages.length - 2) {
+                setCurrentConversationIndex(currentConversationIndex + 2)
+              }
             }}
-          >
-            <ReactMarkdown
-              rehypePlugins={[rehypeRaw]}
-              className={`markdown-content break-words rounded-md p-1 ${getClassNames(lastAssistantMessage)}`}
-            >
-              {convertMessageToString(getLastMessage(messages, 'assistant'))}
-            </ReactMarkdown>
-          </div>
-          <div className="mt-2 flex justify-between">
-            <button
-              className="mr-1 flex cursor-pointer items-center rounded-md border-0 bg-blue-100 px-2.5 py-1"
-              onClick={() => {
-                getLLMResponse(prevPrompt)
-              }}
-              type="button"
-            >
-              Re-run
-            </button>
-            <button
-              className="mr-1 flex cursor-pointer items-center rounded-md border-0 bg-blue-100 px-2.5 py-1"
-              onClick={() => {
-                insertAfterHighlightedText()
-              }}
-              type="button"
-            >
-              Insert
-            </button>
-            <button
-              className="mr-1 flex cursor-pointer items-center rounded-md border-0 bg-blue-100 px-2.5 py-1"
-              onClick={() => {
-                copyToClipboard()
-              }}
-              type="button"
-            >
-              Copy
-            </button>
-            <button
-              className="flex cursor-pointer items-center rounded-md border-0 bg-indigo-700 px-2.5 py-1 text-white"
-              onClick={() => {
-                replaceHighlightedText()
-              }}
-              type="button"
-            >
-              Replace
-            </button>
-          </div>
+            getLLMResponse={getLLMResponse}
+            insertAfterHighlightedText={insertAfterHighlightedText}
+            copyToClipboard={copyToClipboard}
+            replaceHighlightedText={replaceHighlightedText}
+            isNewConversation={isNewConversation}
+            prompts={prompts}
+          />
         </div>
       )}
     </div>
