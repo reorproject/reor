@@ -1,16 +1,18 @@
 import React from 'react'
 
 import ReactDOM from 'react-dom/client'
-import { toast } from 'react-toastify'
 import * as Sentry from '@sentry/electron/renderer'
+import { toast } from 'react-toastify'
 
 import App from './App'
 import './styles/global.css'
 import errorToStringRendererProcess from './lib/error'
 
-Sentry.init({
-  integrations: [],
-})
+if (process.env.NODE_ENV === 'production') {
+  Sentry.init({
+    integrations: [],
+  })
+}
 
 window.addEventListener('error', (event) => {
   event.preventDefault()

@@ -15,9 +15,11 @@ import { ollamaService, registerLLMSessionHandlers } from './llm/ipcHandlers'
 import registerPathHandlers from './path/ipcHandlers'
 import { registerDBSessionHandlers } from './vector-database/ipcHandlers'
 
-Sentry.init({
-  dsn: 'https://a764a6135d25ba91f0b25c0252be52f3@o4507840138903552.ingest.us.sentry.io/4507840140410880',
-})
+if (process.env.NODE_ENV === 'production') {
+  Sentry.init({
+    dsn: 'https://a764a6135d25ba91f0b25c0252be52f3@o4507840138903552.ingest.us.sentry.io/4507840140410880',
+  })
+}
 
 const store = new Store<StoreSchema>()
 // store.clear() // clear store for testing CAUTION: THIS WILL DELETE YOUR CHAT HISTORY
