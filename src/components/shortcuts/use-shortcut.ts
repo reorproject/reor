@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useModalOpeners } from '../../contexts/ModalContext'
 import { useChatContext } from '../../contexts/ChatContext'
 import { useContentContext } from '@/contexts/ContentContext'
 import { shortcuts } from './shortcutDefinitions'
 
 function useAppShortcuts() {
-  const { setIsNewDirectoryModalOpen, setIsFlashcardModeOpen, setIsSettingsModalOpen } = useModalOpeners()
-  const { setSidebarShowing } = useChatContext()
+  const { setIsFlashcardModeOpen, setIsSettingsModalOpen } = useModalOpeners()
+  const { setSidebarShowing, openNewChat  } = useChatContext()
   const { createUntitledNote } = useContentContext()
 
   const handleShortcut = useCallback(
@@ -16,7 +16,7 @@ function useAppShortcuts() {
           createUntitledNote()
           break
         case 'open-new-directory-modal':
-          setIsNewDirectoryModalOpen(true)
+          window.dispatchEvent(new CustomEvent('open-new-directory-modal'))
           break
         case 'open-search':
           setSidebarShowing('search')
@@ -25,7 +25,7 @@ function useAppShortcuts() {
           setSidebarShowing('files')
           break
         case 'open-chat-bot':
-          setSidebarShowing('chats')
+          openNewChat();
           break
         case 'open-flashcard-quiz-modal':
           setIsFlashcardModeOpen(true)
@@ -38,21 +38,11 @@ function useAppShortcuts() {
           break
       }
     },
-    [createUntitledNote, setIsNewDirectoryModalOpen, setSidebarShowing, setIsFlashcardModeOpen, setIsSettingsModalOpen],
+    [createUntitledNote, setSidebarShowing, setIsFlashcardModeOpen, setIsSettingsModalOpen],
   )
 
   const handleShortcutRef = useRef(handleShortcut)
   handleShortcutRef.current = handleShortcut
-  // shortcuts.forEach(shortcut => {
-  //   useHotkeys(shortcut.key, (event) => {
-  //     event.preventDefault()
-  //     handleShortcut(shortcut.action)
-  //   }, {
-  //     enableOnFormTags: true,
-  //     preventDefault: true,
-  //     enabled: true // Ensure the hotkey is always enabled
-  //   }, [handleShortcut]) // Add handleShortcut to the dependency array
-  // })
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       const modifierPressed = event.ctrlKey || event.metaKey

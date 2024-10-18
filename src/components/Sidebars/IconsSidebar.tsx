@@ -15,12 +15,17 @@ import NewDirectoryComponent from '../File/NewDirectory'
 
 interface IconsSidebarProps {
   getShortcutDescription: (action: string) => string
+  isNewDirectoryModalOpen: boolean
+  setIsNewDirectoryModalOpen: (isOpen: boolean) => void
 }
 
-const IconsSidebar: React.FC<IconsSidebarProps> = ({ getShortcutDescription }) => {
+const IconsSidebar: React.FC<IconsSidebarProps> = ({
+  getShortcutDescription,
+  isNewDirectoryModalOpen,
+  setIsNewDirectoryModalOpen,
+}) => {
   const { sidebarShowing, setSidebarShowing } = useChatContext()
   const [sidebarWidth, setSidebarWidth] = useState<number>(40)
-  const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false)
 
   const { isSettingsModalOpen, setIsSettingsModalOpen, setIsFlashcardModeOpen } = useModalOpeners()
   const { createUntitledNote } = useContentContext()
@@ -144,11 +149,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ getShortcutDescription }) =
           title={getShortcutDescription('open-settings-modal') || 'Settings'}
         />
       </button>
-      <NewDirectoryComponent
-        isOpen={isNewDirectoryModalOpen}
-        onClose={() => setIsNewDirectoryModalOpen(false)}
-        // parentDirectoryPath={parentDirectoryPathForNewDirectory}
-      />
+      <NewDirectoryComponent isOpen={isNewDirectoryModalOpen} onClose={() => setIsNewDirectoryModalOpen(false)} />
     </div>
   )
 }
