@@ -23,7 +23,7 @@ const MainPageContent: React.FC = () => {
   const { currentlyOpenFilePath } = useFileContext()
 
   const { showChatbot } = useChatContext()
-  const { getShortcutDescription} = useAppShortcuts()
+  const { getShortcutDescription } = useAppShortcuts()
 
   useEffect(() => {
     const openNewDirectoryModal = () => setIsNewDirectoryModalOpen(true)
@@ -41,11 +41,11 @@ const MainPageContent: React.FC = () => {
       />
       <div className="flex h-below-titlebar">
         <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5">
-        <IconsSidebar 
-          getShortcutDescription={getShortcutDescription} 
-          isNewDirectoryModalOpen={isNewDirectoryModalOpen}
-          setIsNewDirectoryModalOpen={setIsNewDirectoryModalOpen}
-        />
+          <IconsSidebar
+            getShortcutDescription={getShortcutDescription}
+            isNewDirectoryModalOpen={isNewDirectoryModalOpen}
+            setIsNewDirectoryModalOpen={setIsNewDirectoryModalOpen}
+          />
         </div>
 
         <ResizableComponent resizeSide="right">

@@ -16,7 +16,7 @@ export const shortcuts: Shortcut[] = [
     displayValue: { mac: 'Cmd+O', other: 'Ctrl+O' },
   },
   {
-    key: 'mod+n',
+    key: 'mod+N',
     action: 'open-new-note',
     description: 'New Note',
     displayValue: { mac: 'Cmd+N', other: 'Ctrl+N' },

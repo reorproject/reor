@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { useModalOpeners } from '../../contexts/ModalContext'
 import { useChatContext } from '../../contexts/ChatContext'
 import { useContentContext } from '@/contexts/ContentContext'
 import { shortcuts } from './shortcutDefinitions'
+import debounce from './shortcutUtil'
 
 function useAppShortcuts() {
   const { setIsFlashcardModeOpen, setIsSettingsModalOpen } = useModalOpeners()
-  const { setSidebarShowing, openNewChat  } = useChatContext()
+  const { setSidebarShowing, openNewChat } = useChatContext()
   const { createUntitledNote } = useContentContext()
 
   const handleShortcut = useCallback(
@@ -25,7 +26,7 @@ function useAppShortcuts() {
           setSidebarShowing('files')
           break
         case 'open-chat-bot':
-          openNewChat();
+          openNewChat()
           break
         case 'open-flashcard-quiz-modal':
           setIsFlashcardModeOpen(true)
@@ -38,7 +39,7 @@ function useAppShortcuts() {
           break
       }
     },
-    [createUntitledNote, setSidebarShowing, setIsFlashcardModeOpen, setIsSettingsModalOpen],
+    [createUntitledNote, setSidebarShowing, setIsFlashcardModeOpen, setIsSettingsModalOpen, openNewChat],
   )
 
   const handleShortcutRef = useRef(handleShortcut)
@@ -59,9 +60,11 @@ function useAppShortcuts() {
       }
     }
 
-    window.addEventListener('keydown', handleKeyDown)
+    const debouncedHandleKeyDown = debounce(handleKeyDown, 300) // 300ms debounce time
+
+    window.addEventListener('keydown', debouncedHandleKeyDown)
     return () => {
-      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keydown', debouncedHandleKeyDown)
     }
   }, [])
 
