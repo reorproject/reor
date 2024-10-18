@@ -56,10 +56,7 @@ const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({ llmConfigs, def
                 {modelName}
               </SelectItem>
               {isOllamaModel && (
-                <FiTrash2
-                  className="ml-2 cursor-pointer text-red-500"
-                  onClick={() => handleDeleteLLM(modelName)}
-                />
+                <FiTrash2 className="ml-2 cursor-pointer text-red-500" onClick={() => handleDeleteLLM(modelName)} />
               )}
             </div>
           )
