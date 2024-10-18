@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 
 import '../styles/global.css'
 import ChatComponent from './Chat'
@@ -24,12 +24,16 @@ const MainPageContent: React.FC = () => {
 
   const { showChatbot } = useChatContext()
   const { getShortcutDescription } = useAppShortcuts()
+  const openNewDirectoryModal = useCallback(() => {
+    setIsNewDirectoryModalOpen(true)
+  }, [])
 
   useEffect(() => {
-    const openNewDirectoryModal = () => setIsNewDirectoryModalOpen(true)
     window.addEventListener('open-new-directory-modal', openNewDirectoryModal)
-    return () => window.removeEventListener('open-new-directory-modal', openNewDirectoryModal)
-  }, [])
+    return () => {
+      window.removeEventListener('open-new-directory-modal', openNewDirectoryModal)
+    }
+  }, [openNewDirectoryModal])
 
   return (
     <div className="relative overflow-x-hidden">

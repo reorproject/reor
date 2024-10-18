@@ -60,7 +60,7 @@ function useAppShortcuts() {
       }
     }
 
-    const debouncedHandleKeyDown = debounce(handleKeyDown, 300) // 300ms debounce time
+    const debouncedHandleKeyDown = debounce(handleKeyDown, 100) 
 
     window.addEventListener('keydown', debouncedHandleKeyDown)
     return () => {
