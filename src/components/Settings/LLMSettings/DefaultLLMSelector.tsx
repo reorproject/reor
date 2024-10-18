@@ -13,8 +13,6 @@ interface DefaultLLMSelectorProps {
 const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({ llmConfigs, defaultLLM, setDefaultLLM }) => {
   const [selectedLLM, setSelectedLLM] = useState(defaultLLM)
 
-  const availableOllamaModels = llmConfigs.filter(({ apiName }) => apiName === 'ollama')
-
   useEffect(() => {
     setSelectedLLM(defaultLLM)
   }, [defaultLLM])
@@ -48,15 +46,15 @@ const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({ llmConfigs, def
       <SelectContent>
         {llmConfigs.map((config) => {
           const { modelName } = config
-          const isOllamaModel = availableOllamaModels.some(({ modelName: ollamaModel }) => ollamaModel === modelName)
-
           return (
             <div key={modelName} className="flex w-full items-center justify-between">
               <SelectItem className="cursor-pointer" value={modelName}>
                 {modelName}
               </SelectItem>
-              {isOllamaModel && (
-                <FiTrash2 className="ml-2 cursor-pointer text-red-500" onClick={() => handleDeleteLLM(modelName)} />
+              {config.apiName === 'Ollama' && (
+                <div className="cursor-pointer text-red-500">
+                  <FiTrash2 onClick={() => handleDeleteLLM(modelName)} />
+                </div>
               )}
             </div>
           )
