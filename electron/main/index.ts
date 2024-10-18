@@ -45,7 +45,6 @@ if (!app.requestSingleInstanceLock()) {
 const preload = join(__dirname, '../preload/index.js')
 const url = process.env.VITE_DEV_SERVER_URL
 const indexHtml = join(process.env.DIST, 'index.html')
-
 app.whenReady().then(async () => {
   await ollamaService.init()
   windowsManager.createWindow(store, preload, url, indexHtml)
