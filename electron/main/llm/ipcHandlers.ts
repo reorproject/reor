@@ -50,20 +50,6 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
   })
 
   ipcMain.handle('delete-llm', async (event, modelName: string) => {
-    try {
-      const currentModels: LLMConfig[] = store.get(StoreKeys.LLMs) || []
-      const foundModel = currentModels.find((model) => model.modelName === modelName)
-      if (!foundModel) {
-        throw new Error(`Model ${modelName} not found in the store`)
-      }
-      const updatedModels = currentModels.filter((model) => model.modelName !== modelName)
-      store.set(StoreKeys.LLMs, updatedModels)
       await ollamaService.deleteModel(modelName)
-
-      return { success: true }
-    } catch (error: any) {
-      console.error(`Failed to delete model: ${modelName}`, error)
-      return { success: false, error: error.message }
-    }
   })
 }
