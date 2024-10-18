@@ -12,7 +12,14 @@ import { useModalOpeners } from '../../contexts/ModalContext'
 import { useChatContext } from '@/contexts/ChatContext'
 import { useContentContext } from '@/contexts/ContentContext'
 import NewDirectoryComponent from '../File/NewDirectory'
-import { IconsSidebarProps } from './IconsSidebarTypes'
+
+export interface IconsSidebarProps {
+  readonly getShortcutDescription: (action: string) => string
+
+  readonly isNewDirectoryModalOpen: boolean
+
+  readonly setIsNewDirectoryModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
 
 const IconsSidebar: React.FC<IconsSidebarProps> = ({
   getShortcutDescription,

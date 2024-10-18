@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
 import { useModalOpeners } from '../../contexts/ModalContext'
 import { useChatContext } from '../../contexts/ChatContext'
 import { useContentContext } from '@/contexts/ContentContext'
 import { shortcuts } from './shortcutDefinitions'
-import debounce from './shortcutUtil'
 
 function useAppShortcuts() {
   const { setIsFlashcardModeOpen, setIsSettingsModalOpen } = useModalOpeners()
@@ -44,29 +44,29 @@ function useAppShortcuts() {
 
   const handleShortcutRef = useRef(handleShortcut)
   handleShortcutRef.current = handleShortcut
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      const modifierPressed = event.ctrlKey || event.metaKey
-      const keyPressed = event.key.toLowerCase()
 
-      const triggeredShortcut = shortcuts.find((s) => {
-        const [mod, key] = s.key.toLowerCase().split('+')
-        return mod === 'mod' && modifierPressed && key === keyPressed
-      })
+  const debouncedHandleKeyDown = useDebouncedCallback((event: KeyboardEvent) => {
+    const modifierPressed = event.ctrlKey || event.metaKey
+    const keyPressed = event.key.toLowerCase()
 
-      if (triggeredShortcut) {
-        event.preventDefault()
-        handleShortcutRef.current(triggeredShortcut.action)
-      }
+    const triggeredShortcut = shortcuts.find((s) => {
+      const [mod, key] = s.key.toLowerCase().split('+')
+      return mod === 'mod' && modifierPressed && key === keyPressed
+    })
+
+    if (triggeredShortcut) {
+      event.preventDefault()
+      handleShortcutRef.current(triggeredShortcut.action)
     }
+  }, 100)
 
-    const debouncedHandleKeyDown = debounce(handleKeyDown, 100)
-
+  useEffect(() => {
     window.addEventListener('keydown', debouncedHandleKeyDown)
     return () => {
       window.removeEventListener('keydown', debouncedHandleKeyDown)
+      debouncedHandleKeyDown.cancel()
     }
-  }, [])
+  }, [debouncedHandleKeyDown])
 
   const getShortcutDescription = useCallback((action: string) => {
     const shortcut = shortcuts.find((s) => s.action === action)
