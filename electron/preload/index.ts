@@ -118,6 +118,7 @@ const llm = {
   setDefaultLLM: createIPCHandler<(modelName: string) => Promise<void>>('set-default-llm'),
   getDefaultLLMName: createIPCHandler<() => Promise<string>>('get-default-llm-name'),
   pullOllamaModel: createIPCHandler<(modelName: string) => Promise<void>>('pull-ollama-model'),
+  deleteLLM: createIPCHandler<(modelNameToDelete: string) => Promise<void>>('delete-llm'),
 }
 
 // Expose to renderer process
