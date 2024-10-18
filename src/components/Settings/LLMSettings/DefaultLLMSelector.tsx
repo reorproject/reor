@@ -43,15 +43,10 @@ const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({ llmConfigs, def
   const deleteLLM = async (modelName: string) => {
     const confirmDelete = window.confirm(`Are you sure you want to delete the model ${modelName}?`)
     if (!confirmDelete) return
-    try {
       await window.llm.deleteLLM(modelName)
       posthog.capture('delete_llm', {
         modelName,
       })
-    } catch (error) {
-      console.error(`Failed to delete model: ${modelName}`, error)
-      window.alert(`Failed to delete the model ${modelName}`)
-    }
   }
 
   return (
