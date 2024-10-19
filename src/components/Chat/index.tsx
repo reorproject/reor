@@ -61,6 +61,7 @@ const ChatComponent: React.FC = () => {
         const llmClient = await resolveLLMClient(defaultLLMName)
         abortControllerRef.current = new AbortController()
         const toolsZodSchema = Object.assign({}, ...outputChat.toolDefinitions.map(convertToolConfigToZodSchema))
+        setLoadingState('waiting-for-first-token')
         const { textStream, toolCalls } = await streamText({
           model: llmClient,
           messages: removeUncalledToolsFromMessages(outputChat.messages),

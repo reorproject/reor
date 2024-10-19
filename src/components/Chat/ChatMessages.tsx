@@ -71,7 +71,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
           </div>
 
           {loadingState === 'waiting-for-first-token' && (
-            <div className="mt-4 flex w-full max-w-3xl items-start gap-6">
+            <div className="mt-4 flex w-full max-w-3xl items-start gap-6 p-2">
               <LoadingDots />
             </div>
           )}
