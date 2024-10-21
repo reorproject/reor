@@ -64,7 +64,7 @@ const ChatSources: React.FC<ChatSourcesProps> = ({ contextItems }) => {
                 </CardDescription>
               </Card>
             </HoverCardTrigger>
-            <HoverCardContent>
+            <HoverCardContent className="max-h-[60vh] w-80 overflow-y-auto">
               <MarkdownRenderer content={getItemContent(contextItem)} />
             </HoverCardContent>
           </HoverCard>
