@@ -40,7 +40,7 @@ const ChatSources: React.FC<ChatSourcesProps> = ({ contextItems }) => {
 
   const handleOpenContent = (path: string) => {
     openContent(path)
-    posthog.capture('open_file_from_chat_context')
+    posthog.capture('open_content_from_chat_sources')
   }
 
   if (contextItems.length === 0) {
@@ -53,7 +53,7 @@ const ChatSources: React.FC<ChatSourcesProps> = ({ contextItems }) => {
 
       <div className="scrollbar-thumb-rounded-full flex space-x-2 overflow-x-auto p-0 pb-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-800">
         {contextItems.map((contextItem) => (
-          <HoverCard key={getItemPath(contextItem)}>
+          <HoverCard key={getItemPath(contextItem)} openDelay={100}>
             <HoverCardTrigger>
               <Card
                 className="flex h-10 w-28 shrink-0 cursor-pointer items-center justify-center bg-secondary"
@@ -65,7 +65,9 @@ const ChatSources: React.FC<ChatSourcesProps> = ({ contextItems }) => {
               </Card>
             </HoverCardTrigger>
             <HoverCardContent className="max-h-[60vh] w-80 overflow-y-auto">
-              <MarkdownRenderer content={getItemContent(contextItem)} />
+              <div className="p-2">
+                <MarkdownRenderer content={getItemContent(contextItem)} />
+              </div>
             </HoverCardContent>
           </HoverCard>
         ))}
