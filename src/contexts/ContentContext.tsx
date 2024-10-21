@@ -57,6 +57,7 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
 
   const createUntitledNote = useCallback(
     async (parentDirectory?: string) => {
+      console.log('parentDirectory: ', parentDirectory)
       const directoryToMakeFileIn =
         parentDirectory ||
         (currentlyOpenFilePath && (await window.path.dirname(currentlyOpenFilePath))) ||

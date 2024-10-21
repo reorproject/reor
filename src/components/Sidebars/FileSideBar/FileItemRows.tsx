@@ -88,10 +88,12 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
 
   const renderContextMenuItems = () => (
     <>
-      <ContextMenuItem onClick={() => createUntitledNote(isDirectory ? file.path : window.path.dirname(file.path))}>
-        New File
+      <ContextMenuItem
+        onClick={async () => createUntitledNote(isDirectory ? file.path : await window.path.dirname(file.path))}
+      >
+        New file
       </ContextMenuItem>
-      <ContextMenuItem onClick={openNewDirectoryModal}>New Folder</ContextMenuItem>
+      <ContextMenuItem onClick={openNewDirectoryModal}>New folder</ContextMenuItem>
       <ContextMenuItem onClick={() => setNoteToBeRenamed(file.path)}>Rename</ContextMenuItem>
       <ContextMenuItem onClick={handleDelete}>Delete</ContextMenuItem>
     </>
