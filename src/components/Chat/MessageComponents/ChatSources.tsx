@@ -1,6 +1,7 @@
 import React from 'react'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { DBEntry } from 'electron/main/vector-database/schema'
+import posthog from 'posthog-js'
 import { Card, CardDescription } from '@/components/ui/card'
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/components/ui/hover-card'
 import { useContentContext } from '@/contexts/ContentContext'
@@ -37,6 +38,11 @@ const ChatSources: React.FC<ChatSourcesProps> = ({ contextItems }) => {
     return item.content
   }
 
+  const handleOpenContent = (path: string) => {
+    openContent(path)
+    posthog.capture('open_content_from_chat_sources')
+  }
+
   if (contextItems.length === 0) {
     return null
   }
@@ -51,7 +57,7 @@ const ChatSources: React.FC<ChatSourcesProps> = ({ contextItems }) => {
             <HoverCardTrigger>
               <Card
                 className="flex h-10 w-28 shrink-0 cursor-pointer items-center justify-center bg-secondary"
-                onClick={() => openContent(getItemPath(contextItem))}
+                onClick={() => handleOpenContent(getItemPath(contextItem))}
               >
                 <CardDescription className="overflow-hidden break-all px-1 text-center text-xs">
                   {truncateName(getItemName(contextItem), 20)}
