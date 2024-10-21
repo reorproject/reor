@@ -53,7 +53,7 @@ const ChatSources: React.FC<ChatSourcesProps> = ({ contextItems }) => {
                 className="flex h-10 w-28 shrink-0 cursor-pointer items-center justify-center bg-secondary"
                 onClick={() => openContent(getItemPath(contextItem))}
               >
-                <CardDescription className="px-1 text-center text-xs">
+                <CardDescription className="overflow-hidden break-all px-1 text-center text-xs">
                   {truncateName(getItemName(contextItem), 20)}
                 </CardDescription>
               </Card>
