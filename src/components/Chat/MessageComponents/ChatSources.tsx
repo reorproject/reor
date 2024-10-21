@@ -40,7 +40,7 @@ const ChatSources: React.FC<ChatSourcesProps> = ({ contextItems }) => {
 
   const handleOpenContent = (path: string) => {
     openContent(path)
-    posthog.capture('open_content_from_chat_sources')
+    posthog.capture('open_file_from_chat_context')
   }
 
   if (contextItems.length === 0) {
