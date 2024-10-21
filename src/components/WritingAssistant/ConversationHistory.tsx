@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
 import TextField from '@mui/material/TextField'
@@ -20,7 +20,7 @@ interface ConversationHistoryProps {
   copyToClipboard: () => void
   replaceHighlightedText: () => void
   isNewConversation: boolean
-  prompts: { option?: string; customPromptInput?: string }[]
+  // prompts: { option?: string; customPromptInput?: string }[]
 }
 
 const ConversationHistory: React.FC<ConversationHistoryProps> = ({
@@ -38,19 +38,19 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
   copyToClipboard,
   replaceHighlightedText,
   isNewConversation,
-  prompts,
+  // prompts,
 }) => {
   const bottomRef = useRef<HTMLDivElement>(null)
-  const [currentPrompt, setCurrentPrompt] = useState<{ option?: string; customPromptInput?: string }>({})
+  // const [currentPrompt, setCurrentPrompt] = useState<{ option?: string; customPromptInput?: string }>({})
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [history, streamingMessage, currentIndex])
 
-  useEffect(() => {
-    setCurrentPrompt(prompts[currentIndex / 2])
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [prompts, currentIndex])
+  // useEffect(() => {
+  //   setCurrentPrompt(prompts[currentIndex / 2])
+  //   bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+  // }, [prompts, currentIndex])
 
   const currentConversation = isNewConversation
     ? [history[history.length - 1]]
@@ -107,18 +107,17 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
         </button>
       </div>
       <div className="grow overflow-y-auto">
-        {currentConversation.map((message) => {
-          return (
-            <div className={`mb-2 rounded-md p-2 ${message.role === 'user' ? 'bg-blue-500' : 'bg-gray-500'}`}>
-              <p className="font-bold">{message.role === 'user' ? 'You' : 'Assistant'}:</p>
-              <ReactMarkdown rehypePlugins={[rehypeRaw]} className="markdown-content break-words">
-                {message.role === 'user'
-                  ? currentPrompt?.customPromptInput || currentPrompt?.option || 'Custom prompt'
-                  : convertMessageToString(message)}
-              </ReactMarkdown>
-            </div>
-          )
-        })}
+        {currentConversation.map(
+          (message) =>
+            message.role === 'assistant' && (
+              <div className="mb-2 rounded-md bg-gray-500 p-2">
+                <p className="font-bold">Assistant:</p>
+                <ReactMarkdown rehypePlugins={[rehypeRaw]} className="markdown-content break-words">
+                  {convertMessageToString(message)}
+                </ReactMarkdown>
+              </div>
+            ),
+        )}
         {streamingMessage && (
           <div className="mb-2 rounded-md bg-gray-500 p-2">
             <p className="font-bold">Assistant:</p>

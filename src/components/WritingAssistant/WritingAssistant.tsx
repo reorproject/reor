@@ -31,7 +31,7 @@ const WritingAssistant: React.FC = () => {
   const [streamingMessage, setStreamingMessage] = useState<string>('')
   const [currentConversationIndex, setCurrentConversationIndex] = useState<number>(0)
   const [isNewConversation, setIsNewConversation] = useState<boolean>(false)
-  const [prompts, setPrompts] = useState<{ option?: string; customPromptInput?: string }[]>([])
+  // const [prompts, setPrompts] = useState<{ option?: string; customPromptInput?: string }[]>([])
 
   const { editor, highlightData } = useFileContext()
 
@@ -264,7 +264,7 @@ const WritingAssistant: React.FC = () => {
           : JSON.stringify(lastAssistantMessage.content)
     }
     const prompt = generatePromptString(option, selectedText, isSpaceTrigger, customPromptInput)
-    setPrompts((prev) => [...prev, { option, customPromptInput }])
+    // setPrompts((prev) => [...prev, { option, customPromptInput }])
     setPrevPrompt(prompt)
     setIsNewConversation(true)
     await getLLMResponse(prompt)
@@ -423,7 +423,7 @@ const WritingAssistant: React.FC = () => {
             copyToClipboard={copyToClipboard}
             replaceHighlightedText={replaceHighlightedText}
             isNewConversation={isNewConversation}
-            prompts={prompts}
+            // prompts={prompts}
           />
         </div>
       )}
