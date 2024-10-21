@@ -14,7 +14,10 @@ const SidebarManager: React.FC = () => {
   const { sidebarShowing } = useChatContext()
 
   const [searchQuery, setSearchQuery] = useState<string>('')
-  const [searchResults, setSearchResults] = useState<DBQueryResult[]>([])
+  const [searchResults, setSearchResults] = useState<{ vectorResults: DBQueryResult[]; textResults: DBQueryResult[] }>({
+    vectorResults: [],
+    textResults: [],
+  })
 
   return (
     <div className="size-full overflow-y-hidden">
