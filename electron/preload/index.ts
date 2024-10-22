@@ -85,7 +85,7 @@ const fileSystem = {
   readFile: createIPCHandler<(filePath: string) => Promise<string>>('read-file'),
   writeFile: createIPCHandler<(writeFileProps: WriteFileProps) => Promise<void>>('write-file'),
   isDirectory: createIPCHandler<(filePath: string) => Promise<boolean>>('is-directory'),
-  renameFileRecursive: createIPCHandler<(renameFileProps: RenameFileProps) => Promise<void>>('rename-file-recursive'),
+  renameFile: createIPCHandler<(renameFileProps: RenameFileProps) => Promise<void>>('rename-file'),
   createFile: createIPCHandler<(filePath: string, content: string) => Promise<void>>('create-file'),
   createDirectory: createIPCHandler<(dirPath: string) => Promise<void>>('create-directory'),
   checkFileExists: createIPCHandler<(filePath: string) => Promise<boolean>>('check-file-exists'),
@@ -105,6 +105,7 @@ const path = {
     'add-extension-if-no-extension-present',
   ),
   pathSep: createIPCHandler<() => Promise<string>>('path-sep'),
+  extName: createIPCHandler<(pathString: string) => Promise<string>>('path-ext-name'),
 }
 
 const llm = {
@@ -117,6 +118,7 @@ const llm = {
   setDefaultLLM: createIPCHandler<(modelName: string) => Promise<void>>('set-default-llm'),
   getDefaultLLMName: createIPCHandler<() => Promise<string>>('get-default-llm-name'),
   pullOllamaModel: createIPCHandler<(modelName: string) => Promise<void>>('pull-ollama-model'),
+  deleteLLM: createIPCHandler<(modelNameToDelete: string) => Promise<void>>('delete-llm'),
 }
 
 // Expose to renderer process

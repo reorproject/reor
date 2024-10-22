@@ -2,9 +2,9 @@ import React, { useEffect, useRef, useCallback } from 'react'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 import posthog from 'posthog-js'
 import { FaSearch } from 'react-icons/fa'
+import { debounce } from 'lodash'
 import { DBSearchPreview } from '../File/DBResultPreview'
-import debounce from './utils'
-import { useWindowContentContext } from '@/contexts/WindowContentContext'
+import { useContentContext } from '@/contexts/ContentContext'
 
 interface SearchComponentProps {
   searchQuery: string
@@ -19,7 +19,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   searchResults,
   setSearchResults,
 }) => {
-  const { openContent: openTabContent } = useWindowContentContext()
+  const { openContent: openTabContent } = useContentContext()
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   const handleSearch = useCallback(

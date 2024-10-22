@@ -1,41 +1,44 @@
 import React, { useState } from 'react'
-
-import { RiChatNewFill, RiArrowDownSLine } from 'react-icons/ri'
 import { IoChatbubbles } from 'react-icons/io5'
-import posthog from 'posthog-js'
+import { RiChatNewFill, RiArrowDownSLine } from 'react-icons/ri'
 import { useChatContext } from '@/contexts/ChatContext'
-import { useWindowContentContext } from '@/contexts/WindowContentContext'
+import { useContentContext } from '@/contexts/ContentContext'
 import { ChatMetadata } from '../../lib/llm/types'
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu'
 
 export interface ChatItemProps {
   chatMetadata: ChatMetadata
 }
 
 export const ChatItem: React.FC<ChatItemProps> = ({ chatMetadata }) => {
-  const { currentOpenChatID } = useChatContext()
-  const { openContent, showContextMenu } = useWindowContentContext()
+  const { currentChat, deleteChat } = useChatContext()
+  const { openContent } = useContentContext()
 
   const itemClasses = `
     flex items-center cursor-pointer py-2 px-3 rounded-md
     transition-colors duration-150 ease-in-out
-    ${chatMetadata.id === currentOpenChatID ? 'bg-neutral-700 text-white' : 'text-gray-300 hover:bg-neutral-800'}
+    ${chatMetadata.id === currentChat?.id ? 'bg-neutral-700 text-white' : 'text-gray-300 hover:bg-neutral-800'}
   `
+
+  const handleDeleteChat = () => {
+    const isConfirmed = window.confirm(`Are you sure you want to delete the chat "${chatMetadata.displayName}"?`)
+    if (isConfirmed) {
+      deleteChat(chatMetadata.id)
+    }
+  }
+
   return (
-    <div>
-      <div
-        onClick={async () => {
-          openContent(chatMetadata.id)
-        }}
-        className={itemClasses}
-        onContextMenu={(e) => {
-          e.stopPropagation()
-          showContextMenu(e, 'ChatItem', { chatMetadata })
-        }}
-      >
-        <IoChatbubbles />
-        <span className="ml-2 flex-1 truncate text-[11px] font-medium">{chatMetadata.displayName}</span>
-      </div>
-    </div>
+    <ContextMenu>
+      <ContextMenuTrigger>
+        <div onClick={() => openContent(chatMetadata.id)} className={itemClasses}>
+          <IoChatbubbles />
+          <span className="ml-2 flex-1 truncate text-[11px] font-medium">{chatMetadata.displayName}</span>
+        </div>
+      </ContextMenuTrigger>
+      <ContextMenuContent>
+        <ContextMenuItem onClick={handleDeleteChat}>Delete Chat</ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   )
 }
 
@@ -43,7 +46,7 @@ export const ChatSidebar: React.FC = () => {
   const [isRecentsOpen, setIsRecentsOpen] = useState(true)
   const dropdownAnimationDelay = 0.02
 
-  const { setShowChatbot, allChatsMetadata, setCurrentOpenChatID } = useChatContext()
+  const { allChatsMetadata, openNewChat } = useChatContext()
 
   const toggleRecents = () => setIsRecentsOpen((prev) => !prev)
 
@@ -58,18 +61,13 @@ export const ChatSidebar: React.FC = () => {
                       shadow-md transition-colors duration-200 hover:bg-blue-400 hover:text-gray-200
                       hover:shadow-lg"
               type="button"
-              onClick={() => {
-                posthog.capture('create_new_chat')
-                setShowChatbot(true)
-                setCurrentOpenChatID(undefined)
-              }}
+              onClick={() => openNewChat()}
             >
               <RiChatNewFill className="text-xl" />
               <span className="text-xs font-bold">Start New Chat</span>
             </button>
           </div>
 
-          {/* Recents Section */}
           <div className="flex-1">
             <div className="flex cursor-pointer items-center justify-between" onClick={toggleRecents}>
               <h4 className="mb-0 mt-1 text-xs font-medium tracking-wider text-gray-200">Recents</h4>

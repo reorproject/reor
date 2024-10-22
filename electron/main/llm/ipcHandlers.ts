@@ -38,4 +38,8 @@ export const registerLLMSessionHandlers = (store: Store<StoreSchema>) => {
     }
     await ollamaService.pullModel(modelName, handleProgress)
   })
+
+  ipcMain.handle('delete-llm', async (event, modelName: string) => {
+    await ollamaService.deleteModel(modelName)
+  })
 }

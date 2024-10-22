@@ -19,8 +19,7 @@ import { appendToolCallsAndAutoExecuteTools, convertToolConfigToZodSchema } from
 const ChatComponent: React.FC = () => {
   const [loadingState, setLoadingState] = useState<LoadingState>('idle')
   const [defaultModelName, setDefaultLLMName] = useState<string>('')
-  const [currentChat, setCurrentChat] = useState<Chat | undefined>(undefined)
-  const { saveChat, currentOpenChatID, setCurrentOpenChatID } = useChatContext()
+  const { currentChat, setCurrentChat, saveChat } = useChatContext()
   const abortControllerRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
@@ -36,18 +35,10 @@ const ChatComponent: React.FC = () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
       }
-
-      const chat = await window.electronStore.getChat(currentOpenChatID)
-      setCurrentChat((oldChat) => {
-        if (oldChat && oldChat.id !== currentOpenChatID) {
-          saveChat(oldChat)
-        }
-        return chat
-      })
       setLoadingState('idle')
     }
     fetchChat()
-  }, [currentOpenChatID, saveChat])
+  }, [currentChat?.id, saveChat])
 
   const handleNewChatMessage = useCallback(
     async (chat: Chat | undefined, userTextFieldInput?: string, agentConfig?: AgentConfig) => {
@@ -65,11 +56,9 @@ const ChatComponent: React.FC = () => {
         }
 
         setCurrentChat(outputChat)
-        setCurrentOpenChatID(outputChat.id)
         await saveChat(outputChat)
 
         const llmClient = await resolveLLMClient(defaultLLMName)
-
         abortControllerRef.current = new AbortController()
         const toolsZodSchema = Object.assign({}, ...outputChat.toolDefinitions.map(convertToolConfigToZodSchema))
         const { textStream, toolCalls } = await streamText({
@@ -140,7 +129,7 @@ const ChatComponent: React.FC = () => {
         abortControllerRef.current = null
       }
     },
-    [setCurrentOpenChatID, saveChat],
+    [saveChat, setCurrentChat],
   )
 
   return (

@@ -6,7 +6,7 @@ import { ChatSidebar } from '../Chat/ChatSidebar'
 
 import SearchComponent from './SearchComponent'
 import { useChatContext } from '@/contexts/ChatContext'
-import FileExplorer from './FileSideBar/FileExplorer'
+import FileSidebar from './FileSideBar/FileSidebar'
 
 export type SidebarAbleToShow = 'files' | 'search' | 'chats'
 
@@ -18,7 +18,7 @@ const SidebarManager: React.FC = () => {
 
   return (
     <div className="size-full overflow-y-hidden">
-      {sidebarShowing === 'files' && <FileExplorer />}
+      {sidebarShowing === 'files' && <FileSidebar />}
 
       {sidebarShowing === 'search' && (
         <SearchComponent

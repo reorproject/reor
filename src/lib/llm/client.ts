@@ -4,6 +4,9 @@ import { createAnthropic } from '@ai-sdk/anthropic'
 import { LanguageModel } from 'ai'
 
 const resolveLLMClient = async (llmName: string): Promise<LanguageModel> => {
+  if (!llmName || llmName === '') {
+    throw new Error('No LLM has been configured. Please setup an LLM in settings.')
+  }
   const llmConfigs = await window.llm.getLLMConfigs()
   const apiConfigs = await window.llm.getLLMAPIConfigs()
 

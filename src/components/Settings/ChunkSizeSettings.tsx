@@ -1,11 +1,9 @@
 import React, { useState, useEffect, ReactNode } from 'react'
-
 import posthog from 'posthog-js'
-
-import CustomSelect from '../Common/Select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface ChunkSizeSettingsProps {
-  children?: ReactNode // Define children prop
+  children?: ReactNode
 }
 
 const ChunkSizeSettings: React.FC<ChunkSizeSettingsProps> = ({ children }) => {
@@ -41,14 +39,18 @@ const ChunkSizeSettings: React.FC<ChunkSizeSettingsProps> = ({ children }) => {
       {children}
       {chunkSize && (
         <div className="w-[140px]">
-          <CustomSelect
-            options={possibleChunkSizes.map((num) => ({
-              label: num.toString(),
-              value: num.toString(),
-            }))}
-            selectedValue={chunkSize?.toString()}
-            onChange={handleChangeOnChunkSizeSelect}
-          />
+          <Select onValueChange={handleChangeOnChunkSizeSelect} value={chunkSize.toString()}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select chunk size" />
+            </SelectTrigger>
+            <SelectContent>
+              {possibleChunkSizes.map((size) => (
+                <SelectItem key={size} value={size.toString()}>
+                  {size}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       )}
     </div>

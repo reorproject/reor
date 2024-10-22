@@ -10,18 +10,27 @@ import { HiOutlinePencilAlt } from 'react-icons/hi'
 
 import { useModalOpeners } from '../../contexts/ModalContext'
 import { useChatContext } from '@/contexts/ChatContext'
+import { useContentContext } from '@/contexts/ContentContext'
+import NewDirectoryComponent from '../File/NewDirectory'
 
-const IconsSidebar: React.FC = () => {
+export interface IconsSidebarProps {
+  readonly getShortcutDescription: (action: string) => string
+
+  readonly isNewDirectoryModalOpen: boolean
+
+  readonly setIsNewDirectoryModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+const IconsSidebar: React.FC<IconsSidebarProps> = ({
+  getShortcutDescription,
+  isNewDirectoryModalOpen,
+  setIsNewDirectoryModalOpen,
+}) => {
   const { sidebarShowing, setSidebarShowing } = useChatContext()
   const [sidebarWidth, setSidebarWidth] = useState<number>(40)
 
-  const {
-    setIsNewNoteModalOpen,
-    setIsNewDirectoryModalOpen,
-    isSettingsModalOpen,
-    setIsSettingsModalOpen,
-    setIsFlashcardModeOpen,
-  } = useModalOpeners()
+  const { isSettingsModalOpen, setIsSettingsModalOpen, setIsFlashcardModeOpen } = useModalOpeners()
+  const { createUntitledNote } = useContentContext()
 
   useEffect(() => {
     const updateWidth = async () => {
@@ -52,7 +61,7 @@ const IconsSidebar: React.FC = () => {
             className="mx-auto text-gray-200"
             color={sidebarShowing === 'files' ? 'white' : 'gray'}
             size={18}
-            title="Files"
+            title={getShortcutDescription('open-files') || 'Open Files'}
           />
         </div>
       </div>
@@ -65,7 +74,7 @@ const IconsSidebar: React.FC = () => {
             color={sidebarShowing === 'chats' ? 'white' : 'gray'}
             className="cursor-pointer text-gray-100 "
             size={18}
-            title={sidebarShowing === 'chats' ? 'Close Chatbot' : 'Open Chatbot'}
+            title={getShortcutDescription('open-chat-bot') || 'Open Chatbot'}
           />
         </div>
       </div>
@@ -78,16 +87,21 @@ const IconsSidebar: React.FC = () => {
             color={sidebarShowing === 'search' ? 'white' : 'gray'}
             size={18}
             className="text-gray-200"
-            title="Semantic Search"
+            title={getShortcutDescription('open-search') || 'Semantic Search'}
           />
         </div>
       </div>
       <div
         className="flex h-8 w-full cursor-pointer items-center justify-center border-none bg-transparent "
-        onClick={() => setIsNewNoteModalOpen(true)}
+        onClick={() => createUntitledNote()}
       >
         <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
-          <HiOutlinePencilAlt className="text-gray-200" color="gray" size={22} title="New Note" />
+          <HiOutlinePencilAlt
+            className="text-gray-200"
+            color="gray"
+            size={22}
+            title={getShortcutDescription('open-new-note') || 'New Note'}
+          />
         </div>
       </div>
       <div
@@ -95,7 +109,12 @@ const IconsSidebar: React.FC = () => {
         onClick={() => setIsNewDirectoryModalOpen(true)}
       >
         <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
-          <VscNewFolder className="text-gray-200" color="gray" size={18} title="New Directory" />
+          <VscNewFolder
+            className="text-gray-200"
+            color="gray"
+            size={18}
+            title={getShortcutDescription('open-new-directory-modal') || 'New Directory'}
+          />
         </div>
       </div>
       <div
@@ -103,7 +122,12 @@ const IconsSidebar: React.FC = () => {
         onClick={() => setIsFlashcardModeOpen(true)}
       >
         <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
-          <MdOutlineQuiz className="text-gray-200" color="gray" size={19} title="Flashcard quiz" />
+          <MdOutlineQuiz
+            className="text-gray-200"
+            color="gray"
+            size={19}
+            title={getShortcutDescription('open-flashcard-quiz-modal') || 'Flashcard quiz'}
+          />
         </div>
       </div>
 
@@ -120,8 +144,14 @@ const IconsSidebar: React.FC = () => {
         type="button"
         aria-label="Open Settings"
       >
-        <MdSettings color="gray" size={18} className="mb-3 size-6 text-gray-100" title="Settings" />
+        <MdSettings
+          color="gray"
+          size={18}
+          className="mb-3 size-6 text-gray-100"
+          title={getShortcutDescription('open-settings-modal') || 'Settings'}
+        />
       </button>
+      <NewDirectoryComponent isOpen={isNewDirectoryModalOpen} onClose={() => setIsNewDirectoryModalOpen(false)} />
     </div>
   )
 }

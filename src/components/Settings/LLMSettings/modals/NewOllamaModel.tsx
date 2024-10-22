@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from 'react'
-
-import { Button } from '@material-tailwind/react'
 import { ProgressResponse } from 'ollama'
 import posthog from 'posthog-js'
 import { toast } from 'react-toastify'
-
+import { Loader2, CheckCircle, XCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog'
 import ExternalLink from '@/components/Common/ExternalLink'
-import ReorModal from '@/components/Common/Modal'
 import errorToStringRendererProcess from '@/lib/error'
-import downloadPercentage from './utils'
+import { Progress } from '@/components/ui/progress'
 
 interface NewOllamaModelModalProps {
   isOpen: boolean
@@ -17,16 +24,16 @@ interface NewOllamaModelModalProps {
 
 interface ModelDownloadStatus {
   progress: ProgressResponse
-  error?: string // Optional error message
+  error?: string
 }
 
 const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({ isOpen, onClose }) => {
-  // const [newModelPath, setNewModelPath] = useState<string>("");
   const [modelNameBeingInputted, setModelNameBeingInputted] = useState('')
-  const [modelNameerror, setModelNameError] = useState('')
+  const [modelNameError, setModelNameError] = useState('')
   const [downloadProgress, setDownloadProgress] = useState<{
     [modelName: string]: ModelDownloadStatus
   }>({})
+  const [isDownloading, setIsDownloading] = useState(false)
 
   const downloadSelectedModel = async () => {
     if (!modelNameBeingInputted) {
@@ -37,6 +44,7 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({ isOpen, onClo
     if (!taggedModelName.includes(':')) {
       taggedModelName = `${taggedModelName}:latest`
     }
+    setIsDownloading(true)
     try {
       posthog.capture('download_new_llm', {
         modelName: taggedModelName,
@@ -53,7 +61,8 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({ isOpen, onClo
           error: errorMessage,
         },
       }))
-      throw e
+    } finally {
+      setIsDownloading(false)
     }
   }
 
@@ -75,63 +84,95 @@ const NewOllamaModelModal: React.FC<NewOllamaModelModalProps> = ({ isOpen, onClo
     }
   }, [])
 
-  return (
-    <ReorModal isOpen={isOpen} onClose={onClose}>
-      <div className="mx-2 mb-2 w-[400px] pl-3">
-        <h2 className="mb-0  font-semibold text-white">New Local LLM</h2>
-        <p className="mb-6 mt-1 text-xs text-white">
-          Reor will automaticaly download an LLM. Please choose an LLM from the{' '}
-          <ExternalLink href="https://ollama.com/library">Ollama Library</ExternalLink> and paste the name of the LLM
-          below:
-        </p>
+  const calculateProgress = (progress: ProgressResponse) => {
+    if (progress.total && progress.completed) {
+      return Math.round((progress.completed / progress.total) * 100)
+    }
+    return 0
+  }
 
-        <input
-          type="text"
-          className=" mt-1 box-border block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
-          value={modelNameBeingInputted}
-          onChange={(e) => setModelNameBeingInputted(e.target.value)}
-          placeholder="llama3.2"
-        />
-        <p className="my-2 text-xs italic text-white"> We recommended either nemotron-mini, llama3.2, or qwen2.5.</p>
+  const renderProgressBar = (modelName: string, { progress, error }: ModelDownloadStatus) => {
+    const progressPercentage = calculateProgress(progress)
 
-        <div className="flex justify-end pb-2">
-          <Button
-            className="mt-3 h-8 w-[100px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
-            onClick={downloadSelectedModel}
-            placeholder=""
-          >
-            Download
-          </Button>
+    if (error) {
+      return (
+        <div className="flex items-center space-x-2 text-destructive">
+          <XCircle size={16} />
+          <span className="text-sm">{`Error: ${error}`}</span>
         </div>
-        {modelNameerror && <p className="break-words text-xs text-red-500">{modelNameerror}</p>}
-        <div>
-          {Object.entries(downloadProgress).map(([modelName, { progress, error }]) => (
-            <div key={modelName} className="mb-4">
-              {(() => {
-                if (error) {
-                  return <p className="break-words text-sm text-red-500">{`${modelName}: Error - ${error}`}</p>
-                }
-                if (progress.status === 'success') {
-                  return (
-                    <p className="text-sm text-white">
-                      {`${modelName}: Download complete! Refresh the chat window to use the new model.`}
-                    </p>
-                  )
-                }
-                return (
-                  <p className="text-sm text-white">
-                    {`${modelName}: Download progress - ${downloadPercentage(progress)}`}
-                  </p>
-                )
-              })()}
+      )
+    }
+
+    if (progress.status === 'success') {
+      return (
+        <div className="flex items-center space-x-2 text-green-500">
+          <CheckCircle size={16} />
+          <span className="text-sm">Download complete! Refresh the chat window to use the new model.</span>
+        </div>
+      )
+    }
+
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-sm">
+          <span>{modelName}</span>
+          <span>{`${progressPercentage}%`}</span>
+        </div>
+        <Progress value={progressPercentage} className="w-full" />
+      </div>
+    )
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-[525px]">
+        <DialogHeader>
+          <DialogTitle>New Local LLM</DialogTitle>
+          <DialogDescription>
+            Reor will automatically download an LLM. Please choose an LLM from the{' '}
+            <ExternalLink href="https://ollama.com/library">Ollama Library</ExternalLink> and paste the name of the LLM
+            below:
+          </DialogDescription>
+        </DialogHeader>
+        <div className="grid gap-4 py-4">
+          <Input
+            type="text"
+            value={modelNameBeingInputted}
+            onChange={(e) => {
+              setModelNameBeingInputted(e.target.value)
+              setModelNameError('')
+            }}
+            placeholder="llama3.2"
+          />
+          <p className="m-0 text-xs italic text-muted-foreground">
+            We recommend either nemotron-mini, llama3.2, or qwen2.5.
+          </p>
+          {modelNameError && <p className="text-xs text-destructive">{modelNameError}</p>}
+          {Object.entries(downloadProgress).map(([modelName, status]) => (
+            <div key={modelName} className="m-0">
+              {renderProgressBar(modelName, status)}
             </div>
           ))}
           {Object.entries(downloadProgress).length > 0 && (
-            <p className="text-xs text-white">(Feel free to close this modal while the download completes)</p>
+            <p className="m-0 text-xs text-muted-foreground">
+              (Feel free to close this modal while the download completes)
+            </p>
           )}
         </div>
-      </div>
-    </ReorModal>
+        <DialogFooter>
+          <Button onClick={downloadSelectedModel} disabled={isDownloading}>
+            {isDownloading ? (
+              <>
+                <Loader2 className="mr-2 size-4 animate-spin" />
+                Downloading...
+              </>
+            ) : (
+              'Download'
+            )}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 

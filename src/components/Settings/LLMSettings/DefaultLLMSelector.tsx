@@ -1,9 +1,8 @@
-import React from 'react'
-
+import React, { useState, useEffect } from 'react'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import posthog from 'posthog-js'
-
-import CustomSelect from '../../Common/Select'
+import { FiTrash2 } from 'react-icons/fi'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 interface DefaultLLMSelectorProps {
   llmConfigs: LLMConfig[]
@@ -12,21 +11,56 @@ interface DefaultLLMSelectorProps {
 }
 
 const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({ llmConfigs, defaultLLM, setDefaultLLM }) => {
-  const handleDefaultModelChange = (selectedModel: string) => {
-    setDefaultLLM(selectedModel)
-    window.llm.setDefaultLLM(selectedModel)
+  const [selectedLLM, setSelectedLLM] = useState(defaultLLM)
+
+  useEffect(() => {
+    setSelectedLLM(defaultLLM)
+  }, [defaultLLM])
+
+  const handleDefaultModelChange = (modelName: string) => {
+    setSelectedLLM(modelName)
+    setDefaultLLM(modelName)
+    window.llm.setDefaultLLM(modelName)
+
     posthog.capture('change_default_llm', {
-      defaultLLM: selectedModel,
+      defaultLLM: modelName,
     })
   }
 
-  const modelOptions = llmConfigs.map((config) => ({
-    label: config.modelName,
-    value: config.modelName,
-  }))
+  const handleDeleteLLM = async (modelName: string) => {
+    const confirmDelete = window.confirm(`Are you sure you want to delete the model ${modelName}?`)
+    if (!confirmDelete) return
+
+    await window.llm.deleteLLM(modelName)
+
+    posthog.capture('delete_llm', {
+      modelName,
+    })
+  }
 
   return (
-    <CustomSelect options={modelOptions} selectedValue={defaultLLM} onChange={handleDefaultModelChange} centerText />
+    <Select onValueChange={handleDefaultModelChange} value={selectedLLM}>
+      <SelectTrigger className="w-[180px]">
+        <SelectValue placeholder="Select default LLM" />
+      </SelectTrigger>
+      <SelectContent>
+        {llmConfigs.map((config) => {
+          const { modelName } = config
+          return (
+            <div key={modelName} className="flex w-full items-center justify-between">
+              <SelectItem className="cursor-pointer" value={modelName}>
+                {modelName}
+              </SelectItem>
+              {config.apiName === 'Ollama' && (
+                <div className="cursor-pointer text-red-500">
+                  <FiTrash2 onClick={() => handleDeleteLLM(modelName)} />
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </SelectContent>
+    </Select>
   )
 }
 
