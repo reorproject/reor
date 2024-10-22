@@ -230,7 +230,7 @@ const WritingAssistant: React.FC = () => {
     posthog.capture('submitted_writing_assistant_message')
 
     const newMessage: ReorChatMessage = { role: 'user', content: prompt }
-    const updatedMessages = isNewConversation ? [newMessage] : [...messages, newMessage]
+    const updatedMessages = [...messages, newMessage]
     setMessages(updatedMessages)
 
     setStreamingMessage('')
@@ -249,7 +249,7 @@ const WritingAssistant: React.FC = () => {
 
     const assistantMessage: ReorChatMessage = { role: 'assistant', content: fullResponse }
     setMessages((prev) => {
-      const newMessages = isNewConversation ? [newMessage, assistantMessage] : [...prev, assistantMessage]
+      const newMessages = [...prev, assistantMessage]
       setCurrentConversationIndex(newMessages.length - 2)
       return newMessages
     })
