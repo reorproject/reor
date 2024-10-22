@@ -426,7 +426,7 @@ const WritingAssistant: React.FC = () => {
             copyToClipboard={copyToClipboard}
             replaceHighlightedText={replaceHighlightedText}
             isNewConversation={isNewConversation}
-            // prompts={prompts}
+            loadingResponse={loadingResponse}
           />
         </div>
       )}

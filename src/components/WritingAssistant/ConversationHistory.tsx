@@ -21,6 +21,7 @@ interface ConversationHistoryProps {
   replaceHighlightedText: () => void
   isNewConversation: boolean
   // prompts: { option?: string; customPromptInput?: string }[]
+  loadingResponse: boolean
 }
 
 const ConversationHistory: React.FC<ConversationHistoryProps> = ({
@@ -39,6 +40,7 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
   replaceHighlightedText,
   isNewConversation,
   // prompts,
+  loadingResponse,
 }) => {
   const bottomRef = useRef<HTMLDivElement>(null)
   // const [currentPrompt, setCurrentPrompt] = useState<{ option?: string; customPromptInput?: string }>({})
@@ -76,6 +78,44 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
           Next
         </button>
       </div>
+      <div className="grow overflow-y-auto">
+        {currentConversation.map(
+          (message) =>
+            message.role === 'assistant' && (
+              <div className="mb-2 rounded-md bg-gray-500 p-2">
+                <ReactMarkdown rehypePlugins={[rehypeRaw]} className="markdown-content break-words">
+                  {convertMessageToString(message)}
+                </ReactMarkdown>
+              </div>
+            ),
+        )}
+        {streamingMessage && (
+          <div className="mb-2 rounded-md bg-gray-500 p-2">
+            <ReactMarkdown rehypePlugins={[rehypeRaw]} className="markdown-content break-words">
+              {streamingMessage}
+            </ReactMarkdown>
+          </div>
+        )}
+        {!streamingMessage && loadingResponse && (
+          <div className="mb-2 rounded-md bg-gray-300 p-2 italic text-gray-600">Generating response...</div>
+        )}
+        <div ref={bottomRef} />
+      </div>
+      <TextField
+        type="text"
+        variant="outlined"
+        size="small"
+        value={customPrompt}
+        onChange={(e) => setCustomPrompt(e.target.value)}
+        placeholder="Follow up..."
+        className="mt-2 w-full p-1"
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            handleCustomPrompt()
+            setCustomPrompt('') // Clear the TextField after submitting
+          }
+        }}
+      />
       <div className="mt-2 flex justify-between">
         <button
           className="mr-1 flex cursor-pointer items-center rounded-md border-0 bg-blue-100 px-2.5 py-1"
@@ -106,42 +146,6 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
           Replace
         </button>
       </div>
-      <div className="grow overflow-y-auto">
-        {currentConversation.map(
-          (message) =>
-            message.role === 'assistant' && (
-              <div className="mb-2 rounded-md bg-gray-500 p-2">
-                <p className="font-bold">Assistant:</p>
-                <ReactMarkdown rehypePlugins={[rehypeRaw]} className="markdown-content break-words">
-                  {convertMessageToString(message)}
-                </ReactMarkdown>
-              </div>
-            ),
-        )}
-        {streamingMessage && (
-          <div className="mb-2 rounded-md bg-gray-500 p-2">
-            <p className="font-bold">Assistant:</p>
-            <ReactMarkdown rehypePlugins={[rehypeRaw]} className="markdown-content break-words">
-              {streamingMessage}
-            </ReactMarkdown>
-          </div>
-        )}
-        <div ref={bottomRef} />
-      </div>
-      <TextField
-        type="text"
-        variant="outlined"
-        size="small"
-        value={customPrompt}
-        onChange={(e) => setCustomPrompt(e.target.value)}
-        placeholder="Follow up..."
-        className="mt-2 w-full p-1"
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            handleCustomPrompt()
-          }
-        }}
-      />
     </div>
   )
 }
