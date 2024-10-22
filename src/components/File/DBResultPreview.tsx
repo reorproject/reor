@@ -62,10 +62,15 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({ dbResult: entr
         <MarkdownRenderer content={entry.content} />
       </div>
       <div className="mt-2 text-xs text-gray-400">
-        {fileName && <span className="text-xs text-gray-400">{fileName} </span>} | Similarity:{' '}
+        {fileName && <span className="text-xs text-gray-400">{fileName} </span>}
         {/* eslint-disable-next-line no-underscore-dangle */}
-        {cosineDistanceToPercentage(entry._distance)}% |{' '}
-        {modified && <span className="text-xs text-gray-400">Modified {modified}</span>}
+        {entry._distance != null && (
+          <>
+            {/* eslint-disable-next-line no-underscore-dangle */}| Similarity:{' '}
+            {cosineDistanceToPercentage(entry._distance)}%{' '}
+          </>
+        )}{' '}
+        | {modified && <span className="text-xs text-gray-400">Modified {modified}</span>}
       </div>
     </div>
   )

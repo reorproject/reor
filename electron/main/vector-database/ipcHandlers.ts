@@ -10,7 +10,7 @@ import { StoreSchema } from '../electron-store/storeConfig'
 import { startWatchingDirectory, updateFileListForRenderer } from '../filesystem/filesystem'
 
 import { rerankSearchedEmbeddings } from './embeddings'
-import { DBEntry, DatabaseFields } from './schema'
+import { DBEntry, DatabaseFields, DBQueryResult } from './schema'
 import { RepopulateTableWithMissingItems } from './tableHelperFunctions'
 
 export interface PromptWithRagResults {
@@ -36,6 +36,24 @@ export const registerDBSessionHandlers = (store: Store<StoreSchema>, _windowMana
     const searchResults = await windowInfo.dbTableClient.search(query, limit, filter)
     return searchResults
   })
+
+  ipcMain.handle(
+    'multi-modal-search',
+    async (
+      event,
+      query: string,
+      limit: number,
+      searchType: 'vector' | 'text' | 'hybrid',
+      filter?: string,
+    ): Promise<{ vectorResults: DBQueryResult[]; textResults: DBQueryResult[] }> => {
+      const windowInfo = windowManager.getWindowInfoForContents(event.sender)
+      if (!windowInfo) {
+        throw new Error('Window info not found.')
+      }
+      const searchResults = await windowInfo.dbTableClient.multiModalSearch(query, limit, searchType, filter)
+      return searchResults
+    },
+  )
 
   ipcMain.handle('index-files-in-directory', async (event) => {
     const windowInfo = windowManager.getWindowInfoForContents(event.sender)

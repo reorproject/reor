@@ -52,7 +52,7 @@ const MainPageContent: React.FC = () => {
           />
         </div>
 
-        <ResizableComponent resizeSide="right">
+        <ResizableComponent resizeSide="right" initialWidth={300}>
           <div className="size-full border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700">
             <SidebarManager />
           </div>
