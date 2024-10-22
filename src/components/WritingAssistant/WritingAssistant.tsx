@@ -181,19 +181,21 @@ const WritingAssistant: React.FC = () => {
   }, [editor, cursorPosition])
 
   const copyToClipboard = () => {
-    const lastMessage = getLastMessage(messages, 'assistant')
-    if (!lastMessage) return
+    const assistantMessage = messages[currentConversationIndex + 1]
+    if (!assistantMessage || assistantMessage.role !== 'assistant') return
 
-    const copiedText = lastMessage.visibleContent ? lastMessage.visibleContent : lastMessage.content
+    const copiedText = assistantMessage.visibleContent || assistantMessage.content
 
-    if (copiedText && typeof copiedText === 'string') navigator.clipboard.writeText(copiedText)
+    if (copiedText && typeof copiedText === 'string') {
+      navigator.clipboard.writeText(copiedText)
+    }
   }
 
   const insertAfterHighlightedText = () => {
-    const lastMessage = getLastMessage(messages, 'assistant')
-    if (!lastMessage || !editor) return
+    const assistantMessage = messages[currentConversationIndex + 1]
+    if (!assistantMessage || assistantMessage.role !== 'assistant' || !editor) return
 
-    const insertionText = lastMessage.visibleContent ? lastMessage.visibleContent : lastMessage.content
+    const insertionText = assistantMessage.visibleContent || assistantMessage.content
 
     editor.view.focus()
 
@@ -207,9 +209,10 @@ const WritingAssistant: React.FC = () => {
   }
 
   const replaceHighlightedText = () => {
-    const lastMessage = getLastMessage(messages, 'assistant')
-    if (!lastMessage || !editor) return
-    const replacementText = lastMessage.visibleContent ? lastMessage.visibleContent : lastMessage.content
+    const assistantMessage = messages[currentConversationIndex + 1]
+    if (!assistantMessage || assistantMessage.role !== 'assistant' || !editor) return
+
+    const replacementText = assistantMessage.visibleContent || assistantMessage.content
 
     if (replacementText) {
       editor.chain().focus().deleteSelection().insertContent(replacementText).run()
