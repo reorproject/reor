@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect, useCallback } from 'react'
 import '../../styles/chat.css'
 import { Chat, AgentConfig, LoadingState, ReorChatMessage } from '../../lib/llm/types'
 import ChatInput from './ChatInput'
@@ -51,27 +51,69 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   loadingState,
 }) => {
   const [userTextFieldInput, setUserTextFieldInput] = useState<string | undefined>()
+  const [shouldAutoScroll, setShouldAutoScroll] = useState(true)
+  const chatContainerRef = useRef<HTMLDivElement>(null)
+  const lastMessageRef = useRef<HTMLDivElement>(null)
+
+  const scrollToBottom = useCallback(() => {
+    if (chatContainerRef.current) {
+      const { scrollHeight, clientHeight } = chatContainerRef.current
+      chatContainerRef.current.scrollTop = scrollHeight - clientHeight
+    }
+  }, [])
+
+  useEffect(() => {
+    if (shouldAutoScroll) {
+      scrollToBottom()
+    }
+  }, [currentChat?.messages, loadingState, shouldAutoScroll, scrollToBottom])
+
+  const handleScroll = () => {
+    if (chatContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current
+      const isScrolledToBottom = Math.abs(scrollHeight - scrollTop - clientHeight) < 1
+      setShouldAutoScroll(isScrolledToBottom)
+    }
+  }
+
+  const handleSubmitNewMessage = () => {
+    if (userTextFieldInput) {
+      handleNewChatMessage(userTextFieldInput)
+      setUserTextFieldInput('')
+      setShouldAutoScroll(true)
+    }
+  }
+
+  useEffect(() => {
+    const observer = new MutationObserver(() => {
+      if (shouldAutoScroll) {
+        scrollToBottom()
+      }
+    })
+
+    if (lastMessageRef.current) {
+      observer.observe(lastMessageRef.current, { childList: true, subtree: true, characterData: true })
+    }
+
+    return () => observer.disconnect()
+  }, [shouldAutoScroll, scrollToBottom])
 
   return (
     <div className="flex h-full flex-col">
-      <div className="grow overflow-auto">
+      <div className="grow overflow-auto" ref={chatContainerRef} onScroll={handleScroll}>
         <div className="flex flex-col items-center gap-3 p-4">
           <div className="w-full max-w-3xl">
             {currentChat?.messages?.length > 0 &&
               currentChat.messages.map((message, index) => (
-                <Message
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={index}
-                  message={message}
-                  index={index}
-                  currentChat={currentChat}
-                  setCurrentChat={setCurrentChat}
-                />
+                // eslint-disable-next-line react/no-array-index-key
+                <div key={index} ref={index === currentChat.messages.length - 1 ? lastMessageRef : null}>
+                  <Message message={message} index={index} currentChat={currentChat} setCurrentChat={setCurrentChat} />
+                </div>
               ))}
           </div>
 
           {loadingState === 'waiting-for-first-token' && (
-            <div className="mt-4 flex w-full max-w-3xl items-start gap-6">
+            <div className="mt-4 flex w-full max-w-3xl items-start gap-6 p-2">
               <LoadingDots />
             </div>
           )}
@@ -83,12 +125,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
           <ChatInput
             userTextFieldInput={userTextFieldInput ?? ''}
             setUserTextFieldInput={setUserTextFieldInput}
-            handleSubmitNewMessage={() => {
-              if (userTextFieldInput) {
-                handleNewChatMessage(userTextFieldInput)
-                setUserTextFieldInput('')
-              }
-            }}
+            handleSubmitNewMessage={handleSubmitNewMessage}
             loadingState={loadingState}
           />
         </div>

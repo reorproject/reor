@@ -7,6 +7,7 @@ import ChatSources from './ChatSources'
 import { findToolResultMatchingToolCall } from '../../../lib/llm/chat'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
+import MarkdownRenderer from '@/components/Common/MarkdownRenderer'
 
 interface ToolCallComponentProps {
   toolCallPart: ToolCallPart
@@ -61,6 +62,13 @@ const SearchToolRenderer: React.FC<ToolRendererProps> = ({ existingToolResult })
 const DefaultToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existingToolResult, executeToolCall }) => {
   const [isOpen, setIsOpen] = useState(true)
 
+  const renderValue = (value: unknown): string => {
+    if (typeof value === 'string') {
+      return value
+    }
+    return JSON.stringify(value, null, 2)
+  }
+
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen} className="mt-2 rounded-md border border-border bg-secondary">
       <div className="flex items-center justify-between px-3 py-2">
@@ -77,16 +85,14 @@ const DefaultToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existi
           {Object.entries(toolCallPart.args as Record<string, unknown>).map(([key, value]) => (
             <div key={key} className="text-xs">
               <span className="font-medium text-secondary-foreground">{key}:</span>{' '}
-              <span className="text-muted-foreground">{JSON.stringify(value)}</span>
+              <MarkdownRenderer content={renderValue(value)} />
             </div>
           ))}
         </div>
         {existingToolResult && (
           <div className="border-t border-border px-3 py-2">
             <h5 className="mb-1 text-xs font-medium text-muted-foreground">Result:</h5>
-            <div className="text-xs text-secondary-foreground">
-              {JSON.stringify(existingToolResult.content[0].result)}
-            </div>
+            <MarkdownRenderer content={renderValue(existingToolResult.content[0].result)} />
           </div>
         )}
         {!existingToolResult && (

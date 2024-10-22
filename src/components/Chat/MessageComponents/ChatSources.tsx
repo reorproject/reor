@@ -1,6 +1,7 @@
 import React from 'react'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { DBEntry } from 'electron/main/vector-database/schema'
+import posthog from 'posthog-js'
 import { Card, CardDescription } from '@/components/ui/card'
 import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/components/ui/hover-card'
 import { useContentContext } from '@/contexts/ContentContext'
@@ -37,6 +38,11 @@ const ChatSources: React.FC<ChatSourcesProps> = ({ contextItems }) => {
     return item.content
   }
 
+  const handleOpenContent = (path: string) => {
+    openContent(path)
+    posthog.capture('open_content_from_chat_sources')
+  }
+
   if (contextItems.length === 0) {
     return null
   }
@@ -45,21 +51,23 @@ const ChatSources: React.FC<ChatSourcesProps> = ({ contextItems }) => {
     <div>
       <div className="mb-1 text-sm text-muted-foreground">Sources:</div>
 
-      <div className="flex space-x-2 overflow-x-auto p-0">
+      <div className="scrollbar-thumb-rounded-full flex space-x-2 overflow-x-auto p-0 pb-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-800">
         {contextItems.map((contextItem) => (
-          <HoverCard key={getItemPath(contextItem)}>
+          <HoverCard key={getItemPath(contextItem)} openDelay={100}>
             <HoverCardTrigger>
               <Card
                 className="flex h-10 w-28 shrink-0 cursor-pointer items-center justify-center bg-secondary"
-                onClick={() => openContent(getItemPath(contextItem))}
+                onClick={() => handleOpenContent(getItemPath(contextItem))}
               >
-                <CardDescription className="px-1 text-center text-xs">
+                <CardDescription className="overflow-hidden break-all px-1 text-center text-xs">
                   {truncateName(getItemName(contextItem), 20)}
                 </CardDescription>
               </Card>
             </HoverCardTrigger>
-            <HoverCardContent>
-              <MarkdownRenderer content={getItemContent(contextItem)} />
+            <HoverCardContent className="max-h-[60vh] w-80 overflow-y-auto">
+              <div className="p-2">
+                <MarkdownRenderer content={getItemContent(contextItem)} />
+              </div>
             </HoverCardContent>
           </HoverCard>
         ))}

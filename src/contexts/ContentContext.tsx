@@ -28,7 +28,7 @@ interface ContentProviderProps {
 export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) => {
   const [currentOpenFileOrChatID, setCurrentOpenFileOrChatID] = useState<string | null>(null)
 
-  const { allChatsMetadata, setShowChatbot, setSidebarShowing, openNewChat } = useChatContext()
+  const { allChatsMetadata, setShowChatbot, openNewChat } = useChatContext()
   const {
     vaultFilesFlattened: flattenedFiles,
     openOrCreateFile,
@@ -45,7 +45,6 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
         openNewChat(pathOrChatID)
       } else {
         setShowChatbot(false)
-        setSidebarShowing('files')
         openOrCreateFile(pathOrChatID, optionalContentToWriteOnCreate)
       }
       setCurrentOpenFileOrChatID(pathOrChatID)
@@ -53,7 +52,7 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
         addToNavigationHistory(pathOrChatID)
       }
     },
-    [allChatsMetadata, setShowChatbot, openNewChat, setSidebarShowing, openOrCreateFile, addToNavigationHistory],
+    [allChatsMetadata, setShowChatbot, openNewChat, openOrCreateFile, addToNavigationHistory],
   )
 
   const createUntitledNote = useCallback(
