@@ -78,7 +78,7 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
           Next
         </button>
       </div>
-      <div className="grow overflow-y-auto">
+      <div className="grow overflow-y-auto pr-2 scrollbar-thin scrollbar-track-gray-200 scrollbar-thumb-gray-400">
         {currentConversation.map(
           (message) =>
             message.role === 'assistant' && (

@@ -267,9 +267,9 @@ const WritingAssistant: React.FC = () => {
           : JSON.stringify(lastAssistantMessage.content)
     }
     const prompt = generatePromptString(option, selectedText, isSpaceTrigger, customPromptInput)
-    // setPrompts((prev) => [...prev, { option, customPromptInput }])
     setPrevPrompt(prompt)
     setIsNewConversation(true)
+    setIsOptionsVisible(false)
     await getLLMResponse(prompt)
   }
 
@@ -297,6 +297,7 @@ const WritingAssistant: React.FC = () => {
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
               handleOption('custom', customPrompt)
+              setCustomPrompt('')
             }
           }}
         />
@@ -364,6 +365,7 @@ const WritingAssistant: React.FC = () => {
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     handleOption('custom', customPrompt)
+                    setCustomPrompt('')
                   }
                 }}
               />
