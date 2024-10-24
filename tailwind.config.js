@@ -118,6 +118,7 @@ export default {
   },
   plugins: [
     require('tailwind-scrollbar'),
-      require("tailwindcss-animate")
+      require("tailwindcss-animate"),
+	  require('tailwind-scrollbar')
 ],
 };
