@@ -1,4 +1,4 @@
-<h1 align="center">Reor Project</h1>
+<h1 align="center">The Reor Project</h1>
 <!-- <p align="center">
     <img src="logo_or_graphic_representation.png" alt="Reor Logo">
 </p> -->
@@ -14,7 +14,7 @@ Private & local AI personal knowledge management app.</h4>
 </p>
 
 > ### 📢 Announcement
-> We are now on [Discord](https://discord.gg/b7zanGCTUY)! Our team is shipping very quickly right now so sharing ❤️feedback❤️ with us will really help shape the product 🚀
+> We are now on [Discord](https://discord.gg/b7zanGCTUY)! Our team is shipping very quickly right now, so sharing ❤️feedback❤️ with us will really help shape the product 🚀
 
 
 
