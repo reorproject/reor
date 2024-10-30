@@ -4,6 +4,7 @@ import { ToolDefinition } from '../../../lib/llm/types'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/ui'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { Badge } from '@/components/ui/badge'
 
 interface ToolSelectorProps {
   allTools: ToolDefinition[]
@@ -29,8 +30,11 @@ const ToolSelector: React.FC<ToolSelectorProps> = ({ allTools, selectedTools, on
         className="w-full justify-between bg-background text-foreground"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className="flex items-center">
+        <span className="flex items-center gap-1.5">
           Tools
+          <Badge variant="secondary" className="h-4 px-1 text-[10px] font-normal">
+            BETA
+          </Badge>
           <TooltipProvider>
             <Tooltip delayDuration={0}>
               <TooltipTrigger asChild>

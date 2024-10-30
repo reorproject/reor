@@ -29,12 +29,12 @@ export const openAIDefaultLLMs: LLMConfig[] = [
 export const anthropicDefaultLLMs: LLMConfig[] = [
   {
     contextLength: 180000,
-    modelName: 'claude-3-5-sonnet-20240620',
+    modelName: 'claude-3-5-sonnet-latest',
     apiName: anthropicDefaultAPIName,
   },
   {
     contextLength: 180000,
-    modelName: 'claude-3-opus-20240229',
+    modelName: 'claude-3-opus-latest',
     apiName: anthropicDefaultAPIName,
   },
   {

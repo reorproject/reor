@@ -197,7 +197,7 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
                         className="scale-75"
                       />
                       <Label htmlFor="db-search-toggle" className="ml-1 text-xs text-muted-foreground">
-                        Make initial knowledge base search
+                        Make knowledge base search
                       </Label>
                     </div>
                     <Drawer>
