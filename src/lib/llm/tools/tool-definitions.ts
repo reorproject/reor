@@ -10,7 +10,7 @@ export const searchToolDefinition: ToolDefinition = {
     {
       name: 'query',
       type: 'string',
-      description: 'The query to search for',
+      description: 'The query to search for. To get the best results, this should be the full user query.',
     },
     {
       name: 'limit',

@@ -1,5 +1,4 @@
 import { AgentConfig, PromptTemplate } from '../../../lib/llm/types'
-import { allAvailableToolDefinitions } from '../../../lib/llm/tools/tool-definitions'
 
 const defaultAgentPromptTemplate: PromptTemplate = [
   {
@@ -66,12 +65,12 @@ const exampleAgents: AgentConfig[] = [
     files: [],
     name: 'Default',
     dbSearchFilters: {
-      limit: 20,
+      limit: 30,
       minDate: undefined,
       maxDate: undefined,
       passFullNoteIntoContext: true,
     },
-    toolDefinitions: allAvailableToolDefinitions,
+    toolDefinitions: [],
     promptTemplate: defaultAgentPromptTemplate,
   },
   // {
