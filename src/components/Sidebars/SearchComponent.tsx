@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react'
+import React, { useEffect, useRef, useCallback, useState } from 'react'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 import posthog from 'posthog-js'
 import { FaSearch } from 'react-icons/fa'
@@ -6,11 +6,13 @@ import { debounce } from 'lodash'
 import { DBSearchPreview } from '../File/DBResultPreview'
 import { useContentContext } from '@/contexts/ContentContext'
 
+type SearchType = 'vector' | 'text' | 'hybrid'
+
 interface SearchComponentProps {
   searchQuery: string
   setSearchQuery: (query: string) => void
-  searchResults: DBQueryResult[]
-  setSearchResults: (results: DBQueryResult[]) => void
+  searchResults: { vectorResults: DBQueryResult[]; textResults: DBQueryResult[] }
+  setSearchResults: (results: { vectorResults: DBQueryResult[]; textResults: DBQueryResult[] }) => void
 }
 
 const SearchComponent: React.FC<SearchComponentProps> = ({
@@ -21,13 +23,14 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
 }) => {
   const { openContent: openTabContent } = useContentContext()
   const searchInputRef = useRef<HTMLInputElement>(null)
+  const [searchType, setSearchType] = useState<SearchType>('vector')
 
   const handleSearch = useCallback(
     async (query: string) => {
-      const results: DBQueryResult[] = await window.database.search(query, 50)
+      const results = await window.database.multiModalSearch(query, 50, searchType)
       setSearchResults(results)
     },
-    [setSearchResults],
+    [setSearchResults, searchType],
   )
 
   const debouncedSearch = useCallback(
@@ -46,7 +49,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
     if (searchQuery) {
       debouncedSearch(searchQuery)
     }
-  }, [searchQuery, debouncedSearch])
+  }, [searchQuery, debouncedSearch, searchType])
 
   const openFileSelectSearch = useCallback(
     (path: string) => {
@@ -70,13 +73,32 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Semantic search..."
         />
+        <select
+          value={searchType}
+          onChange={(e) => setSearchType(e.target.value as SearchType)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 rounded bg-neutral-700 text-white"
+        >
+          <option value="vector">Vector</option>
+          <option value="text">Text</option>
+          <option value="hybrid">Hybrid</option>
+        </select>
       </div>
       <div className="mt-2 w-full">
-        {searchResults.length > 0 && (
-          <div className="w-full">
-            {searchResults.map((result, index) => (
+        {searchResults?.textResults?.length > 0 && (
+          <div className="mt-4 w-full">
+            <h3 className="mb-2 text-white">Text Search Results</h3>
+            {searchResults.textResults.map((result, index) => (
               // eslint-disable-next-line react/no-array-index-key
-              <DBSearchPreview key={index} dbResult={result} onSelect={openFileSelectSearch} />
+              <DBSearchPreview key={`text-${index}`} dbResult={result} onSelect={openFileSelectSearch} />
+            ))}
+          </div>
+        )}
+        {searchResults?.vectorResults?.length > 0 && (
+          <div className="w-full">
+            <h3 className="mb-2 text-white">Vector Search Results</h3>
+            {searchResults.vectorResults.map((result, index) => (
+              // eslint-disable-next-line react/no-array-index-key
+              <DBSearchPreview key={`vector-${index}`} dbResult={result} onSelect={openFileSelectSearch} />
             ))}
           </div>
         )}

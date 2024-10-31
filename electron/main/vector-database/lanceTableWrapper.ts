@@ -118,6 +118,40 @@ class LanceDBTableWrapper {
     const mapped = rawResults.map(convertRecordToDBType<DBEntry>)
     return mapped as DBEntry[]
   }
+
+  async multiModalSearch(
+    query: string,
+    limit: number,
+    searchType: 'vector' | 'text' | 'hybrid' = 'vector',
+    filter?: string,
+  ): Promise<{ vectorResults: DBQueryResult[]; textResults: DBQueryResult[] }> {
+    let vectorResults: DBQueryResult[] = []
+    let textResults: DBQueryResult[] = []
+
+    if (searchType === 'vector' || searchType === 'hybrid') {
+      const vectorQuery = await this.lanceTable.search(query).metricType(MetricType.Cosine).limit(limit)
+      if (filter) {
+        vectorQuery.prefilter(true).filter(filter)
+      }
+      const rawVectorResults = await vectorQuery.execute()
+      vectorResults = rawVectorResults
+        .map(convertRecordToDBType<DBQueryResult>)
+        .filter((r): r is DBQueryResult => r !== null)
+    }
+
+    if (searchType === 'text' || searchType === 'hybrid') {
+      const sanitizedTextQuery = sanitizePathForDatabase(query)
+      const textFilter = filter
+        ? `${filter} AND content LIKE '%${sanitizedTextQuery}%'`
+        : `content LIKE '%${sanitizedTextQuery}%'`
+      const rawTextResults = await this.lanceTable.filter(textFilter).limit(limit).execute()
+      textResults = rawTextResults
+        .map(convertRecordToDBType<DBQueryResult>)
+        .filter((r): r is DBQueryResult => r !== null)
+    }
+
+    return { vectorResults, textResults }
+  }
 }
 
 export default LanceDBTableWrapper
