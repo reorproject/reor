@@ -178,7 +178,7 @@ export function readFile(filePath: string): string {
   return data
 }
 
-export const moveFileOrDirectoryInFileSystem = async (sourcePath: string, destinationPath: string): Promise<string> => {
+export const moveFileOrDirectory = async (sourcePath: string, destinationPath: string): Promise<string> => {
   await fsPromises.access(sourcePath)
 
   let destinationStats
@@ -187,6 +187,7 @@ export const moveFileOrDirectoryInFileSystem = async (sourcePath: string, destin
   } catch (error) {
     // Error means destination path does not exist, which is fine
   }
+
   let resolvedDestinationPath = destinationPath
   if (destinationStats && destinationStats.isFile()) {
     resolvedDestinationPath = path.dirname(destinationPath)
@@ -195,7 +196,17 @@ export const moveFileOrDirectoryInFileSystem = async (sourcePath: string, destin
   await fsPromises.mkdir(resolvedDestinationPath, { recursive: true })
 
   const newPath = path.join(resolvedDestinationPath, path.basename(sourcePath))
-  await fsPromises.rename(sourcePath, newPath)
+
+  try {
+    await fsPromises.access(newPath)
+    throw new Error(`A file already exists at destination: ${newPath}`)
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+      await fsPromises.rename(sourcePath, newPath)
+    } else {
+      throw error
+    }
+  }
 
   return newPath
 }

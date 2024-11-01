@@ -87,7 +87,18 @@ class WindowsManager {
   }
 
   appendNewErrorToDisplayInWindow(errorString: string) {
-    this.errorStringsToSendWindow.push(errorString)
+    let errorSent = false
+    const activeWindows = BrowserWindow.getAllWindows()
+    activeWindows.forEach((window) => {
+      if (!window.webContents.isLoading()) {
+        window.webContents.send('error-to-display-in-window', errorString)
+        errorSent = true
+      }
+    })
+
+    if (!errorSent) {
+      this.errorStringsToSendWindow.push(errorString)
+    }
   }
 
   getAndClearErrorStrings(): string[] {

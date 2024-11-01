@@ -5,7 +5,7 @@ import {
   GetFilesInfoList,
   GetFilesInfoTree,
   flattenFileInfoTree,
-  moveFileOrDirectoryInFileSystem,
+  moveFileOrDirectory,
   readFile,
 } from '../filesystem/filesystem'
 import { FileInfo, FileInfoTree } from '../filesystem/types'
@@ -160,11 +160,11 @@ export const addFileTreeToDBTable = async (dbTable: LanceDBTableWrapper, fileTre
 export const orchestrateEntryMove = async (table: LanceDBTableWrapper, sourcePath: string, destinationPath: string) => {
   const fileSystemTree = GetFilesInfoTree(sourcePath)
   await removeFileTreeFromDBTable(table, fileSystemTree)
-  moveFileOrDirectoryInFileSystem(sourcePath, destinationPath).then((newDestinationPath) => {
-    if (newDestinationPath) {
-      addFileTreeToDBTable(table, GetFilesInfoTree(newDestinationPath))
-    }
-  })
+
+  const newDestinationPath = await moveFileOrDirectory(sourcePath, destinationPath)
+  if (newDestinationPath) {
+    await addFileTreeToDBTable(table, GetFilesInfoTree(newDestinationPath))
+  }
 }
 
 export function formatTimestampForLanceDB(date: Date): string {
