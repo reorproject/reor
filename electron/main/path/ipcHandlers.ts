@@ -13,7 +13,7 @@ const registerPathHandlers = () => {
 
   ipcMain.handle('join-path', (event, ...args) => path.join(...args))
 
-  ipcMain.handle('path-dirname', (event, pathString: string) => path.dirname(pathString) + path.sep)
+  ipcMain.handle('path-dirname', (event, pathString: string) => path.dirname(pathString))
 
   ipcMain.handle('path-relative', (event, from: string, to: string) => path.relative(from, to))
 

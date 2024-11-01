@@ -60,6 +60,8 @@ type FileContextType = {
   setSuggestionsState: React.Dispatch<React.SetStateAction<SuggestionsState | null | undefined>>
   setSpellCheckEnabled: React.Dispatch<React.SetStateAction<boolean>>
   deleteFile: (path: string | undefined) => Promise<boolean>
+  selectedDirectory: string | null
+  setSelectedDirectory: React.Dispatch<React.SetStateAction<string | null>>
 }
 
 export const FileContext = createContext<FileContextType | undefined>(undefined)
@@ -76,6 +78,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [vaultFilesTree, setVaultFilesTree] = useState<FileInfoTree>([])
   const [vaultFilesFlattened, setVaultFilesFlattened] = useState<FileInfo[]>([])
   const [expandedDirectories, setExpandedDirectories] = useState<Map<string, boolean>>(new Map())
+  const [selectedDirectory, setSelectedDirectory] = useState<string | null>(null)
   const [currentlyOpenFilePath, setCurrentlyOpenFilePath] = useState<string | null>(null)
   const [suggestionsState, setSuggestionsState] = useState<SuggestionsState | null>()
   const [needToWriteEditorContentToDisk, setNeedToWriteEditorContentToDisk] = useState<boolean>(false)
@@ -136,6 +139,8 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     editor?.commands.setContent(fileContent)
     setCurrentlyOpenFilePath(filePath)
     setCurrentlyChangingFilePath(false)
+    const parentDirectory = await window.path.dirname(filePath)
+    setSelectedDirectory(parentDirectory)
   }
 
   const openOrCreateFile = async (filePath: string, optionalContentToWriteOnCreate?: string): Promise<void> => {
@@ -401,6 +406,8 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setSuggestionsState,
     setSpellCheckEnabled,
     deleteFile,
+    selectedDirectory,
+    setSelectedDirectory,
   }
 
   const contextValuesMemo: FileContextType = React.useMemo(

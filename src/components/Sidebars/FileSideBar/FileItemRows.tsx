@@ -14,8 +14,15 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
   const fileOrDirectoryObject = visibleItems[index]
   const { file } = fileOrDirectoryObject
 
-  const { handleDirectoryToggle, expandedDirectories, currentlyOpenFilePath, setNoteToBeRenamed, deleteFile } =
-    useFileContext()
+  const {
+    handleDirectoryToggle,
+    expandedDirectories,
+    currentlyOpenFilePath,
+    setNoteToBeRenamed,
+    deleteFile,
+    selectedDirectory,
+    setSelectedDirectory,
+  } = useFileContext()
   const { openContent, createUntitledNote } = useContentContext()
   const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false)
   const [parentDirectoryPathForNewDirectory, setParentDirectoryPathForNewDirectory] = useState<string | undefined>(
@@ -24,7 +31,8 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
   const [isDragOver, setIsDragOver] = useState(false)
 
   const isDirectory = isFileNodeDirectory(file)
-  const isSelected = file.path === currentlyOpenFilePath
+  const isSelected = isDirectory ? file.path === selectedDirectory : file.path === currentlyOpenFilePath
+
   const indentation = fileOrDirectoryObject.indentMultiplyer ? 10 * fileOrDirectoryObject.indentMultiplyer : 0
   const isExpanded = expandedDirectories.get(file.path)
 
@@ -56,14 +64,15 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
     [file.path, isDirectory],
   )
 
-  const toggle = useCallback(() => {
+  const clickOnFileOrDirectory = useCallback(() => {
     if (isDirectory) {
       handleDirectoryToggle(file.path)
+      setSelectedDirectory(file.path)
     } else {
       openContent(file.path)
       posthog.capture('open_file_from_sidebar')
     }
-  }, [file.path, isDirectory, handleDirectoryToggle, openContent])
+  }, [file.path, isDirectory, handleDirectoryToggle, openContent, setSelectedDirectory])
 
   const openNewDirectoryModal = useCallback(async () => {
     const dirPath = isDirectory ? file.path : await window.path.dirname(file.path)
@@ -110,7 +119,7 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
             onDrop={handleDrop}
             onDragLeave={handleDragLeave}
           >
-            <div onClick={toggle} className={itemClasses}>
+            <div onClick={clickOnFileOrDirectory} className={itemClasses}>
               {isDirectory && (
                 <span className="mr-2 mt-1 text-gray-200/20">
                   {isExpanded ? (

@@ -5,6 +5,26 @@ import { isFileNodeDirectory } from '@shared/utils'
 import { useFileContext } from '@/contexts/FileContext'
 import FileItemRows from './FileItemRows'
 
+const getFilesAndIndentationsForSidebar = (
+  files: FileInfoTree,
+  expandedDirectories: Map<string, boolean>,
+  indentation = 0,
+): { file: FileInfoNode; indentation: number }[] => {
+  let visibleItems: { file: FileInfoNode; indentation: number }[] = []
+  files.forEach((file) => {
+    visibleItems.push({ file, indentation })
+    if (isFileNodeDirectory(file) && expandedDirectories.has(file.path) && expandedDirectories.get(file.path)) {
+      if (file.children) {
+        visibleItems = [
+          ...visibleItems,
+          ...getFilesAndIndentationsForSidebar(file.children, expandedDirectories, indentation + 1),
+        ]
+      }
+    }
+  })
+  return visibleItems
+}
+
 interface FileExplorerProps {
   lheight?: number
 }
@@ -23,28 +43,7 @@ const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
     }
   }, [lheight])
 
-  const getVisibleFilesAndFlatten = (
-    _files: FileInfoTree,
-    _expandedDirectories: Map<string, boolean>,
-    indentMultiplyer = 0,
-  ): { file: FileInfoNode; indentMultiplyer: number }[] => {
-    let visibleItems: { file: FileInfoNode; indentMultiplyer: number }[] = []
-    _files.forEach((file) => {
-      const a = { file, indentMultiplyer }
-      visibleItems.push(a)
-      if (isFileNodeDirectory(file) && _expandedDirectories.has(file.path) && _expandedDirectories.get(file.path)) {
-        if (file.children) {
-          visibleItems = [
-            ...visibleItems,
-            ...getVisibleFilesAndFlatten(file.children, _expandedDirectories, indentMultiplyer + 1),
-          ]
-        }
-      }
-    })
-    return visibleItems
-  }
-
-  const visibleItems = getVisibleFilesAndFlatten(vaultFilesTree, expandedDirectories)
+  const visibleItems = getFilesAndIndentationsForSidebar(vaultFilesTree, expandedDirectories)
   const itemCount = visibleItems.length
 
   return (
