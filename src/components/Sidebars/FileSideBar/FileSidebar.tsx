@@ -10,19 +10,19 @@ const getFilesAndIndentationsForSidebar = (
   expandedDirectories: Map<string, boolean>,
   indentation = 0,
 ): { file: FileInfoNode; indentation: number }[] => {
-  let visibleItems: { file: FileInfoNode; indentation: number }[] = []
+  let filesAndIndexes: { file: FileInfoNode; indentation: number }[] = []
   files.forEach((file) => {
-    visibleItems.push({ file, indentation })
+    filesAndIndexes.push({ file, indentation })
     if (isFileNodeDirectory(file) && expandedDirectories.has(file.path) && expandedDirectories.get(file.path)) {
       if (file.children) {
-        visibleItems = [
-          ...visibleItems,
+        filesAndIndexes = [
+          ...filesAndIndexes,
           ...getFilesAndIndentationsForSidebar(file.children, expandedDirectories, indentation + 1),
         ]
       }
     }
   })
-  return visibleItems
+  return filesAndIndexes
 }
 
 interface FileExplorerProps {
@@ -43,18 +43,19 @@ const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
     }
   }, [lheight])
 
-  const visibleItems = getFilesAndIndentationsForSidebar(vaultFilesTree, expandedDirectories)
-  const itemCount = visibleItems.length
+  const filesAndIndentations = getFilesAndIndentationsForSidebar(vaultFilesTree, expandedDirectories)
+  const itemCount = filesAndIndentations.length
 
   return (
-    <div className="h-full grow px-1 pt-2 opacity-70">
+    <div className="h-full grow bg-pink-200 px-1 pt-2 opacity-70">
       <FixedSizeList
         height={listHeight}
         itemCount={itemCount}
         itemSize={30}
         width="100%"
+        style={{ backgroundColor: 'pink' }}
         itemData={{
-          visibleItems,
+          filesAndIndentations,
         }}
       >
         {FileItemRows}

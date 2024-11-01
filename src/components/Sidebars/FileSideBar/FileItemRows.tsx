@@ -10,9 +10,7 @@ import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } 
 import NewDirectoryComponent from '@/components/File/NewDirectory'
 
 const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data }) => {
-  const { visibleItems } = data
-  const fileOrDirectoryObject = visibleItems[index]
-  const { file } = fileOrDirectoryObject
+  const { file, indentation } = data.filesAndIndentations[index]
 
   const {
     handleDirectoryToggle,
@@ -25,15 +23,13 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
   } = useFileContext()
   const { openContent, createUntitledNote } = useContentContext()
   const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false)
-  const [parentDirectoryPathForNewDirectory, setParentDirectoryPathForNewDirectory] = useState<string | undefined>(
-    undefined,
-  )
+  const [parentDirectoryPathForNewDirectory, setParentDirectoryPathForNewDirectory] = useState<string | undefined>()
   const [isDragOver, setIsDragOver] = useState(false)
 
   const isDirectory = isFileNodeDirectory(file)
   const isSelected = isDirectory ? file.path === selectedDirectory : file.path === currentlyOpenFilePath
 
-  const indentation = fileOrDirectoryObject.indentMultiplyer ? 10 * fileOrDirectoryObject.indentMultiplyer : 0
+  const indentationPadding = indentation ? 10 * indentation : 0
   const isExpanded = expandedDirectories.get(file.path)
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -109,7 +105,7 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
   )
 
   return (
-    <div style={{ ...style, paddingLeft: `${indentation}px` }}>
+    <div style={{ ...style, paddingLeft: `${indentationPadding}px` }}>
       <ContextMenu>
         <ContextMenuTrigger>
           <div
