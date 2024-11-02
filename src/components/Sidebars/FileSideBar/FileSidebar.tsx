@@ -4,7 +4,6 @@ import { FixedSizeList } from 'react-window'
 import { isFileNodeDirectory } from '@shared/utils'
 import { useFileContext } from '@/contexts/FileContext'
 import FileItemRows from './FileItemRows'
-import { moveFile } from '@/lib/file'
 
 const getFilesAndIndentationsForSidebar = (
   files: FileInfoTree,
@@ -32,19 +31,24 @@ interface FileExplorerProps {
 
 const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
   const [listHeight, setListHeight] = useState(lheight ?? window.innerHeight - 50)
-  const { vaultFilesTree, expandedDirectories } = useFileContext()
+  const { vaultFilesTree, expandedDirectories, renameFile, setSelectedDirectory } = useFileContext()
 
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
     const sourcePath = e.dataTransfer.getData('text/plain')
-    const destinationPath = await window.electronStore.getVaultDirectoryForWindow()
-    moveFile(sourcePath, destinationPath)
+    const destinationDirectory = await window.electronStore.getVaultDirectoryForWindow()
+    const destinationPath = await window.path.join(destinationDirectory, await window.path.basename(sourcePath))
+    renameFile(sourcePath, destinationPath)
   }
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
+  }
+
+  const handleClick = () => {
+    setSelectedDirectory(null)
   }
 
   useEffect(() => {
@@ -61,7 +65,12 @@ const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
   const itemCount = filesAndIndentations.length
 
   return (
-    <div className="h-full grow px-1 pt-2 opacity-70" onDrop={handleDrop} onDragOver={handleDragOver}>
+    <div
+      className="h-full grow px-1 pt-2 opacity-70"
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      onClick={handleClick}
+    >
       <FixedSizeList
         height={listHeight}
         itemCount={itemCount}

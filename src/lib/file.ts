@@ -19,10 +19,6 @@ export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
   }, [])
 }
 
-export const moveFile = async (sourcePath: string, destinationPath: string) => {
-  await window.fileSystem.moveFileOrDir(sourcePath, destinationPath)
-}
-
 export const getFilesInDirectory = async (directoryPath: string, filesTree: FileInfo[]): Promise<FileInfo[]> => {
   return filesTree.filter((file) => file.path.startsWith(directoryPath))
 }

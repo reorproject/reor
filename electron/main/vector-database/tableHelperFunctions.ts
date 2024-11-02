@@ -1,17 +1,20 @@
 import * as fs from 'fs'
+import * as fsPromises from 'fs/promises'
 
+import { BrowserWindow } from 'electron'
 import { chunkMarkdownByHeadingsAndByCharsIfBig } from '../common/chunking'
 import {
   GetFilesInfoList,
-  GetFilesInfoTree,
   flattenFileInfoTree,
-  moveFileOrDirectory,
   readFile,
+  updateFileListForRenderer,
+  startWatchingDirectory,
 } from '../filesystem/filesystem'
-import { FileInfo, FileInfoTree } from '../filesystem/types'
+import { FileInfo, FileInfoTree, RenameFileProps } from '../filesystem/types'
 
 import LanceDBTableWrapper, { convertRecordToDBType } from './lanceTableWrapper'
 import { DBEntry, DatabaseFields } from './schema'
+import WindowsManager from '../common/windowManager'
 
 const convertFileTypeToDBType = async (file: FileInfo): Promise<DBEntry[]> => {
   const fileContent = readFile(file.path)
@@ -25,6 +28,58 @@ const convertFileTypeToDBType = async (file: FileInfo): Promise<DBEntry[]> => {
     filecreated: file.dateCreated,
   }))
   return entries
+}
+
+export const handleFileRename = async (
+  windowsManager: WindowsManager,
+  windowInfo: { vaultDirectoryForWindow: string; dbTableClient: any },
+  renameFileProps: RenameFileProps,
+  sender: Electron.WebContents,
+): Promise<void> => {
+  windowsManager.watcher?.unwatch(windowInfo.vaultDirectoryForWindow)
+
+  try {
+    await fsPromises.access(renameFileProps.newFilePath)
+    throw new Error(`A file already exists at destination: ${renameFileProps.newFilePath}`)
+  } catch (error) {
+    // If error is ENOENT (file doesn't exist), proceed with rename
+    if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+      throw error
+    }
+  }
+
+  if (process.platform === 'win32') {
+    await windowsManager.watcher?.close()
+    await new Promise<void>((resolve, reject) => {
+      fs.rename(renameFileProps.oldFilePath, renameFileProps.newFilePath, (err) => {
+        if (err) {
+          reject(err)
+          return
+        }
+
+        const win = BrowserWindow.fromWebContents(sender)
+        if (win) {
+          // eslint-disable-next-line no-param-reassign
+          windowsManager.watcher = startWatchingDirectory(win, windowInfo.vaultDirectoryForWindow)
+          updateFileListForRenderer(win, windowInfo.vaultDirectoryForWindow)
+        }
+        resolve()
+      })
+    })
+  } else {
+    await new Promise<void>((resolve, reject) => {
+      fs.rename(renameFileProps.oldFilePath, renameFileProps.newFilePath, (err) => {
+        if (err) {
+          reject(err)
+          return
+        }
+        windowsManager.watcher?.add(windowInfo.vaultDirectoryForWindow)
+        resolve()
+      })
+    })
+  }
+
+  await windowInfo.dbTableClient.updateDBItemsWithNewFilePath(renameFileProps.oldFilePath, renameFileProps.newFilePath)
 }
 
 export const convertFileInfoListToDBItems = async (filesInfoList: FileInfo[]): Promise<DBEntry[][]> => {
@@ -155,16 +210,6 @@ export const RepopulateTableWithMissingItems = async (
 export const addFileTreeToDBTable = async (dbTable: LanceDBTableWrapper, fileTree: FileInfoTree): Promise<void> => {
   const dbEntries = await convertFileTreeToDBEntries(fileTree)
   await dbTable.add(dbEntries)
-}
-
-export const orchestrateEntryMove = async (table: LanceDBTableWrapper, sourcePath: string, destinationPath: string) => {
-  const fileSystemTree = GetFilesInfoTree(sourcePath)
-  await removeFileTreeFromDBTable(table, fileSystemTree)
-
-  const newDestinationPath = await moveFileOrDirectory(sourcePath, destinationPath)
-  if (newDestinationPath) {
-    await addFileTreeToDBTable(table, GetFilesInfoTree(newDestinationPath))
-  }
 }
 
 export function formatTimestampForLanceDB(date: Date): string {

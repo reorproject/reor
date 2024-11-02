@@ -4,7 +4,7 @@ import { FaChevronDown, FaChevronRight } from 'react-icons/fa'
 import posthog from 'posthog-js'
 import { isFileNodeDirectory } from '@shared/utils'
 import { useFileContext } from '@/contexts/FileContext'
-import { moveFile, removeFileExtension } from '@/lib/file'
+import { removeFileExtension } from '@/lib/file'
 import { useContentContext } from '@/contexts/ContentContext'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu'
 import NewDirectoryComponent from '@/components/File/NewDirectory'
@@ -20,6 +20,7 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
     deleteFile,
     selectedDirectory,
     setSelectedDirectory,
+    renameFile,
   } = useFileContext()
   const { openContent, createUntitledNote } = useContentContext()
   const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false)
@@ -54,21 +55,26 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
       e.stopPropagation()
       setIsDragOver(false)
       const sourcePath = e.dataTransfer.getData('text/plain')
-      const destinationPath = isDirectory ? file.path : await window.path.dirname(file.path)
-      moveFile(sourcePath, destinationPath)
+      const destinationDirectory = isDirectory ? file.path : await window.path.dirname(file.path)
+      const destinationPath = await window.path.join(destinationDirectory, await window.path.basename(sourcePath))
+      renameFile(sourcePath, destinationPath)
     },
-    [file.path, isDirectory],
+    [file.path, isDirectory, renameFile],
   )
 
-  const clickOnFileOrDirectory = useCallback(() => {
-    if (isDirectory) {
-      handleDirectoryToggle(file.path)
-      setSelectedDirectory(file.path)
-    } else {
-      openContent(file.path)
-      posthog.capture('open_file_from_sidebar')
-    }
-  }, [file.path, isDirectory, handleDirectoryToggle, openContent, setSelectedDirectory])
+  const clickOnFileOrDirectory = useCallback(
+    (e: React.MouseEvent) => {
+      if (isDirectory) {
+        handleDirectoryToggle(file.path)
+        setSelectedDirectory(file.path)
+      } else {
+        openContent(file.path)
+        posthog.capture('open_file_from_sidebar')
+      }
+      e.stopPropagation()
+    },
+    [file.path, isDirectory, handleDirectoryToggle, openContent, setSelectedDirectory],
+  )
 
   const openNewDirectoryModal = useCallback(async () => {
     const dirPath = isDirectory ? file.path : await window.path.dirname(file.path)
