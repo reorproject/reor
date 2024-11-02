@@ -88,6 +88,7 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
       isDirectory ? ' This will delete all contents of the directory.' : ''
     }`
 
+    // eslint-disable-next-line no-alert
     if (window.confirm(confirmMessage)) {
       deleteFile(file.path)
     }
