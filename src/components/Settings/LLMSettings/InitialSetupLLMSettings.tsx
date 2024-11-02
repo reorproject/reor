@@ -1,7 +1,7 @@
 import React from 'react'
 import { CheckCircleIcon, CogIcon } from '@heroicons/react/24/solid'
 import { Button } from '@material-tailwind/react'
-import useLLMConfigs from './hooks/use-llm-configs'
+import useLLMConfigs from '../../../lib/hooks/use-llm-configs'
 import LLMSettingsContent from './LLMSettingsContent'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 

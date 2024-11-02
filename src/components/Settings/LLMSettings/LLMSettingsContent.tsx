@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import DefaultLLMSelector from './DefaultLLMSelector'
-import useLLMConfigs from './hooks/use-llm-configs'
+import useLLMConfigs from '../../../lib/hooks/use-llm-configs'
 import SettingsRow from '../Shared/SettingsRow'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'

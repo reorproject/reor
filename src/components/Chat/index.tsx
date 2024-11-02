@@ -15,12 +15,19 @@ import { useChatContext } from '@/contexts/ChatContext'
 import StartChat from './StartChat'
 import resolveLLMClient from '@/lib/llm/client'
 import { appendToolCallsAndAutoExecuteTools, convertToolConfigToZodSchema } from '../../lib/llm/tools/utils'
+import useResizeObserver from '@/lib/hooks/use-resize-observer'
 
 const ChatComponent: React.FC = () => {
   const [loadingState, setLoadingState] = useState<LoadingState>('idle')
   const [defaultModelName, setDefaultLLMName] = useState<string>('')
+  const [containerWidth, setContainerWidth] = useState<number>(0)
+  const containerRef = useRef<HTMLDivElement>(null)
   const { currentChat, setCurrentChat, saveChat } = useChatContext()
   const abortControllerRef = useRef<AbortController | null>(null)
+
+  useResizeObserver(containerRef, (entry) => {
+    setContainerWidth(entry.contentRect.width)
+  })
 
   useEffect(() => {
     const fetchDefaultLLM = async () => {
@@ -133,9 +140,17 @@ const ChatComponent: React.FC = () => {
     [saveChat, setCurrentChat],
   )
 
+  // eslint-disable-next-line react/no-unstable-nested-components
+  const CompactChatStart: React.FC = () => (
+    <div className="flex size-full flex-col items-center justify-center p-4">
+      <h3 className="text-lg font-medium">Chat Assistant</h3>
+      <p className="text-sm text-muted-foreground">Please expand the panel to start a new chat</p>
+    </div>
+  )
+
   return (
-    <div className="flex size-full items-center justify-center">
-      <div className="mx-auto flex size-full flex-col overflow-hidden  bg-background">
+    <div ref={containerRef} className="flex size-full items-center justify-center">
+      <div className="mx-auto flex size-full flex-col overflow-hidden bg-background">
         {currentChat && currentChat.messages && currentChat.messages.length > 0 ? (
           <ChatMessages
             currentChat={currentChat}
@@ -146,12 +161,19 @@ const ChatComponent: React.FC = () => {
             }
           />
         ) : (
-          <StartChat
-            defaultModelName={defaultModelName}
-            handleNewChatMessage={(userTextFieldInput?: string, agentConfig?: AgentConfig) =>
-              handleNewChatMessage(undefined, userTextFieldInput, agentConfig)
-            }
-          />
+          // eslint-disable-next-line react/jsx-no-useless-fragment
+          <>
+            {containerWidth > 400 ? (
+              <StartChat
+                defaultModelName={defaultModelName}
+                handleNewChatMessage={(userTextFieldInput?: string, agentConfig?: AgentConfig) =>
+                  handleNewChatMessage(undefined, userTextFieldInput, agentConfig)
+                }
+              />
+            ) : (
+              <CompactChatStart />
+            )}
+          </>
         )}
       </div>
     </div>
