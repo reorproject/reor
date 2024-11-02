@@ -1,3 +1,5 @@
+/* eslint-disable react/jsx-no-useless-fragment */
+/* eslint-disable no-nested-ternary */
 import React, { useState } from 'react'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 
@@ -41,14 +43,14 @@ const MainPageContent: React.FC = () => {
   const { getShortcutDescription } = useAppShortcuts()
 
   return (
-    <div className="relative overflow-x-hidden">
+    <div className="relative flex h-screen flex-col overflow-hidden">
       <TitleBar similarFilesOpen={showSimilarFiles} toggleSimilarFiles={() => setShowSimilarFiles(!showSimilarFiles)} />
-      <div className="flex h-below-titlebar">
+      <div className="flex min-h-0 flex-1">
         <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5">
           <IconsSidebar getShortcutDescription={getShortcutDescription} />
         </div>
 
-        <ResizablePanelGroup direction="horizontal">
+        <ResizablePanelGroup direction="horizontal" className="flex-1">
           <ResizablePanel defaultSize={20} minSize={15} maxSize={40}>
             <div className="size-full border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700">
               <SidebarManager />
@@ -57,22 +59,37 @@ const MainPageContent: React.FC = () => {
 
           <ResizableHandle />
 
-          <ResizablePanel defaultSize={showChatbot ? 50 : 80}>
-            {(!showChatbot || currentlyOpenFilePath) && <MainContent />}
-          </ResizablePanel>
-
-          {showChatbot && (
-            <>
-              <ResizableHandle />
-              <ResizablePanel defaultSize={30}>
-                <div className="w-full bg-pink-200">
-                  <div className="h-below-titlebar w-full">
-                    <ChatComponent />
-                  </div>
+          <ResizablePanel defaultSize={80}>
+            <div className="size-full">
+              {currentlyOpenFilePath ? (
+                <>
+                  {showChatbot ? (
+                    <ResizablePanelGroup direction="horizontal" className="size-full">
+                      <ResizablePanel defaultSize={65}>
+                        <MainContent />
+                      </ResizablePanel>
+                      <ResizableHandle />
+                      <ResizablePanel defaultSize={35}>
+                        <div className="size-full bg-pink-200">
+                          <ChatComponent />
+                        </div>
+                      </ResizablePanel>
+                    </ResizablePanelGroup>
+                  ) : (
+                    <MainContent />
+                  )}
+                </>
+              ) : showChatbot ? (
+                <div className="size-full bg-pink-200">
+                  <ChatComponent />
                 </div>
-              </ResizablePanel>
-            </>
-          )}
+              ) : (
+                <div className="size-full">
+                  <EmptyPage />
+                </div>
+              )}
+            </div>
+          </ResizablePanel>
         </ResizablePanelGroup>
 
         <CommonModals />
