@@ -14,14 +14,38 @@ interface NewDirectoryComponentProps {
 }
 
 const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, onClose, parentDirectoryPath }) => {
-  const [directoryName, setDirectoryName] = useState<string>('')
+  const [directoryRelativePath, setDirectoryRelativePath] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const { currentlyOpenFilePath } = useFileContext()
+  const { selectedDirectory } = useFileContext()
+
+  useEffect(() => {
+    const setupInitialPath = async () => {
+      const vaultDirectory = await window.electronStore.getVaultDirectoryForWindow()
+
+      let fullPath = ''
+      if (parentDirectoryPath) {
+        fullPath = parentDirectoryPath
+      } else if (selectedDirectory) {
+        fullPath = selectedDirectory
+      }
+
+      if (fullPath) {
+        const relativePath = await window.path.relative(vaultDirectory, fullPath)
+        // Add separator at the end of the path
+        const pathWithSeparator = relativePath ? await window.path.join(relativePath, '') : ''
+        setDirectoryRelativePath(pathWithSeparator)
+      }
+    }
+
+    if (isOpen) {
+      setupInitialPath()
+    }
+  }, [isOpen, parentDirectoryPath, selectedDirectory])
 
   useEffect(() => {
     if (!isOpen) {
-      setDirectoryName('')
+      setDirectoryRelativePath('')
       setErrorMessage(null)
     }
   }, [isOpen])
@@ -39,24 +63,25 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
   const handleNameChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newName = e.target.value
     await handleValidName(newName)
-    setDirectoryName(newName)
+    setDirectoryRelativePath(newName)
   }
 
-  const sendNewDirectoryMsg = async () => {
-    const validName = await handleValidName(directoryName)
-    if (!directoryName || errorMessage || !validName) return
+  const createNewDirectory = async () => {
+    const validName = await handleValidName(directoryRelativePath)
+    if (!directoryRelativePath || errorMessage || !validName) return
 
-    let directoryPath: string
+    // let directoryPath: string
+    const directoryPath = await window.electronStore.getVaultDirectoryForWindow()
 
-    if (parentDirectoryPath) {
-      directoryPath = parentDirectoryPath
-    } else if (currentlyOpenFilePath && currentlyOpenFilePath !== '') {
-      directoryPath = await window.path.dirname(currentlyOpenFilePath)
-    } else {
-      directoryPath = await window.electronStore.getVaultDirectoryForWindow()
-    }
+    // if (parentDirectoryPath) {
+    //   directoryPath = parentDirectoryPath
+    // } else if (currentlyOpenFilePath && currentlyOpenFilePath !== '') {
+    //   directoryPath = await window.path.dirname(currentlyOpenFilePath)
+    // } else {
+    //   directoryPath = await window.electronStore.getVaultDirectoryForWindow()
+    // }
 
-    const finalPath = await window.path.join(directoryPath, directoryName)
+    const finalPath = await window.path.join(directoryPath, directoryRelativePath)
     window.fileSystem.createDirectory(finalPath)
     posthog.capture('created_new_directory_from_new_directory_modal')
     onClose()
@@ -69,11 +94,11 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
         <input
           type="text"
           className=" block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
-          value={directoryName}
+          value={directoryRelativePath}
           onChange={handleNameChange}
           onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
             if (e.key === 'Enter') {
-              sendNewDirectoryMsg()
+              createNewDirectory()
             }
           }}
           placeholder="Directory Name"
@@ -84,7 +109,7 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
         <div className="flex items-center gap-3">
           <Button
             className="mb-2 mt-3 h-10 w-[80px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
-            onClick={sendNewDirectoryMsg}
+            onClick={createNewDirectory}
             placeholder=""
           >
             Create
