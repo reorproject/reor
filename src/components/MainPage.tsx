@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 
 import '../styles/global.css'
 import ChatComponent from './Chat'
-import ResizableComponent from './Common/ResizableComponent'
 import TitleBar from './TitleBar/TitleBar'
 import EditorManager from './Editor/EditorManager'
 import IconsSidebar from './Sidebars/IconsSidebar'
@@ -21,18 +21,16 @@ const MainContent: React.FC = () => {
   const { currentlyOpenFilePath } = useFileContext()
 
   return (
-    <ResizableComponent resizeSide="right">
-      <div className="relative flex size-full overflow-hidden">
-        {currentlyOpenFilePath ? (
-          <div className="h-full overflow-hidden">
-            <EditorManager />
-          </div>
-        ) : (
-          <EmptyPage />
-        )}
-        <WritingAssistant />
-      </div>
-    </ResizableComponent>
+    <div className="relative flex size-full overflow-hidden">
+      {currentlyOpenFilePath ? (
+        <div className="h-full overflow-hidden">
+          <EditorManager />
+        </div>
+      ) : (
+        <EmptyPage />
+      )}
+      <WritingAssistant />
+    </div>
   )
 }
 
@@ -50,26 +48,32 @@ const MainPageContent: React.FC = () => {
           <IconsSidebar getShortcutDescription={getShortcutDescription} />
         </div>
 
-        <ResizableComponent resizeSide="right">
-          <div className="size-full border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700">
-            <SidebarManager />
-          </div>
-        </ResizableComponent>
+        <ResizablePanelGroup direction="horizontal">
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={40}>
+            <div className="size-full border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700">
+              <SidebarManager />
+            </div>
+          </ResizablePanel>
 
-        {/* Main content area with split screen support */}
-        <div className="flex grow">
-          {/* Editor section */}
-          {(!showChatbot || currentlyOpenFilePath) && <MainContent />}
+          <ResizableHandle />
+
+          <ResizablePanel defaultSize={showChatbot ? 50 : 80}>
+            {(!showChatbot || currentlyOpenFilePath) && <MainContent />}
+          </ResizablePanel>
 
           {showChatbot && (
-            // eslint-disable-next-line react/jsx-no-useless-fragment
-            <div className="w-full bg-pink-200">
-              <div className="h-below-titlebar w-full">
-                <ChatComponent />
-              </div>
-            </div>
+            <>
+              <ResizableHandle />
+              <ResizablePanel defaultSize={30}>
+                <div className="w-full bg-pink-200">
+                  <div className="h-below-titlebar w-full">
+                    <ChatComponent />
+                  </div>
+                </div>
+              </ResizablePanel>
+            </>
           )}
-        </div>
+        </ResizablePanelGroup>
 
         <CommonModals />
       </div>
