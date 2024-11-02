@@ -33,6 +33,8 @@ const ChatInput: React.FC<ChatInputProps> = ({
             name="Outlined"
             placeholder="Follow up..."
             rows={1}
+            // eslint-disable-next-line jsx-a11y/no-autofocus
+            autoFocus
             style={{
               backgroundColor: 'rgba(255, 255, 255, 0)',
               color: 'rgb(212 212 212)',

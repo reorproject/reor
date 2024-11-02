@@ -44,7 +44,6 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
         setShowChatbot(true)
         openNewChat(pathOrChatID)
       } else {
-        setShowChatbot(false)
         openOrCreateFile(pathOrChatID, optionalContentToWriteOnCreate)
       }
       setCurrentOpenFileOrChatID(pathOrChatID)

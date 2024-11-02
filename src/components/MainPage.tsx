@@ -23,7 +23,7 @@ const MainContent: React.FC = () => {
   return (
     <div className="relative flex size-full overflow-hidden">
       {currentlyOpenFilePath ? (
-        <div className="h-full overflow-hidden">
+        <div className="size-full overflow-hidden">
           <EditorManager />
         </div>
       ) : (
