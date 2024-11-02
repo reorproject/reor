@@ -140,14 +140,6 @@ const ChatComponent: React.FC = () => {
     [saveChat, setCurrentChat],
   )
 
-  // eslint-disable-next-line react/no-unstable-nested-components
-  const CompactChatStart: React.FC = () => (
-    <div className="flex size-full flex-col items-center justify-center p-4">
-      <h3 className="text-lg font-medium">Chat Assistant</h3>
-      <p className="text-sm text-muted-foreground">Please expand the panel to start a new chat</p>
-    </div>
-  )
-
   return (
     <div ref={containerRef} className="flex size-full items-center justify-center">
       <div className="mx-auto flex size-full flex-col overflow-hidden bg-background">
@@ -163,7 +155,7 @@ const ChatComponent: React.FC = () => {
         ) : (
           // eslint-disable-next-line react/jsx-no-useless-fragment
           <>
-            {containerWidth > 400 ? (
+            {containerWidth > 600 ? (
               <StartChat
                 defaultModelName={defaultModelName}
                 handleNewChatMessage={(userTextFieldInput?: string, agentConfig?: AgentConfig) =>
@@ -171,7 +163,14 @@ const ChatComponent: React.FC = () => {
                 }
               />
             ) : (
-              <CompactChatStart />
+              <ChatMessages
+                currentChat={currentChat}
+                setCurrentChat={setCurrentChat}
+                loadingState={loadingState}
+                handleNewChatMessage={(userTextFieldInput?: string, chatFilters?: AgentConfig) =>
+                  handleNewChatMessage(currentChat, userTextFieldInput, chatFilters)
+                }
+              />
             )}
           </>
         )}
