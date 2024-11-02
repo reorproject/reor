@@ -66,6 +66,8 @@ const MainPageContent: React.FC = () => {
   const { setShowEditor, showEditor } = useContentContext()
   const { getShortcutDescription } = useAppShortcuts()
 
+  const panelGroupKey = `${showChatbot}-${showEditor}-${!!currentlyOpenFilePath}`
+
   return (
     <div className="relative flex h-screen flex-col overflow-hidden">
       <TitleBar similarFilesOpen={showSimilarFiles} toggleSimilarFiles={() => setShowSimilarFiles(!showSimilarFiles)} />
@@ -86,7 +88,7 @@ const MainPageContent: React.FC = () => {
           <ResizablePanel defaultSize={80}>
             <div className="size-full">
               {currentlyOpenFilePath || showChatbot ? (
-                <ResizablePanelGroup direction="horizontal" className="size-full">
+                <ResizablePanelGroup direction="horizontal" className="size-full" key={panelGroupKey}>
                   {currentlyOpenFilePath && showEditor && (
                     <>
                       <ResizablePanel defaultSize={65}>
