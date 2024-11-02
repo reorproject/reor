@@ -32,8 +32,7 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
 
       if (fullPath) {
         const relativePath = await window.path.relative(vaultDirectory, fullPath)
-        // Add separator at the end of the path
-        const pathWithSeparator = relativePath ? await window.path.join(relativePath, '') : ''
+        const pathWithSeparator = relativePath ? `${relativePath}${await window.path.pathSep()}` : ''
         setDirectoryRelativePath(pathWithSeparator)
       }
     }
