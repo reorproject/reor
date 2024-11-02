@@ -11,23 +11,16 @@ import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { useModalOpeners } from '../../contexts/ModalContext'
 import { useChatContext } from '@/contexts/ChatContext'
 import { useContentContext } from '@/contexts/ContentContext'
-import NewDirectoryComponent from '../File/NewDirectory'
 
 export interface IconsSidebarProps {
   getShortcutDescription: (action: string) => string
-  isNewDirectoryModalOpen: boolean
-  setIsNewDirectoryModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-const IconsSidebar: React.FC<IconsSidebarProps> = ({
-  getShortcutDescription,
-  isNewDirectoryModalOpen,
-  setIsNewDirectoryModalOpen,
-}) => {
+const IconsSidebar: React.FC<IconsSidebarProps> = ({ getShortcutDescription }) => {
   const { sidebarShowing, setSidebarShowing } = useChatContext()
   const [sidebarWidth, setSidebarWidth] = useState<number>(40)
 
-  const { isSettingsModalOpen, setIsSettingsModalOpen } = useModalOpeners()
+  const { isSettingsModalOpen, setIsSettingsModalOpen, setIsNewDirectoryModalOpen } = useModalOpeners()
   const { createUntitledNote } = useContentContext()
 
   useEffect(() => {
@@ -136,7 +129,6 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
           title={getShortcutDescription('open-settings-modal') || 'Settings'}
         />
       </button>
-      <NewDirectoryComponent isOpen={isNewDirectoryModalOpen} onClose={() => setIsNewDirectoryModalOpen(false)} />
     </div>
   )
 }

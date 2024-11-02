@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import '../styles/global.css'
 import ChatComponent from './Chat'
@@ -19,21 +19,10 @@ import useAppShortcuts from './shortcuts/use-shortcut'
 
 const MainPageContent: React.FC = () => {
   const [showSimilarFiles, setShowSimilarFiles] = useState(false)
-  const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false)
   const { currentlyOpenFilePath } = useFileContext()
 
   const { showChatbot } = useChatContext()
   const { getShortcutDescription } = useAppShortcuts()
-  const openNewDirectoryModal = useCallback(() => {
-    setIsNewDirectoryModalOpen(true)
-  }, [])
-
-  useEffect(() => {
-    window.addEventListener('open-new-directory-modal', openNewDirectoryModal)
-    return () => {
-      window.removeEventListener('open-new-directory-modal', openNewDirectoryModal)
-    }
-  }, [openNewDirectoryModal])
 
   return (
     <div className="relative overflow-x-hidden">
@@ -45,11 +34,7 @@ const MainPageContent: React.FC = () => {
       />
       <div className="flex h-below-titlebar">
         <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5">
-          <IconsSidebar
-            getShortcutDescription={getShortcutDescription}
-            isNewDirectoryModalOpen={isNewDirectoryModalOpen}
-            setIsNewDirectoryModalOpen={setIsNewDirectoryModalOpen}
-          />
+          <IconsSidebar getShortcutDescription={getShortcutDescription} />
         </div>
 
         <ResizableComponent resizeSide="right">

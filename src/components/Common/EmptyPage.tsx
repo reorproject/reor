@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { ImFileEmpty } from 'react-icons/im'
 import { useContentContext } from '@/contexts/ContentContext'
-import NewDirectoryComponent from '../File/NewDirectory'
+import { useModalOpeners } from '@/contexts/ModalContext'
 
 const EmptyPage: React.FC = () => {
-  const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false)
+  const { setIsNewDirectoryModalOpen } = useModalOpeners()
   const { createUntitledNote } = useContentContext()
 
   return (
@@ -29,7 +29,6 @@ const EmptyPage: React.FC = () => {
         >
           Create a Folder
         </button>
-        <NewDirectoryComponent isOpen={isNewDirectoryModalOpen} onClose={() => setIsNewDirectoryModalOpen(false)} />
       </div>
     </div>
   )
