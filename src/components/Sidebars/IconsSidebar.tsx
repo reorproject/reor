@@ -4,7 +4,7 @@ import { FaSearch } from 'react-icons/fa'
 import { GrNewWindow } from 'react-icons/gr'
 import { ImFilesEmpty } from 'react-icons/im'
 import { IoChatbubbleEllipsesOutline } from 'react-icons/io5'
-import { MdOutlineQuiz, MdSettings } from 'react-icons/md'
+import { MdSettings } from 'react-icons/md'
 import { VscNewFolder } from 'react-icons/vsc'
 import { HiOutlinePencilAlt } from 'react-icons/hi'
 
@@ -14,11 +14,9 @@ import { useContentContext } from '@/contexts/ContentContext'
 import NewDirectoryComponent from '../File/NewDirectory'
 
 export interface IconsSidebarProps {
-  readonly getShortcutDescription: (action: string) => string
-
-  readonly isNewDirectoryModalOpen: boolean
-
-  readonly setIsNewDirectoryModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+  getShortcutDescription: (action: string) => string
+  isNewDirectoryModalOpen: boolean
+  setIsNewDirectoryModalOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const IconsSidebar: React.FC<IconsSidebarProps> = ({
@@ -29,7 +27,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
   const { sidebarShowing, setSidebarShowing } = useChatContext()
   const [sidebarWidth, setSidebarWidth] = useState<number>(40)
 
-  const { isSettingsModalOpen, setIsSettingsModalOpen, setIsFlashcardModeOpen } = useModalOpeners()
+  const { isSettingsModalOpen, setIsSettingsModalOpen } = useModalOpeners()
   const { createUntitledNote } = useContentContext()
 
   useEffect(() => {
@@ -114,19 +112,6 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
             color="gray"
             size={18}
             title={getShortcutDescription('open-new-directory-modal') || 'New Directory'}
-          />
-        </div>
-      </div>
-      <div
-        className="flex h-8 w-full cursor-pointer items-center justify-center border-none bg-transparent "
-        onClick={() => setIsFlashcardModeOpen(true)}
-      >
-        <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
-          <MdOutlineQuiz
-            className="text-gray-200"
-            color="gray"
-            size={19}
-            title={getShortcutDescription('open-flashcard-quiz-modal') || 'Flashcard quiz'}
           />
         </div>
       </div>
