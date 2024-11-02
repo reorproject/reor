@@ -7,7 +7,6 @@ import TitleBar from './TitleBar/TitleBar'
 import EditorManager from './Editor/EditorManager'
 import IconsSidebar from './Sidebars/IconsSidebar'
 import SidebarManager from './Sidebars/MainSidebar'
-import SimilarFilesSidebarComponent from './Sidebars/SimilarFilesSidebar'
 import EmptyPage from './Common/EmptyPage'
 import { ContentProvider } from '../contexts/ContentContext'
 import WritingAssistant from './WritingAssistant/WritingAssistant'
@@ -17,21 +16,35 @@ import ModalProvider from '@/contexts/ModalContext'
 import CommonModals from './Common/CommonModals'
 import useAppShortcuts from './shortcuts/use-shortcut'
 
+// Moved MainContent outside as a separate component
+const MainContent: React.FC = () => {
+  const { currentlyOpenFilePath } = useFileContext()
+
+  return (
+    <ResizableComponent resizeSide="right">
+      <div className="relative flex size-full overflow-hidden">
+        {currentlyOpenFilePath ? (
+          <div className="h-full overflow-hidden">
+            <EditorManager />
+          </div>
+        ) : (
+          <EmptyPage />
+        )}
+        <WritingAssistant />
+      </div>
+    </ResizableComponent>
+  )
+}
+
 const MainPageContent: React.FC = () => {
   const [showSimilarFiles, setShowSimilarFiles] = useState(false)
   const { currentlyOpenFilePath } = useFileContext()
-
   const { showChatbot } = useChatContext()
   const { getShortcutDescription } = useAppShortcuts()
 
   return (
     <div className="relative overflow-x-hidden">
-      <TitleBar
-        similarFilesOpen={showSimilarFiles}
-        toggleSimilarFiles={() => {
-          setShowSimilarFiles(!showSimilarFiles)
-        }}
-      />
+      <TitleBar similarFilesOpen={showSimilarFiles} toggleSimilarFiles={() => setShowSimilarFiles(!showSimilarFiles)} />
       <div className="flex h-below-titlebar">
         <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5">
           <IconsSidebar getShortcutDescription={getShortcutDescription} />
@@ -43,31 +56,21 @@ const MainPageContent: React.FC = () => {
           </div>
         </ResizableComponent>
 
-        {!showChatbot && currentlyOpenFilePath ? (
-          <div className="relative flex size-full overflow-hidden">
-            <div className="h-full grow overflow-hidden">
-              <EditorManager />
-            </div>
-            <WritingAssistant />
-            {showSimilarFiles && (
-              <div className="h-full shrink-0 overflow-y-auto overflow-x-hidden">
-                <SimilarFilesSidebarComponent />
-              </div>
-            )}
-          </div>
-        ) : (
-          !showChatbot && (
-            <div className="relative flex size-full overflow-hidden">
-              <EmptyPage />
-            </div>
-          )
-        )}
+        {/* Main content area with split screen support */}
+        <div className="flex grow">
+          {/* Editor section */}
+          {(!showChatbot || currentlyOpenFilePath) && <MainContent />}
 
-        {showChatbot && (
-          <div className="h-below-titlebar w-full">
-            <ChatComponent />
-          </div>
-        )}
+          {showChatbot && (
+            // eslint-disable-next-line react/jsx-no-useless-fragment
+            <div className="w-full bg-pink-200">
+              <div className="h-below-titlebar w-full">
+                <ChatComponent />
+              </div>
+            </div>
+          )}
+        </div>
+
         <CommonModals />
       </div>
     </div>
