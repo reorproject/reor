@@ -40,12 +40,6 @@ export const shortcuts: Shortcut[] = [
     displayValue: { mac: 'Cmd+D', other: 'Ctrl+D' },
   },
   {
-    key: 'mod+L',
-    action: 'open-flashcard-quiz-modal',
-    description: 'Flashcard quiz',
-    displayValue: { mac: 'Cmd+L', other: 'Ctrl+L' },
-  },
-  {
     key: 'mod+,',
     action: 'open-settings-modal',
     description: 'Settings',

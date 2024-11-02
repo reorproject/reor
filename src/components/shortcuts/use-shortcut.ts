@@ -1,12 +1,10 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
-import { useModalOpeners } from '../../contexts/ModalContext'
 import { useChatContext } from '../../contexts/ChatContext'
 import { useContentContext } from '@/contexts/ContentContext'
 import { shortcuts } from './shortcutDefinitions'
 
 function useAppShortcuts() {
-  const { setIsFlashcardModeOpen, setIsSettingsModalOpen } = useModalOpeners()
   const { setSidebarShowing, openNewChat } = useChatContext()
   const { createUntitledNote } = useContentContext()
 
@@ -28,18 +26,12 @@ function useAppShortcuts() {
         case 'open-chat-bot':
           openNewChat()
           break
-        case 'open-flashcard-quiz-modal':
-          setIsFlashcardModeOpen(true)
-          break
-        case 'open-settings-modal':
-          setIsSettingsModalOpen(true)
-          break
         default:
           // No other cases
           break
       }
     },
-    [createUntitledNote, setSidebarShowing, setIsFlashcardModeOpen, setIsSettingsModalOpen, openNewChat],
+    [createUntitledNote, setSidebarShowing, openNewChat],
   )
 
   const handleShortcutRef = useRef(handleShortcut)
