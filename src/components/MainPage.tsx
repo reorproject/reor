@@ -43,7 +43,7 @@ const MainContent: React.FC = () => {
 
   return (
     <div className="relative flex size-full overflow-hidden">
-      {currentlyOpenFilePath && showEditor ? (
+      {currentlyOpenFilePath && showEditor && (
         <div className="size-full overflow-hidden">
           <WindowControls
             onClose={() => setShowEditor(false)}
@@ -53,9 +53,6 @@ const MainContent: React.FC = () => {
           />
           <EditorManager />
         </div>
-      ) : (
-        // <EmptyPage />
-        <></>
       )}
       <WritingAssistant />
     </div>
@@ -66,7 +63,7 @@ const MainPageContent: React.FC = () => {
   const [showSimilarFiles, setShowSimilarFiles] = useState(false)
   const { currentlyOpenFilePath } = useFileContext()
   const { showChatbot, setShowChatbot } = useChatContext()
-  const { setShowEditor } = useContentContext()
+  const { setShowEditor, showEditor } = useContentContext()
   const { getShortcutDescription } = useAppShortcuts()
 
   return (
@@ -88,40 +85,27 @@ const MainPageContent: React.FC = () => {
 
           <ResizablePanel defaultSize={80}>
             <div className="size-full">
-              {currentlyOpenFilePath ? (
-                <>
-                  {showChatbot ? (
-                    <ResizablePanelGroup direction="horizontal" className="size-full">
+              {currentlyOpenFilePath || showChatbot ? (
+                <ResizablePanelGroup direction="horizontal" className="size-full">
+                  {currentlyOpenFilePath && showEditor && (
+                    <>
                       <ResizablePanel defaultSize={65}>
                         <MainContent />
                       </ResizablePanel>
                       <ResizableHandle />
-                      <ResizablePanel defaultSize={35}>
-                        <div className="relative size-full bg-pink-200">
-                          <WindowControls
-                            onClose={() => {
-                              setShowChatbot(false)
-                            }}
-                            onMaximize={() => {
-                              setShowEditor(false)
-                            }}
-                          />
-                          <ChatComponent />
-                        </div>
-                      </ResizablePanel>
-                    </ResizablePanelGroup>
-                  ) : (
-                    <MainContent />
+                    </>
                   )}
-                </>
-              ) : showChatbot ? (
-                <div className="size-full bg-pink-200">
-                  <ChatComponent />
-                </div>
+                  {showChatbot && (
+                    <ResizablePanel defaultSize={currentlyOpenFilePath && showEditor ? 35 : 100}>
+                      <div className="relative size-full bg-pink-200">
+                        <WindowControls onClose={() => setShowChatbot(false)} onMaximize={() => setShowEditor(false)} />
+                        <ChatComponent />
+                      </div>
+                    </ResizablePanel>
+                  )}
+                </ResizablePanelGroup>
               ) : (
-                <div className="size-full">
-                  <EmptyPage />
-                </div>
+                <EmptyPage />
               )}
             </div>
           </ResizablePanel>
