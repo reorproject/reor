@@ -36,11 +36,11 @@ const ReorModal: React.FC<ModalProps> = ({
 
   const modalContent = (
     <div
-      className={`fixed inset-0 flex h-screen w-screen items-center justify-center bg-black/40 ${tailwindStylesOnBackground}`}
+      className={`fixed inset-0 z-[9999] flex h-screen w-screen items-center justify-center bg-black/40 ${tailwindStylesOnBackground}`}
     >
       <div
         ref={modalRef}
-        className="flex flex-col items-center justify-center rounded-lg border border-solid border-gray-700 bg-dark-gray-c-three shadow-xl"
+        className="relative flex flex-col items-center justify-center rounded-lg border border-solid border-gray-700 bg-dark-gray-c-three shadow-xl"
       >
         <div className="z-50 h-0 w-full items-end">
           {!hideCloseButton && (

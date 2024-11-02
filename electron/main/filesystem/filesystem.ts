@@ -1,5 +1,4 @@
 import * as fs from 'fs'
-import * as fsPromises from 'fs/promises'
 import * as path from 'path'
 
 import chokidar from 'chokidar'
@@ -176,28 +175,6 @@ export function appendExtensionIfMissing(filename: string, extensions: string[])
 export function readFile(filePath: string): string {
   const data = fs.readFileSync(filePath, 'utf8')
   return data
-}
-
-export const moveFileOrDirectoryInFileSystem = async (sourcePath: string, destinationPath: string): Promise<string> => {
-  await fsPromises.access(sourcePath)
-
-  let destinationStats
-  try {
-    destinationStats = await fsPromises.lstat(destinationPath)
-  } catch (error) {
-    // Error means destination path does not exist, which is fine
-  }
-  let resolvedDestinationPath = destinationPath
-  if (destinationStats && destinationStats.isFile()) {
-    resolvedDestinationPath = path.dirname(destinationPath)
-  }
-
-  await fsPromises.mkdir(resolvedDestinationPath, { recursive: true })
-
-  const newPath = path.join(resolvedDestinationPath, path.basename(sourcePath))
-  await fsPromises.rename(sourcePath, newPath)
-
-  return newPath
 }
 
 export function splitDirectoryPathIntoBaseAndRepo(fullPath: string) {

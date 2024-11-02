@@ -4,28 +4,33 @@ import { FaChevronDown, FaChevronRight } from 'react-icons/fa'
 import posthog from 'posthog-js'
 import { isFileNodeDirectory } from '@shared/utils'
 import { useFileContext } from '@/contexts/FileContext'
-import { moveFile, removeFileExtension } from '@/lib/file'
+import { removeFileExtension } from '@/lib/file'
 import { useContentContext } from '@/contexts/ContentContext'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu'
 import NewDirectoryComponent from '@/components/File/NewDirectory'
 
 const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data }) => {
-  const { visibleItems } = data
-  const fileOrDirectoryObject = visibleItems[index]
-  const { file } = fileOrDirectoryObject
+  const { file, indentation } = data.filesAndIndentations[index]
 
-  const { handleDirectoryToggle, expandedDirectories, currentlyOpenFilePath, setNoteToBeRenamed, deleteFile } =
-    useFileContext()
+  const {
+    handleDirectoryToggle,
+    expandedDirectories,
+    currentlyOpenFilePath,
+    setNoteToBeRenamed,
+    deleteFile,
+    selectedDirectory,
+    setSelectedDirectory,
+    renameFile,
+  } = useFileContext()
   const { openContent, createUntitledNote } = useContentContext()
   const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false)
-  const [parentDirectoryPathForNewDirectory, setParentDirectoryPathForNewDirectory] = useState<string | undefined>(
-    undefined,
-  )
+  const [parentDirectoryPathForNewDirectory, setParentDirectoryPathForNewDirectory] = useState<string | undefined>()
   const [isDragOver, setIsDragOver] = useState(false)
 
   const isDirectory = isFileNodeDirectory(file)
-  const isSelected = file.path === currentlyOpenFilePath
-  const indentation = fileOrDirectoryObject.indentMultiplyer ? 10 * fileOrDirectoryObject.indentMultiplyer : 0
+  const isSelected = isDirectory ? file.path === selectedDirectory : file.path === currentlyOpenFilePath
+
+  const indentationPadding = indentation ? 10 * indentation : 0
   const isExpanded = expandedDirectories.get(file.path)
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -50,20 +55,26 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
       e.stopPropagation()
       setIsDragOver(false)
       const sourcePath = e.dataTransfer.getData('text/plain')
-      const destinationPath = isDirectory ? file.path : await window.path.dirname(file.path)
-      moveFile(sourcePath, destinationPath)
+      const destinationDirectory = isDirectory ? file.path : await window.path.dirname(file.path)
+      const destinationPath = await window.path.join(destinationDirectory, await window.path.basename(sourcePath))
+      renameFile(sourcePath, destinationPath)
     },
-    [file.path, isDirectory],
+    [file.path, isDirectory, renameFile],
   )
 
-  const toggle = useCallback(() => {
-    if (isDirectory) {
-      handleDirectoryToggle(file.path)
-    } else {
-      openContent(file.path)
-      posthog.capture('open_file_from_sidebar')
-    }
-  }, [file.path, isDirectory, handleDirectoryToggle, openContent])
+  const clickOnFileOrDirectory = useCallback(
+    (e: React.MouseEvent) => {
+      if (isDirectory) {
+        handleDirectoryToggle(file.path)
+        setSelectedDirectory(file.path)
+      } else {
+        openContent(file.path)
+        posthog.capture('open_file_from_sidebar')
+      }
+      e.stopPropagation()
+    },
+    [file.path, isDirectory, handleDirectoryToggle, openContent, setSelectedDirectory],
+  )
 
   const openNewDirectoryModal = useCallback(async () => {
     const dirPath = isDirectory ? file.path : await window.path.dirname(file.path)
@@ -77,6 +88,7 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
       isDirectory ? ' This will delete all contents of the directory.' : ''
     }`
 
+    // eslint-disable-next-line no-alert
     if (window.confirm(confirmMessage)) {
       deleteFile(file.path)
     }
@@ -100,7 +112,7 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
   )
 
   return (
-    <div style={{ ...style, paddingLeft: `${indentation}px` }}>
+    <div style={{ ...style, paddingLeft: `${indentationPadding}px` }}>
       <ContextMenu>
         <ContextMenuTrigger>
           <div
@@ -110,7 +122,7 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
             onDrop={handleDrop}
             onDragLeave={handleDragLeave}
           >
-            <div onClick={toggle} className={itemClasses}>
+            <div onClick={clickOnFileOrDirectory} className={itemClasses}>
               {isDirectory && (
                 <span className="mr-2 mt-1 text-gray-200/20">
                   {isExpanded ? (

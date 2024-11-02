@@ -33,7 +33,7 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
     vaultFilesFlattened: flattenedFiles,
     openOrCreateFile,
     addToNavigationHistory,
-    currentlyOpenFilePath,
+    selectedDirectory,
   } = useFileContext()
 
   const openContent = React.useCallback(
@@ -57,11 +57,9 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
 
   const createUntitledNote = useCallback(
     async (parentDirectory?: string) => {
-      console.log('parentDirectory: ', parentDirectory)
       const directoryToMakeFileIn =
-        parentDirectory ||
-        (currentlyOpenFilePath && (await window.path.dirname(currentlyOpenFilePath))) ||
-        (await window.electronStore.getVaultDirectoryForWindow())
+        parentDirectory || selectedDirectory || (await window.electronStore.getVaultDirectoryForWindow())
+
       const filesInDirectory = await getFilesInDirectory(directoryToMakeFileIn, flattenedFiles)
       const fileName = getNextAvailableFileNameGivenBaseName(
         filesInDirectory.map((file) => file.name),
@@ -71,7 +69,7 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
       openContent(finalPath, `## `)
       posthog.capture('created_new_note_from_new_note_modal')
     },
-    [currentlyOpenFilePath, flattenedFiles, openContent],
+    [selectedDirectory, flattenedFiles, openContent],
   )
 
   const ContentContextMemo = useMemo(

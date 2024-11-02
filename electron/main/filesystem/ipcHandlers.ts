@@ -1,21 +1,14 @@
 import * as fs from 'fs'
 import * as path from 'path'
 
-import { ipcMain, BrowserWindow, dialog } from 'electron'
+import { ipcMain, dialog } from 'electron'
 import Store from 'electron-store'
 
 import WindowsManager from '../common/windowManager'
 import { StoreSchema } from '../electron-store/storeConfig'
-import { orchestrateEntryMove, updateFileInTable } from '../vector-database/tableHelperFunctions'
+import { handleFileRename, updateFileInTable } from '../vector-database/tableHelperFunctions'
 
-import {
-  GetFilesInfoTree,
-  createFileRecursive,
-  isHidden,
-  GetFilesInfoListForListOfPaths,
-  startWatchingDirectory,
-  updateFileListForRenderer,
-} from './filesystem'
+import { GetFilesInfoTree, createFileRecursive, isHidden, GetFilesInfoListForListOfPaths } from './filesystem'
 import { FileInfoTree, WriteFileProps, RenameFileProps, FileInfoWithContent } from './types'
 
 const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: WindowsManager) => {
@@ -91,36 +84,7 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
       throw new Error('Window info not found.')
     }
 
-    windowsManager.watcher?.unwatch(windowInfo?.vaultDirectoryForWindow)
-
-    if (process.platform === 'win32') {
-      windowsManager.watcher?.close().then(() => {
-        fs.rename(renameFileProps.oldFilePath, renameFileProps.newFilePath, (err) => {
-          if (err) {
-            throw err
-          }
-
-          // Re-start watching all paths in array
-          const win = BrowserWindow.fromWebContents(event.sender)
-          if (win) {
-            windowsManager.watcher = startWatchingDirectory(win, windowInfo.vaultDirectoryForWindow)
-            updateFileListForRenderer(win, windowInfo.vaultDirectoryForWindow)
-          }
-        })
-      })
-    } else {
-      // On non-Windows platforms, directly perform the rename operation
-      fs.rename(renameFileProps.oldFilePath, renameFileProps.newFilePath, (err) => {
-        if (err) {
-          throw err
-        }
-        // Re-watch the vault directory after renaming
-        windowsManager.watcher?.add(windowInfo?.vaultDirectoryForWindow)
-      })
-    }
-
-    // then need to trigger reindexing of folder
-    windowInfo.dbTableClient.updateDBItemsWithNewFilePath(renameFileProps.oldFilePath, renameFileProps.newFilePath)
+    await handleFileRename(windowsManager, windowInfo, renameFileProps, event.sender)
   })
 
   ipcMain.handle('index-file-in-database', async (event, filePath: string) => {
@@ -149,14 +113,6 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
     if (!fs.existsSync(dirPath)) {
       mkdirRecursiveSync(dirPath)
     }
-  })
-
-  ipcMain.handle('move-file-or-dir', async (event, sourcePath: string, destinationPath: string) => {
-    const windowInfo = windowsManager.getWindowInfoForContents(event.sender)
-    if (!windowInfo) {
-      throw new Error('Window info not found.')
-    }
-    orchestrateEntryMove(windowInfo.dbTableClient, sourcePath, destinationPath)
   })
 
   ipcMain.handle('get-files', async (_event, filePaths: string[]): Promise<FileInfoWithContent[]> => {
