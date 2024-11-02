@@ -20,6 +20,7 @@ import { Markdown } from 'tiptap-markdown'
 import { useDebounce } from 'use-debounce'
 import { FileInfo, FileInfoTree } from 'electron/main/filesystem/types'
 import {
+  findRelevantDirectoriesToBeExpanded,
   flattenFileInfoTree,
   generateFileNameFromFileContent,
   getFilesInDirectory,
@@ -327,50 +328,25 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }
 
   useEffect(() => {
-    const findRelevantDirectoriesToBeOpened = async () => {
-      if (currentlyOpenFilePath === null) {
-        return expandedDirectories
-      }
-
-      const pathSep = await window.path.pathSep()
-      const isAbsolute = await window.path.isAbsolute(currentlyOpenFilePath)
-
-      const currentPath = isAbsolute ? '' : '.'
-      const newExpandedDirectories = new Map(expandedDirectories)
-
-      const pathSegments = currentlyOpenFilePath.split(pathSep).filter((segment) => segment !== '')
-
-      pathSegments.pop()
-
-      const updatedPath = pathSegments.reduce(async (pathPromise, segment) => {
-        const path = await pathPromise
-        const newPath = await window.path.join(path, segment)
-        newExpandedDirectories.set(newPath, true)
-        return newPath
-      }, Promise.resolve(currentPath))
-
-      await updatedPath
-
-      return newExpandedDirectories
-    }
-
-    const handleFileUpdate = async (updatedFiles: FileInfoTree) => {
+    const handleFilesListUpdateFromMainProcess = async (updatedFiles: FileInfoTree) => {
       const sortedFiles = sortFilesAndDirectories(updatedFiles, null)
       setVaultFilesTree(sortedFiles)
       const updatedFlattenedFiles = flattenFileInfoTree(sortedFiles)
       setVaultFilesFlattened(updatedFlattenedFiles)
-      const directoriesToBeExpanded = await findRelevantDirectoriesToBeOpened()
+      const directoriesToBeExpanded = await findRelevantDirectoriesToBeExpanded(
+        currentlyOpenFilePath,
+        expandedDirectories,
+      )
       setExpandedDirectories(directoriesToBeExpanded)
     }
 
-    const removeFilesListListener = window.ipcRenderer.receive('files-list', handleFileUpdate)
+    const removeFilesListListener = window.ipcRenderer.receive('files-list', handleFilesListUpdateFromMainProcess)
 
     return () => {
       removeFilesListListener()
     }
   }, [currentlyOpenFilePath, expandedDirectories])
 
-  // initial load of files
   useEffect(() => {
     const fetchAndSetFiles = async () => {
       const fetchedFiles = await window.fileSystem.getFilesTreeForWindow()
