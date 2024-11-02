@@ -69,16 +69,7 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
     const validName = await handleValidName(directoryRelativePath)
     if (!directoryRelativePath || errorMessage || !validName) return
 
-    // let directoryPath: string
     const directoryPath = await window.electronStore.getVaultDirectoryForWindow()
-
-    // if (parentDirectoryPath) {
-    //   directoryPath = parentDirectoryPath
-    // } else if (currentlyOpenFilePath && currentlyOpenFilePath !== '') {
-    //   directoryPath = await window.path.dirname(currentlyOpenFilePath)
-    // } else {
-    //   directoryPath = await window.electronStore.getVaultDirectoryForWindow()
-    // }
 
     const finalPath = await window.path.join(directoryPath, directoryRelativePath)
     window.fileSystem.createDirectory(finalPath)
