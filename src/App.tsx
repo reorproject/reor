@@ -79,7 +79,14 @@ const App: React.FC<AppProps> = () => {
   return (
     <div className="max-h-screen bg-neutral-800 font-sans">
       <Portal>
-        <ToastContainer className="mt-4" />
+        <ToastContainer
+          theme="dark"
+          position="bottom-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          closeOnClick
+          pauseOnHover
+        />{' '}
       </Portal>
       {!userHasConfiguredSettingsForIndexing && (
         <InitialSetupSinglePage readyForIndexing={handleAllInitialSettingsAreReady} />
