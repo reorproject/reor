@@ -2,8 +2,7 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable no-nested-ternary */
-import React, { useState } from 'react'
-import { X, Maximize2 } from 'lucide-react'
+import React from 'react'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 
 import '../styles/global.css'
@@ -19,21 +18,8 @@ import { ChatProvider, useChatContext } from '@/contexts/ChatContext'
 import { FileProvider, useFileContext } from '@/contexts/FileContext'
 import ModalProvider from '@/contexts/ModalContext'
 import CommonModals from './Common/CommonModals'
-import useAppShortcuts from './shortcuts/use-shortcut'
-
-const WindowControls: React.FC<{
-  onClose: () => void
-  onMaximize: () => void
-}> = ({ onClose, onMaximize }) => (
-  <div className="absolute right-2 top-2 z-10 flex gap-2">
-    <button onClick={onMaximize} className="rounded p-1 transition-colors hover:bg-neutral-700/50" title="Maximize">
-      <Maximize2 className="size-4 text-neutral-400" />
-    </button>
-    <button onClick={onClose} className="rounded p-1 transition-colors hover:bg-neutral-700/50" title="Close">
-      <X className="size-4 text-neutral-400" />
-    </button>
-  </div>
-)
+import useAppShortcuts from '../lib/shortcuts/use-shortcut'
+import WindowControls from './ui/window-controls'
 
 // Moved MainContent outside as a separate component
 const MainContent: React.FC = () => {
@@ -60,7 +46,6 @@ const MainContent: React.FC = () => {
 }
 
 const MainPageContent: React.FC = () => {
-  const [showSimilarFiles, setShowSimilarFiles] = useState(false)
   const { currentlyOpenFilePath } = useFileContext()
   const { showChatbot, setShowChatbot } = useChatContext()
   const { setShowEditor, showEditor } = useContentContext()
@@ -70,7 +55,7 @@ const MainPageContent: React.FC = () => {
 
   return (
     <div className="relative flex h-screen flex-col overflow-hidden">
-      <TitleBar similarFilesOpen={showSimilarFiles} toggleSimilarFiles={() => setShowSimilarFiles(!showSimilarFiles)} />
+      <TitleBar />
       <div className="flex min-h-0 flex-1">
         <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5">
           <IconsSidebar getShortcutDescription={getShortcutDescription} />
