@@ -1,23 +1,17 @@
 import React, { useState } from 'react'
 import { FiRefreshCw } from 'react-icons/fi'
-import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import SettingsModal, { SettingsTab } from '../Settings'
+import useLLMConfigs from '@/lib/hooks/use-llm-configs'
 
 interface LLMSelectOrButtonProps {
-  llmConfigs: Array<{ modelName: string }>
-  selectedLLM: string
-  setSelectedLLM: (value: string) => void
-  setLLMConfigs: React.Dispatch<React.SetStateAction<LLMConfig[]>>
+  selectedLLM: string | undefined
+  setSelectedLLM: (value: string | undefined) => void
 }
 
-const LLMSelectOrButton: React.FC<LLMSelectOrButtonProps> = ({
-  llmConfigs,
-  selectedLLM,
-  setSelectedLLM,
-  setLLMConfigs,
-}) => {
+const LLMSelectOrButton: React.FC<LLMSelectOrButtonProps> = ({ selectedLLM, setSelectedLLM }) => {
+  const { llmConfigs, fetchAndUpdateModelConfigs } = useLLMConfigs()
   const handleLLMChange = (value: string) => {
     setSelectedLLM(value)
   }
@@ -36,11 +30,6 @@ const LLMSelectOrButton: React.FC<LLMSelectOrButtonProps> = ({
 
   const openLLMSettings = () => {
     openModalWithTab(SettingsTab.LLMSettingsTab)
-  }
-
-  const refreshLLMConfigs = async () => {
-    const LLMConfigs = await window.llm.getLLMConfigs()
-    setLLMConfigs(LLMConfigs)
   }
 
   return (
@@ -64,7 +53,7 @@ const LLMSelectOrButton: React.FC<LLMSelectOrButtonProps> = ({
             </SelectContent>
           </Select>
         )}
-        <FiRefreshCw onClick={refreshLLMConfigs} className="ml-1 cursor-pointer text-xs text-gray-400" />
+        <FiRefreshCw onClick={fetchAndUpdateModelConfigs} className="ml-1 cursor-pointer text-xs text-gray-400" />
         <SettingsModal isOpen={isSettingsModalOpen} onClose={closeModal} initialTab={activeTab} />
       </div>
     </div>

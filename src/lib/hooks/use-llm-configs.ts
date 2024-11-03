@@ -4,7 +4,7 @@ import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 
 const useLLMConfigs = () => {
   const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([])
-  const [defaultLLM, setDefaultLLM] = useState<string>('')
+  const [defaultLLM, setDefaultLocalLLM] = useState<string>('')
 
   const fetchAndUpdateModelConfigs = async () => {
     const fetchedLLMConfigs = await window.llm.getLLMConfigs()
@@ -12,10 +12,15 @@ const useLLMConfigs = () => {
     const storedDefaultLLM = await window.llm.getDefaultLLMName()
     if (!storedDefaultLLM && fetchedLLMConfigs.length > 0) {
       await window.llm.setDefaultLLM(fetchedLLMConfigs[0].modelName)
-      setDefaultLLM(fetchedLLMConfigs[0].modelName)
+      setDefaultLocalLLM(fetchedLLMConfigs[0].modelName)
     } else {
-      setDefaultLLM(storedDefaultLLM)
+      setDefaultLocalLLM(storedDefaultLLM)
     }
+  }
+
+  const setDefaultLLM = async (modelName: string) => {
+    await window.llm.setDefaultLLM(modelName)
+    setDefaultLocalLLM(modelName)
   }
 
   useEffect(() => {
