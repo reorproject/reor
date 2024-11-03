@@ -1,11 +1,13 @@
 import React from 'react'
 
 import { PiPaperPlaneRight } from 'react-icons/pi'
-import { LoadingState } from '../../lib/llm/types'
+import { AgentConfig, LoadingState } from '../../lib/llm/types'
 import { Button } from '../ui/button'
 import LLMSelectOrButton from '../Settings/LLMSettings/LLMSelectOrButton'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { allAvailableToolDefinitions } from '@/lib/llm/tools/tool-definitions'
+import { Switch } from '@/components/ui/switch'
+import { Label } from '@/components/ui/label'
 
 interface ChatInputProps {
   userTextFieldInput: string
@@ -14,6 +16,8 @@ interface ChatInputProps {
   loadingState: LoadingState
   selectedLLM: string | undefined
   setSelectedLLM: (value: string | undefined) => void
+  agentConfig: AgentConfig | undefined
+  setAgentConfig: React.Dispatch<React.SetStateAction<AgentConfig | undefined>>
 }
 
 const ChatInput: React.FC<ChatInputProps> = ({
@@ -23,7 +27,28 @@ const ChatInput: React.FC<ChatInputProps> = ({
   loadingState,
   selectedLLM,
   setSelectedLLM,
+  agentConfig,
+  setAgentConfig,
 }) => {
+  // const [useStream, setUseStream] = React.useState(true)
+
+  const handleDbSearchToggle = (checked: boolean) => {
+    setAgentConfig((prevConfig) => {
+      if (!prevConfig) throw new Error('Agent config must be initialized before setting db search filters')
+      return {
+        ...prevConfig,
+        dbSearchFilters: checked
+          ? {
+              limit: 22,
+              minDate: undefined,
+              maxDate: undefined,
+              passFullNoteIntoContext: true,
+            }
+          : undefined,
+      }
+    })
+  }
+
   return (
     <div className="flex w-full">
       <div className="z-50 flex w-full flex-col overflow-hidden rounded border-2 border-solid border-border bg-background focus-within:ring-1 focus-within:ring-ring">
@@ -65,8 +90,20 @@ const ChatInput: React.FC<ChatInputProps> = ({
           </div>
 
           <div className="flex items-center">
+            <div className="mr-[-8px] flex flex-col">
+              <Switch
+                id="stream-mode"
+                checked={!!agentConfig?.dbSearchFilters}
+                onCheckedChange={handleDbSearchToggle}
+                className="scale-[0.6]"
+              />
+              <Label htmlFor="stream-mode" className="mt-0 text-[8px] text-muted-foreground">
+                Search notes
+              </Label>
+            </div>
+
             <Button
-              className="flex items-center justify-between gap-2 bg-transparent text-[10px] text-primary hover:bg-transparent hover:text-accent-foreground"
+              className="flex items-center justify-between bg-transparent text-[10px] text-primary hover:bg-transparent hover:text-accent-foreground"
               onClick={handleSubmitNewMessage}
               disabled={loadingState !== 'idle'}
             >

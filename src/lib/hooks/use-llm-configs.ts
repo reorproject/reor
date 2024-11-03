@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 
@@ -6,7 +6,7 @@ const useLLMConfigs = () => {
   const [llmConfigs, setLLMConfigs] = useState<LLMConfig[]>([])
   const [defaultLLM, setDefaultLocalLLM] = useState<string>('')
 
-  const fetchAndUpdateModelConfigs = async () => {
+  const fetchAndUpdateModelConfigs = useCallback(async () => {
     const fetchedLLMConfigs = await window.llm.getLLMConfigs()
     setLLMConfigs(fetchedLLMConfigs)
     const storedDefaultLLM = await window.llm.getDefaultLLMName()
@@ -16,7 +16,11 @@ const useLLMConfigs = () => {
     } else {
       setDefaultLocalLLM(storedDefaultLLM)
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    window.ipcRenderer.on('llm-configs-changed', fetchAndUpdateModelConfigs)
+  }, [fetchAndUpdateModelConfigs])
 
   const setDefaultLLM = async (modelName: string) => {
     await window.llm.setDefaultLLM(modelName)
@@ -25,7 +29,7 @@ const useLLMConfigs = () => {
 
   useEffect(() => {
     fetchAndUpdateModelConfigs()
-  }, [])
+  }, [fetchAndUpdateModelConfigs])
 
   return {
     llmConfigs,

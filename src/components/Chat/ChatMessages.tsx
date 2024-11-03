@@ -52,7 +52,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   handleNewChatMessage,
   loadingState,
 }) => {
-  const { agentConfig } = useAgentConfig()
+  const { agentConfig, setAgentConfig } = useAgentConfig()
   const [userTextFieldInput, setUserTextFieldInput] = useState<string | undefined>()
   const { defaultLLM, setDefaultLLM } = useLLMConfigs()
   const [selectedLLM, setSelectedLLM] = useState<string>()
@@ -143,6 +143,8 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
           loadingState={loadingState}
           selectedLLM={selectedLLM}
           setSelectedLLM={setSelectedLLM}
+          agentConfig={agentConfig}
+          setAgentConfig={setAgentConfig}
         />
       </div>
     </div>

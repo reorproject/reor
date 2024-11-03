@@ -4,7 +4,7 @@ import exampleAgents from '@/components/Chat/ChatConfigComponents/exampleAgents'
 
 interface UseAgentConfigReturn {
   agentConfig: AgentConfig | undefined
-  setAgentConfig: (config: AgentConfig | ((prev: AgentConfig | undefined) => AgentConfig)) => void
+  setAgentConfig: React.Dispatch<React.SetStateAction<AgentConfig | undefined>>
 }
 
 function useAgentConfig(): UseAgentConfigReturn {

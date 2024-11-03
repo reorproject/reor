@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { FiRefreshCw } from 'react-icons/fi'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import SettingsModal, { SettingsTab } from '../Settings'
@@ -11,7 +10,7 @@ interface LLMSelectOrButtonProps {
 }
 
 const LLMSelectOrButton: React.FC<LLMSelectOrButtonProps> = ({ selectedLLM, setSelectedLLM }) => {
-  const { llmConfigs, fetchAndUpdateModelConfigs } = useLLMConfigs()
+  const { llmConfigs } = useLLMConfigs()
   const handleLLMChange = (value: string) => {
     setSelectedLLM(value)
   }
@@ -57,7 +56,6 @@ const LLMSelectOrButton: React.FC<LLMSelectOrButtonProps> = ({ selectedLLM, setS
             </SelectContent>
           </Select>
         )}
-        <FiRefreshCw onClick={fetchAndUpdateModelConfigs} className="ml-0 cursor-pointer text-xs text-gray-400" />
         <SettingsModal isOpen={isSettingsModalOpen} onClose={closeModal} initialTab={activeTab} />
       </div>
     </div>
