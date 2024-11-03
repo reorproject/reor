@@ -45,7 +45,6 @@ export const AppearanceSection = () => {
 }
 
 export const EditorSection = () => {
-  // const { spellCheckEnabled, setSpellCheckEnabled } = useFileByFilepath()
   const [tempSpellCheckEnabled, setTempSpellCheckEnabled] = useState(false)
   const [documentStatsEnabled, setDocumentStatsEnabled] = useState(false)
   const [editorFlexCenter, setEditorFlexCenter] = useState<boolean>(true)
@@ -56,7 +55,6 @@ export const EditorSection = () => {
       const isDocumentStatsCheckEnabled = await window.electronStore.getDocumentStats()
 
       if (isSpellCheckEnabled !== undefined) {
-        // setSpellCheckEnabled(isSpellCheckEnabled)
         setTempSpellCheckEnabled(isSpellCheckEnabled)
       }
       if (isDocumentStatsCheckEnabled !== undefined) {

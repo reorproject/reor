@@ -32,7 +32,8 @@ const ChatInput: React.FC<ChatInputProps> = ({
             handleSubmitNewMessage()
           }
         }}
-        className="h-[100px] w-[600px] resize-none border-0 bg-transparent p-4 text-foreground caret-current focus:outline-none"
+        className="h-[100px] w-full resize-none border-0 bg-transparent p-4 text-foreground caret-current focus:outline-none"
+        wrap="soft"
         placeholder="What can Reor help you with today?"
         onChange={(e) => setUserTextFieldInput(e.target.value)}
         // eslint-disable-next-line jsx-a11y/no-autofocus
