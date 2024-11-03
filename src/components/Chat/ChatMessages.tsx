@@ -38,7 +38,7 @@ const Message: React.FC<MessageProps> = ({ message, index, currentChat, setCurre
 }
 
 interface ChatMessagesProps {
-  currentChat: Chat
+  currentChat: Chat | undefined
   setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
   loadingState: LoadingState
   handleNewChatMessage: (userTextFieldInput?: string, agentConfig?: AgentConfig) => void
@@ -76,9 +76,15 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     }
   }
 
-  const handleSubmitNewMessage = () => {
+  const handleSubmitNewMessage = async () => {
     if (userTextFieldInput) {
-      handleNewChatMessage(userTextFieldInput)
+      // this for v1 could just use the default agent config...
+      const agentConfigs = await window.electronStore.getAgentConfigs()
+      if (agentConfigs && agentConfigs.length > 0) {
+        handleNewChatMessage(userTextFieldInput, agentConfigs[0])
+      } else {
+        handleNewChatMessage(userTextFieldInput)
+      }
       setUserTextFieldInput('')
       setShouldAutoScroll(true)
     }
@@ -103,7 +109,9 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
       <div className="grow overflow-auto" ref={chatContainerRef} onScroll={handleScroll}>
         <div className="flex flex-col items-center gap-3 p-4">
           <div className="w-full max-w-3xl">
-            {currentChat?.messages?.length > 0 &&
+            {currentChat &&
+              currentChat.messages &&
+              currentChat.messages.length > 0 &&
               currentChat.messages.map((message, index) => (
                 // eslint-disable-next-line react/no-array-index-key
                 <div key={index} ref={index === currentChat.messages.length - 1 ? lastMessageRef : null}>
@@ -120,16 +128,14 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
         </div>
       </div>
 
-      {currentChat && (
-        <div className="w-full p-4">
-          <ChatInput
-            userTextFieldInput={userTextFieldInput ?? ''}
-            setUserTextFieldInput={setUserTextFieldInput}
-            handleSubmitNewMessage={handleSubmitNewMessage}
-            loadingState={loadingState}
-          />
-        </div>
-      )}
+      <div className="w-full p-4">
+        <ChatInput
+          userTextFieldInput={userTextFieldInput ?? ''}
+          setUserTextFieldInput={setUserTextFieldInput}
+          handleSubmitNewMessage={handleSubmitNewMessage}
+          loadingState={loadingState}
+        />
+      </div>
     </div>
   )
 }

@@ -3,10 +3,12 @@ import { useDebouncedCallback } from 'use-debounce'
 import { useChatContext } from '../../contexts/ChatContext'
 import { useContentContext } from '@/contexts/ContentContext'
 import { shortcuts } from './shortcutDefinitions'
+import { useModalOpeners } from '@/contexts/ModalContext'
 
 function useAppShortcuts() {
   const { setSidebarShowing, openNewChat } = useChatContext()
   const { createUntitledNote } = useContentContext()
+  const { setIsNewDirectoryModalOpen } = useModalOpeners()
 
   const handleShortcut = useCallback(
     (action: string) => {
@@ -15,7 +17,7 @@ function useAppShortcuts() {
           createUntitledNote()
           break
         case 'open-new-directory-modal':
-          window.dispatchEvent(new CustomEvent('open-new-directory-modal'))
+          setIsNewDirectoryModalOpen(true)
           break
         case 'open-search':
           setSidebarShowing('search')
@@ -31,7 +33,7 @@ function useAppShortcuts() {
           break
       }
     },
-    [createUntitledNote, setSidebarShowing, openNewChat],
+    [createUntitledNote, setSidebarShowing, openNewChat, setIsNewDirectoryModalOpen],
   )
 
   const handleShortcutRef = useRef(handleShortcut)

@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { PiSidebar, PiSidebarFill } from 'react-icons/pi'
+import { PiSidebarFill } from 'react-icons/pi'
 import FileHistoryNavigator from './NavigationButtons'
 import ExternalLink from '../Common/ExternalLink'
+import { useChatContext } from '@/contexts/ChatContext'
 
 export const titleBarHeight = '30px'
 
-interface TitleBarProps {
-  similarFilesOpen: boolean
-  toggleSimilarFiles: () => void
-}
-
-const TitleBar: React.FC<TitleBarProps> = ({ similarFilesOpen, toggleSimilarFiles }) => {
+const TitleBar: React.FC = () => {
+  const { setShowChatbot } = useChatContext()
   const [platform, setPlatform] = useState('')
 
   useEffect(() => {
@@ -35,22 +32,12 @@ const TitleBar: React.FC<TitleBarProps> = ({ similarFilesOpen, toggleSimilarFile
         <ExternalLink href="https://forms.gle/8H4GtEcE6MBnNAUa7" className="decoration-gray-200">
           <span className="mr-2 cursor-pointer text-sm text-gray-200 hover:text-gray-300">Feedback</span>
         </ExternalLink>
-        {similarFilesOpen ? (
-          <PiSidebarFill
-            className="electron-no-drag mt-[0.2rem] -scale-x-100 cursor-pointer text-gray-100"
-            size={22}
-            title="Hide Similar Files"
-            onClick={toggleSimilarFiles}
-          />
-        ) : (
-          <PiSidebar
-            id="titleBarSimilarFiles"
-            className="electron-no-drag mt-[0.2rem] -scale-x-100 cursor-pointer text-gray-100"
-            size={22}
-            onClick={toggleSimilarFiles}
-            title="Show Similar Files"
-          />
-        )}
+        <PiSidebarFill
+          className="electron-no-drag mt-[0.2rem] -scale-x-100 cursor-pointer text-gray-100"
+          size={22}
+          title="Hide Similar Files"
+          onClick={() => setShowChatbot((show) => !show)}
+        />
       </div>
     </div>
   )

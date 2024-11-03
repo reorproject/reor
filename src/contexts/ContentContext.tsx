@@ -6,6 +6,8 @@ import { useFileContext } from './FileContext'
 import { getFilesInDirectory, getNextAvailableFileNameGivenBaseName } from '@/lib/file'
 
 interface ContentContextType {
+  showEditor: boolean
+  setShowEditor: (showEditor: boolean) => void
   openContent: (pathOrChatID: string, optionalContentToWriteOnCreate?: string, dontUpdateChatHistory?: boolean) => void
   currentOpenFileOrChatID: string | null
   createUntitledNote: (parentFileOrDirectory?: string) => void
@@ -26,6 +28,7 @@ interface ContentProviderProps {
 }
 
 export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) => {
+  const [showEditor, setShowEditor] = useState(false)
   const [currentOpenFileOrChatID, setCurrentOpenFileOrChatID] = useState<string | null>(null)
 
   const { allChatsMetadata, setShowChatbot, openNewChat } = useChatContext()
@@ -44,7 +47,7 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
         setShowChatbot(true)
         openNewChat(pathOrChatID)
       } else {
-        setShowChatbot(false)
+        setShowEditor(true)
         openOrCreateFile(pathOrChatID, optionalContentToWriteOnCreate)
       }
       setCurrentOpenFileOrChatID(pathOrChatID)
@@ -74,11 +77,13 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
 
   const ContentContextMemo = useMemo(
     () => ({
+      showEditor,
+      setShowEditor,
       openContent,
       currentOpenFileOrChatID,
       createUntitledNote,
     }),
-    [openContent, currentOpenFileOrChatID, createUntitledNote],
+    [showEditor, openContent, currentOpenFileOrChatID, createUntitledNote],
   )
 
   return <ContentContext.Provider value={ContentContextMemo}>{children}</ContentContext.Provider>

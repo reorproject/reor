@@ -28,14 +28,13 @@ import {
   getNextAvailableFileNameGivenBaseName,
   sortFilesAndDirectories,
 } from '@/lib/file'
-import { BacklinkExtension } from '@/components/Editor/BacklinkExtension'
 import { SuggestionsState } from '@/components/Editor/BacklinkSuggestionsDisplay'
 import HighlightExtension, { HighlightData } from '@/components/Editor/HighlightExtension'
 import { RichTextLink } from '@/components/Editor/RichTextLink'
 import '@/styles/tiptap.scss'
 import SearchAndReplace from '@/components/Editor/Search/SearchAndReplaceExtension'
 import getMarkdown from '@/components/Editor/utils'
-import useOrderedSet from './hooks/use-ordered-set'
+import useOrderedSet from '../lib/hooks/use-ordered-set'
 import welcomeNote from '@/lib/welcome-note'
 
 type FileContextType = {
@@ -194,7 +193,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         linkOnPaste: true,
         openOnClick: true,
       }),
-      BacklinkExtension(setSuggestionsState),
       CharacterCount,
     ],
   })
