@@ -1,19 +1,29 @@
-/* eslint-disable react/prop-types */
-/* eslint-disable react/button-has-type */
 /* eslint-disable jsx-a11y/control-has-associated-label */
-/* eslint-disable react/react-in-jsx-scope */
+import React from 'react'
 import { X, Maximize2 } from 'lucide-react'
 
-const WindowControls: React.FC<{
+interface WindowControlsProps {
   onClose: () => void
   onMaximize: () => void
-}> = ({ onClose, onMaximize }) => (
+}
+
+const WindowControls = ({ onClose, onMaximize }: WindowControlsProps) => (
   <div className="group absolute right-2 top-2 z-10 transition-opacity hover:opacity-100">
     <div className="flex">
-      <button onClick={onMaximize} className="cursor-pointer bg-transparent p-1.5 transition-colors" title="Maximize">
+      <button
+        type="button"
+        onClick={onMaximize}
+        className="cursor-pointer bg-transparent p-1.5 transition-colors"
+        title="Maximize"
+      >
         <Maximize2 className="size-3 text-neutral-400 hover:text-neutral-300" />
       </button>
-      <button onClick={onClose} className="cursor-pointer bg-transparent p-1.5 transition-colors" title="Close">
+      <button
+        type="button"
+        onClick={onClose}
+        className="cursor-pointer bg-transparent p-1.5 transition-colors"
+        title="Close"
+      >
         <X className="size-3 text-neutral-400 hover:text-neutral-300" />
       </button>
     </div>
