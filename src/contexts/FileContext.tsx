@@ -28,7 +28,6 @@ import {
   getNextAvailableFileNameGivenBaseName,
   sortFilesAndDirectories,
 } from '@/lib/file'
-import { BacklinkExtension } from '@/components/Editor/BacklinkExtension'
 import { SuggestionsState } from '@/components/Editor/BacklinkSuggestionsDisplay'
 import HighlightExtension, { HighlightData } from '@/components/Editor/HighlightExtension'
 import { RichTextLink } from '@/components/Editor/RichTextLink'
@@ -194,7 +193,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         linkOnPaste: true,
         openOnClick: true,
       }),
-      BacklinkExtension(setSuggestionsState),
       CharacterCount,
     ],
   })
