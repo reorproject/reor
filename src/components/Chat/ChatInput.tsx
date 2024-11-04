@@ -4,8 +4,6 @@ import { PiPaperPlaneRight } from 'react-icons/pi'
 import { AgentConfig, LoadingState } from '../../lib/llm/types'
 import { Button } from '../ui/button'
 import LLMSelectOrButton from '../Settings/LLMSettings/LLMSelectOrButton'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
-import { allAvailableToolDefinitions } from '@/lib/llm/tools/tool-definitions'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 
@@ -52,7 +50,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   return (
     <div className="flex w-full">
       <div className="z-50 flex w-full flex-col overflow-hidden rounded border-2 border-solid border-border bg-background focus-within:ring-1 focus-within:ring-ring">
-        <Select value={selectedLLM}>
+        {/* <Select value={selectedLLM}>
           <SelectTrigger className="h-7 w-32 border-0 text-[10px] text-gray-300 focus:ring-0 focus:ring-offset-0">
             <SelectValue placeholder="Tools" />
           </SelectTrigger>
@@ -67,7 +65,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
               </SelectItem>
             ))}
           </SelectContent>
-        </Select>
+        </Select> */}
         <textarea
           value={userTextFieldInput}
           onKeyDown={(e) => {
@@ -92,7 +90,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           <div className="flex items-center">
             <div className="mr-[-8px] flex flex-col">
               <Switch
-                id="stream-mode"
+                id="search-notes"
                 checked={!!agentConfig?.dbSearchFilters}
                 onCheckedChange={handleDbSearchToggle}
                 className="scale-[0.6]"

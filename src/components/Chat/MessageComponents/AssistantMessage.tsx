@@ -4,11 +4,7 @@ import { toast } from 'react-toastify'
 import { ToolCallPart } from 'ai'
 import { FaRegCopy } from 'react-icons/fa'
 import { Chat, ReorChatMessage } from '../../../lib/llm/types'
-import {
-  extractMessagePartsFromAssistantMessage,
-  findToolResultMatchingToolCall,
-  getClassNameBasedOnMessageRole,
-} from '../../../lib/llm/chat'
+import { extractMessagePartsFromAssistantMessage, findToolResultMatchingToolCall } from '../../../lib/llm/chat'
 import { ToolCallComponent } from './ToolCalls'
 import { useContentContext } from '@/contexts/ContentContext'
 import { useChatContext } from '@/contexts/ChatContext'
@@ -74,15 +70,15 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
           <div>
             {/* eslint-disable-next-line react/no-array-index-key */}
             <MarkdownRenderer key={index} content={text} />
-            <div className="mt-2 flex">
+            <div className="mt-0 flex">
               <div
-                className="cursor-pointer items-center justify-center rounded p-1 hover:bg-neutral-700"
+                className="cursor-pointer items-center justify-center rounded px-1 hover:bg-neutral-700"
                 onClick={copyToClipboard}
               >
                 <FaRegCopy color="gray" size={16} className="text-gray-200" title="Copy" />
               </div>
               <div
-                className="cursor-pointer items-center justify-center rounded p-1 hover:bg-neutral-700"
+                className="cursor-pointer items-center justify-center rounded px-1 hover:bg-neutral-700"
                 onClick={createNewNoteFromMessage}
               >
                 <HiOutlinePencilAlt color="gray" size={18} className="text-gray-200" title="New Note" />
@@ -103,7 +99,7 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
   }
 
   return (
-    <div className={`w-full ${getClassNameBasedOnMessageRole(message)} mb-4 flex`}>
+    <div className="mb-7 flex w-full text-[0.94rem] leading-[1.2rem] text-[rgb(210,210,210)] ">
       <div className="w-full flex-col gap-1">
         <div className="flex grow flex-col ">{renderContent()}</div>
       </div>

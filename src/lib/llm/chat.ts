@@ -214,10 +214,6 @@ export const appendToOrCreateChat = async (
   return outputChat
 }
 
-export const getClassNameBasedOnMessageRole = (message: ReorChatMessage): string => {
-  return `markdown-content ${message.role}-chat-message`
-}
-
 export const getDisplayMessage = (message: ReorChatMessage): string | undefined => {
   if (message.hideMessage) {
     return undefined
