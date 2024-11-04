@@ -76,8 +76,8 @@ const electronStore = {
   setEditorFlexCenter: createIPCHandler<(editorFlexCenter: boolean) => Promise<void>>('set-editor-flex-center'),
   getAgentConfigs: createIPCHandler<() => Promise<AgentConfig[]>>('get-agent-configs'),
   setAgentConfig: createIPCHandler<(agentConfig: AgentConfig) => Promise<void>>('set-agent-config'),
-  setAutoContext: (value: boolean) => ipcRenderer.invoke('set-auto-context', value),
-  getAutoContext: () => ipcRenderer.invoke('get-auto-context'),
+  setAutoContext: createIPCHandler<(value: boolean) => Promise<void>>('set-auto-context'),
+  getAutoContext: createIPCHandler<() => Promise<boolean>>('get-auto-context'),
 }
 
 const fileSystem = {
