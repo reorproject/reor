@@ -15,6 +15,7 @@ import {
   GetFilesInfoListForListOfPaths,
   startWatchingDirectory,
   updateFileListForRenderer,
+  searchFiles,
 } from './filesystem'
 import { FileInfoTree, WriteFileProps, RenameFileProps, FileInfoWithContent } from './types'
 
@@ -192,6 +193,10 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
       return result.filePaths
     }
     return []
+  })
+
+  ipcMain.handle('search-files', async (_event, searchTerm: string) => {
+    return searchFiles(store, searchTerm)
   })
 }
 

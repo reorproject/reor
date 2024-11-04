@@ -93,6 +93,7 @@ const fileSystem = {
   moveFileOrDir: createIPCHandler<(sourcePath: string, destinationPath: string) => Promise<void>>('move-file-or-dir'),
   getAllFilenamesInDirectory: createIPCHandler<(dirName: string) => Promise<string[]>>('get-files-in-directory'),
   getFiles: createIPCHandler<(filePaths: string[]) => Promise<FileInfoWithContent[]>>('get-files'),
+  searchFiles: createIPCHandler<(searchTerm: string) => Promise<string[]>>('search-files'),
 }
 
 const path = {

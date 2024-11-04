@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState, useRef } from 'react'
 import { PiPaperPlaneRight } from 'react-icons/pi'
 import { FiSettings } from 'react-icons/fi'
 import { LLMConfig } from 'electron/main/electron-store/storeConfig'
@@ -24,6 +24,7 @@ import { allAvailableToolDefinitions } from '@/lib/llm/tools/tool-definitions'
 import ToolSelector from './ChatConfigComponents/ToolSelector'
 import SuggestionCard from '../ui/suggestion-card'
 import LLMSelectOrButton from '../Settings/LLMSettings/LLMSelectOrButton'
+import FileAutocomplete from './FileAutocomplete'
 
 interface StartChatProps {
   defaultModelName: string
@@ -40,6 +41,10 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
     'Summarize my recent notes on machine learning',
     'Based on what I wrote last week, which tasks should I focus on this week?',
   ])
+  const [showFileAutocomplete, setShowFileAutocomplete] = useState(false)
+  const [autocompletePosition, setAutocompletePosition] = useState({ top: 0, left: 0 })
+  const [searchTerm, setSearchTerm] = useState('')
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   useEffect(() => {
     const fetchAgentConfigs = async () => {
@@ -102,6 +107,82 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
     })
   }
 
+  const getCaretCoordinates = (element: HTMLTextAreaElement) => {
+    const { selectionStart, value } = element
+    const textBeforeCaret = value.substring(0, selectionStart)
+
+    // Create a hidden div with the same styling as textarea
+    const mirror = document.createElement('div')
+    mirror.style.cssText = window.getComputedStyle(element).cssText
+    mirror.style.height = 'auto'
+    mirror.style.position = 'absolute'
+    mirror.style.visibility = 'hidden'
+    mirror.style.whiteSpace = 'pre-wrap'
+    document.body.appendChild(mirror)
+
+    // Create a span for the text before caret
+    const textNode = document.createTextNode(textBeforeCaret)
+    const span = document.createElement('span')
+    span.appendChild(textNode)
+    mirror.appendChild(span)
+
+    // Get coordinates
+    const coordinates = {
+      top: span.offsetTop + parseInt(window.getComputedStyle(element).lineHeight, 10) / 2,
+      left: span.offsetLeft,
+    }
+
+    // Clean up
+    document.body.removeChild(mirror)
+
+    return coordinates
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (!e.shiftKey && e.key === 'Enter') {
+      e.preventDefault()
+      sendMessageHandler()
+    } else if (e.key === '@') {
+      const rect = e.currentTarget.getBoundingClientRect()
+      const position = getCaretCoordinates(e.currentTarget)
+      setAutocompletePosition({
+        top: rect.top + position.top,
+        left: rect.left + position.left,
+      })
+      setShowFileAutocomplete(true)
+    } else if (showFileAutocomplete && e.key === 'Escape') {
+      setShowFileAutocomplete(false)
+    }
+  }
+
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { value } = e.target
+    setUserTextFieldInput(value)
+
+    // Handle @ mentions
+    const lastAtIndex = value.lastIndexOf('@')
+    if (lastAtIndex !== -1 && lastAtIndex < value.length) {
+      const searchText = value.slice(lastAtIndex + 1).split(/\s/)[0]
+      setSearchTerm(searchText)
+    } else {
+      setShowFileAutocomplete(false)
+    }
+
+    // Adjust textarea height
+    e.target.style.height = 'auto'
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 160)}px`
+  }
+
+  const handleFileSelect = (filePath: string) => {
+    const lastAtIndex = userTextFieldInput.lastIndexOf('@')
+    const newValue = `${userTextFieldInput.slice(0, lastAtIndex)}@${filePath} ${userTextFieldInput.slice(
+      lastAtIndex + searchTerm.length + 1,
+    )}`
+
+    setUserTextFieldInput(newValue)
+    setShowFileAutocomplete(false)
+  }
+
   if (!agentConfig) return <div>Loading...</div>
 
   return (
@@ -125,18 +206,20 @@ const StartChat: React.FC<StartChatProps> = ({ defaultModelName, handleNewChatMe
           <div className="flex flex-col">
             <div className="z-50 flex flex-col overflow-hidden rounded border-2 border-solid border-border bg-background focus-within:ring-1 focus-within:ring-ring">
               <textarea
+                ref={textareaRef}
                 value={userTextFieldInput}
-                onKeyDown={(e) => {
-                  if (!e.shiftKey && e.key === 'Enter') {
-                    e.preventDefault()
-                    sendMessageHandler()
-                  }
-                }}
+                onKeyDown={handleKeyDown}
+                onChange={handleInput}
                 className="h-[100px] w-[600px] resize-none border-0 bg-transparent p-4 text-foreground caret-current focus:outline-none"
-                placeholder="What can Reor help you with today?"
-                onChange={(e) => setUserTextFieldInput(e.target.value)}
+                placeholder="Type @ to reference files..."
                 // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
+              />
+              <FileAutocomplete
+                searchTerm={searchTerm}
+                position={autocompletePosition}
+                onSelect={handleFileSelect}
+                visible={showFileAutocomplete}
               />
               <div className="mx-auto h-px w-[96%] bg-background/20" />
               <div className="flex h-10 flex-col items-center justify-between gap-2  py-2 md:flex-row md:gap-4">

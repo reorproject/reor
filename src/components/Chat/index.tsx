@@ -16,6 +16,13 @@ import StartChat from './StartChat'
 import resolveLLMClient from '@/lib/llm/client'
 import { appendToolCallsAndAutoExecuteTools, convertToolConfigToZodSchema } from '../../lib/llm/tools/utils'
 
+const extractFileReferences = (message: string): string[] => {
+  const regex = /@([^@]+?\.md)/g
+  const matches = message.match(regex)
+  // console.log('matches', matches)
+  return matches ? matches.map((match) => match.slice(1)) : []
+}
+
 const ChatComponent: React.FC = () => {
   const [loadingState, setLoadingState] = useState<LoadingState>('idle')
   const [defaultModelName, setDefaultLLMName] = useState<string>('')
@@ -49,12 +56,25 @@ const ChatComponent: React.FC = () => {
           return
         }
 
-        outputChat = userTextFieldInput?.trim() ? await updateOrCreateChat(chat, userTextFieldInput, agentConfig) : chat
+        // Extract file references from the message
+        const fileRefs = extractFileReferences(userTextFieldInput || '')
+        // console.log('fileRefs', fileRefs)
+
+        // Create or update chat with file context
+        outputChat = userTextFieldInput?.trim()
+          ? await updateOrCreateChat(chat, userTextFieldInput, {
+              name: agentConfig?.name || 'default',
+              ...agentConfig,
+              toolDefinitions: agentConfig?.toolDefinitions || [],
+              promptTemplate: agentConfig?.promptTemplate || [],
+              files: fileRefs,
+            })
+          : chat
 
         if (!outputChat) {
           return
         }
-
+        // console.log('outputChat', outputChat)
         setCurrentChat(outputChat)
         await saveChat(outputChat)
 
