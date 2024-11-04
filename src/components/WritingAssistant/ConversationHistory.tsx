@@ -22,6 +22,8 @@ interface ConversationHistoryProps {
   isNewConversation: boolean
   // prompts: { option?: string; customPromptInput?: string }[]
   loadingResponse: boolean
+  autoContext: boolean
+  setAutoContext: (value: boolean) => void
 }
 
 const ConversationHistory: React.FC<ConversationHistoryProps> = ({
@@ -41,6 +43,8 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
   isNewConversation,
   // prompts,
   loadingResponse,
+  autoContext,
+  setAutoContext,
 }) => {
   const bottomRef = useRef<HTMLDivElement>(null)
   // const [currentPrompt, setCurrentPrompt] = useState<{ option?: string; customPromptInput?: string }>({})
@@ -55,28 +59,44 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
   // }, [prompts, currentIndex])
 
   const currentConversation = isNewConversation
-    ? [history[history.length - 1]]
-    : history.slice(currentIndex, currentIndex + 2)
+    ? history.slice(-1)
+    : history.slice(currentIndex, currentIndex + 2).filter(Boolean)
 
   return (
     <div className="mt-4 flex flex-col" style={{ height: markdownMaxHeight }}>
-      <div className="mb-2 flex justify-between">
-        <button
-          onClick={() => onNavigate('prev')}
-          disabled={currentIndex === 0 || isNewConversation}
-          className="rounded bg-gray-200 px-2 py-1"
-          type="button"
-        >
-          Previous
-        </button>
-        <button
-          onClick={() => onNavigate('next')}
-          disabled={currentIndex >= history.length - 2 || isNewConversation}
-          className="rounded bg-gray-200 px-2 py-1"
-          type="button"
-        >
-          Next
-        </button>
+      <div className="flex items-center justify-between border-b border-gray-200 pb-2">
+        <div className="flex items-center gap-2">
+          <label htmlFor="autoContextCheckbox" className="flex items-center">
+            <input
+              type="checkbox"
+              id="autoContextCheckbox"
+              checked={autoContext}
+              onChange={(e) => setAutoContext(e.target.checked)}
+              className="h-4 w-4 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-1 focus:ring-indigo-500/30"
+            />
+            <span className="ml-2 select-none text-xs text-gray-400">
+              Use File Content (If no text selected)
+            </span>
+          </label>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => onNavigate('prev')}
+            disabled={currentIndex === 0 || isNewConversation}
+            className="rounded bg-gray-200 px-2 py-1"
+            type="button"
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => onNavigate('next')}
+            disabled={currentIndex >= history.length - 2 || isNewConversation}
+            className="rounded bg-gray-200 px-2 py-1"
+            type="button"
+          >
+            Next
+          </button>
+        </div>
       </div>
       <div className="grow overflow-y-auto pr-2 scrollbar-thin scrollbar-track-gray-200 scrollbar-thumb-gray-400">
         {currentConversation.map(

@@ -61,6 +61,7 @@ export interface StoreSchema {
   spellCheck: string
   EditorFlexCenter: boolean
   showDocumentStats: boolean
+  autoContext: boolean
 }
 
 export enum StoreKeys {
@@ -82,4 +83,5 @@ export enum StoreKeys {
   SpellCheck = 'spellCheck',
   EditorFlexCenter = 'editorFlexCenter',
   showDocumentStats = 'showDocumentStats',
+  AutoContext = 'autoContext',
 }

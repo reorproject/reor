@@ -34,6 +34,7 @@ const WritingAssistant: React.FC = () => {
   // const [prompts, setPrompts] = useState<{ option?: string; customPromptInput?: string }[]>([])
 
   const { editor, highlightData } = useFileContext()
+  const [autoContext, setAutoContext] = useState<boolean>(true)
 
   useOutsideClick(markdownContainerRef, () => {
     setMessages([])
@@ -138,23 +139,48 @@ const WritingAssistant: React.FC = () => {
   }, [editor])
 
   useEffect(() => {
-    if (editor && isSpaceTrigger && spacePosition !== null) {
-      const checkSpacePresence = () => {
-        const currentContent = editor.state.doc.textBetween(spacePosition, spacePosition + 1)
-        if (currentContent !== ' ') {
-          setIsOptionsVisible(false)
-          setIsSpaceTrigger(false)
-          setSpacePosition(null)
+    if (!editor || !isSpaceTrigger || spacePosition === null) {
+      return undefined
+    }
+
+    const resetSpaceTrigger = () => {
+      setIsOptionsVisible(false)
+      setIsSpaceTrigger(false)
+      setSpacePosition(null)
+    }
+
+    const checkSpacePresence = () => {
+      try {
+        if (!editor.state?.doc) {
+          resetSpaceTrigger()
+          return
         }
-      }
 
-      editor.on('update', checkSpacePresence)
+        const { from } = editor.state.selection
 
-      return () => {
-        editor.off('update', checkSpacePresence)
+        if (from !== spacePosition) {
+          resetSpaceTrigger()
+          return
+        }
+
+        const $pos = editor.state.doc.resolve(from)
+        if (!$pos?.parent?.textContent?.startsWith(' ')) {
+          resetSpaceTrigger()
+        }
+      } catch (error) {
+        resetSpaceTrigger()
       }
     }
-    return () => {}
+
+    const handler = () => {
+      requestAnimationFrame(checkSpacePresence)
+    }
+
+    editor.on('update', handler)
+
+    return () => {
+      editor.off('update', handler)
+    }
   }, [editor, isSpaceTrigger, spacePosition])
 
   useEffect(() => {
@@ -179,6 +205,14 @@ const WritingAssistant: React.FC = () => {
       document.removeEventListener('keydown', handleEscKey)
     }
   }, [editor, cursorPosition])
+
+  useEffect(() => {
+    const loadAutoContext = async () => {
+      const savedAutoContext = await window.electronStore.getAutoContext()
+      setAutoContext(savedAutoContext)
+    }
+    loadAutoContext()
+  }, [])
 
   const copyToClipboard = () => {
     const assistantMessage = messages[currentConversationIndex + 1]
@@ -213,9 +247,12 @@ const WritingAssistant: React.FC = () => {
     if (!assistantMessage || assistantMessage.role !== 'assistant' || !editor) return
 
     const replacementText = assistantMessage.visibleContent || assistantMessage.content
-
     if (replacementText) {
-      editor.chain().focus().deleteSelection().insertContent(replacementText).run()
+      if (highlightData.text) {
+        editor.chain().focus().deleteSelection().insertContent(replacementText).run()
+      } else if (autoContext) {
+        editor.chain().focus().selectAll().deleteSelection().insertContent(replacementText).run()
+      }
     }
 
     setMessages([])
@@ -260,6 +297,9 @@ const WritingAssistant: React.FC = () => {
 
   const handleOption = async (option: string, customPromptInput?: string) => {
     let selectedText = highlightData.text
+    if (autoContext && !selectedText && editor) {
+      selectedText = editor.state.doc.textBetween(0, editor.state.doc.content.size)
+    }
     if (lastAssistantMessage) {
       selectedText =
         typeof lastAssistantMessage.content === 'string'
@@ -271,6 +311,10 @@ const WritingAssistant: React.FC = () => {
     setIsNewConversation(true)
     setIsOptionsVisible(false)
     await getLLMResponse(prompt)
+  }
+  const handleAutoContextChange = async (value: boolean) => {
+    setAutoContext(value)
+    await window.electronStore.setAutoContext(value)
   }
 
   if (!isSpaceTrigger && !highlightData.position) return null
@@ -429,6 +473,8 @@ const WritingAssistant: React.FC = () => {
             replaceHighlightedText={replaceHighlightedText}
             isNewConversation={isNewConversation}
             loadingResponse={loadingResponse}
+            autoContext={autoContext}
+            setAutoContext={handleAutoContextChange}
           />
         </div>
       )}
