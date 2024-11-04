@@ -72,11 +72,9 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
               id="autoContextCheckbox"
               checked={autoContext}
               onChange={(e) => setAutoContext(e.target.checked)}
-              className="h-4 w-4 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-1 focus:ring-indigo-500/30"
+              className="size-4 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-1 focus:ring-indigo-500/30"
             />
-            <span className="ml-2 select-none text-xs text-gray-400">
-              Use File Content (If no text selected)
-            </span>
+            <span className="ml-2 select-none text-xs text-gray-400">Use File Content (If no text selected)</span>
           </label>
         </div>
         <div className="flex gap-2">
