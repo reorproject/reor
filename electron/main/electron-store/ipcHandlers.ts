@@ -213,6 +213,15 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     chatHistoriesMap[vaultDir] = filteredChatHistories
     store.set(StoreKeys.Chats, chatHistoriesMap)
   })
+
+  ipcMain.handle('set-auto-context', (event, autoContext: boolean) => {
+    store.set(StoreKeys.AutoContext, autoContext)
+    event.sender.send('auto-context-changed', autoContext)
+  })
+
+  ipcMain.handle('get-auto-context', () => {
+    return store.get(StoreKeys.AutoContext, true) // Default to true
+  })
 }
 
 export function getDefaultEmbeddingModelConfig(store: Store<StoreSchema>): EmbeddingModelConfig {
