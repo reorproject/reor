@@ -55,7 +55,7 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({ dbResult: entr
 
   return (
     <div
-      className="mb-4 mt-0 max-w-full cursor-pointer overflow-hidden rounded border border-gray-600 bg-neutral-800 p-2 shadow-md transition-transform duration-300 hover:bg-neutral-500 hover:shadow-lg"
+      className="mb-4 mt-0 max-w-full cursor-pointer overflow-hidden rounded border border-gray-600 bg-neutral-800 p-2 shadow-md transition-transform duration-300 hover:bg-neutral-700 hover:shadow-lg"
       onClick={() => onSelect(entry.notepath)}
     >
       <div className="text-sm text-gray-200">

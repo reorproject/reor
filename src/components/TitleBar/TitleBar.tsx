@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { PiSidebarFill } from 'react-icons/pi'
+import { BsChatLeftDots, BsChatLeftDotsFill } from 'react-icons/bs'
 import FileHistoryNavigator from './NavigationButtons'
 import ExternalLink from '../Common/ExternalLink'
 import { useChatContext } from '@/contexts/ChatContext'
@@ -7,7 +7,7 @@ import { useChatContext } from '@/contexts/ChatContext'
 export const titleBarHeight = '30px'
 
 const TitleBar: React.FC = () => {
-  const { setShowChatbot } = useChatContext()
+  const { showChatbot, setShowChatbot } = useChatContext()
   const [platform, setPlatform] = useState('')
 
   useEffect(() => {
@@ -32,12 +32,21 @@ const TitleBar: React.FC = () => {
         <ExternalLink href="https://forms.gle/8H4GtEcE6MBnNAUa7" className="decoration-gray-200">
           <span className="mr-2 cursor-pointer text-sm text-gray-200 hover:text-gray-300">Feedback</span>
         </ExternalLink>
-        <PiSidebarFill
-          className="electron-no-drag mt-[0.2rem] -scale-x-100 cursor-pointer text-gray-100"
-          size={22}
-          title="Hide Similar Files"
-          onClick={() => setShowChatbot((show) => !show)}
-        />
+        {showChatbot ? (
+          <BsChatLeftDotsFill
+            className="electron-no-drag mr-1 mt-[0.2rem] -scale-x-100 cursor-pointer p-[2px] text-gray-100"
+            size={22}
+            title="Hide Similar Files"
+            onClick={() => setShowChatbot((show) => !show)}
+          />
+        ) : (
+          <BsChatLeftDots
+            className="electron-no-drag mr-1 mt-[0.2rem] -scale-x-100 cursor-pointer p-[2px] text-gray-100"
+            size={22}
+            title="Show Chatbot"
+            onClick={() => setShowChatbot((show) => !show)}
+          />
+        )}
       </div>
     </div>
   )

@@ -7,6 +7,8 @@ import AssistantMessage from './MessageComponents/AssistantMessage'
 import SystemMessage from './MessageComponents/SystemMessage'
 import ChatSources from './MessageComponents/ChatSources'
 import LoadingDots from '@/lib/animations'
+import useLLMConfigs from '@/lib/hooks/use-llm-configs'
+import useAgentConfig from '@/lib/hooks/use-agent-configs'
 
 interface MessageProps {
   message: ReorChatMessage
@@ -41,7 +43,7 @@ interface ChatMessagesProps {
   currentChat: Chat | undefined
   setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
   loadingState: LoadingState
-  handleNewChatMessage: (userTextFieldInput?: string, agentConfig?: AgentConfig) => void
+  handleNewChatMessage: (llmName: string, userTextFieldInput?: string, agentConfig?: AgentConfig) => void
 }
 
 const ChatMessages: React.FC<ChatMessagesProps> = ({
@@ -50,10 +52,17 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   handleNewChatMessage,
   loadingState,
 }) => {
+  const { agentConfig, setAgentConfig } = useAgentConfig()
   const [userTextFieldInput, setUserTextFieldInput] = useState<string | undefined>()
+  const { defaultLLM, setDefaultLLM } = useLLMConfigs()
+  const [selectedLLM, setSelectedLLM] = useState<string>()
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true)
   const chatContainerRef = useRef<HTMLDivElement>(null)
   const lastMessageRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    setSelectedLLM(defaultLLM)
+  }, [defaultLLM])
 
   const scrollToBottom = useCallback(() => {
     if (chatContainerRef.current) {
@@ -78,13 +87,11 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 
   const handleSubmitNewMessage = async () => {
     if (userTextFieldInput) {
-      // this for v1 could just use the default agent config...
-      const agentConfigs = await window.electronStore.getAgentConfigs()
-      if (agentConfigs && agentConfigs.length > 0) {
-        handleNewChatMessage(userTextFieldInput, agentConfigs[0])
-      } else {
-        handleNewChatMessage(userTextFieldInput)
+      if (!selectedLLM) {
+        throw new Error('Select an LLM.')
       }
+      setDefaultLLM(selectedLLM)
+      handleNewChatMessage(selectedLLM, userTextFieldInput, agentConfig)
       setUserTextFieldInput('')
       setShouldAutoScroll(true)
     }
@@ -134,6 +141,10 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
           setUserTextFieldInput={setUserTextFieldInput}
           handleSubmitNewMessage={handleSubmitNewMessage}
           loadingState={loadingState}
+          selectedLLM={selectedLLM}
+          setSelectedLLM={setSelectedLLM}
+          agentConfig={agentConfig}
+          setAgentConfig={setAgentConfig}
         />
       </div>
     </div>

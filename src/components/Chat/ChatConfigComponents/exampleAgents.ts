@@ -14,7 +14,7 @@ Here are some guidelines you must follow:
   },
   {
     role: 'user',
-    content: `{QUERY}`,
+    content: `The user's query is: {QUERY}`,
   },
 ]
 
@@ -65,7 +65,7 @@ const exampleAgents: AgentConfig[] = [
     files: [],
     name: 'Default',
     dbSearchFilters: {
-      limit: 30,
+      limit: 20,
       minDate: undefined,
       maxDate: undefined,
       passFullNoteIntoContext: true,
