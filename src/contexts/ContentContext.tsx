@@ -31,7 +31,7 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
   const [showEditor, setShowEditor] = useState(false)
   const [currentOpenFileOrChatID, setCurrentOpenFileOrChatID] = useState<string | null>(null)
 
-  const { allChatsMetadata, setShowChatbot, openNewChat } = useChatContext()
+  const { allChatsMetadata, openNewChat } = useChatContext()
   const {
     vaultFilesFlattened: flattenedFiles,
     openOrCreateFile,
@@ -44,7 +44,6 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
       if (!pathOrChatID) return
       const chatMetadata = allChatsMetadata.find((chat) => chat.id === pathOrChatID)
       if (chatMetadata) {
-        setShowChatbot(true)
         openNewChat(pathOrChatID)
       } else {
         setShowEditor(true)
@@ -55,7 +54,7 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
         addToNavigationHistory(pathOrChatID)
       }
     },
-    [allChatsMetadata, setShowChatbot, openNewChat, openOrCreateFile, addToNavigationHistory],
+    [allChatsMetadata, openNewChat, openOrCreateFile, addToNavigationHistory],
   )
 
   const createUntitledNote = useCallback(
