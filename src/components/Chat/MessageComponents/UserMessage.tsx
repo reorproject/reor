@@ -8,17 +8,29 @@ interface UserMessageProps {
   message: ReorChatMessage
 }
 
-const UserMessage: React.FC<UserMessageProps> = ({ message }) => (
-  <div className="mb-0 w-full flex-col gap-1">
-    <div className="flex grow flex-col">
-      <ReactMarkdown
-        rehypePlugins={[rehypeRaw]}
-        className="max-w-[95%] break-words text-2xl font-bold text-neutral-400"
-      >
-        {getDisplayMessage(message)}
-      </ReactMarkdown>
+const UserMessage: React.FC<UserMessageProps> = ({ message }) => {
+  const displayMessage = getDisplayMessage(message)
+  const messageLength = displayMessage?.length || 0
+
+  // Determine font size class based on message length
+  const getFontSizeClass = () => {
+    if (messageLength > 100) return 'text-lg'
+    if (messageLength > 50) return 'text-xl'
+    return 'text-2xl'
+  }
+
+  return (
+    <div className="mb-0 w-full flex-col gap-1">
+      <div className="flex grow flex-col">
+        <ReactMarkdown
+          rehypePlugins={[rehypeRaw]}
+          className={`max-w-[95%] break-words font-bold text-neutral-400 ${getFontSizeClass()}`}
+        >
+          {displayMessage}
+        </ReactMarkdown>
+      </div>
     </div>
-  </div>
-)
+  )
+}
 
 export default UserMessage

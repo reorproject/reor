@@ -8,7 +8,7 @@ import '../../styles/history.scss'
 import { useFileContext } from '@/contexts/FileContext'
 import { useContentContext } from '@/contexts/ContentContext'
 
-const FileHistoryNavigator: React.FC = () => {
+const NavigationButtons: React.FC = () => {
   const [showMenu, setShowMenu] = useState<string>('')
   const longPressTimer = useRef<NodeJS.Timeout | null>(null)
   const buttonRefBack = useRef<HTMLButtonElement>(null)
@@ -160,4 +160,4 @@ const FileHistoryNavigator: React.FC = () => {
   )
 }
 
-export default FileHistoryNavigator
+export default NavigationButtons

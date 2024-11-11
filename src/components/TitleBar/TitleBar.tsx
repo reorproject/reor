@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { BsChatLeftDots, BsChatLeftDotsFill } from 'react-icons/bs'
-import FileHistoryNavigator from './NavigationButtons'
+import NavigationButtons from './NavigationButtons'
 import ExternalLink from '../Common/ExternalLink'
 import { useChatContext } from '@/contexts/ChatContext'
 
@@ -22,7 +22,7 @@ const TitleBar: React.FC = () => {
   return (
     <div className="electron-drag flex justify-between bg-[#303030]">
       <div className="mt-px flex" style={platform === 'darwin' ? { marginLeft: '65px' } : { marginLeft: '2px' }}>
-        <FileHistoryNavigator />
+        <NavigationButtons />
       </div>
 
       <div
