@@ -369,17 +369,17 @@ const WritingAssistant: React.FC = () => {
           </Button>
         </div>
         <div className="mt-2 flex items-center">
-      <label htmlFor="autoContextCheckbox" className="flex items-center">
-        <input
-          type="checkbox"
-          id="autoContextCheckbox"
-          checked={autoContext}
-          onChange={(e) => handleAutoContextChange(e.target.checked)}
-          className="size-4 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-1 focus:ring-indigo-500/30"
-        />
-        <span className="ml-2 select-none text-xs text-gray-400">Use File Content (If no text selected)</span>
-      </label>
-    </div>
+          <label htmlFor="autoContextCheckbox" className="flex items-center">
+            <input
+              type="checkbox"
+              id="autoContextCheckbox"
+              checked={autoContext}
+              onChange={(e) => handleAutoContextChange(e.target.checked)}
+              className="size-4 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-1 focus:ring-indigo-500/30"
+            />
+            <span className="ml-2 select-none text-xs text-gray-400">Use File Content (If no text selected)</span>
+          </label>
+        </div>
       </div>
     )
   return (

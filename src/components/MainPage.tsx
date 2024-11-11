@@ -47,7 +47,7 @@ const MainContent: React.FC = () => {
 
 const MainPageContent: React.FC = () => {
   const { currentlyOpenFilePath } = useFileContext()
-  const { showChatbot, setShowChatbot } = useChatContext()
+  const { showChatbot, setShowChatbot, openNewChat } = useChatContext()
   const { setShowEditor, showEditor } = useContentContext()
   const { getShortcutDescription } = useAppShortcuts()
 
@@ -57,7 +57,7 @@ const MainPageContent: React.FC = () => {
     <div className="relative flex h-screen flex-col overflow-hidden">
       <TitleBar />
       <div className="flex min-h-0 flex-1">
-        <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5">
+        <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700">
           <IconsSidebar getShortcutDescription={getShortcutDescription} />
         </div>
 
@@ -85,7 +85,11 @@ const MainPageContent: React.FC = () => {
                   {showChatbot && (
                     <ResizablePanel defaultSize={currentlyOpenFilePath && showEditor ? 35 : 100}>
                       <div className="relative size-full bg-pink-200">
-                        <WindowControls onClose={() => setShowChatbot(false)} onMaximize={() => setShowEditor(false)} />
+                        <WindowControls
+                          onClose={() => setShowChatbot(false)}
+                          onMaximize={() => setShowEditor(false)}
+                          onNewChat={() => openNewChat()}
+                        />
                         <ChatComponent />
                       </div>
                     </ResizablePanel>
