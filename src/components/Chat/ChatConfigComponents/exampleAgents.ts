@@ -8,13 +8,11 @@ const defaultAgentPromptTemplate: PromptTemplate = [
 Here are some guidelines you must follow:
 - Always respond in the same language as the user's query and context.
 - You may be given context from the user's knowledge base that is relevant to the user's query. If so, please use it.
-- You may be given a list of tools that you can use to help you search the user's knowledge base or perform actions on the user's knowledge base.
-- If provided to you, the search tool is particularly useful, although you should *not* use it initially if context has already been provided.
 - The date and time of the query is {TODAY}.`,
   },
   {
     role: 'user',
-    content: `The user's query is: {QUERY}`,
+    content: `{QUERY}`,
   },
 ]
 

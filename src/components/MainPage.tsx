@@ -57,7 +57,7 @@ const MainPageContent: React.FC = () => {
     <div className="relative flex h-screen flex-col overflow-hidden">
       <TitleBar />
       <div className="flex min-h-0 flex-1">
-        <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700 pt-2.5">
+        <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700">
           <IconsSidebar getShortcutDescription={getShortcutDescription} />
         </div>
 
