@@ -59,7 +59,7 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
     : history.slice(currentIndex, currentIndex + 2)
 
   return (
-    <div className="mt-4 flex flex-col" style={{ height: markdownMaxHeight }}>
+    <div className="mt-4 flex flex-col" style={{ maxHeight: markdownMaxHeight }}>
       <div className="mb-2 flex justify-between">
         <button
           onClick={() => onNavigate('prev')}
