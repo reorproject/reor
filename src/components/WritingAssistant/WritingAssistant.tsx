@@ -19,7 +19,7 @@ const WritingAssistant: React.FC = () => {
   const [isOptionsVisible, setIsOptionsVisible] = useState<boolean>(false)
   const [prevPrompt, setPrevPrompt] = useState<string>('')
   const [positionStyle, setPositionStyle] = useState({ top: 0, left: 0 })
-  const [markdownMaxHeight, setMarkdownMaxHeight] = useState('auto')
+  // const [markdownMaxHeight, setMarkdownMaxHeight] = useState('auto')
   const [isSpaceTrigger, setIsSpaceTrigger] = useState<boolean>(false)
   const [spacePosition, setSpacePosition] = useState<number | null>(null)
   const [cursorPosition, setCursorPosition] = useState<number | null>(null)
@@ -86,27 +86,27 @@ const WritingAssistant: React.FC = () => {
     calculatePosition()
   }, [isSpaceTrigger, highlightData, editor, isOptionsVisible])
 
-  useLayoutEffect(() => {
-    if (hasValidMessages) {
-      const calculateMaxHeight = () => {
-        if (!markdownContainerRef.current) return
+  // useLayoutEffect(() => {
+  //   if (hasValidMessages) {
+  //     const calculateMaxHeight = () => {
+  //       if (!markdownContainerRef.current) return
 
-        const screenHeight = window.innerHeight
-        const containerTop = positionStyle.top
-        const buttonHeight = 30
-        const padding = 54
-        const availableHeight = screenHeight - containerTop - buttonHeight - padding
+  //       const screenHeight = window.innerHeight
+  //       const containerTop = positionStyle.top
+  //       const buttonHeight = 30
+  //       const padding = 54
+  //       const availableHeight = screenHeight - containerTop - buttonHeight - padding
 
-        setMarkdownMaxHeight(`${availableHeight}px`)
-      }
+  //       /setMarkdownMaxHeight(`${availableHeight}px`)
+  //     }
 
-      calculateMaxHeight()
-      window.addEventListener('resize', calculateMaxHeight)
+  //     calculateMaxHeight()
+  //     window.addEventListener('resize', calculateMaxHeight)
 
-      return () => window.removeEventListener('resize', calculateMaxHeight)
-    }
-    return () => {}
-  }, [hasValidMessages, positionStyle.top])
+  //     return () => window.removeEventListener('resize', calculateMaxHeight)
+  //   }
+  //   return () => {}
+  // }, [hasValidMessages, positionStyle.top])
 
   useEffect(() => {
     if (editor) {
@@ -461,12 +461,16 @@ const WritingAssistant: React.FC = () => {
             top: positionStyle.top,
             left: positionStyle.left,
             width: '385px',
+            maxHeight: '500px',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
           <ConversationHistory
             history={messages}
             streamingMessage={streamingMessage}
-            markdownMaxHeight={markdownMaxHeight}
+            // markdownMaxHeight={markdownMaxHeight}
             customPrompt={customPrompt}
             setCustomPrompt={setCustomPrompt}
             handleCustomPrompt={() => handleOption('custom', customPrompt)}
