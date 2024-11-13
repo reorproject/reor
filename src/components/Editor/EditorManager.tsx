@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { EditorContent } from '@tiptap/react'
-import InEditorBacklinkSuggestionsDisplay from './BacklinkSuggestionsDisplay'
 import EditorContextMenu from './EditorContextMenu'
 import SearchBar from './Search/SearchBar'
 import { useFileContext } from '@/contexts/FileContext'
-import { useContentContext } from '@/contexts/ContentContext'
+import DocumentStats from './DocumentStats'
 
 const EditorManager: React.FC = () => {
   const [showSearchBar, setShowSearchBar] = useState(false)
@@ -12,9 +11,7 @@ const EditorManager: React.FC = () => {
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
   const [editorFlex, setEditorFlex] = useState(true)
 
-  const { editor, suggestionsState, vaultFilesFlattened } = useFileContext()
-  const [showDocumentStats, setShowDocumentStats] = useState(false)
-  const { openContent } = useContentContext()
+  const { editor } = useFileContext()
 
   const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault()
@@ -29,15 +26,6 @@ const EditorManager: React.FC = () => {
     if (contextMenuVisible) setContextMenuVisible(false)
   }
 
-  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    const { target } = event
-    if (target instanceof HTMLElement && target.getAttribute('data-backlink') === 'true') {
-      event.preventDefault()
-      const backlinkPath = target.textContent
-      if (backlinkPath) openContent(backlinkPath)
-    }
-  }
-
   useEffect(() => {
     const initEditorContentCenter = async () => {
       const isCenter = await window.electronStore.getEditorFlexCenter()
@@ -50,21 +38,6 @@ const EditorManager: React.FC = () => {
 
     initEditorContentCenter()
     window.ipcRenderer.on('editor-flex-center-changed', handleEditorChange)
-  }, [])
-
-  useEffect(() => {
-    const initDocumentStats = async () => {
-      const showStats = await window.electronStore.getDocumentStats()
-      setShowDocumentStats(showStats)
-    }
-
-    initDocumentStats()
-
-    const handleDocStatsChange = (event: Electron.IpcRendererEvent, value: boolean) => {
-      setShowDocumentStats(value)
-    }
-
-    window.ipcRenderer.on('show-doc-stats-changed', handleDocStatsChange)
   }, [])
 
   return (
@@ -82,9 +55,7 @@ const EditorManager: React.FC = () => {
         />
       )}
 
-      <div
-        className={`relative h-full ${editorFlex ? 'flex justify-center py-4 pl-4' : ''} ${showDocumentStats ? 'pb-3' : ''}`}
-      >
+      <div className={`relative h-full ${editorFlex ? 'flex justify-center py-4 pl-4' : ''}`}>
         <div className="relative size-full overflow-y-auto">
           <EditorContent
             className={`relative size-full bg-dark-gray-c-eleven ${editorFlex ? 'max-w-xl' : ''}`}
@@ -92,23 +63,11 @@ const EditorManager: React.FC = () => {
               wordBreak: 'break-word',
             }}
             onContextMenu={handleContextMenu}
-            onClick={handleClick}
             editor={editor}
           />
         </div>
       </div>
-      {suggestionsState && (
-        <InEditorBacklinkSuggestionsDisplay
-          suggestionsState={suggestionsState}
-          suggestions={vaultFilesFlattened.map((file) => file.relativePath)}
-        />
-      )}
-      {editor && showDocumentStats && (
-        <div className="absolute bottom-2 right-2 flex gap-4 text-sm text-gray-500">
-          <div>Characters: {editor.storage.characterCount.characters()}</div>
-          <div>Words: {editor.storage.characterCount.words()}</div>
-        </div>
-      )}
+      <DocumentStats editor={editor} />
     </div>
   )
 }

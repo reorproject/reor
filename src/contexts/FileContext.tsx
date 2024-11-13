@@ -28,7 +28,6 @@ import {
   getNextAvailableFileNameGivenBaseName,
   sortFilesAndDirectories,
 } from '@/lib/file'
-import { SuggestionsState } from '@/components/Editor/BacklinkSuggestionsDisplay'
 import HighlightExtension, { HighlightData } from '@/components/Editor/HighlightExtension'
 import { RichTextLink } from '@/components/Editor/RichTextLink'
 import '@/styles/tiptap.scss'
@@ -49,7 +48,6 @@ type FileContextType = {
   navigationHistory: string[]
   addToNavigationHistory: (value: string) => void
   openOrCreateFile: (filePath: string, optionalContentToWriteOnCreate?: string) => Promise<void>
-  suggestionsState: SuggestionsState | null | undefined
   spellCheckEnabled: boolean
   highlightData: HighlightData
   noteToBeRenamed: string
@@ -57,7 +55,6 @@ type FileContextType = {
   fileDirToBeRenamed: string
   setFileDirToBeRenamed: React.Dispatch<React.SetStateAction<string>>
   renameFile: (oldFilePath: string, newFilePath: string) => Promise<void>
-  setSuggestionsState: React.Dispatch<React.SetStateAction<SuggestionsState | null | undefined>>
   setSpellCheckEnabled: React.Dispatch<React.SetStateAction<boolean>>
   deleteFile: (path: string | undefined) => Promise<boolean>
   selectedDirectory: string | null
@@ -80,7 +77,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [expandedDirectories, setExpandedDirectories] = useState<Map<string, boolean>>(new Map())
   const [selectedDirectory, setSelectedDirectory] = useState<string | null>(null)
   const [currentlyOpenFilePath, setCurrentlyOpenFilePath] = useState<string | null>(null)
-  const [suggestionsState, setSuggestionsState] = useState<SuggestionsState | null>()
   const [needToWriteEditorContentToDisk, setNeedToWriteEditorContentToDisk] = useState<boolean>(false)
   const [needToIndexEditorContent, setNeedToIndexEditorContent] = useState<boolean>(false)
   const [spellCheckEnabled, setSpellCheckEnabled] = useState<boolean>(false)
@@ -369,7 +365,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     navigationHistory,
     addToNavigationHistory,
     openOrCreateFile,
-    suggestionsState,
     spellCheckEnabled,
     highlightData,
     noteToBeRenamed,
@@ -377,7 +372,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     fileDirToBeRenamed,
     setFileDirToBeRenamed,
     renameFile,
-    setSuggestionsState,
     setSpellCheckEnabled,
     deleteFile,
     selectedDirectory,
