@@ -60,13 +60,20 @@ const EditorManager: React.FC = () => {
             },
           }}
         >
-          {showAIPopup ? (
-            <AiEditMenu selectedText={editor.getText()} onEdit={() => {}} />
-          ) : (
-            <button onClick={() => setShowAIPopup(true)} className="rounded p-2 hover:bg-gray-700">
-              Ask AI
-            </button>
-          )}
+          <div
+            onMouseDown={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+            }}
+          >
+            {showAIPopup ? (
+              <AiEditMenu selectedText={editor.getText()} onEdit={() => {}} />
+            ) : (
+              <button onClick={() => setShowAIPopup(true)} className="rounded p-2 hover:bg-gray-700">
+                Ask AI
+              </button>
+            )}
+          </div>
         </BubbleMenu>
       )}
       <SearchBar editor={editor} showSearch={showSearchBar} setShowSearch={setShowSearchBar} />
