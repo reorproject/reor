@@ -52,7 +52,7 @@ const EditorManager: React.FC = () => {
           editor={editor}
           tippyOptions={{
             duration: 100,
-            onShown: () => {
+            onHidden: () => {
               setShowAIPopup(false)
             },
           }}
