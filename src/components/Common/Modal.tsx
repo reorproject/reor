@@ -36,7 +36,7 @@ const ReorModal: React.FC<ModalProps> = ({
 
   const modalContent = (
     <div
-      className={`fixed inset-0 z-[9999] flex h-screen w-screen items-center justify-center bg-black/40 ${tailwindStylesOnBackground}`}
+      className={`fixed inset-0 flex h-screen w-screen items-center justify-center bg-black/40 ${tailwindStylesOnBackground}`}
     >
       <div
         ref={modalRef}
