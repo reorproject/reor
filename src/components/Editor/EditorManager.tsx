@@ -11,7 +11,7 @@ const EditorManager: React.FC = () => {
   const [contextMenuVisible, setContextMenuVisible] = useState(false)
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
   const [editorFlex, setEditorFlex] = useState(true)
-
+  const [showAIPopup, setShowAIPopup] = useState(false)
   const { editor } = useFileContext()
 
   const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -52,24 +52,13 @@ const EditorManager: React.FC = () => {
           editor={editor}
           tippyOptions={{ duration: 100 }}
         >
-          <button
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            className={`rounded p-2 hover:bg-gray-700 ${editor.isActive('bold') ? 'bg-gray-700' : ''}`}
-          >
-            Bold
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={`rounded p-2 hover:bg-gray-700 ${editor.isActive('italic') ? 'bg-gray-700' : ''}`}
-          >
-            Italic
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleStrike().run()}
-            className={`rounded p-2 hover:bg-gray-700 ${editor.isActive('strike') ? 'bg-gray-700' : ''}`}
-          >
-            Strike
-          </button>
+          {showAIPopup ? (
+            <div>test hide</div>
+          ) : (
+            <button onClick={() => setShowAIPopup(true)} className="rounded p-2 hover:bg-gray-700">
+              Ask AI
+            </button>
+          )}
         </BubbleMenu>
       )}
       <SearchBar editor={editor} showSearch={showSearchBar} setShowSearch={setShowSearchBar} />
