@@ -50,7 +50,12 @@ const EditorManager: React.FC = () => {
         <BubbleMenu
           className="flex gap-2 rounded-lg border border-gray-700 bg-dark-gray-c-eleven p-2 shadow-lg"
           editor={editor}
-          tippyOptions={{ duration: 100 }}
+          tippyOptions={{
+            duration: 100,
+            onShown: () => {
+              setShowAIPopup(false)
+            },
+          }}
         >
           {showAIPopup ? (
             <div>test hide</div>
