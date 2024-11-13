@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
 import { FaSearch } from 'react-icons/fa'
 import { GrNewWindow } from 'react-icons/gr'
@@ -18,31 +18,12 @@ export interface IconsSidebarProps {
 
 const IconsSidebar: React.FC<IconsSidebarProps> = ({ getShortcutDescription }) => {
   const { sidebarShowing, setSidebarShowing } = useChatContext()
-  const [sidebarWidth, setSidebarWidth] = useState<number>(40)
 
   const { isSettingsModalOpen, setIsSettingsModalOpen, setIsNewDirectoryModalOpen } = useModalOpeners()
   const { createUntitledNote } = useContentContext()
 
-  useEffect(() => {
-    const updateWidth = async () => {
-      const isCompact = await window.electronStore.getSBCompact()
-      setSidebarWidth(isCompact ? 40 : 60)
-    }
-
-    const handleSettingsChange = (isCompact: number) => {
-      setSidebarWidth(isCompact ? 40 : 60)
-    }
-
-    updateWidth()
-
-    window.ipcRenderer.receive('sb-compact-changed', handleSettingsChange)
-  }, [])
-
   return (
-    <div
-      className="flex size-full flex-col items-center justify-between gap-1 bg-neutral-800"
-      style={{ width: `${sidebarWidth}px` }}
-    >
+    <div className="flex size-full w-[55px] flex-col items-center justify-between gap-1 bg-neutral-800 pt-2">
       <div
         className=" flex h-8 w-full cursor-pointer items-center justify-center"
         onClick={() => setSidebarShowing('files')}

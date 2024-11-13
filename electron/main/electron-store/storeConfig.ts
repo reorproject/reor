@@ -57,7 +57,6 @@ export interface StoreSchema {
   agentConfigs: AgentConfig[]
   analytics?: boolean
   chunkSize: number
-  isSBCompact: boolean
   spellCheck: string
   EditorFlexCenter: boolean
   showDocumentStats: boolean
@@ -79,7 +78,6 @@ export enum StoreKeys {
   Chats = 'chats',
   AgentConfigs = 'agentConfigs',
   ChunkSize = 'chunkSize',
-  IsSBCompact = 'isSBCompact',
   SpellCheck = 'spellCheck',
   EditorFlexCenter = 'editorFlexCenter',
   showDocumentStats = 'showDocumentStats',

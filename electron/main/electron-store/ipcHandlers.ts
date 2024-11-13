@@ -94,13 +94,6 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     return store.get(StoreKeys.LLMGenerationParameters)
   })
 
-  ipcMain.handle('set-sb-compact', (event, isSBCompact) => {
-    store.set(StoreKeys.IsSBCompact, isSBCompact)
-    event.sender.send('sb-compact-changed', isSBCompact)
-  })
-
-  ipcMain.handle('get-sb-compact', () => store.get(StoreKeys.IsSBCompact))
-
   ipcMain.handle('get-editor-flex-center', () => store.get(StoreKeys.EditorFlexCenter))
 
   ipcMain.handle('set-editor-flex-center', (event, setEditorFlexCenter) => {
