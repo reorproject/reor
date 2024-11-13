@@ -52,7 +52,9 @@ const EditorManager: React.FC = () => {
           className="flex gap-2 rounded-lg border border-gray-700 bg-dark-gray-c-eleven p-2 shadow-lg"
           editor={editor}
           tippyOptions={{
-            duration: 100,
+            duration: 1000,
+            placement: 'auto',
+            offset: [0, 10],
             onHidden: () => {
               setShowAIPopup(false)
             },
