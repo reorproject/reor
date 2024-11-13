@@ -388,8 +388,8 @@ const WritingAssistant: React.FC = () => {
         <Popover>
           <PopoverTrigger
             style={{
-              top: `${highlightData.position.top}px`,
-              left: `${highlightData.position.left + 30}px`,
+              top: `${Math.max(highlightData.position.top + 30, 10)}px`,
+              left: `${Math.min(highlightData.position.left, window.innerWidth - 550)}px`,
               zIndex: 50,
             }}
             className="absolute flex size-7 cursor-pointer items-center justify-center rounded-full border-none bg-gray-200 text-gray-600 shadow-md hover:bg-gray-300"
@@ -404,7 +404,7 @@ const WritingAssistant: React.FC = () => {
               ref={optionsContainerRef}
               style={{
                 position: 'absolute',
-                transform: 'translate(-50%, -50%)',
+                transform: 'translate(-50%, -40%)',
               }}
               className="absolute z-50 w-96 rounded-md border border-gray-300 bg-white p-2.5"
             >
