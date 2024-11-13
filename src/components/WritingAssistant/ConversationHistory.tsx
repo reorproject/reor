@@ -8,7 +8,7 @@ import { convertMessageToString } from '../../lib/llm/chat'
 interface ConversationHistoryProps {
   history: ReorChatMessage[]
   streamingMessage: string
-  markdownMaxHeight: string | number
+  // markdownMaxHeight: string | number
   customPrompt: string
   setCustomPrompt: (value: string) => void
   handleCustomPrompt: () => void
@@ -27,7 +27,7 @@ interface ConversationHistoryProps {
 const ConversationHistory: React.FC<ConversationHistoryProps> = ({
   history,
   streamingMessage,
-  markdownMaxHeight,
+  // markdownMaxHeight,
   customPrompt,
   setCustomPrompt,
   handleCustomPrompt,
@@ -59,7 +59,7 @@ const ConversationHistory: React.FC<ConversationHistoryProps> = ({
     : history.slice(currentIndex, currentIndex + 2)
 
   return (
-    <div className="mt-4 flex flex-col" style={{ height: markdownMaxHeight }}>
+    <div className="flex flex-col" style={{ height: '400px' }}>
       <div className="mb-2 flex justify-between">
         <button
           onClick={() => onNavigate('prev')}
