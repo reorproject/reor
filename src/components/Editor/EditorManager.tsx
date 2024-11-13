@@ -1,5 +1,6 @@
+/* eslint-disable react/button-has-type */
 import React, { useEffect, useState } from 'react'
-import { EditorContent } from '@tiptap/react'
+import { EditorContent, BubbleMenu } from '@tiptap/react'
 import EditorContextMenu from './EditorContextMenu'
 import SearchBar from './Search/SearchBar'
 import { useFileContext } from '@/contexts/FileContext'
@@ -45,6 +46,32 @@ const EditorManager: React.FC = () => {
       className="relative size-full cursor-text overflow-hidden bg-dark-gray-c-eleven py-4 text-slate-400 opacity-80"
       onClick={() => editor?.commands.focus()}
     >
+      {editor && (
+        <BubbleMenu
+          className="flex gap-2 rounded-lg border border-gray-700 bg-dark-gray-c-eleven p-2 shadow-lg"
+          editor={editor}
+          tippyOptions={{ duration: 100 }}
+        >
+          <button
+            onClick={() => editor.chain().focus().toggleBold().run()}
+            className={`rounded p-2 hover:bg-gray-700 ${editor.isActive('bold') ? 'bg-gray-700' : ''}`}
+          >
+            Bold
+          </button>
+          <button
+            onClick={() => editor.chain().focus().toggleItalic().run()}
+            className={`rounded p-2 hover:bg-gray-700 ${editor.isActive('italic') ? 'bg-gray-700' : ''}`}
+          >
+            Italic
+          </button>
+          <button
+            onClick={() => editor.chain().focus().toggleStrike().run()}
+            className={`rounded p-2 hover:bg-gray-700 ${editor.isActive('strike') ? 'bg-gray-700' : ''}`}
+          >
+            Strike
+          </button>
+        </BubbleMenu>
+      )}
       <SearchBar editor={editor} showSearch={showSearchBar} setShowSearch={setShowSearchBar} />
       {contextMenuVisible && (
         <EditorContextMenu
