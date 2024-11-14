@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { DBEntry } from 'electron/main/vector-database/schema'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { generateChatName } from '@shared/utils'
@@ -77,61 +78,78 @@ export function anonymizeAgentConfigForPosthog(
 
 const generateStringOfContextItemsForPrompt = (contextItems: DBEntry[] | FileInfoWithContent[]): string => {
   const contextString = contextItems.map((item) => JSON.stringify(item, null, 2)).join('\n\n')
-  return `<context>${contextString}</context>`
+  return `${contextString}`
+}
+
+const replaceTemplatePlaceholders = (content: string, userQuery: string) => {
+  const now = new Date()
+  const today = format(now, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")
+  return content.replace('{QUERY}', userQuery).replace('{TODAY}', today)
 }
 
 const generateMessagesFromTemplate = (
   promptTemplate: PromptTemplate,
-  query: string,
+  userQuery: string,
   contextItems: DBEntry[] | FileInfoWithContent[],
-  contextString: string,
 ): ReorChatMessage[] => {
-  return promptTemplate.map((message) => {
-    const replacePlaceholders = (content: string) => {
-      const now = new Date()
-      const today = format(now, "yyyy-MM-dd'T'HH:mm:ss.SSSxxx")
-      return content.replace('{QUERY}', query).replace('{TODAY}', today)
-    }
-
-    if (message.role === 'system') {
+  return promptTemplate.map((templateMessage) => {
+    if (templateMessage.role === 'system') {
       return {
-        ...message,
-        content: `${replacePlaceholders(message.content)}\n\n${contextString}`,
+        ...templateMessage,
+        content: `${replaceTemplatePlaceholders(templateMessage.content, userQuery)}`,
         hideMessage: true,
       }
     }
 
-    if (message.role === 'user') {
+    if (templateMessage.role === 'user') {
       return {
-        ...message,
+        ...templateMessage,
         context: contextItems,
-        content: replacePlaceholders(message.content),
-        visibleContent: query,
+        content: replaceTemplatePlaceholders(templateMessage.content, userQuery),
+        visibleContent: userQuery,
       }
     }
 
-    return message
+    return templateMessage
   }) as ReorChatMessage[]
 }
 
-export const doInitialRAG = async (query: string, agentConfig: AgentConfig): Promise<ReorChatMessage[]> => {
-  const { promptTemplate, files } = agentConfig
-  let contextItems: DBEntry[] | FileInfoWithContent[] = []
-
-  if (files.length > 0) {
-    contextItems = await window.fileSystem.getFiles(files)
-  } else if (agentConfig.dbSearchFilters) {
-    contextItems = await retreiveFromVectorDB(query, agentConfig.dbSearchFilters)
+const injectContextStringIntoMessages = (
+  messages: ReorChatMessage[],
+  contextItems: DBEntry[] | FileInfoWithContent[],
+  contextString: string,
+): ReorChatMessage[] => {
+  const lastUserMessage = messages.findLast((message) => message.role === 'user')
+  if (lastUserMessage) {
+    lastUserMessage.content = `The context retrieved from the user's knowledge base for the query is: ${contextString}\n\n${lastUserMessage.content}`
+    lastUserMessage.context = contextItems
   }
-
-  const contextString = generateStringOfContextItemsForPrompt(contextItems)
-  const messages = generateMessagesFromTemplate(promptTemplate, query, contextItems, contextString)
-
   return messages
 }
 
+const retrieveContextItems = async (
+  query: string,
+  agentConfig: AgentConfig,
+): Promise<DBEntry[] | FileInfoWithContent[]> => {
+  const { files } = agentConfig
+
+  if (files.length > 0) {
+    return window.fileSystem.getFiles(files)
+  }
+
+  if (agentConfig.dbSearchFilters) {
+    return retreiveFromVectorDB(query, agentConfig.dbSearchFilters)
+  }
+
+  return []
+}
+
 export const generateInitialChat = async (userTextFieldInput: string, agentConfig: AgentConfig): Promise<Chat> => {
-  const ragMessages = await doInitialRAG(userTextFieldInput ?? '', agentConfig)
+  const contextItems = await retrieveContextItems(userTextFieldInput ?? '', agentConfig)
+
+  const contextString = generateStringOfContextItemsForPrompt(contextItems)
+  const messages = generateMessagesFromTemplate(agentConfig.promptTemplate, userTextFieldInput ?? '', contextItems)
+  const ragMessages = injectContextStringIntoMessages(messages, contextItems, contextString)
 
   return {
     id: Date.now().toString(),
@@ -141,6 +159,32 @@ export const generateInitialChat = async (userTextFieldInput: string, agentConfi
     toolDefinitions: agentConfig.toolDefinitions,
   }
 }
+
+const generateFollowUpChat = async (
+  currentChat: Chat | undefined,
+  userTextFieldInput: string,
+  agentConfig: AgentConfig | undefined,
+): Promise<Chat> => {
+  if (!currentChat) {
+    throw new Error('Current chat is required')
+  }
+  currentChat.messages.push({
+    role: 'user',
+    visibleContent: userTextFieldInput,
+    content: `The user's query is: ${userTextFieldInput}`,
+    context: [],
+  })
+
+  if (agentConfig) {
+    const contextItems = await retrieveContextItems(userTextFieldInput ?? '', agentConfig)
+    const contextString = generateStringOfContextItemsForPrompt(contextItems)
+    currentChat.messages = injectContextStringIntoMessages(currentChat.messages, contextItems, contextString)
+    currentChat.toolDefinitions = agentConfig.toolDefinitions
+  }
+
+  return currentChat
+}
+
 export const appendToOrCreateChat = async (
   currentChat: Chat | undefined,
   userTextFieldInput: string,
@@ -160,11 +204,7 @@ export const appendToOrCreateChat = async (
       ...anonymizedAgentConfig,
     })
   } else {
-    outputChat.messages.push({
-      role: 'user',
-      content: userTextFieldInput,
-      context: [],
-    })
+    outputChat = await generateFollowUpChat(outputChat, userTextFieldInput, agentConfig)
     posthog.capture('follow_up_chat_message_submitted', {
       chatId: outputChat?.id,
       chatLength: outputChat?.messages.length,
@@ -172,10 +212,6 @@ export const appendToOrCreateChat = async (
   }
 
   return outputChat
-}
-
-export const getClassNameBasedOnMessageRole = (message: ReorChatMessage): string => {
-  return `markdown-content ${message.role}-chat-message`
 }
 
 export const getDisplayMessage = (message: ReorChatMessage): string | undefined => {

@@ -22,7 +22,7 @@ const EmbeddingModelSelect: React.FC<EmbeddingModelSelectProps> = ({
         {Object.entries(embeddingModels).map(([model, config]) => (
           <SelectItem key={model} value={model}>
             <div>
-              <div>{config.readableName}</div>
+              <div>{config.readableName || model}</div>
               <div className="text-xs text-gray-400">{config.description}</div>
             </div>
           </SelectItem>

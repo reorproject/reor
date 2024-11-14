@@ -1,57 +1,29 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
 import { FaSearch } from 'react-icons/fa'
 import { GrNewWindow } from 'react-icons/gr'
 import { ImFilesEmpty } from 'react-icons/im'
 import { IoChatbubbleEllipsesOutline } from 'react-icons/io5'
-import { MdOutlineQuiz, MdSettings } from 'react-icons/md'
+import { MdSettings } from 'react-icons/md'
 import { VscNewFolder } from 'react-icons/vsc'
 import { HiOutlinePencilAlt } from 'react-icons/hi'
 
 import { useModalOpeners } from '../../contexts/ModalContext'
 import { useChatContext } from '@/contexts/ChatContext'
 import { useContentContext } from '@/contexts/ContentContext'
-import NewDirectoryComponent from '../File/NewDirectory'
 
 export interface IconsSidebarProps {
-  readonly getShortcutDescription: (action: string) => string
-
-  readonly isNewDirectoryModalOpen: boolean
-
-  readonly setIsNewDirectoryModalOpen: React.Dispatch<React.SetStateAction<boolean>>
+  getShortcutDescription: (action: string) => string
 }
 
-const IconsSidebar: React.FC<IconsSidebarProps> = ({
-  getShortcutDescription,
-  isNewDirectoryModalOpen,
-  setIsNewDirectoryModalOpen,
-}) => {
+const IconsSidebar: React.FC<IconsSidebarProps> = ({ getShortcutDescription }) => {
   const { sidebarShowing, setSidebarShowing } = useChatContext()
-  const [sidebarWidth, setSidebarWidth] = useState<number>(40)
 
-  const { isSettingsModalOpen, setIsSettingsModalOpen, setIsFlashcardModeOpen } = useModalOpeners()
+  const { isSettingsModalOpen, setIsSettingsModalOpen, setIsNewDirectoryModalOpen } = useModalOpeners()
   const { createUntitledNote } = useContentContext()
 
-  useEffect(() => {
-    const updateWidth = async () => {
-      const isCompact = await window.electronStore.getSBCompact()
-      setSidebarWidth(isCompact ? 40 : 60)
-    }
-
-    const handleSettingsChange = (isCompact: number) => {
-      setSidebarWidth(isCompact ? 40 : 60)
-    }
-
-    updateWidth()
-
-    window.ipcRenderer.receive('sb-compact-changed', handleSettingsChange)
-  }, [])
-
   return (
-    <div
-      className="flex size-full flex-col items-center justify-between gap-1 bg-neutral-800"
-      style={{ width: `${sidebarWidth}px` }}
-    >
+    <div className="flex size-full w-[55px] flex-col items-center justify-between gap-1 bg-neutral-800 pt-2">
       <div
         className=" flex h-8 w-full cursor-pointer items-center justify-center"
         onClick={() => setSidebarShowing('files')}
@@ -117,19 +89,6 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
           />
         </div>
       </div>
-      <div
-        className="flex h-8 w-full cursor-pointer items-center justify-center border-none bg-transparent "
-        onClick={() => setIsFlashcardModeOpen(true)}
-      >
-        <div className="flex size-4/5 items-center justify-center rounded hover:bg-neutral-700">
-          <MdOutlineQuiz
-            className="text-gray-200"
-            color="gray"
-            size={19}
-            title={getShortcutDescription('open-flashcard-quiz-modal') || 'Flashcard quiz'}
-          />
-        </div>
-      </div>
 
       <div className="grow border-yellow-300" />
       <div
@@ -151,7 +110,6 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({
           title={getShortcutDescription('open-settings-modal') || 'Settings'}
         />
       </button>
-      <NewDirectoryComponent isOpen={isNewDirectoryModalOpen} onClose={() => setIsNewDirectoryModalOpen(false)} />
     </div>
   )
 }

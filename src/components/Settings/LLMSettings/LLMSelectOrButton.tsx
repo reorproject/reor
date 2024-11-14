@@ -1,23 +1,16 @@
 import React, { useState } from 'react'
-import { FiRefreshCw } from 'react-icons/fi'
-import { LLMConfig } from 'electron/main/electron-store/storeConfig'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import SettingsModal, { SettingsTab } from '../Settings'
+import useLLMConfigs from '@/lib/hooks/use-llm-configs'
 
 interface LLMSelectOrButtonProps {
-  llmConfigs: Array<{ modelName: string }>
-  selectedLLM: string
-  setSelectedLLM: (value: string) => void
-  setLLMConfigs: React.Dispatch<React.SetStateAction<LLMConfig[]>>
+  selectedLLM: string | undefined
+  setSelectedLLM: (value: string | undefined) => void
 }
 
-const LLMSelectOrButton: React.FC<LLMSelectOrButtonProps> = ({
-  llmConfigs,
-  selectedLLM,
-  setSelectedLLM,
-  setLLMConfigs,
-}) => {
+const LLMSelectOrButton: React.FC<LLMSelectOrButtonProps> = ({ selectedLLM, setSelectedLLM }) => {
+  const { llmConfigs } = useLLMConfigs()
   const handleLLMChange = (value: string) => {
     setSelectedLLM(value)
   }
@@ -38,11 +31,6 @@ const LLMSelectOrButton: React.FC<LLMSelectOrButtonProps> = ({
     openModalWithTab(SettingsTab.LLMSettingsTab)
   }
 
-  const refreshLLMConfigs = async () => {
-    const LLMConfigs = await window.llm.getLLMConfigs()
-    setLLMConfigs(LLMConfigs)
-  }
-
   return (
     <div className="text-left">
       <div className="flex items-center">
@@ -52,19 +40,22 @@ const LLMSelectOrButton: React.FC<LLMSelectOrButtonProps> = ({
           </Button>
         ) : (
           <Select value={selectedLLM} onValueChange={(value) => handleLLMChange(value)}>
-            <SelectTrigger className="w-32 ">
+            <SelectTrigger className="h-7 w-32 border-0 text-[10px] text-gray-300 focus:ring-0 focus:ring-offset-0">
               <SelectValue placeholder="Select LLM" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded-md border border-dark-gray-c-eight bg-[#1c1c1c]">
               {llmConfigs.map((llm) => (
-                <SelectItem key={llm.modelName} value={llm.modelName}>
+                <SelectItem
+                  key={llm.modelName}
+                  value={llm.modelName}
+                  className="cursor-pointer text-[10px] text-gray-300 hover:bg-[#252525] focus:bg-[#252525] focus:text-gray-200"
+                >
                   {llm.modelName}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         )}
-        <FiRefreshCw onClick={refreshLLMConfigs} className="ml-1 cursor-pointer text-xs text-gray-400" />
         <SettingsModal isOpen={isSettingsModalOpen} onClose={closeModal} initialTab={activeTab} />
       </div>
     </div>

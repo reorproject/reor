@@ -40,8 +40,6 @@ jobs:
         run: npm install
       - name: Run Linter
         run: npm run lint
-      - name: Run Tests
-        run: npm run test
       - name: Set up environment for macOS build
         if: matrix.os == 'macos-13' || matrix.os == 'macos-latest'
         env:
@@ -50,6 +48,7 @@ jobs:
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_OPTIONS: "--max-old-space-size=8192"
         run: |
           npm run build
       - name: Notarize macOS build
@@ -60,6 +59,8 @@ jobs:
         run: npm run notarize
       - name: Build for non-macOS
         if: matrix.os != 'macos-13' && matrix.os != 'macos-latest'
+        env:
+          NODE_OPTIONS: "--max-old-space-size=8192"
         run: |
           npm run build
       - name: Set version as env

@@ -57,7 +57,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
               }`}
               onClick={() => setActiveTab(SettingsTab.GeneralSettingsTab)}
             >
-              General
+              Editor
             </div>
             <div
               className={`flex cursor-pointer items-center rounded border-b border-gray-200 p-2 text-sm hover:bg-neutral-600 ${

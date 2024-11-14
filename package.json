@@ -1,6 +1,6 @@
 {
   "name": "reor-project",
-  "version": "0.2.26",
+  "version": "0.2.30",
   "productName": "Reor",
   "main": "dist-electron/main/index.js",
   "description": "An AI note-taking app that runs models locally.",
@@ -60,6 +60,7 @@
     "@radix-ui/react-tabs": "^1.1.1",
     "@radix-ui/react-tooltip": "^1.1.3",
     "@sentry/electron": "^5.3.0",
+    "@sentry/vite-plugin": "^2.22.6",
     "@tailwindcss/typography": "^0.5.10",
     "@tiptap/core": "^2.5.0",
     "@tiptap/extension-bubble-menu": "^2.4.0",
@@ -113,6 +114,7 @@
     "react-icons": "^4.12.0",
     "react-markdown": "^9.0.1",
     "react-quill": "^2.0.0",
+    "react-resizable-panels": "^2.1.6",
     "react-rnd": "^10.4.1",
     "react-switch": "^7.0.0",
     "react-toastify": "^10.0.4",

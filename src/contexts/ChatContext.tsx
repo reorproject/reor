@@ -8,7 +8,7 @@ interface ChatContextType {
   sidebarShowing: SidebarAbleToShow
   setSidebarShowing: (option: SidebarAbleToShow) => void
   showChatbot: boolean
-  setShowChatbot: (show: boolean) => void
+  setShowChatbot: React.Dispatch<React.SetStateAction<boolean>>
   allChatsMetadata: ChatMetadata[]
   deleteChat: (chatID: string | undefined) => Promise<void>
   saveChat: (updatedChat: Chat) => Promise<void>

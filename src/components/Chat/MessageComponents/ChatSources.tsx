@@ -53,7 +53,7 @@ const ChatSources: React.FC<ChatSourcesProps> = ({ contextItems }) => {
 
       <div className="scrollbar-thumb-rounded-full flex space-x-2 overflow-x-auto p-0 pb-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-800">
         {contextItems.map((contextItem) => (
-          <HoverCard key={getItemPath(contextItem)} openDelay={100}>
+          <HoverCard key={getItemPath(contextItem)} openDelay={600}>
             <HoverCardTrigger>
               <Card
                 className="flex h-10 w-28 shrink-0 cursor-pointer items-center justify-center bg-secondary"
@@ -64,8 +64,8 @@ const ChatSources: React.FC<ChatSourcesProps> = ({ contextItems }) => {
                 </CardDescription>
               </Card>
             </HoverCardTrigger>
-            <HoverCardContent className="max-h-[60vh] w-80 overflow-y-auto">
-              <div className="p-2">
+            <HoverCardContent className="z-[100] max-h-[60vh] w-80 overflow-y-auto" sideOffset={5}>
+              <div className="">
                 <MarkdownRenderer content={getItemContent(contextItem)} />
               </div>
             </HoverCardContent>

@@ -1,51 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import Switch from '@mui/material/Switch'
 
-export const AppearanceSection = () => {
-  const [isIconSBCompact, setIsIconSBCompact] = useState<boolean>(false)
-
-  useEffect(() => {
-    const fetchParams = async () => {
-      const storedIsIconSBCompact = await window.electronStore.getSBCompact()
-
-      if (storedIsIconSBCompact !== undefined) {
-        setIsIconSBCompact(storedIsIconSBCompact)
-      }
-    }
-
-    fetchParams()
-  }, [])
-
-  return (
-    <div className="flex w-full flex-col">
-      <h4 className="xs:text-sm mb-1 mt-10 flex w-full items-center justify-between gap-5 pb-2 text-lg text-white sm:text-base">
-        Appearance
-      </h4>
-      <div className="h-[2px] w-full bg-neutral-700" />
-      <div className="flex w-full flex-wrap items-center justify-between">
-        <div className="flex flex-col justify-center">
-          <p className="xs:text-xs flex flex-col text-base text-gray-100 opacity-80 sm:text-sm">
-            IconSidebar Compact
-            <span className="m-0 pt-1 text-xs text-gray-100">Decreases padding on IconSidebar</span>
-          </p>
-        </div>
-        <Switch
-          checked={isIconSBCompact}
-          onChange={() => {
-            setIsIconSBCompact(!isIconSBCompact)
-            if (isIconSBCompact !== undefined) {
-              window.electronStore.setSBCompact(!isIconSBCompact)
-            }
-          }}
-        />
-      </div>
-      <div className="h-[2px] w-full bg-neutral-700" />
-    </div>
-  )
-}
-
 export const EditorSection = () => {
-  // const { spellCheckEnabled, setSpellCheckEnabled } = useFileByFilepath()
   const [tempSpellCheckEnabled, setTempSpellCheckEnabled] = useState(false)
   const [documentStatsEnabled, setDocumentStatsEnabled] = useState(false)
   const [editorFlexCenter, setEditorFlexCenter] = useState<boolean>(true)
@@ -56,7 +12,6 @@ export const EditorSection = () => {
       const isDocumentStatsCheckEnabled = await window.electronStore.getDocumentStats()
 
       if (isSpellCheckEnabled !== undefined) {
-        // setSpellCheckEnabled(isSpellCheckEnabled)
         setTempSpellCheckEnabled(isSpellCheckEnabled)
       }
       if (isDocumentStatsCheckEnabled !== undefined) {
@@ -92,10 +47,7 @@ export const EditorSection = () => {
   }, [])
 
   return (
-    <div className="w-full flex-col">
-      <h4 className="xs:text-sm mb-1 mt-10 flex w-full items-center justify-between gap-5 pb-2 text-lg text-white sm:text-base">
-        Editor
-      </h4>
+    <div className="w-full flex-col pt-4">
       <div className="h-[2px] w-full bg-neutral-700" />
       <div className="flex w-full flex-wrap items-center justify-between">
         <div className="flex w-[70%] flex-col justify-center">
@@ -159,8 +111,7 @@ export const EditorSection = () => {
 const GeneralSettings = () => {
   return (
     <div className="w-full flex-col justify-between rounded bg-dark-gray-c-three">
-      <h2 className="mb-0 text-2xl font-semibold text-white">General</h2>
-      <AppearanceSection />
+      <h2 className="mb-0 text-2xl font-semibold text-white">Editor</h2>
       <EditorSection />
     </div>
   )

@@ -5,6 +5,7 @@ import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import electron from 'vite-plugin-electron'
 import renderer from 'vite-plugin-electron-renderer'
+import { sentryVitePlugin } from "@sentry/vite-plugin"
 
 import pkg from './package.json'
 
@@ -14,7 +15,7 @@ export default defineConfig(({ command }) => {
 
   const isServe = command === 'serve'
   const isBuild = command === 'build'
-  const sourcemap = isServe || !!process.env.VSCODE_DEBUG
+  const sourcemap = true
 
   return {
     resolve: {
@@ -81,6 +82,11 @@ export default defineConfig(({ command }) => {
         },
       ]),
       renderer(),
+      sentryVitePlugin({
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+        org: "reor",
+        project: "electron",
+      }),
     ],
     css: {
       postcss: {
@@ -97,5 +103,8 @@ export default defineConfig(({ command }) => {
         }
       })(),
     clearScreen: false,
+    build: {
+      sourcemap: true,
+    },
   }
 })

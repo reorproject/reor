@@ -4,7 +4,7 @@ import { streamText } from 'ai'
 import { toast } from 'react-toastify'
 import {
   appendStringContentToMessages,
-  appendToOrCreateChat as updateOrCreateChat,
+  appendToOrCreateChat,
   removeUncalledToolsFromMessages,
 } from '../../lib/llm/chat'
 
@@ -12,7 +12,6 @@ import '../../styles/chat.css'
 import ChatMessages from './ChatMessages'
 import { Chat, AgentConfig, LoadingState } from '../../lib/llm/types'
 import { useChatContext } from '@/contexts/ChatContext'
-import StartChat from './StartChat'
 import resolveLLMClient from '@/lib/llm/client'
 import { appendToolCallsAndAutoExecuteTools, convertToolConfigToZodSchema } from '../../lib/llm/tools/utils'
 
@@ -25,17 +24,9 @@ const extractFileReferences = (message: string): string[] => {
 
 const ChatComponent: React.FC = () => {
   const [loadingState, setLoadingState] = useState<LoadingState>('idle')
-  const [defaultModelName, setDefaultLLMName] = useState<string>('')
+  const containerRef = useRef<HTMLDivElement>(null)
   const { currentChat, setCurrentChat, saveChat } = useChatContext()
   const abortControllerRef = useRef<AbortController | null>(null)
-
-  useEffect(() => {
-    const fetchDefaultLLM = async () => {
-      const defaultName = await window.llm.getDefaultLLMName()
-      setDefaultLLMName(defaultName)
-    }
-    fetchDefaultLLM()
-  }, [])
 
   useEffect(() => {
     const fetchChat = async () => {
@@ -48,10 +39,9 @@ const ChatComponent: React.FC = () => {
   }, [currentChat?.id, saveChat])
 
   const handleNewChatMessage = useCallback(
-    async (chat: Chat | undefined, userTextFieldInput?: string, agentConfig?: AgentConfig) => {
+    async (chat: Chat | undefined, llmName: string, userTextFieldInput?: string, agentConfig?: AgentConfig) => {
       let outputChat: Chat | undefined
       try {
-        const defaultLLMName = await window.llm.getDefaultLLMName()
         if (!userTextFieldInput?.trim() && (!chat || chat.messages.length === 0)) {
           return
         }
@@ -61,14 +51,16 @@ const ChatComponent: React.FC = () => {
         // console.log('fileRefs', fileRefs)
 
         // Create or update chat with file context
+        // outputChat = userTextFieldInput?.trim()
+        //   ? await updateOrCreateChat(chat, userTextFieldInput, {
+        //       name: agentConfig?.name || 'default',
+        //       ...agentConfig,
+        //       toolDefinitions: agentConfig?.toolDefinitions || [],
+        //       promptTemplate: agentConfig?.promptTemplate || [],
+        //       files: fileRefs,
+        //     })
         outputChat = userTextFieldInput?.trim()
-          ? await updateOrCreateChat(chat, userTextFieldInput, {
-              name: agentConfig?.name || 'default',
-              ...agentConfig,
-              toolDefinitions: agentConfig?.toolDefinitions || [],
-              promptTemplate: agentConfig?.promptTemplate || [],
-              files: fileRefs,
-            })
+          ? await appendToOrCreateChat(chat, userTextFieldInput, agentConfig)
           : chat
 
         if (!outputChat) {
@@ -78,7 +70,7 @@ const ChatComponent: React.FC = () => {
         setCurrentChat(outputChat)
         await saveChat(outputChat)
 
-        const llmClient = await resolveLLMClient(defaultLLMName)
+        const llmClient = await resolveLLMClient(llmName)
         abortControllerRef.current = new AbortController()
         const toolsZodSchema = Object.assign({}, ...outputChat.toolDefinitions.map(convertToolConfigToZodSchema))
         setLoadingState('waiting-for-first-token')
@@ -116,7 +108,7 @@ const ChatComponent: React.FC = () => {
           setCurrentChat(outputChat)
           await saveChat(outputChat)
           if (allToolCallsHaveBeenExecuted) {
-            handleNewChatMessage(outputChat, undefined, agentConfig)
+            handleNewChatMessage(outputChat, llmName, undefined, agentConfig)
           }
         }
 
@@ -139,7 +131,7 @@ const ChatComponent: React.FC = () => {
             )
             const agentWithoutTools = { ...agentConfig, toolDefinitions: [] }
             outputChat.toolDefinitions = []
-            handleNewChatMessage(outputChat, undefined, agentWithoutTools)
+            handleNewChatMessage(outputChat, llmName, undefined, agentWithoutTools)
             return
           }
         }
@@ -154,25 +146,16 @@ const ChatComponent: React.FC = () => {
   )
 
   return (
-    <div className="flex size-full items-center justify-center">
-      <div className="mx-auto flex size-full flex-col overflow-hidden  bg-background">
-        {currentChat && currentChat.messages && currentChat.messages.length > 0 ? (
-          <ChatMessages
-            currentChat={currentChat}
-            setCurrentChat={setCurrentChat}
-            loadingState={loadingState}
-            handleNewChatMessage={(userTextFieldInput?: string, chatFilters?: AgentConfig) =>
-              handleNewChatMessage(currentChat, userTextFieldInput, chatFilters)
-            }
-          />
-        ) : (
-          <StartChat
-            defaultModelName={defaultModelName}
-            handleNewChatMessage={(userTextFieldInput?: string, agentConfig?: AgentConfig) =>
-              handleNewChatMessage(undefined, userTextFieldInput, agentConfig)
-            }
-          />
-        )}
+    <div ref={containerRef} className="flex size-full items-center justify-center">
+      <div className="mx-auto flex size-full flex-col overflow-hidden bg-background">
+        <ChatMessages
+          currentChat={currentChat}
+          setCurrentChat={setCurrentChat}
+          loadingState={loadingState}
+          handleNewChatMessage={(llmName: string, userTextFieldInput?: string, agentConfig?: AgentConfig) =>
+            handleNewChatMessage(currentChat, llmName, userTextFieldInput, agentConfig)
+          }
+        />
       </div>
     </div>
   )

@@ -1,21 +1,14 @@
-import React, { createContext, useContext, useState, ReactNode, useMemo, useEffect } from 'react'
+import React, { createContext, useContext, useState, ReactNode, useMemo } from 'react'
 
 interface ModalProviderProps {
   children: ReactNode
 }
 
-/**
- * Every modal requires a setter and opener
- */
 interface ModalOpenContextType {
+  isNewDirectoryModalOpen: boolean
+  setIsNewDirectoryModalOpen: (newDirectoryOpen: boolean) => void
   isSettingsModalOpen: boolean
   setIsSettingsModalOpen: (settingsOpen: boolean) => void
-  isFlashcardModeOpen: boolean
-  setIsFlashcardModeOpen: (flashcardOpen: boolean) => void
-  initialFileToCreateFlashcard: string
-  setInitialFileToCreateFlashcard: (flashcardName: string) => void
-  initialFileToReviewFlashcard: string
-  setInitialFileToReviewFlashcard: (flashcardName: string) => void
 }
 
 const ModalContext = createContext<ModalOpenContextType | undefined>(undefined)
@@ -29,37 +22,17 @@ export const useModalOpeners = (): ModalOpenContextType => {
 }
 
 export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
+  const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
-  const [isFlashcardModeOpen, setIsFlashcardModeOpen] = useState(false)
-  const [initialFileToCreateFlashcard, setInitialFileToCreateFlashcard] = useState('')
-  const [initialFileToReviewFlashcard, setInitialFileToReviewFlashcard] = useState('')
-
-  useEffect(() => {
-    const createFlashcardFileListener = window.ipcRenderer.receive(
-      'create-flashcard-file-listener',
-      (noteName: string) => {
-        setIsFlashcardModeOpen(!!noteName)
-        setInitialFileToCreateFlashcard(noteName)
-      },
-    )
-
-    return () => {
-      createFlashcardFileListener()
-    }
-  }, [setIsFlashcardModeOpen, setInitialFileToCreateFlashcard])
 
   const modalOpenContextValue = useMemo(
     () => ({
+      isNewDirectoryModalOpen,
+      setIsNewDirectoryModalOpen,
       isSettingsModalOpen,
       setIsSettingsModalOpen,
-      isFlashcardModeOpen,
-      setIsFlashcardModeOpen,
-      initialFileToCreateFlashcard,
-      setInitialFileToCreateFlashcard,
-      initialFileToReviewFlashcard,
-      setInitialFileToReviewFlashcard,
     }),
-    [isSettingsModalOpen, isFlashcardModeOpen, initialFileToReviewFlashcard, initialFileToCreateFlashcard],
+    [isNewDirectoryModalOpen, isSettingsModalOpen],
   )
 
   return <ModalContext.Provider value={modalOpenContextValue}>{children}</ModalContext.Provider>

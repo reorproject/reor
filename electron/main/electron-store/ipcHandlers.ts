@@ -94,13 +94,6 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     return store.get(StoreKeys.LLMGenerationParameters)
   })
 
-  ipcMain.handle('set-sb-compact', (event, isSBCompact) => {
-    store.set(StoreKeys.IsSBCompact, isSBCompact)
-    event.sender.send('sb-compact-changed', isSBCompact)
-  })
-
-  ipcMain.handle('get-sb-compact', () => store.get(StoreKeys.IsSBCompact))
-
   ipcMain.handle('get-editor-flex-center', () => store.get(StoreKeys.EditorFlexCenter))
 
   ipcMain.handle('set-editor-flex-center', (event, setEditorFlexCenter) => {
@@ -212,6 +205,15 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
 
     chatHistoriesMap[vaultDir] = filteredChatHistories
     store.set(StoreKeys.Chats, chatHistoriesMap)
+  })
+
+  ipcMain.handle('set-auto-context', (event, autoContext: boolean) => {
+    store.set(StoreKeys.AutoContext, autoContext)
+    event.sender.send('auto-context-changed', autoContext)
+  })
+
+  ipcMain.handle('get-auto-context', () => {
+    return store.get(StoreKeys.AutoContext, true) // Default to true
   })
 }
 

@@ -70,12 +70,12 @@ const electronStore = {
   saveChat: createIPCHandler<(chat: Chat) => Promise<void>>('save-chat'),
   deleteChat: createIPCHandler<(chatID: string) => Promise<void>>('delete-chat'),
   getChat: createIPCHandler<(chatID: string | undefined) => Promise<Chat | undefined>>('get-chat'),
-  getSBCompact: createIPCHandler<() => Promise<boolean>>('get-sb-compact'),
-  setSBCompact: createIPCHandler<(isSBCompact: boolean) => Promise<void>>('set-sb-compact'),
   getEditorFlexCenter: createIPCHandler<() => Promise<boolean>>('get-editor-flex-center'),
   setEditorFlexCenter: createIPCHandler<(editorFlexCenter: boolean) => Promise<void>>('set-editor-flex-center'),
   getAgentConfigs: createIPCHandler<() => Promise<AgentConfig[]>>('get-agent-configs'),
   setAgentConfig: createIPCHandler<(agentConfig: AgentConfig) => Promise<void>>('set-agent-config'),
+  setAutoContext: createIPCHandler<(value: boolean) => Promise<void>>('set-auto-context'),
+  getAutoContext: createIPCHandler<() => Promise<boolean>>('get-auto-context'),
 }
 
 const fileSystem = {
@@ -90,7 +90,6 @@ const fileSystem = {
   createDirectory: createIPCHandler<(dirPath: string) => Promise<void>>('create-directory'),
   checkFileExists: createIPCHandler<(filePath: string) => Promise<boolean>>('check-file-exists'),
   deleteFile: createIPCHandler<(filePath: string) => Promise<void>>('delete-file'),
-  moveFileOrDir: createIPCHandler<(sourcePath: string, destinationPath: string) => Promise<void>>('move-file-or-dir'),
   getAllFilenamesInDirectory: createIPCHandler<(dirName: string) => Promise<string[]>>('get-files-in-directory'),
   getFiles: createIPCHandler<(filePaths: string[]) => Promise<FileInfoWithContent[]>>('get-files'),
   searchFiles: createIPCHandler<(searchTerm: string) => Promise<string[]>>('search-files'),

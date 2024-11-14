@@ -6,6 +6,8 @@ import { useFileContext } from './FileContext'
 import { getFilesInDirectory, getNextAvailableFileNameGivenBaseName } from '@/lib/file'
 
 interface ContentContextType {
+  showEditor: boolean
+  setShowEditor: (showEditor: boolean) => void
   openContent: (pathOrChatID: string, optionalContentToWriteOnCreate?: string, dontUpdateChatHistory?: boolean) => void
   currentOpenFileOrChatID: string | null
   createUntitledNote: (parentFileOrDirectory?: string) => void
@@ -26,14 +28,15 @@ interface ContentProviderProps {
 }
 
 export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) => {
+  const [showEditor, setShowEditor] = useState(false)
   const [currentOpenFileOrChatID, setCurrentOpenFileOrChatID] = useState<string | null>(null)
 
-  const { allChatsMetadata, setShowChatbot, openNewChat } = useChatContext()
+  const { allChatsMetadata, openNewChat } = useChatContext()
   const {
     vaultFilesFlattened: flattenedFiles,
     openOrCreateFile,
     addToNavigationHistory,
-    currentlyOpenFilePath,
+    selectedDirectory,
   } = useFileContext()
 
   const openContent = React.useCallback(
@@ -41,10 +44,9 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
       if (!pathOrChatID) return
       const chatMetadata = allChatsMetadata.find((chat) => chat.id === pathOrChatID)
       if (chatMetadata) {
-        setShowChatbot(true)
         openNewChat(pathOrChatID)
       } else {
-        setShowChatbot(false)
+        setShowEditor(true)
         openOrCreateFile(pathOrChatID, optionalContentToWriteOnCreate)
       }
       setCurrentOpenFileOrChatID(pathOrChatID)
@@ -52,16 +54,14 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
         addToNavigationHistory(pathOrChatID)
       }
     },
-    [allChatsMetadata, setShowChatbot, openNewChat, openOrCreateFile, addToNavigationHistory],
+    [allChatsMetadata, openNewChat, openOrCreateFile, addToNavigationHistory],
   )
 
   const createUntitledNote = useCallback(
     async (parentDirectory?: string) => {
-      console.log('parentDirectory: ', parentDirectory)
       const directoryToMakeFileIn =
-        parentDirectory ||
-        (currentlyOpenFilePath && (await window.path.dirname(currentlyOpenFilePath))) ||
-        (await window.electronStore.getVaultDirectoryForWindow())
+        parentDirectory || selectedDirectory || (await window.electronStore.getVaultDirectoryForWindow())
+
       const filesInDirectory = await getFilesInDirectory(directoryToMakeFileIn, flattenedFiles)
       const fileName = getNextAvailableFileNameGivenBaseName(
         filesInDirectory.map((file) => file.name),
@@ -71,16 +71,18 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
       openContent(finalPath, `## `)
       posthog.capture('created_new_note_from_new_note_modal')
     },
-    [currentlyOpenFilePath, flattenedFiles, openContent],
+    [selectedDirectory, flattenedFiles, openContent],
   )
 
   const ContentContextMemo = useMemo(
     () => ({
+      showEditor,
+      setShowEditor,
       openContent,
       currentOpenFileOrChatID,
       createUntitledNote,
     }),
-    [openContent, currentOpenFileOrChatID, createUntitledNote],
+    [showEditor, openContent, currentOpenFileOrChatID, createUntitledNote],
   )
 
   return <ContentContext.Provider value={ContentContextMemo}>{children}</ContentContext.Provider>

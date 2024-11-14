@@ -19,10 +19,6 @@ export function flattenFileInfoTree(tree: FileInfoTree): FileInfo[] {
   }, [])
 }
 
-export const moveFile = async (sourcePath: string, destinationPath: string) => {
-  await window.fileSystem.moveFileOrDir(sourcePath, destinationPath)
-}
-
 export const getFilesInDirectory = async (directoryPath: string, filesTree: FileInfo[]): Promise<FileInfo[]> => {
   return filesTree.filter((file) => file.path.startsWith(directoryPath))
 }
@@ -160,4 +156,32 @@ export const sortFilesAndDirectories = (fileList: FileInfoTree, currentFilePath:
   })
 
   return fileList
+}
+
+export const findRelevantDirectoriesToBeExpanded = async (
+  filePath: string | null,
+  currentExpandedDirs: Map<string, boolean>,
+) => {
+  if (!filePath) {
+    return currentExpandedDirs
+  }
+
+  const pathSep = await window.path.pathSep()
+  const isAbsolute = await window.path.isAbsolute(filePath)
+  const basePath = isAbsolute ? '' : '.'
+
+  const directoryPath = await window.path.dirname(filePath)
+  const pathSegments = directoryPath.split(pathSep).filter(Boolean)
+
+  const newExpandedDirectories = new Map(currentExpandedDirs)
+  let currentPath = basePath
+
+  // eslint-disable-next-line no-restricted-syntax
+  for (const segment of pathSegments) {
+    // eslint-disable-next-line no-await-in-loop
+    currentPath = await window.path.join(currentPath, segment)
+    newExpandedDirectories.set(currentPath, true)
+  }
+
+  return newExpandedDirectories
 }

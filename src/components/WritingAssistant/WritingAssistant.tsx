@@ -4,7 +4,7 @@ import TextField from '@mui/material/TextField'
 import Button from '@mui/material/Button'
 import posthog from 'posthog-js'
 import { streamText } from 'ai'
-import useOutsideClick from './hooks/use-outside-click'
+import useOutsideClick from '../../lib/hooks/use-outside-click'
 import { generatePromptString, getLastMessage } from './utils'
 import { ReorChatMessage } from '../../lib/llm/types'
 import { useFileContext } from '@/contexts/FileContext'
@@ -19,7 +19,7 @@ const WritingAssistant: React.FC = () => {
   const [isOptionsVisible, setIsOptionsVisible] = useState<boolean>(false)
   const [prevPrompt, setPrevPrompt] = useState<string>('')
   const [positionStyle, setPositionStyle] = useState({ top: 0, left: 0 })
-  const [markdownMaxHeight, setMarkdownMaxHeight] = useState('auto')
+  // const [markdownMaxHeight, setMarkdownMaxHeight] = useState('auto')
   const [isSpaceTrigger, setIsSpaceTrigger] = useState<boolean>(false)
   const [spacePosition, setSpacePosition] = useState<number | null>(null)
   const [cursorPosition, setCursorPosition] = useState<number | null>(null)
@@ -34,6 +34,7 @@ const WritingAssistant: React.FC = () => {
   // const [prompts, setPrompts] = useState<{ option?: string; customPromptInput?: string }[]>([])
 
   const { editor, highlightData } = useFileContext()
+  const [autoContext, setAutoContext] = useState<boolean>(true)
 
   useOutsideClick(markdownContainerRef, () => {
     setMessages([])
@@ -85,27 +86,27 @@ const WritingAssistant: React.FC = () => {
     calculatePosition()
   }, [isSpaceTrigger, highlightData, editor, isOptionsVisible])
 
-  useLayoutEffect(() => {
-    if (hasValidMessages) {
-      const calculateMaxHeight = () => {
-        if (!markdownContainerRef.current) return
+  // useLayoutEffect(() => {
+  //   if (hasValidMessages) {
+  //     const calculateMaxHeight = () => {
+  //       if (!markdownContainerRef.current) return
 
-        const screenHeight = window.innerHeight
-        const containerTop = positionStyle.top
-        const buttonHeight = 30
-        const padding = 54
-        const availableHeight = screenHeight - containerTop - buttonHeight - padding
+  //       const screenHeight = window.innerHeight
+  //       const containerTop = positionStyle.top
+  //       const buttonHeight = 30
+  //       const padding = 54
+  //       const availableHeight = screenHeight - containerTop - buttonHeight - padding
 
-        setMarkdownMaxHeight(`${availableHeight}px`)
-      }
+  //       /setMarkdownMaxHeight(`${availableHeight}px`)
+  //     }
 
-      calculateMaxHeight()
-      window.addEventListener('resize', calculateMaxHeight)
+  //     calculateMaxHeight()
+  //     window.addEventListener('resize', calculateMaxHeight)
 
-      return () => window.removeEventListener('resize', calculateMaxHeight)
-    }
-    return () => {}
-  }, [hasValidMessages, positionStyle.top])
+  //     return () => window.removeEventListener('resize', calculateMaxHeight)
+  //   }
+  //   return () => {}
+  // }, [hasValidMessages, positionStyle.top])
 
   useEffect(() => {
     if (editor) {
@@ -138,23 +139,48 @@ const WritingAssistant: React.FC = () => {
   }, [editor])
 
   useEffect(() => {
-    if (editor && isSpaceTrigger && spacePosition !== null) {
-      const checkSpacePresence = () => {
-        const currentContent = editor.state.doc.textBetween(spacePosition, spacePosition + 1)
-        if (currentContent !== ' ') {
-          setIsOptionsVisible(false)
-          setIsSpaceTrigger(false)
-          setSpacePosition(null)
+    if (!editor || !isSpaceTrigger || spacePosition === null) {
+      return undefined
+    }
+
+    const resetSpaceTrigger = () => {
+      setIsOptionsVisible(false)
+      setIsSpaceTrigger(false)
+      setSpacePosition(null)
+    }
+
+    const checkSpacePresence = () => {
+      try {
+        if (!editor.state?.doc) {
+          resetSpaceTrigger()
+          return
         }
-      }
 
-      editor.on('update', checkSpacePresence)
+        const { from } = editor.state.selection
 
-      return () => {
-        editor.off('update', checkSpacePresence)
+        if (from !== spacePosition) {
+          resetSpaceTrigger()
+          return
+        }
+
+        const $pos = editor.state.doc.resolve(from)
+        if (!$pos?.parent?.textContent?.startsWith(' ')) {
+          resetSpaceTrigger()
+        }
+      } catch (error) {
+        resetSpaceTrigger()
       }
     }
-    return () => {}
+
+    const handler = () => {
+      requestAnimationFrame(checkSpacePresence)
+    }
+
+    editor.on('update', handler)
+
+    return () => {
+      editor.off('update', handler)
+    }
   }, [editor, isSpaceTrigger, spacePosition])
 
   useEffect(() => {
@@ -179,6 +205,14 @@ const WritingAssistant: React.FC = () => {
       document.removeEventListener('keydown', handleEscKey)
     }
   }, [editor, cursorPosition])
+
+  useEffect(() => {
+    const loadAutoContext = async () => {
+      const savedAutoContext = await window.electronStore.getAutoContext()
+      setAutoContext(savedAutoContext)
+    }
+    loadAutoContext()
+  }, [])
 
   const copyToClipboard = () => {
     const assistantMessage = messages[currentConversationIndex + 1]
@@ -213,9 +247,12 @@ const WritingAssistant: React.FC = () => {
     if (!assistantMessage || assistantMessage.role !== 'assistant' || !editor) return
 
     const replacementText = assistantMessage.visibleContent || assistantMessage.content
-
     if (replacementText) {
-      editor.chain().focus().deleteSelection().insertContent(replacementText).run()
+      if (highlightData.text) {
+        editor.chain().focus().deleteSelection().insertContent(replacementText).run()
+      } else if (autoContext) {
+        editor.chain().focus().selectAll().deleteSelection().insertContent(replacementText).run()
+      }
     }
 
     setMessages([])
@@ -260,6 +297,9 @@ const WritingAssistant: React.FC = () => {
 
   const handleOption = async (option: string, customPromptInput?: string) => {
     let selectedText = highlightData.text
+    if (autoContext && !selectedText && editor) {
+      selectedText = editor.state.doc.textBetween(0, editor.state.doc.content.size)
+    }
     if (lastAssistantMessage) {
       selectedText =
         typeof lastAssistantMessage.content === 'string'
@@ -271,6 +311,10 @@ const WritingAssistant: React.FC = () => {
     setIsNewConversation(true)
     setIsOptionsVisible(false)
     await getLLMResponse(prompt)
+  }
+  const handleAutoContextChange = async (value: boolean) => {
+    setAutoContext(value)
+    await window.electronStore.setAutoContext(value)
   }
 
   if (!isSpaceTrigger && !highlightData.position) return null
@@ -324,6 +368,18 @@ const WritingAssistant: React.FC = () => {
             List key Takeaways
           </Button>
         </div>
+        <div className="mt-2 flex items-center">
+          <label htmlFor="autoContextCheckbox" className="flex items-center">
+            <input
+              type="checkbox"
+              id="autoContextCheckbox"
+              checked={autoContext}
+              onChange={(e) => handleAutoContextChange(e.target.checked)}
+              className="size-4 rounded border-gray-600 bg-gray-700 text-indigo-500 focus:ring-1 focus:ring-indigo-500/30"
+            />
+            <span className="ml-2 select-none text-xs text-gray-400">Use File Content (If no text selected)</span>
+          </label>
+        </div>
       </div>
     )
   return (
@@ -332,8 +388,8 @@ const WritingAssistant: React.FC = () => {
         <Popover>
           <PopoverTrigger
             style={{
-              top: `${highlightData.position.top}px`,
-              left: `${highlightData.position.left + 30}px`,
+              top: `${Math.max(highlightData.position.top + 30, 10)}px`,
+              left: `${Math.min(highlightData.position.left, window.innerWidth - 550)}px`,
               zIndex: 50,
             }}
             className="absolute flex size-7 cursor-pointer items-center justify-center rounded-full border-none bg-gray-200 text-gray-600 shadow-md hover:bg-gray-300"
@@ -348,7 +404,7 @@ const WritingAssistant: React.FC = () => {
               ref={optionsContainerRef}
               style={{
                 position: 'absolute',
-                transform: 'translate(-50%, -50%)',
+                transform: 'translate(-50%, -40%)',
               }}
               className="absolute z-50 w-96 rounded-md border border-gray-300 bg-white p-2.5"
             >
@@ -405,12 +461,16 @@ const WritingAssistant: React.FC = () => {
             top: positionStyle.top,
             left: positionStyle.left,
             width: '385px',
+            maxHeight: '500px',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
           }}
         >
           <ConversationHistory
             history={messages}
             streamingMessage={streamingMessage}
-            markdownMaxHeight={markdownMaxHeight}
+            // markdownMaxHeight={markdownMaxHeight}
             customPrompt={customPrompt}
             setCustomPrompt={setCustomPrompt}
             handleCustomPrompt={() => handleOption('custom', customPrompt)}

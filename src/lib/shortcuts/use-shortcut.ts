@@ -1,14 +1,14 @@
 import { useCallback, useEffect, useRef } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
-import { useModalOpeners } from '../../contexts/ModalContext'
 import { useChatContext } from '../../contexts/ChatContext'
 import { useContentContext } from '@/contexts/ContentContext'
 import { shortcuts } from './shortcutDefinitions'
+import { useModalOpeners } from '@/contexts/ModalContext'
 
 function useAppShortcuts() {
-  const { setIsFlashcardModeOpen, setIsSettingsModalOpen } = useModalOpeners()
   const { setSidebarShowing, openNewChat } = useChatContext()
   const { createUntitledNote } = useContentContext()
+  const { setIsNewDirectoryModalOpen } = useModalOpeners()
 
   const handleShortcut = useCallback(
     (action: string) => {
@@ -17,7 +17,7 @@ function useAppShortcuts() {
           createUntitledNote()
           break
         case 'open-new-directory-modal':
-          window.dispatchEvent(new CustomEvent('open-new-directory-modal'))
+          setIsNewDirectoryModalOpen(true)
           break
         case 'open-search':
           setSidebarShowing('search')
@@ -28,18 +28,12 @@ function useAppShortcuts() {
         case 'open-chat-bot':
           openNewChat()
           break
-        case 'open-flashcard-quiz-modal':
-          setIsFlashcardModeOpen(true)
-          break
-        case 'open-settings-modal':
-          setIsSettingsModalOpen(true)
-          break
         default:
           // No other cases
           break
       }
     },
-    [createUntitledNote, setSidebarShowing, setIsFlashcardModeOpen, setIsSettingsModalOpen, openNewChat],
+    [createUntitledNote, setSidebarShowing, openNewChat, setIsNewDirectoryModalOpen],
   )
 
   const handleShortcutRef = useRef(handleShortcut)
