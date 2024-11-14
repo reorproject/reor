@@ -40,8 +40,8 @@ const AiEditMenu = ({ selectedText, onEdit }: AiEditMenuProps) => {
         <div className="relative rounded-md border border-border bg-background/95 p-3 text-sm text-foreground shadow-lg backdrop-blur">
           {isLoading && !response && <div className="animate-pulse text-muted-foreground">Generating response...</div>}
           {response && (
-            <div className="prose prose-invert max-w-none">
-              <p className="m-0">{response}</p>
+            <div className="prose prose-invert max-h-[400px] max-w-none overflow-y-auto">
+              <p className="m-0 text-sm">{response}</p>
             </div>
           )}
         </div>

@@ -59,9 +59,11 @@ const EditorManager: React.FC = () => {
             onHidden: () => {
               setShowAIPopup(false)
             },
+            maxWidth: 'none',
           }}
         >
           <div
+            className="w-[300px]"
             onMouseDown={(e) => {
               e.preventDefault()
               e.stopPropagation()
@@ -72,17 +74,12 @@ const EditorManager: React.FC = () => {
             }}
           >
             {showAIPopup ? (
-              // <input
-              //   type="text"
-              //   onClick={(e) => e.stopPropagation()}
-              //   onMouseDown={(e) => e.stopPropagation()}
-              //   onKeyDown={(e) => e.stopPropagation()}
-              //   className="bg-dark-gray-c-twelve rounded border border-gray-700 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              // />
+              // <div className="max-h-[400px] overflow-y-auto">
               <AiEditMenu selectedText={editor.getText()} onEdit={() => {}} />
             ) : (
+              // </div>
               <button onClick={() => setShowAIPopup(true)} className="rounded p-2 hover:bg-gray-700">
-                AI Edit{' '}
+                AI Edit
               </button>
             )}
           </div>
