@@ -82,7 +82,7 @@ const EditorManager: React.FC = () => {
               <AiEditMenu selectedText={editor.getText()} onEdit={() => {}} />
             ) : (
               <button onClick={() => setShowAIPopup(true)} className="rounded p-2 hover:bg-gray-700">
-                Ask AI
+                AI Edit{' '}
               </button>
             )}
           </div>
