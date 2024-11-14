@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React from 'react'
+import { ArrowUp } from 'lucide-react'
+import React, { useState } from 'react'
+import { streamText } from 'ai'
+import { Button } from '../ui/button'
+import resolveLLMClient from '@/lib/llm/client'
 
 interface AiEditMenuProps {
   selectedText: string
@@ -7,6 +11,21 @@ interface AiEditMenuProps {
 }
 
 const AiEditMenu = ({ selectedText, onEdit }: AiEditMenuProps) => {
+  const [response, setResponse] = useState<string>('')
+
+  const handleEdit = async () => {
+    const defaultLLMName = await window.llm.getDefaultLLMName()
+    const llmClient = await resolveLLMClient(defaultLLMName)
+    const { textStream } = await streamText({
+      model: llmClient,
+      messages: [{ role: 'user', content: `Edit the following text: ${selectedText}` }],
+    })
+
+    // eslint-disable-next-line no-restricted-syntax
+    for await (const textPart of textStream) {
+      setResponse((prev) => prev + textPart)
+    }
+  }
   return (
     <div className="flex items-center gap-2">
       <input
@@ -18,6 +37,9 @@ const AiEditMenu = ({ selectedText, onEdit }: AiEditMenuProps) => {
         // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus
       />
+      <Button onClick={handleEdit} size="icon" variant="ghost" className="text-purple-500 hover:bg-purple-500/10">
+        <ArrowUp className="size-5" />
+      </Button>
     </div>
   )
 }
