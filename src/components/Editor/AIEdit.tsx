@@ -28,6 +28,13 @@ const AiEditMenu = ({ selectedText, onEdit }: AiEditMenuProps) => {
         <div className="flex items-center gap-2">
           <Sparkles className="size-5 text-purple-500" />
           <CardTitle className="text-sm text-gray-300">Ask AI to edit or generate...</CardTitle>
+          <input
+            type="text"
+            onClick={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+            className="bg-dark-gray-c-twelve rounded border border-gray-700 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
         </div>
         <Button size="icon" variant="ghost" className="text-purple-500">
           <ArrowUp className="size-5" />

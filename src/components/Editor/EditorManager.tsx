@@ -5,6 +5,7 @@ import EditorContextMenu from './EditorContextMenu'
 import SearchBar from './Search/SearchBar'
 import { useFileContext } from '@/contexts/FileContext'
 import DocumentStats from './DocumentStats'
+import AiEditMenu from './AIEdit'
 
 const EditorManager: React.FC = () => {
   const [showSearchBar, setShowSearchBar] = useState(false)
@@ -71,13 +72,14 @@ const EditorManager: React.FC = () => {
             }}
           >
             {showAIPopup ? (
-              <input
-                type="text"
-                onClick={(e) => e.stopPropagation()}
-                onMouseDown={(e) => e.stopPropagation()}
-                onKeyDown={(e) => e.stopPropagation()}
-                className="bg-dark-gray-c-twelve rounded border border-gray-700 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
-              />
+              // <input
+              //   type="text"
+              //   onClick={(e) => e.stopPropagation()}
+              //   onMouseDown={(e) => e.stopPropagation()}
+              //   onKeyDown={(e) => e.stopPropagation()}
+              //   className="bg-dark-gray-c-twelve rounded border border-gray-700 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              // />
+              <AiEditMenu selectedText={editor.getText()} onEdit={() => {}} />
             ) : (
               <button onClick={() => setShowAIPopup(true)} className="rounded p-2 hover:bg-gray-700">
                 Ask AI
