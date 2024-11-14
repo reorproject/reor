@@ -5,7 +5,6 @@ import EditorContextMenu from './EditorContextMenu'
 import SearchBar from './Search/SearchBar'
 import { useFileContext } from '@/contexts/FileContext'
 import DocumentStats from './DocumentStats'
-import AiEditMenu from './AIEdit'
 
 const EditorManager: React.FC = () => {
   const [showSearchBar, setShowSearchBar] = useState(false)
@@ -52,9 +51,10 @@ const EditorManager: React.FC = () => {
           className="flex gap-2 rounded-lg border border-gray-700 bg-dark-gray-c-eleven p-2 shadow-lg"
           editor={editor}
           tippyOptions={{
-            duration: 1000,
             placement: 'auto',
             offset: [0, 10],
+            interactive: true,
+            interactiveBorder: 20,
             onHidden: () => {
               setShowAIPopup(false)
             },
@@ -65,9 +65,19 @@ const EditorManager: React.FC = () => {
               e.preventDefault()
               e.stopPropagation()
             }}
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+            }}
           >
             {showAIPopup ? (
-              <AiEditMenu selectedText={editor.getText()} onEdit={() => {}} />
+              <input
+                type="text"
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
+                className="bg-dark-gray-c-twelve rounded border border-gray-700 px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              />
             ) : (
               <button onClick={() => setShowAIPopup(true)} className="rounded p-2 hover:bg-gray-700">
                 Ask AI
