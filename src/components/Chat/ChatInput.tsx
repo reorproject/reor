@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import React, { useRef, useState } from 'react'
 import { PiPaperPlaneRight } from 'react-icons/pi'
 import FileAutocomplete from './FileAutocomplete'
 import { AgentConfig, LoadingState } from '../../lib/llm/types'
@@ -131,7 +131,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
   return (
     <div className="flex w-full">
-      <div className="z-50 flex w-full flex-col overflow-hidden rounded border-2 border-solid border-border bg-background focus-within:ring-1 focus-within:ring-ring">
+      <div className="relative z-50 flex w-full flex-col overflow-visible rounded border-2 border-solid border-border bg-background focus-within:ring-1 focus-within:ring-ring">
         {/* <Select value={selectedLLM}>
           <SelectTrigger className="h-7 w-32 border-0 text-[10px] text-gray-300 focus:ring-0 focus:ring-offset-0">
             <SelectValue placeholder="Tools" />
@@ -149,19 +149,25 @@ const ChatInput: React.FC<ChatInputProps> = ({
           </SelectContent>
         </Select> */}
         <textarea
+          ref={textareaRef}
           value={userTextFieldInput}
           onKeyDown={(e) => {
+            handleKeyDown(e)
             if (!e.shiftKey && e.key === 'Enter') {
               e.preventDefault()
               handleSubmitNewMessage()
             }
           }}
-          className="h-[100px] w-full resize-none border-0 bg-transparent p-4 text-foreground caret-current focus:outline-none"
+          onChange={(e) => {
+            handleInput(e)
+            setUserTextFieldInput(e.target.value)
+          }}
+          className="min-h-[100px] w-full resize-none border-0 bg-transparent p-4 text-foreground caret-current focus:outline-none"
           wrap="soft"
           placeholder="What can Reor help you with today?"
-          onChange={(e) => setUserTextFieldInput(e.target.value)}
           // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus
+          // rows={1}
         />
         <div className="mx-auto h-px w-[96%] bg-background/20" />
         <div className="flex h-10 flex-col items-center justify-between gap-2  py-2 md:flex-row md:gap-4">

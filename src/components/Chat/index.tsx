@@ -48,20 +48,21 @@ const ChatComponent: React.FC = () => {
 
         // Extract file references from the message
         const fileRefs = extractFileReferences(userTextFieldInput || '')
-        // console.log('fileRefs', fileRefs)
+        console.log('fileRefs', fileRefs)
 
         // Create or update chat with file context
-        // outputChat = userTextFieldInput?.trim()
-        //   ? await updateOrCreateChat(chat, userTextFieldInput, {
-        //       name: agentConfig?.name || 'default',
-        //       ...agentConfig,
-        //       toolDefinitions: agentConfig?.toolDefinitions || [],
-        //       promptTemplate: agentConfig?.promptTemplate || [],
-        //       files: fileRefs,
-        //     })
         outputChat = userTextFieldInput?.trim()
-          ? await appendToOrCreateChat(chat, userTextFieldInput, agentConfig)
+          ? await appendToOrCreateChat(chat, userTextFieldInput, {
+              name: agentConfig?.name || 'default',
+              ...agentConfig,
+              toolDefinitions: agentConfig?.toolDefinitions || [],
+              promptTemplate: agentConfig?.promptTemplate || [],
+              files: fileRefs,
+            })
           : chat
+        // outputChat = userTextFieldInput?.trim()
+        //   ? await appendToOrCreateChat(chat, userTextFieldInput, agentConfig)
+        //   : chat
 
         if (!outputChat) {
           return

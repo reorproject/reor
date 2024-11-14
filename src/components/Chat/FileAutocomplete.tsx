@@ -26,7 +26,11 @@ const FileAutocomplete: React.FC<FileAutocompleteProps> = ({ searchTerm, positio
   return (
     <div
       className="absolute z-50 max-h-48 w-64 overflow-y-auto rounded-md border border-neutral-700 bg-background shadow-lg"
-      style={{ top: position.top, left: position.left }}
+      style={{
+        top: 'auto',
+        bottom: `calc(100% + 10px)`,
+        left: position.left,
+      }}
     >
       {files.map((file) => (
         <div key={file} className="cursor-pointer px-4 py-2 hover:bg-neutral-700" onClick={() => onSelect(file)}>

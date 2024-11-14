@@ -8,7 +8,13 @@ import WindowsManager from '../common/windowManager'
 import { StoreSchema } from '../electron-store/storeConfig'
 import { handleFileRename, updateFileInTable } from '../vector-database/tableHelperFunctions'
 
-import { GetFilesInfoTree, createFileRecursive, isHidden, GetFilesInfoListForListOfPaths } from './filesystem'
+import {
+  GetFilesInfoTree,
+  createFileRecursive,
+  isHidden,
+  GetFilesInfoListForListOfPaths,
+  searchFiles,
+} from './filesystem'
 import { FileInfoTree, WriteFileProps, RenameFileProps, FileInfoWithContent } from './types'
 
 const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: WindowsManager) => {
