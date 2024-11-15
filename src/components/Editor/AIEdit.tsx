@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { ArrowUp } from 'lucide-react'
 import React, { useState } from 'react'
 import { streamText } from 'ai'
+import { ArrowUp } from 'lucide-react'
 import { Button } from '../ui/button'
 import resolveLLMClient from '@/lib/llm/client'
 
@@ -71,8 +71,7 @@ const AiEditMenu = ({ selectedText, onEdit }: AiEditMenuProps) => {
       )}
 
       <div className="flex items-center gap-2">
-        <input
-          type="text"
+        <textarea
           value={instruction}
           onChange={(e) => setInstruction(e.target.value)}
           placeholder="Enter your editing instruction..."
@@ -80,11 +79,13 @@ const AiEditMenu = ({ selectedText, onEdit }: AiEditMenuProps) => {
           onMouseDown={(e) => e.stopPropagation()}
           onKeyDown={(e) => {
             e.stopPropagation()
-            if (e.key === 'Enter' && !isLoading) {
+            if (e.key === 'Enter' && !e.shiftKey && !isLoading) {
+              e.preventDefault() // Prevent new line on Enter
               handleEdit()
             }
           }}
-          className="z-50 flex w-full flex-col overflow-hidden rounded border-2 border-solid border-border bg-background text-white focus-within:ring-1 focus-within:ring-ring"
+          rows={1}
+          className="z-50 flex w-full flex-col overflow-hidden rounded border-2 border-solid border-border bg-background p-2 text-white focus-within:ring-1 focus-within:ring-ring"
           // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus
         />
