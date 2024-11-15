@@ -70,7 +70,7 @@ const AiEditMenu = ({ selectedText, onEdit }: AiEditMenuProps) => {
         </div>
       )}
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 bg-background">
         <textarea
           value={instruction}
           onChange={(e) => setInstruction(e.target.value)}

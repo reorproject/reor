@@ -52,7 +52,7 @@ const EditorManager: React.FC = () => {
     >
       {editor && (
         <BubbleMenu
-          className="flex gap-2 rounded-lg border border-gray-700 bg-dark-gray-c-eleven p-2 shadow-lg"
+          className="flex gap-2 rounded-lg bg-transparent px-2"
           editor={editor}
           tippyOptions={{
             placement: 'auto',
