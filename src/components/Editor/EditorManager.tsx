@@ -1,6 +1,8 @@
 /* eslint-disable react/button-has-type */
 import React, { useEffect, useState } from 'react'
 import { EditorContent, BubbleMenu } from '@tiptap/react'
+import { getHTMLFromFragment } from '@tiptap/core'
+import TurndownService from 'turndown'
 import EditorContextMenu from './EditorContextMenu'
 import SearchBar from './Search/SearchBar'
 import { useFileContext } from '@/contexts/FileContext'
@@ -14,6 +16,7 @@ const EditorManager: React.FC = () => {
   const [editorFlex, setEditorFlex] = useState(true)
   const [showAIPopup, setShowAIPopup] = useState(false)
   const { editor } = useFileContext()
+  const turndownService = new TurndownService()
 
   const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault()
@@ -74,9 +77,13 @@ const EditorManager: React.FC = () => {
             }}
           >
             {showAIPopup ? (
-              // <div className="max-h-[400px] overflow-y-auto">
               <AiEditMenu
-                selectedText={editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to)}
+                selectedText={turndownService.turndown(
+                  getHTMLFromFragment(
+                    editor.state.doc.slice(editor.state.selection.from, editor.state.selection.to).content,
+                    editor.schema,
+                  ),
+                )}
                 onEdit={(newText: string) => {
                   editor
                     .chain()
@@ -90,7 +97,6 @@ const EditorManager: React.FC = () => {
                 }}
               />
             ) : (
-              // </div>
               <button onClick={() => setShowAIPopup(true)} className="rounded p-2 hover:bg-gray-700">
                 AI Edit
               </button>
