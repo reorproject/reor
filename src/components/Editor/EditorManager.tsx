@@ -75,7 +75,20 @@ const EditorManager: React.FC = () => {
           >
             {showAIPopup ? (
               // <div className="max-h-[400px] overflow-y-auto">
-              <AiEditMenu selectedText={editor.getText()} onEdit={() => {}} />
+              <AiEditMenu
+                selectedText={editor.state.doc.textBetween(editor.state.selection.from, editor.state.selection.to)}
+                onEdit={(newText: string) => {
+                  editor
+                    .chain()
+                    .focus()
+                    .deleteRange({
+                      from: editor.state.selection.from,
+                      to: editor.state.selection.to,
+                    })
+                    .insertContent(newText)
+                    .run()
+                }}
+              />
             ) : (
               // </div>
               <button onClick={() => setShowAIPopup(true)} className="rounded p-2 hover:bg-gray-700">
