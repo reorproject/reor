@@ -19,6 +19,7 @@ import { toast } from 'react-toastify'
 import { Markdown } from 'tiptap-markdown'
 import { useDebounce } from 'use-debounce'
 import { FileInfo, FileInfoTree } from 'electron/main/filesystem/types'
+import Highlight from '@tiptap/extension-highlight'
 import {
   findRelevantDirectoriesToBeExpanded,
   flattenFileInfoTree,
@@ -181,6 +182,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         transformPastedText: true,
         transformCopiedText: false,
       }),
+      Highlight,
       TaskItem.configure({
         nested: true,
       }),

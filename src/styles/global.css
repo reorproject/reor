@@ -190,6 +190,14 @@ button {
   /* Adjust day cell size */
 }
 
+/* AI Edit highlight styles */
+/* .tiptap .ai-edit-highlight {
+  background-color: pink; 
+  border-radius: 2px;
+  padding: 2px 0;
+  margin: 0 -2px;
+} */
+
 @layer base {
   :root {
     --background: 0 0% 100%;

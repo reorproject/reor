@@ -66,6 +66,7 @@
     "@tiptap/extension-bubble-menu": "^2.4.0",
     "@tiptap/extension-character-count": "^2.7.2",
     "@tiptap/extension-document": "^2.5.0",
+    "@tiptap/extension-highlight": "^2.9.1",
     "@tiptap/extension-link": "^2.2.4",
     "@tiptap/extension-paragraph": "^2.5.0",
     "@tiptap/extension-table": "^2.4.0",

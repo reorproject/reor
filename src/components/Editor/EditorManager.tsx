@@ -1,7 +1,7 @@
 /* eslint-disable react/button-has-type */
 import React, { useEffect, useState } from 'react'
 import { EditorContent, BubbleMenu } from '@tiptap/react'
-import { getHTMLFromFragment } from '@tiptap/core'
+import { getHTMLFromFragment, Range } from '@tiptap/core'
 import TurndownService from 'turndown'
 import EditorContextMenu from './EditorContextMenu'
 import SearchBar from './Search/SearchBar'
@@ -17,6 +17,7 @@ const EditorManager: React.FC = () => {
   const [showAIPopup, setShowAIPopup] = useState(false)
   const { editor } = useFileContext()
   const turndownService = new TurndownService()
+  const [selectedRange, setSelectedRange] = useState<Range | null>(null)
 
   const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault()
@@ -45,6 +46,23 @@ const EditorManager: React.FC = () => {
     window.ipcRenderer.on('editor-flex-center-changed', handleEditorChange)
   }, [])
 
+  useEffect(() => {
+    if (!editor) return
+
+    if (showAIPopup && selectedRange) {
+      editor.chain().focus().setMark('highlight').run()
+    }
+  }, [showAIPopup, selectedRange, editor])
+
+  useEffect(() => {
+    if (!editor) return
+
+    if (!showAIPopup) {
+      editor.chain().focus().unsetMark('highlight').run()
+      editor.chain().focus().toggleHighlight().run()
+    }
+  }, [showAIPopup, editor])
+
   return (
     <div
       className="relative size-full cursor-text overflow-hidden bg-dark-gray-c-eleven py-4 text-slate-400 opacity-80"
@@ -61,6 +79,8 @@ const EditorManager: React.FC = () => {
             interactiveBorder: 20,
             onHidden: () => {
               setShowAIPopup(false)
+              console.log('unsetting selected range')
+              setSelectedRange(null)
             },
             maxWidth: 'none',
           }}
@@ -71,6 +91,17 @@ const EditorManager: React.FC = () => {
               e.preventDefault()
               e.stopPropagation()
             }}
+            onMouseUp={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+
+              if (!showAIPopup) {
+                setSelectedRange({
+                  from: editor.state.selection.from,
+                  to: editor.state.selection.to,
+                })
+              }
+            }}
             onClick={(e) => {
               e.preventDefault()
               e.stopPropagation()
@@ -80,7 +111,10 @@ const EditorManager: React.FC = () => {
               <AiEditMenu
                 selectedText={turndownService.turndown(
                   getHTMLFromFragment(
-                    editor.state.doc.slice(editor.state.selection.from, editor.state.selection.to).content,
+                    editor.state.doc.slice(
+                      selectedRange?.from || editor.state.selection.from,
+                      selectedRange?.to || editor.state.selection.to,
+                    ).content,
                     editor.schema,
                   ),
                 )}
@@ -89,11 +123,12 @@ const EditorManager: React.FC = () => {
                     .chain()
                     .focus()
                     .deleteRange({
-                      from: editor.state.selection.from,
-                      to: editor.state.selection.to,
+                      from: selectedRange?.from || editor.state.selection.from,
+                      to: selectedRange?.to || editor.state.selection.to,
                     })
                     .insertContent(newText)
                     .run()
+                  setShowAIPopup(false)
                 }}
               />
             ) : (
