@@ -1,20 +1,23 @@
+/* eslint-disable react/button-has-type */
 import React, { useEffect, useState } from 'react'
-import { EditorContent } from '@tiptap/react'
-import InEditorBacklinkSuggestionsDisplay from './BacklinkSuggestionsDisplay'
+import { EditorContent, BubbleMenu } from '@tiptap/react'
+import { getHTMLFromFragment, Range } from '@tiptap/core'
+import TurndownService from 'turndown'
 import EditorContextMenu from './EditorContextMenu'
 import SearchBar from './Search/SearchBar'
 import { useFileContext } from '@/contexts/FileContext'
-import { useContentContext } from '@/contexts/ContentContext'
+import DocumentStats from './DocumentStats'
+import AiEditMenu from './AIEdit'
 
 const EditorManager: React.FC = () => {
   const [showSearchBar, setShowSearchBar] = useState(false)
   const [contextMenuVisible, setContextMenuVisible] = useState(false)
   const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
   const [editorFlex, setEditorFlex] = useState(true)
-
-  const { editor, suggestionsState, vaultFilesFlattened } = useFileContext()
-  const [showDocumentStats, setShowDocumentStats] = useState(false)
-  const { openContent } = useContentContext()
+  const [showAIPopup, setShowAIPopup] = useState(false)
+  const { editor } = useFileContext()
+  const turndownService = new TurndownService()
+  const [selectedRange, setSelectedRange] = useState<Range | null>(null)
 
   const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
     event.preventDefault()
@@ -27,15 +30,6 @@ const EditorManager: React.FC = () => {
 
   const hideMenu = () => {
     if (contextMenuVisible) setContextMenuVisible(false)
-  }
-
-  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    const { target } = event
-    if (target instanceof HTMLElement && target.getAttribute('data-backlink') === 'true') {
-      event.preventDefault()
-      const backlinkPath = target.textContent
-      if (backlinkPath) openContent(backlinkPath)
-    }
   }
 
   useEffect(() => {
@@ -53,25 +47,96 @@ const EditorManager: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    const initDocumentStats = async () => {
-      const showStats = await window.electronStore.getDocumentStats()
-      setShowDocumentStats(showStats)
+    if (!editor) return
+
+    if (showAIPopup && selectedRange) {
+      editor.chain().focus().setMark('highlight').run()
     }
+  }, [showAIPopup, selectedRange, editor])
 
-    initDocumentStats()
+  useEffect(() => {
+    if (!editor) return
 
-    const handleDocStatsChange = (event: Electron.IpcRendererEvent, value: boolean) => {
-      setShowDocumentStats(value)
+    if (!showAIPopup) {
+      editor?.commands.clearFormatting()
     }
-
-    window.ipcRenderer.on('show-doc-stats-changed', handleDocStatsChange)
-  }, [])
+  }, [showAIPopup, editor])
 
   return (
     <div
       className="relative size-full cursor-text overflow-hidden bg-dark-gray-c-eleven py-4 text-slate-400 opacity-80"
       onClick={() => editor?.commands.focus()}
     >
+      {editor && (
+        <BubbleMenu
+          className="flex gap-2 rounded-lg bg-transparent px-2"
+          editor={editor}
+          tippyOptions={{
+            placement: 'auto',
+            offset: [0, 10],
+            interactive: true,
+            interactiveBorder: 20,
+            onHidden: () => {
+              setShowAIPopup(false)
+              setSelectedRange(null)
+            },
+            maxWidth: 'none',
+          }}
+        >
+          <div
+            className="w-[300px]"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+            }}
+            onMouseUp={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+
+              if (!showAIPopup) {
+                setSelectedRange({
+                  from: editor.state.selection.from,
+                  to: editor.state.selection.to,
+                })
+              }
+            }}
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+            }}
+          >
+            {showAIPopup ? (
+              <AiEditMenu
+                selectedText={turndownService.turndown(
+                  getHTMLFromFragment(
+                    editor.state.doc.slice(
+                      selectedRange?.from || editor.state.selection.from,
+                      selectedRange?.to || editor.state.selection.to,
+                    ).content,
+                    editor.schema,
+                  ),
+                )}
+                onEdit={(newText: string) => {
+                  editor
+                    .chain()
+                    .focus()
+                    .deleteRange({
+                      from: selectedRange?.from || editor.state.selection.from,
+                      to: selectedRange?.to || editor.state.selection.to,
+                    })
+                    .insertContent(newText)
+                    .run()
+                  setShowAIPopup(false)
+                }}
+              />
+            ) : (
+              <button onClick={() => setShowAIPopup(true)} className="rounded p-2 hover:bg-gray-700">
+                AI Edit
+              </button>
+            )}
+          </div>
+        </BubbleMenu>
+      )}
       <SearchBar editor={editor} showSearch={showSearchBar} setShowSearch={setShowSearchBar} />
       {contextMenuVisible && (
         <EditorContextMenu
@@ -82,9 +147,7 @@ const EditorManager: React.FC = () => {
         />
       )}
 
-      <div
-        className={`relative h-full ${editorFlex ? 'flex justify-center py-4 pl-4' : ''} ${showDocumentStats ? 'pb-3' : ''}`}
-      >
+      <div className={`relative h-full ${editorFlex ? 'flex justify-center py-4 pl-4' : ''}`}>
         <div className="relative size-full overflow-y-auto">
           <EditorContent
             className={`relative size-full bg-dark-gray-c-eleven ${editorFlex ? 'max-w-xl' : ''}`}
@@ -92,23 +155,11 @@ const EditorManager: React.FC = () => {
               wordBreak: 'break-word',
             }}
             onContextMenu={handleContextMenu}
-            onClick={handleClick}
             editor={editor}
           />
         </div>
       </div>
-      {suggestionsState && (
-        <InEditorBacklinkSuggestionsDisplay
-          suggestionsState={suggestionsState}
-          suggestions={vaultFilesFlattened.map((file) => file.relativePath)}
-        />
-      )}
-      {editor && showDocumentStats && (
-        <div className="absolute bottom-2 right-2 flex gap-4 text-sm text-gray-500">
-          <div>Characters: {editor.storage.characterCount.characters()}</div>
-          <div>Words: {editor.storage.characterCount.words()}</div>
-        </div>
-      )}
+      <DocumentStats editor={editor} />
     </div>
   )
 }

@@ -13,7 +13,6 @@ import IconsSidebar from './Sidebars/IconsSidebar'
 import SidebarManager from './Sidebars/MainSidebar'
 import EmptyPage from './Common/EmptyPage'
 import { ContentProvider, useContentContext } from '../contexts/ContentContext'
-import WritingAssistant from './WritingAssistant/WritingAssistant'
 import { ChatProvider, useChatContext } from '@/contexts/ChatContext'
 import { FileProvider, useFileContext } from '@/contexts/FileContext'
 import ModalProvider from '@/contexts/ModalContext'
@@ -40,7 +39,6 @@ const MainContent: React.FC = () => {
           <EditorManager />
         </div>
       )}
-      <WritingAssistant />
     </div>
   )
 }

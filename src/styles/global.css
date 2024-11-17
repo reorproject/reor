@@ -190,6 +190,25 @@ button {
   /* Adjust day cell size */
 }
 
+/* Add this before the @layer base section */
+.tiptap mark.selection-highlight {
+  background: rgba(66, 135, 245, 0.4) !important;
+  color: inherit !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+/* You can remove or comment out the existing AI edit highlight styles */
+/* .tiptap .ai-edit-highlight {
+  background-color: pink; 
+  border-radius: 2px;
+  padding: 2px 0;
+  margin: 0 -2px;
+} */
+
 @layer base {
   :root {
     --background: 0 0% 100%;

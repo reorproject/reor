@@ -103,7 +103,7 @@ const NavigationButtons: React.FC = () => {
           }}
         >
           <ul>
-            {menuChild.map((pathOrChatID) => (
+            {menuChild.reverse().map((pathOrChatID) => (
               <li key={pathOrChatID}>
                 <div key={pathOrChatID} onClick={() => goSelected(pathOrChatID)}>
                   {removeFileExtension(pathOrChatID.replace(/\\/g, '/').split('/').pop() || '')}
