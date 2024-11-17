@@ -37,6 +37,7 @@ import getMarkdown from '@/components/Editor/utils'
 import useOrderedSet from '../lib/hooks/use-ordered-set'
 import welcomeNote from '@/lib/welcome-note'
 import ClearFormattingExtension from '@/components/Editor/Extensions/FormattingExtension'
+import CustomHighlight from '@/components/Editor/Extensions/CustomHighlight'
 
 type FileContextType = {
   vaultFilesTree: FileInfoTree
@@ -169,6 +170,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       TableHeader,
       TableCell,
       TextStyle,
+      CustomHighlight,
       SearchAndReplace.configure({
         searchResultClass: 'bg-yellow-400',
         disableRegex: false,
