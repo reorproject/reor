@@ -58,8 +58,7 @@ const EditorManager: React.FC = () => {
     if (!editor) return
 
     if (!showAIPopup) {
-      editor.chain().focus().unsetMark('highlight').run()
-      editor.chain().focus().toggleHighlight().run()
+      editor?.commands.clearFormatting()
     }
   }, [showAIPopup, editor])
 
@@ -79,7 +78,6 @@ const EditorManager: React.FC = () => {
             interactiveBorder: 20,
             onHidden: () => {
               setShowAIPopup(false)
-              console.log('unsetting selected range')
               setSelectedRange(null)
             },
             maxWidth: 'none',

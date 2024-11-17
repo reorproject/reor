@@ -36,6 +36,7 @@ import SearchAndReplace from '@/components/Editor/Search/SearchAndReplaceExtensi
 import getMarkdown from '@/components/Editor/utils'
 import useOrderedSet from '../lib/hooks/use-ordered-set'
 import welcomeNote from '@/lib/welcome-note'
+import ClearFormattingExtension from '@/components/Editor/Extensions/FormattingExtension'
 
 type FileContextType = {
   vaultFilesTree: FileInfoTree
@@ -183,6 +184,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         transformCopiedText: false,
       }),
       Highlight,
+      ClearFormattingExtension,
       TaskItem.configure({
         nested: true,
       }),
