@@ -33,50 +33,17 @@ const ChatInput: React.FC<ChatInputProps> = ({
   const [searchTerm, setSearchTerm] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
-  const getCaretCoordinates = (element: HTMLTextAreaElement) => {
-    const { selectionStart, value } = element
-    const textBeforeCaret = value.substring(0, selectionStart)
-
-    // Create a hidden div with the same styling as textarea
-    const mirror = document.createElement('div')
-    mirror.style.cssText = window.getComputedStyle(element).cssText
-    mirror.style.height = 'auto'
-    mirror.style.position = 'absolute'
-    mirror.style.visibility = 'hidden'
-    mirror.style.whiteSpace = 'pre-wrap'
-    document.body.appendChild(mirror)
-
-    // Create a span for the text before caret
-    const textNode = document.createTextNode(textBeforeCaret)
-    const span = document.createElement('span')
-    span.appendChild(textNode)
-    mirror.appendChild(span)
-
-    // Get coordinates
-    const coordinates = {
-      top: span.offsetTop + parseInt(window.getComputedStyle(element).lineHeight, 10) / 2,
-      left: span.offsetLeft,
-    }
-
-    // Clean up
-    document.body.removeChild(mirror)
-
-    return coordinates
-  }
-
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (userTextFieldInput && !e.shiftKey && e.key === 'Enter') {
       e.preventDefault()
       handleSubmitNewMessage()
     } else if (e.key === '@') {
       const rect = e.currentTarget.getBoundingClientRect()
-      const position = getCaretCoordinates(e.currentTarget)
       setAutocompletePosition({
-        top: rect.top + position.top,
-        left: rect.left + position.left,
+        top: rect.top,
+        left: rect.left,
       })
       setShowFileAutocomplete(true)
-      // console.log('showFileAutocomplete', showFileAutocomplete)
     } else if (showFileAutocomplete && e.key === 'Escape') {
       setShowFileAutocomplete(false)
     }
