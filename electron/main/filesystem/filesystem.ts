@@ -197,17 +197,26 @@ export function splitDirectoryPathIntoBaseAndRepo(fullPath: string) {
   return { localModelPath, repoName }
 }
 
-export const searchFiles = async (store: Store<StoreSchema>, searchTerm: string): Promise<string[]> => {
+interface FileSearchResult {
+  absolutePath: string
+  relativePath: string
+}
+
+export const searchFiles = async (store: Store<StoreSchema>, searchTerm: string): Promise<FileSearchResult[]> => {
   const vaultDirectory = store.get(StoreKeys.DirectoryFromPreviousSession)
   if (!vaultDirectory || typeof vaultDirectory !== 'string') {
     throw new Error('No valid vault directory found')
   }
 
   const allFiles = GetFilesInfoList(vaultDirectory)
-
   const searchTermLower = searchTerm.toLowerCase()
 
-  const matchingFiles = allFiles.filter((file) => file.name.toLowerCase().startsWith(searchTermLower))
+  const matchingFiles = allFiles
+    .filter((file) => file.name.toLowerCase().startsWith(searchTermLower))
+    .map((file) => ({
+      absolutePath: file.path,
+      relativePath: file.path.replace(vaultDirectory, '').replace(/^[/\\]+/, ''),
+    }))
 
-  return matchingFiles.map((file) => file.path)
+  return matchingFiles
 }

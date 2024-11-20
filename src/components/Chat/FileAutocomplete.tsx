@@ -8,20 +8,31 @@ interface FileAutocompleteProps {
 }
 
 const FileAutocomplete: React.FC<FileAutocompleteProps> = ({ searchTerm, position, onSelect, visible }) => {
-  const [files, setFiles] = useState<string[]>([])
+  const [files, setFiles] = useState<Array<{ absolutePath: string; relativePath: string }>>([])
 
   useEffect(() => {
     const searchFiles = async () => {
       if (searchTerm && visible) {
-        // Use the electron API to search for files
         const results = await window.fileSystem.searchFiles(searchTerm)
-        setFiles(results)
+        setFiles(results.map((path) => ({ absolutePath: path, relativePath: path })))
       }
     }
     searchFiles()
   }, [searchTerm, visible])
 
   if (!visible || !searchTerm) return null
+
+  const formatFilePath = (relativePath: string) => {
+    const parts = relativePath.split('/')
+    const fileName = parts.pop() || ''
+    const folderPath = parts.join('/')
+    return (
+      <div className="flex items-center justify-between">
+        <span>{fileName}</span>
+        <span className="ml-2 truncate text-xs text-neutral-500">{folderPath ? `(${folderPath})` : ''}</span>
+      </div>
+    )
+  }
 
   return (
     <div
@@ -33,8 +44,12 @@ const FileAutocomplete: React.FC<FileAutocompleteProps> = ({ searchTerm, positio
       }}
     >
       {files.map((file) => (
-        <div key={file} className="cursor-pointer px-4 py-2 hover:bg-neutral-700" onClick={() => onSelect(file)}>
-          {file.split('/').pop()}
+        <div
+          key={file.absolutePath}
+          className="cursor-pointer px-4 py-2 hover:bg-neutral-700"
+          onClick={() => onSelect(file.absolutePath)}
+        >
+          {formatFilePath(file.relativePath)}
         </div>
       ))}
     </div>

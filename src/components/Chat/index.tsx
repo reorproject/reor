@@ -48,7 +48,7 @@ const ChatComponent: React.FC = () => {
 
         // Extract file references from the message
         const fileRefs = extractFileReferences(userTextFieldInput || '')
-        console.log('fileRefs', fileRefs)
+        // console.log('fileRefs', fileRefs)
 
         // Create or update chat with file context
         outputChat = userTextFieldInput?.trim()
