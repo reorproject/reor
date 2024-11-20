@@ -92,7 +92,11 @@ const fileSystem = {
   deleteFile: createIPCHandler<(filePath: string) => Promise<void>>('delete-file'),
   getAllFilenamesInDirectory: createIPCHandler<(dirName: string) => Promise<string[]>>('get-files-in-directory'),
   getFiles: createIPCHandler<(filePaths: string[]) => Promise<FileInfoWithContent[]>>('get-files'),
-  searchFiles: createIPCHandler<(searchTerm: string) => Promise<string[]>>('search-files'),
+  searchFiles:
+    createIPCHandler<(searchTerm: string) => Promise<Array<{ absolutePath: string; relativePath: string }>>>(
+      'search-files',
+    ),
+  getVaultPath: createIPCHandler<() => Promise<string>>('get-vault-path'),
 }
 
 const path = {

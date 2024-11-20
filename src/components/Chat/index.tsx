@@ -15,11 +15,19 @@ import { useChatContext } from '@/contexts/ChatContext'
 import resolveLLMClient from '@/lib/llm/client'
 import { appendToolCallsAndAutoExecuteTools, convertToolConfigToZodSchema } from '../../lib/llm/tools/utils'
 
-const extractFileReferences = (message: string): string[] => {
+const extractFileReferences = async (message: string): Promise<string[]> => {
   const regex = /@([^@]+?\.md)/g
   const matches = message.match(regex)
-  // console.log('matches', matches)
-  return matches ? matches.map((match) => match.slice(1)) : []
+
+  if (!matches) return []
+
+  // Convert relative paths to absolute paths
+  const vaultPath = await window.fileSystem.getVaultPath()
+  return matches.map((match) => {
+    const relativePath = match.slice(1) // Remove @ symbol
+
+    return `${vaultPath}/${relativePath}`
+  })
 }
 
 const ChatComponent: React.FC = () => {
@@ -47,7 +55,7 @@ const ChatComponent: React.FC = () => {
         }
 
         // Extract file references from the message
-        const fileRefs = extractFileReferences(userTextFieldInput || '')
+        const fileRefs = await extractFileReferences(userTextFieldInput || '')
         // console.log('fileRefs', fileRefs)
 
         // Create or update chat with file context

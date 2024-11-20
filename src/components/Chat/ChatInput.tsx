@@ -100,9 +100,9 @@ const ChatInput: React.FC<ChatInputProps> = ({
     e.target.style.height = `${Math.min(e.target.scrollHeight, 160)}px`
   }
 
-  const handleFileSelect = (filePath: string) => {
+  const handleFileSelect = (filePath: { absolutePath: string; relativePath: string }) => {
     const lastAtIndex = userTextFieldInput.lastIndexOf('@')
-    const newValue = `${userTextFieldInput.slice(0, lastAtIndex)}@${filePath} ${userTextFieldInput.slice(
+    const newValue = `${userTextFieldInput.slice(0, lastAtIndex)}@${filePath.relativePath} ${userTextFieldInput.slice(
       lastAtIndex + searchTerm.length + 1,
     )}`
 

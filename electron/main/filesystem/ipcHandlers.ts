@@ -14,6 +14,7 @@ import {
   isHidden,
   GetFilesInfoListForListOfPaths,
   searchFiles,
+  getVaultPath,
 } from './filesystem'
 import { FileInfoTree, WriteFileProps, RenameFileProps, FileInfoWithContent } from './types'
 
@@ -158,6 +159,10 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
 
   ipcMain.handle('search-files', async (_event, searchTerm: string) => {
     return searchFiles(store, searchTerm)
+  })
+
+  ipcMain.handle('get-vault-path', async () => {
+    return getVaultPath(store)
   })
 }
 

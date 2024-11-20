@@ -220,3 +220,11 @@ export const searchFiles = async (store: Store<StoreSchema>, searchTerm: string)
 
   return matchingFiles
 }
+
+export const getVaultPath = (store: Store<StoreSchema>): string => {
+  const vaultDirectory = store.get(StoreKeys.DirectoryFromPreviousSession)
+  if (!vaultDirectory || typeof vaultDirectory !== 'string') {
+    throw new Error('No valid vault directory found')
+  }
+  return vaultDirectory
+}

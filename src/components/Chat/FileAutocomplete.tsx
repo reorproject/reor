@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 interface FileAutocompleteProps {
   searchTerm: string
   position: { top: number; left: number }
-  onSelect: (filePath: string) => void
+  onSelect: (filePath: { absolutePath: string; relativePath: string }) => void
   visible: boolean
 }
 
@@ -14,7 +14,7 @@ const FileAutocomplete: React.FC<FileAutocompleteProps> = ({ searchTerm, positio
     const searchFiles = async () => {
       if (searchTerm && visible) {
         const results = await window.fileSystem.searchFiles(searchTerm)
-        setFiles(results.map((path) => ({ absolutePath: path, relativePath: path })))
+        setFiles(results)
       }
     }
     searchFiles()
@@ -43,15 +43,17 @@ const FileAutocomplete: React.FC<FileAutocompleteProps> = ({ searchTerm, positio
         left: position.left,
       }}
     >
-      {files.map((file) => (
-        <div
-          key={file.absolutePath}
-          className="cursor-pointer px-4 py-2 hover:bg-neutral-700"
-          onClick={() => onSelect(file.absolutePath)}
-        >
-          {formatFilePath(file.relativePath)}
-        </div>
-      ))}
+      {files.map((file) => {
+        return (
+          <div
+            key={file.absolutePath}
+            className="cursor-pointer px-4 py-2 hover:bg-neutral-700"
+            onClick={() => onSelect({ absolutePath: file.absolutePath, relativePath: file.relativePath })}
+          >
+            {formatFilePath(file.relativePath)}
+          </div>
+        )
+      })}
     </div>
   )
 }
