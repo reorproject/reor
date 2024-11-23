@@ -4,6 +4,7 @@ import { streamText } from 'ai'
 import { ArrowUp } from 'lucide-react'
 import { Button } from '../ui/button'
 import resolveLLMClient from '@/lib/llm/client'
+import MarkdownRenderer from '../Common/MarkdownRenderer'
 
 interface AiEditMenuProps {
   selectedText: string
@@ -53,7 +54,7 @@ const AiEditMenu = ({ selectedText, onEdit }: AiEditMenuProps) => {
           {response && (
             <>
               <div className="prose prose-invert max-h-[400px] max-w-none overflow-y-auto">
-                <p className="m-0 text-sm">{response}</p>
+                <MarkdownRenderer content={response} />
               </div>
               <div className="mt-2 flex justify-end">
                 <Button
@@ -86,8 +87,6 @@ const AiEditMenu = ({ selectedText, onEdit }: AiEditMenuProps) => {
           }}
           rows={1}
           className="z-50 flex w-full flex-col overflow-hidden rounded border-2 border-solid border-border bg-background p-2 text-white outline-none focus-within:ring-1 focus-within:ring-ring"
-          // eslint-disable-next-line jsx-a11y/no-autofocus
-          autoFocus
         />
         <Button
           onClick={handleEdit}

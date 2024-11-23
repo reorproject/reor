@@ -62,6 +62,17 @@ const EditorManager: React.FC = () => {
     }
   }, [showAIPopup, editor])
 
+  useEffect(() => {
+    if (showAIPopup) {
+      setTimeout(() => {
+        const textarea = document.querySelector('.ai-edit-menu textarea')
+        if (textarea instanceof HTMLTextAreaElement) {
+          textarea.focus()
+        }
+      }, 50)
+    }
+  }, [showAIPopup])
+
   return (
     <div
       className="relative size-full cursor-text overflow-hidden bg-dark-gray-c-eleven py-4 text-slate-400 opacity-80"
@@ -106,29 +117,31 @@ const EditorManager: React.FC = () => {
             }}
           >
             {showAIPopup ? (
-              <AiEditMenu
-                selectedText={turndownService.turndown(
-                  getHTMLFromFragment(
-                    editor.state.doc.slice(
-                      selectedRange?.from || editor.state.selection.from,
-                      selectedRange?.to || editor.state.selection.to,
-                    ).content,
-                    editor.schema,
-                  ),
-                )}
-                onEdit={(newText: string) => {
-                  editor
-                    .chain()
-                    .focus()
-                    .deleteRange({
-                      from: selectedRange?.from || editor.state.selection.from,
-                      to: selectedRange?.to || editor.state.selection.to,
-                    })
-                    .insertContent(newText)
-                    .run()
-                  setShowAIPopup(false)
-                }}
-              />
+              <div className="ai-edit-menu">
+                <AiEditMenu
+                  selectedText={turndownService.turndown(
+                    getHTMLFromFragment(
+                      editor.state.doc.slice(
+                        selectedRange?.from || editor.state.selection.from,
+                        selectedRange?.to || editor.state.selection.to,
+                      ).content,
+                      editor.schema,
+                    ),
+                  )}
+                  onEdit={(newText: string) => {
+                    editor
+                      .chain()
+                      .focus()
+                      .deleteRange({
+                        from: selectedRange?.from || editor.state.selection.from,
+                        to: selectedRange?.to || editor.state.selection.to,
+                      })
+                      .insertContent(newText)
+                      .run()
+                    setShowAIPopup(false)
+                  }}
+                />
+              </div>
             ) : (
               <button onClick={() => setShowAIPopup(true)} className="rounded p-2 hover:bg-gray-700">
                 AI Edit
