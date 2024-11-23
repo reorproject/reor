@@ -4,7 +4,7 @@ import { Button } from '@material-tailwind/react'
 import posthog from 'posthog-js'
 
 import ReorModal from '../Common/Modal'
-import { getInvalidCharacterInFileName } from '@/lib/file'
+import { getInvalidCharacterInFilePath } from '@/lib/file'
 import { useFileContext } from '@/contexts/FileContext'
 
 interface NewDirectoryComponentProps {
@@ -50,7 +50,7 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
   }, [isOpen])
 
   const handleValidName = async (name: string) => {
-    const invalidCharacters = await getInvalidCharacterInFileName(name)
+    const invalidCharacters = await getInvalidCharacterInFilePath(name)
     if (invalidCharacters) {
       setErrorMessage(`Cannot put ${invalidCharacters} in file name`)
       return false
