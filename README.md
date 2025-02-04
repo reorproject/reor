@@ -21,7 +21,7 @@ Private & local AI personal knowledge management app.</h4>
 
 **Reor** is an AI-powered desktop note-taking app: it automatically links related notes, answers questions on your notes and provides semantic search. Everything is stored locally and you can edit your notes with an Obsidian-like markdown editor.
 
-The hypothesis of the project is that AI tools for thought should run models locally *by default*. Reor stands on the shoulders of the giants [Ollama](https://github.com/ollama/ollama), [Transformers.js](https://github.com/xenova/transformers.js) & [LanceDB](https://github.com/lancedb/lancedb) to enable both LLMs and embedding models to run locally:
+The hypothesis of the project is that AI tools for thought should run models locally _by default_. Reor stands on the shoulders of the giants [Ollama](https://github.com/ollama/ollama), [Transformers.js](https://github.com/xenova/transformers.js) & [LanceDB](https://github.com/lancedb/lancedb) to enable both LLMs and embedding models to run locally:
 
 1. Every note you write is chunked and embedded into an internal vector database.
 2. Related notes are connected automatically via vector similarity.
@@ -84,4 +84,4 @@ We are always on the lookout for contributors keen on building the future of kno
 
 AGPL-3.0 license. See `LICENSE` for details.
 
-*Reor means "to think" in Latin.*
+_Reor means "to think" in Latin._

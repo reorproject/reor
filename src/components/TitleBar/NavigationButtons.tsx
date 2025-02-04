@@ -7,6 +7,7 @@ import { removeFileExtension } from '@/lib/file'
 import '../../styles/history.scss'
 import { useFileContext } from '@/contexts/FileContext'
 import { useContentContext } from '@/contexts/ContentContext'
+import { YStack, XStack, View, Text } from 'tamagui'
 
 const NavigationButtons: React.FC = () => {
   const [showMenu, setShowMenu] = useState<string>('')
@@ -91,27 +92,21 @@ const NavigationButtons: React.FC = () => {
     return (
       showMenu !== '' &&
       menuChild.length > 0 && (
-        <div
-          ref={ref}
-          // eslint-disable-next-line tailwindcss/no-custom-classname
-          className="history-menu"
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-          tabIndex={0}
-          style={{
-            left: `${offsetLeft}px`,
-            top: `${offsetTop + offsetHeight}px`,
-          }}
-        >
-          <ul>
+        <View ref={ref} tabIndex={0} position="absolute" left={offsetLeft} top={offsetTop + offsetHeight}>
+          <YStack>
             {menuChild.map((pathOrChatID) => (
-              <li key={pathOrChatID}>
-                <div key={pathOrChatID} onClick={() => goSelected(pathOrChatID)}>
-                  {removeFileExtension(pathOrChatID.replace(/\\/g, '/').split('/').pop() || '')}
-                </div>
-              </li>
+              <XStack
+                key={pathOrChatID}
+                padding="$3"
+                cursor="pointer"
+                hoverStyle={{ backgroundColor: '$backgroundHover' }}
+                onPress={() => goSelected(pathOrChatID)}
+              >
+                <Text>{removeFileExtension(pathOrChatID.replace(/\\/g, '/').split('/').pop() || '')}</Text>
+              </XStack>
             ))}
-          </ul>
-        </div>
+          </YStack>
+        </View>
       )
     )
   }

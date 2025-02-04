@@ -8,6 +8,7 @@ import {
   EmbeddingModelWithRepo,
   StoreKeys,
   StoreSchema,
+  TamaguiThemeTypes,
 } from './storeConfig'
 
 import WindowsManager from '../common/windowManager'
@@ -214,6 +215,15 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
 
   ipcMain.handle('get-auto-context', () => {
     return store.get(StoreKeys.AutoContext, true) // Default to true
+  })
+
+  ipcMain.handle('set-tamagui-theme', (event, theme: TamaguiThemeTypes) => {
+    store.set(StoreKeys.TamaguiTheme, theme)
+    event.sender.send('tamagui-theme-changed', theme)
+  })
+
+  ipcMain.handle('get-tamagui-theme', () => {
+    return store.get(StoreKeys.TamaguiTheme, 'dark') // Default to dark
   })
 }
 

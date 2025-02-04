@@ -3,7 +3,8 @@ import React, { useState } from 'react'
 import { LLMAPIConfig } from 'electron/main/electron-store/storeConfig'
 import posthog from 'posthog-js'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+// import { Input } from '@/components/ui/input'
+import { Input, XStack, YStack } from 'tamagui'
 import {
   Dialog,
   DialogContent,
@@ -11,6 +12,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogOverlay,
 } from '@/components/ui/dialog'
 import ExternalLink from '../../../Common/ExternalLink'
 import errorToStringRendererProcess from '@/lib/error'
@@ -36,20 +38,23 @@ const ModelNameInput: React.FC<ModelNameInputProps> = ({ modelNames, setModelNam
   }
 
   return (
-    <div className="">
+    <YStack className="">
       <h4 className="mb-1 font-medium">Model Names</h4>
-      <div className="flex space-x-2">
+      <XStack flex={1} gap="$2">
         <Input
           type="text"
-          className="mt-0"
+          className="mt-0 w-full"
           placeholder="Add model name"
           value={newModelName}
-          onChange={(e) => setNewModelName(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewModelName(e.target.value)}
+          size="$1"
+          py="$4"
+          px="$2"
         />
         <Button onClick={addModelName} type="button" variant="secondary">
           Add
         </Button>
-      </div>
+      </XStack>
       <div className="flex flex-wrap gap-2">
         {modelNames.map((name, index) => (
           // eslint-disable-next-line react/no-array-index-key
@@ -58,7 +63,7 @@ const ModelNameInput: React.FC<ModelNameInputProps> = ({ modelNames, setModelNam
           </span>
         ))}
       </div>
-    </div>
+    </YStack>
   )
 }
 
@@ -108,63 +113,76 @@ const CustomLLMAPISetupModal: React.FC<RemoteLLMModalProps> = ({ isOpen, onClose
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-[525px]">
-        <DialogHeader>
-          <DialogTitle>Remote LLM Setup</DialogTitle>
-          <DialogDescription>
-            Connect with a custom OpenAI-like API endpoint like{' '}
-            <ExternalLink href="https://github.com/oobabooga/text-generation-webui/wiki/12-%E2%80%90-OpenAI-API">
-              Oobabooga
-            </ExternalLink>
-            . A guide to doing this is on the{' '}
-            <ExternalLink href="https://www.reorproject.org/docs/documentation/openai-like-api">docs</ExternalLink>.
-            This is mainly for folks hosting their own models on other machines.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-2 py-4">
-          <div className="grid gap-1">
-            <label htmlFor="apiUrl">API URL</label>
-            <Input
-              id="apiUrl"
-              type="text"
-              placeholder="API URL"
-              value={apiURL}
-              onChange={(e) => setApiURL(e.target.value)}
-            />
-            <p className="mt-0 text-xs text-muted-foreground">
-              (This must be an OpenAI compatible API endpoint. That typically is the part of the url before
-              /chat/completions like for example http://127.0.0.1:1337/v1)
-            </p>
+      <DialogOverlay>
+        <DialogContent className="max-h-[60vh] overflow-y-auto sm:max-w-[525px] p-4">
+          <DialogHeader>
+            <DialogTitle>Remote LLM Setup</DialogTitle>
+            <DialogDescription>
+              Connect with a custom OpenAI-like API endpoint like{' '}
+              <ExternalLink href="https://github.com/oobabooga/text-generation-webui/wiki/12-%E2%80%90-OpenAI-API">
+                Oobabooga
+              </ExternalLink>
+              . A guide to doing this is on the{' '}
+              <ExternalLink href="https://www.reorproject.org/docs/documentation/openai-like-api">docs</ExternalLink>.
+              This is mainly for folks hosting their own models on other machines.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-2 py-4">
+            <div className="grid gap-1">
+              <label htmlFor="apiUrl">API URL</label>
+              <Input
+                id="apiUrl"
+                type="text"
+                placeholder="API URL"
+                value={apiURL}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setApiURL(e.target.value)}
+                size="$1"
+                py="$4"
+                px="$2"
+              />
+              <p className="mt-0 text-xs text-muted-foreground">
+                (This must be an OpenAI compatible API endpoint. That typically is the part of the url before
+                /chat/completions like for example http://127.0.0.1:1337/v1)
+              </p>
+            </div>
+            <div className="grid gap-1">
+              <label htmlFor="apiName">API Name</label>
+              <Input
+                id="apiName"
+                type="text"
+                placeholder="API Name"
+                value={apiName}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setApiName(e.target.value)}
+                size="$1"
+                py="$4"
+                px="$2"
+              />
+              <p className="mt-0 text-xs text-muted-foreground">(A name for your new api)</p>
+            </div>
+            <div className="grid gap-1">
+              <label htmlFor="apiKey">Optional API Key</label>
+              <Input
+                id="apiKey"
+                type="text"
+                placeholder="API Key"
+                value={apiKey}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setApiKey(e.target.value)}
+                size="$1"
+                py="$4"
+                px="$2"
+              />
+              <p className="mt-0 text-xs text-muted-foreground">(If your endpoint requires an API key.)</p>
+            </div>
+            <ModelNameInput modelNames={modelNames} setModelNames={setModelNames} />
+            {currentError && <p className="text-xs text-destructive">{currentError}</p>}
           </div>
-          <div className="grid gap-1">
-            <label htmlFor="apiName">API Name</label>
-            <Input
-              id="apiName"
-              type="text"
-              placeholder="API Name"
-              value={apiName}
-              onChange={(e) => setApiName(e.target.value)}
-            />
-            <p className="mt-0 text-xs text-muted-foreground">(A name for your new api)</p>
-          </div>
-          <div className="grid gap-1">
-            <label htmlFor="apiKey">Optional API Key</label>
-            <Input
-              id="apiKey"
-              type="password"
-              placeholder="API Key"
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-            />
-            <p className="mt-0 text-xs text-muted-foreground">(If your endpoint requires an API key.)</p>
-          </div>
-          <ModelNameInput modelNames={modelNames} setModelNames={setModelNames} />
-          {currentError && <p className="text-xs text-destructive">{currentError}</p>}
-        </div>
-        <DialogFooter>
-          <Button onClick={handleSave}>Save</Button>
-        </DialogFooter>
-      </DialogContent>
+          <DialogFooter>
+            <Button variant="secondary" onClick={handleSave}>
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </DialogOverlay>
     </Dialog>
   )
 }

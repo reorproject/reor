@@ -6,6 +6,7 @@ import posthog from 'posthog-js'
 import ReorModal from '../Common/Modal'
 import { getInvalidCharacterInFilePath } from '@/lib/file'
 import { useFileContext } from '@/contexts/FileContext'
+import { Input, H3 } from 'tamagui'
 
 interface NewDirectoryComponentProps {
   isOpen: boolean
@@ -80,19 +81,30 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
   return (
     <ReorModal isOpen={isOpen} onClose={onClose}>
       <div className="my-2 ml-3 mr-6 h-full min-w-[400px]">
-        <h2 className="mb-3 text-xl font-semibold text-white">New Directory</h2>
-        <input
+        <H3 color="$gray13" fontWeight="semi-bold">
+          New Directory
+        </H3>
+        <Input
           type="text"
-          className=" block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
+          width="100%"
+          height="$3"
+          fontSize="$1"
+          borderRadius="$3"
+          borderWidth={1}
+          borderColor="$gray7"
+          paddingHorizontal="$3"
+          paddingVertical="$2"
+          focusStyle={{ borderColor: '$blue7', outlineStyle: 'none' }}
           value={directoryRelativePath}
           onChange={handleNameChange}
           onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+            console.log(`Key pressed: ${e.key}`)
             if (e.key === 'Enter') {
               createNewDirectory()
             }
           }}
           placeholder="Directory Name"
-          // eslint-disable-next-line jsx-a11y/no-autofocus
+          marginTop="$3"
           autoFocus
         />
 

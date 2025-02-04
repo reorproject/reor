@@ -53,7 +53,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   return (
     <div className="h-full">
       <ResizableComponent resizeSide="left" initialWidth={300}>
-        <div className="flex h-full flex-col border-y-0 border-l-[0.1px] border-r-0 border-solid border-neutral-700">
+        <div className="flex h-full flex-col border-y-0 border-l-[0.5px] border-r-0 border-solid border-neutral-700">
           <div className="flex items-center bg-neutral-800 p-0">
             <div className="flex-1" />
             <div className="flex items-center justify-center px-4">

@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react'
 import ReactDOM from 'react-dom'
+import { YStack, XStack } from 'tamagui'
 
 interface ModalProps {
   isOpen: boolean
@@ -35,29 +36,37 @@ const ReorModal: React.FC<ModalProps> = ({
   }
 
   const modalContent = (
-    <div
-      className={`fixed inset-0 flex h-screen w-screen items-center justify-center bg-black/40 ${tailwindStylesOnBackground}`}
+    <YStack
+      position="fixed"
+      top={0}
+      left={0}
+      right={0}
+      bottom={0}
+      alignItems="center"
+      justifyContent="center"
+      backgroundColor="rgba(0, 0, 0, 0.4)"
     >
-      <div
+      <YStack
         ref={modalRef}
-        className="relative flex flex-col items-center justify-center rounded-lg border border-solid border-gray-700 bg-dark-gray-c-three shadow-xl"
+        borderRadius="$4"
+        borderWidth={1}
+        borderColor="$gray7"
+        backgroundColor="$background"
+        shadowColor="$shadowColor"
+        shadowOpacity={0.5}
+        shadowRadius={10}
+        padding="$4"
       >
-        <div className="z-50 h-0 w-full items-end">
-          {!hideCloseButton && (
-            <div className="m-2 flex justify-end">
-              <button
-                onClick={onClose}
-                className="flex size-5 cursor-pointer items-center justify-center border-none bg-transparent text-gray-600 hover:bg-slate-700/40"
-                type="button"
-              >
-                <span className="text-3xl leading-none">&times;</span>
-              </button>
-            </div>
-          )}
-        </div>
+        {!hideCloseButton && (
+          <XStack position="absolute" top={10} right={15}>
+            <button onClick={onClose} style={{ background: 'transparent', border: 'none' }}>
+              <span style={{ fontSize: 24, cursor: 'pointer' }}>&times;</span>
+            </button>
+          </XStack>
+        )}
         {children}
-      </div>
-    </div>
+      </YStack>
+    </YStack>
   )
 
   return ReactDOM.createPortal(modalContent, document.body)

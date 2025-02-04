@@ -7,6 +7,7 @@ import { ChatSidebar } from '../Chat/ChatSidebar'
 import SearchComponent from './SearchComponent'
 import { useChatContext } from '@/contexts/ChatContext'
 import FileSidebar from './FileSideBar/FileSidebar'
+import { YStack } from 'tamagui'
 
 export type SidebarAbleToShow = 'files' | 'search' | 'chats'
 
@@ -17,7 +18,7 @@ const SidebarManager: React.FC = () => {
   const [searchResults, setSearchResults] = useState<DBQueryResult[]>([])
 
   return (
-    <div className="size-full overflow-y-hidden">
+    <YStack className="size-full overflow-y-hidden">
       {sidebarShowing === 'files' && <FileSidebar />}
 
       {sidebarShowing === 'search' && (
@@ -30,7 +31,7 @@ const SidebarManager: React.FC = () => {
       )}
 
       {sidebarShowing === 'chats' && <ChatSidebar />}
-    </div>
+    </YStack>
   )
 }
 

@@ -5,6 +5,8 @@ import { FaSearch } from 'react-icons/fa'
 import { debounce } from 'lodash'
 import { DBSearchPreview } from '../File/DBResultPreview'
 import { useContentContext } from '@/contexts/ContentContext'
+import { Input, View, XStack, YStack } from 'tamagui'
+import { Search } from '@tamagui/lucide-icons'
 
 interface SearchComponentProps {
   searchQuery: string
@@ -57,21 +59,35 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   )
 
   return (
-    <div className="h-below-titlebar overflow-y-auto overflow-x-hidden p-1">
-      <div className="relative mr-1 rounded bg-neutral-800 p-2">
-        <span className="absolute inset-y-0 left-0 mt-[2px] flex items-center pl-3">
-          <FaSearch className="text-lg text-gray-200" size={14} />
-        </span>
-        <input
+    <YStack height="100%" padding="$1" overflowX="hidden" overflowY="auto">
+      <XStack position="relative" marginRight="$1" borderRadius="$3" padding="$2">
+        <XStack position="absolute" left={0} top={14} alignItems="center" paddingLeft="$3">
+          <Search size={14} color="$gray13" />
+        </XStack>
+        <Input
           ref={searchInputRef}
           type="text"
-          className="mr-1 mt-1 h-8 w-full rounded-md border border-transparent bg-neutral-700 pl-7 pr-5 text-white focus:border-white focus:outline-none focus:ring-1 focus:ring-white"
+          width="100%"
+          height="$2"
+          paddingLeft="$5"
+          borderRadius="$2"
+          backgroundColor="$gray1"
+          color="$gray13"
+          borderWidth={1}
+          borderColor="$gray13"
+          focusStyle={{
+            borderColor: '$gray13',
+            outlineWidth: 0,
+            ringWidth: 1,
+            ringColor: '$gray13',
+          }}
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          onChangeText={setSearchQuery}
           placeholder="Semantic search..."
+          fontSize="$1"
         />
-      </div>
-      <div className="mt-2 w-full">
+      </XStack>
+      {/* <div className="mt-2 w-full">
         {searchResults.length > 0 && (
           <div className="w-full">
             {searchResults.map((result, index) => (
@@ -80,8 +96,15 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
             ))}
           </div>
         )}
-      </div>
-    </div>
+      </div> */}
+      {searchResults.length > 0 && (
+        <YStack marginTop="$2" width="100%" px="$3">
+          {searchResults.map((result, index) => (
+            <DBSearchPreview key={index} dbResult={result} onSelect={openFileSelectSearch} />
+          ))}
+        </YStack>
+      )}
+    </YStack>
   )
 }
 
