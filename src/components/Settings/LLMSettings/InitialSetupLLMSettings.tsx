@@ -33,6 +33,8 @@ const InitialSetupLLMSettings: React.FC<InitialSetupLLMSettingsProps> = () => {
                   : 'bg-dark-gray-c-eight hover:bg-dark-gray-c-ten'
               } font-normal transition-colors duration-200`}
               placeholder=""
+              onPointerEnterCapture={() => {}}
+              onPointerLeaveCapture={() => {}}
             >
               {isSetupComplete ? (
                 <>

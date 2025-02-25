@@ -86,7 +86,7 @@ const App: React.FC<AppProps> = () => {
           hideProgressBar={false}
           closeOnClick
           pauseOnHover
-          toastClassName="text-xs" // Added max height and overflow
+          toastClassName="text-xs"
         />{' '}
       </Portal>
       {!userHasConfiguredSettingsForIndexing && (

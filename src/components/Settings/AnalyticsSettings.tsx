@@ -55,6 +55,8 @@ const AnalyticsSettings: React.FC<AnalyticsSettingsProps> = () => {
             placeholder=""
             onClick={handleSave}
             className="mb-0 mr-4 mt-2 h-8 w-[150px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
+            onPointerEnterCapture={() => {}}
+            onPointerLeaveCapture={() => {}}
           >
             Save
           </Button>

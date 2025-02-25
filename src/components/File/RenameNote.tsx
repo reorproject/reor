@@ -72,6 +72,8 @@ const RenameNoteModal: React.FC = () => {
             className="mb-2 mt-3 h-10 w-[80px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
             onClick={handleNoteRename}
             placeholder=""
+            onPointerEnterCapture={() => {}}
+            onPointerLeaveCapture={() => {}}
           >
             Rename
           </Button>
