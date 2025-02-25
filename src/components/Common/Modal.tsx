@@ -21,7 +21,7 @@ const ReorModal: React.FC<ModalProps> = ({
   useEffect(() => {
     const handleOffClick = (event: MouseEvent) => {
       if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-        onClose()
+        // onClose()
       }
     }
     document.addEventListener('mousedown', handleOffClick)
