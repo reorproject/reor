@@ -20,15 +20,17 @@ const ReorModal: React.FC<ModalProps> = ({
 
   useEffect(() => {
     const handleOffClick = (event: MouseEvent) => {
-      if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-        // onClose()
+      const isBackdropClick = event.target === document.querySelector(`.${tailwindStylesOnBackground}`)
+
+      if (modalRef.current && !modalRef.current.contains(event.target as Node) && isBackdropClick) {
+        onClose()
       }
     }
     document.addEventListener('mousedown', handleOffClick)
     return () => {
       document.removeEventListener('mousedown', handleOffClick)
     }
-  }, [onClose])
+  }, [onClose, tailwindStylesOnBackground])
 
   if (!isOpen) {
     return null
@@ -41,6 +43,7 @@ const ReorModal: React.FC<ModalProps> = ({
       <div
         ref={modalRef}
         className="relative flex flex-col items-center justify-center rounded-lg border border-solid border-gray-700 bg-dark-gray-c-three shadow-xl"
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="z-50 h-0 w-full items-end">
           {!hideCloseButton && (
