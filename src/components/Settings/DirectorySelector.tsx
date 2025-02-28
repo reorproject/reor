@@ -41,8 +41,6 @@ const DirectorySelector: React.FC<DirectorySelectorProps> = ({ setErrorMsg }) =>
         className="h-10 w-[140px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
         onClick={handleDirectorySelection}
         placeholder=""
-        onPointerEnterCapture={() => {}}
-        onPointerLeaveCapture={() => {}}
       >
         Select Directory
       </Button>

@@ -91,8 +91,6 @@ const RenameDirModal: React.FC = () => {
             onClick={sendDirRename}
             placeholder=""
             disabled={isUpdatingDirName}
-            onPointerEnterCapture={() => {}}
-            onPointerLeaveCapture={() => {}}
           >
             Rename
           </Button>
