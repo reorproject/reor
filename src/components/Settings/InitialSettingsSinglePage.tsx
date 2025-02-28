@@ -58,8 +58,6 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({ readyForInd
             className="mb-3 mt-4 h-10  w-[80px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
             onClick={handleNext}
             placeholder=""
-            onPointerEnterCapture={() => {}}
-            onPointerLeaveCapture={() => {}}
           >
             Next
           </Button>
