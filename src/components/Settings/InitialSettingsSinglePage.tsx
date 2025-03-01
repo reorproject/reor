@@ -10,9 +10,10 @@ import InitialSetupLLMSettings from './LLMSettings/InitialSetupLLMSettings'
 
 interface OldInitialSettingsProps {
   readyForIndexing: () => void
+  onClose?: () => void
 }
 
-const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({ readyForIndexing }) => {
+const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({ readyForIndexing, onClose }) => {
   const [directoryErrorMsg, setDirectoryErrorMsg] = useState('')
   const [embeddingErrorMsg, setEmbeddingErrorMsg] = useState('')
   const [showError, setShowError] = useState(false)
@@ -26,7 +27,7 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({ readyForInd
   }
 
   return (
-    <ReorModal isOpen onClose={() => {}} hideCloseButton>
+    <ReorModal isOpen onClose={onClose || (() => {})} hideCloseButton={!onClose}>
       <div className="ml-2 mr-4 w-[620px] py-3">
         <div className="ml-2 mt-0 h-[450px]  ">
           <h2 className="mb-0 text-center text-2xl font-semibold text-white">Welcome to the Reor Project</h2>
