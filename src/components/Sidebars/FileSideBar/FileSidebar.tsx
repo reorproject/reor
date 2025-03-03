@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { FileInfoNode, FileInfoTree } from 'electron/main/filesystem/types'
 import { FixedSizeList } from 'react-window'
 import { isFileNodeDirectory } from '@shared/utils'
+import { YStack } from 'tamagui'
 import { useFileContext } from '@/contexts/FileContext'
 import FileItemRows from './FileItemRows'
 
@@ -30,6 +31,7 @@ interface FileExplorerProps {
 }
 
 const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
+  // const { state, actions } = useThemeManager()
   const [listHeight, setListHeight] = useState(lheight ?? window.innerHeight - 50)
   const { vaultFilesTree, expandedDirectories, renameFile, setSelectedDirectory } = useFileContext()
 
@@ -63,10 +65,11 @@ const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
 
   const filesAndIndentations = getFilesAndIndentationsForSidebar(vaultFilesTree, expandedDirectories)
   const itemCount = filesAndIndentations.length
-
   return (
-    <div
-      className="h-full grow px-1 pt-2 opacity-70"
+    <YStack
+      backgroundColor="$gray3"
+      color="$gray11"
+      className="h-full grow px-1 pt-2 "
       onDrop={handleDrop}
       onDragOver={handleDragOver}
       onClick={handleClick}
@@ -82,7 +85,7 @@ const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
       >
         {FileItemRows}
       </FixedSizeList>
-    </div>
+    </YStack>
   )
 }
 

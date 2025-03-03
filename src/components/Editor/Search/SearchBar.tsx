@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { Editor } from '@tiptap/react'
+// import { Editor } from '@tiptap/react'
+import { BlockNoteEditor } from '@/lib/blocknote'
 
 interface SearchBarProps {
-  editor: Editor | null
+  editor: BlockNoteEditor | null
   showSearch: boolean
   setShowSearch: (show: boolean) => void
 }

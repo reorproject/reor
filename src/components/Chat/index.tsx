@@ -61,7 +61,6 @@ const ChatComponent: React.FC = () => {
           abortSignal: abortControllerRef.current.signal,
         })
 
-        // eslint-disable-next-line no-restricted-syntax
         for await (const text of textStream) {
           if (abortControllerRef.current.signal.aborted) {
             return

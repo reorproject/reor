@@ -6,6 +6,7 @@ import {
   LLMConfig,
   LLMAPIConfig,
   LLMGenerationParameters,
+  TamaguiThemeTypes,
 } from 'electron/main/electron-store/storeConfig'
 import { FileInfoTree, FileInfoWithContent, RenameFileProps, WriteFileProps } from 'electron/main/filesystem/types'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
@@ -76,14 +77,24 @@ const electronStore = {
   setAgentConfig: createIPCHandler<(agentConfig: AgentConfig) => Promise<void>>('set-agent-config'),
   setAutoContext: createIPCHandler<(value: boolean) => Promise<void>>('set-auto-context'),
   getAutoContext: createIPCHandler<() => Promise<boolean>>('get-auto-context'),
+  setTamaguiTheme: createIPCHandler<(theme: TamaguiThemeTypes) => Promise<void>>('set-tamagui-theme'),
+  getTamaguiTheme: createIPCHandler<() => Promise<TamaguiThemeTypes>>('get-tamagui-theme'),
 }
 
 const fileSystem = {
   openDirectoryDialog: createIPCHandler<() => Promise<string[]>>('open-directory-dialog'),
   openFileDialog: createIPCHandler<(fileExtensions?: string[]) => Promise<string[]>>('open-file-dialog'),
+  openImageFileDialog: createIPCHandler<() => Promise<string[]>>('open-img-file-dialog'),
+  openVideoFileDialog: createIPCHandler<() => Promise<string[]>>('open-video-file-dialog'),
   getFilesTreeForWindow: createIPCHandler<() => Promise<FileInfoTree>>('get-files-tree-for-window'),
-  readFile: createIPCHandler<(filePath: string) => Promise<string>>('read-file'),
+  readFile: createIPCHandler<(filePath: string, encoding: string) => Promise<string>>('read-file'),
   writeFile: createIPCHandler<(writeFileProps: WriteFileProps) => Promise<void>>('write-file'),
+  storeImage:
+    createIPCHandler<(imageData: string, filePath: string, blockID: string) => Promise<string>>('store-image'),
+  getImage: createIPCHandler<(fileName: string) => Promise<string | null>>('get-image'),
+  storeVideo:
+    createIPCHandler<(videoData: string, filePath: string, blockID: string) => Promise<string>>('store-video'),
+  getVideo: createIPCHandler<(fileName: string) => Promise<string | null>>('get-video'),
   isDirectory: createIPCHandler<(filePath: string) => Promise<boolean>>('is-directory'),
   renameFile: createIPCHandler<(renameFileProps: RenameFileProps) => Promise<void>>('rename-file'),
   createFile: createIPCHandler<(filePath: string, content: string) => Promise<void>>('create-file'),

@@ -35,10 +35,10 @@ const ChunkSizeSettings: React.FC<ChunkSizeSettingsProps> = ({ children }) => {
   const possibleChunkSizes = Array.from({ length: 20 }, (_, i) => (i + 1) * 100)
 
   return (
-    <div className="flex w-full items-center justify-between gap-5 border-0 border-b-2 border-solid border-neutral-700 pb-2 pt-3">
+    <div className="flex w-[140px] items-center justify-between gap-5 pb-2 pt-3">
       {children}
       {chunkSize && (
-        <div className="w-[140px]">
+        <div>
           <Select onValueChange={handleChangeOnChunkSizeSelect} value={chunkSize.toString()}>
             <SelectTrigger>
               <SelectValue placeholder="Select chunk size" />

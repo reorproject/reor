@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { IoChatbubbles } from 'react-icons/io5'
 import { RiChatNewFill, RiArrowDownSLine } from 'react-icons/ri'
+import { YStack, XStack, SizableText } from 'tamagui'
 import { useChatContext } from '@/contexts/ChatContext'
 import { useContentContext } from '@/contexts/ContentContext'
 import { ChatMetadata } from '../../lib/llm/types'
@@ -14,10 +15,11 @@ export const ChatItem: React.FC<ChatItemProps> = ({ chatMetadata }) => {
   const { currentChat, deleteChat } = useChatContext()
   const { openContent } = useContentContext()
 
+  const isSelected = chatMetadata.id === currentChat?.id
   const itemClasses = `
-    flex items-center cursor-pointer py-2 px-3 rounded-md
+    flex items-center cursor-pointer py-2 px-3 rounded-md font-sans text-xs leading-relaxed
     transition-colors duration-150 ease-in-out
-    ${chatMetadata.id === currentChat?.id ? 'bg-neutral-700 text-white' : 'text-gray-300 hover:bg-neutral-800'}
+    ${chatMetadata.id === currentChat?.id ? 'text-white' : 'text-gray-300'}
   `
 
   const handleDeleteChat = () => {
@@ -30,10 +32,21 @@ export const ChatItem: React.FC<ChatItemProps> = ({ chatMetadata }) => {
   return (
     <ContextMenu>
       <ContextMenuTrigger>
-        <div onClick={() => openContent(chatMetadata.id)} className={itemClasses}>
+        <XStack
+          backgroundColor={isSelected ? '$gray7' : undefined}
+          gap="$2"
+          alignItems="center"
+          hoverStyle={{
+            backgroundColor: '$gray7',
+          }}
+          onClick={() => openContent(chatMetadata.id)}
+          className={itemClasses}
+        >
           <IoChatbubbles />
-          <span className="ml-2 flex-1 truncate text-[11px] font-medium">{chatMetadata.displayName}</span>
-        </div>
+          <SizableText fontSize={11} fontWeight={500} ellipse className="flex-1">
+            {chatMetadata.displayName}
+          </SizableText>
+        </XStack>
       </ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuItem onClick={handleDeleteChat}>Delete Chat</ContextMenuItem>
@@ -51,8 +64,8 @@ export const ChatSidebar: React.FC = () => {
   const toggleRecents = () => setIsRecentsOpen((prev) => !prev)
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto bg-neutral-800 px-2 pb-4 pt-2.5">
-      <div className="flex h-full flex-col gap-2 text-white/90">
+    <YStack backgroundColor="$gray3" className="flex h-full flex-col overflow-y-auto px-2 pb-4 pt-2.5">
+      <div className="flex h-full flex-col gap-2">
         <div className="flex min-h-0 flex-1 flex-col gap-4">
           <div className="mb-4 flex flex-col gap-6">
             <button
@@ -69,12 +82,16 @@ export const ChatSidebar: React.FC = () => {
           </div>
 
           <div className="flex-1">
-            <div className="flex cursor-pointer items-center justify-between" onClick={toggleRecents}>
-              <h4 className="mb-0 mt-1 text-xs font-medium tracking-wider text-gray-200">Recents</h4>
+            <XStack
+              color="$gray11"
+              className="flex cursor-pointer items-center justify-between"
+              onClick={toggleRecents}
+            >
+              <h4 className="mb-0 mt-1 text-xs font-medium tracking-wider">Recents</h4>
               <RiArrowDownSLine
                 className={`mt-1 transition-transform duration-200 ${!isRecentsOpen ? 'rotate-0' : 'rotate-180'}`}
               />
-            </div>
+            </XStack>
             {isRecentsOpen && (
               <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
                 {allChatsMetadata
@@ -94,6 +111,6 @@ export const ChatSidebar: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+    </YStack>
   )
 }

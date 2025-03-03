@@ -176,7 +176,6 @@ export const findRelevantDirectoriesToBeExpanded = async (
   const newExpandedDirectories = new Map(currentExpandedDirs)
   let currentPath = basePath
 
-  // eslint-disable-next-line no-restricted-syntax
   for (const segment of pathSegments) {
     // eslint-disable-next-line no-await-in-loop
     currentPath = await window.path.join(currentPath, segment)

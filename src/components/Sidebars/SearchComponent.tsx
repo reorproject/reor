@@ -1,8 +1,10 @@
+/* eslint-disable react/no-array-index-key */
 import React, { useEffect, useRef, useCallback } from 'react'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 import posthog from 'posthog-js'
-import { FaSearch } from 'react-icons/fa'
 import { debounce } from 'lodash'
+import { Input, XStack, YStack, ScrollView } from 'tamagui'
+import { Search } from '@tamagui/lucide-icons'
 import { DBSearchPreview } from '../File/DBResultPreview'
 import { useContentContext } from '@/contexts/ContentContext'
 
@@ -57,31 +59,42 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   )
 
   return (
-    <div className="h-below-titlebar overflow-y-auto overflow-x-hidden p-1">
-      <div className="relative mr-1 rounded bg-neutral-800 p-2">
-        <span className="absolute inset-y-0 left-0 mt-[2px] flex items-center pl-3">
-          <FaSearch className="text-lg text-gray-200" size={14} />
-        </span>
-        <input
-          ref={searchInputRef}
-          type="text"
-          className="mr-1 mt-1 h-8 w-full rounded-md border border-transparent bg-neutral-700 pl-7 pr-5 text-white focus:border-white focus:outline-none focus:ring-1 focus:ring-white"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Semantic search..."
-        />
-      </div>
-      <div className="mt-2 w-full">
+    <ScrollView>
+      <YStack height="100%" padding="$1">
+        <XStack position="relative" marginRight="$1" borderRadius="$3" padding="$2">
+          <XStack position="absolute" left={0} top={14} alignItems="center" paddingLeft="$3">
+            <Search size={14} color="$gray13" />
+          </XStack>
+          <Input
+            ref={searchInputRef}
+            type="text"
+            width="100%"
+            height="$2"
+            paddingLeft="$5"
+            borderRadius="$2"
+            backgroundColor="$gray1"
+            color="$gray13"
+            borderWidth={1}
+            borderColor="$gray13"
+            focusStyle={{
+              borderColor: '$gray13',
+              outlineWidth: 0,
+            }}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder="Semantic search..."
+            fontSize="$1"
+          />
+        </XStack>
         {searchResults.length > 0 && (
-          <div className="w-full">
+          <YStack marginTop="$2" width="100%" px="$3">
             {searchResults.map((result, index) => (
-              // eslint-disable-next-line react/no-array-index-key
               <DBSearchPreview key={index} dbResult={result} onSelect={openFileSelectSearch} />
             ))}
-          </div>
+          </YStack>
         )}
-      </div>
-    </div>
+      </YStack>
+    </ScrollView>
   )
 }
 

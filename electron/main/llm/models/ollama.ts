@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-syntax */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable prefer-promise-reject-errors */
 /* eslint-disable @typescript-eslint/no-unused-vars */

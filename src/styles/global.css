@@ -14,7 +14,6 @@ body {
   min-height: 100%;
   min-width: 100%;
   overflow-y: hidden;
-  
 }
 
 * {
@@ -28,10 +27,8 @@ a {
   color: rgb(16, 214, 218);
 }
 
-
 ::marker {
   color: rgb(163 163 163);
-
 }
 
 .electron-drag {
@@ -69,10 +66,9 @@ button {
   align-self: center;
 }
 
-
 /* Css for table on bubble-menu */
 .table-size-selector {
-  background: #1E1E1E;
+  background: #1e1e1e;
   border: 1px solid rgb(55 65 81);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 10px;
@@ -96,7 +92,6 @@ button {
 .table-size-selector .cell:hover {
   background-color: #ddd;
 }
-
 
 /**
  * TAKEN FROM: https://tiptap.dev/docs/editor/extensions/nodes/table
@@ -125,8 +120,8 @@ button {
   vertical-align: top;
 }
 
-.tiptap td>*,
-.tiptap th>* {
+.tiptap td > *,
+.tiptap th > * {
   margin-bottom: 0;
 }
 
@@ -140,7 +135,7 @@ button {
 
 .tiptap .selectedCell:after {
   /* background: rgba(61, 37, 20, .08); */
-  content: "";
+  content: '';
   left: 0;
   right: 0;
   top: 0;

@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import posthog from 'posthog-js'
 import { APIInterface, LLMAPIConfig } from 'electron/main/electron-store/storeConfig'
 import {
   anthropicDefaultAPIName,
@@ -7,8 +6,9 @@ import {
   openAIDefaultAPIName,
   openAIDefaultLLMs,
 } from '@shared/defaultLLMs'
+import { Input } from 'tamagui'
+import { NativeSyntheticEvent, TextInputKeyPressEventData } from 'react-native'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogOverlay,
 } from '@/components/ui/dialog'
 
 export interface CloudLLMSetupModalProps {
@@ -31,10 +32,6 @@ const DefaultLLMAPISetupModal: React.FC<CloudLLMSetupModalProps> = ({ isOpen, on
 
   const handleSave = async () => {
     if (apiKey) {
-      posthog.capture('save_cloud_llm', {
-        provider: apiInterface,
-      })
-
       if (apiInterface === 'openai') {
         const api: LLMAPIConfig = {
           apiKey,
@@ -60,35 +57,42 @@ const DefaultLLMAPISetupModal: React.FC<CloudLLMSetupModalProps> = ({ isOpen, on
     onClose()
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+  const handleKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+    if (e.nativeEvent.key === 'Enter') {
       handleSave()
     }
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{LLMDisplayName} Setup</DialogTitle>
-          <DialogDescription>Enter your {LLMDisplayName} API key below:</DialogDescription>
-        </DialogHeader>
-        <div className="grid gap-4">
-          <Input
-            type="password"
-            value={apiKey}
-            onChange={(e) => setAPIKey(e.target.value)}
-            onKeyDown={handleKeyPress}
-            placeholder={`${LLMDisplayName} API Key`}
-          />
-          <p className="mt-0 text-xs text-muted-foreground">
-            <i>You&apos;ll then be able to choose an {LLMDisplayName} model in the model dropdown...</i>
-          </p>
-        </div>
-        <DialogFooter>
-          <Button onClick={handleSave}>Save</Button>
-        </DialogFooter>
-      </DialogContent>
+      <DialogOverlay>
+        <DialogContent className="p-4 sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>{LLMDisplayName} Setup</DialogTitle>
+            <DialogDescription>Enter your {LLMDisplayName} API key below:</DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 pt-4">
+            <Input
+              value={apiKey}
+              onChangeText={setAPIKey}
+              onKeyPress={handleKeyPress}
+              placeholder={`${LLMDisplayName} API Key`}
+              size="$1"
+              py="$3"
+              px="$2"
+              secureTextEntry
+            />
+            <p className="mt-0 text-xs text-muted-foreground">
+              <i>You&apos;ll then be able to choose an {LLMDisplayName} model in the model dropdown...</i>
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="secondary" onClick={handleSave}>
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </DialogOverlay>
     </Dialog>
   )
 }

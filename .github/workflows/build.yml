@@ -2,10 +2,10 @@ name: Build and Package Electron App
 on:
   push:
     branches:
-      - "*"
+      - '*'
   pull_request:
     branches:
-      - "*"
+      - '*'
 jobs:
   build_and_package:
     strategy:
@@ -25,7 +25,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20"
+          node-version: '20'
       - name: Cache npm dependencies
         uses: actions/cache@v3
         with:
@@ -50,13 +50,13 @@ jobs:
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_OPTIONS: "--max-old-space-size=8192"
+          NODE_OPTIONS: '--max-old-space-size=8192'
         run: |
           npm run build
       - name: Build for non-macOS
         if: matrix.os != 'macos-13' && matrix.os != 'macos-latest'
         env:
-          NODE_OPTIONS: "--max-old-space-size=8192"
+          NODE_OPTIONS: '--max-old-space-size=8192'
         run: |
           npm run build
       - name: Notarize macOS build
@@ -70,11 +70,11 @@ jobs:
       - name: Print APP_VERSION
         run: echo "APP_VERSION=${{ env.APP_VERSION }}"
       - name: List output files
-        if: matrix.os != 'macos-13' && matrix.os != 'macos-latest' 
+        if: matrix.os != 'macos-13' && matrix.os != 'macos-latest'
         run: |
           ls ./release/${{ env.APP_VERSION }}/
       - name: Check runner architecture
-        if: matrix.os != 'macos-13' && matrix.os != 'macos-latest' 
+        if: matrix.os != 'macos-13' && matrix.os != 'macos-latest'
         run: uname -m
       - name: Rename artifacts for ARM architecture
         if: matrix.os == 'macos-latest'
