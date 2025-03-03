@@ -8,7 +8,14 @@ import WindowsManager from '../common/windowManager'
 import { StoreSchema } from '../electron-store/storeConfig'
 import { handleFileRename, updateFileInTable } from '../vector-database/tableHelperFunctions'
 
-import { GetFilesInfoTree, createFileRecursive, isHidden, GetFilesInfoListForListOfPaths } from './filesystem'
+import {
+  GetFilesInfoTree,
+  createFileRecursive,
+  isHidden,
+  GetFilesInfoListForListOfPaths,
+  searchFiles,
+  getVaultPath,
+} from './filesystem'
 import { FileInfoTree, WriteFileProps, RenameFileProps, FileInfoWithContent } from './types'
 
 const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: WindowsManager) => {
@@ -148,6 +155,14 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
       return result.filePaths
     }
     return []
+  })
+
+  ipcMain.handle('search-files', async (_event, searchTerm: string) => {
+    return searchFiles(store, searchTerm)
+  })
+
+  ipcMain.handle('get-vault-path', async () => {
+    return getVaultPath(store)
   })
 }
 

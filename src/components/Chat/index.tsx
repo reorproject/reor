@@ -15,6 +15,21 @@ import { useChatContext } from '@/contexts/ChatContext'
 import resolveLLMClient from '@/lib/llm/client'
 import { appendToolCallsAndAutoExecuteTools, convertToolConfigToZodSchema } from '../../lib/llm/tools/utils'
 
+const extractFileReferences = async (message: string): Promise<string[]> => {
+  const regex = /@([^@]+?\.md)/g
+  const matches = message.match(regex)
+
+  if (!matches) return []
+
+  // Convert relative paths to absolute paths
+  const vaultPath = await window.fileSystem.getVaultPath()
+  return matches.map((match) => {
+    const relativePath = match.slice(1) // Remove @ symbol
+
+    return `${vaultPath}/${relativePath}`
+  })
+}
+
 const ChatComponent: React.FC = () => {
   const [loadingState, setLoadingState] = useState<LoadingState>('idle')
   const containerRef = useRef<HTMLDivElement>(null)
@@ -39,14 +54,22 @@ const ChatComponent: React.FC = () => {
           return
         }
 
+        const fileRefs = await extractFileReferences(userTextFieldInput || '')
+
+        // Create or update chat with file context
         outputChat = userTextFieldInput?.trim()
-          ? await appendToOrCreateChat(chat, userTextFieldInput, agentConfig)
+          ? await appendToOrCreateChat(chat, userTextFieldInput, {
+              name: agentConfig?.name || 'default',
+              ...agentConfig,
+              toolDefinitions: agentConfig?.toolDefinitions || [],
+              promptTemplate: agentConfig?.promptTemplate || [],
+              files: fileRefs,
+            })
           : chat
 
         if (!outputChat) {
           return
         }
-
         setCurrentChat(outputChat)
         await saveChat(outputChat)
 

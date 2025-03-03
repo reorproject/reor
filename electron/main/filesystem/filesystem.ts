@@ -4,9 +4,11 @@ import * as path from 'path'
 import chokidar from 'chokidar'
 import { BrowserWindow } from 'electron'
 
+import Store from 'electron-store'
 import { FileInfo, FileInfoTree } from './types'
 import addExtensionToFilenameIfNoExtensionPresent from '../path/path'
 import { isFileNodeDirectory } from '../../../shared/utils'
+import { StoreSchema, StoreKeys } from '../electron-store/storeConfig'
 
 export const markdownExtensions = ['.md', '.markdown', '.mdown', '.mkdn', '.mkd']
 
@@ -193,4 +195,36 @@ export function splitDirectoryPathIntoBaseAndRepo(fullPath: string) {
   const repoName = path.basename(pathWithSeparator.slice(0, -1))
 
   return { localModelPath, repoName }
+}
+
+interface FileSearchResult {
+  absolutePath: string
+  relativePath: string
+}
+
+export const searchFiles = async (store: Store<StoreSchema>, searchTerm: string): Promise<FileSearchResult[]> => {
+  const vaultDirectory = store.get(StoreKeys.DirectoryFromPreviousSession)
+  if (!vaultDirectory || typeof vaultDirectory !== 'string') {
+    throw new Error('No valid vault directory found')
+  }
+
+  const allFiles = GetFilesInfoList(vaultDirectory)
+  const searchTermLower = searchTerm.toLowerCase()
+
+  const matchingFiles = allFiles
+    .filter((file) => file.name.toLowerCase().startsWith(searchTermLower))
+    .map((file) => ({
+      absolutePath: file.path,
+      relativePath: file.path.replace(vaultDirectory, '').replace(/^[/\\]+/, ''),
+    }))
+
+  return matchingFiles
+}
+
+export const getVaultPath = (store: Store<StoreSchema>): string => {
+  const vaultDirectory = store.get(StoreKeys.DirectoryFromPreviousSession)
+  if (!vaultDirectory || typeof vaultDirectory !== 'string') {
+    throw new Error('No valid vault directory found')
+  }
+  return vaultDirectory
 }

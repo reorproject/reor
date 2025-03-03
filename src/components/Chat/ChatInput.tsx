@@ -1,6 +1,6 @@
-import React from 'react'
-
+import React, { useRef, useState } from 'react'
 import { PiPaperPlaneRight } from 'react-icons/pi'
+import FileAutocomplete from './FileAutocomplete'
 import { AgentConfig, LoadingState } from '../../lib/llm/types'
 import { Button } from '../ui/button'
 import LLMSelectOrButton from '../Settings/LLMSettings/LLMSelectOrButton'
@@ -28,6 +28,55 @@ const ChatInput: React.FC<ChatInputProps> = ({
   agentConfig,
   setAgentConfig,
 }) => {
+  const [showFileAutocomplete, setShowFileAutocomplete] = useState(false)
+  const [autocompletePosition, setAutocompletePosition] = useState({ top: 0, left: 0 })
+  const [searchTerm, setSearchTerm] = useState('')
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (userTextFieldInput && !e.shiftKey && e.key === 'Enter') {
+      e.preventDefault()
+      handleSubmitNewMessage()
+    } else if (e.key === '@') {
+      const rect = e.currentTarget.getBoundingClientRect()
+      setAutocompletePosition({
+        top: rect.top,
+        left: rect.left,
+      })
+      setShowFileAutocomplete(true)
+    } else if (showFileAutocomplete && e.key === 'Escape') {
+      setShowFileAutocomplete(false)
+    }
+  }
+
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { value } = e.target
+    setUserTextFieldInput(value)
+
+    // Handle @ mentions
+    const lastAtIndex = value.lastIndexOf('@')
+    if (lastAtIndex !== -1 && lastAtIndex < value.length) {
+      const searchText = value.slice(lastAtIndex + 1).split(/\s/)[0]
+      setSearchTerm(searchText)
+    } else {
+      setShowFileAutocomplete(false)
+    }
+
+    // Adjust textarea height
+    e.target.style.height = 'auto'
+    e.target.style.height = `${Math.min(e.target.scrollHeight, 160)}px`
+  }
+
+  const handleFileSelect = (filePath: { absolutePath: string; relativePath: string }) => {
+    const lastAtIndex = userTextFieldInput.lastIndexOf('@')
+    const newValue = `${userTextFieldInput.slice(0, lastAtIndex)}@${filePath.relativePath} ${userTextFieldInput.slice(
+      lastAtIndex + searchTerm.length + 1,
+    )}`
+
+    setUserTextFieldInput(newValue)
+    setShowFileAutocomplete(false)
+  }
+
   // const [useStream, setUseStream] = React.useState(true)
 
   const handleDbSearchToggle = (checked: boolean) => {
@@ -49,7 +98,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
   return (
     <div className="flex w-full">
-      <div className="z-50 flex w-full flex-col overflow-hidden rounded border-2 border-solid border-border bg-background focus-within:ring-1 focus-within:ring-ring">
+      <div className="relative z-50 flex w-full flex-col overflow-visible rounded border-2 border-solid border-border bg-background focus-within:ring-1 focus-within:ring-ring">
         {/* <Select value={selectedLLM}>
           <SelectTrigger className="h-7 w-32 border-0 text-[10px] text-gray-300 focus:ring-0 focus:ring-offset-0">
             <SelectValue placeholder="Tools" />
@@ -67,19 +116,25 @@ const ChatInput: React.FC<ChatInputProps> = ({
           </SelectContent>
         </Select> */}
         <textarea
+          ref={textareaRef}
           value={userTextFieldInput}
           onKeyDown={(e) => {
+            handleKeyDown(e)
             if (!e.shiftKey && e.key === 'Enter') {
               e.preventDefault()
               handleSubmitNewMessage()
             }
           }}
-          className="h-[100px] w-full resize-none border-0 bg-transparent p-4 text-foreground caret-current focus:outline-none"
+          onChange={(e) => {
+            handleInput(e)
+            setUserTextFieldInput(e.target.value)
+          }}
+          className="min-h-[100px] w-full resize-none border-0 bg-transparent p-4 text-foreground caret-current focus:outline-none"
           wrap="soft"
           placeholder="What can Reor help you with today?"
-          onChange={(e) => setUserTextFieldInput(e.target.value)}
           // eslint-disable-next-line jsx-a11y/no-autofocus
           autoFocus
+          // rows={1}
         />
         <div className="mx-auto h-px w-[96%] bg-background/20" />
         <div className="flex h-10 flex-col items-center justify-between gap-2  py-2 md:flex-row md:gap-4">
@@ -109,6 +164,12 @@ const ChatInput: React.FC<ChatInputProps> = ({
             </Button>
           </div>
         </div>
+        <FileAutocomplete
+          searchTerm={searchTerm}
+          position={autocompletePosition}
+          onSelect={handleFileSelect}
+          visible={showFileAutocomplete}
+        />
       </div>
     </div>
   )
