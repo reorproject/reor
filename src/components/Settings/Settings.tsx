@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { YStack, SizableText, XStack, ScrollView } from 'tamagui'
+import { YStack, SizableText, XStack, ScrollView, DialogTitle, VisuallyHidden } from 'tamagui'
 import { Dialog, DialogContent, DialogOverlay } from '@/components/ui/dialog'
 
 import AnalyticsSettings from './AnalyticsSettings'
@@ -49,6 +49,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     >
       <DialogOverlay>
         <DialogContent>
+          {/* <VisuallyHidden>
+            <DialogTitle>Empty Title</DialogTitle>
+          </VisuallyHidden> */}
           <ScrollView>
             <XStack height="80vh" width="100%">
               <YStack
@@ -62,7 +65,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   color={activeTab === SettingsTab.GeneralSettingsTab ? '$gray13' : ''}
                   hoverStyle={{
                     backgroundColor: '$gray7',
-                    backgroundFocus: '$gray8',
                   }}
                   cursor="pointer"
                   py="$2"
@@ -79,7 +81,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   color={activeTab === SettingsTab.LLMSettingsTab ? '$gray13' : ''}
                   hoverStyle={{
                     backgroundColor: '$gray7',
-                    backgroundFocus: '$gray8',
                   }}
                   cursor="pointer"
                   py="$2"
@@ -97,7 +98,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   color={activeTab === SettingsTab.EmbeddingModelTab ? '$gray13' : ''}
                   hoverStyle={{
                     backgroundColor: '$gray7',
-                    backgroundFocus: '$gray8',
                   }}
                   cursor="pointer"
                   py="$2"
@@ -115,7 +115,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   color={activeTab === SettingsTab.AnalyticsTab ? '$gray13' : ''}
                   hoverStyle={{
                     backgroundColor: '$gray7',
-                    backgroundFocus: '$gray8',
                   }}
                   cursor="pointer"
                   py="$2"
