@@ -43,7 +43,6 @@ export interface LinkOptions {
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
-    // @ts-expect-error
     link: {
       /**
        * Set a link mark

@@ -37,6 +37,7 @@ export function displayVideoType(videoURL: string, editor: BlockNoteEditor<HMBlo
       left={0}
       bottom={0}
       right={0}
+      // @ts-expect-error
       src={videoURL}
       frameBorder="0"
       allowFullScreen

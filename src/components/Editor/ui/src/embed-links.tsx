@@ -1,5 +1,5 @@
 import { YStack, XStack, Button, Popover, Separator, Input, Theme, SizableText, Text } from 'tamagui'
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { IconType } from 'react-icons'
 import { MediaType } from '@/components/Editor/types/media-render'
 
@@ -28,39 +28,48 @@ const EmbedComponent: React.FC<EmbedRenderProps> = ({ props, submit, assign }) =
   const [isClicked, setIsClicked] = useState(false)
   const [selectedOption, setSelectedOption] = useState('upload')
   const [errorRaised, setErrorRaised] = useState('')
-  const [position, setPosition] = useState({ top: 0, left: 0 })
-
-  useEffect(() => {
-    const selection = window.getSelection()
-    if (!selection?.rangeCount) return
-
-    const range = selection.getRangeAt(0)
-    const rect = range.getBoundingClientRect()
-
-    setPosition({
-      top: rect.bottom + window.scrollY + 5,
-      left: rect.left + window.scrollX,
-    })
-  }, [])
 
   const handleClick = () => setIsClicked(!isClicked)
 
   return (
-    <Popover 
-      allowFlip 
-      size="$5" 
-      open={true}
-      onOpenChange={() => setErrorRaised('')}
-    >
+    <Popover allowFlip size="$5" onOpenChange={() => setErrorRaised('')}>
+      <Popover.Trigger asChild>
+        <YStack
+          position="relative"
+          borderColor="$color8"
+          borderWidth={0}
+          backgroundColor="$purple3"
+          borderRadius="$4"
+          outlineWidth={0}
+          contentEditable={false}
+          onClick={handleClick}
+          height={50}
+          hoverStyle={{
+            backgroundColor: '$purple4',
+            cursor: 'pointer',
+          }}
+        >
+          <XStack
+            alignItems="center"
+            justifyContent="flex-start"
+            borderRadius="$2"
+            height="100%"
+            paddingLeft={10}
+            gap={8}
+            opacity={0.4}
+          >
+            {icon && React.createElement(icon)}
+            <Text size={14} color="$color8" fontFamily="$mono">
+              {hint}
+            </Text>
+          </XStack>
+        </YStack>
+      </Popover.Trigger>
+
       <Popover.Content
         borderWidth={1}
         borderColor="$color8"
         borderRadius={10}
-        style={{
-          position: 'absolute',
-          top: position.top,
-          left: position.left,
-        }}
         enterStyle={{ y: -10, opacity: 0 }}
         exitStyle={{ y: -10, opacity: 0 }}
         elevate

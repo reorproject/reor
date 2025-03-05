@@ -8,7 +8,6 @@
 import '@tamagui/polyfill-dev'
 
 import type { UseHoverProps } from '@floating-ui/react'
-// @ts-expect-error
 import { Adapt } from '@tamagui/adapt'
 import { Animate } from '@tamagui/animate'
 import { ResetPresence } from '@tamagui/animate-presence'
@@ -39,7 +38,6 @@ import { Sheet, SheetController } from '@tamagui/sheet'
 import type { YStackProps } from '@tamagui/stacks'
 import { YStack } from '@tamagui/stacks'
 import { useControllableState } from '@tamagui/use-controllable-state'
-// import * as React from 'react'
 import React, { FocusEvent } from 'react'
 import { Platform, ScrollView } from 'react-native-web'
 import { useAdaptParent } from '@/contexts/AdaptContext'

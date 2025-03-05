@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 import { GrNewWindow } from 'react-icons/gr'
 import { MdSettings } from 'react-icons/md'

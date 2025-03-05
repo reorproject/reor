@@ -2,7 +2,8 @@ import { visit } from 'unist-util-visit'
 import { defaultHandlers } from 'remark-rehype'
 
 export function removeSingleSpace() {
-  return (tree) => {
+  // TODO: Give a specific type
+  return (tree: any) => {
     visit(tree, 'text', (node) => {
       node.value = node.value.replace(/\u00A0/g, '')
     })
@@ -11,7 +12,7 @@ export function removeSingleSpace() {
 
 // Custom plugin that converts empty lines to a single space.
 export function preserveEmptyParagraphs() {
-  return (tree) => {
+  return (tree: any) => {
     visit(tree, 'element', (node) => {
       if (node.tagName === 'p' && (!node.children || node.children.length === 0)) {
         node.children = [{ type: 'text', value: '\u00A0' }] // Add a non-breaking space

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { YStack, SizableText, XStack, ScrollView, DialogTitle, VisuallyHidden } from 'tamagui'
+import { YStack, SizableText, XStack, ScrollView } from 'tamagui'
 import { Dialog, DialogContent, DialogOverlay } from '@/components/ui/dialog'
 
 import AnalyticsSettings from './AnalyticsSettings'

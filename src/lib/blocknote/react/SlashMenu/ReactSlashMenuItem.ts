@@ -1,4 +1,4 @@
-import { BaseSlashMenuItem, BlockSchema, DefaultBlockSchema } from '@/editor/blocknote/core'
+import { BaseSlashMenuItem, BlockSchema, DefaultBlockSchema } from '@/lib/blocknote'
 
 export type ReactSlashMenuItem<BSchema extends BlockSchema = DefaultBlockSchema> = BaseSlashMenuItem<BSchema> & {
   group: string

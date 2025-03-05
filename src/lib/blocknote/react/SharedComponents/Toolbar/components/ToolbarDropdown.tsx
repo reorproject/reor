@@ -16,7 +16,7 @@ export const ToolbarDropdown = (props: ToolbarDropdownProps) => {
   }
 
   return (
-    <Menu exitTransitionDuration={0} disabled={props.isDisabled}>
+    <Menu disabled={props.isDisabled}>
       <Menu.Target>
         <ToolbarDropdownTarget text={selectedItem.text} icon={selectedItem.icon} isDisabled={selectedItem.isDisabled} />
       </Menu.Target>

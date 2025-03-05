@@ -1,4 +1,4 @@
-import { EditorElement, ElementFactory } from '../../shared/EditorElement'
+// import { EditorElement, ElementFactory } from '../../shared/EditorElement'
 import { BlockNoteEditor } from '../../BlockNoteEditor'
 import { Block, BlockSchema } from '../Blocks/api/blockTypes'
 

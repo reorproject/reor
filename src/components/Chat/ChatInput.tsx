@@ -53,6 +53,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
       <div className="z-50 flex w-full flex-col overflow-hidden rounded border-2">
         <TextArea
           value={userTextFieldInput}
+          // @ts-expect-error
           onKeyPress={(e: KeyboardEvent) => {
             if (!e.shiftKey && e.key === 'Enter') {
               e.preventDefault()
@@ -69,13 +70,10 @@ const ChatInput: React.FC<ChatInputProps> = ({
           p="$4"
           color="$foreground"
           borderWidth={2}
-          caretColor="current"
           borderColor="$border"
           focusStyle={{
-            outline: 'none',
             borderColor: '$ring',
             borderWidth: 2,
-            ringWidth: 1,
           }}
           fontSize={12}
         />

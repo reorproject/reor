@@ -39,7 +39,7 @@ export const ChatItem: React.FC<ChatItemProps> = ({ chatMetadata }) => {
           hoverStyle={{
             backgroundColor: '$gray7',
           }}
-          onClick={() => openContent(chatMetadata.id)}
+          onPress={() => openContent(chatMetadata.id)}
           className={itemClasses}
         >
           <IoChatbubbles />
@@ -82,11 +82,7 @@ export const ChatSidebar: React.FC = () => {
           </div>
 
           <div className="flex-1">
-            <XStack
-              color="$gray11"
-              className="flex cursor-pointer items-center justify-between"
-              onClick={toggleRecents}
-            >
+            <XStack className="flex cursor-pointer items-center justify-between" onPress={toggleRecents}>
               <h4 className="mb-0 mt-1 text-xs font-medium tracking-wider">Recents</h4>
               <RiArrowDownSLine
                 className={`mt-1 transition-transform duration-200 ${!isRecentsOpen ? 'rotate-0' : 'rotate-180'}`}

@@ -75,20 +75,18 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
               <YStack
                 hoverStyle={{
                   backgroundColor: '$gray7',
-                  backgroundFocus: '$gray8',
                 }}
                 className="cursor-pointer items-center justify-center rounded px-1 hover:bg-neutral-700"
-                onClick={copyToClipboard}
+                onPress={copyToClipboard}
               >
                 <FaRegCopy color="gray" size={16} className="text-gray-200" title="Copy" />
               </YStack>
               <YStack
                 hoverStyle={{
                   backgroundColor: '$gray7',
-                  backgroundFocus: '$gray8',
                 }}
                 className="cursor-pointer items-center justify-center rounded px-1 hover:bg-neutral-700"
-                onClick={createNewNoteFromMessage}
+                onPress={createNewNoteFromMessage}
               >
                 <HiOutlinePencilAlt color="gray" size={18} className="text-gray-200" title="New Note" />
               </YStack>

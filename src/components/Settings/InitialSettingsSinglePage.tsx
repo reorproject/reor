@@ -10,10 +10,9 @@ import InitialSetupLLMSettings from './LLMSettings/InitialSetupLLMSettings'
 
 interface OldInitialSettingsProps {
   readyForIndexing: () => void
-  onClose?: () => void
 }
 
-const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({ readyForIndexing, onClose }) => {
+const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({ readyForIndexing }) => {
   const [directoryErrorMsg, setDirectoryErrorMsg] = useState('')
   const [embeddingErrorMsg, setEmbeddingErrorMsg] = useState('')
   const [showError, setShowError] = useState(false)

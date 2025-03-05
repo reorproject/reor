@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Button, Text, XStack, YStack, toast } from '@shm/ui'
+import { Button, Text, XStack, YStack } from '@shm/ui'
+import { toast } from 'react-toastify'
 import { Block, BlockNoteEditor } from '@lib/blocknote'
 import type { HMBlockSchema } from '../schema'
 import { InlineContent } from '@/lib/blocknote/react'
@@ -18,7 +19,7 @@ interface ContainerProps {
   onHoverOut?: (e: any) => void
   width?: number | string
   className?: string
-  onPress?: (e: Event) => void
+  // onPress?: (e: Event) => void
 }
 
 const MediaContainer = ({
@@ -34,7 +35,7 @@ const MediaContainer = ({
   onHoverOut,
   width = '100%',
   className,
-  onPress,
+  // onPress,
 }: ContainerProps) => {
   const [hover, setHover] = useState(false)
   const [drag, setDrag] = useState(false)
@@ -112,6 +113,7 @@ const MediaContainer = ({
       width={width}
       alignSelf="center"
       borderWidth={0}
+      // @ts-expect-error
       draggable="true"
       onDragStart={(e: any) => {
         // Uncomment to allow drag only if block is selected
@@ -126,15 +128,15 @@ const MediaContainer = ({
         e.stopPropagation()
         editor.sideMenu.blockDragEnd()
       }}
-      onPress={
-        onPress
-          ? (e: MouseEvent) => {
-              e.preventDefault()
-              e.stopPropagation()
-              onPress(e)
-            }
-          : undefined
-      }
+      // onPress={
+      //   onPress
+      //     ? (e: MouseEvent) => {
+      //         e.preventDefault()
+      //         e.stopPropagation()
+      //         onPress(e)
+      //       }
+      //     : undefined
+      // }
     >
       {drag && !isEmbed ? (
         <XStack
