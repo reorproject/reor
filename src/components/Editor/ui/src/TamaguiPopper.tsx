@@ -147,23 +147,23 @@ export const Popper = (props: ScopedPopperProps<PopperProps>) => {
 
   // Subscribe to keyboard state
   const [keyboardOpen, setKeyboardOpen] = useState(false)
-  useEffect(() => {
-    const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
-      startTransition(() => {
-        setKeyboardOpen(true)
-      })
-    })
-    const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
-      startTransition(() => {
-        setKeyboardOpen(false)
-      })
-    })
+  // useEffect(() => {
+  //   const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
+  //     startTransition(() => {
+  //       setKeyboardOpen(true)
+  //     })
+  //   })
+  //   const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
+  //     startTransition(() => {
+  //       setKeyboardOpen(false)
+  //     })
+  //   })
 
-    return () => {
-      showSubscription.remove()
-      hideSubscription.remove()
-    }
-  }, [])
+  //   return () => {
+  //     showSubscription.remove()
+  //     hideSubscription.remove()
+  //   }
+  // }, [])
 
   useIsomorphicLayoutEffect(() => {
     floating.update()
@@ -187,7 +187,7 @@ export const Popper = (props: ScopedPopperProps<PopperProps>) => {
  * PopperAnchor
  * -----------------------------------------------------------------------------------------------*/
 
-type PopperAnchorRef = HTMLElement | View
+type PopperAnchorRef = HTMLElement | typeof View
 
 export type PopperAnchorProps = YStackProps & {
   virtualRef?: RefObject<any>
@@ -226,7 +226,7 @@ export const PopperAnchor = YStack.extractable(
  * PopperContent
  * -----------------------------------------------------------------------------------------------*/
 
-type PopperContentElement = HTMLElement | View
+type PopperContentElement = HTMLElement | typeof View
 
 export type PopperContentProps = SizableStackProps & {
   enableAnimationForPositionChange?: boolean
@@ -248,8 +248,9 @@ export const PopperContentFrame = styled(ThemeableStack, {
     size: {
       '...size': (val, { tokens }) => {
         return {
-          padding: tokens.space[val],
-          borderRadius: tokens.radius[val],
+          // little hack to prevent ts compile error
+          padding: tokens.space[val as keyof typeof tokens.space],
+          borderRadius: tokens.radius[val as keyof typeof tokens.radius],
         }
       },
     },
@@ -422,9 +423,13 @@ export const PopperArrow = PopperArrowFrame.styleable<PopperArrowExtraProps>(fun
 
   if (primaryPlacement) {
     // allows for extra diagonal size
-    arrowStyle[isVertical ? 'width' : 'height'] = size * 2
+    if (isVertical)
+      arrowStyle.width = size * 2
+    else
+      arrowStyle.height = size * 2
     const oppSide = opposites[primaryPlacement]
     if (oppSide) {
+      // @ts-expect-error
       arrowStyle[oppSide] = -size
       innerArrowStyle[oppSide] = size / 2
     }
