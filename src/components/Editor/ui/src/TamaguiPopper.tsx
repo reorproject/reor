@@ -17,13 +17,12 @@ import {
   useProps,
 } from '@tamagui/core'
 import type { Coords, OffsetOptions, Placement, Strategy, UseFloatingReturn } from '@tamagui/floating'
-import { arrow, autoUpdate, flip, offset as offsetFn, platform, shift, useFloating } from '@tamagui/floating'
+import { arrow, flip, offset as offsetFn, platform, shift, useFloating } from '@tamagui/floating'
 import { getSpace } from '@tamagui/get-token'
 import type { SizableStackProps, YStackProps } from '@tamagui/stacks'
 import { ThemeableStack, YStack } from '@tamagui/stacks'
-import React, { useState, useEffect, useRef, useMemo, ReactNode, startTransition, forwardRef, RefObject } from 'react'
-import type { View } from 'react-native-web'
-import { Keyboard, useWindowDimensions } from 'react-native-web'
+import React, { useState, useEffect, useRef, useMemo, ReactNode, forwardRef, RefObject } from 'react'
+// import { useWindowDimensions } from 'react-native-web'
 
 type ShiftProps = typeof shift extends (options: infer Opts) => void ? Opts : never
 type FlipProps = typeof flip extends (options: infer Opts) => void ? Opts : never
@@ -126,48 +125,7 @@ export const Popper = (props: ScopedPopperProps<PopperProps>) => {
     ].filter(Boolean),
   })
 
-  const {
-    refs,
-    middlewareData,
-    // @ts-expect-error this comes from Tooltip for example
-    open,
-  } = floating
-
-  useIsomorphicLayoutEffect(() => {
-    if (process.env.TAMAGUI_TARGET !== 'web') return
-
-    if (open && refs.reference.current && refs.floating.current) {
-      floating.update()
-      autoUpdate(refs.reference.current, refs.floating.current, floating.update)
-    }
-  }, [open, floating.update, refs.floating, refs.reference])
-
-  // Subscribe to window dimensions (orientation, scale, etc...)
-  const dimensions = useWindowDimensions()
-
-  // Subscribe to keyboard state
-  const [keyboardOpen, setKeyboardOpen] = useState(false)
-  // useEffect(() => {
-  //   const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
-  //     startTransition(() => {
-  //       setKeyboardOpen(true)
-  //     })
-  //   })
-  //   const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
-  //     startTransition(() => {
-  //       setKeyboardOpen(false)
-  //     })
-  //   })
-
-  //   return () => {
-  //     showSubscription.remove()
-  //     hideSubscription.remove()
-  //   }
-  // }, [])
-
-  useIsomorphicLayoutEffect(() => {
-    floating.update()
-  }, [dimensions, keyboardOpen])
+  const { middlewareData } = floating
 
   const popperContext = {
     size,
@@ -187,7 +145,7 @@ export const Popper = (props: ScopedPopperProps<PopperProps>) => {
  * PopperAnchor
  * -----------------------------------------------------------------------------------------------*/
 
-type PopperAnchorRef = HTMLElement | typeof View
+type PopperAnchorRef = HTMLElement | typeof TamaguiView
 
 export type PopperAnchorProps = YStackProps & {
   virtualRef?: RefObject<any>
@@ -226,7 +184,7 @@ export const PopperAnchor = YStack.extractable(
  * PopperContent
  * -----------------------------------------------------------------------------------------------*/
 
-type PopperContentElement = HTMLElement | typeof View
+type PopperContentElement = HTMLElement | typeof TamaguiView
 
 export type PopperContentProps = SizableStackProps & {
   enableAnimationForPositionChange?: boolean
@@ -423,10 +381,8 @@ export const PopperArrow = PopperArrowFrame.styleable<PopperArrowExtraProps>(fun
 
   if (primaryPlacement) {
     // allows for extra diagonal size
-    if (isVertical)
-      arrowStyle.width = size * 2
-    else
-      arrowStyle.height = size * 2
+    if (isVertical) arrowStyle.width = size * 2
+    else arrowStyle.height = size * 2
     const oppSide = opposites[primaryPlacement]
     if (oppSide) {
       // @ts-expect-error
