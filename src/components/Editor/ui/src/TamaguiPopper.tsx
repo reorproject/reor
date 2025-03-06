@@ -22,7 +22,6 @@ import { getSpace } from '@tamagui/get-token'
 import type { SizableStackProps, YStackProps } from '@tamagui/stacks'
 import { ThemeableStack, YStack } from '@tamagui/stacks'
 import React, { useState, useEffect, useRef, useMemo, ReactNode, forwardRef, RefObject } from 'react'
-// import { useWindowDimensions } from 'react-native-web'
 
 type ShiftProps = typeof shift extends (options: infer Opts) => void ? Opts : never
 type FlipProps = typeof flip extends (options: infer Opts) => void ? Opts : never

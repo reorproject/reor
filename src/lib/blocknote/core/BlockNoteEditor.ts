@@ -29,7 +29,6 @@ import { getBlockInfoFromPos } from './extensions/Blocks/helpers/getBlockInfoFro
 
 import { FormattingToolbarProsemirrorPlugin } from './extensions/FormattingToolbar/FormattingToolbarPlugin'
 import { HyperlinkToolbarProsemirrorPlugin } from './extensions/HyperlinkToolbar/HyperlinkToolbarPlugin'
-import { LinkMenuProsemirrorPlugin } from './extensions/LinkMenu/LinkMenuPlugin'
 import { SideMenuProsemirrorPlugin } from './extensions/SideMenu/SideMenuPlugin'
 import { BaseSlashMenuItem } from './extensions/SlashMenu/BaseSlashMenuItem'
 import { SlashMenuProsemirrorPlugin } from './extensions/SlashMenu/SlashMenuPlugin'
@@ -151,8 +150,6 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
 
   public readonly hyperlinkToolbar: HyperlinkToolbarProsemirrorPlugin<BSchema>
 
-  public readonly linkMenu: LinkMenuProsemirrorPlugin<BSchema, any>
-
   constructor(private readonly options: Partial<BlockNoteEditorOptions<BSchema>> = {}) {
     // apply defaults
     const newOptions: Omit<typeof options, 'defaultStyles' | 'blockSchema'> & {
@@ -174,7 +171,6 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
       newOptions.slashMenuItems || getDefaultSlashMenuItems(newOptions.blockSchema),
     )
     this.hyperlinkToolbar = new HyperlinkToolbarProsemirrorPlugin(this)
-    this.linkMenu = new LinkMenuProsemirrorPlugin(this)
 
     const extensions = getBlockNoteExtensions<BSchema>({
       editor: this,
@@ -195,7 +191,6 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
           this.formattingToolbar.plugin,
           this.slashMenu.plugin,
           this.hyperlinkToolbar.plugin,
-          this.linkMenu.plugin,
         ]
       },
     })

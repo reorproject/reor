@@ -4,6 +4,7 @@ import { DBQueryResult } from 'electron/main/vector-database/schema'
 import posthog from 'posthog-js'
 import { debounce } from 'lodash'
 import { Input, XStack, YStack, ScrollView } from 'tamagui'
+import { TextInput } from 'react-native'
 import { Search } from '@tamagui/lucide-icons'
 import { DBSearchPreview } from '../File/DBResultPreview'
 import { useContentContext } from '@/contexts/ContentContext'
@@ -22,7 +23,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   setSearchResults,
 }) => {
   const { openContent: openTabContent } = useContentContext()
-  const searchInputRef = useRef<HTMLInputElement>(null)
+  const searchInputRef = useRef<TextInput>(null)
 
   const handleSearch = useCallback(
     async (query: string) => {
@@ -67,7 +68,6 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
           </XStack>
           <Input
             ref={searchInputRef}
-            type="text"
             width="100%"
             height="$2"
             paddingLeft="$5"
