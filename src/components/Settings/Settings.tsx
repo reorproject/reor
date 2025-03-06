@@ -69,7 +69,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   cursor="pointer"
                   py="$2"
                   px="$2"
-                  alignItems="left"
+                  alignItems="flex-start"
                   onPress={() => setActiveTab(SettingsTab.GeneralSettingsTab)}
                 >
                   <SizableText size="$2" fontWeight={activeTab === SettingsTab.GeneralSettingsTab ? 'bold' : 'normal'}>
@@ -85,7 +85,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   cursor="pointer"
                   py="$2"
                   px="$2"
-                  alignItems="left"
+                  alignItems="flex-start"
                   borderRadius="$2"
                   onPress={() => setActiveTab(SettingsTab.LLMSettingsTab)}
                 >
@@ -102,7 +102,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   cursor="pointer"
                   py="$2"
                   px="$2"
-                  alignItems="left"
+                  alignItems="flex-start"
                   borderRadius="$2"
                   onPress={() => setActiveTab(SettingsTab.EmbeddingModelTab)}
                 >
@@ -119,7 +119,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                   cursor="pointer"
                   py="$2"
                   px="$2"
-                  alignItems="left"
+                  alignItems="flex-start"
                   borderRadius="$2"
                   onPress={() => setActiveTab(SettingsTab.AnalyticsTab)}
                 >

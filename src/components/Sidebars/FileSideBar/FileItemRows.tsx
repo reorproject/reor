@@ -58,6 +58,7 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
       const sourcePath = e.dataTransfer.getData('text/plain')
       const destinationDirectory = isDirectory ? file.path : await window.path.dirname(file.path)
       const destinationPath = await window.path.join(destinationDirectory, await window.path.basename(sourcePath))
+      console.log(`sourcePath: ${sourcePath}, destinationPath: ${destinationPath}`)
       renameFile(sourcePath, destinationPath)
     },
     [file.path, isDirectory, renameFile],
@@ -116,7 +117,7 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
     <div style={{ ...style, paddingLeft: `${indentationPadding}px` }}>
       <ContextMenu>
         <ContextMenuTrigger>
-          <YStack
+          <div
             draggable
             onDragStart={handleDragStart}
             onDragOver={handleDragOver}
@@ -126,7 +127,6 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
             <XStack
               hoverStyle={{
                 backgroundColor: '$gray7',
-                backgroundFocus: '$gray8',
               }}
               backgroundColor={isSelected && !isDirectory ? '$gray7' : ''}
               onClick={clickOnFileOrDirectory}
@@ -150,7 +150,7 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
               onClose={() => setIsNewDirectoryModalOpen(false)}
               parentDirectoryPath={parentDirectoryPathForNewDirectory}
             />
-          </YStack>
+          </div>
         </ContextMenuTrigger>
         <ContextMenuContent>{renderContextMenuItems()}</ContextMenuContent>
       </ContextMenu>

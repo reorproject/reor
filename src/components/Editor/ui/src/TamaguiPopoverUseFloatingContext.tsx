@@ -8,8 +8,16 @@ import type { UseFloatingOptions } from '@floating-ui/react'
 import { safePolygon, useDismiss, useFloating, useFocus, useHover, useInteractions, useRole } from '@floating-ui/react'
 import React from 'react'
 
+interface FloatingContextProps {
+  open: boolean
+  setOpen: (val: boolean, type: 'hover' | 'press') => void
+  disable: boolean
+  disableFocus: boolean
+  hoverable: boolean | Record<string, any>  
+}
+
 // Custom floating context to override the Popper on web
-export const useFloatingContext = ({ open, setOpen, disable, disableFocus, hoverable }) => {
+export const useFloatingContext = ({ open, setOpen, disable, disableFocus, hoverable }: FloatingContextProps) => {
   return React.useCallback(
     (props: UseFloatingOptions) => {
       const floating = useFloating({
@@ -26,7 +34,7 @@ export const useFloatingContext = ({ open, setOpen, disable, disableFocus, hover
       const { getReferenceProps, getFloatingProps } = useInteractions([
         hoverable
           ? useHover(floating.context, {
-              enabled: !disable && hoverable,
+              enabled: !disable && hoverable as boolean,
               handleClose: safePolygon({
                 requireIntent: true,
                 blockPointerEvents: true,

@@ -1,4 +1,4 @@
-import { YStack, XStack, Button, Popover, Separator, Input, Theme, SizableText, Text } from 'tamagui'
+import { YStack, XStack, Button, Popover, Separator, Input, Theme, SizableText } from 'tamagui'
 import React, { useState } from 'react'
 import { IconType } from 'react-icons'
 import { MediaType } from '@/components/Editor/types/media-render'
@@ -41,6 +41,7 @@ const EmbedComponent: React.FC<EmbedRenderProps> = ({ props, submit, assign }) =
           backgroundColor="$purple3"
           borderRadius="$4"
           outlineWidth={0}
+          // @ts-expect-error
           contentEditable={false}
           onClick={handleClick}
           height={50}
@@ -59,9 +60,9 @@ const EmbedComponent: React.FC<EmbedRenderProps> = ({ props, submit, assign }) =
             opacity={0.4}
           >
             {icon && React.createElement(icon)}
-            <Text size={14} color="$color8" fontFamily="$mono">
+            <SizableText size={14} color="$color8" fontFamily="$mono">
               {hint}
-            </Text>
+            </SizableText>
           </XStack>
         </YStack>
       </Popover.Trigger>
@@ -151,13 +152,13 @@ const EmbedComponent: React.FC<EmbedRenderProps> = ({ props, submit, assign }) =
               <YStack gap="$2">
                 <Input
                   autoFocus
-                  color="black"
+                  color="$white"
                   height={32}
                   fontFamily="$mono"
                   backgroundColor={errorRaised ? '$color5' : 'color7'}
                   borderRadius="$4"
                   hoverStyle={{
-                    backgroundColor: 'hsl(0, 0%, 92.0%)',
+                    backgroundColor: '$gray4',
                   }}
                   focusStyle={{
                     outlineColor: '$blue7',
@@ -166,7 +167,7 @@ const EmbedComponent: React.FC<EmbedRenderProps> = ({ props, submit, assign }) =
                   }}
                   placeholder={embedPlaceholder}
                   value={url}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setURL(e.target.value)}
+                  onChangeText={setURL}
                 />
                 {errorRaised && (
                   <SizableText size="$2" color="red" fontWeight="semiBold">

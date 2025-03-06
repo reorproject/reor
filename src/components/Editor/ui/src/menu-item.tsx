@@ -2,7 +2,7 @@ import React from 'react'
 import { ListItem, ListItemProps } from '@tamagui/list-item'
 import { SizableText } from '@tamagui/text'
 
-const MenuItem = ({ disabled, title, icon, iconAfter, children, ...props }: ListItemProps) => {
+const MenuItem: React.FC<ListItemProps> = ({ disabled, title, icon, iconAfter, children, ...props }) => {
   return (
     <ListItem
       hoverTheme
