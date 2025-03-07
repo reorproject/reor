@@ -66,8 +66,8 @@ const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
   const filesAndIndentations = getFilesAndIndentationsForSidebar(vaultFilesTree, expandedDirectories)
   const itemCount = filesAndIndentations.length
   return (
-    <YStack backgroundColor="$gray3" color="$gray11">
-      <div className="h-full grow px-1 pt-2 " onDrop={handleDrop} onDragOver={handleDragOver} onClick={handleClick}>
+    <YStack className="h-full grow px-1 pt-2" backgroundColor="$gray3" color="$gray11">
+      <div onDrop={handleDrop} onDragOver={handleDragOver} onClick={handleClick}>
         <FixedSizeList
           height={listHeight}
           itemCount={itemCount}

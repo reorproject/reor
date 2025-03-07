@@ -58,7 +58,6 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
       const sourcePath = e.dataTransfer.getData('text/plain')
       const destinationDirectory = isDirectory ? file.path : await window.path.dirname(file.path)
       const destinationPath = await window.path.join(destinationDirectory, await window.path.basename(sourcePath))
-      console.log(`sourcePath: ${sourcePath}, destinationPath: ${destinationPath}`)
       renameFile(sourcePath, destinationPath)
     },
     [file.path, isDirectory, renameFile],
