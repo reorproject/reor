@@ -21,10 +21,13 @@ const TextColorExtension = Extension.create({
             default: 'default',
             parseHTML: (element) =>
               element.hasAttribute('data-text-color') ? element.getAttribute('data-text-color') : 'default',
-            renderHTML: (attributes) =>
-              attributes.textColor !== 'default' && {
-                'data-text-color': attributes.textColor,
-              },
+            renderHTML: (attributes) => {
+              return attributes.textColor !== 'default'
+                ? {
+                    'data-text-color': attributes.textColor,
+                  }
+                : null
+            },
           },
         },
       },

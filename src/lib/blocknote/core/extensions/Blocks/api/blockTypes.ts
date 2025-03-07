@@ -1,9 +1,9 @@
 /** Define the main block types * */
 import { Node, NodeConfig } from '@tiptap/core'
 import { ParseRule } from '@tiptap/pm/model'
-import { IBlockNoteEditor } from '../../../IBlockNoteEditor'
 import { DefaultBlockSchema } from './defaultBlocks'
 import { InlineContent, PartialInlineContent } from './inlineContentTypes'
+import { BlockNoteEditor } from '../../../BlockNoteEditor'
 
 export type BlockNoteDOMElement = 'editor' | 'blockContainer' | 'blockGroup' | 'blockContent' | 'inlineContent'
 
@@ -98,7 +98,7 @@ export type BlockConfig<
      * This is typed generically. If you want an editor with your custom schema, you need to
      * cast it manually, e.g.: `const e = editor as BlockNoteEditor<typeof mySchema>;`
      */
-    editor: IBlockNoteEditor<BSchema & { [k in Type]: BlockSpec<Type, PSchema> }>,
+    editor: BlockNoteEditor<BSchema>,
     // (note) if we want to fix the manual cast, we need to prevent circular references and separate block definition and render implementations
     // or allow manually passing <BSchema>, but that's not possible without passing the other generics because Typescript doesn't support partial inferred generics
   ) => ContainsInlineContent extends true

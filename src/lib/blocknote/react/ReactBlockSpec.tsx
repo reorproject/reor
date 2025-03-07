@@ -103,7 +103,7 @@ export function createReactBlockSpec<
         }
 
         // Gets BlockNote editor instance
-        const editor = this.options.editor! as BlockNoteEditor<BSchema & { [k in BType]: BlockSpec<BType, PSchema> }>
+        const editor = this.options.editor! as BlockNoteEditor<BSchema>
         // Gets position of the node
         const pos = typeof props.getPos === 'function' ? props.getPos() : undefined
 

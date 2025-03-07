@@ -2,6 +2,7 @@ import React from 'react'
 import { ListItem, ListItemProps } from '@tamagui/list-item'
 import { SizableText } from '@tamagui/text'
 
+// @ts-ignore Produces "union type that is too complex to present" error.
 const MenuItem: React.FC<ListItemProps> = ({ disabled, title, icon, iconAfter, children, ...props }) => {
   return (
     <ListItem

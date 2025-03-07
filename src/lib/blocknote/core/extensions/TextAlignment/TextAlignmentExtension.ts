@@ -22,10 +22,13 @@ const TextAlignmentExtension = Extension.create({
           textAlignment: {
             default: 'left',
             parseHTML: (element) => element.getAttribute('data-text-alignment'),
-            renderHTML: (attributes) =>
-              attributes.textAlignment !== 'left' && {
-                'data-text-alignment': attributes.textAlignment,
-              },
+            renderHTML: (attributes) => {
+              return attributes.textAlignment !== 'left'
+                ? {
+                    'data-text-alignment': attributes.textAlignment,
+                  }
+                : null
+            },
           },
         },
       },

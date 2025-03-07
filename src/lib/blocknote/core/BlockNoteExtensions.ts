@@ -16,7 +16,6 @@ import { Strike } from '@tiptap/extension-strike'
 import { Text } from '@tiptap/extension-text'
 import { Underline } from '@tiptap/extension-underline'
 import * as Y from 'yjs'
-import { IBlockNoteEditor } from './IBlockNoteEditor'
 // import {createInlineEmbedNode} from '../../mentions-plugin'
 import { Link } from '../../tiptap-extension-link'
 import styles from './editor.module.css'
@@ -30,16 +29,16 @@ import { Placeholder } from './extensions/Placeholder/PlaceholderExtension'
 import { TrailingNode } from './extensions/TrailingNode/TrailingNodeExtension'
 import UniqueID from './extensions/UniqueID/UniqueID'
 import { HMBlockSchema } from '@/components/Editor/schema'
-import { DiffExtension } from './extensions/Diff/diffExtension'
 import SearchAndReplace from '@/components/Editor/Search/SearchAndReplaceExtension'
 import TextAlignmentExtension from './extensions/TextAlignment/TextAlignmentExtension'
+import { BlockNoteEditor } from './BlockNoteEditor'
 
 /**
  * Get all the Tiptap extensions BlockNote is configured with by default
  */
 const getBlockNoteExtensions = <BSchema extends HMBlockSchema>(opts: {
   editable?: boolean
-  editor: IBlockNoteEditor
+  editor: BlockNoteEditor<BSchema>
   domAttributes: Partial<BlockNoteDOMAttributes>
   blockSchema: BSchema
   linkExtensionOptions: any
@@ -99,7 +98,6 @@ const getBlockNoteExtensions = <BSchema extends HMBlockSchema>(opts: {
     // TextColorExtension,
     TextAlignmentExtension,
     // LocalMediaPastePlugin,
-    DiffExtension,
     // nodes
     Doc,
     BlockGroup.configure({

@@ -33,12 +33,12 @@ const DialogContent = styled(DialogPrimitive.Content, {
   top: '50%',
   zIndex: 60,
   width: '60vw',
-  maxWidth: {
-    sm: '90%', // For small screens
-    md: '80%', // For medium screens
-    lg: '70%', // For large screens
-    xl: '60%', // For extra-large screens
-  },
+  // maxWidth: {
+  //   sm: '90%', // For small screens
+  //   md: '80%', // For medium screens
+  //   lg: '70%', // For large screens
+  //   xl: '60%', // For extra-large screens
+  // },
   transform: 'translate(-50%, -50%)',
   variants: {
     open: {

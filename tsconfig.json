@@ -26,6 +26,6 @@
     }
   },
   "include": ["src", "electron", "shared"],
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "src/components/Editor/ui/src/generated-themes.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

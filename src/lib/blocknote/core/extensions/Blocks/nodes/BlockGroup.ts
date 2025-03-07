@@ -63,7 +63,7 @@ const BlockGroup = Node.create<{
         find: /^\d+\.\s/,
         handler: ({ state, chain, range }) => {
           chain()
-            .UpdateGroup(state.selection.from, 'ol', false, this.editor.state.doc.textBetween(range.from, range.to - 1))
+            .UpdateGroup(state.selection.from, 'ol', false)
             // Removes the "1." characters used to set the list.
             .deleteRange({ from: range.from, to: range.to })
         },
