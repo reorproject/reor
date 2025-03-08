@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef } from 'react'
 import ReactDOM from 'react-dom'
 import { YStack, XStack } from '@tamagui/stacks'
 import { X } from '@tamagui/lucide-icons'
@@ -10,12 +10,7 @@ interface ModalProps {
   hideCloseButton?: boolean
 }
 
-const ReorModal: React.FC<ModalProps> = ({
-  isOpen,
-  onClose,
-  children,
-  hideCloseButton,
-}) => {
+const ReorModal: React.FC<ModalProps> = ({ isOpen, onClose, children, hideCloseButton }) => {
   const modalRef = useRef<HTMLDivElement>(null)
 
   if (!isOpen) {
@@ -52,7 +47,7 @@ const ReorModal: React.FC<ModalProps> = ({
         shadowOpacity={0.5}
         shadowRadius={10}
         padding="$4"
-        onClick={(e) => e.stopPropagation()} 
+        onClick={(e) => e.stopPropagation()}
       >
         {!hideCloseButton && (
           <XStack position="absolute" top={10} right={15}>

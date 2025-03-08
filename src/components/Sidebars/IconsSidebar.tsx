@@ -148,9 +148,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ getShortcutDescription }) =
           )}
         </YStack>
       </div>
-      <div
-        className="flex h-8 w-full cursor-pointer items-center justify-center border-none bg-transparent"
-      >
+      <div className="flex h-8 w-full cursor-pointer items-center justify-center border-none bg-transparent">
         <YStack
           alignItems="center"
           hoverStyle={{
