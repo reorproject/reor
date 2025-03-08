@@ -1,5 +1,6 @@
 import React from 'react'
-import { ImFileEmpty } from 'react-icons/im'
+import { SizableText, YStack } from 'tamagui'
+import { File } from '@tamagui/lucide-icons'
 import { useContentContext } from '@/contexts/ContentContext'
 import { useModalOpeners } from '@/contexts/ModalContext'
 
@@ -10,12 +11,16 @@ const EmptyPage: React.FC = () => {
   return (
     <div className="flex size-full flex-col items-center justify-center text-white">
       <div className="flex flex-col items-center">
-        <div className="opacity-10">
-          <ImFileEmpty size={168} />
+        <div className="mb-2 opacity-10">
+          <File size={168} color="$brand3" />
         </div>
-        <h3 className="mb-0 opacity-90">No File Selected!</h3>
-        <p className="mt-1 opacity-70">Open a file and get back to work!</p>
-        <div className="mt-2 flex flex-col gap-2">
+        <SizableText color="$gray11" size="$6" fontWeight={400} className="mb-0">
+          No File Selected!
+        </SizableText>
+        <SizableText color="$gray11" paddingTop={6}>
+          Open a file and get back to work!
+        </SizableText>
+        <YStack paddingTop={20}>
           <button
             className="cursor-pointer border-0 bg-transparent pb-1 pr-0 text-left text-2lg text-blue-500"
             onClick={() => createUntitledNote()}
@@ -30,7 +35,7 @@ const EmptyPage: React.FC = () => {
           >
             Create a Folder
           </button>
-        </div>
+        </YStack>
       </div>
     </div>
   )

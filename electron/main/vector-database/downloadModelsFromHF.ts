@@ -42,7 +42,6 @@ const DownloadModelFilesFromHFRepo = async (repo: string, saveDirectory: string,
   })
 
   const files = []
-  // eslint-disable-next-line no-restricted-syntax
   for await (const file of fileList) {
     if (file.type === 'file') {
       if (file.path.endsWith('onnx')) {

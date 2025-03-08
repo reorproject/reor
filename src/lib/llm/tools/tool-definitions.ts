@@ -175,7 +175,7 @@ export const toolNamesToFunctions: ToolFunctionMap = {
     return `Directory ${directoryName} created successfully`
   },
   readFile: async (filePath: string): Promise<string> => {
-    const content = await window.fileSystem.readFile(filePath)
+    const content = await window.fileSystem.readFile(filePath, 'utf-8')
     return content
   },
   deleteNote: async (filename: string): Promise<string> => {
@@ -193,7 +193,7 @@ export const toolNamesToFunctions: ToolFunctionMap = {
   appendToNote: async (filename: string, content: string): Promise<string> => {
     const vault = await window.electronStore.getVaultDirectoryForWindow()
     const path = await window.path.join(vault, filename)
-    const currentContent = await window.fileSystem.readFile(path)
+    const currentContent = await window.fileSystem.readFile(path, 'utf-8')
     await window.fileSystem.writeFile({ filePath: path, content: currentContent + content })
     return `Note ${filename} appended to successfully`
   },

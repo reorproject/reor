@@ -25,7 +25,7 @@ const SimilarFilesSidebarComponent: React.FC = () => {
     if (!filePathForChunk) {
       return undefined
     }
-    const fileContent: string = await window.fileSystem.readFile(filePathForChunk)
+    const fileContent: string = await window.fileSystem.readFile(filePathForChunk, 'utf-8')
     if (!fileContent) {
       return undefined
     }

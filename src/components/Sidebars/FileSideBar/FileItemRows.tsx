@@ -1,8 +1,9 @@
 import React, { useState, useCallback } from 'react'
 import { ListChildComponentProps } from 'react-window'
-import { FaChevronDown, FaChevronRight } from 'react-icons/fa'
 import posthog from 'posthog-js'
 import { isFileNodeDirectory } from '@shared/utils'
+import { XStack } from 'tamagui'
+import { ChevronRight, ChevronDown } from '@tamagui/lucide-icons'
 import { useFileContext } from '@/contexts/FileContext'
 import { removeFileExtension } from '@/lib/file'
 import { useContentContext } from '@/contexts/ContentContext'
@@ -94,8 +95,8 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
     }
   }, [deleteFile, file.path, isDirectory])
 
-  const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 hover:bg-neutral-700 h-full mt-0 mb-0 text-cyan-100 font-sans text-xs leading-relaxed rounded-md ${
-    isSelected ? 'bg-neutral-700 text-white font-semibold' : 'text-gray-200'
+  const itemClasses = `flex items-center cursor-pointer px-2 py-1 border-b border-gray-200 h-full mt-0 mb-0 font-sans text-xs leading-relaxed rounded-md ${
+    isSelected ? 'font-semibold' : ''
   } ${isDragOver ? 'bg-neutral-500' : ''}`
 
   const renderContextMenuItems = () => (
@@ -122,18 +123,27 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
             onDrop={handleDrop}
             onDragLeave={handleDragLeave}
           >
-            <div onClick={clickOnFileOrDirectory} className={itemClasses}>
+            <XStack
+              hoverStyle={{
+                backgroundColor: '$gray7',
+              }}
+              backgroundColor={isSelected && !isDirectory ? '$gray7' : ''}
+              onClick={clickOnFileOrDirectory}
+              className={itemClasses}
+            >
               {isDirectory && (
-                <span className="mr-2 mt-1 text-gray-200/20">
+                <span className="mr-2 mt-1">
                   {isExpanded ? (
-                    <FaChevronDown title="Collapse Directory" />
+                    // <FaChevronDown title="Collapse Directory" />
+                    <ChevronDown title="Collapse Directory" size={14} color="$gray10" />
                   ) : (
-                    <FaChevronRight title="Open Directory" />
+                    // <FaChevronRight title="Open Directory" />
+                    <ChevronRight title="Open Directory" size={14} color="$gray10" />
                   )}
                 </span>
               )}
               <span className="mt-0 flex-1 truncate">{isDirectory ? file.name : removeFileExtension(file.name)}</span>
-            </div>
+            </XStack>
             <NewDirectoryComponent
               isOpen={isNewDirectoryModalOpen}
               onClose={() => setIsNewDirectoryModalOpen(false)}

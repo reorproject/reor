@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import SettingsModal, { SettingsTab } from '../Settings'
 import useLLMConfigs from '@/lib/hooks/use-llm-configs'
+import { useThemeManager } from '@/contexts/ThemeContext'
 
 interface LLMSelectOrButtonProps {
   selectedLLM: string | undefined
@@ -11,6 +12,7 @@ interface LLMSelectOrButtonProps {
 
 const LLMSelectOrButton: React.FC<LLMSelectOrButtonProps> = ({ selectedLLM, setSelectedLLM }) => {
   const { llmConfigs } = useLLMConfigs()
+  const { state } = useThemeManager()
   const handleLLMChange = (value: string) => {
     setSelectedLLM(value)
   }
@@ -40,7 +42,9 @@ const LLMSelectOrButton: React.FC<LLMSelectOrButtonProps> = ({ selectedLLM, setS
           </Button>
         ) : (
           <Select value={selectedLLM} onValueChange={(value) => handleLLMChange(value)}>
-            <SelectTrigger className="h-7 w-32 border-0 text-[10px] text-gray-300 focus:ring-0 focus:ring-offset-0">
+            <SelectTrigger
+              className={`h-7 w-32 border-0 text-[10px] ${state === 'light' ? 'text-black' : 'text-white'}focus:ring-0 focus:ring-offset-0`}
+            >
               <SelectValue placeholder="Select LLM" />
             </SelectTrigger>
             <SelectContent className="rounded-md border border-dark-gray-c-eight bg-[#1c1c1c]">

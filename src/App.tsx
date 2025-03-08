@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css'
 import IndexingProgress from './components/Common/IndexingProgress'
 import MainPageComponent from './components/MainPage'
 import InitialSetupSinglePage from './components/Settings/InitialSettingsSinglePage'
+import { ThemeProvider } from './contexts/ThemeContext'
 
 interface AppProps {}
 
@@ -77,26 +78,28 @@ const App: React.FC<AppProps> = () => {
   }
 
   return (
-    <div className="max-h-screen bg-neutral-800 font-sans">
-      <Portal>
-        <ToastContainer
-          theme="dark"
-          position="bottom-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          closeOnClick
-          pauseOnHover
-          toastClassName="text-xs"
-        />{' '}
-      </Portal>
-      {!userHasConfiguredSettingsForIndexing && (
-        <InitialSetupSinglePage readyForIndexing={handleAllInitialSettingsAreReady} />
-      )}
-      {userHasConfiguredSettingsForIndexing && indexingProgress < 1 && (
-        <IndexingProgress indexingProgress={indexingProgress} />
-      )}
-      {userHasConfiguredSettingsForIndexing && indexingProgress >= 1 && <MainPageComponent />}
-    </div>
+    <ThemeProvider>
+      <div className="max-h-screen font-sans">
+        <Portal>
+          <ToastContainer
+            theme="dark"
+            position="bottom-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            closeOnClick
+            pauseOnHover
+            toastClassName="text-xs" // Added max height and overflow
+          />{' '}
+        </Portal>
+        {!userHasConfiguredSettingsForIndexing && (
+          <InitialSetupSinglePage readyForIndexing={handleAllInitialSettingsAreReady} />
+        )}
+        {userHasConfiguredSettingsForIndexing && indexingProgress < 1 && (
+          <IndexingProgress indexingProgress={indexingProgress} />
+        )}
+        {userHasConfiguredSettingsForIndexing && indexingProgress >= 1 && <MainPageComponent />}
+      </div>
+    </ThemeProvider>
   )
 }
 
