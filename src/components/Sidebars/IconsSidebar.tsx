@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import { GrNewWindow } from 'react-icons/gr'
 import { MdSettings } from 'react-icons/md'
@@ -11,6 +11,7 @@ import { useModalOpeners } from '../../contexts/ModalContext'
 import { useChatContext } from '@/contexts/ChatContext'
 import { useContentContext } from '@/contexts/ContentContext'
 import { useThemeManager } from '@/contexts/ThemeContext'
+import InitialSetupSinglePage from '../Settings/InitialSettingsSinglePage'
 
 export interface IconsSidebarProps {
   getShortcutDescription: (action: string) => string
@@ -18,10 +19,16 @@ export interface IconsSidebarProps {
 
 const IconsSidebar: React.FC<IconsSidebarProps> = ({ getShortcutDescription }) => {
   const { sidebarShowing, setSidebarShowing } = useChatContext()
-  const { state, actions } = useThemeManager() // State => theme, actions => toggle, set, syncWithSystem
+  const [showVaultSetup, setShowVaultSetup] = useState(false)
 
+  const { state, actions } = useThemeManager() // State => theme, actions => toggle, set, syncWithSystem
   const { isSettingsModalOpen, setIsSettingsModalOpen, setIsNewDirectoryModalOpen } = useModalOpeners()
   const { createUntitledNote } = useContentContext()
+
+  const handleAllInitialSettingsAreReady = () => {
+    setShowVaultSetup(false)
+    window.database.indexFilesInDirectory()
+  }
 
   const determineColor = (sidebarName: string) => {
     return sidebarShowing === sidebarName ? '$gray11' : '$gray9'
@@ -143,15 +150,14 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ getShortcutDescription }) =
       </div>
       <div
         className="flex h-8 w-full cursor-pointer items-center justify-center border-none bg-transparent"
-        onClick={() => window.electronUtils.openNewWindow()}
       >
         <YStack
           alignItems="center"
-          onPress={() => actions.toggle()}
           hoverStyle={{
             backgroundColor: '$gray7',
           }}
           className="flex size-4/5 items-center justify-center rounded"
+          onClick={() => setShowVaultSetup(true)}
         >
           <GrNewWindow className="text-gray-100" color="gray" size={14} title="Open New Vault" />
         </YStack>
@@ -170,6 +176,15 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ getShortcutDescription }) =
         >
           <MdSettings color="gray" size={18} title={getShortcutDescription('open-settings-modal') || 'Settings'} />
         </YStack>
+      </div>
+
+      <div>
+        {showVaultSetup && (
+          <InitialSetupSinglePage
+            readyForIndexing={handleAllInitialSettingsAreReady}
+            onClose={() => setShowVaultSetup(false)}
+          />
+        )}
       </div>
     </YStack>
   )

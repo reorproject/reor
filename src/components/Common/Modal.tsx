@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useEffect } from 'react'
 import ReactDOM from 'react-dom'
 import { YStack, XStack } from '@tamagui/stacks'
 import { X } from '@tamagui/lucide-icons'
@@ -10,30 +10,28 @@ interface ModalProps {
   hideCloseButton?: boolean
 }
 
-const ReorModal: React.FC<ModalProps> = ({ isOpen, onClose, children, hideCloseButton }) => {
+const ReorModal: React.FC<ModalProps> = ({
+  isOpen,
+  onClose,
+  children,
+  hideCloseButton,
+}) => {
   const modalRef = useRef<HTMLDivElement>(null)
-
-  // useEffect(() => {
-  //   const handleOffClick = (event: MouseEvent) => {
-  //     const isBackdropClick = event.target === document.querySelector(`.${tailwindStylesOnBackground}`)
-
-  //     if (modalRef.current && !modalRef.current.contains(event.target as Node) && isBackdropClick) {
-  //       onClose()
-  //     }
-  //   }
-  //   document.addEventListener('mousedown', handleOffClick)
-  //   return () => {
-  //     document.removeEventListener('mousedown', handleOffClick)
-  //   }
-  // }, [onClose, tailwindStylesOnBackground])
 
   if (!isOpen) {
     return null
   }
 
+  const handleBackdropClick = (event: React.MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+      onClose()
+    }
+  }
+  console.log(`modalRef:`, modalRef)
+
   const modalContent = (
     <YStack
-      // position="fixed"
+      position="fixed"
       top={0}
       left={0}
       right={0}
@@ -42,6 +40,7 @@ const ReorModal: React.FC<ModalProps> = ({ isOpen, onClose, children, hideCloseB
       justifyContent="center"
       backgroundColor="rgba(0, 0, 0, 0.4)"
       height="100vh"
+      onClick={handleBackdropClick}
     >
       <YStack
         ref={modalRef}
@@ -53,6 +52,7 @@ const ReorModal: React.FC<ModalProps> = ({ isOpen, onClose, children, hideCloseB
         shadowOpacity={0.5}
         shadowRadius={10}
         padding="$4"
+        onClick={(e) => e.stopPropagation()} 
       >
         {!hideCloseButton && (
           <XStack position="absolute" top={10} right={15}>
