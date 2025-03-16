@@ -49,7 +49,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     >
       <DialogOverlay>
         <DialogContent>
-          <ScrollView height="80vh" >
+          <ScrollView height="80vh">
             <XStack height="100%" minHeight="80vh" width="100%">
               <YStack
                 backgroundColor="$gray12"
