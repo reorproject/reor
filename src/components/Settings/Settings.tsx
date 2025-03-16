@@ -49,15 +49,13 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     >
       <DialogOverlay>
         <DialogContent>
-          {/* <VisuallyHidden>
-            <DialogTitle>Empty Title</DialogTitle>
-          </VisuallyHidden> */}
-          <ScrollView>
-            <XStack height="80vh" width="100%">
+          <ScrollView height="80vh" >
+            <XStack height="100%" minHeight="80vh" width="100%">
               <YStack
                 backgroundColor="$gray12"
                 width="150px"
                 gap="$1"
+                flex={1}
                 className="flex flex-col rounded-l-lg border-y-0 border-l-0 border-r-[0.1px] border-solid border-gray-700 p-2 text-white"
               >
                 <YStack
