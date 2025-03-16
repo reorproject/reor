@@ -13,12 +13,22 @@ const AnalyticsSettings: React.FC<AnalyticsSettingsProps> = () => {
       const storedIsAnalyticsEnabled = await window.electronStore.getAnalyticsMode()
 
       if (storedIsAnalyticsEnabled !== undefined) {
+        console.log(`Stored analytics: ${storedIsAnalyticsEnabled}`)
         setIsAnalyticsEnabled(storedIsAnalyticsEnabled)
       }
     }
 
     fetchParams()
   }, [])
+
+  const handleSave = () => {
+    // Execute the save function here
+    if (isAnalyticsEnabled !== undefined) {
+      window.electronStore.setAnalyticsMode(!isAnalyticsEnabled)
+      setIsAnalyticsEnabled(!isAnalyticsEnabled)
+      posthog.capture('analytics_disabled')
+    }
+  }
 
   return (
     <YStack px="$4" backgroundColor="$gray1" maxWidth="100%">
@@ -33,12 +43,7 @@ const AnalyticsSettings: React.FC<AnalyticsSettingsProps> = () => {
             </SizableText>
             <Switch
               checked={isAnalyticsEnabled}
-              onChange={() => {
-                setIsAnalyticsEnabled(!isAnalyticsEnabled)
-                if (isAnalyticsEnabled) {
-                  posthog.capture('analytics_disabled')
-                }
-              }}
+              onChange={handleSave}
               inputProps={{ 'aria-label': 'controlled' }}
             />
           </XStack>
