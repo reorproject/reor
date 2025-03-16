@@ -86,7 +86,9 @@ const NewRemoteEmbeddingModelModal: React.FC<NewRemoteEmbeddingModelModalProps> 
             </p>
           </div>
           <DialogFooter>
-            <Button onClick={saveModelConfigToElectronStore}>Attach</Button>
+            <Button variant="secondary" onClick={saveModelConfigToElectronStore}>
+              Attach
+            </Button>
           </DialogFooter>
         </DialogContent>
       </DialogOverlay>
