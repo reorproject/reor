@@ -22,7 +22,6 @@ const ReorModal: React.FC<ModalProps> = ({ isOpen, onClose, children, hideCloseB
       onClose()
     }
   }
-  console.log(`modalRef:`, modalRef)
 
   const modalContent = (
     <YStack

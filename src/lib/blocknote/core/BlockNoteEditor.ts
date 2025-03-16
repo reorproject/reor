@@ -2,7 +2,6 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 import { Editor as TiptapEditor, EditorOptions, Extension } from '@tiptap/core'
 import { Node } from 'prosemirror-model'
-// import "./blocknote.css";
 import * as Y from 'yjs'
 import getBlockNoteExtensions from './BlockNoteExtensions'
 import { insertBlocks, removeBlocks, replaceBlocks, updateBlock } from './api/blockManipulation/blockManipulation'

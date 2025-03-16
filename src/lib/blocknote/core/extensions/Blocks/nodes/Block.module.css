@@ -190,7 +190,7 @@ NESTED BLOCKS
 }
 
 /* HEADINGS*/
-/* [data-level='1'],
+[data-level='1'],
 [data-content-type='heading'] {
   --level: 32px;
 }
@@ -214,6 +214,7 @@ NESTED BLOCKS
   --level: 18px;
 }
 
+/*
 [data-prev-level='1'] {
   --prev-level: 32px;
 }
@@ -241,40 +242,8 @@ NESTED BLOCKS
   font-weight: bold;
 } */
 
-[data-node-type='blockGroup'] [data-content-type='heading'] {
-  --level: 32px;
-}
-
 [data-content-type='paragraph'] {
   font-size: 1rem;
-}
-
-[data-node-type='blockGroup'] [data-node-type='blockGroup'] [data-content-type='heading'] {
-  --level: 24px;
-}
-
-[data-node-type='blockGroup']
-  [data-node-type='blockGroup']
-  [data-node-type='blockGroup']
-  [data-content-type='heading'] {
-  --level: 22px;
-}
-
-[data-node-type='blockGroup']
-  [data-node-type='blockGroup']
-  [data-node-type='blockGroup']
-  [data-node-type='blockGroup']
-  [data-content-type='heading'] {
-  --level: 20px;
-}
-
-[data-node-type='blockGroup']
-  [data-node-type='blockGroup']
-  [data-node-type='blockGroup']
-  [data-node-type='blockGroup']
-  [data-node-type='blockGroup']
-  [data-content-type='heading'] {
-  --level: 18px;
 }
 
 .blockOuter:not([data-prev-type]) > .block .blockContent[data-content-type='heading'] {

@@ -131,29 +131,29 @@ shorthands.oy = "overflowY";
 var import_web4 = require("@tamagui/core");
 
 // node_modules/@tamagui/constants/dist/esm/constants.mjs
-var import_react = __toESM(require("react"), 1);
+var import_react = require("react");
 var isWeb = true;
 var isWindowDefined = typeof window < "u";
 var isServer = isWeb && !isWindowDefined;
 var isClient = isWeb && isWindowDefined;
-var useIsomorphicLayoutEffect = isServer ? import_react.default.useEffect : import_react.default.useLayoutEffect;
+var useIsomorphicLayoutEffect = isServer ? import_react.useEffect : import_react.useLayoutEffect;
 var isChrome = typeof navigator < "u" && /Chrome/.test(navigator.userAgent || "");
 var isWebTouchable = isClient && ("ontouchstart" in window || navigator.maxTouchPoints > 0);
 var isIos = process.env.TEST_NATIVE_PLATFORM === "ios";
 
 // node_modules/@tamagui/use-presence/dist/esm/PresenceContext.mjs
-var React2 = __toESM(require("react"), 1);
+var React = __toESM(require("react"), 1);
 var import_jsx_runtime = require("react/jsx-runtime");
-var PresenceContext = React2.createContext(null);
+var PresenceContext = React.createContext(null);
 var ResetPresence = /* @__PURE__ */ __name((props) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)(PresenceContext.Provider, {
   value: null,
   children: props.children
 }), "ResetPresence");
 
 // node_modules/@tamagui/use-presence/dist/esm/usePresence.mjs
-var React3 = __toESM(require("react"), 1);
+var React2 = __toESM(require("react"), 1);
 function usePresence() {
-  const context = React3.useContext(PresenceContext);
+  const context = React2.useContext(PresenceContext);
   if (!context) return [true, null, context];
   const {
     id,
@@ -161,7 +161,7 @@ function usePresence() {
     onExitComplete,
     register
   } = context;
-  return React3.useEffect(() => register(id), []), !isPresent2 && onExitComplete ? [false, () => onExitComplete?.(id), context] : [true, void 0, context];
+  return React2.useEffect(() => register(id), []), !isPresent2 && onExitComplete ? [false, () => onExitComplete?.(id), context] : [true, void 0, context];
 }
 __name(usePresence, "usePresence");
 

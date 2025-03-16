@@ -44,8 +44,7 @@ export function getBlockInfo(blockContainer: Node): BlockInfoWithoutPositions {
  */
 export function getBlockInfoFromPos(doc: Node, pos: number): BlockInfo {
   // If the position is outside the outer block group, we need to move it to the
-  // nearest block. This happens when the collaboration plugin is active, where
-  // the selection is placed at the very end of the doc.
+  // nearest block.
   const outerBlockGroupStartPos = 1
   const outerBlockGroupEndPos = doc.nodeSize - 2
   if (pos <= outerBlockGroupStartPos) {

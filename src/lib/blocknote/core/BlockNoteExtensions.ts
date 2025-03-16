@@ -110,7 +110,6 @@ const getBlockNoteExtensions = <BSchema extends HMBlockSchema>(opts: {
       })
     }),
     CustomBlockSerializerExtension,
-
     Dropcursor.configure({ width: 5, color: '#ddeeff' }),
     HardBreak,
     // This needs to be at the bottom of this list, because Key events (such as enter, when selecting a /command),

@@ -179,8 +179,6 @@ const headingLinePlugin = new Plugin({
 export function getParentBlockFromPos(state: EditorState, pos: number) {
   const $pos = state.doc.resolve(pos)
   const depth = $pos.depth
-
-  // if (depth > 3 && container.type.name == 'blockContainer') {
   if (depth > 3) {
     const parent = $pos.node(depth - 3)
     const parentGroup = $pos.node(depth - 2)
@@ -547,7 +545,6 @@ export const BlockContainer = Node.create<{
                 .chain()
                 .deleteSelection()
                 .BNSplitBlock(state.selection.from, false)
-                .sinkListItem('blockContainer')
                 .UpdateGroup(-1, blockInfo.node.attrs.listType, true)
                 .run()
             })
@@ -563,8 +560,8 @@ export const BlockContainer = Node.create<{
               // automatically, spanning newBlockContentPos to newBlockContentPos + 1.
               state.tr.insert(newBlockInsertionPos, newBlock)
 
-              // // Replaces the content of the newly created block's content node. Doesn't replace the whole content node so
-              // // its type doesn't change.
+              // Replaces the content of the newly created block's content node. Doesn't replace the whole content node so
+              // its type doesn't change.
               state.tr.replace(
                 newBlockContentPos,
                 newBlockContentPos + 1,
@@ -631,7 +628,6 @@ export const BlockContainer = Node.create<{
             level: groupLevel,
             $pos,
           } = getGroupInfoFromPos(posInBlock < 0 ? state.selection.from : posInBlock, state)
-
           if (isSank && group.attrs.listType === listType) return true
 
           // Change group type to div
@@ -728,7 +724,7 @@ export const BlockContainer = Node.create<{
 
             if (container) {
               setTimeout(() => {
-                this.editor.commands.UpdateGroupChildren(container!, $pos, groupLevel, listType, 1)
+                this.editor.commands.UpdateGroupChildren(container!, $pos, groupLevel, listType, 0)
               })
             }
           }
