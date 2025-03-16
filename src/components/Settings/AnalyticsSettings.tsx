@@ -13,7 +13,6 @@ const AnalyticsSettings: React.FC<AnalyticsSettingsProps> = () => {
       const storedIsAnalyticsEnabled = await window.electronStore.getAnalyticsMode()
 
       if (storedIsAnalyticsEnabled !== undefined) {
-        console.log(`Stored analytics: ${storedIsAnalyticsEnabled}`)
         setIsAnalyticsEnabled(storedIsAnalyticsEnabled)
       }
     }
@@ -41,11 +40,7 @@ const AnalyticsSettings: React.FC<AnalyticsSettingsProps> = () => {
               Reor tracks anonymous usage data to help us understand how the app is used and which features are popular.
               You can disable this at any time:
             </SizableText>
-            <Switch
-              checked={isAnalyticsEnabled}
-              onChange={handleSave}
-              inputProps={{ 'aria-label': 'controlled' }}
-            />
+            <Switch checked={isAnalyticsEnabled} onChange={handleSave} inputProps={{ 'aria-label': 'controlled' }} />
           </XStack>
         </XStack>
       </YStack>
