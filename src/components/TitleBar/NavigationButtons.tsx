@@ -7,9 +7,12 @@ import { removeFileExtension } from '@/lib/file'
 import '../../styles/history.scss'
 import { useFileContext } from '@/contexts/FileContext'
 import { useContentContext } from '@/contexts/ContentContext'
+import { useThemeManager } from '@/contexts/ThemeContext'
 
 const NavigationButtons: React.FC = () => {
   const [showMenu, setShowMenu] = useState<string>('')
+    const { state } = useThemeManager()
+
   const longPressTimer = useRef<NodeJS.Timeout | null>(null)
   const buttonRefBack = useRef<HTMLButtonElement>(null)
   const buttonRefForward = useRef<HTMLButtonElement>(null)
@@ -110,6 +113,13 @@ const NavigationButtons: React.FC = () => {
     )
   }
 
+  const navigationColor = (canNavigate: boolean) => {
+    if (state === 'light') {
+      return canNavigate ? 'black' : '#e0e0e0'; // Slightly less white when disabled
+    }
+    return canNavigate ? '#dedede' : '#727272'; // Dark mode colors
+  };
+
   return (
     // eslint-disable-next-line tailwindcss/no-custom-classname
     <div className="history-container flex">
@@ -122,7 +132,7 @@ const NavigationButtons: React.FC = () => {
         onClick={goBack}
         disabled={!canGoBack}
         style={{
-          color: !canGoBack ? '#727272' : '#dedede',
+          color: navigationColor(canGoBack),
           cursor: !canGoBack ? 'default' : 'pointer',
         }}
         title="Back"
@@ -140,7 +150,7 @@ const NavigationButtons: React.FC = () => {
         onClick={goForward}
         disabled={!canGoForward}
         style={{
-          color: !canGoForward ? '#727272' : '#dedede',
+          color: navigationColor(canGoForward),
           cursor: !canGoForward ? 'default' : 'pointer',
         }}
         title="Forward"
