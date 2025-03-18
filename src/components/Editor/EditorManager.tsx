@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { YStack } from 'tamagui'
 import InEditorBacklinkSuggestionsDisplay from './BacklinkSuggestionsDisplay'
 import { useFileContext } from '@/contexts/FileContext'
-import { BlockNoteView, FormattingToolbarPositioner, SlashMenuPositioner } from '@/lib/blocknote'
+import { BlockNoteView, FormattingToolbarPositioner, SlashMenuPositioner, SideMenuPositioner } from '@/lib/blocknote'
 
 const EditorManager: React.FC = () => {
   // const [showSearchBar, setShowSearchBar] = useState(false)
@@ -53,6 +53,7 @@ const EditorManager: React.FC = () => {
             <BlockNoteView editor={editor}>
               <FormattingToolbarPositioner editor={editor} />
               <SlashMenuPositioner editor={editor} />
+              <SideMenuPositioner editor={editor} placement="left" />
             </BlockNoteView>
           )}
         </YStack>

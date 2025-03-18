@@ -11,7 +11,7 @@ import { useThemeManager } from '@/contexts/ThemeContext'
 
 const NavigationButtons: React.FC = () => {
   const [showMenu, setShowMenu] = useState<string>('')
-    const { state } = useThemeManager()
+  const { state } = useThemeManager()
 
   const longPressTimer = useRef<NodeJS.Timeout | null>(null)
   const buttonRefBack = useRef<HTMLButtonElement>(null)
@@ -115,10 +115,10 @@ const NavigationButtons: React.FC = () => {
 
   const navigationColor = (canNavigate: boolean) => {
     if (state === 'light') {
-      return canNavigate ? 'black' : '#e0e0e0'; // Slightly less white when disabled
+      return canNavigate ? 'black' : '#e0e0e0' // Slightly less white when disabled
     }
-    return canNavigate ? '#dedede' : '#727272'; // Dark mode colors
-  };
+    return canNavigate ? '#dedede' : '#727272' // Dark mode colors
+  }
 
   return (
     // eslint-disable-next-line tailwindcss/no-custom-classname

@@ -6,7 +6,7 @@ import {
 } from '@shm/ui'
 import { NodeSelection, TextSelection } from 'prosemirror-state'
 import { Block, BlockNoteEditor, useEditorSelectionChange } from '@/lib/blocknote'
-import MultipleNodeSelection from '@/lib/blocknote/core/extensions/SideMenu/MultipleNodeSelection'
+import MultipleNodeSelection from '@/lib/blocknote/core/extensions/DraggableBlocks/MultipleNodeSelection'
 import type { HMBlockSchema } from '../schema'
 import { getNodesInSelection } from './utils'
 import mediaConfig from '@/components/Editor/ui/src/tamagui/config/mediaEmbed'

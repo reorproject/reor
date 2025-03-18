@@ -39982,7 +39982,7 @@ var SelectViewport = SelectViewportFrame.styleable(function(props, forwardedRef)
     children,
     disableScroll,
     ...viewportProps
-  } = props, context2 = useSelectContext(VIEWPORT_NAME, __scopeSelect), itemContext = useSelectItemParentContext(VIEWPORT_NAME, __scopeSelect), isAdapted = useAdaptIsActive();
+  } = props, context2 = useSelectContext(VIEWPORT_NAME, __scopeSelect), itemContext = useSelectItemParentContext(VIEWPORT_NAME, __scopeSelect), isAdapted = useAdaptIsActive(), composedRefs = useComposedRefs(forwardedRef, context2.floatingContext?.refs.setFloating);
   if (useIsomorphicLayoutEffect(() => {
     context2.update && context2.update();
   }, [isAdapted]), itemContext.shouldRenderWebNative) return /* @__PURE__ */ (0, import_jsx_runtime49.jsx)(import_jsx_runtime49.Fragment, {
@@ -40002,7 +40002,7 @@ var SelectViewport = SelectViewportFrame.styleable(function(props, forwardedRef)
     // remove this, it was set to "Select" always
     className,
     ...floatingProps
-  } = itemContext.interactions.getFloatingProps(), composedRefs = useComposedRefs(forwardedRef, context2.floatingContext?.refs.setFloating);
+  } = itemContext.interactions.getFloatingProps();
   return /* @__PURE__ */ (0, import_jsx_runtime49.jsxs)(import_jsx_runtime49.Fragment, {
     children: [!disableScroll && !props.unstyled && /* @__PURE__ */ (0, import_jsx_runtime49.jsx)("style", {
       dangerouslySetInnerHTML: {

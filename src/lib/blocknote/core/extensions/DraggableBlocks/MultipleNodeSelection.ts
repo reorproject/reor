@@ -1,5 +1,5 @@
-import { Fragment, Node, ResolvedPos, Slice } from 'prosemirror-model'
 import { Selection } from 'prosemirror-state'
+import { Fragment, Node, ResolvedPos, Slice } from 'prosemirror-model'
 import { Mappable } from 'prosemirror-transform'
 
 /**

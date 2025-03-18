@@ -16,6 +16,8 @@ export * from './SlashMenu/components/SlashMenuItem'
 export * from './SlashMenu/components/SlashMenuPositioner'
 export { default as getDefaultReactSlashMenuItems } from './SlashMenu/defaultReactSlashMenuItems'
 
+export * from './SideMenu/components/SideMenuPositioner'
+
 export { default as Toolbar } from './SharedComponents/Toolbar/components/Toolbar'
 export * from './SharedComponents/Toolbar/components/ToolbarButton'
 export * from './SharedComponents/Toolbar/components/ToolbarDropdown'
