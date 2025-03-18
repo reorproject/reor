@@ -5,6 +5,24 @@ import { getGroupInfoFromPos } from '@/lib/blocknote/core/extensions/Blocks/help
 import DefaultSideMenu from './DefaultSideMenu'
 import { DragHandleMenuProps } from './DragHandleMenu/DragHandleMenu'
 
+const popperOptions = {
+  modifiers: [
+    {
+      name: 'flip',
+      options: {
+        fallbackPlacements: [],
+      },
+    },
+    {
+      name: 'preventOverflow',
+      options: {
+        mainAxis: false,
+        altAxis: false,
+      },
+    },
+  ],
+}
+
 export type SideMenuProps<BSchema extends BlockSchema = DefaultBlockSchema> = Pick<
   SideMenuProsemirrorPlugin<BSchema>,
   'blockDragStart' | 'blockDragEnd' | 'addBlock' | 'freezeMenu' | 'unfreezeMenu'
@@ -31,19 +49,6 @@ export const SideMenuPositioner = <BSchema extends BlockSchema = DefaultBlockSch
       setLh(sideMenuState.lineHeight)
     })
   }, [props.editor])
-
-  // useEffect(() => {
-  //   scrollEvents.subscribe(handleHide)
-  //   window.addEventListener('resize', handleHide)
-  //   return () => {
-  //     window.removeEventListener('resize', handleHide)
-  //   }
-
-  //   function handleHide() {
-  //     props.editor.sideMenu.unfreezeMenu()
-  //     setShow(false)
-  //   }
-  // }, [])
 
   const getReferenceClientRect = useMemo(
     () => {
@@ -83,14 +88,14 @@ export const SideMenuPositioner = <BSchema extends BlockSchema = DefaultBlockSch
       switch (block.type) {
         case 'paragraph':
         case 'heading':
-          return (referencePos?.current?.height / 2) * -1 + lhValue
+          return (referencePos.current.height / 2) * -1 + lhValue
         default:
           return 8
       }
     } else {
       return 8
     }
-  }, [referencePos.current])
+  }, [block, lh])
 
   // Add right offset if the node is inside a list or blockquote
   const rightOffset = useMemo(() => {
@@ -108,7 +113,7 @@ export const SideMenuPositioner = <BSchema extends BlockSchema = DefaultBlockSch
       })
     }
     return offset
-  }, [referencePos.current])
+  }, [block, props.editor._tiptapEditor])
 
   return (
     <Tippy
@@ -123,21 +128,4 @@ export const SideMenuPositioner = <BSchema extends BlockSchema = DefaultBlockSch
       popperOptions={popperOptions}
     />
   )
-}
-const popperOptions = {
-  modifiers: [
-    {
-      name: 'flip',
-      options: {
-        fallbackPlacements: [],
-      },
-    },
-    {
-      name: 'preventOverflow',
-      options: {
-        mainAxis: false,
-        altAxis: false,
-      },
-    },
-  ],
 }

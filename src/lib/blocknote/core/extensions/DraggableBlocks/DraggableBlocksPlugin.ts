@@ -240,7 +240,7 @@ export class BlockMenuView<BSchema extends BlockSchema> {
     this.horizontalPosAnchoredAtRoot = horizontalPosAnchoredAtRoot
     this.horizontalPosAnchor = (this.ttEditor.view.dom.firstChild! as HTMLElement).getBoundingClientRect().x
 
-    this.blockMenu = blockMenuFactory(this.getStaticParams())
+    this.blockMenu = blockMenuFactory.create(this.getStaticParams()) as BlockSideMenu<BSchema>
 
     document.body.addEventListener('drop', this.onDrop, true)
     document.body.addEventListener('dragover', this.onDragOver)
@@ -363,20 +363,6 @@ export class BlockMenuView<BSchema extends BlockSchema> {
         this.ttEditor.commands.focus(pos.inside + this.ttEditor.state.doc.resolve(pos.pos).node().nodeSize - 1)
       }
     }
-    // else {
-    //   const blocks = this.editor.topLevelBlocks
-    //   this.editor.insertBlocks(
-    //     [
-    //       {
-    //         type: 'paragraph',
-    //         content: '',
-    //         props: {},
-    //       },
-    //     ],
-    //     blocks[blocks.length - 1],
-    //     'after',
-    //   )
-    // }
   }
 
   onMouseMove = (event: MouseEvent) => {

@@ -25,7 +25,7 @@ export function getDraggableBlockFromCoords(coords: { left: number; top: number 
     return undefined
   }
 
-  let node = view.nodeDOM(pos.inside) || (view.domAtPos(pos.pos).node as HTMLElement)
+  let node = (view.nodeDOM(pos.inside) || view.domAtPos(pos.pos).node) as HTMLElement
   // let atomNode = view.nodeDOM(pos.inside) as HTMLElement
 
   if (node === view.dom) {
@@ -232,7 +232,7 @@ export class SideMenuView<BSchema extends BlockSchema> implements PluginView {
 
     if (
       !block.node?.hasAttribute('data-node-type') &&
-      !block.node?.getAttribute('data-node-type') === 'blockContainer'
+      block.node?.getAttribute('data-node-type') !== 'blockContainer'
     ) {
       return
     }

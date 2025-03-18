@@ -14,7 +14,7 @@ import {
   RiText,
 } from 'react-icons/ri'
 import { updateGroup } from '@/lib/utils'
-import { RemoveBlockButton } from './DefaultButtons/RemoveBlockButton'
+import RemoveBlockButton from './DefaultButtons/RemoveBlockButton'
 import { DragHandleMenu, DragHandleMenuProps } from './DragHandleMenu'
 import DragHandleMenuItem from './DragHandleMenuItem'
 import { HMBlockSchema } from '@/components/Editor/schema'
