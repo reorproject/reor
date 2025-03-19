@@ -1,5 +1,4 @@
 import React from 'react'
-import { Menu } from '@mantine/core'
 import { PolymorphicComponentProps } from '@mantine/utils'
 import { ThemedMenuItem } from '@/components/ui/ThemedMenu'
 

@@ -9,4 +9,5 @@ tailwind.config.js
 *.test.ts
 
 # generated files
+src/components/Editor/ui/src/tamagui/themes/themes-generated.ts
 src/components/Editor/ui/src/generated-themes.ts

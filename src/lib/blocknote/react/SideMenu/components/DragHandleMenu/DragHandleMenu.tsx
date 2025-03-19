@@ -1,12 +1,12 @@
 import { Menu } from '@mantine/core'
 import { createStyles } from '@mantine/styles'
 import React, { ReactNode } from 'react'
-import { Block, BlockNoteEditor, BlockSchema } from '@/lib/blocknote/core'
+import { Block, BlockNoteEditor } from '@/lib/blocknote/core'
 import { HMBlockSchema } from '@/components/Editor/schema'
 
 export type DragHandleMenuProps<BSchema extends HMBlockSchema> = {
-  block: Block<HMBlockSchema>
-  editor: BlockNoteEditor<HMBlockSchema>
+  block: Block<BSchema>
+  editor: BlockNoteEditor<BSchema>
 }
 
 export const DragHandleMenu = (props: { children: ReactNode }) => {

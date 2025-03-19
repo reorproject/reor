@@ -1,17 +1,15 @@
 import React, { ReactNode } from 'react'
-import { Menu, MenuProps } from '@mantine/core'
-import { PolymorphicComponentProps } from '@mantine/utils'
+import { Menu, MenuProps, MenuLabelProps } from '@mantine/core'
 import { useTheme } from 'tamagui'
-import { MenuLabelProps } from '@mantine/core'
 
 interface ThemedMenuProps {
-  children: ReactNode,
+  children: ReactNode
 }
 
-type ThemedMenuItemProps<C = "button"> = PolymorphicComponentProps<
-  C,
-  React.ComponentProps<typeof Menu.Item>
->;
+type ThemedMenuItemProps<C extends React.ElementType = 'button'> = {
+  style?: React.CSSProperties
+  icon?: React.ReactNode
+} & React.ComponentPropsWithoutRef<C>
 
 const ThemedMenu: React.FC<ThemedMenuProps & MenuProps> = ({ children, ...restProps }) => {
   const theme = useTheme()
@@ -23,8 +21,11 @@ const ThemedMenu: React.FC<ThemedMenuProps & MenuProps> = ({ children, ...restPr
   )
 }
 
-export const ThemedMenuItem = <C extends React.ElementType = "button">({style, ...props}: ThemedMenuItemProps<C>) => {
-  const theme = useTheme();
+export const ThemedMenuItem: React.FC<ThemedMenuItemProps> = <C extends React.ElementType = 'button'>({
+  style,
+  ...props
+}: ThemedMenuItemProps<C>) => {
+  const theme = useTheme()
 
   return (
     <Menu.Item
@@ -36,29 +37,30 @@ export const ThemedMenuItem = <C extends React.ElementType = "button">({style, .
       }}
       onMouseEnter={(e: any) => {
         // TODO: Temporary fix for hover background color. Original is too light.
-        e.currentTarget.style.backgroundColor = theme.background.val === '#f9f9f9' ? 'hsl(0, 0%, 93.3%)' : theme.backgroundHover.val;
+        e.currentTarget.style.backgroundColor =
+          theme.background.val === '#f9f9f9' ? 'hsl(0, 0%, 93.3%)' : theme.backgroundHover.val
       }}
       onMouseLeave={(e: any) => {
-        e.currentTarget.style.backgroundColor = theme.background.val;
+        e.currentTarget.style.backgroundColor = theme.background.val
       }}
     />
-  );
-};
+  )
+}
 
-export const ThemedLabel: React.FC<ThemedMenuProps & MenuLabelProps> = ({children, ...restProps}) => {
+export const ThemedLabel: React.FC<ThemedMenuProps & MenuLabelProps> = ({ children, ...restProps }) => {
   const theme = useTheme()
 
   return (
-    <Menu.Label 
+    <Menu.Label
       {...restProps}
       style={{
         backgroundColor: theme.background.val,
         color: theme.color.val,
       }}
-    >{children}</Menu.Label>
+    >
+      {children}
+    </Menu.Label>
   )
 }
 
-
 export default ThemedMenu
-

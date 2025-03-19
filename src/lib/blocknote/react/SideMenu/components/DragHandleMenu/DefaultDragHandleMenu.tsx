@@ -20,13 +20,12 @@ import DragHandleMenuItem from './DragHandleMenuItem'
 import { HMBlockSchema } from '@/components/Editor/schema'
 import ThemedMenu, { ThemedMenuItem, ThemedLabel } from '@/components/ui/ThemedMenu'
 
-
-const turnIntoItems = [
+const TurnIntoItems = <BSchema extends HMBlockSchema>() => [
   {
     label: 'Paragraph',
     group: 'Block operations',
     Icon: RiText,
-    onClick: ({ block, editor }: { block: Block<HMBlockSchema>; editor: BlockNoteEditor<HMBlockSchema> }) => {
+    onClick: ({ block, editor }: { block: Block<BSchema>; editor: BlockNoteEditor<BSchema> }) => {
       editor.focus()
       editor.updateBlock(block, {
         type: 'paragraph',
@@ -38,7 +37,7 @@ const turnIntoItems = [
     label: 'Heading',
     group: 'Block operations',
     Icon: RiHeading,
-    onClick: ({ block, editor }: { block: Block<HMBlockSchema>; editor: BlockNoteEditor<HMBlockSchema> }) => {
+    onClick: ({ block, editor }: { block: Block<BSchema>; editor: BlockNoteEditor<BSchema> }) => {
       editor.focus()
       editor.updateBlock(block, {
         type: 'heading',
@@ -50,7 +49,7 @@ const turnIntoItems = [
     label: 'Code',
     group: 'Block operations',
     Icon: RiCodeBoxLine,
-    onClick: ({ block, editor }: { block: Block<HMBlockSchema>; editor: BlockNoteEditor<HMBlockSchema> }) => {
+    onClick: ({ block, editor }: { block: Block<BSchema>; editor: BlockNoteEditor<BSchema> }) => {
       editor.focus()
       editor.updateBlock(block, {
         type: 'code-block',
@@ -77,7 +76,7 @@ const turnIntoItems = [
     label: 'Bullet item',
     group: 'Group operations',
     Icon: RiListUnordered,
-    onClick: ({ block, editor }: { block: Block<HMBlockSchema>; editor: BlockNoteEditor<HMBlockSchema> }) => {
+    onClick: ({ block, editor }: { block: Block<BSchema>; editor: BlockNoteEditor<BSchema> }) => {
       editor.focus()
       updateGroup(editor, block, 'ul')
     },
@@ -86,7 +85,7 @@ const turnIntoItems = [
     label: 'Numbered item',
     group: 'Group operations',
     Icon: RiListOrdered,
-    onClick: ({ block, editor }: { block: Block<HMBlockSchema>; editor: BlockNoteEditor<HMBlockSchema> }) => {
+    onClick: ({ block, editor }: { block: Block<BSchema>; editor: BlockNoteEditor<BSchema> }) => {
       editor.focus()
       updateGroup(editor, block, 'ul')
     },
@@ -95,7 +94,7 @@ const turnIntoItems = [
     label: 'Group item',
     group: 'Group operations',
     Icon: RiMenuLine,
-    onClick: ({ block, editor }: { block: Block<HMBlockSchema>; editor: BlockNoteEditor<HMBlockSchema> }) => {
+    onClick: ({ block, editor }: { block: Block<BSchema>; editor: BlockNoteEditor<BSchema> }) => {
       editor.focus()
       updateGroup(editor, block, 'group')
     },
@@ -105,7 +104,7 @@ const turnIntoItems = [
     label: 'Blockquote item',
     group: 'Group operations',
     Icon: RiChatQuoteLine,
-    onClick: ({ block, editor }: { block: Block<HMBlockSchema>; editor: BlockNoteEditor<HMBlockSchema> }) => {
+    onClick: ({ block, editor }: { block: Block<BSchema>; editor: BlockNoteEditor<BSchema> }) => {
       editor.focus()
       updateGroup(editor, block, 'blockquote')
     },
@@ -133,6 +132,7 @@ const TurnIntoMenu = <BSchema extends BlockSchema>(props: DragHandleMenuProps<BS
     setOpened(true)
   }, [])
 
+  const turnIntoItems = TurnIntoItems<BSchema>()
   const groups = _.groupBy(turnIntoItems, (i) => i.group)
   const renderedItems: any[] = []
 
@@ -146,7 +146,6 @@ const TurnIntoMenu = <BSchema extends BlockSchema>(props: DragHandleMenuProps<BS
           onClick={() => {
             item.onClick(props)
           }}
-          component="div"
           icon={<item.Icon size={12} />}
         >
           {item.label}

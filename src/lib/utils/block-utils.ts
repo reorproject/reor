@@ -111,7 +111,11 @@ export function getBlockInfoFromPos(doc: Node, pos: number): BlockInfo {
   }
 }
 
-export function updateGroup(editor: BlockNoteEditor, block: any, listType: BlockChildrenType) {
+export function updateGroup<BSchema extends BlockSchema>(
+  editor: BlockNoteEditor<BSchema>,
+  block: any,
+  listType: BlockChildrenType,
+) {
   const { posBeforeNode } = getNodeById(block.id, editor._tiptapEditor.state.doc)
 
   const posData = getBlockInfoFromPos(editor._tiptapEditor.state.doc, posBeforeNode + 1)
