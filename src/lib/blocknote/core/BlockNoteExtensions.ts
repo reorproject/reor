@@ -32,6 +32,7 @@ import { HMBlockSchema } from '@/components/Editor/schema'
 import SearchAndReplace from '@/components/Editor/Search/SearchAndReplaceExtension'
 import TextAlignmentExtension from './extensions/TextAlignment/TextAlignmentExtension'
 import { BlockNoteEditor } from './BlockNoteEditor'
+import { LocalMediaPastePlugin } from './extensions/Pasting/local-media-paste-plugin'
 
 /**
  * Get all the Tiptap extensions BlockNote is configured with by default
@@ -97,7 +98,7 @@ const getBlockNoteExtensions = <BSchema extends HMBlockSchema>(opts: {
     // TextColorMark,
     // TextColorExtension,
     TextAlignmentExtension,
-    // LocalMediaPastePlugin,
+    LocalMediaPastePlugin,
     // nodes
     Doc,
     BlockGroup.configure({

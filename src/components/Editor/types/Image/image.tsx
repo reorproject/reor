@@ -192,7 +192,6 @@ const Render = (block: Block<HMBlockSchema>, editor: BlockNoteEditor<HMBlockSche
         const imageData = `data:image/png;base64,${fileData}`
 
         const storedImageUrl = await window.fileSystem.storeImage(imageData, filePath, block.id)
-
         assignMedia({
           id: block.id,
           props: {
