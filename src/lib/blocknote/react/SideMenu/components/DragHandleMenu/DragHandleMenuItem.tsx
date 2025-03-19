@@ -1,10 +1,11 @@
 import React from 'react'
 import { Menu } from '@mantine/core'
 import { PolymorphicComponentProps } from '@mantine/utils'
+import { ThemedMenuItem } from '@/components/ui/ThemedMenu'
 
 const DragHandleMenuItem = (props: PolymorphicComponentProps<'button'>) => {
   const { children, ...remainingProps } = props
-  return <Menu.Item {...remainingProps}>{children}</Menu.Item>
+  return <ThemedMenuItem {...remainingProps}>{children}</ThemedMenuItem>
 }
 
 export default DragHandleMenuItem

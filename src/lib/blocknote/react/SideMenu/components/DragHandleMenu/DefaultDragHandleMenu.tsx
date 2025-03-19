@@ -18,6 +18,8 @@ import RemoveBlockButton from './DefaultButtons/RemoveBlockButton'
 import { DragHandleMenu, DragHandleMenuProps } from './DragHandleMenu'
 import DragHandleMenuItem from './DragHandleMenuItem'
 import { HMBlockSchema } from '@/components/Editor/schema'
+import ThemedMenu, { ThemedMenuItem, ThemedLabel } from '@/components/ui/ThemedMenu'
+
 
 const turnIntoItems = [
   {
@@ -135,11 +137,11 @@ const TurnIntoMenu = <BSchema extends BlockSchema>(props: DragHandleMenuProps<BS
   const renderedItems: any[] = []
 
   _.forEach(groups, (groupedItems) => {
-    renderedItems.push(<Menu.Label key={groupedItems[0].group}>{groupedItems[0].group}</Menu.Label>)
+    renderedItems.push(<ThemedLabel key={groupedItems[0].group}>{groupedItems[0].group}</ThemedLabel>)
 
     for (const item of groupedItems) {
       renderedItems.push(
-        <Menu.Item
+        <ThemedMenuItem
           key={item.label}
           onClick={() => {
             item.onClick(props)
@@ -148,7 +150,7 @@ const TurnIntoMenu = <BSchema extends BlockSchema>(props: DragHandleMenuProps<BS
           icon={<item.Icon size={12} />}
         >
           {item.label}
-        </Menu.Item>,
+        </ThemedMenuItem>,
       )
     }
   })
@@ -159,7 +161,7 @@ const TurnIntoMenu = <BSchema extends BlockSchema>(props: DragHandleMenuProps<BS
 
   return (
     <DragHandleMenuItem onMouseOver={stopMenuCloseTimer} onMouseLeave={startMenuCloseTimer}>
-      <Menu opened={opened} position="right">
+      <ThemedMenu opened={opened} position="right">
         <Menu.Target>
           <XStack gap="$2">
             <RefreshCcw size={14} />
@@ -176,7 +178,7 @@ const TurnIntoMenu = <BSchema extends BlockSchema>(props: DragHandleMenuProps<BS
         >
           {renderedItems}
         </Menu.Dropdown>
-      </Menu>
+      </ThemedMenu>
     </DragHandleMenuItem>
   )
 }
