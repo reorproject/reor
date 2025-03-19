@@ -28,6 +28,7 @@ const DefaultLLMSelector: React.FC<DefaultLLMSelectorProps> = ({ llmConfigs, def
   }
 
   const handleDeleteLLM = async (modelName: string) => {
+    // eslint-disable-next-line no-alert
     const confirmDelete = window.confirm(`Are you sure you want to delete the model ${modelName}?`)
     if (!confirmDelete) return
 
