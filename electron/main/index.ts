@@ -1,7 +1,7 @@
 import { release } from 'node:os'
 import { join } from 'node:path'
 
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, protocol } from 'electron'
 import Store from 'electron-store'
 
 import * as Sentry from '@sentry/electron/main'

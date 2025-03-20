@@ -89,6 +89,15 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
     }
   })
 
+  ipcMain.handle('delete-image', async (event, fileName: string) => {
+    try {
+      await imageStorage.deleteMedia(fileName)
+      return true
+    } catch (error) {
+      throw new Error('Failed to delete image')
+    }
+  })
+
   ipcMain.handle('get-image', async (event, fileName) => {
     try {
       const imageData = await imageStorage.getMedia(fileName)

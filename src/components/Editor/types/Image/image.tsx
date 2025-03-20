@@ -176,6 +176,7 @@ const Display = ({ editor, block, selected, setSelected, assign }: DisplayCompon
   )
 }
 
+
 const Render = (block: Block<HMBlockSchema>, editor: BlockNoteEditor<HMBlockSchema>) => {
   const submitImage = async (
     assignMedia: (props: MediaType) => void,

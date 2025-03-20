@@ -867,6 +867,7 @@ export const BlockContainer = Node.create<{
                 ) {
                   if (dispatch) {
                     const { startPos, contentNode } = blockInfo
+
                     state.tr
                       .setSelection(NodeSelection.create(state.doc, prevBlockInfo.startPos))
                       .deleteRange(startPos, startPos + contentNode.nodeSize)
@@ -874,6 +875,20 @@ export const BlockContainer = Node.create<{
                   }
                 }
               } else {
+                console.log(`Not a paragraph`)
+                if (blockInfo.contentType.name === 'image') {
+                  const { url } = blockInfo.contentNode.attrs
+                  const strippedURL = url.replace('local://', '')
+                  if (strippedURL.length !== 0) {
+                    try {
+                      window.fileSystem.deleteImage(strippedURL).then((success) => {
+                        console.log(`Successfully deleted: ${strippedURL}`)
+                      })
+                    } catch (error) {
+                      console.log(`Cold not delete file: `, error)
+                    }
+                  }
+                }
                 return commands.BNUpdateBlock(state.selection.from, {
                   type: 'paragraph',
                   props: {},

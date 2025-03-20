@@ -32,6 +32,7 @@ const handleLocalMediaPastePlugin = new Plugin({
               .then((data) => {
                 const {name} = img
                 const {schema} = view.state
+                console.log(`Image data: `, data)
                 const node = schema.nodes.image.create({
                   url: data,
                   name: name,
