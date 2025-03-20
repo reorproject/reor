@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 
 import { Button } from '@material-tailwind/react'
+import { SizableText } from 'tamagui'
 
 interface DirectorySelectorProps {
   setErrorMsg: (error: string) => void
@@ -45,9 +46,9 @@ const DirectorySelector: React.FC<DirectorySelectorProps> = ({ setErrorMsg }) =>
         Select Directory
       </Button>
       {userDirectory && (
-        <p className="mt-2 w-full text-right text-xs text-gray-100">
+        <SizableText fontSize={12} width="100%" textAlign="right" marginTop={1} fontWeight={300}>
           Selected: <strong>{userDirectory}</strong>
-        </p>
+        </SizableText>
       )}
     </div>
   )
