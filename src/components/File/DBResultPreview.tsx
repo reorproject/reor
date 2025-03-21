@@ -1,13 +1,15 @@
 import React from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
+import removeMd from 'remove-markdown'
 import MarkdownRenderer from '../Common/MarkdownRenderer'
 
 const cosineDistanceToPercentage = (similarity: number) => ((1 - similarity) * 100).toFixed(2)
 
-export function getFileName(filePath: string): string {
-  const parts = filePath.split(/[/\\]/)
-  return parts.pop() || ''
+const getFileName = (path: string) => {
+  if (!path) return null
+  const parts = path.split('/')
+  return parts[parts.length - 1]
 }
 
 const formatModifiedDate = (date: Date) => {
@@ -46,17 +48,50 @@ export const DBResultPreview: React.FC<DBResultPreviewProps> = ({ dbResult: entr
 
 interface DBSearchPreviewProps {
   dbResult: DBQueryResult
-  onSelect: (path: string) => void
+  onSelect: (path: string, content: string) => void
 }
 
 export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({ dbResult: entry, onSelect }) => {
   const modified = formatModifiedDate(entry.filemodified)
   const fileName = getFileName(entry.notepath)
 
+  const handleClick = () => {
+    // First extract the title from the content if possible
+    const lines = removeMd(entry.content).split('\n')
+    let textToFind = ''
+
+    // Try to find the title/heading line (usually at the beginning)
+    const firstFewLines = lines.slice(0, 5)
+    const titleLine = firstFewLines.find((line) => {
+      const trimmed = line.trim()
+      return trimmed && trimmed.length > 3 && trimmed.length < 100
+    })
+
+    if (titleLine) {
+      textToFind = titleLine.trim()
+    } else {
+      // If no title found, use the first non-empty line with reasonable length
+      const firstGoodLine = lines.find((line) => {
+        const trimmed = line.trim()
+        return trimmed && trimmed.length > 5 && trimmed.length < 120
+      })
+
+      if (firstGoodLine) {
+        textToFind = firstGoodLine.trim()
+      } else {
+        // If still no good text found, use first few words of content
+        const plainText = removeMd(entry.content).trim()
+        textToFind = plainText.substring(0, Math.min(50, plainText.length))
+      }
+    }
+
+    onSelect(entry.notepath, textToFind)
+  }
+
   return (
     <div
       className="mb-4 mt-0 max-w-full cursor-pointer overflow-hidden rounded border border-gray-600 bg-neutral-800 p-2 shadow-md transition-transform duration-300 hover:bg-neutral-700 hover:shadow-lg"
-      onClick={() => onSelect(entry.notepath)}
+      onClick={handleClick}
     >
       <div className="text-sm text-gray-200">
         <MarkdownRenderer content={entry.content} />

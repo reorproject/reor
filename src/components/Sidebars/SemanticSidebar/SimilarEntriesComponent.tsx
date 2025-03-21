@@ -4,6 +4,7 @@ import { CircularProgress } from '@mui/material'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 import { FiRefreshCw } from 'react-icons/fi'
 import { PiGraph } from 'react-icons/pi'
+import removeMd from 'remove-markdown'
 
 import '../../../styles/global.css'
 import ResizableComponent from '@/components/Common/ResizableComponent'
@@ -13,7 +14,7 @@ import { useFileContext } from '@/contexts/FileContext'
 interface SimilarEntriesComponentProps {
   similarEntries: DBQueryResult[]
   setSimilarEntries?: (entries: DBQueryResult[]) => void
-  onSelect: (path: string) => void
+  onSelect: (path: string, content?: string) => void
   updateSimilarEntries?: (isRefined?: boolean) => Promise<void>
   titleText: string
   isLoadingSimilarEntries: boolean
@@ -30,6 +31,39 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   let content
   const { saveCurrentlyOpenedFile } = useFileContext()
 
+  const handleResultSelect = (path: string, dbResult: DBQueryResult) => {
+    // First extract the title from the content if possible
+    const lines = removeMd(dbResult.content).split('\n')
+    let textToFind = ''
+
+    // Try to find the title/heading line (usually at the beginning)
+    const firstFewLines = lines.slice(0, 5)
+    const titleLine = firstFewLines.find((line) => {
+      const trimmed = line.trim()
+      return trimmed && trimmed.length > 3 && trimmed.length < 100
+    })
+
+    if (titleLine) {
+      textToFind = titleLine.trim()
+    } else {
+      // If no title found, use the first non-empty line with reasonable length
+      const firstGoodLine = lines.find((line) => {
+        const trimmed = line.trim()
+        return trimmed && trimmed.length > 5 && trimmed.length < 120
+      })
+
+      if (firstGoodLine) {
+        textToFind = firstGoodLine.trim()
+      } else {
+        // If still no good text found, use first few words of content
+        const plainText = removeMd(dbResult.content).trim()
+        textToFind = plainText.substring(0, Math.min(50, plainText.length))
+      }
+    }
+
+    onSelect(path, textToFind)
+  }
+
   if (similarEntries.length > 0) {
     content = (
       <div className="size-full">
@@ -37,7 +71,7 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
           .filter((dbResult) => dbResult)
           .map((dbResult) => (
             <div className="px-2 pb-2 pt-1" key={`${dbResult.notepath}-${dbResult.subnoteindex}`}>
-              <DBResultPreview dbResult={dbResult} onSelect={onSelect} />
+              <DBResultPreview dbResult={dbResult} onSelect={(path) => handleResultSelect(path, dbResult)} />
             </div>
           ))}
       </div>

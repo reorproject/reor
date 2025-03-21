@@ -48,7 +48,11 @@ type FileContextType = {
   editor: Editor | null
   navigationHistory: string[]
   addToNavigationHistory: (value: string) => void
-  openOrCreateFile: (filePath: string, optionalContentToWriteOnCreate?: string) => Promise<void>
+  openOrCreateFile: (
+    filePath: string,
+    optionalContentToWriteOnCreate?: string,
+    contentToScrollTo?: string,
+  ) => Promise<void>
   suggestionsState: SuggestionsState | null | undefined
   spellCheckEnabled: boolean
   highlightData: HighlightData
@@ -128,7 +132,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return absolutePath
   }
 
-  const loadFileIntoEditor = async (filePath: string) => {
+  const loadFileIntoEditor = async (filePath: string, contentToScrollTo?: string) => {
     setCurrentlyChangingFilePath(true)
     await writeEditorContentToDisk(editor, currentlyOpenFilePath)
     if (currentlyOpenFilePath && needToIndexEditorContent) {
@@ -141,11 +145,120 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setCurrentlyChangingFilePath(false)
     const parentDirectory = await window.path.dirname(filePath)
     setSelectedDirectory(parentDirectory)
+
+    if (editor && contentToScrollTo) {
+      // A simple solution: Find all headings and paragraphs in the document
+      setTimeout(() => {
+        try {
+          // Find all heading and paragraph elements to search within
+          const { dom } = editor.view
+          const headingsNodeList = dom.querySelectorAll('h1, h2, h3, h4, h5, h6, p')
+          // Explicitly cast to HTMLElement array to avoid type errors
+          const headings = Array.from(headingsNodeList).filter((el): el is HTMLElement => el instanceof HTMLElement)
+
+          const searchText = contentToScrollTo.toLowerCase().trim()
+
+          let bestMatchElement: HTMLElement | null = null
+          let bestMatchScore = 0
+
+          headings.forEach((element) => {
+            const elementText = element.textContent?.toLowerCase() || ''
+
+            let matchScore = 0
+
+            // If exact match, high score
+            if (elementText.includes(searchText)) {
+              matchScore = 100
+            }
+            // If contains first 20 chars, decent score
+            else if (searchText.length > 20 && elementText.includes(searchText.substring(0, 20))) {
+              matchScore = 80
+            }
+            // If contains first few words, lower score
+            else if (searchText.length > 10 && elementText.includes(searchText.substring(0, 10))) {
+              matchScore = 60
+            }
+
+            if (matchScore > bestMatchScore) {
+              bestMatchScore = matchScore
+              bestMatchElement = element
+            }
+          })
+
+          if (bestMatchElement) {
+            // @ts-ignore - HTMLElement does have scrollIntoView
+            bestMatchElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+
+            return true
+          }
+
+          // The DOM approach failed, try using a word-by-word search as fallback
+          const words = searchText.split(/\s+/).filter((w) => w.length > 3) // Only use meaningful words
+
+          if (words.length > 0) {
+            const docText = editor.state.doc.textContent.toLowerCase()
+            // Try to find first occurrence of any significant word
+            let bestPos = -1
+
+            words.some((word) => {
+              if (word.length < 4) return false
+
+              const pos = docText.indexOf(word)
+              if (pos >= 0) {
+                bestPos = pos
+                return true
+              }
+              return false
+            })
+
+            if (bestPos >= 0) {
+              editor.commands.setTextSelection(bestPos)
+
+              try {
+                const { node } = editor.view.domAtPos(editor.state.selection.anchor)
+
+                let element: HTMLElement | null = null
+                if (node instanceof HTMLElement) {
+                  element = node
+                } else if (node.parentElement instanceof HTMLElement) {
+                  element = node.parentElement
+                }
+
+                if (element) {
+                  // @ts-ignore - HTMLElement does have scrollIntoView
+                  element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+
+                  return true
+                }
+              } catch (e) {
+                // eslint-disable-next-line no-console
+                console.error('Error handling DOM node:', e)
+              }
+            }
+          }
+
+          // If all else fails, scroll to the top of the document
+          editor.commands.setTextSelection(0)
+          editor.view.dom.scrollTo(0, 0)
+
+          return false
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.error('Error in scroll to content:', e)
+          editor.view.dom.scrollTo(0, 0)
+          return false
+        }
+      }, 800)
+    }
   }
 
-  const openOrCreateFile = async (filePath: string, optionalContentToWriteOnCreate?: string): Promise<void> => {
+  const openOrCreateFile = async (
+    filePath: string,
+    optionalContentToWriteOnCreate?: string,
+    contentToScrollTo?: string,
+  ): Promise<void> => {
     const absolutePath = await createFileIfNotExists(filePath, optionalContentToWriteOnCreate)
-    await loadFileIntoEditor(absolutePath)
+    await loadFileIntoEditor(absolutePath, contentToScrollTo)
   }
 
   const editor = useEditor({

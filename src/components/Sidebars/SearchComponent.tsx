@@ -49,8 +49,8 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   }, [searchQuery, debouncedSearch])
 
   const openFileSelectSearch = useCallback(
-    (path: string) => {
-      openTabContent(path)
+    (path: string, content: string) => {
+      openTabContent(path, undefined, false, content)
       posthog.capture('open_file_from_search')
     },
     [openTabContent],
