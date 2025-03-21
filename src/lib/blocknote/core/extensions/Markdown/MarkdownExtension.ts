@@ -4,6 +4,7 @@ import { Plugin } from 'prosemirror-state'
 import { BlockNoteEditor } from '../../BlockNoteEditor'
 import { getBlockInfoFromPos } from '@/lib/utils'
 import * as BlockUtils from '@/lib/utils/block-utils'
+import { youtubeParser } from '@/components/Editor/types/utils'
 
 function containsMarkdownSymbols(pastedText: string) {
   // Regex to detect unique Markdown symbols at the start of a line
@@ -65,6 +66,7 @@ const createMarkdownExtension = (bnEditor: BlockNoteEditor) => {
         new Plugin({
           props: {
             handlePaste: (view, event, slice) => {
+              console.log(`Pasting in markdwon!`)
               const selectedNode = view.state.selection.$from.parent
               // Don't proceed if pasting into code block
               if (selectedNode.type.name === 'code-block' || selectedNode.firstChild?.type.name === 'code-block') {
@@ -73,12 +75,13 @@ const createMarkdownExtension = (bnEditor: BlockNoteEditor) => {
               const pastedText = event.clipboardData!.getData('text/plain')
               const pastedHtml = event.clipboardData!.getData('text/html')
               const hasList = pastedHtml.includes('<ul') || pastedHtml.includes('<ol')
-
+              const hasVideo = pastedText.includes('youtube')
+              console.log(`Text`, pastedText)
               const { state } = view
               const { selection } = state
 
               const isMarkdown = pastedHtml ? containsMarkdownSymbols(pastedText) : true
-
+              console.log(`isMarkdown: `, isMarkdown)
               if (!isMarkdown) {
                 if (hasList) {
                   const firstBlockGroup = slice.content.firstChild?.type.name === 'blockGroup'
@@ -100,16 +103,31 @@ const createMarkdownExtension = (bnEditor: BlockNoteEditor) => {
                 return false
               }
 
-              bnEditor.markdownToBlocks(pastedText).then((organizedBlocks) => {
-                const blockInfo = getBlockInfoFromPos(state.doc, selection.from)
+              if (hasVideo) {
+                let embedUrl = 'https://www.youtube.com/embed/'
+                if (pastedText.includes('youtu.be') || pastedText.includes('youtube')) {
+                  const ytId = youtubeParser(pastedText)
+                  if (ytId) {
+                    embedUrl += ytId
+                    const node = view.state.schema.nodes.video.create({
+                      url: embedUrl,
+                      name: 'youtube',
+                    })
+                    view.dispatch(view.state.tr.replaceSelectionWith(node))
+                  }
+                }
+              }
 
-                bnEditor.replaceBlocks(
-                  [blockInfo.node.attrs.id],
-                  // @ts-ignore
-                  organizedBlocks,
-                )
-                BlockUtils.setGroupTypes(bnEditor._tiptapEditor, organizedBlocks)
-              })
+              // bnEditor.markdownToBlocks(pastedText).then((organizedBlocks) => {
+              //   const blockInfo = getBlockInfoFromPos(state.doc, selection.from)
+              //   console.log(`BLockINfo type: `, blockInfo.node.type.name)
+              //   bnEditor.replaceBlocks(
+              //     [blockInfo.node.attrs.id],
+              //     // @ts-ignore
+              //     organizedBlocks,
+              //   )
+              //   BlockUtils.setGroupTypes(bnEditor._tiptapEditor, organizedBlocks)
+              // })
 
               return true
             },

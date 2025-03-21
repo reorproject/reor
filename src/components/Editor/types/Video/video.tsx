@@ -29,7 +29,7 @@ export function displayVideoType(videoURL: string, editor: BlockNoteEditor<HMBlo
   }
   return (
     <XStack
-      pointerEvents={editor.isEditable ? 'none' : 'auto'}
+      pointerEvents={'auto'}
       tag="iframe"
       position="absolute"
       className="video-iframe"
@@ -83,6 +83,7 @@ const Display = ({ editor, block, selected, setSelected, assign }: DisplayCompon
           setVideoURL(block.props.url)
         }
       } finally {
+        console.log(`setting loading to false!`)
         setIsLoading(false)
       }
     }
@@ -186,6 +187,7 @@ const Display = ({ editor, block, selected, setSelected, assign }: DisplayCompon
     height: 0,
   }
 
+  console.log(`videoUrl: `, block.props.url)
   return (
     <MediaContainer
       editor={editor}

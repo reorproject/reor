@@ -65,6 +65,7 @@ export async function HTMLToBlocks<BSchema extends BlockSchema>(
   schema: Schema,
 ): Promise<Block<BSchema>[]> {
   const htmlNode = document.createElement('div')
+  console.log(`html.trim()`, html.trim())
   htmlNode.innerHTML = html.trim()
 
   const parser = DOMParser.fromSchema(schema)
@@ -75,6 +76,7 @@ export async function HTMLToBlocks<BSchema extends BlockSchema>(
     blocks.push(nodeToBlock(parentNode.firstChild!.child(i), blockSchema))
   }
 
+  console.log(`Blocks: `, blocks)
   return blocks
 }
 
@@ -152,7 +154,7 @@ function convertBlockToHtml<BSchema extends BlockSchema>(block: Block<BSchema>, 
       case 'code-block':
         return `<pre><code class="language-${block.props.language || 'plaintext'}">${contentHtml}</code></pre>`
       case 'video':
-        return `<p>!video[${block.props.name}](${block.props.url})</p>`
+        return `![${block.props.name}](${block.props.url} "width=${block.props.width}")`
       default:
         return contentHtml
     }

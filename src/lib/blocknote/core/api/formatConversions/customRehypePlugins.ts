@@ -64,6 +64,7 @@ export function code(state: any, node: any) {
  * Matches any video markdown and converst them to nodes.
  */
 export function videos(state: any, node: any) {
+  console.log(`node: `, node)
   if (node.type !== 'paragraph') {
     return defaultHandlers.paragraph(state, node)
   }
@@ -71,12 +72,14 @@ export function videos(state: any, node: any) {
   if (!node.children?.[0]?.value) return defaultHandlers.paragraph(state, node)
 
   const text = node.children[0].value
-  const videoMatch = text.match(/!video\[(.*?)\]\((.*?)\)/)
+  const regex = /!\[(.*?)\]\((.*?)\s*"width=(.*?)"\)/;
+  const videoMatch = text.match(regex)
+  console.log(`Found video: `, videoMatch)
 
   if (videoMatch) {
     const result = {
       type: 'element',
-      tagName: 'video',
+      tagName: 'iframe',
       properties: {
         src: videoMatch[2],
         title: videoMatch[1],
@@ -84,6 +87,7 @@ export function videos(state: any, node: any) {
       children: [],
     }
 
+    console.log(`result: `, result)
     state.patch(node, result)
     return state.applyData(node, result)
   }
