@@ -1,4 +1,5 @@
 import { AgentConfig, Chat } from '@/lib/llm/types'
+import { SearchProps } from './types'
 
 export type APIInterface = 'openai' | 'anthropic' | 'ollama'
 
@@ -34,11 +35,6 @@ export interface EmbeddingModelWithLocalPath {
   localPath: string
   description?: string
   readableName?: string
-}
-
-export interface SearchProps {
-  searchMode: 'vector' | 'hybrid'
-  vectorWeight: number
 }
 
 export interface StoreSchema {

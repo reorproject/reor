@@ -4,6 +4,7 @@ import posthog from 'posthog-js'
 import { FaSearch } from 'react-icons/fa'
 import { debounce } from 'lodash'
 import { BiFilterAlt } from 'react-icons/bi'
+import { SearchProps as SearchParamsType } from 'electron/main/electron-store/types'
 import { DBSearchPreview } from '../File/DBResultPreview'
 import { useContentContext } from '@/contexts/ContentContext'
 import { hybridSearch } from '@/lib/db'
@@ -15,12 +16,7 @@ interface SearchComponentProps {
   setSearchResults: (results: DBQueryResult[]) => void
 }
 
-export type SearchModeTypes = "vector" | "hybrid"
-
-interface SearchParamsType {
-  searchMode: SearchModeTypes
-  vectorWeight: number
-}
+export type SearchModeTypes = 'vector' | 'hybrid'
 
 // Custom toggle component
 const ToggleSwitch: React.FC<{
@@ -155,10 +151,10 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
         <div className="mt-2 rounded border border-gray-600 bg-neutral-800 p-3">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-gray-200">Hybrid Search</span>
-            <ToggleSwitch 
-              isHybrid={searchParams.searchMode === 'hybrid'} 
-              onChange={(mode) => setSearchParams((prev) => ({ ...prev, searchMode: mode }))} 
-              label="Hybrid Search" 
+            <ToggleSwitch
+              isHybrid={searchParams.searchMode === 'hybrid'}
+              onChange={(mode) => setSearchParams((prev) => ({ ...prev, searchMode: mode }))}
+              label="Hybrid Search"
             />
           </div>
 
@@ -167,7 +163,8 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
               <div className="mb-2 flex items-center justify-between">
                 <div className="text-sm font-medium text-gray-200">Search Balance</div>
                 <span className="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300">
-                  {Math.round(searchParams.vectorWeight * 100)}% Semantic - {Math.round((1 - searchParams.vectorWeight) * 100)}% Keywords
+                  {Math.round(searchParams.vectorWeight * 100)}% Semantic -{' '}
+                  {Math.round((1 - searchParams.vectorWeight) * 100)}% Keywords
                 </span>
               </div>
               <div className="relative">

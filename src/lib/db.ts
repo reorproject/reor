@@ -69,19 +69,19 @@ const keywordSearch = async (query: string, limit: number, filter?: string): Pro
 
     const vectorResults = await window.database.search(query, limit, filter)
 
-    const escapedKeywords = keywords.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
-    const keywordRegex = new RegExp(`\\b(${escapedKeywords.join('|')})\\b`, 'gi');
+    const escapedKeywords = keywords.map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    const keywordRegex = new RegExp(`\\b(${escapedKeywords.join('|')})\\b`, 'gi')
 
     const resultsWithKeywordScores = vectorResults
       .map((result) => {
-        const matches = result.content.matchAll(keywordRegex);
-        const score = Array.from(matches).length;
+        const matches = result.content.matchAll(keywordRegex)
+        const score = Array.from(matches).length
         return {
           ...result,
           keyword_score: score,
-        };
+        }
       })
-      .sort((a, b) => (b.keyword_score || 0) - (a.keyword_score || 0));
+      .sort((a, b) => (b.keyword_score || 0) - (a.keyword_score || 0))
 
     return resultsWithKeywordScores
   } catch (error) {

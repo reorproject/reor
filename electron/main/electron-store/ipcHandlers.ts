@@ -6,10 +6,11 @@ import {
   EmbeddingModelConfig,
   EmbeddingModelWithLocalPath,
   EmbeddingModelWithRepo,
-  SearchProps,
   StoreKeys,
   StoreSchema,
 } from './storeConfig'
+
+import { SearchProps } from './types'
 
 import WindowsManager from '../common/windowManager'
 
