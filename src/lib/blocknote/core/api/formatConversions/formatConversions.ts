@@ -65,7 +65,6 @@ export async function HTMLToBlocks<BSchema extends BlockSchema>(
   schema: Schema,
 ): Promise<Block<BSchema>[]> {
   const htmlNode = document.createElement('div')
-  console.log(`Html is: `, html)
   htmlNode.innerHTML = html.trim()
 
   const parser = DOMParser.fromSchema(schema)

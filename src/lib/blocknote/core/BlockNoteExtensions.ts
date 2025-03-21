@@ -1,7 +1,5 @@
 import { Extensions, extensions } from '@tiptap/core'
-// import {HMBlockSchema} from '../../schema'
 
-// import {LocalMediaPastePlugin} from '@/editor/handle-local-media-paste-plugin'
 // import {debugPlugin} from '@/editor/prosemirror-debugger'
 import { Bold } from '@tiptap/extension-bold'
 import { Code } from '@tiptap/extension-code'
@@ -32,7 +30,7 @@ import { HMBlockSchema } from '@/components/Editor/schema'
 import SearchAndReplace from '@/components/Editor/Search/SearchAndReplaceExtension'
 import TextAlignmentExtension from './extensions/TextAlignment/TextAlignmentExtension'
 import { BlockNoteEditor } from './BlockNoteEditor'
-import { LocalMediaPastePlugin } from './extensions/Pasting/local-media-paste-plugin'
+import LocalMediaPastePlugin from './extensions/Pasting/local-media-paste-plugin'
 
 /**
  * Get all the Tiptap extensions BlockNote is configured with by default

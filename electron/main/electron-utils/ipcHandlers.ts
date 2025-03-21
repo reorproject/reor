@@ -24,8 +24,8 @@ const registerElectronUtilsHandlers = (
   ipcMain.handle('get-reor-app-version', async () => app.getVersion())
 
   ipcMain.handle('get-user-data-path', () => {
-    return app.getPath('userData');
-  });
+    return app.getPath('userData')
+  })
 }
 
 export default registerElectronUtilsHandlers
