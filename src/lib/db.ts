@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { DBEntry, DBQueryResult } from 'electron/main/vector-database/schema'
 import { parse, isValid, format } from 'date-fns'
@@ -68,23 +69,19 @@ const keywordSearch = async (query: string, limit: number, filter?: string): Pro
 
     const vectorResults = await window.database.search(query, limit, filter)
 
+    const escapedKeywords = keywords.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const keywordRegex = new RegExp(`\\b(${escapedKeywords.join('|')})\\b`, 'gi');
+
     const resultsWithKeywordScores = vectorResults
       .map((result) => {
-        let score = 0
-        keywords.forEach((keyword) => {
-          const regex = new RegExp(keyword, 'gi')
-          const matches = result.content.match(regex)
-          if (matches) {
-            score += matches.length
-          }
-        })
-
+        const matches = result.content.matchAll(keywordRegex);
+        const score = Array.from(matches).length;
         return {
           ...result,
           keyword_score: score,
-        }
+        };
       })
-      .sort((a, b) => (b.keyword_score || 0) - (a.keyword_score || 0))
+      .sort((a, b) => (b.keyword_score || 0) - (a.keyword_score || 0));
 
     return resultsWithKeywordScores
   } catch (error) {
@@ -103,11 +100,10 @@ const combineAndRankResults = (
   const keywordWeight = 1 - vectorWeight
   const resultsMap = new Map<string, DBQueryResult & { combinedScore: number; keywordScore?: number }>()
 
-  const maxKeywordScore = keywordResults.length > 0 ? Math.max(...keywordResults.map((r) => r.keyword_score || 0)) : 1
+  const maxKeywordScore = keywordResults.length > 0 ? Math.max(...keywordResults.map((r) => r.keyword_score || 0)) : 0
 
   vectorResults.forEach((result) => {
     const key = `${result.notepath}-${result.subnoteindex}`
-    // eslint-disable-next-line no-underscore-dangle
     const vectorScore = 1 - result._distance
 
     resultsMap.set(key, {
@@ -131,7 +127,6 @@ const combineAndRankResults = (
     } else {
       resultsMap.set(key, {
         ...result,
-        // eslint-disable-next-line no-underscore-dangle
         _distance: 1 - keywordScoreComponent,
         combinedScore: keywordScoreComponent,
         keywordScore: result.keyword_score,
@@ -151,14 +146,11 @@ const combineAndRankResults = (
         // Handle the case where we're using 100% keyword search
         if (entry.keywordScore !== undefined && maxKeywordScore > 0) {
           const normalizedScore = entry.keywordScore / maxKeywordScore
-          // eslint-disable-next-line no-underscore-dangle
           updatedEntry._distance = 1 - normalizedScore
         } else {
-          // eslint-disable-next-line no-underscore-dangle
           updatedEntry._distance = 0.99 // Show at least 1% similarity
         }
       } else {
-        // eslint-disable-next-line no-underscore-dangle
         updatedEntry._distance = 1 - entry.combinedScore
       }
 
