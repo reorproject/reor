@@ -6,6 +6,7 @@ import {
   LLMConfig,
   LLMAPIConfig,
   LLMGenerationParameters,
+  SearchProps,
 } from 'electron/main/electron-store/storeConfig'
 import { FileInfoTree, FileInfoWithContent, RenameFileProps, WriteFileProps } from 'electron/main/filesystem/types'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
@@ -76,6 +77,8 @@ const electronStore = {
   setAgentConfig: createIPCHandler<(agentConfig: AgentConfig) => Promise<void>>('set-agent-config'),
   setAutoContext: createIPCHandler<(value: boolean) => Promise<void>>('set-auto-context'),
   getAutoContext: createIPCHandler<() => Promise<boolean>>('get-auto-context'),
+  getSearchParams: createIPCHandler<() => Promise<SearchProps>>('get-search-params'),
+  setSearchParams: createIPCHandler<(searchParams: SearchProps) => Promise<void>>('set-search-params'),
 }
 
 const fileSystem = {

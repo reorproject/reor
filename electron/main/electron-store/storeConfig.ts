@@ -36,6 +36,11 @@ export interface EmbeddingModelWithLocalPath {
   readableName?: string
 }
 
+export interface SearchProps {
+  searchMode: 'vector' | 'hybrid'
+  vectorWeight: number
+}
+
 export interface StoreSchema {
   hasUserOpenedAppBefore: boolean
   schemaVersion: number
@@ -61,6 +66,7 @@ export interface StoreSchema {
   EditorFlexCenter: boolean
   showDocumentStats: boolean
   autoContext: boolean
+  searchParams: SearchProps
 }
 
 export enum StoreKeys {
@@ -82,4 +88,5 @@ export enum StoreKeys {
   EditorFlexCenter = 'editorFlexCenter',
   showDocumentStats = 'showDocumentStats',
   AutoContext = 'autoContext',
+  SearchParams = 'searchParams',
 }

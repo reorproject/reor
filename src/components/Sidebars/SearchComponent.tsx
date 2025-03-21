@@ -15,27 +15,34 @@ interface SearchComponentProps {
   setSearchResults: (results: DBQueryResult[]) => void
 }
 
+export type SearchModeTypes = "vector" | "hybrid"
+
+interface SearchParamsType {
+  searchMode: SearchModeTypes
+  vectorWeight: number
+}
+
 // Custom toggle component
 const ToggleSwitch: React.FC<{
-  checked: boolean
-  onChange: (checked: boolean) => void
+  isHybrid: boolean
+  onChange: (searchMode: SearchModeTypes) => void
   className?: string
   label: string
-}> = ({ checked, onChange, className = '', label }) => (
+}> = ({ isHybrid, onChange, className = '', label }) => (
   <button
     type="button"
     className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors duration-200 focus:outline-none ${
-      checked ? 'bg-blue-500' : 'bg-gray-600'
+      isHybrid ? 'bg-blue-500' : 'bg-gray-600'
     } ${className}`}
-    onClick={() => onChange(!checked)}
-    aria-checked={checked}
+    onClick={() => onChange(isHybrid ? 'vector' : 'hybrid')}
+    aria-checked={isHybrid}
     role="switch"
     aria-label={label}
   >
     <span className="sr-only">{label}</span>
     <span
       className={`inline-block size-3.5 rounded-full bg-white shadow-md transition-transform duration-200 ease-in-out ${
-        checked ? 'translate-x-[18px]' : 'translate-x-[2px]'
+        isHybrid ? 'translate-x-[18px]' : 'translate-x-[2px]'
       }`}
     />
   </button>
@@ -49,23 +56,25 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
 }) => {
   const { openContent: openTabContent } = useContentContext()
   const searchInputRef = useRef<HTMLInputElement>(null)
-  const [useHybridSearch, setUseHybridSearch] = useState(() => {
-    const savedValue = localStorage.getItem('useHybridSearch')
-    return savedValue !== null ? savedValue === 'true' : true
+  const [searchParams, setSearchParams] = useState<SearchParamsType>({
+    searchMode: 'vector',
+    vectorWeight: 0.7,
   })
   const [showSearchOptions, setShowSearchOptions] = useState(false)
-  const [vectorWeight, setVectorWeight] = useState(() => {
-    const savedWeight = localStorage.getItem('vectorWeight')
-    return savedWeight !== null ? parseFloat(savedWeight) : 0.7
-  })
 
+  // Fetches search mode on launch
   useEffect(() => {
-    localStorage.setItem('useHybridSearch', useHybridSearch.toString())
-  }, [useHybridSearch])
+    const fetchSearchMode = async () => {
+      const storedParams = await window.electronStore.getSearchParams()
+      if (storedParams) setSearchParams(storedParams)
+    }
+    fetchSearchMode()
+  }, [])
 
+  // Sets the search mode whenever it changes
   useEffect(() => {
-    localStorage.setItem('vectorWeight', vectorWeight.toString())
-  }, [vectorWeight])
+    window.electronStore.setSearchParams(searchParams)
+  }, [searchParams])
 
   const handleSearch = useCallback(
     async (query: string) => {
@@ -74,15 +83,15 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
         return
       }
 
-      if (useHybridSearch) {
-        const results = await hybridSearch(query, 50, undefined, vectorWeight)
+      if (searchParams.searchMode === 'hybrid') {
+        const results = await hybridSearch(query, 50, undefined, searchParams.vectorWeight)
         setSearchResults(results)
       } else {
         const results: DBQueryResult[] = await window.database.search(query, 50)
         setSearchResults(results)
       }
     },
-    [setSearchResults, useHybridSearch, vectorWeight],
+    [setSearchResults, searchParams.searchMode, searchParams.vectorWeight],
   )
 
   const debouncedSearch = useCallback(
@@ -100,16 +109,8 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   useEffect(() => {
     if (searchQuery) {
       debouncedSearch(searchQuery)
-    } else {
-      setSearchResults([])
     }
-  }, [searchQuery, debouncedSearch, setSearchResults])
-
-  useEffect(() => {
-    if (searchQuery) {
-      debouncedSearch(searchQuery)
-    }
-  }, [useHybridSearch, vectorWeight, debouncedSearch, searchQuery])
+  }, [searchParams.searchMode, searchParams.vectorWeight, debouncedSearch, searchQuery])
 
   const openFileSelectSearch = useCallback(
     (path: string) => {
@@ -120,7 +121,10 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   )
 
   const handleVectorWeightChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setVectorWeight(parseFloat(event.target.value))
+    setSearchParams((prev) => ({
+      ...prev,
+      vectorWeight: parseFloat(event.target.value),
+    }))
   }
 
   return (
@@ -135,7 +139,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
           className="mr-1 mt-1 h-8 w-full rounded-md border border-transparent bg-neutral-700 pl-7 pr-10 text-white focus:border-white focus:outline-none focus:ring-1 focus:ring-white"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder={useHybridSearch ? 'Hybrid search...' : 'Semantic search...'}
+          placeholder={searchParams.searchMode ? 'Hybrid search...' : 'Semantic search...'}
         />
         <button
           type="button"
@@ -151,15 +155,19 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
         <div className="mt-2 rounded border border-gray-600 bg-neutral-800 p-3">
           <div className="flex items-center justify-between">
             <span className="text-sm font-medium text-gray-200">Hybrid Search</span>
-            <ToggleSwitch checked={useHybridSearch} onChange={setUseHybridSearch} label="Hybrid Search" />
+            <ToggleSwitch 
+              isHybrid={searchParams.searchMode === 'hybrid'} 
+              onChange={(mode) => setSearchParams((prev) => ({ ...prev, searchMode: mode }))} 
+              label="Hybrid Search" 
+            />
           </div>
 
-          {useHybridSearch && (
+          {searchParams.searchMode === 'hybrid' && (
             <div className="mt-4">
               <div className="mb-2 flex items-center justify-between">
                 <div className="text-sm font-medium text-gray-200">Search Balance</div>
                 <span className="rounded bg-gray-700 px-2 py-1 text-xs text-gray-300">
-                  {Math.round(vectorWeight * 100)}% Semantic - {Math.round((1 - vectorWeight) * 100)}% Keywords
+                  {Math.round(searchParams.vectorWeight * 100)}% Semantic - {Math.round((1 - searchParams.vectorWeight) * 100)}% Keywords
                 </span>
               </div>
               <div className="relative">
@@ -169,7 +177,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
                   min="0"
                   max="1"
                   step="0.1"
-                  value={vectorWeight}
+                  value={searchParams.vectorWeight}
                   onChange={handleVectorWeightChange}
                   className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-gray-700"
                   aria-label="Search balance slider"
