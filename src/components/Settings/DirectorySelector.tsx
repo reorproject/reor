@@ -38,7 +38,7 @@ const DirectorySelector: React.FC<DirectorySelectorProps> = ({ setErrorMsg }) =>
   }, [userDirectory, setErrorMsg])
 
   return (
-    <div className="flex flex-col items-end max-w-60 w-full">
+    <div className="flex w-full max-w-60 flex-col items-end">
       <Button
         className="h-10 w-[140px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
         onClick={handleDirectorySelection}
@@ -47,13 +47,7 @@ const DirectorySelector: React.FC<DirectorySelectorProps> = ({ setErrorMsg }) =>
         Select Directory
       </Button>
       {userDirectory && (
-        <SizableText 
-          fontSize={12} 
-          width="100%" 
-          textAlign="left" 
-          marginTop={1} 
-          fontWeight={300}
-        >
+        <SizableText fontSize={12} width="100%" textAlign="left" marginTop={1} fontWeight={300}>
           <strong>{truncateName(userDirectory, 60)}</strong>
         </SizableText>
       )}
