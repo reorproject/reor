@@ -12,7 +12,7 @@ import { Block, BlockSchema } from '../../extensions/Blocks/api/blockTypes'
 
 import { blockToNode, nodeToBlock } from '../nodeConversions/nodeConversions'
 import simplifyBlocks from './simplifyBlocksRehypePlugin'
-import { removeSingleSpace, preserveEmptyParagraphs, code, videos } from './customRehypePlugins'
+import { removeSingleSpace, preserveEmptyParagraphs, code, handleMedia } from './customRehypePlugins'
 
 /**
  * Converts our blocks to HTML:
@@ -50,47 +50,6 @@ export async function blocksToHTML<BSchema extends BlockSchema>(
 }
 
 /**
- * Media is stored with a local prefix. When we want to parse them,
- *  we need to remove it and get the actual image data.
- *
- * @param html The HTML string we want to convert to fit our format
- * @returns The decoded media data in base64
- */
-async function replaceLocalUrls(html: string) {
-  const imgRegex = /<img[^>]*?src="(local:\/\/[^"]*?)"[^>]*?>/g
-  let result = html
-  const matches = Array.from(html.matchAll(imgRegex))
-  // each match is made up of [[fullImg, src], ...
-
-  const replacementPromises = matches.map(async ([fullImg, src]) => {
-    const fileName = src.replace('local://', '')
-
-    try {
-      const imageData = await window.fileSystem.getImage(fileName)
-      if (imageData) {
-        return { fullImg, newImg: fullImg.replace(src, imageData) }
-      }
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Failed to load image:', fileName, error)
-    }
-
-    return null
-  })
-
-  // wait for all resolves
-  const replacements = await Promise.all(replacementPromises)
-
-  for (const replacement of replacements) {
-    if (replacement) {
-      result = result.replace(replacement.fullImg, replacement.newImg)
-    }
-  }
-
-  return result
-}
-
-/**
  * Converts an HTML element to our custom block
  *
  * <img src=".." alt=".." /> -> ImageBlock
@@ -106,8 +65,7 @@ export async function HTMLToBlocks<BSchema extends BlockSchema>(
   schema: Schema,
 ): Promise<Block<BSchema>[]> {
   const htmlNode = document.createElement('div')
-  const transformedHTML = await replaceLocalUrls(html)
-  htmlNode.innerHTML = transformedHTML.trim()
+  htmlNode.innerHTML = html.trim()
 
   const parser = DOMParser.fromSchema(schema)
   const parentNode = parser.parse(htmlNode) // , { preserveWhitespace: "full" });
@@ -190,11 +148,11 @@ function convertBlockToHtml<BSchema extends BlockSchema>(block: Block<BSchema>, 
       case 'paragraph':
         return `<p>${contentHtml}</p>`
       case 'image':
-        return `<img src="${block.props.url}" alt="${block.props.name}" />`
+        return `[${block.props.alt}](${block.props.url} "width=${block.props.width}")`
       case 'code-block':
         return `<pre><code class="language-${block.props.language || 'plaintext'}">${contentHtml}</code></pre>`
       case 'video':
-        return `<p>!video[${block.props.name}](${block.props.url})</p>`
+        return `![${block.props.name}](${block.props.url} "width=${block.props.width}")`
       default:
         return contentHtml
     }
@@ -265,7 +223,7 @@ export async function markdownToBlocks<BSchema extends BlockSchema>(
       handlers: {
         ...(defaultHandlers as any),
         code,
-        paragraph: videos,
+        paragraph: handleMedia,
       },
     })
     // @ts-expect-error

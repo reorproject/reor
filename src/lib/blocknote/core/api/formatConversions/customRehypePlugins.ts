@@ -63,29 +63,56 @@ export function code(state: any, node: any) {
 /**
  * Matches any video markdown and converst them to nodes.
  */
-export function videos(state: any, node: any) {
-  if (node.type !== 'paragraph') {
+export function handleMedia(state: any, node: any) {
+  if (node.type !== 'paragraph' || !node.children?.[0]?.value) {
     return defaultHandlers.paragraph(state, node)
   }
 
-  if (!node.children?.[0]?.value) return defaultHandlers.paragraph(state, node)
+  const textValue = node.children[0].value.trim()
 
-  const text = node.children[0].value
-  const videoMatch = text.match(/!video\[(.*?)\]\((.*?)\)/)
+  if (textValue.startsWith('![')) {
+    // Check if video
+    if (node.children.length === 3) {
+      // Found video
+      const url = node.children[1].url
+      const width = node.children[2].value.match(/width=(\d+)/)
 
-  if (videoMatch) {
-    const result = {
-      type: 'element',
-      tagName: 'video',
-      properties: {
-        src: videoMatch[2],
-        title: videoMatch[1],
-      },
-      children: [],
+      const result = {
+        type: 'element',
+        tagName: 'iframe',
+        properties: {
+          src: url,
+          title: 'youtube',
+          width: width ? width[1] : '',
+        },
+        children: [],
+      }
+
+      state.patch(node, result)
+      return state.applyData(node, result)
     }
+  } else if (textValue.startsWith('[')) {
+    // Check if image
+    const match = textValue.match(/\[(.*?)\]\((.*?)\s*"width=(.*?)"\)/)
 
-    state.patch(node, result)
-    return state.applyData(node, result)
+    if (match) {
+      const [, alt, url, width] = match
+
+      const result = {
+        type: 'element',
+        tagName: 'img',
+        properties: {
+          src: url,
+          alt: alt || '',
+          width: width || '',
+        },
+        children: [],
+      }
+
+      state.patch(node, result)
+      return state.applyData(node, result)
+    }
   }
+
   return defaultHandlers.paragraph(state, node)
 }

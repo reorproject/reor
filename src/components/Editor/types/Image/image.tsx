@@ -192,7 +192,6 @@ const Render = (block: Block<HMBlockSchema>, editor: BlockNoteEditor<HMBlockSche
         const imageData = `data:image/png;base64,${fileData}`
 
         const storedImageUrl = await window.fileSystem.storeImage(imageData, filePath, block.id)
-
         assignMedia({
           id: block.id,
           props: {
@@ -280,15 +279,12 @@ const ImageBlock = createReactBlockSpec({
   parseHTML: [
     {
       tag: 'img[src]',
-      getAttrs: (element: any) => {
-        const name = element.getAttribute('title')
-        const width = element.getAttribute('width') || element.style.width
-        const alt = element.getAttribute('alt')
+      getAttrs: (element: HTMLElement) => {
         return {
           url: element.getAttribute('src'),
-          name,
-          width,
-          alt,
+          width: element.getAttribute('width') || element.style.width,
+          alt: element.getAttribute('alt') || '',
+          name: element.getAttribute('title') || '',
         }
       },
       node: 'image',

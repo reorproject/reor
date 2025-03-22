@@ -38,7 +38,7 @@ const EmbedComponent: React.FC<EmbedRenderProps> = ({ props, submit, assign }) =
           position="relative"
           borderColor="$color8"
           borderWidth={0}
-          backgroundColor="$purple3"
+          backgroundColor="$purple4"
           borderRadius="$4"
           outlineWidth={0}
           // @ts-expect-error
@@ -46,7 +46,7 @@ const EmbedComponent: React.FC<EmbedRenderProps> = ({ props, submit, assign }) =
           onClick={handleClick}
           height={50}
           hoverStyle={{
-            backgroundColor: '$purple4',
+            backgroundColor: '$purple5',
             cursor: 'pointer',
           }}
         >
@@ -60,7 +60,7 @@ const EmbedComponent: React.FC<EmbedRenderProps> = ({ props, submit, assign }) =
             opacity={0.4}
           >
             {icon && React.createElement(icon)}
-            <SizableText size={14} color="$color8" fontFamily="$mono">
+            <SizableText size="$4" fontFamily="$mono">
               {hint}
             </SizableText>
           </XStack>
@@ -128,7 +128,7 @@ const EmbedComponent: React.FC<EmbedRenderProps> = ({ props, submit, assign }) =
             <YStack gap="$3" paddingTop={3}>
               <Button
                 size={14}
-                color="$color8"
+                color="$color10"
                 fontFamily="$mono"
                 padding={16}
                 backgroundColor="hsl(0, 0%, 96.0%)"

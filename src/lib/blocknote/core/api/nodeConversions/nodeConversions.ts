@@ -415,12 +415,11 @@ export function nodeToBlock<BSchema extends BlockSchema>(
   const block: Block<BSchema> = {
     id,
     type: blockInfo.contentType.name,
-    props,
+    props: props,
     content,
     children,
   }
 
   blockCache?.set(node, block)
-
   return block
 }

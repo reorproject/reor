@@ -867,6 +867,7 @@ export const BlockContainer = Node.create<{
                 ) {
                   if (dispatch) {
                     const { startPos, contentNode } = blockInfo
+
                     state.tr
                       .setSelection(NodeSelection.create(state.doc, prevBlockInfo.startPos))
                       .deleteRange(startPos, startPos + contentNode.nodeSize)
@@ -874,6 +875,18 @@ export const BlockContainer = Node.create<{
                   }
                 }
               } else {
+                if (blockInfo.contentType.name === 'image') {
+                  const { url } = blockInfo.contentNode.attrs
+                  const strippedURL = url.replace('local://', '')
+                  if (strippedURL.length !== 0) {
+                    try {
+                      window.fileSystem.deleteImage(strippedURL)
+                    } catch (error) {
+                      // eslint-disable-next-line no-console
+                      console.error(`Received error: `, error)
+                    }
+                  }
+                }
                 return commands.BNUpdateBlock(state.selection.from, {
                   type: 'paragraph',
                   props: {},

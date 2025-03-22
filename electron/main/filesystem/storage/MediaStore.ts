@@ -101,6 +101,17 @@ class MediaStore {
     return `local://${fileName}`
   }
 
+  // Removes the media file from the storage and updates the metadata
+  public async deleteMedia(fileName: string): Promise<void> {
+    const url = fileName.replace('local://', '')
+    const filePath = path.join(this.storageDir, url)
+    if (fs.existsSync(filePath)) {
+      await fs.promises.unlink(filePath)
+    } else {
+      throw new Error(`File not found: ${filePath}`)
+    }
+  }
+
   public async getMedia(fileName: string): Promise<string | null> {
     try {
       const updatedFileName = fileName.replace('local://', '')
