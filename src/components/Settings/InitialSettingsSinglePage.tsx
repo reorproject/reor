@@ -38,7 +38,7 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({ readyForInd
             Reor is a private AI personal knowledge management tool. Each note will be saved as a markdown file to a
             vault directory on your machine.
           </SizableText>
-          <XStack className="mt-10 flex items-center justify-between border-0 border-b-2 border-solid border-neutral-700 pb-4">
+          <XStack className="mt-10 flex w-full items-center justify-between border-0 border-b-2 border-solid border-neutral-700 pb-4">
             <YStack className="w-80 flex-col">
               <SizableText fontSize={16} fontWeight="bold">
                 Vault Directory
