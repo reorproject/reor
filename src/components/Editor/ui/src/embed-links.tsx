@@ -60,7 +60,7 @@ const EmbedComponent: React.FC<EmbedRenderProps> = ({ props, submit, assign }) =
             opacity={0.4}
           >
             {icon && React.createElement(icon)}
-            <SizableText size='$4' fontFamily="$mono">
+            <SizableText size="$4" fontFamily="$mono">
               {hint}
             </SizableText>
           </XStack>
