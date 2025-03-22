@@ -250,68 +250,57 @@ export const SearchAndReplace = Extension.create<SearchAndReplaceOptions, Search
 
   addCommands() {
     return {
-      setSearchTerm:
-        (searchTerm: string) =>
-        ({ editor }) => {
-          editor.storage.searchAndReplace.searchTerm = searchTerm
+      setSearchTerm: (searchTerm: string) => () => {
+        // editor.storage.searchAndReplace.searchTerm = searchTerm
+        this.editor.storage.searchAndReplace.searchTerm = searchTerm
 
-          return false
-        },
-      setReplaceTerm:
-        (replaceTerm: string) =>
-        ({ editor }) => {
-          editor.storage.searchAndReplace.replaceTerm = replaceTerm
+        return false
+      },
+      setReplaceTerm: (replaceTerm: string) => () => {
+        this.editor.storage.searchAndReplace.replaceTerm = replaceTerm
 
-          return false
-        },
-      setCaseSensitive:
-        (caseSensitive: boolean) =>
-        ({ editor }) => {
-          editor.storage.searchAndReplace.caseSensitive = caseSensitive
+        return false
+      },
+      setCaseSensitive: (caseSensitive: boolean) => () => {
+        this.editor.storage.searchAndReplace.caseSensitive = caseSensitive
 
-          return false
-        },
-      resetIndex:
-        () =>
-        ({ editor }) => {
-          editor.storage.searchAndReplace.resultIndex = 0
+        return false
+      },
+      resetIndex: () => () => {
+        this.editor.storage.searchAndReplace.resultIndex = 0
 
-          return false
-        },
-      nextSearchResult:
-        () =>
-        ({ editor }) => {
-          const { results, resultIndex } = editor.storage.searchAndReplace
+        return false
+      },
+      nextSearchResult: () => () => {
+        const { results, resultIndex } = this.editor.storage.searchAndReplace
 
-          const nextIndex = resultIndex + 1
+        const nextIndex = resultIndex + 1
 
-          if (results[nextIndex]) {
-            editor.storage.searchAndReplace.resultIndex = nextIndex
-          } else {
-            editor.storage.searchAndReplace.resultIndex = 0
-          }
+        if (results[nextIndex]) {
+          this.editor.storage.searchAndReplace.resultIndex = nextIndex
+        } else {
+          this.editor.storage.searchAndReplace.resultIndex = 0
+        }
 
-          return false
-        },
-      previousSearchResult:
-        () =>
-        ({ editor }) => {
-          const { results, resultIndex } = editor.storage.searchAndReplace
+        return false
+      },
+      previousSearchResult: () => () => {
+        const { results, resultIndex } = this.editor.storage.searchAndReplace
 
-          const prevIndex = resultIndex - 1
+        const prevIndex = resultIndex - 1
 
-          if (results[prevIndex]) {
-            editor.storage.searchAndReplace.resultIndex = prevIndex
-          } else {
-            editor.storage.searchAndReplace.resultIndex = results.length - 1
-          }
+        if (results[prevIndex]) {
+          this.editor.storage.searchAndReplace.resultIndex = prevIndex
+        } else {
+          this.editor.storage.searchAndReplace.resultIndex = results.length - 1
+        }
 
-          return false
-        },
+        return false
+      },
       replace:
         () =>
-        ({ editor, state, dispatch }) => {
-          const { replaceTerm, results } = editor.storage.searchAndReplace
+        ({ state, dispatch }) => {
+          const { replaceTerm, results } = this.editor.storage.searchAndReplace
 
           replace(replaceTerm, results, { state, dispatch })
 
@@ -319,8 +308,8 @@ export const SearchAndReplace = Extension.create<SearchAndReplaceOptions, Search
         },
       replaceAll:
         () =>
-        ({ editor, tr, dispatch }) => {
-          const { replaceTerm, results } = editor.storage.searchAndReplace
+        ({ tr, dispatch }) => {
+          const { replaceTerm, results } = this.editor.storage.searchAndReplace
 
           replaceAll(replaceTerm, results, { tr, dispatch })
 

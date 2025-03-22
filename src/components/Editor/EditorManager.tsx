@@ -3,9 +3,10 @@ import { YStack } from 'tamagui'
 import InEditorBacklinkSuggestionsDisplay from './BacklinkSuggestionsDisplay'
 import { useFileContext } from '@/contexts/FileContext'
 import { BlockNoteView, FormattingToolbarPositioner, SlashMenuPositioner, SideMenuPositioner } from '@/lib/blocknote'
+import SearchBar from './Search/SearchBar'
 
 const EditorManager: React.FC = () => {
-  // const [showSearchBar, setShowSearchBar] = useState(false)
+  const [showSearchBar, setShowSearchBar] = useState(false)
 
   const [editorFlex, setEditorFlex] = useState(true)
 
@@ -42,8 +43,8 @@ const EditorManager: React.FC = () => {
   }, [])
 
   return (
-    <YStack className="relative size-full cursor-text overflow-y-auto py-4 " onPress={() => editor?.focus()}>
-      {/* <SearchBar editor={editor} showSearch={showSearchBar} setShowSearch={setShowSearchBar} /> */}
+    <YStack className="relative size-full cursor-text overflow-y-auto" onPress={() => editor?.focus()}>
+      <SearchBar editor={editor?._tiptapEditor ?? null} showSearch={showSearchBar} setShowSearch={setShowSearchBar} />
 
       <YStack
         className={`relative h-full  py-4 ${editorFlex ? 'flex justify-center px-24' : 'px-12'} ${showDocumentStats ? 'pb-3' : ''}`}

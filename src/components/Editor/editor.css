@@ -1,12 +1,5 @@
 #editor-header-content,
-.editor {
-  --text-unit: 18;
-  --layout-unit: 24;
-  max-width: calc(75ch + 108px);
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-}
+
 
 /* #editor-header-content {
   padding: 0 34px;
@@ -459,4 +452,12 @@ ol > [data-node-type='block-outer']::marker {
   .side-menu {
     display: flex !important;
   }
+}
+
+.search-result {
+  background-color: rgba(255, 255, 0, 0.3);
+}
+
+.search-result-current {
+  background-color: rgb(255,165,0, 0.3);
 }

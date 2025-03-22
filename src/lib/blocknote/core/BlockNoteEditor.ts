@@ -35,6 +35,7 @@ import { getDefaultSlashMenuItems } from './extensions/SlashMenu/defaultSlashMen
 import UniqueID from './extensions/UniqueID/UniqueID'
 import { mergeCSSClasses } from './shared/utils'
 import { HMBlockSchema, hmBlockSchema } from '@/components/Editor/schema'
+import '@/components/Editor/editor.css'
 
 export type BlockNoteEditorOptions<BSchema extends BlockSchema> = {
   // TODO: Figure out if enableBlockNoteExtensions/disableHistoryExtension are needed and document them.
