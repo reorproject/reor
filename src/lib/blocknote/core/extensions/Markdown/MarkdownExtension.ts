@@ -1,7 +1,6 @@
 import { Editor, Extension } from '@tiptap/core'
 import { Fragment, Node } from '@tiptap/pm/model'
 import { Plugin } from 'prosemirror-state'
-import { BlockNoteEditor } from '../../BlockNoteEditor'
 import { youtubeParser } from '@/components/Editor/types/utils'
 
 function containsMarkdownSymbols(pastedText: string) {
