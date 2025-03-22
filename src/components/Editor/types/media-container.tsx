@@ -40,7 +40,6 @@ const MediaContainer = ({
   const [hover, setHover] = useState(false)
   const [drag, setDrag] = useState(false)
   const isEmbed = ['embed', 'web-embed'].includes(mediaType)
-  console.log(`IsEmbed: `, isEmbed)
 
   const handleDragReplace = async (file: File) => {
     const formData = new FormData()

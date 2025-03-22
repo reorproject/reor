@@ -279,15 +279,12 @@ const ImageBlock = createReactBlockSpec({
   parseHTML: [
     {
       tag: 'img[src]',
-      getAttrs: (element: any) => {
-        const name = element.getAttribute('title')
-        const width = element.getAttribute('width') || element.style.width
-        const alt = element.getAttribute('alt')
+      getAttrs: (element: HTMLElement) => {
         return {
           url: element.getAttribute('src'),
-          name,
-          width,
-          alt,
+          width: element.getAttribute('width') || element.style.width,
+          alt: element.getAttribute('alt') || '',
+          name: element.getAttribute('title') || '',
         }
       },
       node: 'image',

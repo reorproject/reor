@@ -2,8 +2,6 @@ import { Editor, Extension } from '@tiptap/core'
 import { Fragment, Node } from '@tiptap/pm/model'
 import { Plugin } from 'prosemirror-state'
 import { BlockNoteEditor } from '../../BlockNoteEditor'
-import { getBlockInfoFromPos } from '@/lib/utils'
-import * as BlockUtils from '@/lib/utils/block-utils'
 import { youtubeParser } from '@/components/Editor/types/utils'
 
 function containsMarkdownSymbols(pastedText: string) {
@@ -56,7 +54,7 @@ function getPastedNodes(parent: Node | Fragment, editor: Editor) {
   return nodes
 }
 
-const createMarkdownExtension = (bnEditor: BlockNoteEditor) => {
+const createMarkdownExtension = () => {
   const MarkdownExtension = Extension.create({
     name: 'MarkdownPasteHandler',
     priority: 900,
@@ -66,7 +64,6 @@ const createMarkdownExtension = (bnEditor: BlockNoteEditor) => {
         new Plugin({
           props: {
             handlePaste: (view, event, slice) => {
-              console.log(`Pasting in markdwon!`)
               const selectedNode = view.state.selection.$from.parent
               // Don't proceed if pasting into code block
               if (selectedNode.type.name === 'code-block' || selectedNode.firstChild?.type.name === 'code-block') {
@@ -76,12 +73,10 @@ const createMarkdownExtension = (bnEditor: BlockNoteEditor) => {
               const pastedHtml = event.clipboardData!.getData('text/html')
               const hasList = pastedHtml.includes('<ul') || pastedHtml.includes('<ol')
               const hasVideo = pastedText.includes('youtube')
-              console.log(`Text`, pastedText)
               const { state } = view
               const { selection } = state
 
               const isMarkdown = pastedHtml ? containsMarkdownSymbols(pastedText) : true
-              console.log(`isMarkdown: `, isMarkdown)
               if (!isMarkdown) {
                 if (hasList) {
                   const firstBlockGroup = slice.content.firstChild?.type.name === 'blockGroup'

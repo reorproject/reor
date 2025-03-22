@@ -33,7 +33,6 @@ const handleLocalMediaPastePlugin = new Plugin({
   key: new PluginKey('pm-local-media-paste'),
   props: {
     handlePaste(view, event) {
-      console.log(`Pasting!`)
       const currentSelection = view.state.selection
       const items = Array.from(event.clipboardData?.items || [])
       const blockInfo = getBlockInfoFromPos(view.state.doc, view.state.selection.from)!

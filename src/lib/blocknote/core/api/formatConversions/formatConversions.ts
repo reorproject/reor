@@ -12,7 +12,7 @@ import { Block, BlockSchema } from '../../extensions/Blocks/api/blockTypes'
 
 import { blockToNode, nodeToBlock } from '../nodeConversions/nodeConversions'
 import simplifyBlocks from './simplifyBlocksRehypePlugin'
-import { removeSingleSpace, preserveEmptyParagraphs, code, videos } from './customRehypePlugins'
+import { removeSingleSpace, preserveEmptyParagraphs, code, handleMedia } from './customRehypePlugins'
 
 /**
  * Converts our blocks to HTML:
@@ -65,7 +65,6 @@ export async function HTMLToBlocks<BSchema extends BlockSchema>(
   schema: Schema,
 ): Promise<Block<BSchema>[]> {
   const htmlNode = document.createElement('div')
-  console.log(`html.trim()`, html.trim())
   htmlNode.innerHTML = html.trim()
 
   const parser = DOMParser.fromSchema(schema)
@@ -76,7 +75,6 @@ export async function HTMLToBlocks<BSchema extends BlockSchema>(
     blocks.push(nodeToBlock(parentNode.firstChild!.child(i), blockSchema))
   }
 
-  console.log(`Blocks: `, blocks)
   return blocks
 }
 
@@ -150,7 +148,7 @@ function convertBlockToHtml<BSchema extends BlockSchema>(block: Block<BSchema>, 
       case 'paragraph':
         return `<p>${contentHtml}</p>`
       case 'image':
-        return `<img src="${block.props.url}" alt="${block.props.name}" />`
+        return `[${block.props.alt}](${block.props.url} "width=${block.props.width}")`
       case 'code-block':
         return `<pre><code class="language-${block.props.language || 'plaintext'}">${contentHtml}</code></pre>`
       case 'video':
@@ -225,7 +223,7 @@ export async function markdownToBlocks<BSchema extends BlockSchema>(
       handlers: {
         ...(defaultHandlers as any),
         code,
-        paragraph: videos,
+        paragraph: handleMedia,
       },
     })
     // @ts-expect-error

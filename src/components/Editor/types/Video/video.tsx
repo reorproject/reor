@@ -17,7 +17,7 @@ export const getSourceType = (name: string) => {
  *  Depending on start of video data type, uses
  *  <video /> html element or <XStack />
  */
-export function displayVideoType(videoURL: string, editor: BlockNoteEditor<HMBlockSchema>) {
+export function displayVideoType(videoURL: string) {
   if (videoURL.startsWith('data:video/')) {
     return (
       // eslint-disable-next-line jsx-a11y/media-has-caption
@@ -29,14 +29,10 @@ export function displayVideoType(videoURL: string, editor: BlockNoteEditor<HMBlo
   }
   return (
     <XStack
-      pointerEvents={'auto'}
+      width="100%"
+      pointerEvents="auto"
       tag="iframe"
-      position="absolute"
       className="video-iframe"
-      top={0}
-      left={0}
-      bottom={0}
-      right={0}
       // @ts-expect-error
       src={videoURL}
       frameBorder="0"
@@ -52,6 +48,7 @@ const Display = ({ editor, block, selected, setSelected, assign }: DisplayCompon
   // Min video width in px.
   const minWidth = 256
   let width: number = parseFloat(block.props.width) || editor.domElement.firstElementChild!.clientWidth
+
   const [currentWidth, setCurrentWidth] = useState(width)
   const [showHandle, setShowHandle] = useState(false)
   let resizeParams:
@@ -83,7 +80,6 @@ const Display = ({ editor, block, selected, setSelected, assign }: DisplayCompon
           setVideoURL(block.props.url)
         }
       } finally {
-        console.log(`setting loading to false!`)
         setIsLoading(false)
       }
     }
@@ -181,19 +177,11 @@ const Display = ({ editor, block, selected, setSelected, assign }: DisplayCompon
     editor.setTextCursorPosition(block.id, 'start')
   }
 
-  const videoProps = {
-    paddingBottom: '56.25%',
-    position: 'relative',
-    height: 0,
-  }
-
-  console.log(`videoUrl: `, block.props.url)
   return (
     <MediaContainer
       editor={editor}
       block={block}
       mediaType="video"
-      styleProps={videoProps}
       selected={selected}
       setSelected={setSelected}
       assign={assign}
@@ -214,7 +202,7 @@ const Display = ({ editor, block, selected, setSelected, assign }: DisplayCompon
       {isLoading ? (
         <div className="flex h-32 w-full items-center justify-center bg-gray-100">Loading video...</div>
       ) : (
-        displayVideoType(videoURL, editor)
+        displayVideoType(videoURL)
       )}
     </MediaContainer>
   )
@@ -329,7 +317,7 @@ export const VideoBlock = createReactBlockSpec({
     {
       tag: 'iframe',
       getAttrs: (element: any) => {
-        return { url: element.getAttribute('src') }
+        return { url: element.getAttribute('src'), width: element.getAttribute('width') }
       },
     },
   ],
