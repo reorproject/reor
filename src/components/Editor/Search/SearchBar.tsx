@@ -71,18 +71,19 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor }) => {
   const goToSelection = useCallback(() => {
     if (!editor) return
     const { results, resultIndex } = editor.storage.searchAndReplace
-  
+
     const position = results[resultIndex]
     if (!position) return
     editor.commands.setTextSelection(position)
     const { node } = editor.view.domAtPos(editor.state.selection.anchor)
-  
+
     if (node instanceof Element) {
       node.scrollIntoView?.(false)
     }
-  
+
     updateSearchResults()
-  }, [editor, updateSearchResults])  
+  }, [editor, updateSearchResults])
+
 
   const handleSearch = useCallback((event: any, genericSearchResult: (() => boolean) | undefined) => {
     event.preventDefault()
@@ -92,7 +93,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor }) => {
 
   const handleKeyDown = useCallback(
     (event: any) => {
-      event.preventDefault() // Prevent browser search from triggering
       if (event.key === 'Enter') {
         handleSearch(event, editor?.commands.nextSearchResult)
       } else if ((event.metaKey || event.ctrlKey) && event.key === 'f' && !showSearch) {
