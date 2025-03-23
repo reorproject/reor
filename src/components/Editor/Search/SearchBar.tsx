@@ -84,12 +84,14 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor }) => {
     updateSearchResults()
   }, [editor, updateSearchResults])
 
-
-  const handleSearch = useCallback((event: any, genericSearchResult: (() => boolean) | undefined) => {
-    event.preventDefault()
-    if (genericSearchResult) genericSearchResult()
-    goToSelection()
-  }, [goToSelection])
+  const handleSearch = useCallback(
+    (event: any, genericSearchResult: (() => boolean) | undefined) => {
+      event.preventDefault()
+      if (genericSearchResult) genericSearchResult()
+      goToSelection()
+    },
+    [goToSelection],
+  )
 
   const handleKeyDown = useCallback(
     (event: any) => {
