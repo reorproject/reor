@@ -6,20 +6,27 @@ import { ChevronDown, ChevronUp, X, Replace } from '@tamagui/lucide-icons'
 
 interface SearchBarProps {
   editor: Editor | null
-  showSearch: boolean
-  setShowSearch: (show: boolean) => void
-  searchTerm: string
-  setSearchTerm: (term: string) => void
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ editor, showSearch, setShowSearch, searchTerm, setSearchTerm }) => {
+interface SearchLocationProps {
+  currentIndex: number
+  totalResults: number
+  resultsExist: boolean
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ editor }) => {
+  const [showSearch, setShowSearch] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+
   const searchBarRef = useRef<HTMLDivElement>(null)
 
   const [replaceTerm, setReplaceTerm] = useState('')
-  const [resultsExist, setResultsExist] = useState(false)
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [totalResults, setTotalResults] = useState(0)
 
+  const [searchLocation, setSearchLocation] = useState<SearchLocationProps>({
+    currentIndex: 0,
+    totalResults: 0,
+    resultsExist: false,
+  })
   const [showReplace, setShowReplace] = useState(false)
 
   const updateSearchResults = useCallback(() => {
@@ -27,9 +34,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor, showSearch, setShowSearch
     const { results, resultIndex } = editor.storage.searchAndReplace
 
     const hasResults = results.length > 0
-    setResultsExist(hasResults)
-    setCurrentIndex(Math.min(resultIndex + 1, results.length))
-    setTotalResults(results.length)
+    setSearchLocation({
+      currentIndex: Math.min(resultIndex + 1, results.length),
+      totalResults: results.length,
+      resultsExist: hasResults,
+    })
   }, [editor])
 
   const toggleReplace = () => {
@@ -37,13 +46,15 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor, showSearch, setShowSearch
   }
 
   const toggleSearch = useCallback(() => {
-    setShowSearch(!showSearch)
     if (!showSearch) {
+      // Toggling from off to on, so restate the original value
       editor?.commands.setSearchTerm(searchTerm)
       updateSearchResults()
     } else {
+      // Toggling on to off, so clear the search term (if we do not then the highlights remain)
       editor?.commands.setSearchTerm('')
     }
+    setShowSearch(!showSearch)
   }, [showSearch, setShowSearch, editor?.commands, searchTerm, updateSearchResults])
 
   const handleSearchChange = (value: string) => {
@@ -57,42 +68,40 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor, showSearch, setShowSearch
     editor?.commands.setReplaceTerm(value)
   }
 
-  const goToSelection = () => {
+  const goToSelection = useCallback(() => {
     if (!editor) return
     const { results, resultIndex } = editor.storage.searchAndReplace
-
+  
     const position = results[resultIndex]
     if (!position) return
     editor.commands.setTextSelection(position)
     const { node } = editor.view.domAtPos(editor.state.selection.anchor)
-
+  
     if (node instanceof Element) {
       node.scrollIntoView?.(false)
     }
-
+  
     updateSearchResults()
-  }
+  }, [editor, updateSearchResults])  
 
-  const handleNextSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      editor?.commands.nextSearchResult()
-      goToSelection()
-    } else if (event.key === 'Escape') {
-      toggleSearch()
-    }
-  }
+  const handleSearch = useCallback((event: any, genericSearchResult: (() => boolean) | undefined) => {
+    event.preventDefault()
+    if (genericSearchResult) genericSearchResult()
+    goToSelection()
+  }, [goToSelection])
 
   const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key === 'f') {
+    (event: any) => {
+      event.preventDefault() // Prevent browser search from triggering
+      if (event.key === 'Enter') {
+        handleSearch(event, editor?.commands.nextSearchResult)
+      } else if ((event.metaKey || event.ctrlKey) && event.key === 'f' && !showSearch) {
         toggleSearch()
-      }
-      if (event.key === 'Escape' && showSearch) {
+      } else if (event.key === 'Escape' && showSearch) {
         toggleSearch()
       }
     },
-    [showSearch, toggleSearch],
+    [showSearch, handleSearch, editor?.commands.nextSearchResult, toggleSearch],
   )
 
   const handleClickOutside = useCallback(
@@ -115,7 +124,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor, showSearch, setShowSearch
 
   const iconProps = {
     size: 18,
-    color: resultsExist ? 'white' : 'gray',
+    color: searchLocation.resultsExist ? 'white' : 'gray',
     cursor: 'pointer',
   }
 
@@ -123,14 +132,9 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor, showSearch, setShowSearch
   return (
     <div
       ref={searchBarRef}
-      className="animate-slide-in-down"
+      className="fixed right-4 top-10 w-[280px] animate-slide-in-down rounded-[12px]"
       style={{
-        position: 'absolute',
-        top: '10px',
-        right: '16px',
         zIndex: 1000,
-        borderRadius: '12px',
-        width: '280px',
         outline: 'rgba(35, 131, 226, 0.14) solid 3px',
       }}
     >
@@ -142,15 +146,15 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor, showSearch, setShowSearch
         <div className="relative flex-1">
           <input
             value={searchTerm}
-            onKeyDown={handleNextSearch}
+            onKeyDown={handleKeyDown}
             onChange={(event) => handleSearchChange(event.target.value)}
             placeholder="Search..."
             // eslint-disable-next-line jsx-a11y/no-autofocus
             autoFocus
-            className="w-full bg-transparent p-3 pr-16 text-white focus:outline-none"
+            className="w-full bg-transparent p-1 pr-16 text-white focus:outline-none"
           />
           <div className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-white">
-            {resultsExist ? `${currentIndex} / ${totalResults}` : '0 / 0'}
+            {searchLocation.resultsExist ? `${searchLocation.currentIndex} / ${searchLocation.totalResults}` : '0 / 0'}
           </div>
         </div>
 
@@ -159,21 +163,12 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor, showSearch, setShowSearch
         <XStack alignItems="center" gap={10}>
           <ChevronUp
             {...iconProps}
-            onMouseDown={(event) => {
-              event.preventDefault()
-              editor?.commands.previousSearchResult()
-              goToSelection()
-            }}
+            onMouseDown={(event) => handleSearch(event, editor?.commands.previousSearchResult)}
           />
-          <ChevronDown
-            {...iconProps}
-            onMouseDown={(event) => {
-              event.preventDefault()
-              editor?.commands.nextSearchResult()
-              goToSelection()
-            }}
-          />
-          {(showReplace || resultsExist) && <Replace color="white" cursor="pointer" onClick={toggleReplace} />}
+          <ChevronDown {...iconProps} onMouseDown={(event) => handleSearch(event, editor?.commands.nextSearchResult)} />
+          {(showReplace || searchLocation.resultsExist) && (
+            <Replace size={16} color="white" cursor="pointer" onClick={toggleReplace} />
+          )}
           <X {...iconProps} onClick={toggleSearch} />
         </XStack>
       </XStack>
@@ -183,16 +178,10 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor, showSearch, setShowSearch
           <YStack alignItems="center" gap={3} className="rounded-b-md bg-gray-800 p-2 shadow-lg">
             <input
               value={replaceTerm}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  event.preventDefault()
-                  editor?.commands.replace()
-                  updateSearchResults()
-                }
-              }}
+              onKeyDown={handleKeyDown}
               onChange={(event) => handleReplaceChange(event.target.value)}
               placeholder="Replace..."
-              className="w-full bg-transparent p-3 pr-16 text-white focus:outline-none"
+              className="w-full bg-transparent p-1 pr-16 text-white focus:outline-none"
               // eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus
             />

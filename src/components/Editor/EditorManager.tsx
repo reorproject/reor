@@ -6,9 +6,6 @@ import { BlockNoteView, FormattingToolbarPositioner, SlashMenuPositioner, SideMe
 import SearchBar from './Search/SearchBar'
 
 const EditorManager: React.FC = () => {
-  const [showSearchBar, setShowSearchBar] = useState(false)
-  const [searchTerm, setSearchTerm] = useState('') // For persistence
-
   const [editorFlex, setEditorFlex] = useState(true)
 
   const { editor, suggestionsState, vaultFilesFlattened } = useFileContext()
@@ -45,15 +42,7 @@ const EditorManager: React.FC = () => {
 
   return (
     <YStack className="relative size-full cursor-text overflow-y-auto">
-      {editor && (
-        <SearchBar
-          editor={editor._tiptapEditor}
-          showSearch={showSearchBar}
-          setShowSearch={setShowSearchBar}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-        />
-      )}
+      {editor && <SearchBar editor={editor._tiptapEditor} />}
 
       <YStack
         className={`relative h-full  py-4 ${editorFlex ? 'flex justify-center px-24' : 'px-12'} ${showDocumentStats ? 'pb-3' : ''}`}
