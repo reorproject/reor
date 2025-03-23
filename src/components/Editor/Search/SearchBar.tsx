@@ -1,23 +1,26 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { Editor } from '@tiptap/core' // Adjust import based on your setup}
-import { XStack } from 'tamagui'
-import { ChevronDown, ChevronUp, X } from '@tamagui/lucide-icons'
+import { Button } from '@material-tailwind/react'
+import { XStack, YStack, Separator } from 'tamagui'
+import { ChevronDown, ChevronUp, X, Replace } from '@tamagui/lucide-icons'
 
 interface SearchBarProps {
   editor: Editor | null
   showSearch: boolean
   setShowSearch: (show: boolean) => void
+  searchTerm: string
+  setSearchTerm: (term: string) => void
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ editor, showSearch, setShowSearch }) => {
-  const [searchTerm, setSearchTerm] = useState('')
+const SearchBar: React.FC<SearchBarProps> = ({ editor, showSearch, setShowSearch, searchTerm, setSearchTerm }) => {
+  const searchBarRef = useRef<HTMLDivElement>(null)
+
+  const [replaceTerm, setReplaceTerm] = useState('')
   const [resultsExist, setResultsExist] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [totalResults, setTotalResults] = useState(0)
 
-  const toggleSearch = useCallback(() => {
-    setShowSearch(!showSearch)
-  }, [showSearch, setShowSearch])
+  const [showReplace, setShowReplace] = useState(false)
 
   const updateSearchResults = useCallback(() => {
     if (!editor) return
@@ -25,14 +28,33 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor, showSearch, setShowSearch
 
     const hasResults = results.length > 0
     setResultsExist(hasResults)
-    setCurrentIndex(resultIndex + 1)
+    setCurrentIndex(Math.min(resultIndex + 1, results.length))
     setTotalResults(results.length)
   }, [editor])
+
+  const toggleReplace = () => {
+    setShowReplace(!showReplace)
+  }
+
+  const toggleSearch = useCallback(() => {
+    setShowSearch(!showSearch)
+    if (!showSearch) {
+      editor?.commands.setSearchTerm(searchTerm)
+      updateSearchResults()
+    } else {
+      editor?.commands.setSearchTerm('')
+    }
+  }, [showSearch, setShowSearch, editor?.commands, searchTerm, updateSearchResults])
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value)
     editor?.commands.setSearchTerm(value)
-    updateSearchResults() // Update only when term changes
+    updateSearchResults()
+  }
+
+  const handleReplaceChange = (value: string) => {
+    setReplaceTerm(value)
+    editor?.commands.setReplaceTerm(value)
   }
 
   const goToSelection = () => {
@@ -58,17 +80,38 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor, showSearch, setShowSearch
       goToSelection()
     } else if (event.key === 'Escape') {
       toggleSearch()
-      handleSearchChange('')
     }
   }
 
-  useEffect(() => {
-    if (editor) {
-      updateSearchResults()
-    }
-  }, [editor, searchTerm, updateSearchResults])
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if ((event.metaKey || event.ctrlKey) && event.key === 'f') {
+        toggleSearch()
+      }
+      if (event.key === 'Escape' && showSearch) {
+        toggleSearch()
+      }
+    },
+    [showSearch, toggleSearch],
+  )
 
-  if (!showSearch) return null
+  const handleClickOutside = useCallback(
+    (event: MouseEvent) => {
+      if (searchBarRef.current && !searchBarRef.current.contains(event.target as Node)) {
+        toggleSearch()
+      }
+    },
+    [toggleSearch],
+  )
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [handleClickOutside, handleKeyDown])
 
   const iconProps = {
     size: 18,
@@ -76,9 +119,26 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor, showSearch, setShowSearch
     cursor: 'pointer',
   }
 
+  if (!showSearch) return null
   return (
-    <div className="fixed right-4 top-10 z-50 flex items-center space-x-2 rounded-md p-2">
-      <XStack alignItems="center" width="100%" className="rounded-md bg-gray-800 p-2 shadow-lg">
+    <div
+      ref={searchBarRef}
+      className="animate-slide-in-down"
+      style={{
+        position: 'absolute',
+        top: '10px',
+        right: '16px',
+        zIndex: 1000,
+        borderRadius: '12px',
+        width: '280px',
+        outline: 'rgba(35, 131, 226, 0.14) solid 3px',
+      }}
+    >
+      <XStack
+        alignItems="center"
+        width="100%"
+        className={`rounded-t-md ${!showReplace ? 'rounded-b-md' : ''} bg-gray-800 p-2 shadow-lg`}
+      >
         <div className="relative flex-1">
           <input
             value={searchTerm}
@@ -99,21 +159,69 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor, showSearch, setShowSearch
         <XStack alignItems="center" gap={10}>
           <ChevronUp
             {...iconProps}
-            onClick={() => {
+            onMouseDown={(event) => {
+              event.preventDefault()
               editor?.commands.previousSearchResult()
               goToSelection()
             }}
           />
           <ChevronDown
             {...iconProps}
-            onClick={() => {
+            onMouseDown={(event) => {
+              event.preventDefault()
               editor?.commands.nextSearchResult()
               goToSelection()
             }}
           />
-          <X {...iconProps} />
+          {(showReplace || resultsExist) && <Replace color="white" cursor="pointer" onClick={toggleReplace} />}
+          <X {...iconProps} onClick={toggleSearch} />
         </XStack>
       </XStack>
+      {showReplace && (
+        <YStack className="animate-slide-in-down">
+          <Separator />
+          <YStack alignItems="center" gap={3} className="rounded-b-md bg-gray-800 p-2 shadow-lg">
+            <input
+              value={replaceTerm}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') {
+                  event.preventDefault()
+                  editor?.commands.replace()
+                  updateSearchResults()
+                }
+              }}
+              onChange={(event) => handleReplaceChange(event.target.value)}
+              placeholder="Replace..."
+              className="w-full bg-transparent p-3 pr-16 text-white focus:outline-none"
+              // eslint-disable-next-line jsx-a11y/no-autofocus
+              autoFocus
+            />
+            <div className="flex w-full justify-end gap-1">
+              <Button
+                className="h-10 w-[90px] cursor-pointer border-none bg-transparent px-2 py-0 text-center hover:bg-gray-700"
+                onClick={() => {
+                  if (!editor) return
+                  editor.commands.replaceAll()
+                  updateSearchResults()
+                }}
+              >
+                Replace All
+              </Button>
+
+              <Button
+                className="h-10 w-[100px] cursor-pointer border-none bg-blue-600 px-2 py-0 text-center hover:bg-blue-700"
+                onClick={() => {
+                  if (!editor) return
+                  editor.commands.replace()
+                  updateSearchResults()
+                }}
+              >
+                Replace Next
+              </Button>
+            </div>
+          </YStack>
+        </YStack>
+      )}
     </div>
   )
 }

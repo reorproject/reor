@@ -101,10 +101,15 @@ export default {
             opacity: '0',
           },
         },
+        slideInDown: {
+          '0%': { transform: 'translateY(-100%)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
       },
       animation: {
         'slide-in': 'slideIn 0.3s ease-out',
         bounce: 'bounce 1.4s infinite both',
+        'slide-in-down': 'slideInDown 0.15s ease-out',
       },
       borderRadius: {
         lg: 'var(--radius)',
