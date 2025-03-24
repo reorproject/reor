@@ -4,7 +4,11 @@ import { DBQueryResult } from 'electron/main/vector-database/schema'
 import { Card, Text, YStack } from 'tamagui'
 import MarkdownRenderer from '../Common/MarkdownRenderer'
 
-const cosineDistanceToPercentage = (similarity: number) => ((1 - similarity) * 100).toFixed(2)
+const cosineDistanceToPercentage = (similarity: number) => {
+  // Ensure we show at least 1% similarity
+  const percentage = (1 - similarity) * 100
+  return percentage < 1 ? '1.00' : percentage.toFixed(2)
+}
 
 export function getFileName(filePath: string): string {
   const parts = filePath.split(/[/\\]/)

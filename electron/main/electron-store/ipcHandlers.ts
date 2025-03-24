@@ -11,6 +11,8 @@ import {
   TamaguiThemeTypes,
 } from './storeConfig'
 
+import { SearchProps } from './types'
+
 import WindowsManager from '../common/windowManager'
 
 import { initializeAndMaybeMigrateStore } from './storeSchemaMigrator'
@@ -224,6 +226,15 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
 
   ipcMain.handle('get-tamagui-theme', () => {
     return store.get(StoreKeys.TamaguiTheme, 'dark') // Default to dark
+  })
+
+  ipcMain.handle('get-search-params', () => {
+    return store.get(StoreKeys.SearchParams, { searchMode: 'vector', vectorWeight: 0.7 }) // Default to 'vector'
+  })
+
+  ipcMain.handle('set-search-params', (event, searchMode: SearchProps) => {
+    store.set(StoreKeys.SearchParams, searchMode)
+    event.sender.send('search-mode-changed', searchMode)
   })
 }
 

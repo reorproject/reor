@@ -23,6 +23,7 @@ export const ChatItem: React.FC<ChatItemProps> = ({ chatMetadata }) => {
   `
 
   const handleDeleteChat = () => {
+    // eslint-disable-next-line no-alert
     const isConfirmed = window.confirm(`Are you sure you want to delete the chat "${chatMetadata.displayName}"?`)
     if (isConfirmed) {
       deleteChat(chatMetadata.id)

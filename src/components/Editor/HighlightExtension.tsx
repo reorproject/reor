@@ -31,7 +31,7 @@ const HighlightExtension = (setHighlightData: (data: HighlightData) => void) =>
                     position: { top: buttonTop, left: buttonLeft },
                   })
                 } else {
-                  setHighlightData({ text: '', position: null })
+                  setHighlightData({ text: '', position: null }) // memoize this
                 }
               },
             }

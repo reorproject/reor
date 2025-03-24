@@ -1,4 +1,5 @@
 import { AgentConfig, Chat } from '@/lib/llm/types'
+import { SearchProps } from './types'
 
 export type APIInterface = 'openai' | 'anthropic' | 'ollama'
 
@@ -64,6 +65,7 @@ export interface StoreSchema {
   showDocumentStats: boolean
   autoContext: boolean
   tamaguiTheme: TamaguiThemeTypes
+  searchParams: SearchProps
 }
 
 export enum StoreKeys {
@@ -86,4 +88,5 @@ export enum StoreKeys {
   showDocumentStats = 'showDocumentStats',
   AutoContext = 'autoContext',
   TamaguiTheme = 'tamaguiTheme',
+  SearchParams = 'searchParams',
 }

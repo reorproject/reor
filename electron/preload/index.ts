@@ -8,6 +8,7 @@ import {
   LLMGenerationParameters,
   TamaguiThemeTypes,
 } from 'electron/main/electron-store/storeConfig'
+import { SearchProps } from 'electron/main/electron-store/types'
 import { FileInfoTree, FileInfoWithContent, RenameFileProps, WriteFileProps } from 'electron/main/filesystem/types'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 
@@ -80,6 +81,8 @@ const electronStore = {
   getAutoContext: createIPCHandler<() => Promise<boolean>>('get-auto-context'),
   setTamaguiTheme: createIPCHandler<(theme: TamaguiThemeTypes) => Promise<void>>('set-tamagui-theme'),
   getTamaguiTheme: createIPCHandler<() => Promise<TamaguiThemeTypes>>('get-tamagui-theme'),
+  getSearchParams: createIPCHandler<() => Promise<SearchProps>>('get-search-params'),
+  setSearchParams: createIPCHandler<(searchParams: SearchProps) => Promise<void>>('set-search-params'),
 }
 
 const fileSystem = {
