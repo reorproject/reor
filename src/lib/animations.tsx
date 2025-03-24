@@ -5,7 +5,7 @@ const LoadingDots = () => {
     <div className="flex space-x-1 text-lg text-white">
       <span className="animate-bounce">.</span>
       <span className="animate-bounce delay-200">.</span>
-      <span className="delay-&lsqb;&lsqb;400ms&rsqb;&rsqb; animate-bounce">.</span>
+      <span className="animate-bounce delay-400">.</span>
     </div>
   )
 }

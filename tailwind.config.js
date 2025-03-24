@@ -79,6 +79,9 @@ export default {
   		transitionDuration: {
   			'400': '400ms'
   		},
+  		transitionDelay: {
+  			'400': '400ms'
+  		},
   		fontSize: {
   			'2lg': '1.0rem'
   		},
@@ -117,8 +120,12 @@ export default {
     preflight: false,
   },
   plugins: [
-    require('tailwind-scrollbar'),
-      require("tailwindcss-animate"),
-	  require('tailwind-scrollbar')
-],
+    require('tailwind-scrollbar')({
+      nocompatible: true,
+      scrollbar: {
+        rounded: 'rounded-full'
+      }
+    }),
+    require("tailwindcss-animate")
+  ],
 };
