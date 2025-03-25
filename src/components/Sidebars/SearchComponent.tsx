@@ -5,7 +5,7 @@ import posthog from 'posthog-js'
 import { debounce } from 'lodash'
 import { Input, XStack, YStack, ScrollView, Slider, Text } from 'tamagui'
 import { TextInput } from 'react-native'
-import { Search, Filter } from '@tamagui/lucide-icons'
+import { Search, Filter, FilterX } from '@tamagui/lucide-icons'
 import { SearchProps as SearchParamsType } from 'electron/main/electron-store/types'
 import { DBSearchPreview } from '../File/DBResultPreview'
 import { useContentContext } from '@/contexts/ContentContext'
@@ -119,7 +119,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
 
   return (
     <ScrollView>
-      <YStack height="100%" padding="$1">
+      <YStack padding="$1">
         <XStack position="relative" marginRight="$1" borderRadius="$3" padding="$2">
           <XStack position="absolute" left={0} top={14} alignItems="center" paddingLeft="$3">
             <Search size={14} color="$gray13" />
@@ -155,12 +155,14 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
             aria-label="Search options"
             cursor="pointer"
           >
-            <Filter color="$gray10" size={14} />
+            {showSearchOptions ? <FilterX color="$gray10" size={14} /> :
+              <Filter color="$gray10" size={14} />
+            }
           </XStack>
         </XStack>
 
         {showSearchOptions && (
-          <YStack className="animate-slide-down">
+          <YStack className="animate-slide-down max-h-[100px]">
             <YStack
               marginTop="$2"
               borderRadius="$2"
@@ -195,7 +197,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
                       {Math.round((1 - searchParams.vectorWeight) * 100)}% Keywords
                     </Text>
                   </XStack>
-                  <XStack position="relative">
+                  <XStack position="relative" px={5}>
                     <Slider
                       min={0}
                       max={1}

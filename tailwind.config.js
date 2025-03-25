@@ -106,8 +106,8 @@ export default {
           '100%': { transform: 'translateY(0)', opacity: '1', height: '100%' },
         },
         slideDown: {
-          '0%': { height: '0' },
-          '100%': { height: '100%' },
+          '0%': { maxHeight: '0', opacity: '0' },
+          '100%': { maxHeight: '300px', opacity: '1' },
         }
       },
       animation: {
