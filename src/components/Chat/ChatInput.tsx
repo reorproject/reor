@@ -1,12 +1,13 @@
 import React from 'react'
 
 import { PiPaperPlaneRight } from 'react-icons/pi'
-import { TextArea, Switch } from 'tamagui'
+import { TextArea } from 'tamagui'
 import { AgentConfig, LoadingState } from '../../lib/llm/types'
 import { Button } from '../ui/button'
 import LLMSelectOrButton from '../Settings/LLMSettings/LLMSelectOrButton'
 import { Label } from '@/components/ui/label'
 import { useThemeManager } from '@/contexts/ThemeContext'
+import { ToggleButton, ToggleThumb } from '../Editor/ui/src/toggle'
 
 interface ChatInputProps {
   userTextFieldInput: string
@@ -83,24 +84,21 @@ const ChatInput: React.FC<ChatInputProps> = ({
             <LLMSelectOrButton selectedLLM={selectedLLM} setSelectedLLM={setSelectedLLM} />
           </div>
 
-          <div className="flex items-center">
-            <div className="mr-[-8px] flex flex-col">
-              {/* <Switch
-                id="search-notes"
-                checked={!!agentConfig?.dbSearchFilters}
-                onCheckedChange={handleDbSearchToggle}
-                className="scale-[0.6]"
-              /> */}
-              <Switch
-                id="search-notes"
-                size="$1"
-                checked={!!agentConfig?.dbSearchFilters}
-                onCheckedChange={handleDbSearchToggle}
-                backgroundColor="$gray6" // Default background color
+          <div className="flex">
+            <div className="mr-[-8px] flex flex-col items-center mt-[8px]">
+              <ToggleButton
+                hybrid={!!agentConfig?.dbSearchFilters}
+                onPress={() => handleDbSearchToggle(!agentConfig?.dbSearchFilters)}
+                aria-checked={!!agentConfig?.dbSearchFilters}
+                role="switch"
+                aria-label="Search notes"
               >
-                <Switch.Thumb animation="unset" backgroundColor="$blue9" width={20} />
-              </Switch>
-              <Label htmlFor="stream-mode" className="mt-0 text-[8px] text-muted-foreground">
+                <ToggleThumb hybrid={!!agentConfig?.dbSearchFilters} />
+              </ToggleButton>
+              <Label 
+                htmlFor="stream-mode"
+                className="mt-0 text-[8px] text-muted-foreground"
+              >
                 Search notes
               </Label>
             </div>
