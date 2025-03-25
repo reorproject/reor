@@ -1,5 +1,6 @@
 import { AgentConfig, Chat } from '@/lib/llm/types'
 import { SearchProps } from './types'
+import { SearchProps } from './types'
 
 export type APIInterface = 'openai' | 'anthropic' | 'ollama'
 

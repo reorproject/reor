@@ -13,6 +13,8 @@ import {
 
 import { SearchProps } from './types'
 
+import { SearchProps } from './types'
+
 import WindowsManager from '../common/windowManager'
 
 import { initializeAndMaybeMigrateStore } from './storeSchemaMigrator'

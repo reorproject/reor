@@ -21,7 +21,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v3
+
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -35,6 +37,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-npm-
 
+
       - name: Cache TypeScript build
         uses: actions/cache@v3
         with:
@@ -42,6 +45,7 @@ jobs:
           key: ${{ runner.os }}-tsc-${{ hashFiles('**/tsconfig.json') }}
           restore-keys: |
             ${{ runner.os }}-tsc-
+        
         
       - name: Install dependencies
         run: npm install
@@ -88,6 +92,7 @@ jobs:
         run: |
           mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/Reor_${{ env.APP_VERSION }}-intel.dmg
       - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-app
