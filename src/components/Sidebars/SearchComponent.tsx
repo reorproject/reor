@@ -6,11 +6,11 @@ import { debounce } from 'lodash'
 import { Input, XStack, YStack, ScrollView, Slider, Text } from 'tamagui'
 import { TextInput } from 'react-native'
 import { Search, Filter } from '@tamagui/lucide-icons'
+import { SearchProps as SearchParamsType } from 'electron/main/electron-store/types'
 import { DBSearchPreview } from '../File/DBResultPreview'
 import { useContentContext } from '@/contexts/ContentContext'
 import { hybridSearch } from '@/lib/db'
 import { ToggleButton, ToggleThumb } from '@/components/Editor/ui/src/toggle'
-import { SearchProps as SearchParamsType } from 'electron/main/electron-store/types'
 
 interface SearchComponentProps {
   searchQuery: string
@@ -28,7 +28,6 @@ const ToggleSwitch: React.FC<{
   className?: string
   label: string
 }> = ({ isHybrid, onChange, className = '', label }) => (
-
   <ToggleButton
     hybrid={isHybrid}
     className={className}
@@ -50,7 +49,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   const { openContent: openTabContent } = useContentContext()
   const searchInputRef = useRef<TextInput>(null)
   const [searchParams, setSearchParams] = useState<SearchParamsType>({
-    searchMode: 'vector', 
+    searchMode: 'vector',
     vectorWeight: 0.7,
   })
   const [showSearchOptions, setShowSearchOptions] = useState(false)
@@ -154,16 +153,14 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
             focusStyle={{ outlineWidth: 0 }}
             onPress={() => setShowSearchOptions(!showSearchOptions)}
             aria-label="Search options"
-            cursor='pointer'
+            cursor="pointer"
           >
             <Filter color="$gray10" size={14} />
           </XStack>
         </XStack>
 
         {showSearchOptions && (
-          <YStack
-            className="animate-slide-down"
-          >
+          <YStack className="animate-slide-down">
             <YStack
               marginTop="$2"
               borderRadius="$2"
@@ -176,14 +173,8 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
               elevation="$1"
               backgroundColor="$gray2"
             >
-              <XStack
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                <Text
-                  fontSize="$1"
-                  fontWeight="500"
-                >
+              <XStack alignItems="center" justifyContent="space-between">
+                <Text fontSize="$1" fontWeight="500">
                   Hybrid Search
                 </Text>
                 <ToggleSwitch
@@ -195,25 +186,13 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
 
               {searchParams.searchMode === 'hybrid' && (
                 <YStack marginTop="$3" className="animate-slide-down overflow-hidden">
-                  <XStack
-                    marginBottom='$2'
-                    alignItems='center'
-                    justifyContent='space-between'
-                  >
-                    <Text
-                      fontSize="$1"
-                      fontWeight="500"
-                    >
+                  <XStack marginBottom="$2" alignItems="center" justifyContent="space-between">
+                    <Text fontSize="$1" fontWeight="500">
                       Search Balance
                     </Text>
-                    <Text 
-                      fontSize="$1"
-                      paddingHorizontal="$2"
-                      paddingVertical="$1"
-                      borderRadius="$1"
-                    >
+                    <Text fontSize="$1" paddingHorizontal="$2" paddingVertical="$1" borderRadius="$1">
                       {Math.round(searchParams.vectorWeight * 100)}% Semantic -{' '}
-                      {Math.round((1 - searchParams.vectorWeight) * 100)}% Keywords 
+                      {Math.round((1 - searchParams.vectorWeight) * 100)}% Keywords
                     </Text>
                   </XStack>
                   <XStack position="relative">
@@ -228,34 +207,39 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
                       borderRadius="$10"
                       aria-label="Search balance slider"
                     >
-                      { /* Track is the comoonent to the right of the button, 
-                        TractActive is the component to the left of the button.*/}
-                      <Slider.Track backgroundColor='$gray6'>
-                        <Slider.TrackActive backgroundColor='$blue9' />
+                      {/* Track is the comoonent to the right of the button, 
+                        TractActive is the component to the left of the button. */}
+                      <Slider.Track backgroundColor="$gray6">
+                        <Slider.TrackActive backgroundColor="$blue9" />
                       </Slider.Track>
-                      <Slider.Thumb 
+                      <Slider.Thumb
                         index={0}
                         circular
                         size={20}
                         backgroundColor="white"
-                        hoverStyle={{ backgroundColor: "rgba(255, 255, 255, 86%)" }} 
-                        focusStyle={{ backgroundColor: "rgba(255, 255, 255, 86%)" }}
+                        hoverStyle={{ backgroundColor: 'rgba(255, 255, 255, 86%)' }}
+                        focusStyle={{ backgroundColor: 'rgba(255, 255, 255, 86%)' }}
                       />
                     </Slider>
                   </XStack>
                   <XStack marginTop="$1.5" justifyContent="space-between">
-                    <Text fontSize="$1" color="$gray10">Keywords</Text>
-                    <Text fontSize="$1" color="$gray10">Balanced</Text>
-                    <Text fontSize="$1" color="$gray10">Semantic</Text>
+                    <Text fontSize="$1" color="$gray10">
+                      Keywords
+                    </Text>
+                    <Text fontSize="$1" color="$gray10">
+                      Balanced
+                    </Text>
+                    <Text fontSize="$1" color="$gray10">
+                      Semantic
+                    </Text>
                   </XStack>
                 </YStack>
-              )}            
+              )}
             </YStack>
           </YStack>
         )}
 
-
-        { /* Search Results */ }
+        {/* Search Results */}
         {searchResults.length > 0 && (
           <YStack marginTop="$2" width="100%" px="$3">
             {searchResults.map((result, index) => (
