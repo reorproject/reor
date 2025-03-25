@@ -101,15 +101,20 @@ export default {
             opacity: '0',
           },
         },
-        slideInDown: {
-          '0%': { transform: 'translateY(-100%)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
+        shiftInDown: {
+          '0%': { transform: 'translateY(-100%)', opacity: '0', height: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1', height: '100%' },
         },
+        slideDown: {
+          '0%': { height: '0' },
+          '100%': { height: '100%' },
+        }
       },
       animation: {
         'slide-in': 'slideIn 0.3s ease-out',
         bounce: 'bounce 1.4s infinite both',
-        'slide-in-down': 'slideInDown 0.15s ease-out',
+        'shift-in-down': 'shiftInDown 0.15s ease-in-out',
+        'slide-down': 'slideDown 0.30s ease-in-out forwards',    
       },
       borderRadius: {
         lg: 'var(--radius)',

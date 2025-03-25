@@ -134,7 +134,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor }) => {
   return (
     <div
       ref={searchBarRef}
-      className="fixed right-4 top-10 w-[280px] animate-slide-in-down rounded-[12px]"
+      className="fixed right-4 top-10 w-[280px] animate-shift-in-down rounded-[12px]"
       style={{
         zIndex: 1000,
         outline: 'rgba(35, 131, 226, 0.14) solid 3px',
@@ -175,7 +175,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor }) => {
         </XStack>
       </XStack>
       {showReplace && (
-        <YStack className="animate-slide-in-down">
+        <YStack className="animate-shift-in-down">
           <Separator />
           <YStack alignItems="center" gap={3} className="rounded-b-md bg-gray-800 p-2 shadow-lg">
             <input

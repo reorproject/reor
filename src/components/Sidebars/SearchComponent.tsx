@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useCallback, useState } from 'react'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 import posthog from 'posthog-js'
 import { debounce } from 'lodash'
-import { Input, XStack, YStack, ScrollView, Stack, Slider, Text } from 'tamagui'
+import { Input, XStack, YStack, ScrollView, Slider, Text } from 'tamagui'
 import { TextInput } from 'react-native'
 import { Search, Filter } from '@tamagui/lucide-icons'
 import { DBSearchPreview } from '../File/DBResultPreview'
@@ -37,18 +37,6 @@ const ToggleSwitch: React.FC<{
     role="switch"
     aria-label={label}
   >
-    <Stack 
-      position="absolute"
-      width={1}
-      height={1}
-      padding={0}
-      margin={-1}
-      overflow="hidden"
-      whiteSpace="nowrap"
-      borderWidth={0}
-    >
-      {label}
-    </Stack>
     <ToggleThumb hybrid={isHybrid} />
   </ToggleButton>
 )
@@ -174,85 +162,95 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
 
         {showSearchOptions && (
           <YStack
-            marginTop="$2"
-            borderRadius="$2"
-            borderWidth={1}
-            borderColor="$gray6"
-            padding="$3"
-            shadowColor="$shadowColor"
-            shadowRadius="$1"
-            elevation="$1"
-            backgroundColor="$gray2"
-            className="animate-slide-in-down"
+            className="animate-slide-down"
           >
-            <XStack
-              alignItems="center"
-              justifyContent="space-between"
+            <YStack
+              marginTop="$2"
+              borderRadius="$2"
+              borderWidth={1}
+              borderColor="$gray6"
+              padding="$3"
+              mx={10}
+              shadowColor="$shadowColor"
+              shadowRadius="$1"
+              elevation="$1"
+              backgroundColor="$gray2"
             >
-              <Text
-                fontSize="$1"
-                fontWeight="500"
+              <XStack
+                alignItems="center"
+                justifyContent="space-between"
               >
-                Hybrid Search
-              </Text>
-              <ToggleSwitch
-                isHybrid={searchParams.searchMode === 'hybrid'}
-                onChange={(mode) => setSearchParams((prev) => ({ ...prev, searchMode: mode }))}
-                label="Hybrid Search"
-              />
-            </XStack>
-
-            {searchParams.searchMode === 'hybrid' && (
-              <YStack marginTop="$3">
-                <XStack
-                  marginBottom='$2'
-                  alignItems='center'
-                  justifyContent='space-between'
+                <Text
+                  fontSize="$1"
+                  fontWeight="500"
                 >
-                  <Text
-                    fontSize="$1"
-                    fontWeight="500"
+                  Hybrid Search
+                </Text>
+                <ToggleSwitch
+                  isHybrid={searchParams.searchMode === 'hybrid'}
+                  onChange={(mode) => setSearchParams((prev) => ({ ...prev, searchMode: mode }))}
+                  label="Hybrid Search"
+                />
+              </XStack>
+
+              {searchParams.searchMode === 'hybrid' && (
+                <YStack marginTop="$3" className="animate-slide-down overflow-hidden">
+                  <XStack
+                    marginBottom='$2'
+                    alignItems='center'
+                    justifyContent='space-between'
                   >
-                    Search Balance
-                  </Text>
-                  <Text 
-                    fontSize="$1"
-                    backgroundColor="$gray7"
-                    paddingHorizontal="$2"
-                    paddingVertical="$1"
-                    borderRadius="$1"
-                  >
-                    {Math.round(searchParams.vectorWeight * 100)}% Semantic -{' '}
-                    {Math.round((1 - searchParams.vectorWeight) * 100)}% Keywords 
-                  </Text>
-                </XStack>
-                <XStack position="relative">
-                  <Slider
-                    id="vector-weight-slider"
-                    min={0}
-                    max={1}
-                    step={0.1}
-                    value={[searchParams.vectorWeight]}
-                    onValueChange={handleVectorWeightChange}
-                    height="$1"
-                    width="100%"
-                    backgroundColor="$gray9"
-                    borderRadius="$10"
-                    aria-label="Search balance slider"
-                  >
-                    <Slider.Track>
-                      <Slider.TrackActive />
-                    </Slider.Track>
-                    <Slider.Thumb index={0} circular size={20} />
-                  </Slider>
-                </XStack>
-                <XStack marginTop="$1.5" justifyContent="space-between">
-                  <Text fontSize="$1" color="$gray10">Keywords</Text>
-                  <Text fontSize="$1" color="$gray10">Balanced</Text>
-                  <Text fontSize="$1" color="$gray10">Semantic</Text>
-                </XStack>
-              </YStack>
-            )}            
+                    <Text
+                      fontSize="$1"
+                      fontWeight="500"
+                    >
+                      Search Balance
+                    </Text>
+                    <Text 
+                      fontSize="$1"
+                      paddingHorizontal="$2"
+                      paddingVertical="$1"
+                      borderRadius="$1"
+                    >
+                      {Math.round(searchParams.vectorWeight * 100)}% Semantic -{' '}
+                      {Math.round((1 - searchParams.vectorWeight) * 100)}% Keywords 
+                    </Text>
+                  </XStack>
+                  <XStack position="relative">
+                    <Slider
+                      min={0}
+                      max={1}
+                      step={0.1}
+                      value={[searchParams.vectorWeight]}
+                      onValueChange={handleVectorWeightChange}
+                      height="$1"
+                      width="100%"
+                      borderRadius="$10"
+                      aria-label="Search balance slider"
+                    >
+                      { /* Track is the comoonent to the right of the button, 
+                        TractActive is the component to the left of the button.*/}
+                      <Slider.Track backgroundColor='$gray6'>
+                        <Slider.TrackActive backgroundColor='$blue9' />
+                      </Slider.Track>
+                      <Slider.Thumb 
+                        index={0}
+                        circular
+                        size={20}
+                        backgroundColor="white"
+                        hoverStyle={{ backgroundColor: "rgba(255, 255, 255, 86%)" }} 
+                        focusStyle={{ backgroundColor: "rgba(255, 255, 255, 86%)" }}
+                      />
+                    </Slider>
+                  </XStack>
+                  <XStack marginTop="$1.5" justifyContent="space-between">
+                    <Text fontSize="$1" color="$gray10">Keywords</Text>
+                    <Text fontSize="$1" color="$gray10">Balanced</Text>
+                    <Text fontSize="$1" color="$gray10">Semantic</Text>
+                  </XStack>
+                </YStack>
+              )}            
+            </YStack>
           </YStack>
         )}
 
