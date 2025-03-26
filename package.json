@@ -91,7 +91,7 @@
     "date-fns": "^2.30.0",
     "dotenv": "^16.4.5",
     "electron-store": "^8.1.0",
-    "electron-updater": "^6.1.1",
+    "electron-updater": "^6.3.0",
     "install": "^0.13.0",
     "js-tiktoken": "^1.0.10",
     "katex": "^0.16.10",
@@ -178,7 +178,7 @@
     "tmp": "^0.2.1",
     "ts-jest": "^29.1.2",
     "typescript": "^5.1.6",
-    "vite": "^4.4.9",
+    "vite": "^4.5.3",
     "vite-plugin-electron": "^0.13.0-beta.3",
     "vite-plugin-electron-renderer": "^0.14.5"
   },
