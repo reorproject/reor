@@ -93,16 +93,18 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor }) => {
     [goToSelection],
   )
 
-  const handleMeta = useCallback((event: any) => {
-    if (event.key === 'Enter') {
-      console.log(`going next search!`)
-      handleSearch(event, editor?.commands.nextSearchResult)
-    } else if ((event.metaKey || event.ctrlKey) && event.key === 'f' && !showSearch) {
-      toggleSearch()
-    } else if (event.key === 'Escape' && showSearch) {
-      toggleSearch()
-    }
-  }, [handleSearch, toggleSearch])
+  const handleMeta = useCallback(
+    (event: any) => {
+      if (event.key === 'Enter') {
+        handleSearch(event, editor?.commands.nextSearchResult)
+      } else if ((event.metaKey || event.ctrlKey) && event.key === 'f' && !showSearch) {
+        toggleSearch()
+      } else if (event.key === 'Escape' && showSearch) {
+        toggleSearch()
+      }
+    },
+    [handleSearch, toggleSearch, showSearch, editor?.commands.nextSearchResult],
+  )
 
   const handleClickOutside = useCallback(
     (event: MouseEvent) => {
