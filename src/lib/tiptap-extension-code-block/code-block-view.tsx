@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { Check, ChevronDown, ChevronUp, Select, XStack, YStack } from '@shm/ui'
+import { Check, ChevronDown, ChevronUp, Select, XStack, YStack } from '@/components/Editor/ui/src'
 import { NodeViewProps } from '@tiptap/core'
 import { NodeViewContent } from '@tiptap/react'
 import React, { useState } from 'react'

@@ -2,7 +2,7 @@
  * MediaStore.ts
  * ---------------
  *
- * Generic class to store media in the appData directoory in electron.
+ * Generic class to store media in the appData directory in electron.
  * This application requires an ImageStore and a VideoStore which calls
  * the appropriate methods.
  */
@@ -76,7 +76,7 @@ class MediaStore {
 
   public async storeMedia(mediaData: string, originalName: string, blockId: string): Promise<string> {
     const base64Data = mediaData.replace(/^data:[^;]+;base64,/, '')
-    const buffer: any = Buffer.from(base64Data, 'base64')
+    const buffer: Buffer = Buffer.from(base64Data, 'base64')
 
     const type = await MediaStore.checkFileType(buffer)
     if (!type || !this.validateFileType(type.mime)) {

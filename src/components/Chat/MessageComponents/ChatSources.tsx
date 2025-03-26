@@ -58,7 +58,7 @@ const ChatSources: React.FC<ChatSourcesProps> = ({ contextItems }) => {
           ${state === 'light' ? 'scrollbar-thumb-gray-200' : 'scrollbar-thumb-gray-700'}`}
       >
         {contextItems.map((contextItem) => (
-          <XStack>
+          <XStack key={getItemPath(contextItem)}>
             <Tooltip content={getItemContent(contextItem)} renderMarkdown placement="top">
               <Card
                 cursor="pointer"

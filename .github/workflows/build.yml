@@ -21,9 +21,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
-      - name: Checkout repository
         uses: actions/checkout@v3
-
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -45,7 +43,6 @@ jobs:
           key: ${{ runner.os }}-tsc-${{ hashFiles('**/tsconfig.json') }}
           restore-keys: |
             ${{ runner.os }}-tsc-
-        
         
       - name: Install dependencies
         run: npm install

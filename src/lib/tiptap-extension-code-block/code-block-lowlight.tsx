@@ -27,7 +27,6 @@ export const CodeBlockLowlight = CodeBlock.extend<CodeBlockLowlightOptions>({
       const Content = CodeBlockView
       const blockContentDOMAttributes = this.options.domAttributes?.blockContent || {}
       const language = props.node.attrs.language
-      const node = props.node
       return (
         <NodeViewWrapper
           {...Object.fromEntries(Object.entries(blockContentDOMAttributes).filter(([key]) => key !== 'class'))}

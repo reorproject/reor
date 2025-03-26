@@ -40,7 +40,7 @@ const slashMenuItems = [
     group: 'Text blocks',
     icon: <RiCodeBoxFill size={18} />,
     hint: 'Insert a Code Block',
-    execute: (editor: BlockNoteEditor) => {
+    execute: (editor: BlockNoteEditor<Record<string, BlockSpec<string, PropSchema>>>) => {
       insertOrUpdateBlock(editor, {
         type: 'code-block',
         props: {

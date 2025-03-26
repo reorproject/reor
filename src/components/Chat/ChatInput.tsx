@@ -95,7 +95,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
               >
                 <ToggleThumb hybrid={!!agentConfig?.dbSearchFilters} />
               </ToggleButton>
-              <Label htmlFor="stream-mode" className="mt-0 text-[8px] text-muted-foreground">
+              <Label className="mt-0 text-[8px] text-muted-foreground">
                 Search notes
               </Label>
             </div>

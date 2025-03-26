@@ -85,7 +85,7 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
       const localURL = await imageStorage.storeMedia(imageData, originalName, blockID)
       return localURL
     } catch (error) {
-      throw new Error(`Failed to store image`)
+      throw new Error(`Failed to store image: ${error}`)
     }
   })
 
@@ -94,7 +94,7 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
       await imageStorage.deleteMedia(fileName)
       return true
     } catch (error) {
-      throw new Error('Failed to delete image')
+      throw new Error(`Failed to delete image: ${error}`)
     }
   })
 
@@ -103,7 +103,7 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
       const imageData = await imageStorage.getMedia(fileName)
       return imageData
     } catch (error) {
-      throw new Error(`Failed to get image`)
+      throw new Error(`Failed to get image: ${error}`)
     }
   })
 
@@ -112,7 +112,7 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
       const localURL = await videoStorage.storeMedia(videoData, originalName, blockId)
       return localURL
     } catch (error) {
-      throw new Error(`Failed to store video`)
+      throw new Error(`Failed to store video: ${error}`)
     }
   })
 
@@ -121,7 +121,7 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
       const videoData = await videoStorage.getMedia(fileName)
       return videoData
     } catch (error) {
-      throw new Error(`Failed to get video`)
+      throw new Error(`Failed to get video: ${error}`)
     }
   })
 

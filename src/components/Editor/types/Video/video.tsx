@@ -303,7 +303,6 @@ export const VideoBlock = createReactBlockSpec({
     },
   },
   containsInlineContent: true,
-  // @ts-ignore
   render: ({ block, editor }: { block: Block<HMBlockSchema>; editor: BlockNoteEditor<HMBlockSchema> }) =>
     Render(block, editor),
 

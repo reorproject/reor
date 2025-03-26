@@ -76,7 +76,11 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
                 hoverStyle={{
                   backgroundColor: '$gray7',
                 }}
-                className="cursor-pointer items-center justify-center rounded px-1 hover:bg-neutral-700"
+                cursor='pointer'
+                alignItems='center'
+                justifyContent='center'
+                px={4}
+                borderRadius='$1'
                 onPress={copyToClipboard}
               >
                 <FaRegCopy color="gray" size={16} className="text-gray-200" title="Copy" />
@@ -85,7 +89,11 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
                 hoverStyle={{
                   backgroundColor: '$gray7',
                 }}
-                className="cursor-pointer items-center justify-center rounded px-1 hover:bg-neutral-700"
+                cursor='pointer'
+                alignContent='center'
+                justifyContent='center'
+                px={4}
+                borderRadius='$1'
                 onPress={createNewNoteFromMessage}
               >
                 <HiOutlinePencilAlt color="gray" size={18} className="text-gray-200" title="New Note" />

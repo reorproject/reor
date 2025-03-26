@@ -91,7 +91,7 @@ const fileSystem = {
   openImageFileDialog: createIPCHandler<() => Promise<string[]>>('open-img-file-dialog'),
   openVideoFileDialog: createIPCHandler<() => Promise<string[]>>('open-video-file-dialog'),
   getFilesTreeForWindow: createIPCHandler<() => Promise<FileInfoTree>>('get-files-tree-for-window'),
-  readFile: createIPCHandler<(filePath: string, encoding: string) => Promise<string>>('read-file'),
+  readFile: createIPCHandler<(filePath: string, encoding: 'utf-8' | string) => Promise<string>>('read-file'),
   writeFile: createIPCHandler<(writeFileProps: WriteFileProps) => Promise<void>>('write-file'),
   storeImage:
     createIPCHandler<(imageData: string, filePath: string, blockID: string) => Promise<string>>('store-image'),

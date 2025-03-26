@@ -30,16 +30,16 @@ module.exports = {
     'jsx-a11y/no-static-element-interactions': 'off',
     'jsx-a11y/click-events-have-key-events': 'off',
     'react/require-default-props': 'off',
-    'import/no-extraneous-dependencies': [
-      'error',
-      {
-        devDependencies: [
-          '**/electron/**',
-          '**/preload/**',
-          'src/components/Editor/schema.ts',
-        ]
-      }
-    ],
+    // 'import/no-extraneous-dependencies': [
+    //   'error',
+    //   {
+    //     devDependencies: [
+    //       '**/electron/**',
+    //       '**/preload/**',
+    //       'src/components/Editor/schema.ts',
+    //     ]
+    //   }
+    // ],
     'no-underscore-dangle': 'off',
     'react/destructoring-assignment': 'off',
     'react/jsx-props-no-spreading': 'off',

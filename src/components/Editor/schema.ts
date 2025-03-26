@@ -10,8 +10,8 @@ export const hmBlockSchema: BlockSchema = {
   // bulletListItem: defaultBlockSchema.bulletListItem,
   // numberedListItem: defaultBlockSchema.numberedListItem,
   image: ImageBlock,
-  // ts-ignore
-  'code-block': {
+  // @ts-ignore
+  ['code-block']: {
     propSchema: {
       ...defaultProps,
       language: { default: '' },

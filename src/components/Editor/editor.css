@@ -70,8 +70,8 @@
 }
 
 .video-iframe {
-  width: calc(100%);
-  height: calc(100%);
+  width: 100%;
+  height: 100%;
 }
 .image-caption {
   font-size: 0.75em;
@@ -342,45 +342,6 @@ ol > [data-node-type='block-outer']::marker {
   overflow-wrap: break-word;
   white-space: nowrap;
   text-overflow: ellipsis;
-}
-.infoLink {
-  color: inherit;
-  text-decoration: none;
-}
-.infoLink {
-  height: var(--tweet-actions-icon-wrapper-size);
-  width: var(--tweet-actions-icon-wrapper-size);
-  font: inherit;
-  margin-left: auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-right: -4px;
-  border-radius: 9999px;
-  transition-property: background-color;
-  transition-duration: 0.2s;
-}
-.infoLink:hover {
-  background-color: var(--backgroundHover);
-}
-.infoIcon {
-  color: inherit;
-  fill: currentColor;
-  height: var(--tweet-actions-icon-size);
-  user-select: none;
-}
-.infoLink:hover > .infoIcon {
-  color: var(--background);
-}
-
-.x-post-container:hover {
-  background-color: var(--backgroundHover);
-}
-
-.x-post-container.article {
-  position: relative;
-  box-sizing: inherit;
-  padding: 0.75rem 1rem;
 }
 
 .hljs-comment,

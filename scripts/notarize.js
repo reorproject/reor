@@ -10,18 +10,22 @@ const { version } = require('../package.json')
 
 // Recursive function to print directory tree
 function printDirectoryTree(startPath, indent = '') {
-  const filesAndDirs = fs.readdirSync(startPath)
+  try {
+    const filesAndDirs = fs.readdirSync(startPath)
 
-  filesAndDirs.forEach((file, index) => {
-    const filePath = path.join(startPath, file)
-    const stats = fs.statSync(filePath)
-    const isLast = index === filesAndDirs.length - 1
-
-    console.log(`${indent}${isLast ? '└──' : '├──'} ${file}`)
-    if (stats.isDirectory()) {
-      printDirectoryTree(filePath, indent + (isLast ? '    ' : '│   '))
-    }
-  })
+    filesAndDirs.forEach((file, index) => {
+      const filePath = path.join(startPath, file)
+      const stats = fs.statSync(filePath)
+      const isLast = index === filesAndDirs.length - 1
+  
+      console.log(`${indent}${isLast ? '└──' : '├──'} ${file}`)
+      if (stats.isDirectory()) {
+        printDirectoryTree(filePath, indent + (isLast ? '    ' : '│   '))
+      }
+    })
+  } catch (error) {
+    console.error(`Error reading directory ${startPath}: ${error.message}`)
+  }
 }
 
 async function notarizeApp() {

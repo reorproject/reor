@@ -9,7 +9,7 @@ const EmptyPage: React.FC = () => {
   const { createUntitledNote } = useContentContext()
 
   return (
-    <div className="flex size-full flex-col items-center justify-center text-white">
+    <div className="flex size-full flex-col items-center justify-center">
       <div className="flex flex-col items-center">
         <div className="mb-2 opacity-10">
           <File size={168} color="$brand3" />

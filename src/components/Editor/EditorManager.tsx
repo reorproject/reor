@@ -45,7 +45,7 @@ const EditorManager: React.FC = () => {
       {editor && <SearchBar editor={editor._tiptapEditor} />}
 
       <YStack
-        className={`relative h-full  py-4 ${editorFlex ? 'flex justify-center px-24' : 'px-12'} ${showDocumentStats ? 'pb-3' : ''}`}
+        className={`relative h-full py-4 ${editorFlex ? 'flex justify-center px-24' : 'px-12'} ${showDocumentStats ? 'pb-3' : ''}`}
       >
         <YStack className="relative size-full">
           {editor && (

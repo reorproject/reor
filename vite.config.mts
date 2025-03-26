@@ -16,8 +16,6 @@ const require = createRequire(import.meta.url)
 const pkg = require('./package.json')
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-console.log(`Resolved: @shm/ui:`, path.join(__dirname, './src/components/Editor/ui/src/index.tsx'))
-
 export default defineConfig(({ command }) => {
   rmSync('dist-electron', { recursive: true, force: true })
 
@@ -29,7 +27,6 @@ export default defineConfig(({ command }) => {
       alias: {
         '@': path.join(__dirname, './src'),
         '@shared': path.join(__dirname, './shared'),
-        '@shm/ui': path.join(__dirname, './src/components/Editor/ui/src'),
       },
     },
     extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
@@ -62,7 +59,6 @@ export default defineConfig(({ command }) => {
             resolve: {
               alias: {
                 '@shared': path.join(__dirname, 'shared'),
-                '@shm/ui': path.join(__dirname, 'src/components/Editor/ui/src'),
                 'react-native-svg': 'react-native-svg-web',
               },
             },
@@ -85,7 +81,6 @@ export default defineConfig(({ command }) => {
             resolve: {
               alias: {
                 '@shared': path.join(__dirname, 'shared'),
-                '@shm/ui': path.join(__dirname, 'src/components/Editor/ui/src'),
                 'react-native-svg': 'react-native-svg-web',
               },
             },

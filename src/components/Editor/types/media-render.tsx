@@ -1,9 +1,6 @@
 import React, { useState } from 'react'
-import {
-  YStack,
-  EmbedComponent,
-  // useDocContentContext,
-} from '@shm/ui'
+import { YStack } from 'tamagui'
+import { EmbedComponent } from '../ui/src'
 import { NodeSelection, TextSelection } from 'prosemirror-state'
 import { Block, BlockNoteEditor, useEditorSelectionChange } from '@/lib/blocknote'
 import MultipleNodeSelection from '@/lib/blocknote/core/extensions/DraggableBlocks/MultipleNodeSelection'
@@ -104,7 +101,7 @@ export const MediaRender: React.FC<RenderProps> = ({
   const [selected, setSelected] = useState(false)
   useEditorSelectionChange(editor, () => updateSelection(editor, block, setSelected))
 
-  const assignMedia = (props: any) => {
+  const assignMedia = (props: MediaType) => {
     editor.updateBlock(block.id, props)
   }
   return (
