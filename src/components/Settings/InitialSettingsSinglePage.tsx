@@ -29,7 +29,7 @@ const InitialSetupSinglePage: React.FC<OldInitialSettingsProps> = ({ readyForInd
   return (
     <ReorModal isOpen onClose={onClose || (() => {})} hideCloseButton={!onClose}>
       <div className="ml-2 mr-4 w-[620px] py-3">
-        <div className="ml-2 mt-0 h-[450px]  ">
+        <div className="ml-2 mt-0 h-[450px]">
           <h2 className="mb-0 text-center text-2xl font-semibold text-white">Welcome to the Reor Project</h2>
           <p className="mt-2 text-center text-gray-100">
             Reor is a private AI personal knowledge management tool. Each note will be saved as a markdown file to a
