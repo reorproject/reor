@@ -93,18 +93,16 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor }) => {
     [goToSelection],
   )
 
-  const handleKeyDown = useCallback(
-    (event: any) => {
-      if (event.key === 'Enter') {
-        handleSearch(event, editor?.commands.nextSearchResult)
-      } else if ((event.metaKey || event.ctrlKey) && event.key === 'f' && !showSearch) {
-        toggleSearch()
-      } else if (event.key === 'Escape' && showSearch) {
-        toggleSearch()
-      }
-    },
-    [showSearch, handleSearch, editor?.commands.nextSearchResult, toggleSearch],
-  )
+  const handleMeta = useCallback((event: any) => {
+    if (event.key === 'Enter') {
+      console.log(`going next search!`)
+      handleSearch(event, editor?.commands.nextSearchResult)
+    } else if ((event.metaKey || event.ctrlKey) && event.key === 'f' && !showSearch) {
+      toggleSearch()
+    } else if (event.key === 'Escape' && showSearch) {
+      toggleSearch()
+    }
+  }, [handleSearch, toggleSearch])
 
   const handleClickOutside = useCallback(
     (event: MouseEvent) => {
@@ -116,13 +114,13 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor }) => {
   )
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('keydown', handleMeta)
     window.addEventListener('mousedown', handleClickOutside)
     return () => {
-      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keydown', handleMeta)
       window.removeEventListener('mousedown', handleClickOutside)
     }
-  }, [handleClickOutside, handleKeyDown])
+  }, [handleClickOutside, handleMeta])
 
   const iconProps = {
     size: 18,
@@ -148,7 +146,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor }) => {
         <div className="relative flex-1">
           <input
             value={searchTerm}
-            onKeyDown={handleKeyDown}
             onChange={(event) => handleSearchChange(event.target.value)}
             placeholder="Search..."
             // eslint-disable-next-line jsx-a11y/no-autofocus
@@ -180,7 +177,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor }) => {
           <YStack alignItems="center" gap={3} className="rounded-b-md bg-gray-800 p-2 shadow-lg">
             <input
               value={replaceTerm}
-              onKeyDown={handleKeyDown}
               onChange={(event) => handleReplaceChange(event.target.value)}
               placeholder="Replace..."
               className="w-full bg-transparent p-1 pr-16 text-white focus:outline-none"
