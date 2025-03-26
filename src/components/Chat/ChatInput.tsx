@@ -2,12 +2,12 @@ import React from 'react'
 
 import { PiPaperPlaneRight } from 'react-icons/pi'
 import { TextArea } from 'tamagui'
+import { ToggleButton, ToggleThumb } from '@/components/Editor/ui/src/toggle'
 import { AgentConfig, LoadingState } from '../../lib/llm/types'
 import { Button } from '../ui/button'
 import LLMSelectOrButton from '../Settings/LLMSettings/LLMSelectOrButton'
 import { Label } from '@/components/ui/label'
 import { useThemeManager } from '@/contexts/ThemeContext'
-import { ToggleButton, ToggleThumb } from '../Editor/ui/src/toggle'
 
 interface ChatInputProps {
   userTextFieldInput: string
@@ -85,7 +85,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
           </div>
 
           <div className="flex">
-            <div className="mr-[-8px] flex flex-col items-center mt-[8px]">
+            <div className="mr-[-8px] mt-[8px] flex flex-col items-center">
               <ToggleButton
                 hybrid={!!agentConfig?.dbSearchFilters}
                 onPress={() => handleDbSearchToggle(!agentConfig?.dbSearchFilters)}
@@ -95,10 +95,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
               >
                 <ToggleThumb hybrid={!!agentConfig?.dbSearchFilters} />
               </ToggleButton>
-              <Label 
-                htmlFor="stream-mode"
-                className="mt-0 text-[8px] text-muted-foreground"
-              >
+              <Label htmlFor="stream-mode" className="mt-0 text-[8px] text-muted-foreground">
                 Search notes
               </Label>
             </div>

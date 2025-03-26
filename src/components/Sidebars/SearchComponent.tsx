@@ -155,14 +155,12 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
             aria-label="Search options"
             cursor="pointer"
           >
-            {showSearchOptions ? <FilterX color="$gray10" size={14} /> :
-              <Filter color="$gray10" size={14} />
-            }
+            {showSearchOptions ? <FilterX color="$gray10" size={14} /> : <Filter color="$gray10" size={14} />}
           </XStack>
         </XStack>
 
         {showSearchOptions && (
-          <YStack className="animate-slide-down max-h-[100px]">
+          <YStack className="max-h-[100px] animate-slide-down">
             <YStack
               marginTop="$2"
               borderRadius="$2"

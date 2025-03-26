@@ -9,7 +9,6 @@ import {
   TamaguiThemeTypes,
 } from 'electron/main/electron-store/storeConfig'
 import { SearchProps } from 'electron/main/electron-store/types'
-import { SearchProps } from 'electron/main/electron-store/types'
 import { FileInfoTree, FileInfoWithContent, RenameFileProps, WriteFileProps } from 'electron/main/filesystem/types'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 
