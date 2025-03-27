@@ -1,8 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, PropsWithChildren, FC } from 'react'
 import type { TamaguiThemeTypes } from 'electron/main/electron-store/storeConfig'
-import { TamaguiProvider } from 'tamagui'
+import { TamaguiProvider, useTheme } from 'tamagui'
 import config from '../../tamagui.config'
-import { useTheme } from 'tamagui'
 
 interface ThemeActions {
   toggle: () => void
@@ -42,7 +41,7 @@ const styles = {
     systemGray6: 'rgb(28, 28, 30)',
     systemBlue: 'rgb(10, 132, 255)',
     systemBlueHover: 'rgba(0, 122, 255, 1)',
-  }
+  },
 }
 
 /**
@@ -50,7 +49,7 @@ const styles = {
  * tamagui styles to mantine styles.
  */
 export const MantineStyleProps = () => {
-  const theme= useTheme()
+  const theme = useTheme()
 
   const colors = styles[theme.background.val as keyof typeof styles]
 
@@ -73,7 +72,6 @@ export const MantineStyleProps = () => {
     },
   }
 }
-
 
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 

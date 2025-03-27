@@ -13,7 +13,9 @@ import { ThemeProvider } from './contexts/ThemeContext'
 interface AppProps {}
 
 const App: React.FC<AppProps> = () => {
-  const [userHasConfiguredSettingsForIndexing, setUserHasConfiguredSettingsForIndexing] = useState<boolean | undefined>(undefined)
+  const [userHasConfiguredSettingsForIndexing, setUserHasConfiguredSettingsForIndexing] = useState<boolean | undefined>(
+    undefined,
+  )
 
   const [indexingProgress, setIndexingProgress] = useState<number>(0)
 
@@ -92,7 +94,7 @@ const App: React.FC<AppProps> = () => {
             toastClassName="text-xs" // Added max height and overflow
           />{' '}
         </Portal>
-        {(!userHasConfiguredSettingsForIndexing && userHasConfiguredSettingsForIndexing !== undefined ) && (
+        {!userHasConfiguredSettingsForIndexing && userHasConfiguredSettingsForIndexing !== undefined && (
           <InitialSetupSinglePage readyForIndexing={handleAllInitialSettingsAreReady} />
         )}
         {userHasConfiguredSettingsForIndexing && indexingProgress < 1 && (
