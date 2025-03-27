@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { YStack } from 'tamagui'
-import { EmbedComponent } from '../ui/src'
 import { NodeSelection, TextSelection } from 'prosemirror-state'
+import { EmbedComponent } from '../ui/src'
 import { Block, BlockNoteEditor, useEditorSelectionChange } from '@/lib/blocknote'
 import MultipleNodeSelection from '@/lib/blocknote/core/extensions/DraggableBlocks/MultipleNodeSelection'
 import type { HMBlockSchema } from '../schema'

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, Text, XStack, YStack } from 'tamagui'
+import { Button, YStack } from 'tamagui'
 import { Block, BlockNoteEditor } from '@lib/blocknote'
 import type { HMBlockSchema } from '../schema'
 import { InlineContent } from '@/lib/blocknote/react'
@@ -11,7 +11,6 @@ interface ContainerProps {
   mediaType: string
   styleProps?: Object
   selected: boolean
-  setSelected: any
   assign: any
   children: any
   onHoverIn?: () => void
@@ -27,7 +26,6 @@ const MediaContainer = ({
   mediaType,
   styleProps,
   selected,
-  setSelected,
   assign,
   children,
   onHoverIn,
@@ -37,9 +35,6 @@ const MediaContainer = ({
   // onPress,
 }: ContainerProps) => {
   const [hover, setHover] = useState(false)
-  const [drag, setDrag] = useState(false)
-  const isEmbed = ['embed', 'web-embed'].includes(mediaType)
-
 
   const mediaProps = {
     ...styleProps,

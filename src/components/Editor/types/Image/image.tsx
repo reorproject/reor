@@ -7,7 +7,7 @@ import { DisplayComponentProps, MediaRender, MediaType } from '../media-render'
 import type { HMBlockSchema } from '../../schema'
 import { isValidUrl } from '../utils'
 
-const Display = ({ editor, block, selected, setSelected, assign }: DisplayComponentProps) => {
+const Display = ({ editor, block, selected, assign }: DisplayComponentProps) => {
   const [imageUrl, setImageUrl] = useState(block.props.url)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -148,7 +148,6 @@ const Display = ({ editor, block, selected, setSelected, assign }: DisplayCompon
       block={block}
       mediaType="image"
       selected={selected}
-      setSelected={setSelected}
       assign={assign}
       onHoverIn={() => {
         if (editor.isEditable) {

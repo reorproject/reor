@@ -41,7 +41,7 @@ export function displayVideoType(videoURL: string) {
   )
 }
 
-const Display = ({ editor, block, selected, setSelected, assign }: DisplayComponentProps) => {
+const Display = ({ editor, block, selected, assign }: DisplayComponentProps) => {
   const [videoURL, setVideoURL] = useState(block.props.url)
   const [isLoading, setIsLoading] = useState(true)
 
@@ -183,7 +183,6 @@ const Display = ({ editor, block, selected, setSelected, assign }: DisplayCompon
       block={block}
       mediaType="video"
       selected={selected}
-      setSelected={setSelected}
       assign={assign}
       onHoverIn={() => {
         if (editor.isEditable) {

@@ -11,14 +11,14 @@ export const hmBlockSchema: BlockSchema = {
   // numberedListItem: defaultBlockSchema.numberedListItem,
   image: ImageBlock,
   // @ts-ignore
-  ['code-block']: {
+  'code-block': {
     propSchema: {
       ...defaultProps,
       language: { default: '' },
     },
     // @ts-ignore
     node: CodeBlockLowlight.configure({
-      defaultLanguage: 'plaintext',
+      defaultLanguage: 'Plaintext',
       lowlight: createLowlight(common),
       languageClassPrefix: 'language-',
     }),

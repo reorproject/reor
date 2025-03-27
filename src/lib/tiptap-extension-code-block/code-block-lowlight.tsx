@@ -37,10 +37,7 @@ export const CodeBlockLowlight = CodeBlock.extend<CodeBlockLowlightOptions>({
           )}
           data-content-type={props.node.type.name}
         >
-          <Content
-            props={props}
-            languages={[...this.options.lowlight.listLanguages(), 'html'].sort((a, b) => a.localeCompare(b))}
-          />
+          <Content props={props} />
         </NodeViewWrapper>
       )
     }

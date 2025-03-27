@@ -21,7 +21,7 @@ const UserMessage: React.FC<UserMessageProps> = ({ message }) => {
   }
 
   return (
-    <div className="mb-0 w-full flex flex-col gap-1 text-center">
+    <div className="mb-0 flex w-full flex-col gap-1 text-center">
       <SizableText fontWeight="bold" color="$gray13">
         <ReactMarkdown rehypePlugins={[rehypeRaw]} className={`max-w-[95%] break-words ${getFontSizeClass()}`}>
           {displayMessage}

@@ -281,9 +281,14 @@ NESTED BLOCKS
 
 .blockContent[data-content-type='code-block'] code {
   font-family: 'ui-monospace', 'SFMono-Regular', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
-  font-size: 0.85em;
+  font-size: 0.65em;
   white-space: pre;
   padding: 0;
+}
+
+.blockContent[data-content-type='code-block'] pre {
+  background-color: var(--color4);
+  color: var(--color12)
 }
 
 /* LISTS */
