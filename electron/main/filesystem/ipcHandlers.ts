@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 
-import { ipcMain, dialog } from 'electron'
+import { ipcMain, dialog, app } from 'electron'
 import Store from 'electron-store'
 
 import WindowsManager from '../common/windowManager'
@@ -10,6 +10,11 @@ import { handleFileRename, updateFileInTable } from '../vector-database/tableHel
 
 import { GetFilesInfoTree, createFileRecursive, isHidden, GetFilesInfoListForListOfPaths } from './filesystem'
 import { FileInfoTree, WriteFileProps, RenameFileProps, FileInfoWithContent } from './types'
+import ImageStorage from './storage/ImageStore'
+import VideoStorage from './storage/VideoStore'
+
+const imageStorage = new ImageStorage(app.getPath('userData'))
+const videoStorage = new VideoStorage(app.getPath('userData'))
 
 const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: WindowsManager) => {
   const windowsManager = _windowsManager
@@ -21,16 +26,16 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
     return files
   })
 
-  ipcMain.handle('read-file', async (event, filePath: string): Promise<string> => fs.readFileSync(filePath, 'utf-8'))
+  ipcMain.handle('read-file', async (event, filePath, encoding = 'utf-8') => {
+    const data = await fs.promises.readFile(filePath, encoding)
+    return data
+  })
 
   ipcMain.handle('check-file-exists', async (event, filePath) => {
     try {
-      // Attempt to access the file to check existence
       await fs.promises.access(filePath, fs.constants.F_OK)
-      // If access is successful, return true
       return true
     } catch (error) {
-      // If an error occurs (e.g., file doesn't exist), return false
       return false
     }
   })
@@ -73,6 +78,51 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
       })
     }
     fs.writeFileSync(writeFileProps.filePath, writeFileProps.content, 'utf-8')
+  })
+
+  ipcMain.handle('store-image', async (event, imageData: string, originalName: string, blockID: string) => {
+    try {
+      const localURL = await imageStorage.storeMedia(imageData, originalName, blockID)
+      return localURL
+    } catch (error) {
+      throw new Error(`Failed to store image: ${error}`)
+    }
+  })
+
+  ipcMain.handle('delete-image', async (event, fileName: string) => {
+    try {
+      await imageStorage.deleteMedia(fileName)
+      return true
+    } catch (error) {
+      throw new Error(`Failed to delete image: ${error}`)
+    }
+  })
+
+  ipcMain.handle('get-image', async (event, fileName) => {
+    try {
+      const imageData = await imageStorage.getMedia(fileName)
+      return imageData
+    } catch (error) {
+      throw new Error(`Failed to get image: ${error}`)
+    }
+  })
+
+  ipcMain.handle('store-video', async (event, videoData, originalName, blockId) => {
+    try {
+      const localURL = await videoStorage.storeMedia(videoData, originalName, blockId)
+      return localURL
+    } catch (error) {
+      throw new Error(`Failed to store video: ${error}`)
+    }
+  })
+
+  ipcMain.handle('get-video', async (event, fileName) => {
+    try {
+      const videoData = await videoStorage.getMedia(fileName)
+      return videoData
+    } catch (error) {
+      throw new Error(`Failed to get video: ${error}`)
+    }
   })
 
   ipcMain.handle('is-directory', (event, filepath: string) => fs.statSync(filepath).isDirectory())
@@ -148,6 +198,24 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
       return result.filePaths
     }
     return []
+  })
+
+  // Similar to open-file-dialog except it filters out non-images
+  ipcMain.handle('open-img-file-dialog', async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openFile'],
+      filters: [{ name: 'Images', extensions: ['jpg', 'png', 'gif'] }],
+    })
+    return result.filePaths
+  })
+
+  // Similar to open-file-dialog except it filters out non-videos
+  ipcMain.handle('open-video-file-dialog', async () => {
+    const result = await dialog.showOpenDialog({
+      properties: ['openFile'],
+      filters: [{ name: 'Videos', extensions: ['mp4', 'mkv'] }],
+    })
+    return result.filePaths
   })
 }
 

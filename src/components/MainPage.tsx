@@ -3,6 +3,7 @@
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable no-nested-ternary */
 import React from 'react'
+import { YStack } from 'tamagui'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 
 import '../styles/global.css'
@@ -13,7 +14,7 @@ import IconsSidebar from './Sidebars/IconsSidebar'
 import SidebarManager from './Sidebars/MainSidebar'
 import EmptyPage from './Common/EmptyPage'
 import { ContentProvider, useContentContext } from '../contexts/ContentContext'
-import WritingAssistant from './WritingAssistant/WritingAssistant'
+// import WritingAssistant from './WritingAssistant/WritingAssistant'
 import { ChatProvider, useChatContext } from '@/contexts/ChatContext'
 import { FileProvider, useFileContext } from '@/contexts/FileContext'
 import ModalProvider from '@/contexts/ModalContext'
@@ -40,7 +41,7 @@ const MainContent: React.FC = () => {
           <EditorManager />
         </div>
       )}
-      <WritingAssistant />
+      {/* <WritingAssistant /> */}
     </div>
   )
 }
@@ -54,7 +55,7 @@ const MainPageContent: React.FC = () => {
   const panelGroupKey = `${showChatbot}-${showEditor}-${!!currentlyOpenFilePath}`
 
   return (
-    <div className="relative flex h-screen flex-col overflow-hidden">
+    <YStack className="relative flex h-screen flex-col overflow-hidden">
       <TitleBar />
       <div className="flex min-h-0 flex-1">
         <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700">
@@ -84,7 +85,7 @@ const MainPageContent: React.FC = () => {
                   )}
                   {showChatbot && (
                     <ResizablePanel defaultSize={currentlyOpenFilePath && showEditor ? 35 : 100}>
-                      <div className="relative size-full bg-pink-200">
+                      <div className="relative size-full ">
                         <WindowControls
                           onClose={() => setShowChatbot(false)}
                           onMaximize={() => setShowEditor(false)}
@@ -104,7 +105,7 @@ const MainPageContent: React.FC = () => {
 
         <CommonModals />
       </div>
-    </div>
+    </YStack>
   )
 }
 

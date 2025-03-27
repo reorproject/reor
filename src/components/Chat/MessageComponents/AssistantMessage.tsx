@@ -3,6 +3,7 @@ import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { toast } from 'react-toastify'
 import { ToolCallPart } from 'ai'
 import { FaRegCopy } from 'react-icons/fa'
+import { YStack } from 'tamagui'
 import { Chat, ReorChatMessage } from '../../../lib/llm/types'
 import { extractMessagePartsFromAssistantMessage, findToolResultMatchingToolCall } from '../../../lib/llm/chat'
 import { ToolCallComponent } from './ToolCalls'
@@ -71,18 +72,32 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
             {/* eslint-disable-next-line react/no-array-index-key */}
             <MarkdownRenderer key={index} content={text} />
             <div className="mt-0 flex">
-              <div
-                className="cursor-pointer items-center justify-center rounded px-1 hover:bg-neutral-700"
-                onClick={copyToClipboard}
+              <YStack
+                hoverStyle={{
+                  backgroundColor: '$gray7',
+                }}
+                cursor="pointer"
+                alignItems="center"
+                justifyContent="center"
+                px={4}
+                borderRadius="$1"
+                onPress={copyToClipboard}
               >
                 <FaRegCopy color="gray" size={16} className="text-gray-200" title="Copy" />
-              </div>
-              <div
-                className="cursor-pointer items-center justify-center rounded px-1 hover:bg-neutral-700"
-                onClick={createNewNoteFromMessage}
+              </YStack>
+              <YStack
+                hoverStyle={{
+                  backgroundColor: '$gray7',
+                }}
+                cursor="pointer"
+                alignContent="center"
+                justifyContent="center"
+                px={4}
+                borderRadius="$1"
+                onPress={createNewNoteFromMessage}
               >
                 <HiOutlinePencilAlt color="gray" size={18} className="text-gray-200" title="New Note" />
-              </div>
+              </YStack>
             </div>
           </div>
         ))}

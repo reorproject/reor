@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import '../../styles/chat.css'
+import { Spinner, YStack } from 'tamagui'
 import { Chat, AgentConfig, LoadingState, ReorChatMessage } from '../../lib/llm/types'
 import ChatInput from './ChatInput'
 import UserMessage from './MessageComponents/UserMessage'
 import AssistantMessage from './MessageComponents/AssistantMessage'
 import SystemMessage from './MessageComponents/SystemMessage'
 import ChatSources from './MessageComponents/ChatSources'
-import LoadingDots from '@/lib/animations'
 import useLLMConfigs from '@/lib/hooks/use-llm-configs'
 import useAgentConfig from '@/lib/hooks/use-agent-configs'
 
@@ -129,7 +129,10 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 
           {loadingState === 'waiting-for-first-token' && (
             <div className="mt-4 flex w-full max-w-3xl items-start gap-6 p-2">
-              <LoadingDots />
+              <YStack padding="$3" space="$4" alignItems="center">
+                {/* @ts-expect-error */}
+                <Spinner size="small" color="$blue9" />
+              </YStack>
             </div>
           )}
         </div>

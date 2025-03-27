@@ -2,21 +2,23 @@ import React from 'react'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { DBEntry } from 'electron/main/vector-database/schema'
 import posthog from 'posthog-js'
-import { Card, CardDescription } from '@/components/ui/card'
-import { HoverCard, HoverCardTrigger, HoverCardContent } from '@/components/ui/hover-card'
+import { Card, XStack, ScrollView } from 'tamagui'
 import { useContentContext } from '@/contexts/ContentContext'
+import Tooltip from '@/components/Editor/ui/src/tooltip'
 import MarkdownRenderer from '@/components/Common/MarkdownRenderer'
+import { useThemeManager } from '@/contexts/ThemeContext'
 
 interface ChatSourcesProps {
   contextItems: FileInfoWithContent[] | DBEntry[]
 }
 
-const truncateName = (name: string, maxLength: number) => {
+export const truncateName = (name: string, maxLength: number) => {
   if (name.length <= maxLength) return name
   return `${name.slice(0, maxLength - 3)}...`
 }
 
 const ChatSources: React.FC<ChatSourcesProps> = ({ contextItems }) => {
+  const { state } = useThemeManager()
   const { openContent } = useContentContext()
 
   const isDBEntry = (item: FileInfoWithContent | DBEntry): item is DBEntry => {
@@ -51,25 +53,33 @@ const ChatSources: React.FC<ChatSourcesProps> = ({ contextItems }) => {
     <div>
       <div className="mb-1 text-sm text-muted-foreground">Sources:</div>
 
-      <div className="flex space-x-2 overflow-x-auto p-0 pb-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-gray-800">
+      <div
+        className={`flex space-x-2 overflow-x-auto p-0 pb-1 scrollbar-thin scrollbar-track-transparent 
+          ${state === 'light' ? 'scrollbar-thumb-gray-200' : 'scrollbar-thumb-gray-700'}`}
+      >
         {contextItems.map((contextItem) => (
-          <HoverCard key={getItemPath(contextItem)} openDelay={600}>
-            <HoverCardTrigger>
+          <XStack key={getItemPath(contextItem)}>
+            <Tooltip content={getItemContent(contextItem)} renderMarkdown placement="top">
               <Card
-                className="flex h-10 w-28 shrink-0 cursor-pointer items-center justify-center bg-secondary"
-                onClick={() => handleOpenContent(getItemPath(contextItem))}
+                cursor="pointer"
+                overflow="hidden"
+                borderRadius="$4"
+                borderWidth={1}
+                borderColor="$borderColor"
+                shadowColor="$gray7"
+                shadowRadius="$2"
+                px="$3"
+                hoverStyle={{
+                  shadowRadius: '$4',
+                }}
+                onPress={() => handleOpenContent(getItemPath(contextItem))}
               >
-                <CardDescription className="overflow-hidden break-all px-1 text-center text-xs">
-                  {truncateName(getItemName(contextItem), 20)}
-                </CardDescription>
+                <ScrollView maxHeight="100px">
+                  <MarkdownRenderer content={truncateName(getItemName(contextItem), 20)} />
+                </ScrollView>
               </Card>
-            </HoverCardTrigger>
-            <HoverCardContent className="z-[100] max-h-[60vh] w-80 overflow-y-auto" sideOffset={5}>
-              <div className="">
-                <MarkdownRenderer content={getItemContent(contextItem)} />
-              </div>
-            </HoverCardContent>
-          </HoverCard>
+            </Tooltip>
+          </XStack>
         ))}
       </div>
     </div>

@@ -2,14 +2,17 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import posthog from 'posthog-js'
 import { IoMdArrowRoundBack, IoMdArrowRoundForward } from 'react-icons/io'
-
+import { YStack, XStack, View, Text } from 'tamagui'
 import { removeFileExtension } from '@/lib/file'
 import '../../styles/history.scss'
 import { useFileContext } from '@/contexts/FileContext'
 import { useContentContext } from '@/contexts/ContentContext'
+import { useThemeManager } from '@/contexts/ThemeContext'
 
 const NavigationButtons: React.FC = () => {
   const [showMenu, setShowMenu] = useState<string>('')
+  const { state } = useThemeManager()
+
   const longPressTimer = useRef<NodeJS.Timeout | null>(null)
   const buttonRefBack = useRef<HTMLButtonElement>(null)
   const buttonRefForward = useRef<HTMLButtonElement>(null)
@@ -91,29 +94,30 @@ const NavigationButtons: React.FC = () => {
     return (
       showMenu !== '' &&
       menuChild.length > 0 && (
-        <div
-          ref={ref}
-          // eslint-disable-next-line tailwindcss/no-custom-classname
-          className="history-menu"
-          // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
-          tabIndex={0}
-          style={{
-            left: `${offsetLeft}px`,
-            top: `${offsetTop + offsetHeight}px`,
-          }}
-        >
-          <ul>
+        <View ref={ref} tabIndex={0} position="absolute" left={offsetLeft} top={offsetTop + offsetHeight}>
+          <YStack>
             {menuChild.map((pathOrChatID) => (
-              <li key={pathOrChatID}>
-                <div key={pathOrChatID} onClick={() => goSelected(pathOrChatID)}>
-                  {removeFileExtension(pathOrChatID.replace(/\\/g, '/').split('/').pop() || '')}
-                </div>
-              </li>
+              <XStack
+                key={pathOrChatID}
+                padding="$3"
+                cursor="pointer"
+                hoverStyle={{ backgroundColor: '$backgroundHover' }}
+                onPress={() => goSelected(pathOrChatID)}
+              >
+                <Text>{removeFileExtension(pathOrChatID.replace(/\\/g, '/').split('/').pop() || '')}</Text>
+              </XStack>
             ))}
-          </ul>
-        </div>
+          </YStack>
+        </View>
       )
     )
+  }
+
+  const navigationColor = (canNavigate: boolean) => {
+    if (state === 'light') {
+      return canNavigate ? 'black' : '#e0e0e0' // Slightly less white when disabled
+    }
+    return canNavigate ? '#dedede' : '#727272' // Dark mode colors
   }
 
   return (
@@ -128,7 +132,7 @@ const NavigationButtons: React.FC = () => {
         onClick={goBack}
         disabled={!canGoBack}
         style={{
-          color: !canGoBack ? '#727272' : '#dedede',
+          color: navigationColor(canGoBack),
           cursor: !canGoBack ? 'default' : 'pointer',
         }}
         title="Back"
@@ -146,7 +150,7 @@ const NavigationButtons: React.FC = () => {
         onClick={goForward}
         disabled={!canGoForward}
         style={{
-          color: !canGoForward ? '#727272' : '#dedede',
+          color: navigationColor(canGoForward),
           cursor: !canGoForward ? 'default' : 'pointer',
         }}
         title="Forward"

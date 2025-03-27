@@ -1,7 +1,7 @@
 import React from 'react'
-
 import ReactDOM from 'react-dom/client'
-import * as Sentry from '@sentry/electron/renderer'
+// import * as Sentry from '@sentry/electron/renderer'
+import * as Sentry from '@sentry/react'
 import { toast } from 'react-toastify'
 
 import App from './App'

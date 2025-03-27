@@ -1,0 +1,588 @@
+/*
+BASIC STYLES
+*/
+
+.blockOuter {
+  line-height: 1.5;
+  transition: margin 0.2s;
+  /* padding-left: 0.5em; */
+}
+
+/*Ensures blocks & block content spans editor width*/
+.block {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/*Ensures block content inside React node views spans editor width*/
+.reactNodeViewRenderer {
+  display: flex;
+  flex-grow: 1;
+}
+
+.blockContent {
+  padding: 12px 0 3px 0;
+  flex-grow: 1;
+  transition: font-size 0.2s;
+  max-width: 100%;
+  max-height: 100%;
+  /*
+  because the content elements are display: block
+  we use flex to position them next to list markers
+  */
+}
+
+.blockContent::before {
+  /* content: ""; */
+  transition: all 0.2s;
+  /*margin: 0px;*/
+}
+
+/*
+NESTED BLOCKS
+*/
+
+.blockGroup .blockGroup {
+  margin-left: 1.5em;
+}
+
+.blockGroup .blockGroup > .blockOuter {
+  position: relative;
+}
+
+.blockGroup .blockGroup > .blockOuter:not([data-prev-depth-changed])::before {
+  content: ' ';
+  display: inline;
+  position: absolute;
+  left: -20px;
+  height: 100%;
+  transition: all 0.2s 0.1s;
+}
+
+.blockGroup[data-list-type='Blockquote'] {
+  border-left: 3px solid var(--color8);
+  padding-left: 15px;
+  margin: 1em 0;
+  /* font-style: italic; */
+}
+.blockGroup[data-list-type='ul'],
+.blockGroup[data-list-type='ol'] {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 0;
+}
+
+.blockGroup[data-list-type='ul'] {
+  margin-left: 1em;
+  list-style-type: disc;
+}
+
+.blockGroup[data-list-level='2'] {
+  list-style-type: circle;
+}
+
+.blockGroup[data-list-level='3'] {
+  list-style-type: square;
+}
+
+.blockGroup[data-list-type='ol'] {
+  margin-left: 1em;
+  list-style-type: decimal;
+}
+
+.blockGroup[data-list-type='ul'] > .blockOuter {
+  display: list-item !important;
+}
+
+.blockGroup[data-list-type='ol'] > .blockOuter {
+  display: list-item !important;
+}
+
+.blockGroup[data-list-type='ul'] > span[data-decoration-type='link-dropdown'] {
+  display: list-item !important;
+}
+
+.blockGroup[data-list-type='ol'] > span[data-decoration-type='link-dropdown'] {
+  display: list-item !important;
+}
+
+.inlineContent {
+  font-size: 0.9em;
+  /* font-family:
+    'Inter',
+    'SF Pro Display',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Open Sans',
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif; */
+  font-family: Georgia, serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* [data-theme='light']
+  .blockGroup
+  .blockGroup
+  > .blockOuter:not([data-prev-depth-changed])::before {
+  border-left: 1px solid #cccccc;
+}
+
+[data-theme='dark']
+  .blockGroup
+  .blockGroup
+  > .blockOuter:not([data-prev-depth-changed])::before {
+  border-left: 1px solid #999999;
+} */
+
+.blockGroup .blockGroup > .blockOuter[data-prev-depth-change='-2']::before {
+  height: 0;
+}
+
+/* NESTED BLOCK ANIMATIONS (change in indent) */
+
+/* [data-prev-depth-change='1'] {
+  --x: 1;
+}
+[data-prev-depth-change='2'] {
+  --x: 2;
+}
+[data-prev-depth-change='3'] {
+  --x: 3;
+}
+[data-prev-depth-change='4'] {
+  --x: 4;
+}
+[data-prev-depth-change='5'] {
+  --x: 5;
+}
+
+[data-prev-depth-change='-1'] {
+  --x: -1;
+}
+[data-prev-depth-change='-2'] {
+  --x: -2;
+}
+[data-prev-depth-change='-3'] {
+  --x: -3;
+}
+[data-prev-depth-change='-4'] {
+  --x: -4;
+}
+[data-prev-depth-change='-5'] {
+  --x: -5;
+} */
+
+.blockOuter[data-prev-depth-change] {
+  margin-left: calc(10px * var(--x));
+}
+
+.blockOuter[data-prev-depth-change] .blockOuter[data-prev-depth-change] {
+  margin-left: 0;
+}
+
+/* HEADINGS*/
+[data-level='1'],
+[data-content-type='heading'] {
+  --level: 32px;
+}
+[data-level='2'],
+[data-content-type='heading'] [data-content-type='heading'] {
+  --level: 24px;
+}
+[data-level='3'] {
+  --level: 22px;
+}
+
+[data-level='4'] {
+  --level: 20px;
+}
+
+[data-level='5'] {
+  --level: 18px;
+}
+
+[data-level='6'] {
+  --level: 18px;
+}
+
+/*
+[data-prev-level='1'] {
+  --prev-level: 32px;
+}
+[data-prev-level='2'] {
+  --prev-level: 24px;
+}
+[data-prev-level='3'] {
+  --prev-level: 22px;
+}
+
+[data-prev-level='4'] {
+  --prev-level: 20px;
+}
+
+[data-prev-level='4'] {
+  --prev-level: 18px;
+}
+
+[data-prev-level='4'] {
+  --prev-level: 18px;
+} */
+
+/* .blockOuter[data-prev-type='heading'] > .block .blockContent {
+  font-size: var(--prev-level);
+  font-weight: bold;
+} */
+
+[data-content-type='paragraph'] {
+  font-size: 1rem;
+}
+
+.blockOuter:not([data-prev-type]) > .block .blockContent[data-content-type='heading'] {
+  font-size: var(--level);
+  line-height: 1.2;
+  /* margin-top: 0.6em; */
+  font-weight: bold;
+}
+
+/* IMAGE PLACEHOLDER */
+.blockContent[data-content-type='imagePlaceholder'] {
+  background-color: var(--color4);
+  border-color: var(--color4);
+  border-width: 2px;
+  border-radius: 5px;
+  overflow: 'hidden';
+  padding: 16px;
+  margin-top: 12px;
+  outline-width: 0;
+}
+
+.blockContent {
+  margin-top: 4px;
+}
+
+/* CODE BLOCK */
+.blockContent[data-content-type='code-block'] {
+  /* background-color: var(--color4); */
+  border-radius: 6px;
+  overflow: auto;
+  /* margin-left: -16px;
+  margin-right: -16px; */
+  position: 'relative';
+}
+
+.blockContent[data-content-type='code-block'] code {
+  font-family: 'ui-monospace', 'SFMono-Regular', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
+  font-size: 0.65em;
+  white-space: pre;
+  padding: 0;
+}
+
+.blockContent[data-content-type='code-block'] pre {
+  background-color: var(--color4);
+  color: var(--color12)
+}
+
+/* LISTS */
+
+.blockContent::before {
+  margin-right: 0;
+  content: '';
+}
+
+/* Ordered */
+[data-content-type='numberedListItem'] {
+  --index: attr(data-index);
+}
+
+[data-prev-type='numberedListItem'] {
+  --prev-index: attr(data-prev-index);
+}
+
+.blockOuter[data-prev-type='numberedListItem']:not([data-prev-index='none']) > .block > .blockContent::before {
+  margin-right: 1.2em;
+  content: var(--prev-index) '.';
+}
+
+.blockOuter:not([data-prev-type]) > .block > .blockContent[data-content-type='numberedListItem']::before {
+  margin-right: 1.2em;
+  content: var(--index) '.';
+}
+
+/* Unordered */
+/* No list nesting */
+.blockOuter[data-prev-type='bulletListItem'] > .block > .blockContent::before {
+  margin-right: 1.2em;
+  content: '•';
+}
+
+.blockOuter:not([data-prev-type]) > .block > .blockContent[data-content-type='bulletListItem']::before {
+  margin-right: 1.2em;
+  content: '•';
+}
+
+/* 1 level of list nesting */
+[data-content-type='bulletListItem']
+  ~ .blockGroup
+  > .blockOuter[data-prev-type='bulletListItem']
+  > .block
+  > .blockContent::before {
+  margin-right: 1.2em;
+  content: '◦';
+}
+
+[data-content-type='bulletListItem']
+  ~ .blockGroup
+  > .blockOuter:not([data-prev-type])
+  > .block
+  > .blockContent[data-content-type='bulletListItem']::before {
+  margin-right: 1.2em;
+  content: '◦';
+}
+
+/* 2 levels of list nesting */
+[data-content-type='bulletListItem']
+  ~ .blockGroup
+  [data-content-type='bulletListItem']
+  ~ .blockGroup
+  > .blockOuter[data-prev-type='bulletListItem']
+  > .block
+  > .blockContent::before {
+  margin-right: 1.2em;
+  content: '▪';
+}
+
+[data-content-type='bulletListItem']
+  ~ .blockGroup
+  [data-content-type='bulletListItem']
+  ~ .blockGroup
+  > .blockOuter:not([data-prev-type])
+  > .block
+  > .blockContent[data-content-type='bulletListItem']::before {
+  margin-right: 1.2em;
+  content: '▪';
+}
+
+/* PLACEHOLDERS*/
+
+.isEmpty .inlineContent:before,
+.isFilter .inlineContent:before {
+  /*float: left; */
+  content: '';
+  pointer-events: none;
+  height: 0;
+  /* width: 0; */
+  position: absolute;
+  font-style: italic;
+}
+
+.isEmpty .inlineContent:before,
+.isFilter .inlineContent:before {
+  opacity: 0.5;
+}
+
+/* [data-theme='dark'] .isEmpty .inlineContent:before,
+.isFilter .inlineContent:before {
+  color: #999999;
+} */
+
+/* TODO: would be nicer if defined from code */
+
+.blockContent.isEmpty.hasAnchor .inlineContent:before {
+  font-size: 0.9em;
+  font-family:
+    'Inter',
+    'SF Pro Display',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Open Sans',
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  content: "Enter text or type '/' for commands";
+}
+
+.blockContent.isFilter.hasAnchor .inlineContent:before {
+  font-family:
+    'Inter',
+    'SF Pro Display',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Open Sans',
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  content: 'Type to filter';
+}
+
+.blockContent[data-content-type='heading'].isEmpty.hasAnchor .inlineContent:before {
+  font-family:
+    'Inter',
+    'SF Pro Display',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Open Sans',
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  content: 'Heading';
+}
+
+.blockContent[data-content-type='code-block'].isEmpty.hasAnchor .inlineContent:before {
+  font-family:
+    'Inter',
+    'SF Pro Display',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Open Sans',
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  content: 'Code Block';
+  line-height: 1.5;
+}
+
+.isEmpty.hasAnchor .blockContent[data-content-type='image'] .inlineContent:before {
+  content: 'Image caption';
+}
+
+[data-content-type='heading'] {
+  font-family:
+    'Inter',
+    'SF Pro Display',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Open Sans',
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+}
+
+/* TEXT COLORS */
+[data-text-color='gray'] {
+  color: #9b9a97;
+}
+
+[data-text-color='brown'] {
+  color: #64473a;
+}
+
+[data-text-color='red'] {
+  color: #e03e3e;
+}
+
+[data-text-color='orange'] {
+  color: #d9730d;
+}
+
+[data-text-color='yellow'] {
+  color: #dfab01;
+}
+
+[data-text-color='green'] {
+  color: #4d6461;
+}
+
+[data-text-color='blue'] {
+  color: #0b6e99;
+}
+
+[data-text-color='purple'] {
+  color: #6940a5;
+}
+
+[data-text-color='pink'] {
+  color: #ad1a72;
+}
+
+/* BACKGROUND COLORS */
+[data-background-color='gray'] {
+  background-color: #ebeced;
+}
+
+[data-background-color='brown'] {
+  background-color: #e9e5e3;
+}
+
+[data-background-color='red'] {
+  background-color: #fbe4e4;
+}
+
+[data-background-color='orange'] {
+  background-color: #faebdd;
+}
+
+[data-background-color='yellow'] {
+  background-color: #fbf3db;
+}
+
+[data-background-color='green'] {
+  background-color: #ddedea;
+}
+
+[data-background-color='blue'] {
+  background-color: #ddebf1;
+}
+
+[data-background-color='purple'] {
+  background-color: #eae4f2;
+}
+
+[data-background-color='pink'] {
+  background-color: #f4dfeb;
+}
+
+/* TEXT ALIGNMENT */
+[data-text-alignment='left'] {
+  text-align: left;
+}
+
+[data-text-alignment='center'] {
+  text-align: center;
+}
+
+[data-text-alignment='right'] {
+  text-align: right;
+}
+
+[data-text-alignment='justify'] {
+  text-align: justify;
+}

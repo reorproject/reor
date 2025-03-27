@@ -1,67 +1,66 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef } from 'react'
 import ReactDOM from 'react-dom'
+import { YStack, XStack } from '@tamagui/stacks'
+import { X } from '@tamagui/lucide-icons'
 
 interface ModalProps {
   isOpen: boolean
   onClose: () => void
   children: React.ReactNode
   hideCloseButton?: boolean
-  tailwindStylesOnBackground?: string
 }
 
-const ReorModal: React.FC<ModalProps> = ({
-  isOpen,
-  onClose,
-  children,
-  hideCloseButton,
-  tailwindStylesOnBackground,
-}) => {
+const ReorModal: React.FC<ModalProps> = ({ isOpen, onClose, children, hideCloseButton }) => {
   const modalRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const handleOffClick = (event: MouseEvent) => {
-      const isBackdropClick = event.target === document.querySelector(`.${tailwindStylesOnBackground}`)
-
-      if (modalRef.current && !modalRef.current.contains(event.target as Node) && isBackdropClick) {
-        onClose()
-      }
-    }
-    document.addEventListener('mousedown', handleOffClick)
-    return () => {
-      document.removeEventListener('mousedown', handleOffClick)
-    }
-  }, [onClose, tailwindStylesOnBackground])
 
   if (!isOpen) {
     return null
   }
 
+  const handleBackdropClick = (event: React.MouseEvent) => {
+    if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+      onClose()
+    }
+  }
+
   const modalContent = (
-    <div
-      className={`fixed inset-0 flex h-screen w-screen items-center justify-center bg-black/40 ${tailwindStylesOnBackground}`}
-      style={{ zIndex: 9999 }}
+    <YStack
+      position="fixed"
+      top={0}
+      left={0}
+      right={0}
+      bottom={0}
+      alignItems="center"
+      justifyContent="center"
+      backgroundColor="rgba(0, 0, 0, 0.4)"
+      height="100vh"
+      onClick={handleBackdropClick}
+      zIndex={9999}
     >
-      <div
+      <YStack
         ref={modalRef}
-        className="relative flex flex-col items-center justify-center rounded-lg border border-solid border-gray-700 bg-dark-gray-c-three shadow-xl"
+        borderRadius="$4"
+        borderWidth={1}
+        borderColor="$gray7"
+        backgroundColor="$background"
+        shadowColor="$shadowColor"
+        shadowOpacity={0.5}
+        shadowRadius={10}
+        padding="$4"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="z-50 h-0 w-full items-end">
-          {!hideCloseButton && (
-            <div className="m-2 flex justify-end">
-              <button
-                onClick={onClose}
-                className="flex size-5 cursor-pointer items-center justify-center border-none bg-transparent text-gray-600 hover:bg-slate-700/40"
-                type="button"
-              >
-                <span className="text-3xl leading-none">&times;</span>
-              </button>
-            </div>
-          )}
-        </div>
+        {!hideCloseButton && (
+          <XStack position="absolute" top={10} right={15}>
+            <button type="button" onClick={onClose} style={{ background: 'transparent', border: 'none' }}>
+              <span style={{ fontSize: 24, cursor: 'pointer' }}>
+                <X size={18} />
+              </span>
+            </button>
+          </XStack>
+        )}
         {children}
-      </div>
-    </div>
+      </YStack>
+    </YStack>
   )
 
   return ReactDOM.createPortal(modalContent, document.body)

@@ -2,7 +2,7 @@ name: Release script
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
 jobs:
   build_and_package:
     runs-on: ${{ matrix.os }}
@@ -21,7 +21,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20"
+          node-version: '20'
       - name: Cache npm dependencies
         uses: actions/cache@v3
         with:
@@ -48,7 +48,7 @@ jobs:
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_OPTIONS: "--max-old-space-size=8192"
+          NODE_OPTIONS: '--max-old-space-size=8192'
         run: |
           npm run build
       - name: Notarize macOS build
@@ -60,7 +60,7 @@ jobs:
       - name: Build for non-macOS
         if: matrix.os != 'macos-13' && matrix.os != 'macos-latest'
         env:
-          NODE_OPTIONS: "--max-old-space-size=8192"
+          NODE_OPTIONS: '--max-old-space-size=8192'
         run: |
           npm run build
       - name: Set version as env
