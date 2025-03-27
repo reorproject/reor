@@ -13,7 +13,7 @@ import { ThemeProvider } from './contexts/ThemeContext'
 interface AppProps {}
 
 const App: React.FC<AppProps> = () => {
-  const [userHasConfiguredSettingsForIndexing, setUserHasConfiguredSettingsForIndexing] = useState<boolean>(false)
+  const [userHasConfiguredSettingsForIndexing, setUserHasConfiguredSettingsForIndexing] = useState<boolean | undefined>(undefined)
 
   const [indexingProgress, setIndexingProgress] = useState<number>(0)
 
@@ -63,8 +63,9 @@ const App: React.FC<AppProps> = () => {
         window.electronStore.getVaultDirectoryForWindow(),
         window.electronStore.getDefaultEmbeddingModel(),
       ])
+      const configuedInitialSettings = !!(initialDirectory && defaultEmbedFunc)
+      setUserHasConfiguredSettingsForIndexing(configuedInitialSettings)
       if (initialDirectory && defaultEmbedFunc) {
-        setUserHasConfiguredSettingsForIndexing(true)
         window.database.indexFilesInDirectory()
       }
     }
@@ -73,7 +74,7 @@ const App: React.FC<AppProps> = () => {
   }, [])
 
   const handleAllInitialSettingsAreReady = () => {
-    setUserHasConfiguredSettingsForIndexing(true)
+    // setUserHasConfiguredSettingsForIndexing(true)
     window.database.indexFilesInDirectory()
   }
 
@@ -91,7 +92,7 @@ const App: React.FC<AppProps> = () => {
             toastClassName="text-xs" // Added max height and overflow
           />{' '}
         </Portal>
-        {!userHasConfiguredSettingsForIndexing && (
+        {(!userHasConfiguredSettingsForIndexing && userHasConfiguredSettingsForIndexing !== undefined ) && (
           <InitialSetupSinglePage readyForIndexing={handleAllInitialSettingsAreReady} />
         )}
         {userHasConfiguredSettingsForIndexing && indexingProgress < 1 && (
