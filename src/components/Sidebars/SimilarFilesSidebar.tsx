@@ -102,8 +102,8 @@ const SimilarFilesSidebarComponent: React.FC = () => {
       <SimilarEntriesComponent
         similarEntries={similarEntries}
         setSimilarEntries={setSimilarEntries}
-        onSelect={(path) => {
-          openTabContent(path)
+        onSelect={(path, content) => {
+          openTabContent(path, undefined, false, content)
           posthog.capture('open_file_from_related_notes')
         }}
         updateSimilarEntries={updateSimilarEntries}

@@ -8,7 +8,12 @@ import { getFilesInDirectory, getNextAvailableFileNameGivenBaseName } from '@/li
 interface ContentContextType {
   showEditor: boolean
   setShowEditor: (showEditor: boolean) => void
-  openContent: (pathOrChatID: string, optionalContentToWriteOnCreate?: string, dontUpdateChatHistory?: boolean) => void
+  openContent: (
+    pathOrChatID: string,
+    optionalContentToWriteOnCreate?: string,
+    dontUpdateChatHistory?: boolean,
+    contentToScrollTo?: string,
+  ) => void
   currentOpenFileOrChatID: string | null
   createUntitledNote: (parentFileOrDirectory?: string) => void
 }
@@ -40,14 +45,19 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
   } = useFileContext()
 
   const openContent = React.useCallback(
-    async (pathOrChatID: string, optionalContentToWriteOnCreate?: string, dontUpdateChatHistory?: boolean) => {
+    async (
+      pathOrChatID: string,
+      optionalContentToWriteOnCreate?: string,
+      dontUpdateChatHistory?: boolean,
+      contentToScrollTo?: string,
+    ) => {
       if (!pathOrChatID) return
       const chatMetadata = allChatsMetadata.find((chat) => chat.id === pathOrChatID)
       if (chatMetadata) {
         openNewChat(pathOrChatID)
       } else {
         setShowEditor(true)
-        openOrCreateFile(pathOrChatID, optionalContentToWriteOnCreate)
+        openOrCreateFile(pathOrChatID, optionalContentToWriteOnCreate, contentToScrollTo)
       }
       setCurrentOpenFileOrChatID(pathOrChatID)
       if (!dontUpdateChatHistory) {
