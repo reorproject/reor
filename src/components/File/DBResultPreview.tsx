@@ -37,7 +37,7 @@ export const DBResultPreview: React.FC<DBResultPreviewProps> = ({ dbResult: entr
       width="100%"
       cursor="pointer"
       overflow='hidden'
-      backgroundColor='$background'
+      backgroundColor='$gray3'
       hoverStyle={{
         backgroundColor: '$gray3'
       }}
@@ -50,12 +50,12 @@ export const DBResultPreview: React.FC<DBResultPreviewProps> = ({ dbResult: entr
     >
       <Stack
         fontSize="sm"
-        color="$colorLight"
         width="100%"
+        color="$gray11"
       >
         <MarkdownRenderer content={entry.content} />
       </Stack>
-      <div className="mt-2 text-xs text-gray-400">
+      <div className="mt-2 text-xs">
         {fileName && <span className="text-xs text-gray-400">{fileName} </span>} | Similarity:{' '}
         {/* eslint-disable-next-line no-underscore-dangle */}
         {cosineDistanceToPercentage(entry._distance)}% |{' '}

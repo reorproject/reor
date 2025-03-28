@@ -2,7 +2,7 @@ import React from 'react'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { DBEntry } from 'electron/main/vector-database/schema'
 import posthog from 'posthog-js'
-import { Card, XStack, ScrollView } from 'tamagui'
+import { Card, XStack, ScrollView, Stack } from 'tamagui'
 import { useContentContext } from '@/contexts/ContentContext'
 import Tooltip from '@/components/Editor/ui/src/tooltip'
 import MarkdownRenderer from '@/components/Common/MarkdownRenderer'
@@ -72,6 +72,7 @@ const ChatSources: React.FC<ChatSourcesProps> = ({ contextItems }) => {
                 hoverStyle={{
                   shadowRadius: '$4',
                 }}
+                width="100%"
                 onPress={() => handleOpenContent(getItemPath(contextItem))}
               >
                 <ScrollView maxHeight="100px">

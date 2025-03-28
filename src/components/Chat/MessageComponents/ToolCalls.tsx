@@ -8,6 +8,7 @@ import { findToolResultMatchingToolCall } from '../../../lib/llm/chat'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import MarkdownRenderer from '@/components/Common/MarkdownRenderer'
+import { Stack } from 'tamagui'
 
 interface ToolCallComponentProps {
   toolCallPart: ToolCallPart
@@ -83,17 +84,17 @@ const DefaultToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existi
         <div className="border-t border-border px-3 py-2">
           <h5 className="mb-1 text-xs font-medium text-muted-foreground">Arguments:</h5>
           {Object.entries(toolCallPart.args as Record<string, unknown>).map(([key, value]) => (
-            <div key={key} className="text-xs">
+            <Stack key={key} className="text-xs" color="$gray11">
               <span className="font-medium text-secondary-foreground">{key}:</span>{' '}
               <MarkdownRenderer content={renderValue(value)} />
-            </div>
+            </Stack>
           ))}
         </div>
         {existingToolResult && (
-          <div className="border-t border-border px-3 py-2">
+          <Stack className="border-t border-border px-3 py-2" color="$gray11">
             <h5 className="mb-1 text-xs font-medium text-muted-foreground">Result:</h5>
             <MarkdownRenderer content={renderValue(existingToolResult.content[0].result)} />
-          </div>
+          </Stack>
         )}
         {!existingToolResult && (
           <div className="border-t border-border px-3 py-2">

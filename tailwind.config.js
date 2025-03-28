@@ -87,10 +87,12 @@ export default {
           '0%': {
             transform: 'translateX(100%)',
             opacity: '0',
+            width: '0',
           },
           '100%': {
             transform: 'translateX(0)',
             opacity: '1',
+            width: '100%',
           },
         },
         bounce: {
@@ -111,7 +113,7 @@ export default {
         }
       },
       animation: {
-        'slide-in': 'slideIn 0.3s ease-out',
+        'slide-in': 'slideIn 0.5s ease-out',
         bounce: 'bounce 1.4s infinite both',
         'shift-in-down': 'shiftInDown 0.15s ease-in-out',
         'slide-down': 'slideDown 0.30s ease-in-out forwards',    

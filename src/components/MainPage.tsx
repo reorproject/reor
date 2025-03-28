@@ -54,6 +54,12 @@ const MainPageContent: React.FC = () => {
   const { getShortcutDescription } = useAppShortcuts()
   const [showPanel, setShowPanel] = useState(false)
 
+  const [panelSizes, setPanelSizes] = useState({
+    mainContent: 65,
+    chatComponent: 35,
+    similarFilesSidebar: 200,
+  })
+
   const panelGroupKey = `${showChatbot}-${showEditor}-${!!currentlyOpenFilePath}`
 
   return (
@@ -79,14 +85,21 @@ const MainPageContent: React.FC = () => {
                 <ResizablePanelGroup direction="horizontal" className="size-full" key={panelGroupKey}>
                   {currentlyOpenFilePath && showEditor && (
                     <>
-                      <ResizablePanel defaultSize={65}>
+                      <ResizablePanel 
+                        defaultSize={panelSizes.mainContent}
+                        onResize={(size) => setPanelSizes((prev) => ({...prev, mainContent: size}))}
+                      >
                         <MainContent />
                       </ResizablePanel>
                       <ResizableHandle />
                     </>
                   )}
-                  {showChatbot && (
-                    <ResizablePanel defaultSize={currentlyOpenFilePath && showEditor ? 35 : 100}>
+                  {(showChatbot && !showPanel) && (
+                    <ResizablePanel
+                      className='animate-slide-in' 
+                      defaultSize={panelSizes.chatComponent}
+                      onResize={(size) => setPanelSizes((prev) => ({...prev, chatComponent: size}))}
+                    >
                       <div className="relative size-full ">
                         <WindowControls
                           onClose={() => setShowChatbot(false)}
@@ -97,8 +110,12 @@ const MainPageContent: React.FC = () => {
                       </div>
                     </ResizablePanel>
                   )}
-                  {showPanel && (
-                    <ResizablePanel>
+                  {(showPanel && !showChatbot) && (
+                    <ResizablePanel
+                      className='animate-slide-in' 
+                      defaultSize={panelSizes.similarFilesSidebar}
+                      onResize={(size) => setPanelSizes((prev) => ({...prev, similarFilesSidebar: size}))}
+                    >
                         <SimilarFilesSidebarComponent />
                     </ResizablePanel>
                   )}

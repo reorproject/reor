@@ -1,7 +1,6 @@
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
-import { useTheme } from 'tamagui'
 
 interface MarkdownRendererProps {
   content: string
@@ -11,7 +10,7 @@ interface MarkdownRendererProps {
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
   return (
     <ReactMarkdown
-      className={`overflow-hidden whitespace-normal break-words text-sm leading-relaxed text-muted-foreground`}
+      className={`overflow-hidden whitespace-normal break-words text-sm leading-relaxed`}
       rehypePlugins={[rehypeRaw]}
     >
       {content}

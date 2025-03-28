@@ -8,7 +8,7 @@ import '../../../styles/global.css'
 // import ResizableComponent from '@/components/Common/ResizableComponent'
 import { DBResultPreview } from '@/components/File/DBResultPreview'
 import { useFileContext } from '@/contexts/FileContext'
-import { ScrollView, Stack, YStack, XStack, Text, Button, AnimatePresence } from 'tamagui'
+import { ScrollView, Stack, YStack, XStack, Text, Button } from 'tamagui'
 import Spinner from '@/components/ui/Spinner'
 
 interface SimilarEntriesComponentProps {
@@ -56,58 +56,53 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
   }
 
   return (
-    <AnimatePresence>
-      <ScrollView maxHeight='100%'>
-        <Stack 
-          flex={1} 
-          width="100%"
-          enterStyle={{ opacity: 0, translateX: -200 }}
-          exitStyle={{ opacity: 0, translateX: -200 }}
-          style={{ opacity: 1, translateX: 0}}
+    <ScrollView maxHeight='100%' backgroundColor="$gray3">
+      <Stack 
+        flex={1} 
+      >
+        <YStack
+          borderLeftWidth={0.5}
+          borderColor="$neutral700"
+          backgroundColor="$neutral800"
         >
-          <YStack
-            borderLeftWidth={0.5}
-            borderColor="$neutral700"
-            backgroundColor="$neutral800"
-          >
-            {/* Header */}
-            <XStack alignItems="center" paddingHorizontal="$4" paddingVertical="$2" backgroundColor="$neutral800">
-              <XStack flex={1} />
-              <XStack alignItems="center" justifyContent="center">
-                <PiGraph size={16} color="$gray300" />
-                <Text marginLeft="$1" fontSize="$2" color="$gray300">
-                  {titleText}
-                </Text>
-              </XStack>
-              <XStack flex={1} justifyContent="flex-end">
-                {updateSimilarEntries && setSimilarEntries && (
-                  <Button
-                    onPress={async () => {
-                      setSimilarEntries([]) // simulate refresh
-                      await saveCurrentlyOpenedFile()
-                      updateSimilarEntries()
-                    }}
-                    size="$2"
-                    backgroundColor="transparent"
-                    borderWidth={0}
-                    padding={0}
-                  >
-                    {isLoadingSimilarEntries 
-                      ? <Spinner size="small" />
-                      : <FiRefreshCw color="$gray300" />}
-                  </Button>
-                )}
-              </XStack>
+          {/* Header */}
+          <XStack alignItems="center" paddingHorizontal="$4" paddingVertical="$2" backgroundColor="$neutral800">
+            <XStack flex={1} />
+            <XStack alignItems="center" justifyContent="center">
+              <PiGraph size={16} color="$gray300" />
+              <Text marginLeft="$1" fontSize="$2" color="$gray300">
+                {titleText}
+              </Text>
             </XStack>
+            <XStack flex={1} justifyContent="flex-end">
+              {updateSimilarEntries && setSimilarEntries && (
+                <Button
+                  onPress={async () => {
+                    setSimilarEntries([]) // simulate refresh
+                    await saveCurrentlyOpenedFile()
+                    updateSimilarEntries()
+                  }}
+                  size="$2"
+                  backgroundColor="transparent"
+                  borderWidth={0}
+                  padding={0}
+                >
+                  {isLoadingSimilarEntries 
+                    ? <Spinner size="small" />
+                    : <FiRefreshCw color="$gray300" 
+                  />}
+                </Button>
+              )}
+            </XStack>
+          </XStack>
 
-            {/* Content */}
-            <YStack>
-              {content}
-            </YStack>
+          {/* Content */}
+          <YStack>
+            {content}
           </YStack>
-        </Stack>
-      </ScrollView>
-    </AnimatePresence>
+        </YStack>
+      </Stack>
+    </ScrollView>
   )
 }
 

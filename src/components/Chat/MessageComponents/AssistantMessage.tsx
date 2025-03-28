@@ -11,6 +11,7 @@ import { useContentContext } from '@/contexts/ContentContext'
 import { useChatContext } from '@/contexts/ChatContext'
 import MarkdownRenderer from '@/components/Common/MarkdownRenderer'
 import { makeAndAddToolResultToMessages } from '../../../lib/llm/tools/utils'
+import { Stack, XStack } from 'tamagui'
 
 interface AssistantMessageProps {
   message: ReorChatMessage
@@ -68,9 +69,11 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
     return (
       <>
         {textParts.map((text, index) => (
-          <div>
+          <Stack>
             {/* eslint-disable-next-line react/no-array-index-key */}
-            <MarkdownRenderer key={index} content={text} />
+            <Stack color="$color11">
+              <MarkdownRenderer key={index} content={text} />
+            </Stack>
             <div className="mt-0 flex">
               <YStack
                 hoverStyle={{
@@ -99,7 +102,7 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
                 <HiOutlinePencilAlt color="gray" size={18} className="text-gray-200" title="New Note" />
               </YStack>
             </div>
-          </div>
+          </Stack>
         ))}
         {toolCalls.map((toolCall) => (
           <ToolCallComponent
@@ -114,11 +117,12 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
   }
 
   return (
-    <div className="mb-7 flex w-full text-[0.94rem] leading-[1.2rem] text-[rgb(210,210,210)] ">
-      <div className="w-full flex-col gap-1">
-        <div className="flex grow flex-col ">{renderContent()}</div>
-      </div>
-    </div>
+    <Stack 
+      marginBottom={7}
+      width="100%"
+    >
+      <YStack flex={1}>{renderContent()}</YStack>
+    </Stack>
   )
 }
 
