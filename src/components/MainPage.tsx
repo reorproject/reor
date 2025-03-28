@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable no-nested-ternary */
-import React from 'react'
+import React, { useState } from 'react'
 import { YStack } from 'tamagui'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 
@@ -21,6 +21,7 @@ import ModalProvider from '@/contexts/ModalContext'
 import CommonModals from './Common/CommonModals'
 import useAppShortcuts from '../lib/shortcuts/use-shortcut'
 import WindowControls from './ui/window-controls'
+import SimilarFilesSidebarComponent from '@/components/Sidebars/SimilarFilesSidebar'
 
 // Moved MainContent outside as a separate component
 const MainContent: React.FC = () => {
@@ -51,12 +52,13 @@ const MainPageContent: React.FC = () => {
   const { showChatbot, setShowChatbot, openNewChat } = useChatContext()
   const { setShowEditor, showEditor } = useContentContext()
   const { getShortcutDescription } = useAppShortcuts()
+  const [showPanel, setShowPanel] = useState(false)
 
   const panelGroupKey = `${showChatbot}-${showEditor}-${!!currentlyOpenFilePath}`
 
   return (
     <YStack className="relative flex h-screen flex-col overflow-hidden">
-      <TitleBar />
+      <TitleBar showPanel={showPanel} setShowPanel={setShowPanel} />
       <div className="flex min-h-0 flex-1">
         <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700">
           <IconsSidebar getShortcutDescription={getShortcutDescription} />
@@ -93,6 +95,11 @@ const MainPageContent: React.FC = () => {
                         />
                         <ChatComponent />
                       </div>
+                    </ResizablePanel>
+                  )}
+                  {showPanel && (
+                    <ResizablePanel>
+                        <SimilarFilesSidebarComponent />
                     </ResizablePanel>
                   )}
                 </ResizablePanelGroup>

@@ -1,7 +1,7 @@
 import React from 'react'
 import { formatDistanceToNow } from 'date-fns'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
-import { Card, Text, YStack } from 'tamagui'
+import { Card, Text, YStack, Stack } from 'tamagui'
 import MarkdownRenderer from '../Common/MarkdownRenderer'
 
 const cosineDistanceToPercentage = (similarity: number) => {
@@ -32,20 +32,36 @@ export const DBResultPreview: React.FC<DBResultPreviewProps> = ({ dbResult: entr
   const fileName = getFileName(entry.notepath)
 
   return (
-    <div
-      className="mt-0 max-w-full cursor-pointer overflow-hidden rounded border-[0.1px] border-solid border-gray-600 bg-neutral-800 px-2 py-1 text-slate-300 shadow-md transition-transform duration-300 hover:bg-neutral-700 hover:shadow-lg"
+    <Stack
+      mt={0}
+      width="100%"
+      cursor="pointer"
+      overflow='hidden'
+      backgroundColor='$background'
+      hoverStyle={{
+        backgroundColor: '$gray3'
+      }}
+      borderRadius='$1'
+      borderWidth={0.1}
+      borderColor='$gray10'
+      paddingHorizontal='$2'
+      paddingVertical='$1'
       onClick={() => onSelect(entry.notepath)}
     >
-      <div className="text-sm text-gray-200">
+      <Stack
+        fontSize="sm"
+        color="$colorLight"
+        width="100%"
+      >
         <MarkdownRenderer content={entry.content} />
-      </div>
+      </Stack>
       <div className="mt-2 text-xs text-gray-400">
         {fileName && <span className="text-xs text-gray-400">{fileName} </span>} | Similarity:{' '}
         {/* eslint-disable-next-line no-underscore-dangle */}
         {cosineDistanceToPercentage(entry._distance)}% |{' '}
         {modified && <span className="text-xs text-gray-400">Modified {modified}</span>}
       </div>
-    </div>
+    </Stack>
   )
 }
 
@@ -59,20 +75,6 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({ dbResult: entr
   const fileName = getFileName(entry.notepath)
 
   return (
-    // <div
-    //   className="mb-4 mt-0 max-w-full cursor-pointer overflow-hidden rounded border border-gray-600 bg-neutral-800 p-2 shadow-md transition-transform duration-300 hover:bg-neutral-700 hover:shadow-lg"
-    //   onClick={() => onSelect(entry.notepath)}
-    // >
-    //   <div className="text-sm text-gray-200">
-    //     <MarkdownRenderer content={entry.content} />
-    //   </div>
-    //   <div className="mt-2 text-xs text-gray-400">
-    //     {fileName && <span className="text-xs text-gray-400">{fileName} </span>} | Similarity:{' '}
-    //     {/* eslint-disable-next-line no-underscore-dangle */}
-    //     {cosineDistanceToPercentage(entry._distance)}% |{' '}
-    //     {modified && <span className="text-xs text-gray-400">Modified {modified}</span>}
-    //   </div>
-    // </div>
     <Card
       marginBottom="$4"
       marginTop="$0"

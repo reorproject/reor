@@ -89,7 +89,7 @@ const SimilarFilesSidebarComponent: React.FC = () => {
 
   return (
     <>
-      <HighlightButton
+      {/* <HighlightButton
         highlightData={highlightData}
         onClick={async () => {
           setSimilarEntries([])
@@ -98,7 +98,7 @@ const SimilarFilesSidebarComponent: React.FC = () => {
           const searchResults: DBQueryResult[] = await window.database.search(highlightData.text, 20, filterString)
           setSimilarEntries(searchResults)
         }}
-      />{' '}
+      />{' '} */}
       <SimilarEntriesComponent
         similarEntries={similarEntries}
         setSimilarEntries={setSimilarEntries}

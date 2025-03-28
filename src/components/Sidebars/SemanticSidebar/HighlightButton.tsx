@@ -5,6 +5,7 @@ import { PiGraph } from 'react-icons/pi'
 
 import '../../../styles/global.css'
 import { HighlightData } from '@/components/Editor/HighlightExtension'
+import { Button } from 'tamagui'
 
 interface HighlightButtonProps {
   highlightData: HighlightData

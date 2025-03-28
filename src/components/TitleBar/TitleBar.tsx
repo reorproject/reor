@@ -4,10 +4,16 @@ import { MessageSquareMore, MessageSquareOff } from '@tamagui/lucide-icons'
 import NavigationButtons from './NavigationButtons'
 import ExternalLink from '../Common/ExternalLink'
 import { useChatContext } from '@/contexts/ChatContext'
+import { PanelRightOpen, PanelRightClose } from '@tamagui/lucide-icons'
 
 export const titleBarHeight = '30px'
 
-const TitleBar: React.FC = () => {
+interface TitleBarProps {
+  showPanel: boolean
+  setShowPanel: (show: boolean) => void
+}
+
+const TitleBar: React.FC<TitleBarProps> = ({ showPanel, setShowPanel }) => {
   const { showChatbot, setShowChatbot } = useChatContext()
   const [platform, setPlatform] = useState('')
 
@@ -40,6 +46,16 @@ const TitleBar: React.FC = () => {
             <MessageSquareOff size={19} title="Hide Similar Files" />
           ) : (
             <MessageSquareMore size={22} title="Show Chatbot" />
+          )}
+        </XStack>
+        <XStack 
+          marginLeft={3}
+          onPress={() => setShowPanel(!showPanel)}
+        >
+          {!showPanel ? (
+            <PanelRightOpen size={22} title="Show Similar Files" />
+          ) : (
+            <PanelRightClose size={22} title="Hide Similar Files" />
           )}
         </XStack>
       </div>
