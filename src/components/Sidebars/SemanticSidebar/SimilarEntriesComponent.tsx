@@ -1,14 +1,14 @@
 import React from 'react'
 
 import { DBQueryResult } from 'electron/main/vector-database/schema'
-import { FiRefreshCw } from 'react-icons/fi'
+import { RefreshCw } from '@tamagui/lucide-icons'
 import { PiGraph } from 'react-icons/pi'
 
 import '../../../styles/global.css'
 // import ResizableComponent from '@/components/Common/ResizableComponent'
+import { ScrollView, Stack, YStack, XStack, Text, Button } from 'tamagui'
 import { DBResultPreview } from '@/components/File/DBResultPreview'
 import { useFileContext } from '@/contexts/FileContext'
-import { ScrollView, Stack, YStack, XStack, Text, Button } from 'tamagui'
 import Spinner from '@/components/ui/Spinner'
 
 interface SimilarEntriesComponentProps {
@@ -37,11 +37,12 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
         {similarEntries
           .filter((dbResult) => dbResult)
           .map((dbResult) => (
-            <Stack key={`${dbResult.notepath}-${dbResult.subnoteindex}`}
+            <Stack
+              key={`${dbResult.notepath}-${dbResult.subnoteindex}`}
               paddingHorizontal="$2"
               paddingVertical="$1"
               width="100%"
-              >
+            >
               <DBResultPreview dbResult={dbResult} onSelect={onSelect} />
             </Stack>
           ))}
@@ -49,22 +50,18 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
     )
   } else if (!isLoadingSimilarEntries) {
     content = (
-      <div className="flex size-full flex-col items-center justify-center">
-        <p className="mx-auto flex items-center justify-center text-center text-lg text-gray-500">No items found</p>
-      </div>
+      <Stack height="100%" width="100%">
+        <Text fontSize="$2" fontFamily="$body" margin={0} lineHeight="$1" color="$gray11" textAlign="center">
+          No items found
+        </Text>
+      </Stack>
     )
   }
 
   return (
-    <ScrollView maxHeight='100%' backgroundColor="$gray3">
-      <Stack 
-        flex={1} 
-      >
-        <YStack
-          borderLeftWidth={0.5}
-          borderColor="$neutral700"
-          backgroundColor="$neutral800"
-        >
+    <ScrollView maxHeight="100%" backgroundColor="$gray3">
+      <Stack flex={1}>
+        <YStack>
           {/* Header */}
           <XStack alignItems="center" paddingHorizontal="$4" paddingVertical="$2" backgroundColor="$neutral800">
             <XStack flex={1} />
@@ -87,28 +84,18 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
                   borderWidth={0}
                   padding={0}
                 >
-                  {isLoadingSimilarEntries 
-                    ? <Spinner size="small" />
-                    : <FiRefreshCw color="$gray300" 
-                  />}
+                  {isLoadingSimilarEntries ? <Spinner size="small" /> : <RefreshCw size={16} />}
                 </Button>
               )}
             </XStack>
           </XStack>
 
           {/* Content */}
-          <YStack>
-            {content}
-          </YStack>
+          <YStack>{content}</YStack>
         </YStack>
       </Stack>
     </ScrollView>
   )
-}
-
-SimilarEntriesComponent.defaultProps = {
-  setSimilarEntries: () => {},
-  updateSimilarEntries: async () => {},
 }
 
 export default SimilarEntriesComponent

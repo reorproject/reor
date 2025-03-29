@@ -10,7 +10,7 @@ interface MarkdownRendererProps {
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
   return (
     <ReactMarkdown
-      className={`overflow-hidden whitespace-normal break-words text-sm leading-relaxed`}
+      className="overflow-hidden whitespace-normal break-words text-sm leading-relaxed"
       rehypePlugins={[rehypeRaw]}
     >
       {content}

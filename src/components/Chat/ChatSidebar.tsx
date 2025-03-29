@@ -75,7 +75,7 @@ export const ChatSidebar: React.FC = () => {
                       shadow-md transition-colors duration-200 hover:bg-blue-400 hover:text-gray-200
                       hover:shadow-lg"
               type="button"
-              onClick={() => openNewChat()}
+              onClick={() => openNewChat(undefined)}
             >
               <RiChatNewFill className="text-xl" />
               <span className="text-xs font-bold">Start New Chat</span>

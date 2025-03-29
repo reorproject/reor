@@ -2,13 +2,13 @@ import { CoreToolMessage, ToolCallPart } from 'ai'
 import React, { useState } from 'react'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { ChevronDown, ChevronUp } from 'lucide-react'
+import { Stack } from 'tamagui'
 import { Chat } from '../../../lib/llm/types'
 import ChatSources from './ChatSources'
 import { findToolResultMatchingToolCall } from '../../../lib/llm/chat'
 import { Button } from '@/components/ui/button'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import MarkdownRenderer from '@/components/Common/MarkdownRenderer'
-import { Stack } from 'tamagui'
 
 interface ToolCallComponentProps {
   toolCallPart: ToolCallPart

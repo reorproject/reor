@@ -3,7 +3,7 @@ import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { toast } from 'react-toastify'
 import { ToolCallPart } from 'ai'
 import { FaRegCopy } from 'react-icons/fa'
-import { YStack } from 'tamagui'
+import { YStack, Stack } from 'tamagui'
 import { Chat, ReorChatMessage } from '../../../lib/llm/types'
 import { extractMessagePartsFromAssistantMessage, findToolResultMatchingToolCall } from '../../../lib/llm/chat'
 import { ToolCallComponent } from './ToolCalls'
@@ -11,7 +11,6 @@ import { useContentContext } from '@/contexts/ContentContext'
 import { useChatContext } from '@/contexts/ChatContext'
 import MarkdownRenderer from '@/components/Common/MarkdownRenderer'
 import { makeAndAddToolResultToMessages } from '../../../lib/llm/tools/utils'
-import { Stack, XStack } from 'tamagui'
 
 interface AssistantMessageProps {
   message: ReorChatMessage
@@ -70,8 +69,8 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
       <>
         {textParts.map((text, index) => (
           <Stack>
-            {/* eslint-disable-next-line react/no-array-index-key */}
             <Stack color="$color11">
+              {/* eslint-disable-next-line react/no-array-index-key */}
               <MarkdownRenderer key={index} content={text} />
             </Stack>
             <div className="mt-0 flex">
@@ -117,10 +116,7 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
   }
 
   return (
-    <Stack 
-      marginBottom={7}
-      width="100%"
-    >
+    <Stack marginBottom={7} width="100%">
       <YStack flex={1}>{renderContent()}</YStack>
     </Stack>
   )

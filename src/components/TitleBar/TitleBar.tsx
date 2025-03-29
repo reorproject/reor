@@ -1,20 +1,17 @@
 import React, { useEffect, useState } from 'react'
 import { XStack, SizableText } from 'tamagui'
-import { MessageSquareMore, MessageSquareOff } from '@tamagui/lucide-icons'
+import { MessageSquareMore, MessageSquareOff, PanelRightOpen, PanelRightClose } from '@tamagui/lucide-icons'
 import NavigationButtons from './NavigationButtons'
 import ExternalLink from '../Common/ExternalLink'
-import { useChatContext } from '@/contexts/ChatContext'
-import { PanelRightOpen, PanelRightClose } from '@tamagui/lucide-icons'
 
 export const titleBarHeight = '30px'
 
 interface TitleBarProps {
-  showPanel: boolean
-  setShowPanel: (show: boolean) => void
+  activePanel: 'chat' | 'similarFiles' | null
+  togglePanel: (show: 'chat' | 'similarFiles' | null) => void
 }
 
-const TitleBar: React.FC<TitleBarProps> = ({ showPanel, setShowPanel }) => {
-  const { showChatbot, setShowChatbot } = useChatContext()
+const TitleBar: React.FC<TitleBarProps> = ({ activePanel, togglePanel }) => {
   const [platform, setPlatform] = useState('')
 
   useEffect(() => {
@@ -27,38 +24,35 @@ const TitleBar: React.FC<TitleBarProps> = ({ showPanel, setShowPanel }) => {
   }, [])
 
   return (
-    <XStack backgroundColor="$gray3" className="electron-drag flex justify-between bg-[#303030]">
+    <XStack alignItems="center" backgroundColor="$gray3" className="electron-drag flex justify-between bg-[#303030]">
       <div className="mt-px flex" style={platform === 'darwin' ? { marginLeft: '65px' } : { marginLeft: '2px' }}>
         <NavigationButtons />
       </div>
 
-      <div
-        className="electron-no-drag mt-[0.5px] flex items-center justify-end"
+      <XStack
+        className="electron-no-drag flex items-center justify-end"
         style={platform === 'win32' ? { marginRight: '8.5rem' } : { marginRight: '0.3rem' }}
       >
-        <ExternalLink href="https://forms.gle/8H4GtEcE6MBnNAUa7" className="cursor-pointer">
-          <SizableText color="$gray13" fontSize={14} className="mr-4">
+        <ExternalLink href="https://forms.gle/8H4GtEcE6MBnNAUa7" className="mr-4 cursor-pointer">
+          <SizableText color="$gray11" fontSize={14} className="mr-4">
             Feedback
           </SizableText>
         </ExternalLink>
-        <XStack onPress={() => setShowChatbot((show) => !show)}>
-          {showChatbot ? (
-            <MessageSquareOff size={19} title="Hide Similar Files" />
+        <XStack onPress={() => togglePanel('chat')}>
+          {activePanel !== 'chat' ? (
+            <MessageSquareMore size={22} title="Show Chatbot" color="$gray11" cursor="pointer" />
           ) : (
-            <MessageSquareMore size={22} title="Show Chatbot" />
+            <MessageSquareOff size={22} title="Hide Similar Files" color="$gray11" cursor="pointer" />
           )}
         </XStack>
-        <XStack 
-          marginLeft={3}
-          onPress={() => setShowPanel(!showPanel)}
-        >
-          {!showPanel ? (
-            <PanelRightOpen size={22} title="Show Similar Files" />
+        <XStack marginLeft={3} onPress={() => togglePanel('similarFiles')}>
+          {activePanel !== 'similarFiles' ? (
+            <PanelRightOpen size={22} title="Show Similar Files" color="$gray11" cursor="pointer" />
           ) : (
-            <PanelRightClose size={22} title="Hide Similar Files" />
+            <PanelRightClose size={22} title="Hide Similar Files" color="$gray11" cursor="pointer" />
           )}
         </XStack>
-      </div>
+      </XStack>
     </XStack>
   )
 }

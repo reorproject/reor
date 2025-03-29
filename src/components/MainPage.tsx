@@ -2,7 +2,7 @@
 /* eslint-disable jsx-a11y/control-has-associated-label */
 /* eslint-disable react/jsx-no-useless-fragment */
 /* eslint-disable no-nested-ternary */
-import React, { useState } from 'react'
+import React from 'react'
 import { YStack } from 'tamagui'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 
@@ -23,10 +23,13 @@ import useAppShortcuts from '../lib/shortcuts/use-shortcut'
 import WindowControls from './ui/window-controls'
 import SimilarFilesSidebarComponent from '@/components/Sidebars/SimilarFilesSidebar'
 
+interface MainContentProps {
+  togglePanel: (panel: 'chat' | 'similarFiles' | null) => void
+}
+
 // Moved MainContent outside as a separate component
-const MainContent: React.FC = () => {
+const MainContent: React.FC<MainContentProps> = ({ togglePanel }) => {
   const { currentlyOpenFilePath } = useFileContext()
-  const { setShowChatbot } = useChatContext()
   const { showEditor, setShowEditor } = useContentContext()
 
   return (
@@ -36,35 +39,35 @@ const MainContent: React.FC = () => {
           <WindowControls
             onClose={() => setShowEditor(false)}
             onMaximize={() => {
-              setShowChatbot(false)
+              togglePanel('chat')
             }}
           />
           <EditorManager />
         </div>
       )}
-      {/* <WritingAssistant /> */}
     </div>
   )
 }
 
 const MainPageContent: React.FC = () => {
   const { currentlyOpenFilePath } = useFileContext()
-  const { showChatbot, setShowChatbot, openNewChat } = useChatContext()
   const { setShowEditor, showEditor } = useContentContext()
   const { getShortcutDescription } = useAppShortcuts()
-  const [showPanel, setShowPanel] = useState(false)
+  const { activePanel, setActivePanel, openNewChat } = useChatContext()
 
-  const [panelSizes, setPanelSizes] = useState({
+  const togglePanel = (panel: 'chat' | 'similarFiles' | null) => {
+    setActivePanel((prev) => (prev === panel ? null : panel))
+  }
+
+  const panelSizes = {
     mainContent: 65,
     chatComponent: 35,
-    similarFilesSidebar: 200,
-  })
-
-  const panelGroupKey = `${showChatbot}-${showEditor}-${!!currentlyOpenFilePath}`
+    similarFilesSidebar: 30,
+  }
 
   return (
     <YStack className="relative flex h-screen flex-col overflow-hidden">
-      <TitleBar showPanel={showPanel} setShowPanel={setShowPanel} />
+      <TitleBar activePanel={activePanel} togglePanel={togglePanel} />
       <div className="flex min-h-0 flex-1">
         <div className="border-y-0 border-l-0 border-r-[0.001px] border-solid border-neutral-700">
           <IconsSidebar getShortcutDescription={getShortcutDescription} />
@@ -79,30 +82,23 @@ const MainPageContent: React.FC = () => {
 
           <ResizableHandle />
 
-          <ResizablePanel defaultSize={80}>
+          <ResizablePanel>
             <div className="size-full">
-              {currentlyOpenFilePath || showChatbot ? (
-                <ResizablePanelGroup direction="horizontal" className="size-full" key={panelGroupKey}>
+              {currentlyOpenFilePath || activePanel ? (
+                <ResizablePanelGroup direction="horizontal" className="size-full">
                   {currentlyOpenFilePath && showEditor && (
                     <>
-                      <ResizablePanel 
-                        defaultSize={panelSizes.mainContent}
-                        onResize={(size) => setPanelSizes((prev) => ({...prev, mainContent: size}))}
-                      >
-                        <MainContent />
+                      <ResizablePanel defaultSize={panelSizes.mainContent}>
+                        <MainContent togglePanel={togglePanel} />
                       </ResizablePanel>
                       <ResizableHandle />
                     </>
                   )}
-                  {(showChatbot && !showPanel) && (
-                    <ResizablePanel
-                      className='animate-slide-in' 
-                      defaultSize={panelSizes.chatComponent}
-                      onResize={(size) => setPanelSizes((prev) => ({...prev, chatComponent: size}))}
-                    >
+                  {activePanel === 'chat' && (
+                    <ResizablePanel defaultSize={panelSizes.chatComponent}>
                       <div className="relative size-full ">
                         <WindowControls
-                          onClose={() => setShowChatbot(false)}
+                          onClose={() => setActivePanel(null)}
                           onMaximize={() => setShowEditor(false)}
                           onNewChat={() => openNewChat()}
                         />
@@ -110,13 +106,9 @@ const MainPageContent: React.FC = () => {
                       </div>
                     </ResizablePanel>
                   )}
-                  {(showPanel && !showChatbot) && (
-                    <ResizablePanel
-                      className='animate-slide-in' 
-                      defaultSize={panelSizes.similarFilesSidebar}
-                      onResize={(size) => setPanelSizes((prev) => ({...prev, similarFilesSidebar: size}))}
-                    >
-                        <SimilarFilesSidebarComponent />
+                  {activePanel === 'similarFiles' && (
+                    <ResizablePanel defaultSize={panelSizes.similarFilesSidebar}>
+                      <SimilarFilesSidebarComponent />
                     </ResizablePanel>
                   )}
                 </ResizablePanelGroup>

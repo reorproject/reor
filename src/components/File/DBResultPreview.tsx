@@ -36,23 +36,19 @@ export const DBResultPreview: React.FC<DBResultPreviewProps> = ({ dbResult: entr
       mt={0}
       width="100%"
       cursor="pointer"
-      overflow='hidden'
-      backgroundColor='$gray3'
+      overflow="hidden"
+      backgroundColor="$gray3"
       hoverStyle={{
-        backgroundColor: '$gray3'
+        backgroundColor: '$gray5',
       }}
-      borderRadius='$1'
+      borderRadius="$1"
       borderWidth={0.1}
-      borderColor='$gray10'
-      paddingHorizontal='$2'
-      paddingVertical='$1'
+      borderColor="$gray7"
+      paddingHorizontal="$2"
+      paddingVertical="$1"
       onClick={() => onSelect(entry.notepath)}
     >
-      <Stack
-        fontSize="sm"
-        width="100%"
-        color="$gray11"
-      >
+      <Stack fontSize="sm" width="100%" color="$gray11">
         <MarkdownRenderer content={entry.content} />
       </Stack>
       <div className="mt-2 text-xs">

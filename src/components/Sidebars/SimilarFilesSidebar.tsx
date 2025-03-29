@@ -7,9 +7,9 @@ import removeMd from 'remove-markdown'
 import '../../styles/global.css'
 
 import posthog from 'posthog-js'
+import { Stack } from 'tamagui'
 import errorToStringRendererProcess from '@/lib/error'
 import SimilarEntriesComponent from './SemanticSidebar/SimilarEntriesComponent'
-import HighlightButton from './SemanticSidebar/HighlightButton'
 import { useFileContext } from '@/contexts/FileContext'
 import { useContentContext } from '@/contexts/ContentContext'
 
@@ -17,7 +17,7 @@ const SimilarFilesSidebarComponent: React.FC = () => {
   const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([])
   const [isLoadingSimilarEntries, setIsLoadingSimilarEntries] = useState(false)
 
-  const { currentlyOpenFilePath, highlightData } = useFileContext()
+  const { currentlyOpenFilePath } = useFileContext()
   const { openContent: openTabContent } = useContentContext()
 
   const getChunkForInitialSearchFromFile = async (filePathForChunk: string | null) => {
@@ -88,7 +88,7 @@ const SimilarFilesSidebarComponent: React.FC = () => {
   }
 
   return (
-    <>
+    <Stack height="100%">
       {/* <HighlightButton
         highlightData={highlightData}
         onClick={async () => {
@@ -110,7 +110,7 @@ const SimilarFilesSidebarComponent: React.FC = () => {
         isLoadingSimilarEntries={isLoadingSimilarEntries}
         titleText="Related notes"
       />
-    </>
+    </Stack>
   )
 }
 

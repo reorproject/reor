@@ -44,15 +44,9 @@ const Tooltip = ({
         <TTooltip.Arrow />
         <ScrollView maxHeight="300px" maxWidth="350px">
           <Stack px={4}>
-            <Text 
-              fontSize="$1"
-              fontFamily="$body"
-              margin={0}
-              lineHeight="$1"
-              color="$gray11"
-            >
+            <Text fontSize="$1" fontFamily="$body" margin={0} lineHeight="$1" color="$gray11">
               {renderMarkdown ? (
-                <MarkdownRenderer content={content as string} /> 
+                <MarkdownRenderer content={content as string} />
               ) : (
                 <Text
                   fontSize="$1"
