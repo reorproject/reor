@@ -14,6 +14,7 @@ import { Chat, AgentConfig, LoadingState } from '../../lib/llm/types'
 import { useChatContext } from '@/contexts/ChatContext'
 import resolveLLMClient from '@/lib/llm/client'
 import { appendToolCallsAndAutoExecuteTools, convertToolConfigToZodSchema } from '../../lib/llm/tools/utils'
+import { useContentContext } from '@/contexts/ContentContext'
 
 const ChatComponent: React.FC = () => {
   const [loadingState, setLoadingState] = useState<LoadingState>('idle')
@@ -126,7 +127,7 @@ const ChatComponent: React.FC = () => {
 
   return (
     <div ref={containerRef} className="flex size-full items-center justify-center">
-      <div className="mx-auto flex size-full flex-col overflow-hidden bg-background">
+      <div className="mx-auto flex size-full flex-col overflow-hidden">
         <ChatMessages
           currentChat={currentChat}
           setCurrentChat={setCurrentChat}
