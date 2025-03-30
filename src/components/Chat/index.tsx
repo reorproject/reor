@@ -14,7 +14,6 @@ import { Chat, AgentConfig, LoadingState } from '../../lib/llm/types'
 import { useChatContext } from '@/contexts/ChatContext'
 import resolveLLMClient from '@/lib/llm/client'
 import { appendToolCallsAndAutoExecuteTools, convertToolConfigToZodSchema } from '../../lib/llm/tools/utils'
-import { useContentContext } from '@/contexts/ContentContext'
 
 const ChatComponent: React.FC = () => {
   const [loadingState, setLoadingState] = useState<LoadingState>('idle')

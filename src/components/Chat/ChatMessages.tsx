@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import '../../styles/chat.css'
-import { Spinner, YStack, ScrollView } from 'tamagui'
+import { Spinner, YStack } from 'tamagui'
 import { Chat, AgentConfig, LoadingState, ReorChatMessage } from '../../lib/llm/types'
 import ChatInput from './ChatInput'
 import UserMessage from './MessageComponents/UserMessage'
@@ -116,10 +116,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   }, [shouldAutoScroll, scrollToBottom])
 
   return (
-    <YStack 
-      flex={1}
-      backgroundColor={activePanel && showEditor ? ( '$gray3' ) : ( '$background' )}
-    >
+    <YStack flex={1} backgroundColor={activePanel && showEditor ? '$gray3' : '$background'}>
       <div className="grow overflow-auto" ref={chatContainerRef} onScroll={handleScroll}>
         <div className="flex flex-col items-center gap-3 p-4">
           <div className="w-full max-w-3xl">
@@ -145,10 +142,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
         </div>
       </div>
 
-      <YStack 
-        width="100%"
-        padding="$4"
-      >
+      <YStack width="100%" padding="$4">
         <ChatInput
           userTextFieldInput={userTextFieldInput ?? ''}
           setUserTextFieldInput={setUserTextFieldInput}
