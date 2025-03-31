@@ -1,19 +1,24 @@
 import { rmSync } from 'node:fs'
 import path from 'node:path'
-
+import { fileURLToPath } from 'url'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
 import electron from 'vite-plugin-electron'
 import renderer from 'vite-plugin-electron-renderer'
-import { sentryVitePlugin } from "@sentry/vite-plugin"
+import { sentryVitePlugin } from '@sentry/vite-plugin'
+import { tamaguiPlugin } from '@tamagui/vite-plugin'
+import tailwindcss from 'tailwindcss'
+import autoprefixer from 'autoprefixer'
 
-import pkg from './package.json'
+// For CommonJS compatibility
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
+const pkg = require('./package.json')
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
-// https://vitejs.dev/config/
 export default defineConfig(({ command }) => {
   rmSync('dist-electron', { recursive: true, force: true })
 
-  const isServe = command === 'serve'
   const isBuild = command === 'build'
   const sourcemap = true
 
@@ -24,15 +29,20 @@ export default defineConfig(({ command }) => {
         '@shared': path.join(__dirname, './shared'),
       },
     },
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
     plugins: [
+      tamaguiPlugin({
+        config: './tamagui.config.ts',
+        components: ['tamagui'],
+      }),
+      // tamaguiExtractPlugin(),
       react(),
       electron([
         {
-          // Main-Process entry file of the Electron App.
           entry: 'electron/main/index.ts',
           onstart(options) {
             if (process.env.VSCODE_DEBUG) {
-              console.log(/* For `.vscode/.debug.script.mjs` */ '[startup] Electron App')
+              console.log('[startup] Electron App')
             } else {
               options.startup()
             }
@@ -43,15 +53,13 @@ export default defineConfig(({ command }) => {
               minify: isBuild,
               outDir: 'dist-electron/main',
               rollupOptions: {
-                external: [
-                  ...Object.keys('dependencies' in pkg ? pkg.dependencies : {}),
-                  '@shared/utils',
-                ],
+                external: [...Object.keys('dependencies' in pkg ? pkg.dependencies : {}), '@shared/utils'],
               },
             },
             resolve: {
               alias: {
                 '@shared': path.join(__dirname, 'shared'),
+                'react-native-svg': 'react-native-svg-web',
               },
             },
           },
@@ -67,15 +75,13 @@ export default defineConfig(({ command }) => {
               minify: isBuild,
               outDir: 'dist-electron/preload',
               rollupOptions: {
-                external: [
-                  ...Object.keys('dependencies' in pkg ? pkg.dependencies : {}),
-                  '@shared/utils',
-                ],
+                external: [...Object.keys('dependencies' in pkg ? pkg.dependencies : {}), '@shared/utils'],
               },
             },
             resolve: {
               alias: {
                 '@shared': path.join(__dirname, 'shared'),
+                'react-native-svg': 'react-native-svg-web',
               },
             },
           },
@@ -84,13 +90,13 @@ export default defineConfig(({ command }) => {
       renderer(),
       sentryVitePlugin({
         authToken: process.env.SENTRY_AUTH_TOKEN,
-        org: "reor",
-        project: "electron",
+        org: 'reor',
+        project: 'electron',
       }),
     ],
     css: {
       postcss: {
-        plugins: [require('tailwindcss'), require('autoprefixer')],
+        plugins: [tailwindcss, autoprefixer],
       },
     },
     server:

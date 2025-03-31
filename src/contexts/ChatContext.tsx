@@ -7,8 +7,8 @@ interface ChatContextType {
   setCurrentChat: React.Dispatch<React.SetStateAction<Chat | undefined>>
   sidebarShowing: SidebarAbleToShow
   setSidebarShowing: (option: SidebarAbleToShow) => void
-  showChatbot: boolean
-  setShowChatbot: React.Dispatch<React.SetStateAction<boolean>>
+  activePanel: 'chat' | 'similarFiles' | null
+  setActivePanel: React.Dispatch<React.SetStateAction<'chat' | 'similarFiles' | null>>
   allChatsMetadata: ChatMetadata[]
   deleteChat: (chatID: string | undefined) => Promise<void>
   saveChat: (updatedChat: Chat) => Promise<void>
@@ -19,8 +19,8 @@ const ChatContext = createContext<ChatContextType | undefined>(undefined)
 
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentChat, setCurrentChat] = useState<Chat | undefined>(undefined)
-  const [showChatbot, setShowChatbot] = useState<boolean>(false)
   const [sidebarShowing, setSidebarShowing] = useState<SidebarAbleToShow>('files')
+  const [activePanel, setActivePanel] = useState<'chat' | 'similarFiles' | null>(null)
   const [allChatsMetadata, setAllChatsMetadata] = useState<ChatMetadata[]>([])
 
   useEffect(() => {
@@ -55,9 +55,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         return chat
       })
-      setShowChatbot(true)
+      setActivePanel((prev) => (prev === 'chat' ? null : 'chat'))
     },
-    [setShowChatbot, saveChat],
+    [saveChat],
   )
 
   const value = React.useMemo(
@@ -67,8 +67,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       allChatsMetadata,
       sidebarShowing,
       setSidebarShowing,
-      showChatbot,
-      setShowChatbot,
+      activePanel,
+      setActivePanel,
       deleteChat,
       saveChat,
       openNewChat,
@@ -79,8 +79,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       allChatsMetadata,
       sidebarShowing,
       setSidebarShowing,
-      showChatbot,
-      setShowChatbot,
+      activePanel,
+      setActivePanel,
       deleteChat,
       saveChat,
       openNewChat,

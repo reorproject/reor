@@ -1,0 +1,13 @@
+# electron setup
+dist-electron/
+dist/
+
+# scripts and config
+scripts/
+postcss.config.js
+tailwind.config.js
+*.test.ts
+
+# generated files
+src/components/Editor/ui/src/tamagui/themes/themes-generated.ts
+src/components/Editor/ui/src/generated-themes.ts

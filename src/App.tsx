@@ -8,11 +8,14 @@ import 'react-toastify/dist/ReactToastify.css'
 import IndexingProgress from './components/Common/IndexingProgress'
 import MainPageComponent from './components/MainPage'
 import InitialSetupSinglePage from './components/Settings/InitialSettingsSinglePage'
+import { ThemeProvider } from './contexts/ThemeContext'
 
 interface AppProps {}
 
 const App: React.FC<AppProps> = () => {
-  const [userHasConfiguredSettingsForIndexing, setUserHasConfiguredSettingsForIndexing] = useState<boolean>(false)
+  const [userHasConfiguredSettingsForIndexing, setUserHasConfiguredSettingsForIndexing] = useState<boolean | undefined>(
+    undefined,
+  )
 
   const [indexingProgress, setIndexingProgress] = useState<number>(0)
 
@@ -62,8 +65,9 @@ const App: React.FC<AppProps> = () => {
         window.electronStore.getVaultDirectoryForWindow(),
         window.electronStore.getDefaultEmbeddingModel(),
       ])
+      const configuedInitialSettings = !!(initialDirectory && defaultEmbedFunc)
+      setUserHasConfiguredSettingsForIndexing(configuedInitialSettings)
       if (initialDirectory && defaultEmbedFunc) {
-        setUserHasConfiguredSettingsForIndexing(true)
         window.database.indexFilesInDirectory()
       }
     }
@@ -72,31 +76,33 @@ const App: React.FC<AppProps> = () => {
   }, [])
 
   const handleAllInitialSettingsAreReady = () => {
-    setUserHasConfiguredSettingsForIndexing(true)
+    // setUserHasConfiguredSettingsForIndexing(true)
     window.database.indexFilesInDirectory()
   }
 
   return (
-    <div className="max-h-screen bg-neutral-800 font-sans">
-      <Portal>
-        <ToastContainer
-          theme="dark"
-          position="bottom-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          closeOnClick
-          pauseOnHover
-          toastClassName="text-xs"
-        />{' '}
-      </Portal>
-      {!userHasConfiguredSettingsForIndexing && (
-        <InitialSetupSinglePage readyForIndexing={handleAllInitialSettingsAreReady} />
-      )}
-      {userHasConfiguredSettingsForIndexing && indexingProgress < 1 && (
-        <IndexingProgress indexingProgress={indexingProgress} />
-      )}
-      {userHasConfiguredSettingsForIndexing && indexingProgress >= 1 && <MainPageComponent />}
-    </div>
+    <ThemeProvider>
+      <div className="max-h-screen font-sans">
+        <Portal>
+          <ToastContainer
+            theme="dark"
+            position="bottom-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            closeOnClick
+            pauseOnHover
+            toastClassName="text-xs" // Added max height and overflow
+          />{' '}
+        </Portal>
+        {!userHasConfiguredSettingsForIndexing && userHasConfiguredSettingsForIndexing !== undefined && (
+          <InitialSetupSinglePage readyForIndexing={handleAllInitialSettingsAreReady} />
+        )}
+        {userHasConfiguredSettingsForIndexing && indexingProgress < 1 && (
+          <IndexingProgress indexingProgress={indexingProgress} />
+        )}
+        {userHasConfiguredSettingsForIndexing && indexingProgress >= 1 && <MainPageComponent />}
+      </div>
+    </ThemeProvider>
   )
 }
 

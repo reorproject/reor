@@ -34,6 +34,9 @@ process.env.VITE_PUBLIC = process.env.VITE_DEV_SERVER_URL
 // Disable GPU Acceleration for Windows 7
 if (release().startsWith('6.1')) app.disableHardwareAcceleration()
 
+// Disable GPU acceleration for macOS 21.6
+if (process.platform === 'darwin' && release().startsWith('21.6')) app.disableHardwareAcceleration()
+
 // Set application name for Windows 10+ notifications
 if (process.platform === 'win32') app.setAppUserModelId(app.getName())
 

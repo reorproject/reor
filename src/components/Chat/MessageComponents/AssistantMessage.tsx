@@ -3,6 +3,7 @@ import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { toast } from 'react-toastify'
 import { ToolCallPart } from 'ai'
 import { FaRegCopy } from 'react-icons/fa'
+import { YStack, Stack } from 'tamagui'
 import { Chat, ReorChatMessage } from '../../../lib/llm/types'
 import { extractMessagePartsFromAssistantMessage, findToolResultMatchingToolCall } from '../../../lib/llm/chat'
 import { ToolCallComponent } from './ToolCalls'
@@ -67,24 +68,40 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
     return (
       <>
         {textParts.map((text, index) => (
-          <div>
-            {/* eslint-disable-next-line react/no-array-index-key */}
-            <MarkdownRenderer key={index} content={text} />
+          <Stack>
+            <Stack color="$color11">
+              {/* eslint-disable-next-line react/no-array-index-key */}
+              <MarkdownRenderer key={index} content={text} />
+            </Stack>
             <div className="mt-0 flex">
-              <div
-                className="cursor-pointer items-center justify-center rounded px-1 hover:bg-neutral-700"
-                onClick={copyToClipboard}
+              <YStack
+                hoverStyle={{
+                  backgroundColor: '$gray7',
+                }}
+                cursor="pointer"
+                alignItems="center"
+                justifyContent="center"
+                px={4}
+                borderRadius="$1"
+                onPress={copyToClipboard}
               >
                 <FaRegCopy color="gray" size={16} className="text-gray-200" title="Copy" />
-              </div>
-              <div
-                className="cursor-pointer items-center justify-center rounded px-1 hover:bg-neutral-700"
-                onClick={createNewNoteFromMessage}
+              </YStack>
+              <YStack
+                hoverStyle={{
+                  backgroundColor: '$gray7',
+                }}
+                cursor="pointer"
+                alignContent="center"
+                justifyContent="center"
+                px={4}
+                borderRadius="$1"
+                onPress={createNewNoteFromMessage}
               >
                 <HiOutlinePencilAlt color="gray" size={18} className="text-gray-200" title="New Note" />
-              </div>
+              </YStack>
             </div>
-          </div>
+          </Stack>
         ))}
         {toolCalls.map((toolCall) => (
           <ToolCallComponent
@@ -99,11 +116,9 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
   }
 
   return (
-    <div className="mb-7 flex w-full text-[0.94rem] leading-[1.2rem] text-[rgb(210,210,210)] ">
-      <div className="w-full flex-col gap-1">
-        <div className="flex grow flex-col ">{renderContent()}</div>
-      </div>
-    </div>
+    <Stack marginBottom={7} width="100%">
+      <YStack flex={1}>{renderContent()}</YStack>
+    </Stack>
   )
 }
 

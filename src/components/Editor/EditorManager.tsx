@@ -1,42 +1,15 @@
 import React, { useEffect, useState } from 'react'
-import { EditorContent } from '@tiptap/react'
+import { YStack } from 'tamagui'
 import InEditorBacklinkSuggestionsDisplay from './BacklinkSuggestionsDisplay'
-import EditorContextMenu from './EditorContextMenu'
-import SearchBar from './Search/SearchBar'
 import { useFileContext } from '@/contexts/FileContext'
-import { useContentContext } from '@/contexts/ContentContext'
+import { BlockNoteView, FormattingToolbarPositioner, SlashMenuPositioner, SideMenuPositioner } from '@/lib/blocknote'
+import SearchBar from './Search/SearchBar'
 
 const EditorManager: React.FC = () => {
-  const [showSearchBar, setShowSearchBar] = useState(false)
-  const [contextMenuVisible, setContextMenuVisible] = useState(false)
-  const [menuPosition, setMenuPosition] = useState({ x: 0, y: 0 })
   const [editorFlex, setEditorFlex] = useState(true)
 
   const { editor, suggestionsState, vaultFilesFlattened } = useFileContext()
   const [showDocumentStats, setShowDocumentStats] = useState(false)
-  const { openContent } = useContentContext()
-
-  const handleContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault()
-    setMenuPosition({
-      x: event.pageX,
-      y: event.pageY,
-    })
-    setContextMenuVisible(true)
-  }
-
-  const hideMenu = () => {
-    if (contextMenuVisible) setContextMenuVisible(false)
-  }
-
-  const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    const { target } = event
-    if (target instanceof HTMLElement && target.getAttribute('data-backlink') === 'true') {
-      event.preventDefault()
-      const backlinkPath = target.textContent
-      if (backlinkPath) openContent(backlinkPath)
-    }
-  }
 
   useEffect(() => {
     const initEditorContentCenter = async () => {
@@ -68,48 +41,35 @@ const EditorManager: React.FC = () => {
   }, [])
 
   return (
-    <div
-      className="relative size-full cursor-text overflow-hidden bg-dark-gray-c-eleven py-4 text-slate-400 opacity-80"
-      onClick={() => editor?.commands.focus()}
-    >
-      <SearchBar editor={editor} showSearch={showSearchBar} setShowSearch={setShowSearchBar} />
-      {contextMenuVisible && (
-        <EditorContextMenu
-          editor={editor}
-          menuPosition={menuPosition}
-          setMenuVisible={setContextMenuVisible}
-          hideMenu={hideMenu}
-        />
-      )}
+    <YStack className="relative size-full cursor-text overflow-y-auto">
+      {editor && <SearchBar editor={editor._tiptapEditor} />}
 
-      <div
-        className={`relative h-full ${editorFlex ? 'flex justify-center py-4 pl-4' : ''} ${showDocumentStats ? 'pb-3' : ''}`}
+      <YStack
+        className={`relative h-full py-4 ${editorFlex ? 'flex justify-center px-24' : 'px-12'} ${showDocumentStats ? 'pb-3' : ''}`}
       >
-        <div className="relative size-full overflow-y-auto">
-          <EditorContent
-            className={`relative size-full bg-dark-gray-c-eleven ${editorFlex ? 'max-w-xl' : ''}`}
-            style={{
-              wordBreak: 'break-word',
-            }}
-            onContextMenu={handleContextMenu}
-            onClick={handleClick}
-            editor={editor}
-          />
-        </div>
-      </div>
+        <YStack className="relative size-full">
+          {editor && (
+            <BlockNoteView editor={editor}>
+              <FormattingToolbarPositioner editor={editor} />
+              <SlashMenuPositioner editor={editor} />
+              <SideMenuPositioner editor={editor} placement="left" />
+            </BlockNoteView>
+          )}
+        </YStack>
+      </YStack>
       {suggestionsState && (
         <InEditorBacklinkSuggestionsDisplay
           suggestionsState={suggestionsState}
           suggestions={vaultFilesFlattened.map((file) => file.relativePath)}
         />
       )}
-      {editor && showDocumentStats && (
+      {/* {editor && showDocumentStats && (
         <div className="absolute bottom-2 right-2 flex gap-4 text-sm text-gray-500">
           <div>Characters: {editor.storage.characterCount.characters()}</div>
           <div>Words: {editor.storage.characterCount.words()}</div>
         </div>
-      )}
-    </div>
+      )} */}
+    </YStack>
   )
 }
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import { YStack, H2, SizableText } from 'tamagui'
 
 import CircularProgress from '@mui/material/CircularProgress'
 
@@ -30,10 +31,10 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({ indexingProgress })
 
   return (
     <ReorModal isOpen onClose={() => {}} hideCloseButton>
-      <div className="mx-3 mb-3 mt-2 h-[100px] w-[500px]">
-        <h6 className="my-2 text-2xl font-semibold text-white">
+      <YStack className="mx-3 mb-3 mt-2 h-[100px] w-[500px]">
+        <H2 fontWeight="semi-bold" fontSize="xl" color="$gray13">
           {indexingProgress === 0 ? 'Initializing vector database...' : 'Indexing files...'}
-        </h6>
+        </H2>
         <div
           className={`mb-2 h-4 w-full overflow-hidden rounded-full border-2 border-gray-400 ${
             indexingProgress !== 0 ? 'bg-neutral-800' : ''
@@ -45,15 +46,13 @@ const IndexingProgress: React.FC<IndexingProgressProps> = ({ indexingProgress })
           />
         </div>
         <div className="flex">
-          {indexingProgress === 0 && (
-            <CircularProgress size={20} thickness={7} style={{ color: 'white' }} className="mr-2" />
-          )}
+          {indexingProgress === 0 && <CircularProgress size={20} thickness={7} className="mr-2" />}
 
-          <span className="text-sm font-semibold text-white">
+          <SizableText fontSize={14} color="$gray13">
             {indexingProgress > 0 && <>{Math.round(indexingProgress * 100)}% -</>} {eta}
-          </span>
+          </SizableText>
         </div>
-      </div>
+      </YStack>
     </ReorModal>
   )
 }

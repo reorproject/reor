@@ -1,46 +1,46 @@
 .history-container {
-    padding: 1px;
-    margin: 2px 0px;
-    overflow: hidden;
+  padding: 1px;
+  margin: 2px 0px;
+  overflow: hidden;
 
-    button {
-        background: none;
-        font-size: 20px;
-        border: none;
-    }
+  button {
+    background: none;
+    font-size: 20px;
+    border: none;
+  }
 
-    button#forward {
-        padding-left: 0px;
-    }
+  button#forward {
+    padding-left: 0px;
+  }
 
-    .history-menu {
-        position: absolute;
-        background-color: #666666;
-        box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-        border-radius: 4px;
-        padding: 3px 0px;
-        z-index: 1000;
+  .history-menu {
+    position: absolute;
+    background-color: #666666;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    padding: 3px 0px;
+    z-index: 1000;
 
-        ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
+    ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
 
-            li {
-                padding: 4px 8px;
-                cursor: pointer;
-                background-color: none;
+      li {
+        padding: 4px 8px;
+        cursor: pointer;
+        background-color: none;
 
-                &:hover {
-                    background-color: #7f7f7f;
-                }
-
-                div {
-                    color: #eeeeee;
-                    font-size: 12px;
-                    margin: 2px auto;
-                }
-            }
+        &:hover {
+          background-color: #7f7f7f;
         }
+
+        div {
+          color: #eeeeee;
+          font-size: 12px;
+          margin: 2px auto;
+        }
+      }
     }
+  }
 }

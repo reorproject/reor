@@ -3,6 +3,8 @@ import React, { useState } from 'react'
 import { Button } from '@material-tailwind/react'
 import { toast } from 'react-toastify'
 
+import { YStack, SizableText, Input, XStack } from 'tamagui'
+import { NativeSyntheticEvent, TextInputKeyPressEventData } from 'react-native'
 import ReorModal from '../Common/Modal'
 
 import { getInvalidCharacterInFileName } from '@/lib/file'
@@ -13,11 +15,11 @@ const RenameNoteModal: React.FC = () => {
   const [newNoteName, setNewNoteName] = useState<string>('')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newName = e.target.value
-    setNewNoteName(newName)
+  const handleNameChange = (name: string) => {
+    // const newName = e.target.value
+    setNewNoteName(name)
 
-    const invalidCharacter = getInvalidCharacterInFileName(newName)
+    const invalidCharacter = getInvalidCharacterInFileName(name)
     if (invalidCharacter) {
       setErrorMessage(`The character [${invalidCharacter}] cannot be included in note name.`)
     } else {
@@ -49,35 +51,51 @@ const RenameNoteModal: React.FC = () => {
     onClose()
   }
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+  const handleKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+    if (e.nativeEvent.key === 'Enter') {
       handleNoteRename()
     }
   }
 
   return (
     <ReorModal isOpen={!!noteToBeRenamed} onClose={onClose}>
-      <div className="my-2 ml-3 mr-6 h-full min-w-[400px]">
-        <h2 className="mb-3 text-xl font-semibold text-white">Rename Note</h2>
-        <input
-          type="text"
-          className=" block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
+      <YStack my={2} ml={3} mr={6} h="100%" minWidth={400}>
+        <SizableText mb={3} fontSize={18} fontWeight="bold">
+          Rename Note
+        </SizableText>
+
+        <Input
+          width="100%"
+          borderRadius="$4"
+          borderWidth={1}
+          borderColor="$gray6"
+          mt={10}
           value={newNoteName}
-          onChange={handleNameChange}
-          onKeyDown={handleKeyPress}
+          onChangeText={handleNameChange}
+          onKeyPress={handleKeyPress}
+          fontSize="$1"
+          height="$3"
           placeholder="New Note Name"
+          focusStyle={{
+            borderColor: '$blue6',
+            outlineWidth: 0,
+          }}
         />
-        <div className="flex items-center gap-3">
+
+        <XStack alignItems="center" gap={12}>
           <Button
-            className="mb-2 mt-3 h-10 w-[80px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
+            className="mb-2 mt-3 h-[40px] w-[80px] cursor-pointer border-none bg-blue-500 px-2 py-0 text-center hover:bg-blue-600"
             onClick={handleNoteRename}
-            placeholder=""
           >
             Rename
           </Button>
-          {errorMessage && <p className="text-xs text-red-500">{errorMessage}</p>}
-        </div>
-      </div>
+          {errorMessage && (
+            <SizableText fontSize={12} color="$red10">
+              {errorMessage}
+            </SizableText>
+          )}
+        </XStack>
+      </YStack>
     </ReorModal>
   )
 }

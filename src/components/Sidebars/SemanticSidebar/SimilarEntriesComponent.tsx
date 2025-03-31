@@ -1,14 +1,15 @@
 import React from 'react'
 
-import { CircularProgress } from '@mui/material'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
-import { FiRefreshCw } from 'react-icons/fi'
+import { RefreshCw } from '@tamagui/lucide-icons'
 import { PiGraph } from 'react-icons/pi'
 
 import '../../../styles/global.css'
-import ResizableComponent from '@/components/Common/ResizableComponent'
+// import ResizableComponent from '@/components/Common/ResizableComponent'
+import { ScrollView, Stack, YStack, XStack, Text, Button } from 'tamagui'
 import { DBResultPreview } from '@/components/File/DBResultPreview'
 import { useFileContext } from '@/contexts/FileContext'
+import Spinner from '@/components/ui/Spinner'
 
 interface SimilarEntriesComponentProps {
   similarEntries: DBQueryResult[]
@@ -32,61 +33,69 @@ const SimilarEntriesComponent: React.FC<SimilarEntriesComponentProps> = ({
 
   if (similarEntries.length > 0) {
     content = (
-      <div className="size-full">
+      <Stack flex={1} width="100%">
         {similarEntries
           .filter((dbResult) => dbResult)
           .map((dbResult) => (
-            <div className="px-2 pb-2 pt-1" key={`${dbResult.notepath}-${dbResult.subnoteindex}`}>
+            <Stack
+              key={`${dbResult.notepath}-${dbResult.subnoteindex}`}
+              paddingHorizontal="$2"
+              paddingVertical="$1"
+              width="100%"
+            >
               <DBResultPreview dbResult={dbResult} onSelect={onSelect} />
-            </div>
+            </Stack>
           ))}
-      </div>
+      </Stack>
     )
   } else if (!isLoadingSimilarEntries) {
     content = (
-      <div className="flex size-full flex-col items-center justify-center">
-        <p className="mx-auto flex items-center justify-center text-center text-lg text-gray-500">No items found</p>
-      </div>
+      <Stack height="100%" width="100%">
+        <Text fontSize="$2" fontFamily="$body" margin={0} lineHeight="$1" color="$gray11" textAlign="center">
+          No items found
+        </Text>
+      </Stack>
     )
   }
 
   return (
-    <div className="h-full">
-      <ResizableComponent resizeSide="left" initialWidth={300}>
-        <div className="flex h-full flex-col border-y-0 border-l-[0.1px] border-r-0 border-solid border-neutral-700">
-          <div className="flex items-center bg-neutral-800 p-0">
-            <div className="flex-1" />
-            <div className="flex items-center justify-center px-4">
-              <PiGraph className="mt-1 text-gray-300" />
-              <p className="mb-0 mt-1 pl-1 text-sm text-gray-300">{titleText}</p>
-            </div>
-            <div className="flex flex-1 cursor-pointer justify-end pr-3 pt-1">
+    <ScrollView maxHeight="100%" backgroundColor="$gray3">
+      <Stack flex={1}>
+        <YStack>
+          {/* Header */}
+          <XStack alignItems="center" paddingHorizontal="$4" paddingVertical="$2" backgroundColor="$neutral800">
+            <XStack flex={1} />
+            <XStack alignItems="center" justifyContent="center">
+              <PiGraph size={16} color="$gray300" />
+              <Text marginLeft="$1" fontSize="$2" color="$gray300">
+                {titleText}
+              </Text>
+            </XStack>
+            <XStack flex={1} justifyContent="flex-end">
               {updateSimilarEntries && setSimilarEntries && (
-                <button
-                  onClick={async () => {
+                <Button
+                  onPress={async () => {
                     setSimilarEntries([]) // simulate refresh
                     await saveCurrentlyOpenedFile()
                     updateSimilarEntries()
                   }}
-                  className="m-0 flex cursor-pointer items-center border-0 bg-transparent p-0" // Reset button styles and add custom styles
-                  type="button"
+                  size="$2"
+                  backgroundColor="transparent"
+                  borderWidth={0}
+                  padding={0}
                 >
-                  {!isLoadingSimilarEntries && <FiRefreshCw className="text-gray-300" />}
-                  {isLoadingSimilarEntries && <CircularProgress size={24} />}
-                </button>
+                  {isLoadingSimilarEntries ? <Spinner size="small" /> : <RefreshCw size={16} />}
+                </Button>
               )}
-            </div>
-          </div>
-          <div className="grow overflow-y-auto overflow-x-hidden">{content}</div>
-        </div>
-      </ResizableComponent>
-    </div>
-  )
-}
+            </XStack>
+          </XStack>
 
-SimilarEntriesComponent.defaultProps = {
-  setSimilarEntries: () => {},
-  updateSimilarEntries: async () => {},
+          {/* Content */}
+          <YStack>{content}</YStack>
+        </YStack>
+      </Stack>
+    </ScrollView>
+  )
 }
 
 export default SimilarEntriesComponent

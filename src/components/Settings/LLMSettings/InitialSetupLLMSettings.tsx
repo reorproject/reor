@@ -1,9 +1,10 @@
 import React from 'react'
 import { CheckCircleIcon, CogIcon } from '@heroicons/react/24/solid'
 import { Button } from '@material-tailwind/react'
+import { SizableText, XStack, ScrollView } from 'tamagui'
 import useLLMConfigs from '../../../lib/hooks/use-llm-configs'
 import LLMSettingsContent from './LLMSettingsContent'
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogTrigger, DialogOverlay } from '@/components/ui/dialog'
 
 interface InitialSetupLLMSettingsProps {}
 
@@ -21,38 +22,42 @@ const InitialSetupLLMSettings: React.FC<InitialSetupLLMSettingsProps> = () => {
   }
 
   return (
-    <div className="flex w-full flex-col justify-between rounded bg-dark-gray-c-three">
-      <div className="flex items-center justify-between border-0 border-b-2 border-solid border-neutral-700 py-1">
-        <p className="mb-2 pb-3 text-gray-100">LLM</p>
-        <Dialog open={isSetupModalOpen} onOpenChange={handleOpenChange}>
-          <DialogTrigger asChild>
-            <Button
-              className={`flex cursor-pointer items-center justify-between rounded-md border border-none border-gray-300 px-3 py-2 ${
-                isSetupComplete
-                  ? 'bg-green-700 text-white hover:bg-green-800'
-                  : 'bg-dark-gray-c-eight hover:bg-dark-gray-c-ten'
-              } font-normal transition-colors duration-200`}
-              placeholder=""
-            >
-              {isSetupComplete ? (
-                <>
-                  <CheckCircleIcon className="mr-2 size-5" />
-                  <span>Setup</span>
-                </>
-              ) : (
-                <>
-                  <CogIcon className="mr-2 size-5" />
-                  <span>Setup</span>
-                </>
-              )}
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <LLMSettingsContent />
+    <XStack width="100%" justifyContent="space-between" alignItems="center" paddingTop="$2">
+      <SizableText color="$gray13" fontWeight={600}>
+        LLM
+      </SizableText>
+      <Dialog open={isSetupModalOpen} onOpenChange={handleOpenChange}>
+        <DialogTrigger asChild>
+          <Button
+            className={`flex cursor-pointer items-center justify-between rounded-md border border-none border-gray-300 px-3 py-2 ${
+              isSetupComplete
+                ? 'bg-green-700 text-white hover:bg-green-800'
+                : 'bg-dark-gray-c-eight hover:bg-dark-gray-c-ten'
+            } font-normal transition-colors duration-200`}
+            placeholder=""
+          >
+            {isSetupComplete ? (
+              <>
+                <CheckCircleIcon className="mr-2 size-5" />
+                <span>Setup</span>
+              </>
+            ) : (
+              <>
+                <CogIcon className="mr-2 size-5" />
+                <span>Setup</span>
+              </>
+            )}
+          </Button>
+        </DialogTrigger>
+        <DialogOverlay>
+          <DialogContent style={{ maxHeight: '60vh', display: 'flex', flexDirection: 'column' }}>
+            <ScrollView style={{ flex: 1, overflowY: 'auto' }}>
+              <LLMSettingsContent />
+            </ScrollView>
           </DialogContent>
-        </Dialog>
-      </div>
-    </div>
+        </DialogOverlay>
+      </Dialog>
+    </XStack>
   )
 }
 

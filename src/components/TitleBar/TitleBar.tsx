@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react'
-import { BsChatLeftDots, BsChatLeftDotsFill } from 'react-icons/bs'
+import { XStack, SizableText } from 'tamagui'
+import { MessageSquareMore, MessageSquareOff, PanelRightOpen, PanelRightClose } from '@tamagui/lucide-icons'
 import NavigationButtons from './NavigationButtons'
 import ExternalLink from '../Common/ExternalLink'
-import { useChatContext } from '@/contexts/ChatContext'
 
 export const titleBarHeight = '30px'
 
-const TitleBar: React.FC = () => {
-  const { showChatbot, setShowChatbot } = useChatContext()
+interface TitleBarProps {
+  activePanel: 'chat' | 'similarFiles' | null
+  togglePanel: (show: 'chat' | 'similarFiles' | null) => void
+}
+
+const TitleBar: React.FC<TitleBarProps> = ({ activePanel, togglePanel }) => {
   const [platform, setPlatform] = useState('')
 
   useEffect(() => {
@@ -20,35 +24,36 @@ const TitleBar: React.FC = () => {
   }, [])
 
   return (
-    <div className="electron-drag flex justify-between bg-[#303030]">
+    <XStack alignItems="center" backgroundColor="$gray3" className="electron-drag flex justify-between bg-[#303030]">
       <div className="mt-px flex" style={platform === 'darwin' ? { marginLeft: '65px' } : { marginLeft: '2px' }}>
         <NavigationButtons />
       </div>
 
-      <div
-        className="electron-no-drag mt-[0.5px] flex items-center justify-end"
+      <XStack
+        className="electron-no-drag flex items-center justify-end"
         style={platform === 'win32' ? { marginRight: '8.5rem' } : { marginRight: '0.3rem' }}
       >
-        <ExternalLink href="https://forms.gle/8H4GtEcE6MBnNAUa7" className="decoration-gray-200">
-          <span className="mr-2 cursor-pointer text-sm text-gray-200 hover:text-gray-300">Feedback</span>
+        <ExternalLink href="https://forms.gle/8H4GtEcE6MBnNAUa7" className="mr-4 cursor-pointer">
+          <SizableText color="$gray11" fontSize={14} className="mr-4">
+            Feedback
+          </SizableText>
         </ExternalLink>
-        {showChatbot ? (
-          <BsChatLeftDotsFill
-            className="electron-no-drag mr-1 mt-[0.2rem] -scale-x-100 cursor-pointer p-[2px] text-gray-100"
-            size={22}
-            title="Hide Similar Files"
-            onClick={() => setShowChatbot((show) => !show)}
-          />
-        ) : (
-          <BsChatLeftDots
-            className="electron-no-drag mr-1 mt-[0.2rem] -scale-x-100 cursor-pointer p-[2px] text-gray-100"
-            size={22}
-            title="Show Chatbot"
-            onClick={() => setShowChatbot((show) => !show)}
-          />
-        )}
-      </div>
-    </div>
+        <XStack onPress={() => togglePanel('chat')}>
+          {activePanel !== 'chat' ? (
+            <MessageSquareMore size={22} title="Show Chatbot" color="$gray11" cursor="pointer" />
+          ) : (
+            <MessageSquareOff size={22} title="Hide Similar Files" color="$gray11" cursor="pointer" />
+          )}
+        </XStack>
+        <XStack marginLeft={3} onPress={() => togglePanel('similarFiles')}>
+          {activePanel !== 'similarFiles' ? (
+            <PanelRightOpen size={22} title="Show Similar Files" color="$gray11" cursor="pointer" />
+          ) : (
+            <PanelRightClose size={22} title="Hide Similar Files" color="$gray11" cursor="pointer" />
+          )}
+        </XStack>
+      </XStack>
+    </XStack>
   )
 }
 

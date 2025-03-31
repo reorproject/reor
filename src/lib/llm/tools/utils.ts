@@ -113,7 +113,6 @@ const autoExecuteTools = async (
   if (lastMessage.role !== 'assistant') {
     throw new Error('Last message is not an assistant message')
   }
-  // eslint-disable-next-line no-restricted-syntax
   for (const toolCall of toolsThatNeedExecuting) {
     // eslint-disable-next-line no-await-in-loop
     outputMessages = await makeAndAddToolResultToMessages(outputMessages, toolCall, lastMessage)

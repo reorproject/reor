@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import rehypeRaw from 'rehype-raw'
+import { SizableText } from 'tamagui'
 import { ReorChatMessage } from '../../../lib/llm/types'
 import { getDisplayMessage } from '../../../lib/llm/chat'
 
@@ -9,7 +10,7 @@ interface UserMessageProps {
 }
 
 const UserMessage: React.FC<UserMessageProps> = ({ message }) => {
-  const displayMessage = getDisplayMessage(message)
+  const displayMessage: string | undefined = getDisplayMessage(message)
   const messageLength = displayMessage?.length || 0
 
   // Determine font size class based on message length
@@ -20,15 +21,12 @@ const UserMessage: React.FC<UserMessageProps> = ({ message }) => {
   }
 
   return (
-    <div className="mb-0 w-full flex-col gap-1">
-      <div className="flex grow flex-col">
-        <ReactMarkdown
-          rehypePlugins={[rehypeRaw]}
-          className={`max-w-[95%] break-words font-bold text-neutral-400 ${getFontSizeClass()}`}
-        >
+    <div className="mb-0 flex w-full flex-col gap-1 text-center">
+      <SizableText fontWeight="bold" color="$gray13">
+        <ReactMarkdown rehypePlugins={[rehypeRaw]} className={`max-w-[95%] break-words ${getFontSizeClass()}`}>
           {displayMessage}
         </ReactMarkdown>
-      </div>
+      </SizableText>
     </div>
   )
 }

@@ -3,14 +3,14 @@
     "target": "ESNext",
     "useDefineForClassFields": true,
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "allowJs": false,
+    "allowJs": true,
     "skipLibCheck": true,
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "ESNext",
-    "moduleResolution": "Node",
+    "module": "CommonJS",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
@@ -18,9 +18,13 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@shared/*": ["./shared/*"]
-    },
+      "@shared/*": ["./shared/*"],
+      "@blocknote/*": ["./src/lib/blocknote/*"],
+      "@blocknote/core/*": ["./src/lib/blocknote/core/*"],
+      "@lib/*": ["./src/lib/*"]
+    }
   },
   "include": ["src", "electron", "shared"],
+  "exclude": ["node_modules", "src/components/Editor/ui/src/generated-themes.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

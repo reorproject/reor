@@ -1,11 +1,13 @@
 import React from 'react'
 
 import { PiPaperPlaneRight } from 'react-icons/pi'
+import { TextArea } from 'tamagui'
+import { ToggleButton, ToggleThumb } from '@/components/Editor/ui/src/toggle'
 import { AgentConfig, LoadingState } from '../../lib/llm/types'
 import { Button } from '../ui/button'
 import LLMSelectOrButton from '../Settings/LLMSettings/LLMSelectOrButton'
-import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
+import { useThemeManager } from '@/contexts/ThemeContext'
 
 interface ChatInputProps {
   userTextFieldInput: string
@@ -28,7 +30,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
   agentConfig,
   setAgentConfig,
 }) => {
-  // const [useStream, setUseStream] = React.useState(true)
+  const { state } = useThemeManager()
 
   const handleDbSearchToggle = (checked: boolean) => {
     setAgentConfig((prevConfig) => {
@@ -49,37 +51,32 @@ const ChatInput: React.FC<ChatInputProps> = ({
 
   return (
     <div className="flex w-full">
-      <div className="z-50 flex w-full flex-col overflow-hidden rounded border-2 border-solid border-border bg-background focus-within:ring-1 focus-within:ring-ring">
-        {/* <Select value={selectedLLM}>
-          <SelectTrigger className="h-7 w-32 border-0 text-[10px] text-gray-300 focus:ring-0 focus:ring-offset-0">
-            <SelectValue placeholder="Tools" />
-          </SelectTrigger>
-          <SelectContent className="rounded-md border border-dark-gray-c-eight bg-[#1c1c1c]">
-            {allAvailableToolDefinitions.map((tool) => (
-              <SelectItem
-                key={tool.displayName}
-                value={tool.name}
-                className="cursor-pointer text-[10px] text-gray-300 hover:bg-[#252525] focus:bg-[#252525] focus:text-gray-200"
-              >
-                {tool.displayName}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select> */}
-        <textarea
+      <div className="z-50 flex w-full flex-col overflow-hidden rounded border-2">
+        <TextArea
           value={userTextFieldInput}
-          onKeyDown={(e) => {
+          // @ts-expect-error
+          onKeyPress={(e: KeyboardEvent) => {
             if (!e.shiftKey && e.key === 'Enter') {
               e.preventDefault()
               handleSubmitNewMessage()
             }
           }}
-          className="h-[100px] w-full resize-none border-0 bg-transparent p-4 text-foreground caret-current focus:outline-none"
-          wrap="soft"
           placeholder="What can Reor help you with today?"
-          onChange={(e) => setUserTextFieldInput(e.target.value)}
-          // eslint-disable-next-line jsx-a11y/no-autofocus
+          onChangeText={(text: string) => setUserTextFieldInput(text)}
           autoFocus
+          h={100}
+          w="100%"
+          resize="none"
+          bg="transparent"
+          p="$4"
+          color="$foreground"
+          borderWidth={2}
+          borderColor="$border"
+          focusStyle={{
+            borderColor: '$ring',
+            borderWidth: 2,
+          }}
+          fontSize={12}
         />
         <div className="mx-auto h-px w-[96%] bg-background/20" />
         <div className="flex h-10 flex-col items-center justify-between gap-2  py-2 md:flex-row md:gap-4">
@@ -87,17 +84,18 @@ const ChatInput: React.FC<ChatInputProps> = ({
             <LLMSelectOrButton selectedLLM={selectedLLM} setSelectedLLM={setSelectedLLM} />
           </div>
 
-          <div className="flex items-center">
-            <div className="mr-[-8px] flex flex-col">
-              <Switch
-                id="search-notes"
-                checked={!!agentConfig?.dbSearchFilters}
-                onCheckedChange={handleDbSearchToggle}
-                className="scale-[0.6]"
-              />
-              <Label htmlFor="stream-mode" className="mt-0 text-[8px] text-muted-foreground">
-                Search notes
-              </Label>
+          <div className="flex">
+            <div className="mr-[-8px] mt-[8px] flex flex-col items-center">
+              <ToggleButton
+                hybrid={!!agentConfig?.dbSearchFilters}
+                onPress={() => handleDbSearchToggle(!agentConfig?.dbSearchFilters)}
+                aria-checked={!!agentConfig?.dbSearchFilters}
+                role="switch"
+                aria-label="Search notes"
+              >
+                <ToggleThumb hybrid={!!agentConfig?.dbSearchFilters} />
+              </ToggleButton>
+              <Label className="mt-0 text-[8px] text-muted-foreground">Search notes</Label>
             </div>
 
             <Button
@@ -105,7 +103,7 @@ const ChatInput: React.FC<ChatInputProps> = ({
               onClick={handleSubmitNewMessage}
               disabled={loadingState !== 'idle'}
             >
-              <PiPaperPlaneRight className="size-4" />
+              <PiPaperPlaneRight className="size-4" color={state === 'light' ? 'black' : 'white'} />
             </Button>
           </div>
         </div>

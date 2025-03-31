@@ -3,6 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { Button } from '@material-tailwind/react'
 import posthog from 'posthog-js'
 
+import { Input, H3 } from 'tamagui'
+import { NativeSyntheticEvent, TextInputKeyPressEventData } from 'react-native'
 import ReorModal from '../Common/Modal'
 import { getInvalidCharacterInFilePath } from '@/lib/file'
 import { useFileContext } from '@/contexts/FileContext'
@@ -59,8 +61,7 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
     return true
   }
 
-  const handleNameChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newName = e.target.value
+  const handleNameChange = async (newName: string) => {
     await handleValidName(newName)
     setDirectoryRelativePath(newName)
   }
@@ -80,19 +81,28 @@ const NewDirectoryComponent: React.FC<NewDirectoryComponentProps> = ({ isOpen, o
   return (
     <ReorModal isOpen={isOpen} onClose={onClose}>
       <div className="my-2 ml-3 mr-6 h-full min-w-[400px]">
-        <h2 className="mb-3 text-xl font-semibold text-white">New Directory</h2>
-        <input
-          type="text"
-          className=" block w-full rounded-md border border-gray-300 px-3 py-2 transition duration-150 ease-in-out focus:border-blue-300 focus:outline-none"
+        <H3 color="$gray13" fontWeight="semi-bold">
+          New Directory
+        </H3>
+        <Input
+          width="100%"
+          height="$3"
+          fontSize="$1"
+          borderRadius="$3"
+          borderWidth={1}
+          borderColor="$gray7"
+          paddingHorizontal="$3"
+          paddingVertical="$2"
+          focusStyle={{ borderColor: '$blue7', outlineStyle: 'none' }}
           value={directoryRelativePath}
-          onChange={handleNameChange}
-          onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-            if (e.key === 'Enter') {
+          onChangeText={handleNameChange}
+          onKeyPress={(e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+            if (e.nativeEvent.key === 'Enter') {
               createNewDirectory()
             }
           }}
           placeholder="Directory Name"
-          // eslint-disable-next-line jsx-a11y/no-autofocus
+          marginTop="$3"
           autoFocus
         />
 

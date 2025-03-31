@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 
+import { YStack } from 'tamagui'
 import { ChatSidebar } from '../Chat/ChatSidebar'
 
 import SearchComponent from './SearchComponent'
@@ -17,7 +18,7 @@ const SidebarManager: React.FC = () => {
   const [searchResults, setSearchResults] = useState<DBQueryResult[]>([])
 
   return (
-    <div className="size-full overflow-y-hidden">
+    <YStack className="size-full overflow-y-hidden">
       {sidebarShowing === 'files' && <FileSidebar />}
 
       {sidebarShowing === 'search' && (
@@ -30,7 +31,7 @@ const SidebarManager: React.FC = () => {
       )}
 
       {sidebarShowing === 'chats' && <ChatSidebar />}
-    </div>
+    </YStack>
   )
 }
 

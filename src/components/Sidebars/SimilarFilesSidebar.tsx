@@ -7,9 +7,9 @@ import removeMd from 'remove-markdown'
 import '../../styles/global.css'
 
 import posthog from 'posthog-js'
+import { Stack } from 'tamagui'
 import errorToStringRendererProcess from '@/lib/error'
 import SimilarEntriesComponent from './SemanticSidebar/SimilarEntriesComponent'
-import HighlightButton from './SemanticSidebar/HighlightButton'
 import { useFileContext } from '@/contexts/FileContext'
 import { useContentContext } from '@/contexts/ContentContext'
 
@@ -17,7 +17,7 @@ const SimilarFilesSidebarComponent: React.FC = () => {
   const [similarEntries, setSimilarEntries] = useState<DBQueryResult[]>([])
   const [isLoadingSimilarEntries, setIsLoadingSimilarEntries] = useState(false)
 
-  const { currentlyOpenFilePath, highlightData } = useFileContext()
+  const { currentlyOpenFilePath } = useFileContext()
   const { openContent: openTabContent } = useContentContext()
 
   const getChunkForInitialSearchFromFile = async (filePathForChunk: string | null) => {
@@ -25,7 +25,7 @@ const SimilarFilesSidebarComponent: React.FC = () => {
     if (!filePathForChunk) {
       return undefined
     }
-    const fileContent: string = await window.fileSystem.readFile(filePathForChunk)
+    const fileContent: string = await window.fileSystem.readFile(filePathForChunk, 'utf-8')
     if (!fileContent) {
       return undefined
     }
@@ -88,8 +88,8 @@ const SimilarFilesSidebarComponent: React.FC = () => {
   }
 
   return (
-    <>
-      <HighlightButton
+    <Stack height="100%">
+      {/* <HighlightButton
         highlightData={highlightData}
         onClick={async () => {
           setSimilarEntries([])
@@ -98,7 +98,7 @@ const SimilarFilesSidebarComponent: React.FC = () => {
           const searchResults: DBQueryResult[] = await window.database.search(highlightData.text, 20, filterString)
           setSimilarEntries(searchResults)
         }}
-      />{' '}
+      />{' '} */}
       <SimilarEntriesComponent
         similarEntries={similarEntries}
         setSimilarEntries={setSimilarEntries}
@@ -110,7 +110,7 @@ const SimilarFilesSidebarComponent: React.FC = () => {
         isLoadingSimilarEntries={isLoadingSimilarEntries}
         titleText="Related notes"
       />
-    </>
+    </Stack>
   )
 }
 

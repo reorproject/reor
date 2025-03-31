@@ -23,6 +23,8 @@ export type LLMGenerationParameters = {
 
 export type EmbeddingModelConfig = EmbeddingModelWithRepo | EmbeddingModelWithLocalPath
 
+export type TamaguiThemeTypes = 'light' | 'dark'
+
 export interface EmbeddingModelWithRepo {
   type: 'repo'
   repoName: string
@@ -62,6 +64,7 @@ export interface StoreSchema {
   EditorFlexCenter: boolean
   showDocumentStats: boolean
   autoContext: boolean
+  tamaguiTheme: TamaguiThemeTypes
   searchParams: SearchProps
 }
 
@@ -84,5 +87,6 @@ export enum StoreKeys {
   EditorFlexCenter = 'editorFlexCenter',
   showDocumentStats = 'showDocumentStats',
   AutoContext = 'autoContext',
+  TamaguiTheme = 'tamaguiTheme',
   SearchParams = 'searchParams',
 }

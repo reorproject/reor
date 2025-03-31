@@ -61,7 +61,6 @@ const ChatComponent: React.FC = () => {
           abortSignal: abortControllerRef.current.signal,
         })
 
-        // eslint-disable-next-line no-restricted-syntax
         for await (const text of textStream) {
           if (abortControllerRef.current.signal.aborted) {
             return
@@ -127,7 +126,7 @@ const ChatComponent: React.FC = () => {
 
   return (
     <div ref={containerRef} className="flex size-full items-center justify-center">
-      <div className="mx-auto flex size-full flex-col overflow-hidden bg-background">
+      <div className="mx-auto flex size-full flex-col overflow-hidden">
         <ChatMessages
           currentChat={currentChat}
           setCurrentChat={setCurrentChat}

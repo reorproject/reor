@@ -3,20 +3,17 @@
   "typescript.tsc.autoDetect": "off",
   "json.schemas": [
     {
-      "fileMatch": [
-        "/*electron-builder.json5",
-        "/*electron-builder.json"
-      ],
+      "fileMatch": ["/*electron-builder.json5", "/*electron-builder.json"],
       "url": "https://json.schemastore.org/electron-builder"
     }
   ],
   "editor.codeActionsOnSave": {
-    "source.fixAll": "explicit",
+    "source.fixAll": "explicit"
     // "source.organizeImports": "explicit"
   },
   "eslint.alwaysShowStatus": true,
   "eslint.format.enable": false,
   // "eslint.run": "",
   "editor.formatOnSave": false,
-  "editor.codeActionsOnSaveMode": "explicit"  // This is the updated setting
+  "editor.codeActionsOnSaveMode": "explicit" // This is the updated setting
 }

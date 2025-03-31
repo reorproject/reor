@@ -1,14 +1,16 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react'
 import '../../styles/chat.css'
+import { Spinner, YStack } from 'tamagui'
 import { Chat, AgentConfig, LoadingState, ReorChatMessage } from '../../lib/llm/types'
 import ChatInput from './ChatInput'
 import UserMessage from './MessageComponents/UserMessage'
 import AssistantMessage from './MessageComponents/AssistantMessage'
 import SystemMessage from './MessageComponents/SystemMessage'
 import ChatSources from './MessageComponents/ChatSources'
-import LoadingDots from '@/lib/animations'
 import useLLMConfigs from '@/lib/hooks/use-llm-configs'
 import useAgentConfig from '@/lib/hooks/use-agent-configs'
+import { useChatContext } from '@/contexts/ChatContext'
+import { useContentContext } from '@/contexts/ContentContext'
 
 interface MessageProps {
   message: ReorChatMessage
@@ -59,6 +61,8 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   const [shouldAutoScroll, setShouldAutoScroll] = useState(true)
   const chatContainerRef = useRef<HTMLDivElement>(null)
   const lastMessageRef = useRef<HTMLDivElement>(null)
+  const { showEditor } = useContentContext()
+  const { activePanel } = useChatContext()
 
   useEffect(() => {
     setSelectedLLM(defaultLLM)
@@ -112,7 +116,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   }, [shouldAutoScroll, scrollToBottom])
 
   return (
-    <div className="flex h-full flex-col">
+    <YStack flex={1} backgroundColor={activePanel && showEditor ? '$gray3' : '$background'}>
       <div className="grow overflow-auto" ref={chatContainerRef} onScroll={handleScroll}>
         <div className="flex flex-col items-center gap-3 p-4">
           <div className="w-full max-w-3xl">
@@ -129,13 +133,16 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 
           {loadingState === 'waiting-for-first-token' && (
             <div className="mt-4 flex w-full max-w-3xl items-start gap-6 p-2">
-              <LoadingDots />
+              <YStack padding="$3" space="$4" alignItems="center">
+                {/* @ts-expect-error */}
+                <Spinner size="small" color="$blue9" />
+              </YStack>
             </div>
           )}
         </div>
       </div>
 
-      <div className="w-full p-4">
+      <YStack width="100%" padding="$4">
         <ChatInput
           userTextFieldInput={userTextFieldInput ?? ''}
           setUserTextFieldInput={setUserTextFieldInput}
@@ -146,8 +153,8 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
           agentConfig={agentConfig}
           setAgentConfig={setAgentConfig}
         />
-      </div>
-    </div>
+      </YStack>
+    </YStack>
   )
 }
 
