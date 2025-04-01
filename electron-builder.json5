@@ -5,6 +5,9 @@
     output: 'release/${version}',
   },
   files: ['dist-electron/**/*', 'dist/**/*'],
+  extraMetadata: {
+    "main": "dist-electron/main/index.js",
+  },
   mac: {
     asarUnpack: ['**/*.{node,dll,metal,exp,lib}'],
     artifactName: '${productName}_${version}.${ext}',

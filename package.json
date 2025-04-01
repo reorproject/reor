@@ -3,6 +3,7 @@
   "version": "0.2.31",
   "productName": "Reor",
   "main": "dist-electron/main/index.js",
+  "files": ["dist_electron/**/*", "dist/**/*"],
   "description": "An AI note-taking app that runs models locally.",
   "author": "Sam L'Huillier",
   "license": "AGPL-3.0",

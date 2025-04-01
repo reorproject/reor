@@ -126,6 +126,7 @@ export const SideMenuPositioner = <BSchema extends BlockSchema = DefaultBlockSch
       offset={[topOffset, rightOffset]}
       placement={props.placement}
       popperOptions={popperOptions}
+      zIndex={40}
     />
   )
 }

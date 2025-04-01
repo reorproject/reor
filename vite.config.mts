@@ -28,12 +28,13 @@ export default defineConfig(({ command }) => {
         '@': path.join(__dirname, './src'),
         '@shared': path.join(__dirname, './shared'),
       },
+      extensions: ['.ts', '.tsx', '.js', '.jsx', '.json', '.mjs'],
     },
-    extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
     plugins: [
       tamaguiPlugin({
-        config: './tamagui.config.ts',
+        config: 'tamagui.config.ts',
         components: ['tamagui'],
+        useReactNativeWebLite: true,
       }),
       // tamaguiExtractPlugin(),
       react(),
