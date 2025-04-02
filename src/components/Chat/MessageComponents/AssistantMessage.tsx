@@ -3,7 +3,7 @@ import { HiOutlinePencilAlt } from 'react-icons/hi'
 import { toast } from 'react-toastify'
 import { ToolCallPart } from 'ai'
 import { FaRegCopy } from 'react-icons/fa'
-import { YStack, Stack } from 'tamagui'
+import { YStack, Stack, Text } from 'tamagui'
 import { Chat, ReorChatMessage } from '../../../lib/llm/types'
 import { extractMessagePartsFromAssistantMessage, findToolResultMatchingToolCall } from '../../../lib/llm/chat'
 import { ToolCallComponent } from './ToolCalls'
@@ -69,9 +69,11 @@ const AssistantMessage: React.FC<AssistantMessageProps> = ({ message, setCurrent
       <>
         {textParts.map((text, index) => (
           <Stack>
-            <Stack color="$color11">
-              {/* eslint-disable-next-line react/no-array-index-key */}
-              <MarkdownRenderer key={index} content={text} />
+            <Stack>
+              <Text color="$color11">
+                {/* eslint-disable-next-line react/no-array-index-key */}
+                <MarkdownRenderer key={index} content={text} />
+              </Text>
             </Stack>
             <div className="mt-0 flex">
               <YStack
