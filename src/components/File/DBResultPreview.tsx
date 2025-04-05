@@ -46,10 +46,12 @@ export const DBResultPreview: React.FC<DBResultPreviewProps> = ({ dbResult: entr
       borderColor="$gray7"
       paddingHorizontal="$2"
       paddingVertical="$1"
-      onClick={() => onSelect(entry.notepath)}
+      onPress={() => onSelect(entry.notepath)}
     >
-      <Stack fontSize="sm" width="100%" color="$gray11">
-        <MarkdownRenderer content={entry.content} />
+      <Stack width="100%">
+        <Text fontSize="sm" color="$gray11">
+          <MarkdownRenderer content={entry.content} />
+        </Text>
       </Stack>
       <div className="mt-2 text-xs">
         {fileName && <span className="text-xs text-gray-400">{fileName} </span>} | Similarity:{' '}

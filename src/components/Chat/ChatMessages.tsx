@@ -134,7 +134,6 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
           {loadingState === 'waiting-for-first-token' && (
             <div className="mt-4 flex w-full max-w-3xl items-start gap-6 p-2">
               <YStack padding="$3" space="$4" alignItems="center">
-                {/* @ts-expect-error */}
                 <Spinner size="small" color="$blue9" />
               </YStack>
             </div>

@@ -3,8 +3,6 @@ import { Extensions, extensions } from '@tiptap/core'
 // import {debugPlugin} from '@/editor/prosemirror-debugger'
 import { Bold } from '@tiptap/extension-bold'
 import { Code } from '@tiptap/extension-code'
-import Collaboration from '@tiptap/extension-collaboration'
-import CollaborationCursor from '@tiptap/extension-collaboration-cursor'
 import { Dropcursor } from '@tiptap/extension-dropcursor'
 import { Gapcursor } from '@tiptap/extension-gapcursor'
 import { HardBreak } from '@tiptap/extension-hard-break'
@@ -13,10 +11,8 @@ import { Italic } from '@tiptap/extension-italic'
 import { Strike } from '@tiptap/extension-strike'
 import { Text } from '@tiptap/extension-text'
 import { Underline } from '@tiptap/extension-underline'
-import * as Y from 'yjs'
 // import {createInlineEmbedNode} from '../../mentions-plugin'
 import { Link } from '../../tiptap-extension-link'
-import styles from './editor.module.css'
 import BlockManipulationExtension from './extensions/BlockManipulation/BlockManipulationExtension'
 import { BlockContainer, BlockGroup, Doc } from './extensions/Blocks'
 import { BlockNoteDOMAttributes } from './extensions/Blocks/api/blockTypes'
@@ -42,15 +38,6 @@ const getBlockNoteExtensions = <BSchema extends HMBlockSchema>(opts: {
   blockSchema: BSchema
   linkExtensionOptions: any
   inlineEmbedOptions: any
-  collaboration?: {
-    fragment: Y.XmlFragment
-    user: {
-      name: string
-      color: string
-    }
-    provider: any
-    renderCursor?: (user: any) => HTMLElement
-  }
 }) => {
   const ret: Extensions = [
     // createInlineEmbedNode(opts.editor),
@@ -121,45 +108,7 @@ const getBlockNoteExtensions = <BSchema extends HMBlockSchema>(opts: {
     // debugPlugin,
   ]
 
-  if (opts.collaboration) {
-    ret.push(
-      Collaboration.configure({
-        fragment: opts.collaboration.fragment,
-      }),
-    )
-    if (opts.collaboration.provider?.awareness) {
-      const defaultRender = (user: { color: string; name: string }) => {
-        const cursor = document.createElement('span')
-
-        cursor.classList.add(styles['collaboration-cursor__caret'])
-        cursor.setAttribute('style', `border-color: ${user.color}`)
-
-        const label = document.createElement('span')
-
-        label.classList.add(styles['collaboration-cursor__label'])
-        label.setAttribute('style', `background-color: ${user.color}`)
-        label.insertBefore(document.createTextNode(user.name), null)
-
-        const nonbreakingSpace1 = document.createTextNode('\u2060')
-        const nonbreakingSpace2 = document.createTextNode('\u2060')
-        cursor.insertBefore(nonbreakingSpace1, null)
-        cursor.insertBefore(label, null)
-        cursor.insertBefore(nonbreakingSpace2, null)
-        return cursor
-      }
-      ret.push(
-        CollaborationCursor.configure({
-          user: opts.collaboration.user,
-          render: opts.collaboration.renderCursor || defaultRender,
-          provider: opts.collaboration.provider,
-        }),
-      )
-    }
-  } else {
-    // disable history extension when collaboration is enabled as Yjs takes care of undo / redo
-    ret.push(History)
-  }
-
+  ret.push(History)
   return ret
 }
 

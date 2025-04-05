@@ -8,6 +8,7 @@ const DialogClose = DialogPrimitive.Close
 
 const DialogOverlay = styled(DialogPrimitive.Overlay, {
   name: 'DialogOverlay',
+  // @ts-ignore
   position: 'fixed',
   inset: 0,
   zIndex: 50,
@@ -28,6 +29,7 @@ const DialogContent = styled(DialogPrimitive.Content, {
   name: 'DialogContent',
   backgroundColor: '$background',
   borderRadius: '$3',
+  // @ts-ignore
   position: 'fixed',
   left: '50%',
   top: '50%',

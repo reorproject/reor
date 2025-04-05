@@ -3,6 +3,7 @@ import { Editor } from '@tiptap/core' // Adjust import based on your setup}
 import { Button } from '@material-tailwind/react'
 import { XStack, YStack, Separator } from 'tamagui'
 import { ChevronDown, ChevronUp, X, Replace } from '@tamagui/lucide-icons'
+import { StyledIconButton } from '@/components/Editor/ui/src/button'
 
 interface SearchBarProps {
   editor: Editor | null
@@ -162,15 +163,20 @@ const SearchBar: React.FC<SearchBarProps> = ({ editor }) => {
         <div className="mx-2 h-6 w-px bg-gray-500" />
 
         <XStack alignItems="center" gap={10}>
-          <ChevronUp
-            {...iconProps}
-            onMouseDown={(event) => handleSearch(event, editor?.commands.previousSearchResult)}
-          />
-          <ChevronDown {...iconProps} onMouseDown={(event) => handleSearch(event, editor?.commands.nextSearchResult)} />
+          <StyledIconButton onPress={(event: any) => handleSearch(event, editor?.commands.previousSearchResult)}>
+            <ChevronUp {...iconProps} />
+          </StyledIconButton>
+          <StyledIconButton onPress={(event: any) => handleSearch(event, editor?.commands.nextSearchResult)}>
+            <ChevronDown {...iconProps} />
+          </StyledIconButton>
           {(showReplace || searchLocation.resultsExist) && (
-            <Replace size={16} color="white" cursor="pointer" onClick={toggleReplace} />
+            <StyledIconButton onPress={toggleReplace}>
+              <Replace size={16} color="white" cursor="pointer" />
+            </StyledIconButton>
           )}
-          <X {...iconProps} onClick={toggleSearch} />
+          <StyledIconButton onPress={toggleSearch}>
+            <X {...iconProps} />
+          </StyledIconButton>
         </XStack>
       </XStack>
       {showReplace && (

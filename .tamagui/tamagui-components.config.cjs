@@ -35498,7 +35498,7 @@ function applyAttributeToOthers(uncorrectedAvoidElements, body, ariaHidden, iner
           node.setAttribute(markerName, "");
         }
         if (!alreadyHidden && controlAttribute) {
-          node.setAttribute(controlAttribute, "true");
+          node.setAttribute(controlAttribute, controlAttribute === "inert" ? "" : "true");
         }
       }
     });
@@ -35562,12 +35562,12 @@ function getTabbableIn(container, direction) {
   return nextTabbableElements[0];
 }
 __name(getTabbableIn, "getTabbableIn");
-function getNextTabbable() {
-  return getTabbableIn(document.body, "next");
+function getNextTabbable(referenceElement) {
+  return getTabbableIn(getDocument(referenceElement).body, "next") || referenceElement;
 }
 __name(getNextTabbable, "getNextTabbable");
-function getPreviousTabbable() {
-  return getTabbableIn(document.body, "prev");
+function getPreviousTabbable(referenceElement) {
+  return getTabbableIn(getDocument(referenceElement).body, "prev") || referenceElement;
 }
 __name(getPreviousTabbable, "getPreviousTabbable");
 function isOutsideEvent(event, container) {
@@ -35756,7 +35756,8 @@ function FloatingPortal(props) {
           var _beforeInsideRef$curr;
           (_beforeInsideRef$curr = beforeInsideRef.current) == null || _beforeInsideRef$curr.focus();
         } else {
-          const prevTabbable = getPreviousTabbable() || (focusManagerState == null ? void 0 : focusManagerState.domReference);
+          const domReference = focusManagerState ? focusManagerState.domReference : null;
+          const prevTabbable = getPreviousTabbable(domReference);
           prevTabbable == null || prevTabbable.focus();
         }
       }, "onFocus")
@@ -35771,7 +35772,8 @@ function FloatingPortal(props) {
           var _afterInsideRef$curre;
           (_afterInsideRef$curre = afterInsideRef.current) == null || _afterInsideRef$curre.focus();
         } else {
-          const nextTabbable = getNextTabbable() || (focusManagerState == null ? void 0 : focusManagerState.domReference);
+          const domReference = focusManagerState ? focusManagerState.domReference : null;
+          const nextTabbable = getNextTabbable(domReference);
           nextTabbable == null || nextTabbable.focus();
           (focusManagerState == null ? void 0 : focusManagerState.closeOnFocusOut) && (focusManagerState == null ? void 0 : focusManagerState.onOpenChange(false, event.nativeEvent, "focus-out"));
         }
@@ -35808,7 +35810,7 @@ function addPreviouslyFocusedElement(element) {
   if (element && getNodeName(element) !== "body") {
     previouslyFocusedElements.push(element);
     if (previouslyFocusedElements.length > LIST_LIMIT) {
-      previouslyFocusedElements = previouslyFocusedElements.slice(-LIST_LIMIT);
+      previouslyFocusedElements = previouslyFocusedElements.slice(-20);
     }
   }
 }
@@ -35847,7 +35849,8 @@ function FloatingFocusManager(props) {
     modal = true,
     visuallyHiddenDismiss = false,
     closeOnFocusOut = true,
-    outsideElementsInert = false
+    outsideElementsInert = false,
+    getInsideElements: _getInsideElements = /* @__PURE__ */ __name(() => [], "_getInsideElements")
   } = props;
   const {
     open,
@@ -35863,6 +35866,7 @@ function FloatingFocusManager(props) {
     var _dataRef$current$floa;
     return (_dataRef$current$floa = dataRef.current.floatingContext) == null ? void 0 : _dataRef$current$floa.nodeId;
   });
+  const getInsideElements = useEffectEvent(_getInsideElements);
   const ignoreInitialFocus = typeof initialFocus === "number" && initialFocus < 0;
   const isUntrappedTypeableCombobox = isTypeableCombobox(domReference) && ignoreInitialFocus;
   const inertSupported = supportsInert();
@@ -36002,20 +36006,25 @@ function FloatingFocusManager(props) {
   const mergedBeforeGuardRef = useLiteMergeRefs([beforeGuardRef, portalContext == null ? void 0 : portalContext.beforeInsideRef]);
   const mergedAfterGuardRef = useLiteMergeRefs([afterGuardRef, portalContext == null ? void 0 : portalContext.afterInsideRef]);
   React45.useEffect(() => {
-    var _portalContext$portal;
+    var _portalContext$portal, _ancestors$find;
     if (disabled) return;
     if (!floating) return;
     const portalNodes = Array.from((portalContext == null || (_portalContext$portal = portalContext.portalNode) == null ? void 0 : _portalContext$portal.querySelectorAll("[" + createAttribute("portal") + "]")) || []);
-    const ancestorFloatingNodes = tree && !modal ? getAncestors(tree == null ? void 0 : tree.nodesRef.current, getNodeId()).map((node) => {
+    const ancestors = tree ? getAncestors(tree.nodesRef.current, getNodeId()) : [];
+    const ancestorFloatingNodes = tree && !modal ? ancestors.map((node) => {
       var _node$context6;
       return (_node$context6 = node.context) == null ? void 0 : _node$context6.elements.floating;
     }) : [];
-    const insideElements = [floating, ...portalNodes, ...ancestorFloatingNodes, startDismissButtonRef.current, endDismissButtonRef.current, beforeGuardRef.current, afterGuardRef.current, portalContext == null ? void 0 : portalContext.beforeOutsideRef.current, portalContext == null ? void 0 : portalContext.afterOutsideRef.current, orderRef.current.includes("reference") || isUntrappedTypeableCombobox ? domReference : null].filter((x) => x != null);
+    const rootAncestorComboboxDomReference = (_ancestors$find = ancestors.find((node) => {
+      var _node$context7;
+      return isTypeableCombobox(((_node$context7 = node.context) == null ? void 0 : _node$context7.elements.domReference) || null);
+    })) == null || (_ancestors$find = _ancestors$find.context) == null ? void 0 : _ancestors$find.elements.domReference;
+    const insideElements = [floating, rootAncestorComboboxDomReference, ...portalNodes, ...ancestorFloatingNodes, ...getInsideElements(), startDismissButtonRef.current, endDismissButtonRef.current, beforeGuardRef.current, afterGuardRef.current, portalContext == null ? void 0 : portalContext.beforeOutsideRef.current, portalContext == null ? void 0 : portalContext.afterOutsideRef.current, orderRef.current.includes("reference") || isUntrappedTypeableCombobox ? domReference : null].filter((x) => x != null);
     const cleanup2 = modal || isUntrappedTypeableCombobox ? markOthers(insideElements, !useInert, useInert) : markOthers(insideElements);
     return () => {
       cleanup2();
     };
-  }, [disabled, domReference, floating, modal, orderRef, portalContext, isUntrappedTypeableCombobox, guards, useInert, tree, getNodeId]);
+  }, [disabled, domReference, floating, modal, orderRef, portalContext, isUntrappedTypeableCombobox, guards, useInert, tree, getNodeId, getInsideElements]);
   index2(() => {
     if (disabled || !isHTMLElement(floatingFocusElement)) return;
     const doc = getDocument(floatingFocusElement);
@@ -36099,8 +36108,8 @@ function FloatingFocusManager(props) {
       events.off("openchange", onOpenChange2);
       const activeEl = activeElement(doc);
       const isFocusInsideFloatingTree = contains(floating, activeEl) || tree && getChildren(tree.nodesRef.current, getNodeId()).some((node) => {
-        var _node$context7;
-        return contains((_node$context7 = node.context) == null ? void 0 : _node$context7.elements.floating, activeEl);
+        var _node$context8;
+        return contains((_node$context8 = node.context) == null ? void 0 : _node$context8.elements.floating, activeEl);
       });
       if (isFocusInsideFloatingTree || !!openEvent && ["click", "mousedown"].includes(openEvent.type)) {
         focusReference = true;
@@ -36197,7 +36206,7 @@ function FloatingFocusManager(props) {
         } else if (portalContext != null && portalContext.preserveTabOrder && portalContext.portalNode) {
           preventReturnFocusRef.current = false;
           if (isOutsideEvent(event, portalContext.portalNode)) {
-            const nextTabbable = getNextTabbable() || domReference;
+            const nextTabbable = getNextTabbable(domReference);
             nextTabbable == null || nextTabbable.focus();
           } else {
             var _portalContext$before;
@@ -36216,7 +36225,7 @@ function FloatingFocusManager(props) {
             preventReturnFocusRef.current = true;
           }
           if (isOutsideEvent(event, portalContext.portalNode)) {
-            const prevTabbable = getPreviousTabbable() || domReference;
+            const prevTabbable = getPreviousTabbable(domReference);
             prevTabbable == null || prevTabbable.focus();
           } else {
             var _portalContext$afterO;
@@ -36307,6 +36316,10 @@ function isButtonTarget(event) {
   return isHTMLElement(event.target) && event.target.tagName === "BUTTON";
 }
 __name(isButtonTarget, "isButtonTarget");
+function isAnchorTarget(event) {
+  return isHTMLElement(event.target) && event.target.tagName === "A";
+}
+__name(isAnchorTarget, "isAnchorTarget");
 function isSpaceIgnored(element) {
   return isTypeableElement(element);
 }
@@ -36370,6 +36383,9 @@ function useClick(context2, props) {
       if (event.key === " " && !isSpaceIgnored(domReference)) {
         event.preventDefault();
         didKeyDownRef.current = true;
+      }
+      if (isAnchorTarget(event)) {
+        return;
       }
       if (event.key === "Enter") {
         if (open && toggle) {
@@ -36755,6 +36771,7 @@ function useFloating3(options) {
   const setPositionReference = React45.useCallback((node) => {
     const computedPositionReference = isElement(node) ? {
       getBoundingClientRect: /* @__PURE__ */ __name(() => node.getBoundingClientRect(), "getBoundingClientRect"),
+      getClientRects: /* @__PURE__ */ __name(() => node.getClientRects(), "getClientRects"),
       contextElement: node
     } : node;
     _setPositionReference(computedPositionReference);
@@ -36804,6 +36821,37 @@ function useFloating3(options) {
   }), [position, refs, elements, context2]);
 }
 __name(useFloating3, "useFloating");
+function getUserAgent2() {
+  const uaData = navigator.userAgentData;
+  if (uaData && Array.isArray(uaData.brands)) {
+    return uaData.brands.map((_ref) => {
+      let {
+        brand,
+        version
+      } = _ref;
+      return brand + "/" + version;
+    }).join(" ");
+  }
+  return navigator.userAgent;
+}
+__name(getUserAgent2, "getUserAgent");
+function isJSDOM2() {
+  return getUserAgent2().includes("jsdom/");
+}
+__name(isJSDOM2, "isJSDOM");
+function matchesFocusVisible(element) {
+  if (!element || isJSDOM2()) return true;
+  try {
+    return element.matches(":focus-visible");
+  } catch (_e) {
+    return true;
+  }
+}
+__name(matchesFocusVisible, "matchesFocusVisible");
+function isMacSafari() {
+  return isMac() && isSafari();
+}
+__name(isMacSafari, "isMacSafari");
 function useFocus(context2, props) {
   if (props === void 0) {
     props = {};
@@ -36835,11 +36883,21 @@ function useFocus(context2, props) {
       keyboardModalityRef.current = true;
     }
     __name(onKeyDown, "onKeyDown");
+    function onPointerDown() {
+      keyboardModalityRef.current = false;
+    }
+    __name(onPointerDown, "onPointerDown");
     win.addEventListener("blur", onBlur);
-    win.addEventListener("keydown", onKeyDown, true);
+    if (isMacSafari()) {
+      win.addEventListener("keydown", onKeyDown, true);
+      win.addEventListener("pointerdown", onPointerDown, true);
+    }
     return () => {
       win.removeEventListener("blur", onBlur);
-      win.removeEventListener("keydown", onKeyDown, true);
+      if (isMacSafari()) {
+        win.removeEventListener("keydown", onKeyDown, true);
+        win.removeEventListener("pointerdown", onPointerDown, true);
+      }
     };
   }, [elements.domReference, open, enabled]);
   React45.useEffect(() => {
@@ -36864,10 +36922,6 @@ function useFocus(context2, props) {
     };
   }, []);
   const reference = React45.useMemo(() => ({
-    onPointerDown(event) {
-      if (isVirtualPointerEvent(event.nativeEvent)) return;
-      keyboardModalityRef.current = false;
-    },
     onMouseLeave() {
       blockFocusRef.current = false;
     },
@@ -36875,13 +36929,12 @@ function useFocus(context2, props) {
       if (blockFocusRef.current) return;
       const target = getTarget(event.nativeEvent);
       if (visibleOnly && isElement(target)) {
-        try {
-          if (isSafari() && isMac()) throw Error();
-          if (!target.matches(":focus-visible")) return;
-        } catch (_e) {
+        if (isMacSafari() && !event.relatedTarget) {
           if (!keyboardModalityRef.current && !isTypeableElement(target)) {
             return;
           }
+        } else if (!matchesFocusVisible(target)) {
+          return;
         }
       }
       onOpenChange(true, event.nativeEvent, "focus");

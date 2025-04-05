@@ -149,7 +149,6 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
             top={14}
             alignItems="center"
             backgroundColor="transparent"
-            hoverStyle={{ color: '$white' }}
             focusStyle={{ outlineWidth: 0 }}
             onPress={() => setShowSearchOptions(!showSearchOptions)}
             aria-label="Search options"

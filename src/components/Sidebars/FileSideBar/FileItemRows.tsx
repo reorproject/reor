@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react'
 import { ListChildComponentProps } from 'react-window'
 import posthog from 'posthog-js'
 import { isFileNodeDirectory } from '@shared/utils'
-import { XStack } from 'tamagui'
+import { XStack, Text } from 'tamagui'
 import { ChevronRight, ChevronDown } from '@tamagui/lucide-icons'
 import { useFileContext } from '@/contexts/FileContext'
 import { removeFileExtension } from '@/lib/file'
@@ -64,7 +64,8 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
   )
 
   const clickOnFileOrDirectory = useCallback(
-    (e: React.MouseEvent) => {
+    (event: any) => {
+      const e = event.nativeEvent
       if (isDirectory) {
         handleDirectoryToggle(file.path)
         setSelectedDirectory(file.path)
@@ -128,8 +129,9 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
                 backgroundColor: '$gray7',
               }}
               backgroundColor={isSelected && !isDirectory ? '$gray7' : ''}
-              onClick={clickOnFileOrDirectory}
+              onPress={clickOnFileOrDirectory}
               className={itemClasses}
+              overflow="hidden"
             >
               {isDirectory && (
                 <span className="mr-2 mt-1">
@@ -142,7 +144,9 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
                   )}
                 </span>
               )}
-              <span className="mt-0 flex-1 truncate">{isDirectory ? file.name : removeFileExtension(file.name)}</span>
+              <Text color="$gray11" numberOfLines={1}>
+                {isDirectory ? file.name : removeFileExtension(file.name)}
+              </Text>
             </XStack>
             <NewDirectoryComponent
               isOpen={isNewDirectoryModalOpen}

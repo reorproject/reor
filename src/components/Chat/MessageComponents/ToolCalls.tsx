@@ -2,7 +2,7 @@ import { CoreToolMessage, ToolCallPart } from 'ai'
 import React, { useState } from 'react'
 import { FileInfoWithContent } from 'electron/main/filesystem/types'
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import { Stack } from 'tamagui'
+import { Stack, Text } from 'tamagui'
 import { Chat } from '../../../lib/llm/types'
 import ChatSources from './ChatSources'
 import { findToolResultMatchingToolCall } from '../../../lib/llm/chat'
@@ -84,16 +84,20 @@ const DefaultToolRenderer: React.FC<ToolRendererProps> = ({ toolCallPart, existi
         <div className="border-t border-border px-3 py-2">
           <h5 className="mb-1 text-xs font-medium text-muted-foreground">Arguments:</h5>
           {Object.entries(toolCallPart.args as Record<string, unknown>).map(([key, value]) => (
-            <Stack key={key} className="text-xs" color="$gray11">
-              <span className="font-medium text-secondary-foreground">{key}:</span>{' '}
-              <MarkdownRenderer content={renderValue(value)} />
+            <Stack key={key} className="text-xs">
+              <Text color="$gray11">
+                <span className="font-medium text-secondary-foreground">{key}:</span>{' '}
+                <MarkdownRenderer content={renderValue(value)} />
+              </Text>
             </Stack>
           ))}
         </div>
         {existingToolResult && (
-          <Stack className="border-t border-border px-3 py-2" color="$gray11">
-            <h5 className="mb-1 text-xs font-medium text-muted-foreground">Result:</h5>
-            <MarkdownRenderer content={renderValue(existingToolResult.content[0].result)} />
+          <Stack className="border-t border-border px-3 py-2">
+            <Text color="$gray11">
+              <h5 className="mb-1 text-xs font-medium text-muted-foreground">Result:</h5>
+              <MarkdownRenderer content={renderValue(existingToolResult.content[0].result)} />
+            </Text>
           </Stack>
         )}
         {!existingToolResult && (

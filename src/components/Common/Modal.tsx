@@ -25,7 +25,7 @@ const ReorModal: React.FC<ModalProps> = ({ isOpen, onClose, children, hideCloseB
 
   const modalContent = (
     <YStack
-      position="fixed"
+      position="absolute"
       top={0}
       left={0}
       right={0}
@@ -34,7 +34,8 @@ const ReorModal: React.FC<ModalProps> = ({ isOpen, onClose, children, hideCloseB
       justifyContent="center"
       backgroundColor="rgba(0, 0, 0, 0.4)"
       height="100vh"
-      onClick={handleBackdropClick}
+      // @ts-ignore
+      onPress={handleBackdropClick}
       zIndex={9999}
     >
       <YStack
@@ -47,7 +48,7 @@ const ReorModal: React.FC<ModalProps> = ({ isOpen, onClose, children, hideCloseB
         shadowOpacity={0.5}
         shadowRadius={10}
         padding="$4"
-        onClick={(e) => e.stopPropagation()}
+        onPress={(e: any) => e.stopPropagation()}
       >
         {!hideCloseButton && (
           <XStack position="absolute" top={10} right={15}>

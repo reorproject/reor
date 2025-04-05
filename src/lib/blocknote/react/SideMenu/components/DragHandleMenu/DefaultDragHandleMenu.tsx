@@ -1,4 +1,3 @@
-import { Block, BlockNoteEditor, BlockSchema } from '@lib/blocknote'
 import { Box, Menu } from '@mantine/core'
 import { XStack } from 'tamagui'
 import { Forward, RefreshCcw } from '@tamagui/lucide-icons'
@@ -13,6 +12,7 @@ import {
   RiMenuLine,
   RiText,
 } from 'react-icons/ri'
+import { Block, BlockNoteEditor, BlockSchema } from '@/lib/blocknote'
 import { updateGroup } from '@/lib/utils'
 import RemoveBlockButton from './DefaultButtons/RemoveBlockButton'
 import { DragHandleMenu, DragHandleMenuProps } from './DragHandleMenu'

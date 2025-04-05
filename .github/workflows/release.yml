@@ -74,7 +74,7 @@ jobs:
         run: |
           mv ./release/${{ env.APP_VERSION }}/*.dmg ./release/${{ env.APP_VERSION }}/Reor_${{ env.APP_VERSION }}-intel.dmg
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.os }}-app
           path: |

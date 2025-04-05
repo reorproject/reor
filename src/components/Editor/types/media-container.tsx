@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import { Button, YStack } from 'tamagui'
-import { Block, BlockNoteEditor } from '@lib/blocknote'
+import { Block, BlockNoteEditor, InlineContent } from '@/lib/blocknote'
 import type { HMBlockSchema } from '../schema'
-import { InlineContent } from '@/lib/blocknote/react'
 import { MediaType } from './media-render'
 
 interface ContainerProps {

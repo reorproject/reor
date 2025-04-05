@@ -51,7 +51,7 @@ const InitialSetupLLMSettings: React.FC<InitialSetupLLMSettingsProps> = () => {
         </DialogTrigger>
         <DialogOverlay>
           <DialogContent style={{ maxHeight: '60vh', display: 'flex', flexDirection: 'column' }}>
-            <ScrollView style={{ flex: 1, overflowY: 'auto' }}>
+            <ScrollView style={{ flex: 1 }}>
               <LLMSettingsContent />
             </ScrollView>
           </DialogContent>

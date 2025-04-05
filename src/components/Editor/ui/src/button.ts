@@ -45,3 +45,15 @@ export const AccountTypeButton = styled(ThemeableStack, {
     bg: '$color6',
   },
 })
+
+export const StyledIconButton = styled(Button, {
+  name: 'StyledIconButton',
+  backgroundColor: 'transparent',
+  padding: 0,
+  margin: 0,
+  size: 20,
+  minWidth: 0,
+  aspectRatio: 1,
+  alignItems: 'center',
+  justifyContent: 'center',
+})
