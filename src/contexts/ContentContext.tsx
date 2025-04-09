@@ -8,7 +8,12 @@ import { getFilesInDirectory, getNextAvailableFileNameGivenBaseName } from '@/li
 interface ContentContextType {
   showEditor: boolean
   setShowEditor: (showEditor: boolean) => void
-  openContent: (pathOrChatID: string, optionalContentToWriteOnCreate?: string, dontUpdateChatHistory?: boolean) => void
+  openContent: (
+    pathOrChatID: string,
+    optionalContentToWriteOnCreate?: string,
+    dontUpdateChatHistory?: boolean,
+    scrollToPosition?: number,
+  ) => void
   currentOpenFileOrChatID: string | null
   createUntitledNote: (parentFileOrDirectory?: string) => void
 }
@@ -40,14 +45,28 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
   } = useFileContext()
 
   const openContent = React.useCallback(
-    async (pathOrChatID: string, optionalContentToWriteOnCreate?: string, dontUpdateChatHistory?: boolean) => {
+    async (
+      pathOrChatID: string,
+      optionalContentToWriteOnCreate?: string,
+      dontUpdateChatHistory?: boolean,
+      scrollToPosition?: number,
+    ) => {
+      console.log('[DEBUG-CC] openContent called with:', {
+        pathOrChatID,
+        hasContent: !!optionalContentToWriteOnCreate,
+        dontUpdateChatHistory,
+        scrollToPosition,
+      })
+
       if (!pathOrChatID) return
       const chatMetadata = allChatsMetadata.find((chat) => chat.id === pathOrChatID)
       if (chatMetadata) {
+        console.log('[DEBUG-CC] Opening chat')
         openNewChat(pathOrChatID)
       } else {
+        console.log('[DEBUG-CC] Opening file with position:', scrollToPosition)
         setShowEditor(true)
-        openOrCreateFile(pathOrChatID, optionalContentToWriteOnCreate)
+        openOrCreateFile(pathOrChatID, optionalContentToWriteOnCreate, scrollToPosition)
       }
       setCurrentOpenFileOrChatID(pathOrChatID)
       if (!dontUpdateChatHistory) {

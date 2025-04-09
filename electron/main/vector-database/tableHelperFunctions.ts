@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import * as fsPromises from 'fs/promises'
 
 import { BrowserWindow } from 'electron'
-import { chunkMarkdownByHeadingsAndByCharsIfBig } from '../common/chunking'
+import { chunkMarkdownByHeadingsAndByCharsIfBigWithPositions } from '../common/chunking'
 import {
   GetFilesInfoList,
   flattenFileInfoTree,
@@ -17,16 +17,23 @@ import { DBEntry, DatabaseFields } from './schema'
 import WindowsManager from '../common/windowManager'
 
 const convertFileTypeToDBType = async (file: FileInfo): Promise<DBEntry[]> => {
+  console.log('[DEBUG-DB] Converting file to DB type:', file.path)
   const fileContent = readFile(file.path)
-  const chunks = await chunkMarkdownByHeadingsAndByCharsIfBig(fileContent)
-  const entries = chunks.map((content, index) => ({
+  const chunksWithPositions = await chunkMarkdownByHeadingsAndByCharsIfBigWithPositions(fileContent)
+  console.log('[DEBUG-DB] Got chunks with positions:', chunksWithPositions.length)
+  console.log('[DEBUG-DB] First chunk example:', chunksWithPositions[0])
+
+  const entries = chunksWithPositions.map((chunkInfo, index) => ({
     notepath: file.path,
-    content,
+    content: chunkInfo.chunk,
     subnoteindex: index,
     timeadded: new Date(),
     filemodified: file.dateModified,
     filecreated: file.dateCreated,
+    startPos: chunkInfo.pos,
   }))
+
+  console.log('[DEBUG-DB] Created DB entries, first entry position:', entries[0]?.startPos)
   return entries
 }
 
@@ -166,19 +173,26 @@ export const removeFileTreeFromDBTable = async (
 }
 
 export const updateFileInTable = async (dbTable: LanceDBTableWrapper, filePath: string): Promise<void> => {
+  console.log('[DEBUG-DB] Updating file in table:', filePath)
   await dbTable.deleteDBItemsByFilePaths([filePath])
   const content = readFile(filePath)
-  const chunkedContentList = await chunkMarkdownByHeadingsAndByCharsIfBig(content)
+  const chunksWithPositions = await chunkMarkdownByHeadingsAndByCharsIfBigWithPositions(content)
+  console.log('[DEBUG-DB] Got chunks with positions for update:', chunksWithPositions.length)
+
   const stats = fs.statSync(filePath)
-  const dbEntries = chunkedContentList.map((_content, index) => ({
+  const dbEntries = chunksWithPositions.map((chunkInfo, index) => ({
     notepath: filePath,
-    content: _content,
+    content: chunkInfo.chunk,
     subnoteindex: index,
     timeadded: new Date(), // time now
     filemodified: stats.mtime,
     filecreated: stats.birthtime,
+    startPos: chunkInfo.pos,
   }))
+
+  console.log('[DEBUG-DB] First updated entry position:', dbEntries[1]?.startPos)
   await dbTable.add(dbEntries)
+  console.log('[DEBUG-DB] File updated in database')
 }
 
 export const RepopulateTableWithMissingItems = async (

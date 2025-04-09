@@ -24,7 +24,7 @@ const formatModifiedDate = (date: Date) => {
 
 interface DBResultPreviewProps {
   dbResult: DBQueryResult
-  onSelect: (path: string) => void
+  onSelect: (path: string, position?: number) => void
 }
 
 export const DBResultPreview: React.FC<DBResultPreviewProps> = ({ dbResult: entry, onSelect }) => {
@@ -46,7 +46,7 @@ export const DBResultPreview: React.FC<DBResultPreviewProps> = ({ dbResult: entr
       borderColor="$gray7"
       paddingHorizontal="$2"
       paddingVertical="$1"
-      onClick={() => onSelect(entry.notepath)}
+      onClick={() => onSelect(entry.notepath, entry.startPos)}
     >
       <Stack fontSize="sm" width="100%" color="$gray11">
         <MarkdownRenderer content={entry.content} />
@@ -63,12 +63,19 @@ export const DBResultPreview: React.FC<DBResultPreviewProps> = ({ dbResult: entr
 
 interface DBSearchPreviewProps {
   dbResult: DBQueryResult
-  onSelect: (path: string) => void
+  onSelect: (path: string, position?: number) => void
 }
 
 export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({ dbResult: entry, onSelect }) => {
   const modified = formatModifiedDate(entry.filemodified)
   const fileName = getFileName(entry.notepath)
+
+  // Log the position information
+  console.log('[DEBUG-PREVIEW] Search result entry has position:', {
+    path: entry.notepath,
+    position: entry.startPos,
+    content: `${entry.content.substring(0, 30)}...`,
+  })
 
   return (
     <Card
@@ -86,7 +93,10 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({ dbResult: entr
       hoverStyle={{
         shadowRadius: '$4',
       }}
-      onPress={() => onSelect(entry.notepath)}
+      onPress={() => {
+        console.log('[DEBUG-PREVIEW] onPress called with position:', entry.startPos)
+        onSelect(entry.notepath, entry.startPos)
+      }}
     >
       <YStack>
         <Text fontSize="$2" color="$colorLight">

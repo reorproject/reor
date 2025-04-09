@@ -103,8 +103,14 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   }, [searchParams.searchMode, searchParams.vectorWeight, debouncedSearch, searchQuery])
 
   const openFileSelectSearch = useCallback(
-    (path: string) => {
-      openTabContent(path)
+    (path: string, position?: number) => {
+      // Log the initial parameters
+      console.log('[DEBUG] Search result clicked:', { path, position })
+
+      // First open the file, then scroll to position if available - rely on FileContext's scrolling
+      openTabContent(path, undefined, false, position)
+      console.log('[DEBUG] Called openTabContent with position:', position)
+
       posthog.capture('open_file_from_search')
     },
     [openTabContent],
