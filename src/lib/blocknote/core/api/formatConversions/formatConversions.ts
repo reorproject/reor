@@ -7,7 +7,7 @@ import remarkParse from 'remark-parse'
 import remarkRehype, { defaultHandlers } from 'remark-rehype'
 import remarkStringify from 'remark-stringify'
 import { unified } from 'unified'
-import { Styles } from '@lib/blocknote/core/extensions/Blocks/api/inlineContentTypes'
+import { Styles } from '@/lib/blocknote'
 import { Block, BlockSchema } from '../../extensions/Blocks/api/blockTypes'
 
 import { blockToNode, nodeToBlock } from '../nodeConversions/nodeConversions'
