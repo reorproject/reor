@@ -48,15 +48,7 @@ const Tooltip = ({
               {renderMarkdown ? (
                 <MarkdownRenderer content={content as string} />
               ) : (
-                <Text
-                  fontSize="$1"
-                  fontFamily="$body"
-                  margin={0}
-                  lineHeight="$1"
-                  color="$gray11"
-                  wordBreak="break-word"
-                  whiteSpace="pre-wrap"
-                >
+                <Text fontSize="$1" fontFamily="$body" margin={0} lineHeight="$1" color="$gray11" whiteSpace="pre-wrap">
                   {content}
                 </Text>
               )}

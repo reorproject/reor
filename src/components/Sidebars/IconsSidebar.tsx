@@ -155,7 +155,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ getShortcutDescription }) =
             backgroundColor: '$gray7',
           }}
           className="flex size-4/5 items-center justify-center rounded"
-          onClick={() => setShowVaultSetup(true)}
+          onPress={() => setShowVaultSetup(true)}
         >
           <GrNewWindow className="text-gray-100" color="gray" size={14} title="Open New Vault" />
         </YStack>

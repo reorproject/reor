@@ -176,7 +176,6 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
       editor: this,
       domAttributes: newOptions.domAttributes || {},
       blockSchema: newOptions.blockSchema,
-      collaboration: newOptions.collaboration,
       editable: newOptions.editable,
       linkExtensionOptions: newOptions.linkExtensionOptions,
       inlineEmbedOptions: newOptions.inlineEmbedOptions,
@@ -736,15 +735,5 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
    */
   public async markdownToBlocks(markdown: string): Promise<Block<BSchema>[]> {
     return markdownToBlocks(markdown, this.schema, this._tiptapEditor.schema)
-  }
-
-  /**
-   * Updates the user info for the current user that's shown to other collaborators.
-   */
-  public updateCollaborationUserInfo(user: { name: string; color: string }) {
-    if (!this.options.collaboration) {
-      throw new Error('Cannot update collaboration user info when collaboration is disabled.')
-    }
-    this._tiptapEditor.commands.updateUser(user)
   }
 }
