@@ -70,13 +70,6 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({ dbResult: entr
   const modified = formatModifiedDate(entry.filemodified)
   const fileName = getFileName(entry.notepath)
 
-  // Log the position information
-  console.log('[DEBUG-PREVIEW] Search result entry has position:', {
-    path: entry.notepath,
-    position: entry.startPos,
-    content: `${entry.content.substring(0, 30)}...`,
-  })
-
   return (
     <Card
       marginBottom="$4"
@@ -94,7 +87,7 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({ dbResult: entr
         shadowRadius: '$4',
       }}
       onPress={() => {
-        console.log('[DEBUG-PREVIEW] onPress called with position:', entry.startPos)
+
         onSelect(entry.notepath, entry.startPos)
       }}
     >

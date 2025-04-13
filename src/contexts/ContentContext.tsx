@@ -51,20 +51,11 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
       dontUpdateChatHistory?: boolean,
       scrollToPosition?: number,
     ) => {
-      console.log('[DEBUG-CC] openContent called with:', {
-        pathOrChatID,
-        hasContent: !!optionalContentToWriteOnCreate,
-        dontUpdateChatHistory,
-        scrollToPosition,
-      })
-
       if (!pathOrChatID) return
       const chatMetadata = allChatsMetadata.find((chat) => chat.id === pathOrChatID)
       if (chatMetadata) {
-        console.log('[DEBUG-CC] Opening chat')
         openNewChat(pathOrChatID)
       } else {
-        console.log('[DEBUG-CC] Opening file with position:', scrollToPosition)
         setShowEditor(true)
         openOrCreateFile(pathOrChatID, optionalContentToWriteOnCreate, scrollToPosition)
       }

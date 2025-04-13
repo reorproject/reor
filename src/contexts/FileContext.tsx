@@ -121,7 +121,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }
 
   const loadFileIntoEditor = async (filePath: string, scrollToPosition?: number) => {
-    console.log('[DEBUG-FC] Loading file into editor, with position:', scrollToPosition)
     setCurrentlyChangingFilePath(true)
     await writeEditorContentToDisk(editor, currentlyOpenFilePath)
     if (currentlyOpenFilePath && needToIndexEditorContent) {
@@ -139,40 +138,28 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setCurrentlyChangingFilePath(false)
     const parentDirectory = await window.path.dirname(filePath)
     setSelectedDirectory(parentDirectory)
-    console.log('[DEBUG-FC] File loaded, position to scroll to:', scrollToPosition)
 
     // If a position is provided, scroll to it after loading the content
     if (scrollToPosition !== undefined && editor) {
-      console.log('[DEBUG-FC] Setting up timeout for scrolling to position:', scrollToPosition)
-
-      // Increased timeout to ensure document is fully rendered
       setTimeout(() => {
-        console.log('[DEBUG-FC] Timeout triggered, attempting to scroll')
         // Find the block at this position
         if (editor._tiptapEditor && editor._tiptapEditor.view) {
-          console.log('[DEBUG-FC] Editor and view are available')
           try {
             const docSize = editor._tiptapEditor.state.doc.content.size
-            console.log('[DEBUG-FC] Document size:', docSize)
 
             // Add a small offset to get a bit further into the content
             // This helps with headings and position mismatches
             const position = Math.min(scrollToPosition + 15, docSize - 1)
-            console.log('[DEBUG-FC] Using position with offset:', position)
 
             // Set the cursor position
-            const success = editor._tiptapEditor.commands.setTextSelection(position)
-            console.log('[DEBUG-FC] Set text selection success:', success)
+            editor._tiptapEditor.commands.setTextSelection(position)
 
             // Get the DOM node at that position and scroll to it
             const selectionAnchor = editor._tiptapEditor.state.selection.anchor
-            console.log('[DEBUG-FC] Selection anchor:', selectionAnchor)
 
             const domAtPos = editor._tiptapEditor.view.domAtPos(selectionAnchor)
-            console.log('[DEBUG-FC] DomAtPos result:', !!domAtPos)
 
             const { node } = domAtPos
-            console.log('[DEBUG-FC] Node type:', node?.constructor?.name)
 
             // Try to find the parent block
             let targetNode = node
@@ -182,61 +169,33 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             // Look for a better block element to scroll to
             while (targetNode && depth < MAX_DEPTH) {
               if (targetNode instanceof HTMLElement) {
-                // Check if it's a good block element for scrolling
                 const isBlock = window.getComputedStyle(targetNode).display === 'block'
                 const hasGoodSize = targetNode.offsetHeight > 20
 
                 if (isBlock && hasGoodSize) {
-                  console.log('[DEBUG-FC] Found good block element to scroll to')
                   break
                 }
               }
 
-              targetNode = targetNode.parentElement
+              targetNode = targetNode.parentElement ?? targetNode
               depth++
             }
 
-            // If we couldn't find a good block, use the original node
             if (!targetNode || depth >= MAX_DEPTH) {
               targetNode = node
             }
 
             if (targetNode instanceof HTMLElement) {
-              console.log('[DEBUG-FC] Node is HTMLElement, scrolling into view with highlight')
-
-              // First scroll to make sure the element is visible
               targetNode.scrollIntoView({ behavior: 'smooth', block: 'center' })
-
-              // Add a more prominent visual highlight that fades out
-              const originalBackground = targetNode.style.backgroundColor
-              const originalTransition = targetNode.style.transition
-
-              // Create a temporary highlight effect
-              targetNode.style.transition = 'background-color 2s ease-in-out'
-              targetNode.style.backgroundColor = 'rgba(59, 130, 246, 0.3)' // Light blue highlight
-
-              // Make the highlight persist longer, then fade out
-              setTimeout(() => {
-                targetNode.style.backgroundColor = originalBackground
-                targetNode.style.transition = originalTransition
-              }, 3000)
-
-              console.log('[DEBUG-FC] Scroll into view called with highlight')
             } else if (node instanceof Element) {
               // Fallback for non-HTML elements
-              console.log('[DEBUG-FC] Node is basic Element, performing simple scroll')
+
               node.scrollIntoView({ behavior: 'smooth', block: 'center' })
-            } else {
-              console.log('[DEBUG-FC] Node is not an Element:', node)
             }
           } catch (error) {
+            // eslint-disable-next-line no-console
             console.error('[DEBUG-FC] Error during scrolling:', error)
           }
-        } else {
-          console.log('[DEBUG-FC] Editor or view not available:', {
-            tiptapEditor: !!editor._tiptapEditor,
-            view: !!(editor._tiptapEditor && editor._tiptapEditor.view),
-          })
         }
       }, 800) // Increased delay to ensure the editor has finished rendering
     }
