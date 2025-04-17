@@ -46,7 +46,7 @@ export const DBResultPreview: React.FC<DBResultPreviewProps> = ({ dbResult: entr
       borderColor="$gray7"
       paddingHorizontal="$2"
       paddingVertical="$1"
-      onClick={() => onSelect(entry.notepath, entry.startPos)}
+      onPress={() => onSelect(entry.notepath, entry.startPos)}
     >
       <Stack width="100%">
         <Text fontSize="sm" color="$gray11">
