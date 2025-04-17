@@ -34,7 +34,11 @@ type FileContextType = {
   editor: BlockNoteEditor | null
   navigationHistory: string[]
   addToNavigationHistory: (value: string) => void
-  openOrCreateFile: (filePath: string, optionalContentToWriteOnCreate?: string) => Promise<void>
+  openOrCreateFile: (
+    filePath: string,
+    optionalContentToWriteOnCreate?: string,
+    scrollToPosition?: number,
+  ) => Promise<void>
   suggestionsState: SuggestionsState | null | undefined
   spellCheckEnabled: boolean
   highlightData: HighlightData
@@ -116,7 +120,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return absolutePath
   }
 
-  const loadFileIntoEditor = async (filePath: string) => {
+  const loadFileIntoEditor = async (filePath: string, scrollToPosition?: number) => {
     setCurrentlyChangingFilePath(true)
     await writeEditorContentToDisk(editor, currentlyOpenFilePath)
     if (currentlyOpenFilePath && needToIndexEditorContent) {
@@ -134,11 +138,76 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setCurrentlyChangingFilePath(false)
     const parentDirectory = await window.path.dirname(filePath)
     setSelectedDirectory(parentDirectory)
+
+    // If a position is provided, scroll to it after loading the content
+    if (scrollToPosition !== undefined && editor) {
+      setTimeout(() => {
+        // Find the block at this position
+        if (editor._tiptapEditor && editor._tiptapEditor.view) {
+          try {
+            const docSize = editor._tiptapEditor.state.doc.content.size
+
+            // Add a small offset to get a bit further into the content
+            // This helps with headings and position mismatches
+            const position = Math.min(scrollToPosition + 15, docSize - 1)
+
+            // Set the cursor position
+            editor._tiptapEditor.commands.setTextSelection(position)
+
+            // Get the DOM node at that position and scroll to it
+            const selectionAnchor = editor._tiptapEditor.state.selection.anchor
+
+            const domAtPos = editor._tiptapEditor.view.domAtPos(selectionAnchor)
+
+            const { node } = domAtPos
+
+            // Try to find the parent block
+            let targetNode = node
+            let depth = 0
+            const MAX_DEPTH = 5
+
+            // Look for a better block element to scroll to
+            while (targetNode && depth < MAX_DEPTH) {
+              if (targetNode instanceof HTMLElement) {
+                const isBlock = window.getComputedStyle(targetNode).display === 'block'
+                const hasGoodSize = targetNode.offsetHeight > 20
+
+                if (isBlock && hasGoodSize) {
+                  break
+                }
+              }
+
+              targetNode = targetNode.parentElement ?? targetNode
+              depth++
+            }
+
+            if (!targetNode || depth >= MAX_DEPTH) {
+              targetNode = node
+            }
+
+            if (targetNode instanceof HTMLElement) {
+              targetNode.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            } else if (node instanceof Element) {
+              // Fallback for non-HTML elements
+
+              node.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            }
+          } catch (error) {
+            // eslint-disable-next-line no-console
+            console.error('[DEBUG-FC] Error during scrolling:', error)
+          }
+        }
+      }, 800) // Increased delay to ensure the editor has finished rendering
+    }
   }
 
-  const openOrCreateFile = async (filePath: string, optionalContentToWriteOnCreate?: string): Promise<void> => {
+  const openOrCreateFile = async (
+    filePath: string,
+    optionalContentToWriteOnCreate?: string,
+    scrollToPosition?: number,
+  ): Promise<void> => {
     const absolutePath = await createFileIfNotExists(filePath, optionalContentToWriteOnCreate)
-    await loadFileIntoEditor(absolutePath)
+    await loadFileIntoEditor(absolutePath, scrollToPosition)
   }
 
   const editor = useBlockNote<typeof hmBlockSchema>({
@@ -167,8 +236,8 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const writeEditorContentToDisk = async (_editor: BlockNoteEditor | null, filePath: string | null) => {
     if (filePath !== null && needToWriteEditorContentToDisk && _editor) {
-      const blocks = editor.topLevelBlocks
-      const markdownContent = await editor.blocksToMarkdown(blocks)
+      const blocks = _editor.topLevelBlocks
+      const markdownContent = await _editor.blocksToMarkdown(blocks)
       if (markdownContent !== null) {
         await window.fileSystem.writeFile({
           filePath,

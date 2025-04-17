@@ -24,7 +24,7 @@ const formatModifiedDate = (date: Date) => {
 
 interface DBResultPreviewProps {
   dbResult: DBQueryResult
-  onSelect: (path: string) => void
+  onSelect: (path: string, position?: number) => void
 }
 
 export const DBResultPreview: React.FC<DBResultPreviewProps> = ({ dbResult: entry, onSelect }) => {
@@ -46,7 +46,7 @@ export const DBResultPreview: React.FC<DBResultPreviewProps> = ({ dbResult: entr
       borderColor="$gray7"
       paddingHorizontal="$2"
       paddingVertical="$1"
-      onPress={() => onSelect(entry.notepath)}
+      onPress={() => onSelect(entry.notepath, entry.startPos)}
     >
       <Stack width="100%">
         <Text fontSize="sm" color="$gray11">
@@ -65,7 +65,7 @@ export const DBResultPreview: React.FC<DBResultPreviewProps> = ({ dbResult: entr
 
 interface DBSearchPreviewProps {
   dbResult: DBQueryResult
-  onSelect: (path: string) => void
+  onSelect: (path: string, position?: number) => void
 }
 
 export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({ dbResult: entry, onSelect }) => {
@@ -88,7 +88,9 @@ export const DBSearchPreview: React.FC<DBSearchPreviewProps> = ({ dbResult: entr
       hoverStyle={{
         shadowRadius: '$4',
       }}
-      onPress={() => onSelect(entry.notepath)}
+      onPress={() => {
+        onSelect(entry.notepath, entry.startPos)
+      }}
     >
       <YStack>
         <Text fontSize="$2" color="$colorLight">
