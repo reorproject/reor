@@ -325,8 +325,6 @@ export const BlockContainer = Node.create<{
       BNUpdateBlock:
         (posInBlock, block) =>
         ({ state, dispatch }) => {
-          console.log(`Updating block at position ${posInBlock} with block:`, block)
-          console.log(`State:`, state, " Dispatch:", dispatch)
           const blockInfo = getBlockInfoFromPos(state.doc, posInBlock)
           if (blockInfo === undefined) {
             return false
@@ -492,7 +490,6 @@ export const BlockContainer = Node.create<{
           if (dispatch) {
             // Creates a new block. Since the schema requires it to have a content node, a paragraph node is created
             // automatically, spanning newBlockContentPos to newBlockContentPos + 1.
-            console.log(`Inserting new block at position ${newBlockInsertionPos} using endpos: ${endPos}`)
             state.tr.insert(newBlockInsertionPos, newBlock)
 
             // Replaces the content of the newly created block's content node. Doesn't replace the whole content node so
@@ -624,8 +621,6 @@ export const BlockContainer = Node.create<{
         (posInBlock, listType, tab, isSank = false, turnInto = false) =>
         ({ state, dispatch }) => {
           const blockInfo = getBlockInfoFromPos(state.doc, posInBlock)
-          console.log(`Block info:`, blockInfo.contentType.name)
-          console.log(`Updating group at position ${posInBlock} with listType:`, listType)
           // Find block group, block container and depth it is at
           const {
             group,
@@ -634,7 +629,6 @@ export const BlockContainer = Node.create<{
             level: groupLevel,
             $pos,
           } = getGroupInfoFromPos(posInBlock < 0 ? state.selection.from : posInBlock, state)
-          console.log()
           if (isSank && group.attrs.listType === listType) return true
 
           // Change group type to div
