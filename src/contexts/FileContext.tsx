@@ -149,7 +149,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     blockSchema: hmBlockSchema,
     slashMenuItems,
   })
-
+  
   const [debouncedEditor] = useDebounce(editor?.topLevelBlocks, 3000)
 
   useEffect(() => {
