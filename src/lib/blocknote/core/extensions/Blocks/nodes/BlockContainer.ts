@@ -87,7 +87,7 @@ const PastePlugin = new Plugin({
       const { $from, $to } = selection
 
       const targetNode = state.doc.resolve($from.pos).parent
-
+      
       if (targetNode.type.name === 'image') {
         tr = tr.insertText(event.clipboardData.getData('text/plain'), $from.pos, $to.pos)
         view.dispatch(tr)
