@@ -68,7 +68,6 @@ const createMarkdownExtension = (bnEditor: BlockNoteEditor) => {
             handlePaste: (view, event, slice) => {
               const selectedNode = view.state.selection.$from.parent
               // Don't proceed if pasting into code block
-              console.log(`Pasting content`)
               if (selectedNode.type.name === 'code-block' || selectedNode.firstChild?.type.name === 'code-block') {
                 return false
               }
@@ -100,7 +99,8 @@ const createMarkdownExtension = (bnEditor: BlockNoteEditor) => {
                   return true
                 }
                 return false
-              } else if (hasVideo) {
+              }
+              if (hasVideo) {
                 let embedUrl = 'https://www.youtube.com/embed/'
                 if (pastedText.includes('youtu.be') || pastedText.includes('youtube')) {
                   const ytId = youtubeParser(pastedText)
@@ -117,7 +117,6 @@ const createMarkdownExtension = (bnEditor: BlockNoteEditor) => {
                 // This is not a media file, just plaintext
                 bnEditor.markdownToBlocks(pastedText).then((organizedBlocks: any) => {
                   const blockInfo = getBlockInfoFromPos(state.doc, selection.from)
-                  console.log(`BLockINfo type: `, blockInfo.node.type.name)
                   bnEditor.replaceBlocks(
                     [blockInfo.node.attrs.id],
                     // @ts-ignore
