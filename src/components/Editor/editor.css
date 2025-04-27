@@ -100,11 +100,6 @@
   display: list-item;
 }
 
-[data-list-type='ul'],
-[data-list-type='ol'] {
-  display: list-item;
-}
-
 .editor code {
   background-color: var(--color5);
   font-family: 'ui-monospace', 'SFMono-Regular', 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
