@@ -68,7 +68,7 @@ const getBlockNoteExtensions = <BSchema extends HMBlockSchema>(opts: {
 
     // copy paste:
     // @ts-ignore
-    createMarkdownExtension(),
+    createMarkdownExtension(opts.editor),
 
     // block manupulations:
     BlockManipulationExtension,
