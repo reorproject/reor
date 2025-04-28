@@ -26,8 +26,6 @@ Some features you should be aware of:
 
   - Reor automatically links your notes to other notes in the Related Notes sidebar.
 
-  - You can view the Related Notes to a particular chunk of text by highlighting it and hitting the button that appears.
-
   - You can also create inline links by surrounding text with two square brackets (like in Obsidian). [[Like this]]
 
 You can import notes from other apps by adding markdown files to your vault directory. Note that Reor will only read markdown files.
