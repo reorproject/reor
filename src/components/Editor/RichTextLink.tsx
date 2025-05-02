@@ -3,7 +3,7 @@ import { Link } from '@tiptap/extension-link'
 import type { LinkOptions } from '@tiptap/extension-link'
 import { useEditorState } from '@/lib/utils'
 import { getSimilarFiles } from '@/lib/semanticService'
-
+import { BlockNoteEditor } from '@/lib/blocknote/core/BlockNoteEditor'
 
 /**
  * The input regex for Markdown links with title support, and multiple quotation marks (required
@@ -125,7 +125,6 @@ export function linkFileInputRule(config: Parameters<typeof markInputRule>[0]) {
       if (!matchedText) return
       const { from, to } = range
 
-      // Resolve the file path (async)
       void (async () => {
         const absolutePath = await window.fileSystem.getAbsolutePath(matchedText)
         console.log('Absolute path:', absolutePath)
@@ -174,82 +173,86 @@ function linkPasteRule(config: Parameters<typeof markPasteRule>[0]) {
  * for converting the Markdown link syntax (i.e. `[Doist](https://doist.com)`) into links, and also
  * adds support for the `title` attribute.
  */
-const RichTextLink = Link.extend({
-  inclusive: false,
-  addAttributes() {
-    return {
-      ...this.parent?.(),
-      title: {
-        default: null,
-      },
-    }
-  },
-  addInputRules() {
-    return [
-      linkInputRule({
-        find: inputRegex,
-        type: this.type,
-
-        // We need to use `pop()` to remove the last capture groups from the match to
-        // satisfy Tiptap's `markPasteRule` expectation of having the content as the last
-        // capture group in the match (this makes the attribute order important)
-        getAttributes(match) {
-          return {
-            title: match.pop()?.trim(),
-            href: match.pop()?.trim(),
-          }
+const createLinkExtension = (bnEditor: BlockNoteEditor, linkExtensionsOpts: any) => {
+  const RichTextLink = Link.extend({
+    inclusive: false,
+    addAttributes() {
+      return {
+        ...this.parent?.(),
+        title: {
+          default: null,
         },
-      }),
-      // linkSuggestFilesInputRule({
-      //   find: suggestFileRegex,
-      //   type: this.type,
+      }
+    },
+    addInputRules() {
+      return [
+        linkInputRule({
+          find: inputRegex,
+          type: this.type,
+  
+          // We need to use `pop()` to remove the last capture groups from the match to
+          // satisfy Tiptap's `markPasteRule` expectation of having the content as the last
+          // capture group in the match (this makes the attribute order important)
+          getAttributes(match) {
+            return {
+              title: match.pop()?.trim(),
+              href: match.pop()?.trim(),
+            }
+          },
+        }),
+        // linkSuggestFilesInputRule({
+        //   find: suggestFileRegex,
+        //   type: this.type,
+  
+        //   // We need to use `pop()` to remove the last capture groups from the match to
+        //   // satisfy Tiptap's `markPasteRule` expectation of having the content as the last
+        //   // capture group in the match (this makes the attribute order important)
+        //   getAttributes(match) {
+        //     return {
+        //       title: match.pop()?.trim(),
+        //       href: match.pop()?.trim(),
+        //     }
+        //   },
+        // }),
+        linkFileInputRule({
+          find: fileRegex,
+          type: this.type,
+  
+          // We need to use `pop()` to remove the last capture groups from the match to
+          // satisfy Tiptap's `markPasteRule` expectation of having the content as the last
+          // capture group in the match (this makes the attribute order important)
+          getAttributes(match) {
+            return {
+              title: match.pop()?.trim(),
+              href: match.pop()?.trim(),
+            }
+          },
+        }),
+      ]
+    },
+    addPasteRules() {
+      return [
+        linkPasteRule({
+          find: pasteRegex,
+          type: this.type,
+  
+          // We need to use `pop()` to remove the last capture groups from the match to
+          // satisfy Tiptap's `markInputRule` expectation of having the content as the last
+          // capture group in the match (this makes the attribute order important)
+          getAttributes(match) {
+            return {
+              title: match.pop()?.trim(),
+              href: match.pop()?.trim(),
+            }
+          },
+        }),
+      ]
+    },
+  })
 
-      //   // We need to use `pop()` to remove the last capture groups from the match to
-      //   // satisfy Tiptap's `markPasteRule` expectation of having the content as the last
-      //   // capture group in the match (this makes the attribute order important)
-      //   getAttributes(match) {
-      //     return {
-      //       title: match.pop()?.trim(),
-      //       href: match.pop()?.trim(),
-      //     }
-      //   },
-      // }),
-      linkFileInputRule({
-        find: fileRegex,
-        type: this.type,
+  return RichTextLink
+}
 
-        // We need to use `pop()` to remove the last capture groups from the match to
-        // satisfy Tiptap's `markPasteRule` expectation of having the content as the last
-        // capture group in the match (this makes the attribute order important)
-        getAttributes(match) {
-          return {
-            title: match.pop()?.trim(),
-            href: match.pop()?.trim(),
-          }
-        },
-      }),
-    ]
-  },
-  addPasteRules() {
-    return [
-      linkPasteRule({
-        find: pasteRegex,
-        type: this.type,
-
-        // We need to use `pop()` to remove the last capture groups from the match to
-        // satisfy Tiptap's `markInputRule` expectation of having the content as the last
-        // capture group in the match (this makes the attribute order important)
-        getAttributes(match) {
-          return {
-            title: match.pop()?.trim(),
-            href: match.pop()?.trim(),
-          }
-        },
-      }),
-    ]
-  },
-})
-
-export { RichTextLink }
+export { createLinkExtension }
 
 export type { LinkOptions as RichTextLinkOptions }

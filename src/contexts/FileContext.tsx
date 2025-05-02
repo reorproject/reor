@@ -134,6 +134,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setCurrentlyChangingFilePath(false)
     const parentDirectory = await window.path.dirname(filePath)
     setSelectedDirectory(parentDirectory)
+    editor.setCurrentFilePath(filePath)
   }
 
   const openOrCreateFile = async (filePath: string, optionalContentToWriteOnCreate?: string): Promise<void> => {

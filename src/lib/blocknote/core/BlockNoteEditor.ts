@@ -93,6 +93,11 @@ export type BlockNoteEditorOptions<BSchema extends BlockSchema> = {
   blockSchema: BSchema
 
   /**
+   * The absolute path to the current file the editor is displaying.
+   */
+  currentFilePath: string
+
+  /**
    * When enabled, allows for collaboration between multiple users.
    */
   collaboration: {
@@ -141,6 +146,8 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
   public ready = false
 
   public inlineEmbedOptions = []
+
+  public currentFilePath: string | null = null
 
   public readonly sideMenu: SideMenuProsemirrorPlugin<BSchema>
 
@@ -735,5 +742,21 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
    */
   public async markdownToBlocks(markdown: string): Promise<Block<BSchema>[]> {
     return markdownToBlocks(markdown, this.schema, this._tiptapEditor.schema)
+  }
+
+  /**
+   * Sets the current file path that the editor is displaying.
+   * 
+   * @param filePath The absolute path to the current file the editor is displaying.
+   */
+  public setCurrentFilePath(filePath: string | null) {
+    this.currentFilePath = filePath
+  }
+
+  /**
+   * Gets the current file path that the editor is displaying.
+   */
+  public getCurrentFilePath() {
+    return this.currentFilePath
   }
 }
