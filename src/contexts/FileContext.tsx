@@ -20,7 +20,7 @@ import useOrderedSet from '../lib/hooks/use-ordered-set'
 import welcomeNote from '@/lib/welcome-note'
 import { useBlockNote, BlockNoteEditor } from '@/lib/blocknote'
 import { hmBlockSchema } from '@/components/Editor/schema'
-import { setGroupTypes } from '@/lib/utils'
+import { setGroupTypes, useEditorState } from '@/lib/utils'
 import slashMenuItems from '../components/Editor/slash-menu-items'
 
 type FileContextType = {
@@ -160,6 +160,13 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
     }
   }, [debouncedEditor, currentlyOpenFilePath, editor, currentlyChangingFilePath])
+
+  useEffect(() => {
+    if (editor) {
+      console.log(`Setting path to: `, currentlyOpenFilePath)
+      useEditorState.getState().setCurrentFilePath(currentlyOpenFilePath)
+    }
+  }, [editor, currentlyOpenFilePath])
 
   const saveCurrentlyOpenedFile = async () => {
     await writeEditorContentToDisk(editor, currentlyOpenFilePath)
@@ -327,7 +334,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     selectedDirectory,
     setSelectedDirectory,
   }
-
+  
   const contextValuesMemo: FileContextType = React.useMemo(
     () => ({
       ...contextValues,

@@ -194,3 +194,26 @@ export function splitDirectoryPathIntoBaseAndRepo(fullPath: string) {
 
   return { localModelPath, repoName }
 }
+
+export function findFileRecursive(dir: string, filename: string): string | null {
+  const files = fs.readdirSync(dir);
+  const basename = path.parse(filename).name
+  console.log(`Searching for basename: ${basename}`)
+
+  for (const file of files) {
+    const fullPath = path.resolve(dir, file);
+    const stat = fs.statSync(fullPath);
+
+    if (stat.isDirectory()) {
+      const result = findFileRecursive(fullPath, filename);
+      if (result) return result;
+    } else { // Check if files match
+      const fileName = path.parse(file).name;
+      if (fileName == basename) {
+        return fullPath
+      }
+    }
+  }
+
+  return null;
+}

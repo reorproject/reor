@@ -108,6 +108,7 @@ const fileSystem = {
   deleteFile: createIPCHandler<(filePath: string) => Promise<void>>('delete-file'),
   getAllFilenamesInDirectory: createIPCHandler<(dirName: string) => Promise<string[]>>('get-files-in-directory'),
   getFiles: createIPCHandler<(filePaths: string[]) => Promise<FileInfoWithContent[]>>('get-files'),
+  getAbsolutePath: createIPCHandler<(fileName: string, dir?: string | null) => Promise<string>>('get-absolute-path'),
 }
 
 const path = {

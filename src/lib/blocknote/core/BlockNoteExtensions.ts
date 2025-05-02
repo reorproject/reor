@@ -27,6 +27,7 @@ import SearchAndReplace from '@/components/Editor/Search/SearchAndReplaceExtensi
 import TextAlignmentExtension from './extensions/TextAlignment/TextAlignmentExtension'
 import { BlockNoteEditor } from './BlockNoteEditor'
 import LocalMediaPastePlugin from './extensions/Pasting/local-media-paste-plugin'
+import { RichTextLink } from '@/components/Editor/RichTextLink'
 
 /**
  * Get all the Tiptap extensions BlockNote is configured with by default
@@ -79,7 +80,7 @@ const getBlockNoteExtensions = <BSchema extends HMBlockSchema>(opts: {
     Italic,
     Strike,
     Underline,
-    Link.configure(opts.linkExtensionOptions),
+    RichTextLink.configure(opts.linkExtensionOptions),
     // TextColorMark,
     // TextColorExtension,
     TextAlignmentExtension,
