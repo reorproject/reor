@@ -7,6 +7,7 @@ import { getSimilarFiles } from '@/lib/semanticService'
 import { BlockNoteEditor } from '@/lib/blocknote/core/BlockNoteEditor'
 import clickHandler from '@/lib/tiptap-extension-link/helpers/clickHandler'
 import autolink from '@/lib/tiptap-extension-link/helpers/autolink'
+import { useFileSearchIndex } from '@/lib/utils/cache/fileSearchIndex'
 /**
  * The input regex for Markdown links with title support, and multiple quotation marks (required
  * in case the `Typography` extension is being included).
@@ -91,16 +92,24 @@ export function linkFileInputRule(config: Parameters<typeof markInputRule>[0], b
       const { tr } = props.state
       const { range, match } = props
       const { from, to } = range
-      const hardCodedFilePath = 'reor:///Users/mohamed/Documents/notes/Untitled.md'
+
+      const markedText = match[1]?.trim()
+      // TODO: Standardize this to work if extension or not is given
+      const fileName = `${markedText}.md`
+      console.log('fileName', fileName)
+      const filePath = `reor://${useFileSearchIndex.getState().getPath(fileName)}`
+      console.log('filePath', filePath)
+      // const hardCodedFilePath = 'reor:///Users/mohamed/Documents/notes/Untitled.md'
+
 
       const mark = config.type.create({
-        href: hardCodedFilePath,
-        title: 'Untitled',
+        href: filePath,
+        title: markedText,
       })
       
       tr.deleteRange(from, to)
-      tr.insertText('Untitled', from)
-      tr.addMark(from, from + 'Untitled'.length, mark)
+      tr.insertText(markedText, from)
+      tr.addMark(from, from + markedText.length, mark)
 
       // Block autolink if needed
       props.commands.focus()
@@ -167,7 +176,6 @@ const createLinkExtension = (bnEditor: BlockNoteEditor, linkExtensionsOpts: any)
     },
 
     parseHTML() {
-      // return [{ tag: 'a[href]:not([href *= "javascript:" i])' }]
       return [
         {
           tag: "a[href]",

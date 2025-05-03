@@ -68,3 +68,10 @@ export interface AnonymizedAgentConfig {
 }
 
 export type LoadingState = 'idle' | 'generating' | 'waiting-for-first-token'
+
+export type FileMetadata = {
+  id: string            // Unique identifier for the file
+  fileName: string      // Name of the file
+  absolutePath: string  // Absolute path to the file
+  modifiedAt: string    // Last modified date of the file
+}
