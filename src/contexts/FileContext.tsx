@@ -21,6 +21,7 @@ import welcomeNote from '@/lib/welcome-note'
 import { useBlockNote, BlockNoteEditor } from '@/lib/blocknote'
 import { hmBlockSchema } from '@/components/Editor/schema'
 import { setGroupTypes, useEditorState } from '@/lib/utils'
+import { useFileSearchIndex } from '@/lib/utils/cache/fileSearchIndex'
 import slashMenuItems from '../components/Editor/slash-menu-items'
 
 type FileContextType = {
@@ -94,7 +95,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     fetchSpellCheckMode()
   }, [spellCheckEnabled])
 
-  const createFileIfNotExists = async (filePath: string, optionalContent?: string): Promise<string> => {
+  const createFileIfNotExists = async (filePath: string, optionalContent?: string): Promise<FileInfo> => {
     const invalidChars = await getInvalidCharacterInFilePath(filePath)
     if (invalidChars) {
       const errorMessage = `Could not create note ${filePath}. Character ${invalidChars} cannot be included in note name.`
@@ -108,12 +109,17 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       : await window.path.join(await window.electronStore.getVaultDirectoryForWindow(), filePathWithExtension)
 
     const fileExists = await window.fileSystem.checkFileExists(absolutePath)
+    let fileObject = null
     if (!fileExists) {
-      await window.fileSystem.createFile(absolutePath, optionalContent || ``)
+      fileObject = await window.fileSystem.createFile(absolutePath, optionalContent || ``)
+      if (!fileObject)
+        throw new Error(`Could not create file ${filePathWithExtension}`)
       setNeedToIndexEditorContent(true)
+    } else {
+      fileObject = await window.fileSystem.getFileInfo(absolutePath, filePathWithExtension)
     }
 
-    return absolutePath
+    return fileObject
   }
 
   const loadFileIntoEditor = async (filePath: string) => {
@@ -124,7 +130,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setNeedToIndexEditorContent(false)
     }
     const fileContent = (await window.fileSystem.readFile(filePath, 'utf-8')) ?? ''
-    // editor?.commands.setContent(fileContent)
     const blocks = await editor.markdownToBlocks(fileContent)
     // @ts-expect-error
     editor.replaceBlocks(editor.topLevelBlocks, blocks)
@@ -138,8 +143,11 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   }
 
   const openOrCreateFile = async (filePath: string, optionalContentToWriteOnCreate?: string): Promise<void> => {
-    const absolutePath = await createFileIfNotExists(filePath, optionalContentToWriteOnCreate)
-    await loadFileIntoEditor(absolutePath)
+    const fileObject = await createFileIfNotExists(filePath, optionalContentToWriteOnCreate)
+    await loadFileIntoEditor(fileObject.path)
+    if (!useFileSearchIndex.getState().getPath(fileObject.name)) {
+      useFileSearchIndex.getState().add(fileObject)
+    }
   }
 
   const editor = useBlockNote<typeof hmBlockSchema>({
@@ -151,7 +159,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     slashMenuItems,
     linkExtensionOptions: {
       onLinkClick: (href: string) => {
-        loadFileIntoEditor(href)
+        openOrCreateFile(href)
       },
     },
   })

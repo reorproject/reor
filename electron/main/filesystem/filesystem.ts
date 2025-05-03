@@ -112,7 +112,7 @@ export function GetFilesInfoListForListOfPaths(paths: string[]): FileInfo[] {
   return fileInfoListWithoutDuplicates
 }
 
-export function createFileRecursive(filePath: string, content: string, charset?: BufferEncoding): void {
+export function createFileRecursive(filePath: string, content: string, charset?: BufferEncoding): FileInfo | null {
   const dirname = path.dirname(filePath)
 
   if (!fs.existsSync(dirname)) {
@@ -120,11 +120,18 @@ export function createFileRecursive(filePath: string, content: string, charset?:
   }
 
   if (fs.existsSync(filePath)) {
-    return
+    return null
   }
   const filePathWithExtension = addExtensionToFilenameIfNoExtensionPresent(filePath, markdownExtensions, '.md')
 
   fs.writeFileSync(filePathWithExtension, content, charset)
+  return {
+    name: path.basename(filePathWithExtension),
+    path: filePathWithExtension,
+    relativePath: path.relative(dirname, filePathWithExtension),
+    dateModified: new Date(),
+    dateCreated: new Date(),
+  }
 }
 
 export function updateFileListForRenderer(win: BrowserWindow, directory: string): void {

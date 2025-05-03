@@ -40,6 +40,17 @@ function isValidURI(url: string) {
 }
 
 /**
+ * Generates a random file name if the link is invalid.
+ */
+function generateRandom32DigitString(): string {
+  let result = ''
+  for (let i = 0; i < 32; i++) {
+    result += Math.floor(Math.random() * 10).toString()
+  }
+  return result
+}
+
+/**
  * Input rule built specifically for the `Link` extension, which ignores the auto-linked URL in
  * parentheses (e.g., `(https://doist.dev)`).
  *
@@ -93,14 +104,10 @@ export function linkFileInputRule(config: Parameters<typeof markInputRule>[0], b
       const { range, match } = props
       const { from, to } = range
 
-      const markedText = match[1]?.trim()
-      // TODO: Standardize this to work if extension or not is given
+      const markedText = match[1]?.trim() ? match[1]?.trim() : generateRandom32DigitString()
       const fileName = `${markedText}.md`
-      console.log('fileName', fileName)
-      const filePath = `reor://${useFileSearchIndex.getState().getPath(fileName)}`
-      console.log('filePath', filePath)
-      // const hardCodedFilePath = 'reor:///Users/mohamed/Documents/notes/Untitled.md'
-
+      const cacheResult = useFileSearchIndex.getState().getPath(fileName)
+      const filePath = cacheResult ? `reor://${cacheResult}` : `reor://${fileName}`
 
       const mark = config.type.create({
         href: filePath,

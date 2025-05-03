@@ -26,7 +26,6 @@ export const useFileSearchIndex = create<FileSearchIndexState>((set, get) => ({
   },
 
   add: async (metadata) => {
-    await window.fileSystem.createFile(metadata.path, '')
     set((s) => {
       const newMap = new Map(s.index)
       newMap.set(metadata.name, metadata)
