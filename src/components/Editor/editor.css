@@ -29,32 +29,23 @@
 }
 
 /* recommendation from Haz: https://twitter.com/diegohaz/status/1591829631811846147 */
-.link,
-.hm-link {
+.link {
   text-decoration-line: underline;
   text-underline-offset: 0.2em;
   text-decoration-skip-ink: none;
 }
 
-.link:hover,
-.hm-link:hover {
+.link:hover {
   text-decoration-thickness: 3px;
+  cursor: pointer;
 }
 
 /* manually synced with tamagui colors: blue11 and blueDark11 */
-/* .ProseMirror .link { */
-/* color: var(--blue11); */
-/* } */
+.ProseMirror .link { 
+  color: var(--blue11);
+}
 /* .seed-app-dark .ProseMirror .link {
   color: hsl(210, 100%, 66.1%);
-} */
-
-/* manually sync these values with colors.ts brand5 and brandDark5 */
-.ProseMirror .hm-link {
-  color: var(--brand5);
-}
-/* .seed-app-dark .ProseMirror .hm-link {
-  color: hsl(184, 80%, 71%);
 } */
 
 .ProseMirror .link-placeholder {

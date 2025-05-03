@@ -5,6 +5,7 @@ import { Plugin, PluginKey } from '@tiptap/pm/state'
 type ClickHandlerOptions = {
   type: MarkType
   openUrl?: any
+  openFile?: any
 }
 
 function clickHandler(options: ClickHandlerOptions): Plugin {
@@ -15,16 +16,19 @@ function clickHandler(options: ClickHandlerOptions): Plugin {
         if (event.button !== 0) {
           return false
         }
-
         const attrs = getAttributes(view.state, options.type.name)
         const link = event.target as HTMLLinkElement
 
         const href = link?.href ?? attrs.href
-
-        if (link && href) {
-          const newWindow = false // todo, check for meta key
-          options.openUrl(href, newWindow)
+        if (options.openFile && link && href) { // Linked to a local file, need to open it
+          options.openFile(href.replace('reor://', ''))
           return true
+        } else {
+          if (link && href) {
+            const newWindow = false // todo, check for meta key
+            options.openUrl(href, newWindow)
+            return true
+          }
         }
 
         return false

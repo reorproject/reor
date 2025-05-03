@@ -149,6 +149,11 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     },
     blockSchema: hmBlockSchema,
     slashMenuItems,
+    linkExtensionOptions: {
+      onLinkClick: (href: string) => {
+        loadFileIntoEditor(href)
+      },
+    },
   })
 
   const [debouncedEditor] = useDebounce(editor?.topLevelBlocks, 3000)
@@ -164,7 +169,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   useEffect(() => {
     if (editor) {
-      console.log(`Setting path to: `, currentlyOpenFilePath)
       useEditorState.getState().setCurrentFilePath(currentlyOpenFilePath)
     }
   }, [editor, currentlyOpenFilePath])

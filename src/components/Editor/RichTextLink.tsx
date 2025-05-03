@@ -1,10 +1,12 @@
-import { InputRule, markInputRule, markPasteRule, PasteRule } from '@tiptap/core'
-import { Link } from '@tiptap/extension-link'
+import { InputRule, markInputRule, markPasteRule, PasteRule, mergeAttributes } from '@tiptap/core'
+import { isAllowedUri, Link } from '@tiptap/extension-link'
+import { Plugin } from '@tiptap/pm/state'
 import type { LinkOptions } from '@tiptap/extension-link'
-import { useEditorState } from '@/lib/utils'
+import { useEditorState, isHypermediaScheme } from '@/lib/utils'
 import { getSimilarFiles } from '@/lib/semanticService'
 import { BlockNoteEditor } from '@/lib/blocknote/core/BlockNoteEditor'
-
+import clickHandler from '@/lib/tiptap-extension-link/helpers/clickHandler'
+import autolink from '@/lib/tiptap-extension-link/helpers/autolink'
 /**
  * The input regex for Markdown links with title support, and multiple quotation marks (required
  * in case the `Typography` extension is being included).
@@ -27,6 +29,14 @@ const fileRegex = /\[\[(.*?)\]\]/
  * in case the `Typography` extension is being included).
  */
 const pasteRegex = /(?:^|\s)\[([^\]]*)?\]\((\S+)(?: ["“](.+)["”])?\)/gi
+
+/**
+ * Checks if the given URL is a valid URI. This is used to prevent auto-linking of invalid URLs.
+ * @param url The URL to check
+ */
+function isValidURI(url: string) {
+  return isAllowedUri(url) || isHypermediaScheme(url)
+}
 
 /**
  * Input rule built specifically for the `Link` extension, which ignores the auto-linked URL in
@@ -62,11 +72,9 @@ function linkSuggestFilesInputRule(config: Parameters<typeof markInputRule>[0]) 
     find: config.find,
     handler(props) {
       const { tr } = props.state
-      console.log(`Inside handler!`)
       const currentPath = useEditorState.getState().currentFilePath
       void(async () => {
         const searchResults = await getSimilarFiles(currentPath, 5)
-        console.log(`Search results are: `, searchResults)
 
       })()
 
@@ -76,73 +84,26 @@ function linkSuggestFilesInputRule(config: Parameters<typeof markInputRule>[0]) 
   })
 }
 
-/**
- * Obsidian-style linking to file rule
- */
-// function linkFileInputRule(config: Parameters<typeof markInputRule>[0]) {
-//   const defaultMarkInputRule = markInputRule(config)
-
-//   return new InputRule({
-//     find: config.find,
-//     handler(props) {
-//       const { tr } = props.state
-
-//       const matchedText = props.match[1]?.trim()
-//       console.log(`Filename is: ${matchedText}`)
-//       void(async () => {
-//         const absolutePath = await window.fileSystem.getAbsolutePath(matchedText)
-//         console.log(`Absolute path is: ${absolutePath}`)
-
-//         props.chain()
-//           .focus()
-//           .setMark(config.type, {
-//             href: absolutePath,
-//             title: matchedText,
-//           })
-//           .run()
-//       })()
-//       // const currentPath = useEditorState.getState().currentFilePath
-//       // void(async () => {
-//       //   const searchResults = await getSimilarFiles(currentPath, 5)
-//       //   console.log(`Search results are: `, searchResults)
-
-//       // })()
-
-
-//       defaultMarkInputRule.handler(props)
-//       tr.setMeta('preventAutolink', true)
-//     },
-//   })
-// }
-
-export function linkFileInputRule(config: Parameters<typeof markInputRule>[0]) {
+export function linkFileInputRule(config: Parameters<typeof markInputRule>[0], bnEditor: BlockNoteEditor) {
   return new InputRule({
     find: fileRegex,
     handler: (props) => {
+      const { tr } = props.state
       const { range, match } = props
-
-      const matchedText = match[1]?.trim() // The text inside [[ ]]
-      if (!matchedText) return
       const { from, to } = range
+      const hardCodedFilePath = 'reor:///Users/mohamed/Documents/notes/Untitled.md'
 
-      void (async () => {
-        const absolutePath = await window.fileSystem.getAbsolutePath(matchedText)
-        console.log('Absolute path:', absolutePath)
-
-        props.chain()
-          .focus()
-          .deleteRange({ from, to })         // Delete [[path]]
-          .insertContent(matchedText)        // Insert just Untitled
-          .extendMarkRange(config.type.name) // Select the newly inserted text
-          .setMark(config.type, {            // Set the link
-            href: absolutePath,
-            title: matchedText,
-          })
-          .run()
-      })()
+      const mark = config.type.create({
+        href: hardCodedFilePath,
+        title: 'Untitled',
+      })
+      
+      tr.deleteRange(from, to)
+      tr.insertText('Untitled', from)
+      tr.addMark(from, from + 'Untitled'.length, mark)
 
       // Block autolink if needed
-      props.state.tr.setMeta('preventAutolink', true)
+      props.commands.focus()
     },
   })
 }
@@ -173,9 +134,17 @@ function linkPasteRule(config: Parameters<typeof markPasteRule>[0]) {
  * for converting the Markdown link syntax (i.e. `[Doist](https://doist.com)`) into links, and also
  * adds support for the `title` attribute.
  */
-const createLinkExtension = (bnEditor: BlockNoteEditor, linkExtensionsOpts: any) => {
+const createLinkExtension = (bnEditor: BlockNoteEditor, linkExtensionsOpts: any) => {  
   const RichTextLink = Link.extend({
     inclusive: false,
+
+    addOptions() {
+      return {
+        ...this.parent?.(),
+        onLinkClick: (href: string) => {},
+      }
+    },
+    
     addAttributes() {
       return {
         ...this.parent?.(),
@@ -184,6 +153,36 @@ const createLinkExtension = (bnEditor: BlockNoteEditor, linkExtensionsOpts: any)
         },
       }
     },
+
+    renderHTML({ HTMLAttributes }) {
+      return [
+        'span',
+        {
+          href: '#',
+          'data-path': HTMLAttributes.href,
+          class: 'link'
+        },
+        0,
+      ]
+    },
+
+    parseHTML() {
+      // return [{ tag: 'a[href]:not([href *= "javascript:" i])' }]
+      return [
+        {
+          tag: "a[href]",
+          getAttrs: dom => {
+            const href = (dom as HTMLElement).getAttribute("href")
+
+            if (!href || !isValidURI(href)) {
+              return false
+            }
+            return null
+          }
+        }
+      ]
+    },
+    
     addInputRules() {
       return [
         linkInputRule({
@@ -200,6 +199,20 @@ const createLinkExtension = (bnEditor: BlockNoteEditor, linkExtensionsOpts: any)
             }
           },
         }),
+        linkFileInputRule({
+          find: fileRegex,
+          type: this.type,
+  
+          // We need to use `pop()` to remove the last capture groups from the match to
+          // satisfy Tiptap's `markPasteRule` expectation of having the content as the last
+          // capture group in the match (this makes the attribute order important)
+          getAttributes(match) {
+            return {
+              title: match.pop()?.trim(),
+              href: match.pop()?.trim(),
+            }
+          },
+        }, bnEditor),
         // linkSuggestFilesInputRule({
         //   find: suggestFileRegex,
         //   type: this.type,
@@ -214,20 +227,6 @@ const createLinkExtension = (bnEditor: BlockNoteEditor, linkExtensionsOpts: any)
         //     }
         //   },
         // }),
-        linkFileInputRule({
-          find: fileRegex,
-          type: this.type,
-  
-          // We need to use `pop()` to remove the last capture groups from the match to
-          // satisfy Tiptap's `markPasteRule` expectation of having the content as the last
-          // capture group in the match (this makes the attribute order important)
-          getAttributes(match) {
-            return {
-              title: match.pop()?.trim(),
-              href: match.pop()?.trim(),
-            }
-          },
-        }),
       ]
     },
     addPasteRules() {
@@ -248,9 +247,34 @@ const createLinkExtension = (bnEditor: BlockNoteEditor, linkExtensionsOpts: any)
         }),
       ]
     },
+
+    addProseMirrorPlugins() {
+      const plugins: Plugin[] = []
+  
+      if (this.options.autolink) {
+        plugins.push(
+          autolink({
+            type: this.type,
+            validate: (this.options as any).validate,
+          }),
+        )
+      }
+      
+      if (this.options.openOnClick) {
+        // Opens the file path
+        plugins.push(
+          clickHandler({
+            openFile: (this.options as any).onLinkClick,
+            type: this.type,
+          })
+        )
+      }
+
+      return plugins 
+    }
   })
 
-  return RichTextLink
+  return RichTextLink.configure(linkExtensionsOpts)
 }
 
 export { createLinkExtension }
