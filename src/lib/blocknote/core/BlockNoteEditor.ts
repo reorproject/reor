@@ -36,6 +36,7 @@ import UniqueID from './extensions/UniqueID/UniqueID'
 import { mergeCSSClasses } from './shared/utils'
 import { HMBlockSchema, hmBlockSchema } from '@/components/Editor/schema'
 import '@/components/Editor/editor.css'
+import { LinkToolbarProsemirrorPlugin } from './extensions/LinkToolbar/LinkToolbarPlugin'
 
 export type BlockNoteEditorOptions<BSchema extends BlockSchema> = {
   // TODO: Figure out if enableBlockNoteExtensions/disableHistoryExtension are needed and document them.
@@ -153,6 +154,8 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
 
   public readonly formattingToolbar: FormattingToolbarProsemirrorPlugin<BSchema>
 
+  public readonly similarFilesToolbar: LinkToolbarProsemirrorPlugin<BSchema> 
+
   public readonly slashMenu: SlashMenuProsemirrorPlugin<BSchema, any>
 
   public readonly hyperlinkToolbar: HyperlinkToolbarProsemirrorPlugin<BSchema>
@@ -173,6 +176,7 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
 
     this.sideMenu = new SideMenuProsemirrorPlugin(this)
     this.formattingToolbar = new FormattingToolbarProsemirrorPlugin(this)
+    this.similarFilesToolbar = new LinkToolbarProsemirrorPlugin(this)
     this.slashMenu = new SlashMenuProsemirrorPlugin(
       this,
       newOptions.slashMenuItems || getDefaultSlashMenuItems(newOptions.blockSchema),
@@ -195,6 +199,7 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
         return [
           this.sideMenu.plugin,
           this.formattingToolbar.plugin,
+          this.similarFilesToolbar.plugin,
           this.slashMenu.plugin,
           this.hyperlinkToolbar.plugin,
         ]

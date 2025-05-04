@@ -1,209 +1,31 @@
-/* eslint-disable max-classes-per-file */
-import { isNodeSelection, isTextSelection, posToDOMRect } from '@tiptap/core'
-import { EditorState, Plugin, PluginKey } from 'prosemirror-state'
-import { EditorView } from 'prosemirror-view'
-import { BaseUiElementCallbacks, BaseUiElementState, BlockNoteEditor, BlockSchema } from '../..'
-import EventEmitter from '../../shared/EventEmitter'
+import { EditorToolbarState, EditorToolbarView } from "../EditorToolbar/EditorToolbar";
+import { Plugin, PluginKey } from "prosemirror-state";
+import { BlockNoteEditor, BlockSchema } from "../..";
+import { EditorView } from "prosemirror-view";
+import { isTextSelection, isNodeSelection } from "@tiptap/core";
+import EventEmitter from "../../shared/EventEmitter";
 
-export type FormattingToolbarCallbacks = BaseUiElementCallbacks
-
-export type FormattingToolbarState = BaseUiElementState
-
-export class FormattingToolbarView<BSchema extends BlockSchema> {
-  private formattingToolbarState?: FormattingToolbarState
-
-  public updateFormattingToolbar: () => void
-
-  public preventHide = false
-
-  public preventShow = false
-
-  public prevWasEditable: boolean | null = null
-
-  public static shouldShow: (props: { view: EditorView; state: EditorState; from: number; to: number }) => boolean = ({
-    view,
-    state,
-    from,
-    to,
-  }) => {
-    const { doc, selection } = state
-    const { empty } = selection
-
-    // Sometime check for `empty` is not enough.
-    // Doubleclick an empty paragraph returns a node size of 2.
-    // So we check also for an empty text size.
-    const isEmptyTextBlock = !doc.textBetween(from, to).length && isTextSelection(state.selection)
-
-    return !(
-      !view.hasFocus() ||
-      empty ||
-      isEmptyTextBlock ||
-      // Don't show menu if node selection (image, video, file, embed)
-      isNodeSelection(state.selection)
-    )
-  }
-
+export class FormattingToolbarView<BSchema extends BlockSchema> extends EditorToolbarView<BSchema> {
   constructor(
-    private readonly editor: BlockNoteEditor<BSchema>,
-    private readonly pmView: EditorView,
-    updateFormattingToolbar: (formattingToolbarState: FormattingToolbarState) => void,
+    editor: BlockNoteEditor<BSchema>,
+    pmView: EditorView,
+    updateEditorToolbar: (state: EditorToolbarState) => void
   ) {
-    this.updateFormattingToolbar = () => {
-      if (!this.formattingToolbarState) {
-        throw new Error('Attempting to update uninitialized formatting toolbar')
-      }
+    super(editor, pmView, updateEditorToolbar, ({ view, state, from, to }) => {
+      const { doc, selection } = state
+      const { empty } = selection
 
-      updateFormattingToolbar(this.formattingToolbarState)
-    }
+      const isEmptyTextBlock = !doc.textBetween(from, to).length && isTextSelection(state.selection)
 
-    pmView.dom.addEventListener('mousedown', this.viewMousedownHandler)
-    pmView.dom.addEventListener('mouseup', this.viewMouseupHandler)
-    pmView.dom.addEventListener('dragstart', this.dragstartHandler)
-
-    pmView.dom.addEventListener('focus', this.focusHandler)
-    pmView.dom.addEventListener('blur', this.blurHandler)
-
-    document.addEventListener('scroll', this.scrollHandler)
-  }
-
-  viewMousedownHandler = () => {
-    this.preventShow = true
-  }
-
-  viewMouseupHandler = () => {
-    this.preventShow = false
-    setTimeout(() => this.update(this.pmView))
-  }
-
-  // For dragging the whole editor.
-  dragstartHandler = () => {
-    if (this.formattingToolbarState?.show) {
-      this.formattingToolbarState.show = false
-      this.updateFormattingToolbar()
-    }
-  }
-
-  focusHandler = () => {
-    // we use `setTimeout` to make sure `selection` is already updated
-    setTimeout(() => this.update(this.pmView))
-  }
-
-  blurHandler = (event: FocusEvent) => {
-    if (this.preventHide) {
-      this.preventHide = false
-
-      return
-    }
-
-    const editorWrapper = this.pmView.dom.parentElement!
-
-    // Checks if the focus is moving to an element outside the editor. If it is,
-    // the toolbar is hidden.
-    if (
-      // An element is clicked.
-      event &&
-      event.relatedTarget &&
-      // Element is inside the editor.
-      (editorWrapper === (event.relatedTarget as Node) || editorWrapper?.contains(event.relatedTarget as Node))
-    ) {
-      return
-    }
-
-    if (this.formattingToolbarState?.show) {
-      this.formattingToolbarState.show = false
-      this.updateFormattingToolbar()
-    }
-  }
-
-  scrollHandler = () => {
-    if (this.formattingToolbarState?.show) {
-      this.formattingToolbarState.referencePos = this.getSelectionBoundingBox()
-      this.updateFormattingToolbar()
-    }
-  }
-
-  update(view: EditorView, oldState?: EditorState) {
-    const { state, composing } = view
-    const { doc, selection } = state
-    const isSame = oldState && oldState.doc.eq(doc) && oldState.selection.eq(selection)
-
-    if ((this.prevWasEditable === null || this.prevWasEditable === this.editor.isEditable) && (composing || isSame)) {
-      return
-    }
-
-    this.prevWasEditable = this.editor.isEditable
-
-    // support for CellSelections
-    const { ranges } = selection
-    const from = Math.min(...ranges.map((range) => range.$from.pos))
-    const to = Math.max(...ranges.map((range) => range.$to.pos))
-
-    const shouldShow = FormattingToolbarView.shouldShow?.({
-      view,
-      state,
-      from,
-      to,
+      return false
     })
-
-    // Checks if menu should be shown/updated.
-    if (this.editor.isEditable && !this.preventShow && (shouldShow || this.preventHide)) {
-      this.formattingToolbarState = {
-        show: true,
-        referencePos: this.getSelectionBoundingBox(),
-      }
-
-      this.updateFormattingToolbar()
-
-      return
-    }
-
-    // Checks if menu should be hidden.
-    if (
-      this.formattingToolbarState?.show &&
-      !this.preventHide &&
-      (!shouldShow || this.preventShow || !this.editor.isEditable)
-    ) {
-      this.formattingToolbarState.show = false
-      this.updateFormattingToolbar()
-    }
-  }
-
-  destroy() {
-    this.pmView.dom.removeEventListener('mousedown', this.viewMousedownHandler)
-    this.pmView.dom.removeEventListener('mouseup', this.viewMouseupHandler)
-    this.pmView.dom.removeEventListener('dragstart', this.dragstartHandler)
-
-    this.pmView.dom.removeEventListener('focus', this.focusHandler)
-    this.pmView.dom.removeEventListener('blur', this.blurHandler)
-
-    document.removeEventListener('scroll', this.scrollHandler)
-  }
-
-  getSelectionBoundingBox() {
-    const { state } = this.pmView
-    const { selection } = state
-
-    // support for CellSelections
-    const { ranges } = selection
-    const from = Math.min(...ranges.map((range) => range.$from.pos))
-    const to = Math.max(...ranges.map((range) => range.$to.pos))
-
-    if (isNodeSelection(selection)) {
-      const node = this.pmView.nodeDOM(from) as HTMLElement
-
-      if (node) {
-        return node.getBoundingClientRect()
-      }
-    }
-
-    return posToDOMRect(this.pmView, from, to)
   }
 }
 
 export const formattingToolbarPluginKey = new PluginKey('FormattingToolbarPlugin')
 
 export class FormattingToolbarProsemirrorPlugin<BSchema extends BlockSchema> extends EventEmitter<any> {
-  private view: FormattingToolbarView<BSchema> | undefined
+  private view: EditorToolbarView<BSchema> | undefined
 
   public readonly plugin: Plugin
 
@@ -220,7 +42,7 @@ export class FormattingToolbarProsemirrorPlugin<BSchema extends BlockSchema> ext
     })
   }
 
-  public onUpdate(callback: (state: FormattingToolbarState) => void) {
+  public onUpdate(callback: (state: EditorToolbarState) => void) {
     return this.on('update', callback)
   }
 }
