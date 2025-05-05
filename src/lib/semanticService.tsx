@@ -20,8 +20,11 @@ export async function getSimilarFiles(filePath: string | null, limit: number = 2
     return []
   }
   const { getSemanticData, setSemanticData, shouldRefetch } = useSemanticCache.getState()
-  if (!shouldRefetch(filePath)) return getSemanticData(filePath).data // We've already fetched this recently
-
+  if (!shouldRefetch(filePath)) {
+    console.log(`Using cached similar files for ${filePath}`)
+    return getSemanticData(filePath).data // We've already fetched this recently
+  }
+  console.log(`Fetching new similar files for ${filePath}`)
   const sanitizedText = await getSanitizedChunk(filePath)
   if (!sanitizedText) {
     return []
@@ -34,4 +37,21 @@ export async function getSimilarFiles(filePath: string | null, limit: number = 2
 
   setSemanticData(filePath, searchResults)
   return searchResults
+}
+
+export function getCachedSimilarFiles(filePath: string | null): DBQueryResult[] {
+  if (!filePath) {
+    return []
+  }
+  const { getSemanticData } = useSemanticCache.getState()
+  return getSemanticData(filePath).data
+}
+
+// useSemanticCache.getState().setSemanticData(filePath, await getSimilarFiles(filePath))
+export async function setSimilarFiles(filePath: string | null): Promise<void> {
+  if (!filePath) {
+    return
+  }
+  const { setSemanticData } = useSemanticCache.getState()
+  setSemanticData(filePath, await getSimilarFiles(filePath))
 }

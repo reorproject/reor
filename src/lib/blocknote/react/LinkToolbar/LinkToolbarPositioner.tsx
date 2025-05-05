@@ -2,7 +2,6 @@ import Tippy from '@tippyjs/react'
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react'
 import { sticky } from 'tippy.js'
 import { BlockSchema, DefaultBlockSchema, BlockNoteEditor } from '@/lib/blocknote/core'
-import { getSimilarFiles } from '@/lib/semanticService'
 
 import DefaultFormattingToolbar from '../FormattingToolbar/components/DefaultFormattingToolbar'
 
@@ -42,7 +41,7 @@ export const LinkToolbarPositioner = <BSchema extends BlockSchema = DefaultBlock
     [referencePos.current], // eslint-disable-line
   )
 
-  const formattingToolbarElement = useMemo(async () => {
+  const formattingToolbarElement = useMemo(() => {
     const FormattingToolbar = props.formattingToolbar || DefaultFormattingToolbar
 
     return <FormattingToolbar editor={props.editor} />

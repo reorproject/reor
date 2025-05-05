@@ -2,7 +2,8 @@ import { EditorToolbarState, EditorToolbarView } from "../EditorToolbar/EditorTo
 import { Plugin, PluginKey } from "prosemirror-state";
 import { BlockNoteEditor, BlockSchema } from "../..";
 import { EditorView } from "prosemirror-view";
-import { isTextSelection,isNodeSelection } from "@tiptap/core";
+import { isNodeSelection } from "@tiptap/core";
+import { getCachedSimilarFiles } from "@/lib/semanticService";
 import EventEmitter from "../../shared/EventEmitter";
 
 export class LinkToolbarView<BSchema extends BlockSchema> extends EditorToolbarView<BSchema> {
@@ -13,18 +14,17 @@ export class LinkToolbarView<BSchema extends BlockSchema> extends EditorToolbarV
   ) {
     super(editor, pmView, updateEditorToolbar, ({ view, state, from, to }) => {
       const { selection } = state
-      console.log(`Inside showState`)
+
       if (!view.hasFocus() || !selection.empty || isNodeSelection(selection)) {
         return false
       }
-
+      // const similarFiles = getCachedSimilarFiles(editor.currentFilePath)
+      
       const $pos = selection.$from
       const textBefore = $pos.parent.textBetween(0, $pos.parentOffset, undefined, '\ufffc')
-      console.log(`textBefore: ${textBefore}`)
       // Regex to match [[ just before the cursor (and only that)
       const match = /\[\[$/.exec(textBefore)
 
-      console.log(`match: ${!!match}`)
       return !!match
     })
   }

@@ -23,6 +23,8 @@ import { hmBlockSchema } from '@/components/Editor/schema'
 import { setGroupTypes, useEditorState } from '@/lib/utils'
 import { useFileSearchIndex } from '@/lib/utils/cache/fileSearchIndex'
 import slashMenuItems from '../components/Editor/slash-menu-items'
+import { getSimilarFiles } from '@/lib/semanticService'
+import { useSemanticCache } from '@/lib/utils'
 
 type FileContextType = {
   vaultFilesTree: FileInfoTree
@@ -74,6 +76,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>('')
   const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>('')
   const [currentlyChangingFilePath, setCurrentlyChangingFilePath] = useState(false)
+  const { setSemanticData } = useSemanticCache.getState()
   // TODO: Add highlighting data on search
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [highlightData, setHighlightData] = useState<HighlightData>({
@@ -130,6 +133,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       setNeedToIndexEditorContent(false)
     }
     const fileContent = (await window.fileSystem.readFile(filePath, 'utf-8')) ?? ''
+    useSemanticCache.getState().setSemanticData(filePath, await getSimilarFiles(filePath))
     const blocks = await editor.markdownToBlocks(fileContent)
     // @ts-expect-error
     editor.replaceBlocks(editor.topLevelBlocks, blocks)
