@@ -37,6 +37,7 @@ import { mergeCSSClasses } from './shared/utils'
 import { HMBlockSchema, hmBlockSchema } from '@/components/Editor/schema'
 import '@/components/Editor/editor.css'
 import { LinkToolbarProsemirrorPlugin } from './extensions/LinkToolbar/LinkToolbarPlugin'
+import { removeFileExtension } from '@/lib/file'
 
 export type BlockNoteEditorOptions<BSchema extends BlockSchema> = {
   // TODO: Figure out if enableBlockNoteExtensions/disableHistoryExtension are needed and document them.
@@ -681,6 +682,7 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
     const { state, view } = this._tiptapEditor;
     const { tr, schema, selection, doc } = state;
     const { from } = selection;
+    text = removeFileExtension(text)
     if (!url.startsWith('reor://')) {
       url = `reor://${url}`
     }

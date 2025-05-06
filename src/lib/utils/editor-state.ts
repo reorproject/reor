@@ -10,6 +10,7 @@ type SemanticEntry = {
   data: DBQueryResult[]
   lastFetched: number
   isStale: boolean
+  isFetching: boolean
 }
 
 type SemanticCacheState = {
@@ -18,6 +19,7 @@ type SemanticCacheState = {
   setSemanticData: (filePath: string, data: DBQueryResult[]) => void
   markStale: (filePath: string) => void
   shouldRefetch: (filePath: string, thresholdMs?: number) => boolean
+  setFetching: (filePath: string, isFetching: boolean) => void
 }
 
 export const useEditorState = create<EditorStateStore>((set) => ({
@@ -36,13 +38,14 @@ export const useSemanticCache = create<SemanticCacheState>((set, get) => ({
           data,
           lastFetched: Date.now(),
           isStale: false,
+          isFetching: false,
         }
       }
     }))
   },
 
   getSemanticData: (filePath: string) => {
-    return get().semanticCache[filePath]
+    return get().semanticCache[filePath] ?? { data: [], lastFetched: 0, isStale: true, isFetching: false }
   },
 
   markStale: (filePath: string) => {
@@ -55,6 +58,22 @@ export const useSemanticCache = create<SemanticCacheState>((set, get) => ({
           [filePath]: {
             ...entry,
             isStale: true,
+          }
+        }
+      }
+    })
+  },
+
+  setFetching: (filePath: string, isFetching: boolean) => {
+    set((state) => {
+      const entry = state.semanticCache[filePath]
+      if (!entry) return {}
+      return {
+        semanticCache: {
+          ...state.semanticCache,
+          [filePath]: {
+            ...entry,
+            isFetching,
           }
         }
       }

@@ -3,7 +3,6 @@ import { Plugin, PluginKey } from "prosemirror-state";
 import { BlockNoteEditor, BlockSchema } from "../..";
 import { EditorView } from "prosemirror-view";
 import { isNodeSelection } from "@tiptap/core";
-import { getCachedSimilarFiles } from "@/lib/semanticService";
 import EventEmitter from "../../shared/EventEmitter";
 
 export class LinkToolbarView<BSchema extends BlockSchema> extends EditorToolbarView<BSchema> {

@@ -82,7 +82,7 @@ const getBlockNoteExtensions = <BSchema extends HMBlockSchema>(opts: {
     Strike,
     Underline,
     // RichTextLink.configure(opts.linkExtensionOptions),
-    createLinkExtension(opts.editor as BlockNoteEditor, opts.linkExtensionOptions),
+    createLinkExtension(opts.linkExtensionOptions),
     // TextColorMark,
     // TextColorExtension,
     TextAlignmentExtension,

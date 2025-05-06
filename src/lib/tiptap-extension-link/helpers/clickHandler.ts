@@ -26,6 +26,7 @@ function clickHandler(options: ClickHandlerOptions): Plugin {
           const path = href.replace('reor://', '')
           console.log('Clicking link', href)
           console.log(`Path: ${path}`)
+          console.log(`Open file: ${options.openFile}`)
           options.openFile(path)
           return true
         } else if (/^https?:\/\//.test(href)) {

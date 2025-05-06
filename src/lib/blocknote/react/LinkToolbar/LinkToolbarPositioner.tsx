@@ -42,16 +42,15 @@ export const LinkToolbarPositioner = <BSchema extends BlockSchema = DefaultBlock
     [referencePos.current], // eslint-disable-line
   )
 
-  const formattingToolbarElement = useMemo(() => {
+  const linkToolbarElement = useMemo(() => {
     const LinkContentToolbar = props.linkToolbarPositioner || LinkToolbarContent
-
     return <LinkContentToolbar editor={props.editor} />
   }, [props.editor, props.linkToolbarPositioner])
 
   return (
     <Tippy
       appendTo={props.editor.domElement.parentElement ?? document.body}
-      content={formattingToolbarElement}
+      content={linkToolbarElement}
       getReferenceClientRect={getReferenceClientRect}
       interactive
       visible={show}
