@@ -8,23 +8,55 @@ import clickHandler from '@/lib/tiptap-extension-link/helpers/clickHandler'
 import { useFileSearchIndex } from '@/lib/utils/cache/fileSearchIndex'
 import { isHypermediaScheme } from '@/lib/utils'
 
+/**
+ * Handles conventially markdown link syntax.
+ * [title](url)
+ */
 const inputRegex = /(?:^|\s)\[([^\]]*)?\]\((\S+)(?: ["“](.+)["”])?\)$/i
+
+/**
+ * Handles markdown link syntax for pasting.
+ * [title](url)
+ */
 const pasteRegex = /(?:^|\s)\[([^\]]*)?\]\((\S+)(?: ["“](.+)["”])?\)/gi
+
+/**
+ * Handles inline linking between files. For instance, triggers when a user types [[filename]].
+ */
 const fileRegex = /\[\[(.*?)\]\]/
 
-
+/**
+ * Returns true if this is an internal link that represents a file.
+ * @param href the absolute path to the file
+ * @returns true if this is an internal link
+ */
 function isInternalLink(href?: string) {
   return href?.startsWith('reor://')
 }
 
+/**
+ * Retruns true if this is a valid URI or a hypermedia scheme. For instance, http, https, ftp, reor, etc..
+ * @param url the url to check
+ * @returns 
+ */
 function isValidURI(url: string): boolean {
   return isAllowedUri(url) as boolean || isHypermediaScheme(url)
 }
 
+/**
+ * Generates a random 32 digit string. This is used to generate a random file name when the user types [[filename]]
+ * towards a file that does not exist.
+ * @returns a 32 digit string
+ */
 function generateRandom32DigitString(): string {
   return Array.from({ length: 32 }, () => Math.floor(Math.random() * 10)).join('')
 }
 
+/**
+ * Handles convential markdown link syntax
+ * @param config 
+ * @returns a configured <a> tag
+ */
 function linkInputRule(config: Parameters<typeof markInputRule>[0]) {
   const baseRule = markInputRule(config)
   return new InputRule({
@@ -36,6 +68,10 @@ function linkInputRule(config: Parameters<typeof markInputRule>[0]) {
   })
 }
 
+/**
+ * Handles convential markdown pasting syntax
+ * @param config 
+ */
 function linkPasteRule(config: Parameters<typeof markPasteRule>[0]) {
   const baseRule = markPasteRule(config)
   return new PasteRule({
@@ -47,7 +83,12 @@ function linkPasteRule(config: Parameters<typeof markPasteRule>[0]) {
   })
 }
 
-function linkFileInputRule(config: Parameters<typeof markInputRule>[0], bnEditor: BlockNoteEditor) {
+/**
+ * Deals with the [[filename]] syntax. This is used to link files in the editor.
+ * It will create a link to the file if it exists, otherwise it will create a link to a new file.
+ * @param config 
+ */
+function linkFileInputRule(config: Parameters<typeof markInputRule>[0]) {
   return new InputRule({
     find: fileRegex,
     handler(props) {
@@ -71,7 +112,7 @@ function linkFileInputRule(config: Parameters<typeof markInputRule>[0], bnEditor
   })
 }
 
-const createLinkExtension = (bnEditor: BlockNoteEditor, linkExtensionOpts: Partial<LinkOptions> = {}) => {
+const createLinkExtension = (linkExtensionOpts: Partial<LinkOptions> = {}) => {
   return Link.extend({
     inclusive: false,
 
@@ -150,7 +191,7 @@ const createLinkExtension = (bnEditor: BlockNoteEditor, linkExtensionOpts: Parti
               href: cacheResult ? `reor://${cacheResult}` : `reor://${fileName}`,
             }
           },
-        }, bnEditor),
+        }),
       ]
     },
 
