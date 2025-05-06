@@ -681,6 +681,9 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
     const { state, view } = this._tiptapEditor;
     const { tr, schema, selection, doc } = state;
     const { from } = selection;
+    if (!url.startsWith('reor://')) {
+      url = `reor://${url}`
+    }
   
     const maxSearchLength = 100;
     const searchStart = Math.max(0, from - maxSearchLength);
@@ -703,6 +706,7 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
     tr.insertText(text, matchStart);
     tr.addMark(matchStart, matchStart + text.length, schema.mark('link', { href: url, title: text }));
   
+    console.log(`mark:`, url, text)
     view.dispatch(tr);
     view.focus();
   }

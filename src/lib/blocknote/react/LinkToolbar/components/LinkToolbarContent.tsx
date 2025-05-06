@@ -30,7 +30,6 @@ const LinkToolbarContent = <BSchema extends BlockSchema>(
           }}
           padding="$1"
           onPress={() => {
-            console.log(`Calling add link for ${file.name}`)
             props.editor.addLink(file.notepath, file.name)
           }}
         >

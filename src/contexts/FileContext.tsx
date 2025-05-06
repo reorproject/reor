@@ -162,10 +162,10 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     blockSchema: hmBlockSchema,
     slashMenuItems,
     linkExtensionOptions: {
-      onLinkClick: (href: string) => {
-        openOrCreateFile(href)
+      openFile: (path: string) => {
+        openOrCreateFile(path)
       },
-    },
+    }
   })
 
   const [debouncedEditor] = useDebounce(editor?.topLevelBlocks, 3000)

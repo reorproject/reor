@@ -20,17 +20,17 @@ function clickHandler(options: ClickHandlerOptions): Plugin {
         const link = event.target as HTMLLinkElement
 
         const href = link?.href ?? attrs.href
-        if (options.openFile && link && href) { // Linked to a local file, need to open it
-          console.log(`in open file`)
-          options.openFile(href.replace('reor://', ''))
+        if (!href) return
+
+        if (href.startsWith('reor://')) {
+          const path = href.replace('reor://', '')
+          console.log('Clicking link', href)
+          console.log(`Path: ${path}`)
+          options.openFile(path)
           return true
-        } else {
-          if (link && href) {
-            const newWindow = false // todo, check for meta key
-            console.log(`options.openUrl`, options.openUrl)
-            options.openUrl(href, newWindow)
-            return true
-          }
+        } else if (/^https?:\/\//.test(href)) {
+          window.open(href, '_blank', 'noopener,noreferrer')
+          return true
         }
 
         return false

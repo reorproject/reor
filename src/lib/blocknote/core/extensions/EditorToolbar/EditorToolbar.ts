@@ -119,7 +119,6 @@ export class EditorToolbarView<BSchema extends BlockSchema> {
       from,
       to,
     })
-    console.log("shouldShow", shouldShow)
 
     // Checks if menu should be shown/updated.
     if (this.editor.isEditable && !this.preventShow && (shouldShow || this.preventHide)) {
