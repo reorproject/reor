@@ -1,6 +1,6 @@
 import { InputRule, markInputRule, markPasteRule, PasteRule, mergeAttributes } from '@tiptap/core'
 import { isAllowedUri, Link } from '@tiptap/extension-link'
-import { Plugin } from '@tiptap/pm/state'
+import { EditorState, Plugin } from '@tiptap/pm/state'
 import type { LinkOptions } from '@tiptap/extension-link'
 import { useEditorState, isHypermediaScheme } from '@/lib/utils'
 import { getSimilarFiles } from '@/lib/semanticService'
@@ -70,32 +70,12 @@ function linkInputRule(config: Parameters<typeof markInputRule>[0]) {
   })
 }
 
+
 /**
  * Obsidian-style suggestion rule for links. When our editor detects a the start of a link (i.e. `[[`), it
  * will trigger a search for all similar files. 
  * 
- * TODO: It will then display a popup containing the results of the search. Selecting one will automatically
- * build a link to that file.
  */
-function linkSuggestFilesInputRule(config: Parameters<typeof markInputRule>[0]) {
-  const defaultMarkInputRule = markInputRule(config)
-
-  return new InputRule({
-    find: config.find,
-    handler(props) {
-      const { tr } = props.state
-      const currentPath = useEditorState.getState().currentFilePath
-      void(async () => {
-        const searchResults = await getSimilarFiles(currentPath, 5)
-
-      })()
-
-      defaultMarkInputRule.handler(props)
-      tr.setMeta('preventAutolink', true)
-    },
-  })
-}
-
 export function linkFileInputRule(config: Parameters<typeof markInputRule>[0], bnEditor: BlockNoteEditor) {
   return new InputRule({
     find: fileRegex,
@@ -228,20 +208,6 @@ const createLinkExtension = (bnEditor: BlockNoteEditor, linkExtensionsOpts: any)
             }
           },
         }, bnEditor),
-        // linkSuggestFilesInputRule({
-        //   find: suggestFileRegex,
-        //   type: this.type,
-  
-        //   // We need to use `pop()` to remove the last capture groups from the match to
-        //   // satisfy Tiptap's `markPasteRule` expectation of having the content as the last
-        //   // capture group in the match (this makes the attribute order important)
-        //   getAttributes(match) {
-        //     return {
-        //       title: match.pop()?.trim(),
-        //       href: match.pop()?.trim(),
-        //     }
-        //   },
-        // }),
       ]
     },
     addPasteRules() {

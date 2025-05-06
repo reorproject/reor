@@ -21,11 +21,13 @@ function clickHandler(options: ClickHandlerOptions): Plugin {
 
         const href = link?.href ?? attrs.href
         if (options.openFile && link && href) { // Linked to a local file, need to open it
+          console.log(`in open file`)
           options.openFile(href.replace('reor://', ''))
           return true
         } else {
           if (link && href) {
             const newWindow = false // todo, check for meta key
+            console.log(`options.openUrl`, options.openUrl)
             options.openUrl(href, newWindow)
             return true
           }

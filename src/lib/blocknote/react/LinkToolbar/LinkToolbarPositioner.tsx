@@ -3,9 +3,10 @@ import React, { FC, useEffect, useMemo, useRef, useState } from 'react'
 import { sticky } from 'tippy.js'
 import { BlockSchema, DefaultBlockSchema, BlockNoteEditor } from '@/lib/blocknote/core'
 
-import DefaultFormattingToolbar from '../FormattingToolbar/components/DefaultFormattingToolbar'
+// import DefaultFormattingToolbar from '../FormattingToolbar/components/DefaultFormattingToolbar'
+import LinkToolbarContent from './components/LinkToolbarContent'
 
-export type LinkToolbarPositioner<BSchema extends BlockSchema = DefaultBlockSchema> = {
+export type LinkToolbarPositionerProps<BSchema extends BlockSchema = DefaultBlockSchema> = {
   editor: BlockNoteEditor<BSchema>
 }
 
@@ -17,7 +18,7 @@ const tippyPlugins = [sticky]
 
 export const LinkToolbarPositioner = <BSchema extends BlockSchema = DefaultBlockSchema>(props: {
   editor: BlockNoteEditor<BSchema>
-  formattingToolbar?: FC<LinkToolbarPositioner<BSchema>>
+  linkToolbarPositioner?: FC<LinkToolbarPositionerProps<BSchema>>
 }) => {
   const [show, setShow] = useState<boolean>(false)
 
@@ -42,10 +43,10 @@ export const LinkToolbarPositioner = <BSchema extends BlockSchema = DefaultBlock
   )
 
   const formattingToolbarElement = useMemo(() => {
-    const FormattingToolbar = props.formattingToolbar || DefaultFormattingToolbar
+    const LinkContentToolbar = props.linkToolbarPositioner || LinkToolbarContent
 
-    return <FormattingToolbar editor={props.editor} />
-  }, [props.editor, props.formattingToolbar])
+    return <LinkContentToolbar editor={props.editor} />
+  }, [props.editor, props.linkToolbarPositioner])
 
   return (
     <Tippy

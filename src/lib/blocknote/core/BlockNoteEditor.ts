@@ -672,6 +672,42 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
   }
 
   /**
+   * Adds a new link at the current location
+   * @param url 
+   */
+  public addLink(url: string, text: string) {
+    if (!url || !text) return;
+
+    const { state, view } = this._tiptapEditor;
+    const { tr, schema, selection, doc } = state;
+    const { from } = selection;
+  
+    const maxSearchLength = 100;
+    const searchStart = Math.max(0, from - maxSearchLength);
+  
+    const textBefore = doc.textBetween(searchStart, from, undefined, '\0');
+  
+    // Find the last `[` before the cursor
+    const lastBracketIndex = textBefore.lastIndexOf('[[');
+    if (lastBracketIndex === -1) {
+      // fallback: insert at cursor
+      const mark = schema.mark('link', { href: url, title: text });
+      const insertTr = tr.insertText(text, from).addMark(from, from + text.length, mark);
+      view.dispatch(insertTr);
+      view.focus();
+      return;
+    }
+  
+    const matchStart = from - (textBefore.length - lastBracketIndex);
+    tr.delete(matchStart, from);
+    tr.insertText(text, matchStart);
+    tr.addMark(matchStart, matchStart + text.length, schema.mark('link', { href: url, title: text }));
+  
+    view.dispatch(tr);
+    view.focus();
+  }
+
+  /**
    * Checks if the block containing the text cursor can be nested.
    */
   public canNestBlock() {

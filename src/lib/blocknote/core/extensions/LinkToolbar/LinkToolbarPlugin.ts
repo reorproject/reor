@@ -17,15 +17,18 @@ export class LinkToolbarView<BSchema extends BlockSchema> extends EditorToolbarV
 
       if (!view.hasFocus() || !selection.empty || isNodeSelection(selection)) {
         return false
-      }
-      // const similarFiles = getCachedSimilarFiles(editor.currentFilePath)
-      
-      const $pos = selection.$from
-      const textBefore = $pos.parent.textBetween(0, $pos.parentOffset, undefined, '\ufffc')
-      // Regex to match [[ just before the cursor (and only that)
-      const match = /\[\[$/.exec(textBefore)
+      }      
 
-      return !!match
+      const $from = state.doc.resolve(from)
+      const start = $from.start()
+
+      const maxSearchLength = 100;
+      const searchStart = Math.max(0, from - maxSearchLength);
+      const cleanedStart = searchStart < start ? start : searchStart
+    
+      const textBefore = state.doc.textBetween(cleanedStart, from, undefined, '\0');
+      const lastBracketIndex = textBefore.lastIndexOf('[[');
+      return lastBracketIndex !== -1
     })
   }
 }

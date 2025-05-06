@@ -12,6 +12,7 @@ export type ToolbarButtonProps = {
   isSelected?: boolean
   children?: any
   isDisabled?: boolean
+  hint?: string
 }
 
 /**
@@ -20,13 +21,13 @@ export type ToolbarButtonProps = {
 // eslint-disable-next-line react/display-name
 export const ToolbarButton = forwardRef((props: ToolbarButtonProps, ref: ForwardedRef<HTMLButtonElement>) => {
   const ButtonIcon = props.icon
+  const hasChildrenOrHint = props.children || props.hint
   return (
     <Tippy
       content={<TooltipContent mainTooltip={props.mainTooltip} secondaryTooltip={props.secondaryTooltip} />}
       trigger="mouseenter"
     >
-      {/* Creates an ActionIcon instead of a Button if only an icon is provided as content. */}
-      {props.children ? (
+      {hasChildrenOrHint ? (
         <Button
           onClick={props.onClick}
           data-selected={props.isSelected ? 'true' : undefined}
@@ -34,9 +35,23 @@ export const ToolbarButton = forwardRef((props: ToolbarButtonProps, ref: Forward
           size="xs"
           disabled={props.isDisabled || false}
           ref={ref}
+          fullWidth
         >
-          {ButtonIcon && <ButtonIcon />}
-          {props.children}
+          {/* Space between icon and text */}
+          <span
+            style={{
+              display: 'flex',
+              justifyContent: 'flex-start',
+              alignItems: 'center'
+            }}
+          >
+            {(props.children || props.hint) && (
+              <span>
+                {props.children ?? props.hint}
+              </span>
+            )}
+            {ButtonIcon && <ButtonIcon />}
+          </span>
         </Button>
       ) : (
         <ActionIcon
