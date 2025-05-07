@@ -20,11 +20,10 @@ import useOrderedSet from '../lib/hooks/use-ordered-set'
 import welcomeNote from '@/lib/welcome-note'
 import { useBlockNote, BlockNoteEditor } from '@/lib/blocknote'
 import { hmBlockSchema } from '@/components/Editor/schema'
-import { setGroupTypes, useEditorState } from '@/lib/utils'
-import { useFileSearchIndex } from '@/lib/utils/cache/fileSearchIndex'
+import { setGroupTypes, useEditorState, useSemanticCache } from '@/lib/utils'
+import useFileSearchIndex from '@/lib/utils/cache/fileSearchIndex'
 import slashMenuItems from '../components/Editor/slash-menu-items'
 import { getSimilarFiles } from '@/lib/semanticService'
-import { useSemanticCache } from '@/lib/utils'
 
 type FileContextType = {
   vaultFilesTree: FileInfoTree
@@ -76,7 +75,6 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>('')
   const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>('')
   const [currentlyChangingFilePath, setCurrentlyChangingFilePath] = useState(false)
-  const { setSemanticData } = useSemanticCache.getState()
   // TODO: Add highlighting data on search
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [highlightData, setHighlightData] = useState<HighlightData>({
@@ -115,8 +113,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     let fileObject = null
     if (!fileExists) {
       fileObject = await window.fileSystem.createFile(absolutePath, optionalContent || ``)
-      if (!fileObject)
-        throw new Error(`Could not create file ${filePathWithExtension}`)
+      if (!fileObject) throw new Error(`Could not create file ${filePathWithExtension}`)
       setNeedToIndexEditorContent(true)
     } else {
       fileObject = await window.fileSystem.getFileInfo(absolutePath, filePathWithExtension)
@@ -165,7 +162,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       openFile: (path: string) => {
         openOrCreateFile(path)
       },
-    }
+    },
   })
 
   const [debouncedEditor] = useDebounce(editor?.topLevelBlocks, 3000)
@@ -351,7 +348,7 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     selectedDirectory,
     setSelectedDirectory,
   }
-  
+
   const contextValuesMemo: FileContextType = React.useMemo(
     () => ({
       ...contextValues,

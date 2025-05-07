@@ -100,8 +100,8 @@ class LanceDBTableWrapper {
     }
   }
 
-  async search(query: string, limit: number, filter?: string, unique?: boolean): Promise<DBQueryResult[]> {
-    const lanceQuery = await this.lanceTable.search(query).metricType(MetricType.Cosine).limit(limit)
+  async search(query: string, limit: number, filter?: string): Promise<DBQueryResult[]> {
+    const lanceQuery = this.lanceTable.search(query).metricType(MetricType.Cosine).limit(limit)
 
     if (filter) {
       lanceQuery.prefilter(true)

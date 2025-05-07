@@ -12,7 +12,7 @@ function clickHandler(options: ClickHandlerOptions): Plugin {
   return new Plugin({
     key: new PluginKey('handleClickLink'),
     props: {
-      handleClick: (view, pos, event) => {
+      handleClick: (view, _, event) => {
         if (event.button !== 0) {
           return false
         }
@@ -20,13 +20,14 @@ function clickHandler(options: ClickHandlerOptions): Plugin {
         const link = event.target as HTMLLinkElement
 
         const href = link?.href ?? attrs.href
-        if (!href) return
+        if (!href) return false
 
         if (href.startsWith('reor://')) {
           const path = href.replace('reor://', '')
           options.openFile(path)
           return true
-        } else if (/^https?:\/\//.test(href)) {
+        }
+        if (/^https?:\/\//.test(href)) {
           window.open(href, '_blank', 'noopener,noreferrer')
           return true
         }

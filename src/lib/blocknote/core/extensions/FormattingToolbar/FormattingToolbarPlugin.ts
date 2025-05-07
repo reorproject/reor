@@ -1,30 +1,13 @@
-import { EditorToolbarState, EditorToolbarView } from "../EditorToolbar/EditorToolbar";
-import { Plugin, PluginKey } from "prosemirror-state";
-import { BlockNoteEditor, BlockSchema } from "../..";
-import { EditorView } from "prosemirror-view";
-import { isTextSelection, isNodeSelection } from "@tiptap/core";
-import EventEmitter from "../../shared/EventEmitter";
+import { Plugin, PluginKey } from 'prosemirror-state'
+import { BlockNoteEditor, BlockSchema } from '../..'
+import { EditorToolbarState, EditorToolbarView } from '../EditorToolbar/EditorToolbar'
 
-export class FormattingToolbarView<BSchema extends BlockSchema> extends EditorToolbarView<BSchema> {
-  constructor(
-    editor: BlockNoteEditor<BSchema>,
-    pmView: EditorView,
-    updateEditorToolbar: (state: EditorToolbarState) => void
-  ) {
-    super(editor, pmView, updateEditorToolbar, ({ view, state, from, to }) => {
-      const { doc, selection } = state
-      const { empty } = selection
-
-      const isEmptyTextBlock = !doc.textBetween(from, to).length && isTextSelection(state.selection)
-
-      return false
-    })
-  }
-}
+import FormattingToolbarView from './FormattingToolbarView'
+import EventEmitter from '../../shared/EventEmitter'
 
 export const formattingToolbarPluginKey = new PluginKey('FormattingToolbarPlugin')
 
-export class FormattingToolbarProsemirrorPlugin<BSchema extends BlockSchema> extends EventEmitter<any> {
+class FormattingToolbarProsemirrorPlugin<BSchema extends BlockSchema> extends EventEmitter<any> {
   private view: EditorToolbarView<BSchema> | undefined
 
   public readonly plugin: Plugin
@@ -46,3 +29,5 @@ export class FormattingToolbarProsemirrorPlugin<BSchema extends BlockSchema> ext
     return this.on('update', callback)
   }
 }
+
+export default FormattingToolbarProsemirrorPlugin

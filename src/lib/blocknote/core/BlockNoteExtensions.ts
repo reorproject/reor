@@ -11,8 +11,6 @@ import { Italic } from '@tiptap/extension-italic'
 import { Strike } from '@tiptap/extension-strike'
 import { Text } from '@tiptap/extension-text'
 import { Underline } from '@tiptap/extension-underline'
-// import {createInlineEmbedNode} from '../../mentions-plugin'
-import { Link } from '../../tiptap-extension-link'
 import BlockManipulationExtension from './extensions/BlockManipulation/BlockManipulationExtension'
 import { BlockContainer, BlockGroup, Doc } from './extensions/Blocks'
 import { BlockNoteDOMAttributes } from './extensions/Blocks/api/blockTypes'
@@ -28,7 +26,7 @@ import TextAlignmentExtension from './extensions/TextAlignment/TextAlignmentExte
 import { BlockNoteEditor } from './BlockNoteEditor'
 import LocalMediaPastePlugin from './extensions/Pasting/local-media-paste-plugin'
 // import { RichTextLink } from '@/components/Editor/RichTextLink'
-import { createLinkExtension } from '@/components/Editor/RichTextLink'
+import createLinkExtension from '@/components/Editor/RichTextLink'
 
 /**
  * Get all the Tiptap extensions BlockNote is configured with by default

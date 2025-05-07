@@ -5,13 +5,13 @@ import posthog from 'posthog-js'
 import { ToastContainer, toast } from 'react-toastify'
 
 import 'react-toastify/dist/ReactToastify.css'
+import { FileInfo } from 'electron/main/filesystem/types'
 import IndexingProgress from './components/Common/IndexingProgress'
 import MainPageComponent from './components/MainPage'
 import InitialSetupSinglePage from './components/Settings/InitialSettingsSinglePage'
 import { ThemeProvider } from './contexts/ThemeContext'
-import { useFileSearchIndex } from './lib/utils/cache/fileSearchIndex'
+import useFileSearchIndex from './lib/utils/cache/fileSearchIndex'
 import { flattenFileInfoTree } from './lib/file'
-import { FileInfo } from 'electron/main/filesystem/types'
 
 interface AppProps {}
 
@@ -85,7 +85,6 @@ const App: React.FC<AppProps> = () => {
         ...f,
       }))
       useFileSearchIndex.getState().hydrate(flat)
-      console.log(`FileSearch: `, useFileSearchIndex.getState().index)
     }
     hydrateIndex()
   }, [])

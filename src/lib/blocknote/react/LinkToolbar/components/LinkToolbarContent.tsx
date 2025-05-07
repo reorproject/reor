@@ -1,16 +1,16 @@
-import { useState, useEffect } from "react"
-import { BlockNoteEditor, BlockSchema } from "@/lib/blocknote/core"
-import { LinkToolbarPositionerProps } from "../LinkToolbarPositioner"
-import { Spinner, SizableText, YStack} from 'tamagui'
-import { getUniqueSimilarFiles } from "@/lib/semanticService"
-import { DBQueryResult } from "electron/main/vector-database/schema"
+import React, { useState, useEffect } from 'react'
+import { Spinner, SizableText, YStack } from 'tamagui'
+import { DBQueryResult } from 'electron/main/vector-database/schema'
 import { Stack, Text } from '@mantine/core'
-import ThemedMenu, { ThemedDropdown, ThemedMenuItem } from "@/components/ui/ThemedMenu"
+import { BlockNoteEditor, BlockSchema } from '@/lib/blocknote/core'
+import { LinkToolbarPositionerProps } from '../LinkToolbarPositioner'
+import { getUniqueSimilarFiles } from '@/lib/semanticService'
+import ThemedMenu, { ThemedDropdown, ThemedMenuItem } from '@/components/ui/ThemedMenu'
 
 const LinkToolbarContent = <BSchema extends BlockSchema>(
   props: LinkToolbarPositionerProps<BSchema> & {
     editor: BlockNoteEditor<BSchema>
-  }
+  },
 ) => {
   const [similarFiles, setSimilarFiles] = useState<DBQueryResult[]>([])
   const [loading, setLoading] = useState(true)
@@ -20,7 +20,7 @@ const LinkToolbarContent = <BSchema extends BlockSchema>(
     const timeout = setTimeout(() => {
       setTriggerRender((prev) => prev + 1)
     }, 100)
-  
+
     return () => clearTimeout(timeout)
   }, [])
 
@@ -36,7 +36,7 @@ const LinkToolbarContent = <BSchema extends BlockSchema>(
     }
 
     fetchSimilarFiles()
-  }, [triggerRender])
+  }, [props.editor.currentFilePath, triggerRender])
 
   if (loading) {
     return (
@@ -62,25 +62,18 @@ const LinkToolbarContent = <BSchema extends BlockSchema>(
    * When I tried to use an external library it would introduce many bugs
    */
   return (
-    <ThemedMenu
-      defaultOpened
-      closeDelay={10000000}
-      opened={true}
-      closeOnClickOutside={true}
-    >
+    <ThemedMenu defaultOpened closeDelay={10000000} opened closeOnClickOutside>
       <ThemedDropdown onMouseDown={(e) => e.preventDefault()}>
-        {
-          similarFiles.slice(0, 5).map((file) => (
-            <ThemedMenuItem
-              onClick={() => props.editor.addLink(file.notepath, file.name)}
-            >
-              <Stack spacing={0}>
-                <Text>{file.name}</Text>
-                <Text size={10}>{file.notepath}</Text>
-              </Stack>
-            </ThemedMenuItem>
-          ))
-        }
+        {similarFiles.slice(0, 5).map((file) => (
+          <ThemedMenuItem onClick={() => props.editor.addLink(file.notepath, file.name)}>
+            <Stack spacing={0} w={250}>
+              <Text>{file.name}</Text>
+              <Text size={10} truncate>
+                {file.notepath}
+              </Text>
+            </Stack>
+          </ThemedMenuItem>
+        ))}
       </ThemedDropdown>
     </ThemedMenu>
   )

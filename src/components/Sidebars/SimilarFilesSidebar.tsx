@@ -2,12 +2,11 @@ import React, { useEffect, useState } from 'react'
 
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 import { toast } from 'react-toastify'
-import { getSimilarFiles } from '@/lib/semanticService'
-
 import '../../styles/global.css'
-
 import posthog from 'posthog-js'
 import { Stack } from 'tamagui'
+
+import { getSimilarFiles } from '@/lib/semanticService'
 import errorToStringRendererProcess from '@/lib/error'
 import SimilarEntriesComponent from './SemanticSidebar/SimilarEntriesComponent'
 import { useFileContext } from '@/contexts/FileContext'

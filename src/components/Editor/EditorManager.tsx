@@ -2,7 +2,13 @@ import React, { useEffect, useState } from 'react'
 import { YStack } from 'tamagui'
 import InEditorBacklinkSuggestionsDisplay from './BacklinkSuggestionsDisplay'
 import { useFileContext } from '@/contexts/FileContext'
-import { BlockNoteView, FormattingToolbarPositioner, SlashMenuPositioner, SideMenuPositioner, LinkToolbarPositioner } from '@/lib/blocknote'
+import {
+  BlockNoteView,
+  FormattingToolbarPositioner,
+  SlashMenuPositioner,
+  SideMenuPositioner,
+  LinkToolbarPositioner,
+} from '@/lib/blocknote'
 import SearchBar from './Search/SearchBar'
 
 const EditorManager: React.FC = () => {

@@ -1,8 +1,7 @@
-import { EditorState, Plugin, PluginKey } from "prosemirror-state";
-import { BaseUiElementCallbacks, BaseUiElementState, BlockNoteEditor, BlockSchema } from "../..";
-import { EditorView } from "prosemirror-view";
-import { isTextSelection, isNodeSelection, posToDOMRect } from "@tiptap/core";
-import EventEmitter from "../../shared/EventEmitter"
+import { EditorState } from 'prosemirror-state'
+import { EditorView } from 'prosemirror-view'
+import { isNodeSelection, posToDOMRect } from '@tiptap/core'
+import { BaseUiElementCallbacks, BaseUiElementState, BlockNoteEditor, BlockSchema } from '../..'
 
 export type EditorToolbarCallbacks = BaseUiElementCallbacks
 export type EditorToolbarState = BaseUiElementState
@@ -28,7 +27,7 @@ export class EditorToolbarView<BSchema extends BlockSchema> {
   ) {
     this.updateEditorToolbar = () => {
       if (!this.editorToolbarState) {
-        throw new Error("Attempting to update uninitialized editor toolbar")
+        throw new Error('Attempting to update uninitialized editor toolbar')
       }
 
       updateEditorToolbar(this.editorToolbarState)
@@ -36,14 +35,14 @@ export class EditorToolbarView<BSchema extends BlockSchema> {
 
     this.shouldShow = shouldShow
 
-    pmView.dom.addEventListener("mousedown",  this.viewMousedownHandler)
-    pmView.dom.addEventListener("mouseup",  this.viewMouseupHandler)
-    pmView.dom.addEventListener("dragstart", this.updateEditorToolbar)
+    pmView.dom.addEventListener('mousedown', this.viewMousedownHandler)
+    pmView.dom.addEventListener('mouseup', this.viewMouseupHandler)
+    pmView.dom.addEventListener('dragstart', this.updateEditorToolbar)
 
-    pmView.dom.addEventListener("focus", this.focusHandler)
-    pmView.dom.addEventListener("blur", this.blurHandler)
+    pmView.dom.addEventListener('focus', this.focusHandler)
+    pmView.dom.addEventListener('blur', this.blurHandler)
 
-    document.addEventListener("scroll", this.scrollHandler)
+    document.addEventListener('scroll', this.scrollHandler)
   }
 
   viewMousedownHandler = () => {
@@ -92,7 +91,7 @@ export class EditorToolbarView<BSchema extends BlockSchema> {
   scrollHandler = () => {
     if (this.editorToolbarState?.show) {
       this.editorToolbarState.referencePos = this.getSelectionBoundingBox()
-      this.updateEditorToolbar
+      this.updateEditorToolbar()
     }
   }
 

@@ -4,9 +4,9 @@ import { FileInfo } from 'electron/main/filesystem/types'
 
 type FileSearchIndexState = {
   index: Map<string, FileInfo>
-  
+
   hydrate: (entries: FileInfo[]) => void
-  
+
   // Asynchronous methods
   add: (metadata: FileInfo) => Promise<void>
   rename: (oldName: string, newName: string) => Promise<void>
@@ -17,7 +17,7 @@ type FileSearchIndexState = {
   getMetadata: (fileName: string) => FileInfo | undefined
 }
 
-export const useFileSearchIndex = create<FileSearchIndexState>((set, get) => ({
+const useFileSearchIndex = create<FileSearchIndexState>((set, get) => ({
   index: new Map(),
 
   hydrate: (entries) => {
@@ -71,3 +71,5 @@ export const useFileSearchIndex = create<FileSearchIndexState>((set, get) => ({
   getPath: (name) => get().index.get(name)?.path,
   getMetadata: (name) => get().index.get(name),
 }))
+
+export default useFileSearchIndex

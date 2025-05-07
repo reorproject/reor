@@ -71,7 +71,7 @@ export const ThemedDropdown: React.FC<ThemedMenuProps & MenuDropdownProps> = ({ 
       {...restProps}
       style={{
         backgroundColor: theme.background.val,
-        color: theme.color.val
+        color: theme.color.val,
       }}
     >
       {children}

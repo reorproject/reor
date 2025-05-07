@@ -26,7 +26,7 @@ import { ColorStyle, Styles, ToggledStyle } from './extensions/Blocks/api/inline
 import { Selection } from './extensions/Blocks/api/selectionTypes'
 import { getBlockInfoFromPos } from './extensions/Blocks/helpers/getBlockInfoFromPos'
 
-import { FormattingToolbarProsemirrorPlugin } from './extensions/FormattingToolbar/FormattingToolbarPlugin'
+import FormattingToolbarProsemirrorPlugin from './extensions/FormattingToolbar/FormattingToolbarPlugin'
 import { HyperlinkToolbarProsemirrorPlugin } from './extensions/HyperlinkToolbar/HyperlinkToolbarPlugin'
 import { SideMenuProsemirrorPlugin } from './extensions/SideMenu/SideMenuPlugin'
 import { BaseSlashMenuItem } from './extensions/SlashMenu/BaseSlashMenuItem'
@@ -36,7 +36,7 @@ import UniqueID from './extensions/UniqueID/UniqueID'
 import { mergeCSSClasses } from './shared/utils'
 import { HMBlockSchema, hmBlockSchema } from '@/components/Editor/schema'
 import '@/components/Editor/editor.css'
-import { LinkToolbarProsemirrorPlugin } from './extensions/LinkToolbar/LinkToolbarPlugin'
+import LinkToolbarProsemirrorPlugin from './extensions/LinkToolbar/LinkToolbarPlugin'
 import { removeFileExtension } from '@/lib/file'
 
 export type BlockNoteEditorOptions<BSchema extends BlockSchema> = {
@@ -155,7 +155,7 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
 
   public readonly formattingToolbar: FormattingToolbarProsemirrorPlugin<BSchema>
 
-  public readonly similarFilesToolbar: LinkToolbarProsemirrorPlugin<BSchema> 
+  public readonly similarFilesToolbar: LinkToolbarProsemirrorPlugin<BSchema>
 
   public readonly slashMenu: SlashMenuProsemirrorPlugin<BSchema, any>
 
@@ -674,43 +674,48 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
 
   /**
    * Adds a new link at the current location
-   * @param url 
+   * @param url
    */
   public addLink(url: string, text: string) {
-    if (!url || !text) return;
+    if (!url || !text) return
 
-    const { state, view } = this._tiptapEditor;
-    const { tr, schema, selection, doc } = state;
-    const { from } = selection;
-    text = removeFileExtension(text)
-    if (!url.startsWith('reor://')) {
-      url = `reor://${url}`
-    }
-  
-    const maxSearchLength = 100;
-    const searchStart = Math.max(0, from - maxSearchLength);
-  
-    const textBefore = doc.textBetween(searchStart, from, undefined, '\0');
-  
+    const { state, view } = this._tiptapEditor
+    const { tr, schema, selection, doc } = state
+    const { from } = selection
+    const textWithoutExt = removeFileExtension(text)
+    const shouldAddSym = !url.startsWith('reor://')
+    const urlWithSym = shouldAddSym ? `reor://${url}` : url
+
+    const maxSearchLength = 100
+    const searchStart = Math.max(0, from - maxSearchLength)
+
+    const textBefore = doc.textBetween(searchStart, from, undefined, '\0')
+
     // Find the last `[` before the cursor
-    const lastBracketIndex = textBefore.lastIndexOf('[[');
+    const lastBracketIndex = textBefore.lastIndexOf('[[')
     if (lastBracketIndex === -1) {
       // fallback: insert at cursor
-      const mark = schema.mark('link', { href: url, title: text });
-      const insertTr = tr.insertText(text, from).addMark(from, from + text.length, mark);
-      view.dispatch(insertTr);
-      view.focus();
-      return;
+      const mark = schema.mark('link', { href: urlWithSym, title: textWithoutExt })
+      const insertTr = tr.insertText(textWithoutExt, from).addMark(from, from + textWithoutExt.length, mark)
+      view.dispatch(insertTr)
+      view.focus()
+      return
     }
-  
-    const matchStart = from - (textBefore.length - lastBracketIndex);
-    tr.delete(matchStart, from);
-    tr.insertText(text, matchStart);
-    tr.addMark(matchStart, matchStart + text.length, schema.mark('link', { href: url, title: text }));
-  
-    console.log(`mark:`, url, text)
-    view.dispatch(tr);
-    view.focus();
+
+    const matchStart = from - (textBefore.length - lastBracketIndex)
+    tr.delete(matchStart, from)
+    tr.insertText(textWithoutExt, matchStart)
+    tr.addMark(
+      matchStart,
+      matchStart + textWithoutExt.length,
+      schema.mark('link', {
+        href: urlWithSym,
+        title: textWithoutExt,
+      }),
+    )
+
+    view.dispatch(tr)
+    view.focus()
   }
 
   /**
@@ -793,7 +798,7 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
 
   /**
    * Sets the current file path that the editor is displaying.
-   * 
+   *
    * @param filePath The absolute path to the current file the editor is displaying.
    */
   public setCurrentFilePath(filePath: string | null) {

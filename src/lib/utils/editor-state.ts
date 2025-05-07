@@ -39,8 +39,8 @@ export const useSemanticCache = create<SemanticCacheState>((set, get) => ({
           lastFetched: Date.now(),
           isStale: false,
           isFetching: false,
-        }
-      }
+        },
+      },
     }))
   },
 
@@ -58,8 +58,8 @@ export const useSemanticCache = create<SemanticCacheState>((set, get) => ({
           [filePath]: {
             ...entry,
             isStale: true,
-          }
-        }
+          },
+        },
       }
     })
   },
@@ -74,8 +74,8 @@ export const useSemanticCache = create<SemanticCacheState>((set, get) => ({
           [filePath]: {
             ...entry,
             isFetching,
-          }
-        }
+          },
+        },
       }
     })
   },
@@ -85,6 +85,6 @@ export const useSemanticCache = create<SemanticCacheState>((set, get) => ({
     if (!entry) return true
     if (entry.isStale) return true
     const age = Date.now() - entry.lastFetched
-    return age > (thresholdMs)
+    return age > thresholdMs
   },
 }))

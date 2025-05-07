@@ -8,7 +8,7 @@ import WindowsManager from '../common/windowManager'
 import { StoreSchema } from '../electron-store/storeConfig'
 import { handleFileRename, updateFileInTable } from '../vector-database/tableHelperFunctions'
 
-import { GetFilesInfoTree, createFileRecursive, isHidden, GetFilesInfoListForListOfPaths, findFileRecursive } from './filesystem'
+import { GetFilesInfoTree, createFileRecursive, isHidden, GetFilesInfoListForListOfPaths } from './filesystem'
 import { FileInfoTree, WriteFileProps, RenameFileProps, FileInfoWithContent, FileInfo } from './types'
 import ImageStorage from './storage/ImageStore'
 import VideoStorage from './storage/VideoStore'
@@ -147,8 +147,7 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
 
   ipcMain.handle('create-file', async (event, filePath: string, content: string): Promise<FileInfo | undefined> => {
     const fileObject = createFileRecursive(filePath, content, 'utf-8')
-    if (fileObject)
-      return fileObject
+    if (fileObject) return fileObject
     return undefined
   })
 

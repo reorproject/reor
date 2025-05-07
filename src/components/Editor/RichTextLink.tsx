@@ -1,10 +1,10 @@
-import { Mark, InputRule, markInputRule, markPasteRule, PasteRule, mergeAttributes } from '@tiptap/core'
+import { InputRule, markInputRule, markPasteRule, PasteRule, mergeAttributes } from '@tiptap/core'
 import { isAllowedUri, Link } from '@tiptap/extension-link'
 import { Plugin } from '@tiptap/pm/state'
 import type { LinkOptions } from '@tiptap/extension-link'
 import autolink from '@/lib/tiptap-extension-link/helpers/autolink'
 import clickHandler from '@/lib/tiptap-extension-link/helpers/clickHandler'
-import { useFileSearchIndex } from '@/lib/utils/cache/fileSearchIndex'
+import useFileSearchIndex from '@/lib/utils/cache/fileSearchIndex'
 import { isHypermediaScheme } from '@/lib/utils'
 
 /**
@@ -36,10 +36,10 @@ function isInternalLink(href?: string) {
 /**
  * Retruns true if this is a valid URI or a hypermedia scheme. For instance, http, https, ftp, reor, etc..
  * @param url the url to check
- * @returns 
+ * @returns
  */
 function isValidURI(url: string): boolean {
-  return isAllowedUri(url) as boolean || isHypermediaScheme(url)
+  return (isAllowedUri(url) as boolean) || isHypermediaScheme(url)
 }
 
 /**
@@ -53,7 +53,7 @@ function generateRandom32DigitString(): string {
 
 /**
  * Handles convential markdown link syntax
- * @param config 
+ * @param config
  * @returns a configured <a> tag
  */
 function linkInputRule(config: Parameters<typeof markInputRule>[0]) {
@@ -69,7 +69,7 @@ function linkInputRule(config: Parameters<typeof markInputRule>[0]) {
 
 /**
  * Handles convential markdown pasting syntax
- * @param config 
+ * @param config
  */
 function linkPasteRule(config: Parameters<typeof markPasteRule>[0]) {
   const baseRule = markPasteRule(config)
@@ -85,7 +85,7 @@ function linkPasteRule(config: Parameters<typeof markPasteRule>[0]) {
 /**
  * Deals with the [[filename]] syntax. This is used to link files in the editor.
  * It will create a link to the file if it exists, otherwise it will create a link to a new file.
- * @param config 
+ * @param config
  */
 function linkFileInputRule(config: Parameters<typeof markInputRule>[0]) {
   return new InputRule({
@@ -128,7 +128,7 @@ const createLinkExtension = (linkExtensionOpts: Partial<LinkOptions> = {}) => {
           rel: 'noopener noreferrer nofollow',
           class: null,
         },
-        onLinkClick: (href: string) => {},
+        onLinkClick: () => {},
         ...linkExtensionOpts,
       }
     },
@@ -157,7 +157,7 @@ const createLinkExtension = (linkExtensionOpts: Partial<LinkOptions> = {}) => {
       return [
         {
           tag: 'a[href]',
-          getAttrs: dom => {
+          getAttrs: (dom) => {
             const href = (dom as HTMLElement).getAttribute('href')
             if (!href || !isValidURI(href)) return false
             return null
@@ -235,4 +235,4 @@ const createLinkExtension = (linkExtensionOpts: Partial<LinkOptions> = {}) => {
   }).configure(linkExtensionOpts)
 }
 
-export { createLinkExtension }
+export default createLinkExtension

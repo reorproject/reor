@@ -1,6 +1,5 @@
 import Tippy from '@tippyjs/react'
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react'
-import { sticky } from 'tippy.js'
 import { BlockSchema, DefaultBlockSchema, BlockNoteEditor } from '@/lib/blocknote/core'
 
 // import DefaultFormattingToolbar from '../FormattingToolbar/components/DefaultFormattingToolbar'
@@ -46,7 +45,7 @@ export const LinkToolbarPositioner = <BSchema extends BlockSchema = DefaultBlock
         width: boundingRect.width,
         height: boundingRect.height,
       }
-      
+
       if (boundingRect.bottom + boundingRect.y > window.innerHeight) {
         newRect.top = window.innerHeight / 2.15
       }

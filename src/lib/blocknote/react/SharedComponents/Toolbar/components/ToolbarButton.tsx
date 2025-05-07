@@ -42,14 +42,10 @@ export const ToolbarButton = forwardRef((props: ToolbarButtonProps, ref: Forward
             style={{
               display: 'flex',
               justifyContent: 'flex-start',
-              alignItems: 'center'
+              alignItems: 'center',
             }}
           >
-            {(props.children || props.hint) && (
-              <span>
-                {props.children ?? props.hint}
-              </span>
-            )}
+            {(props.children || props.hint) && <span>{props.children ?? props.hint}</span>}
             {ButtonIcon && <ButtonIcon />}
           </span>
         </Button>

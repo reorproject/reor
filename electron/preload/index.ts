@@ -9,7 +9,13 @@ import {
   TamaguiThemeTypes,
 } from 'electron/main/electron-store/storeConfig'
 import { SearchProps } from 'electron/main/electron-store/types'
-import { FileInfo, FileInfoTree, FileInfoWithContent, RenameFileProps, WriteFileProps } from 'electron/main/filesystem/types'
+import {
+  FileInfo,
+  FileInfoTree,
+  FileInfoWithContent,
+  RenameFileProps,
+  WriteFileProps,
+} from 'electron/main/filesystem/types'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 
 import { AgentConfig, ChatMetadata, Chat } from '@/lib/llm/types'
@@ -108,7 +114,8 @@ const fileSystem = {
   deleteFile: createIPCHandler<(filePath: string) => Promise<void>>('delete-file'),
   getAllFilenamesInDirectory: createIPCHandler<(dirName: string) => Promise<string[]>>('get-files-in-directory'),
   getFiles: createIPCHandler<(filePaths: string[]) => Promise<FileInfoWithContent[]>>('get-files'),
-  getFileInfo: createIPCHandler<(absolutePath: string, parentRelativePath: string) => Promise<FileInfo>>('get-file-info'),
+  getFileInfo:
+    createIPCHandler<(absolutePath: string, parentRelativePath: string) => Promise<FileInfo>>('get-file-info'),
 }
 
 const path = {

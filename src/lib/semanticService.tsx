@@ -24,7 +24,7 @@ export async function getSimilarFiles(filePath: string | null, limit: number = 2
   if (!shouldRefetch(filePath)) {
     return getSemanticData(filePath).data // We've already fetched this recently
   }
- 
+
   store.setFetching(filePath, true)
   const sanitizedText = await getSanitizedChunk(filePath)
   if (!sanitizedText) {
@@ -43,15 +43,15 @@ export async function getSimilarFiles(filePath: string | null, limit: number = 2
 
 /**
  * Gets all of the unique files for a specific file path.
- * 
+ *
  * @param filePath Filepath we want to fetch similar files for
  * @param limit How many files we want to search for
- * @returns 
+ * @returns
  */
 export async function getUniqueSimilarFiles(filePath: string | null, limit: number = 20): Promise<DBQueryResult[]> {
   const results = await getSimilarFiles(filePath, limit)
   const seen = new Set<string>()
-  const deduped = results.filter(row => {
+  const deduped = results.filter((row) => {
     if (seen.has(row.notepath)) return false
     seen.add(row.notepath)
     return true
