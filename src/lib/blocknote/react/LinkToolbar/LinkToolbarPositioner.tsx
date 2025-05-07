@@ -14,14 +14,13 @@ export type LinkToolbarPositionerProps<BSchema extends BlockSchema = DefaultBloc
 // DOMRect's position changes. This happens automatically on scroll, but we need
 // the `sticky` plugin to make it happen in all cases. This is most evident
 // when changing the text alignment using the formatting toolbar.
-const tippyPlugins = [sticky]
+// const tippyPlugins = [sticky]
 
 export const LinkToolbarPositioner = <BSchema extends BlockSchema = DefaultBlockSchema>(props: {
   editor: BlockNoteEditor<BSchema>
   linkToolbarPositioner?: FC<LinkToolbarPositionerProps<BSchema>>
 }) => {
   const [show, setShow] = useState<boolean>(false)
-
   const referencePos = useRef<DOMRect>()
 
   useEffect(() => {
@@ -34,10 +33,25 @@ export const LinkToolbarPositioner = <BSchema extends BlockSchema = DefaultBlock
 
   const getReferenceClientRect = useMemo(
     () => {
-      if (!referencePos) {
+      if (!referencePos.current) {
         return undefined
       }
-      return () => referencePos.current!
+
+      const boundingRect = referencePos.current!
+      const newRect = {
+        top: boundingRect.top,
+        right: boundingRect.right,
+        bottom: boundingRect.bottom,
+        left: boundingRect.left,
+        width: boundingRect.width,
+        height: boundingRect.height,
+      }
+      
+      if (boundingRect.bottom + boundingRect.y > window.innerHeight) {
+        newRect.top = window.innerHeight / 2.15
+      }
+
+      return () => newRect as DOMRect
     },
     [referencePos.current], // eslint-disable-line
   )
@@ -47,18 +61,15 @@ export const LinkToolbarPositioner = <BSchema extends BlockSchema = DefaultBlock
     return <LinkContentToolbar editor={props.editor} />
   }, [props.editor, props.linkToolbarPositioner])
 
-  console.log(`Show: ${show}`)
   return (
     <Tippy
-      appendTo={props.editor.domElement.parentElement ?? document.body}
+      appendTo={document.body}
       content={linkToolbarElement}
       getReferenceClientRect={getReferenceClientRect}
       interactive
       visible={show}
       animation="fade"
-      placement="top-start"
-      sticky
-      plugins={tippyPlugins}
+      placement="auto"
     />
   )
 }

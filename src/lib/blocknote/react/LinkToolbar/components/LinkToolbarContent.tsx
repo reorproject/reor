@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react"
 import { BlockNoteEditor, BlockSchema } from "@/lib/blocknote/core"
 import { LinkToolbarPositionerProps } from "../LinkToolbarPositioner"
-import { Spinner, SizableText, YStack, XStack } from 'tamagui'
+import { Spinner, SizableText, YStack} from 'tamagui'
 import { getSimilarFiles } from "@/lib/semanticService"
 import { DBQueryResult } from "electron/main/vector-database/schema"
+import { Stack, Text } from '@mantine/core'
+import ThemedMenu, { ThemedDropdown, ThemedMenuItem } from "@/components/ui/ThemedMenu"
 
 const LinkToolbarContent = <BSchema extends BlockSchema>(
   props: LinkToolbarPositionerProps<BSchema> & {
@@ -14,7 +16,6 @@ const LinkToolbarContent = <BSchema extends BlockSchema>(
   const [loading, setLoading] = useState(true)
   const [triggerRender, setTriggerRender] = useState(0)
 
-  // DEBOUNCE THIS
   useEffect(() => {
     const timeout = setTimeout(() => {
       setTriggerRender((prev) => prev + 1)
@@ -61,35 +62,27 @@ const LinkToolbarContent = <BSchema extends BlockSchema>(
    * When I tried to use an external library it would introduce many bugs
    */
   return (
-    <YStack
-      background="$gray2"
-      padding="$2"
-      gap="$1"
-      borderRadius="$2"
-      borderWidth={1}
-      borderColor="$gray6"
-      elevation="$2"
+    <ThemedMenu
+      defaultOpened
+      closeDelay={10000000}
+      opened={true}
+      closeOnClickOutside={true}
     >
-      {similarFiles.slice(0, 5).map((file) => (
-        <XStack
-          key={file.notepath}
-          cursor="pointer"
-          hoverStyle={{
-            backgroundColor: '$gray3',
-            borderRadius: '$2',
-          }}
-          padding="$1"
-          onPress={() => {
-            props.editor.addLink(file.notepath, file.name)
-          }}
-          minWidth={200}
-        >
-          <SizableText size="$2" textAlign="left" padding="$2">
-            {file.name}
-          </SizableText>
-        </XStack>
-      ))}
-    </YStack>
+      <ThemedDropdown onMouseDown={(e) => e.preventDefault()}>
+        {
+          similarFiles.slice(0, 5).map((file) => (
+            <ThemedMenuItem
+              onClick={() => props.editor.addLink(file.notepath, file.name)}
+            >
+              <Stack spacing={0}>
+                <Text>{file.name}</Text>
+                <Text size={10}>{file.notepath}</Text>
+              </Stack>
+            </ThemedMenuItem>
+          ))
+        }
+      </ThemedDropdown>
+    </ThemedMenu>
   )
 }
 
