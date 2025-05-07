@@ -47,6 +47,7 @@ export const LinkToolbarPositioner = <BSchema extends BlockSchema = DefaultBlock
     return <LinkContentToolbar editor={props.editor} />
   }, [props.editor, props.linkToolbarPositioner])
 
+  console.log(`Show: ${show}`)
   return (
     <Tippy
       appendTo={props.editor.domElement.parentElement ?? document.body}

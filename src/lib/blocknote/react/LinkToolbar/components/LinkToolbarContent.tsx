@@ -39,7 +39,7 @@ const LinkToolbarContent = <BSchema extends BlockSchema>(
 
   if (loading) {
     return (
-      <XStack
+      <YStack
         background="$gray2"
         padding="$2"
         gap="$1"
@@ -52,10 +52,14 @@ const LinkToolbarContent = <BSchema extends BlockSchema>(
         <SizableText size="$2" textAlign="left" padding="$2">
           Loading similar files...
         </SizableText>
-      </XStack>
+      </YStack>
     )
   }
 
+  /**
+   * Cannot use Menu or Popover because we have some async behavior.
+   * When I tried to use an external library it would introduce many bugs
+   */
   return (
     <YStack
       background="$gray2"
@@ -78,6 +82,7 @@ const LinkToolbarContent = <BSchema extends BlockSchema>(
           onPress={() => {
             props.editor.addLink(file.notepath, file.name)
           }}
+          minWidth={200}
         >
           <SizableText size="$2" textAlign="left" padding="$2">
             {file.name}
