@@ -1,5 +1,6 @@
 import * as fs from 'fs'
 import * as fsPromises from 'fs/promises'
+import path from 'path'
 
 import { BrowserWindow } from 'electron'
 import { chunkMarkdownByHeadingsAndByCharsIfBig } from '../common/chunking'
@@ -20,6 +21,7 @@ const convertFileTypeToDBType = async (file: FileInfo): Promise<DBEntry[]> => {
   const fileContent = readFile(file.path)
   const chunks = await chunkMarkdownByHeadingsAndByCharsIfBig(fileContent)
   const entries = chunks.map((content, index) => ({
+    name: file.name,
     notepath: file.path,
     content,
     subnoteindex: index,
@@ -169,8 +171,10 @@ export const updateFileInTable = async (dbTable: LanceDBTableWrapper, filePath: 
   await dbTable.deleteDBItemsByFilePaths([filePath])
   const content = readFile(filePath)
   const chunkedContentList = await chunkMarkdownByHeadingsAndByCharsIfBig(content)
+  const fileName = path.basename(filePath).split('.')[0]
   const stats = fs.statSync(filePath)
   const dbEntries = chunkedContentList.map((_content, index) => ({
+    name: fileName,
     notepath: filePath,
     content: _content,
     subnoteindex: index,

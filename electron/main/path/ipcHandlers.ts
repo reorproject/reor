@@ -24,6 +24,11 @@ const registerPathHandlers = () => {
   )
 
   ipcMain.handle('path-ext-name', (event, pathString: string) => path.extname(pathString))
+
+  ipcMain.handle('find-absolute-path', (event, filePath: string) => {
+    const absolutePath = path.resolve(filePath)
+    return absolutePath
+  })
 }
 
 export default registerPathHandlers

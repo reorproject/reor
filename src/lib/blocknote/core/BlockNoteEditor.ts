@@ -26,7 +26,7 @@ import { ColorStyle, Styles, ToggledStyle } from './extensions/Blocks/api/inline
 import { Selection } from './extensions/Blocks/api/selectionTypes'
 import { getBlockInfoFromPos } from './extensions/Blocks/helpers/getBlockInfoFromPos'
 
-import { FormattingToolbarProsemirrorPlugin } from './extensions/FormattingToolbar/FormattingToolbarPlugin'
+import FormattingToolbarProsemirrorPlugin from './extensions/FormattingToolbar/FormattingToolbarPlugin'
 import { HyperlinkToolbarProsemirrorPlugin } from './extensions/HyperlinkToolbar/HyperlinkToolbarPlugin'
 import { SideMenuProsemirrorPlugin } from './extensions/SideMenu/SideMenuPlugin'
 import { BaseSlashMenuItem } from './extensions/SlashMenu/BaseSlashMenuItem'
@@ -36,6 +36,8 @@ import UniqueID from './extensions/UniqueID/UniqueID'
 import { mergeCSSClasses } from './shared/utils'
 import { HMBlockSchema, hmBlockSchema } from '@/components/Editor/schema'
 import '@/components/Editor/editor.css'
+import LinkToolbarProsemirrorPlugin from './extensions/LinkToolbar/LinkToolbarPlugin'
+import { removeFileExtension } from '@/lib/file'
 
 export type BlockNoteEditorOptions<BSchema extends BlockSchema> = {
   // TODO: Figure out if enableBlockNoteExtensions/disableHistoryExtension are needed and document them.
@@ -93,6 +95,11 @@ export type BlockNoteEditorOptions<BSchema extends BlockSchema> = {
   blockSchema: BSchema
 
   /**
+   * The absolute path to the current file the editor is displaying.
+   */
+  currentFilePath: string
+
+  /**
    * When enabled, allows for collaboration between multiple users.
    */
   collaboration: {
@@ -142,9 +149,13 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
 
   public inlineEmbedOptions = []
 
+  public currentFilePath: string | null = null
+
   public readonly sideMenu: SideMenuProsemirrorPlugin<BSchema>
 
   public readonly formattingToolbar: FormattingToolbarProsemirrorPlugin<BSchema>
+
+  public readonly similarFilesToolbar: LinkToolbarProsemirrorPlugin<BSchema>
 
   public readonly slashMenu: SlashMenuProsemirrorPlugin<BSchema, any>
 
@@ -166,6 +177,7 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
 
     this.sideMenu = new SideMenuProsemirrorPlugin(this)
     this.formattingToolbar = new FormattingToolbarProsemirrorPlugin(this)
+    this.similarFilesToolbar = new LinkToolbarProsemirrorPlugin(this)
     this.slashMenu = new SlashMenuProsemirrorPlugin(
       this,
       newOptions.slashMenuItems || getDefaultSlashMenuItems(newOptions.blockSchema),
@@ -188,6 +200,7 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
         return [
           this.sideMenu.plugin,
           this.formattingToolbar.plugin,
+          this.similarFilesToolbar.plugin,
           this.slashMenu.plugin,
           this.hyperlinkToolbar.plugin,
         ]
@@ -660,6 +673,52 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
   }
 
   /**
+   * Adds a new link at the current location
+   * @param url
+   */
+  public addLink(url: string, text: string) {
+    if (!url || !text) return
+
+    const { state, view } = this._tiptapEditor
+    const { tr, schema, selection, doc } = state
+    const { from } = selection
+    const textWithoutExt = removeFileExtension(text)
+    const shouldAddSym = !url.startsWith('reor://')
+    const urlWithSym = shouldAddSym ? `reor://${url}` : url
+
+    const maxSearchLength = 100
+    const searchStart = Math.max(0, from - maxSearchLength)
+
+    const textBefore = doc.textBetween(searchStart, from, undefined, '\0')
+
+    // Find the last `[` before the cursor
+    const lastBracketIndex = textBefore.lastIndexOf('[[')
+    if (lastBracketIndex === -1) {
+      // fallback: insert at cursor
+      const mark = schema.mark('link', { href: urlWithSym, title: textWithoutExt })
+      const insertTr = tr.insertText(textWithoutExt, from).addMark(from, from + textWithoutExt.length, mark)
+      view.dispatch(insertTr)
+      view.focus()
+      return
+    }
+
+    const matchStart = from - (textBefore.length - lastBracketIndex)
+    tr.delete(matchStart, from)
+    tr.insertText(textWithoutExt, matchStart)
+    tr.addMark(
+      matchStart,
+      matchStart + textWithoutExt.length,
+      schema.mark('link', {
+        href: urlWithSym,
+        title: textWithoutExt,
+      }),
+    )
+
+    view.dispatch(tr)
+    view.focus()
+  }
+
+  /**
    * Checks if the block containing the text cursor can be nested.
    */
   public canNestBlock() {
@@ -735,5 +794,21 @@ export class BlockNoteEditor<BSchema extends BlockSchema = HMBlockSchema> {
    */
   public async markdownToBlocks(markdown: string): Promise<Block<BSchema>[]> {
     return markdownToBlocks(markdown, this.schema, this._tiptapEditor.schema)
+  }
+
+  /**
+   * Sets the current file path that the editor is displaying.
+   *
+   * @param filePath The absolute path to the current file the editor is displaying.
+   */
+  public setCurrentFilePath(filePath: string | null) {
+    this.currentFilePath = filePath
+  }
+
+  /**
+   * Gets the current file path that the editor is displaying.
+   */
+  public getCurrentFilePath() {
+    return this.currentFilePath
   }
 }

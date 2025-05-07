@@ -9,7 +9,13 @@ import {
   TamaguiThemeTypes,
 } from 'electron/main/electron-store/storeConfig'
 import { SearchProps } from 'electron/main/electron-store/types'
-import { FileInfoTree, FileInfoWithContent, RenameFileProps, WriteFileProps } from 'electron/main/filesystem/types'
+import {
+  FileInfo,
+  FileInfoTree,
+  FileInfoWithContent,
+  RenameFileProps,
+  WriteFileProps,
+} from 'electron/main/filesystem/types'
 import { DBQueryResult } from 'electron/main/vector-database/schema'
 
 import { AgentConfig, ChatMetadata, Chat } from '@/lib/llm/types'
@@ -102,12 +108,14 @@ const fileSystem = {
   getVideo: createIPCHandler<(fileName: string) => Promise<string | null>>('get-video'),
   isDirectory: createIPCHandler<(filePath: string) => Promise<boolean>>('is-directory'),
   renameFile: createIPCHandler<(renameFileProps: RenameFileProps) => Promise<void>>('rename-file'),
-  createFile: createIPCHandler<(filePath: string, content: string) => Promise<void>>('create-file'),
+  createFile: createIPCHandler<(filePath: string, content: string) => Promise<FileInfo | undefined>>('create-file'),
   createDirectory: createIPCHandler<(dirPath: string) => Promise<void>>('create-directory'),
   checkFileExists: createIPCHandler<(filePath: string) => Promise<boolean>>('check-file-exists'),
   deleteFile: createIPCHandler<(filePath: string) => Promise<void>>('delete-file'),
   getAllFilenamesInDirectory: createIPCHandler<(dirName: string) => Promise<string[]>>('get-files-in-directory'),
   getFiles: createIPCHandler<(filePaths: string[]) => Promise<FileInfoWithContent[]>>('get-files'),
+  getFileInfo:
+    createIPCHandler<(absolutePath: string, parentRelativePath: string) => Promise<FileInfo>>('get-file-info'),
 }
 
 const path = {

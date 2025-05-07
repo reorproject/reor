@@ -196,6 +196,7 @@ export async function blocksToMarkdown<BSchema extends BlockSchema>(blocks: Bloc
     // @ts-expect-error
     .use(remarkStringify)
     .process(convertBlocksToHtml(blocks))
+
   return tmpMarkdownString.value as string
 }
 

@@ -12,6 +12,7 @@ export * from './FormattingToolbar/components/FormattingToolbarPositioner'
 
 export * from './SlashMenu/ReactSlashMenuItem'
 export { default as DefaultSlashMenu } from './SlashMenu/components/DefaultSlashMenu'
+export * from './LinkToolbar/LinkToolbarPositioner'
 export * from './SlashMenu/components/SlashMenuItem'
 export * from './SlashMenu/components/SlashMenuPositioner'
 export { default as getDefaultReactSlashMenuItems } from './SlashMenu/defaultReactSlashMenuItems'

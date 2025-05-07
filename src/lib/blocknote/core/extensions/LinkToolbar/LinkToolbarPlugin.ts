@@ -1,13 +1,12 @@
 import { Plugin, PluginKey } from 'prosemirror-state'
 import { BlockNoteEditor, BlockSchema } from '../..'
 import { EditorToolbarState, EditorToolbarView } from '../EditorToolbar/EditorToolbar'
-
-import FormattingToolbarView from './FormattingToolbarView'
 import EventEmitter from '../../shared/EventEmitter'
+import LinkToolbarView from './LinkToolbarView'
 
-export const formattingToolbarPluginKey = new PluginKey('FormattingToolbarPlugin')
+export const linkToolbarPluginKey = new PluginKey('LinkToolbarPlugin')
 
-class FormattingToolbarProsemirrorPlugin<BSchema extends BlockSchema> extends EventEmitter<any> {
+class LinkToolbarProsemirrorPlugin<BSchema extends BlockSchema> extends EventEmitter<any> {
   private view: EditorToolbarView<BSchema> | undefined
 
   public readonly plugin: Plugin
@@ -15,9 +14,9 @@ class FormattingToolbarProsemirrorPlugin<BSchema extends BlockSchema> extends Ev
   constructor(editor: BlockNoteEditor<BSchema>) {
     super()
     this.plugin = new Plugin({
-      key: formattingToolbarPluginKey,
+      key: linkToolbarPluginKey,
       view: (editorView) => {
-        this.view = new FormattingToolbarView(editor, editorView, (state) => {
+        this.view = new LinkToolbarView(editor, editorView, (state) => {
           this.emit('update', state)
         })
         return this.view
@@ -30,4 +29,4 @@ class FormattingToolbarProsemirrorPlugin<BSchema extends BlockSchema> extends Ev
   }
 }
 
-export default FormattingToolbarProsemirrorPlugin
+export default LinkToolbarProsemirrorPlugin

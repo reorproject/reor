@@ -1,5 +1,4 @@
 import { Connection, Table as LanceDBTable, MetricType, makeArrowTable } from 'vectordb'
-
 import { EmbeddingModelConfig } from '../electron-store/storeConfig'
 
 import { EnhancedEmbeddingFunction, createEmbeddingFunction } from './embeddings'
@@ -102,7 +101,7 @@ class LanceDBTableWrapper {
   }
 
   async search(query: string, limit: number, filter?: string): Promise<DBQueryResult[]> {
-    const lanceQuery = await this.lanceTable.search(query).metricType(MetricType.Cosine).limit(limit)
+    const lanceQuery = this.lanceTable.search(query).metricType(MetricType.Cosine).limit(limit)
 
     if (filter) {
       lanceQuery.prefilter(true)
