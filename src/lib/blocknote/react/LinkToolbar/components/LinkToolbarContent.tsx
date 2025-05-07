@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import { BlockNoteEditor, BlockSchema } from "@/lib/blocknote/core"
 import { LinkToolbarPositionerProps } from "../LinkToolbarPositioner"
 import { Spinner, SizableText, YStack} from 'tamagui'
-import { getSimilarFiles } from "@/lib/semanticService"
+import { getUniqueSimilarFiles } from "@/lib/semanticService"
 import { DBQueryResult } from "electron/main/vector-database/schema"
 import { Stack, Text } from '@mantine/core'
 import ThemedMenu, { ThemedDropdown, ThemedMenuItem } from "@/components/ui/ThemedMenu"
@@ -28,7 +28,7 @@ const LinkToolbarContent = <BSchema extends BlockSchema>(
     const fetchSimilarFiles = async () => {
       if (!props.editor.currentFilePath) return
       try {
-        const files = await getSimilarFiles(props.editor.currentFilePath, 5)
+        const files = await getUniqueSimilarFiles(props.editor.currentFilePath, 5)
         setSimilarFiles(files)
       } finally {
         setLoading(false)

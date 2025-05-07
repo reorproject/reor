@@ -41,6 +41,24 @@ export async function getSimilarFiles(filePath: string | null, limit: number = 2
   return searchResults
 }
 
+/**
+ * Gets all of the unique files for a specific file path.
+ * 
+ * @param filePath Filepath we want to fetch similar files for
+ * @param limit How many files we want to search for
+ * @returns 
+ */
+export async function getUniqueSimilarFiles(filePath: string | null, limit: number = 20): Promise<DBQueryResult[]> {
+  const results = await getSimilarFiles(filePath, limit)
+  const seen = new Set<string>()
+  const deduped = results.filter(row => {
+    if (seen.has(row.notepath)) return false
+    seen.add(row.notepath)
+    return true
+  })
+  return deduped
+}
+
 // useSemanticCache.getState().setSemanticData(filePath, await getSimilarFiles(filePath))
 export async function setSimilarFiles(filePath: string | null): Promise<void> {
   if (!filePath) {
