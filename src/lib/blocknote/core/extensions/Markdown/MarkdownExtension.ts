@@ -2,6 +2,9 @@ import { Editor, Extension } from '@tiptap/core'
 import { Fragment, Node } from '@tiptap/pm/model'
 import { Plugin } from 'prosemirror-state'
 import { youtubeParser } from '@/components/Editor/types/utils'
+import { BlockNoteEditor } from '../../BlockNoteEditor'
+import { getBlockInfoFromPos } from '@/lib/utils'
+import * as BlockUtils from '@/lib/utils/block-utils'
 
 function containsMarkdownSymbols(pastedText: string) {
   // Regex to detect unique Markdown symbols at the start of a line
@@ -53,7 +56,7 @@ function getPastedNodes(parent: Node | Fragment, editor: Editor) {
   return nodes
 }
 
-const createMarkdownExtension = () => {
+const createMarkdownExtension = (bnEditor: BlockNoteEditor) => {
   const MarkdownExtension = Extension.create({
     name: 'MarkdownPasteHandler',
     priority: 900,
@@ -76,6 +79,7 @@ const createMarkdownExtension = () => {
               const { selection } = state
 
               const isMarkdown = pastedHtml ? containsMarkdownSymbols(pastedText) : true
+
               if (!isMarkdown) {
                 if (hasList) {
                   const firstBlockGroup = slice.content.firstChild?.type.name === 'blockGroup'
@@ -96,7 +100,6 @@ const createMarkdownExtension = () => {
                 }
                 return false
               }
-
               if (hasVideo) {
                 let embedUrl = 'https://www.youtube.com/embed/'
                 if (pastedText.includes('youtu.be') || pastedText.includes('youtube')) {
@@ -110,19 +113,18 @@ const createMarkdownExtension = () => {
                     view.dispatch(view.state.tr.replaceSelectionWith(node))
                   }
                 }
+              } else {
+                // This is not a media file, just plaintext
+                bnEditor.markdownToBlocks(pastedText).then((organizedBlocks: any) => {
+                  const blockInfo = getBlockInfoFromPos(state.doc, selection.from)
+                  bnEditor.replaceBlocks(
+                    [blockInfo.node.attrs.id],
+                    // @ts-ignore
+                    organizedBlocks,
+                  )
+                  BlockUtils.setGroupTypes(bnEditor._tiptapEditor, organizedBlocks)
+                })
               }
-
-              // bnEditor.markdownToBlocks(pastedText).then((organizedBlocks) => {
-              //   const blockInfo = getBlockInfoFromPos(state.doc, selection.from)
-              //   console.log(`BLockINfo type: `, blockInfo.node.type.name)
-              //   bnEditor.replaceBlocks(
-              //     [blockInfo.node.attrs.id],
-              //     // @ts-ignore
-              //     organizedBlocks,
-              //   )
-              //   BlockUtils.setGroupTypes(bnEditor._tiptapEditor, organizedBlocks)
-              // })
-
               return true
             },
           },
