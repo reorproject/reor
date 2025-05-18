@@ -5,10 +5,13 @@ import posthog from 'posthog-js'
 import { ToastContainer, toast } from 'react-toastify'
 
 import 'react-toastify/dist/ReactToastify.css'
+import { FileInfo } from 'electron/main/filesystem/types'
 import IndexingProgress from './components/Common/IndexingProgress'
 import MainPageComponent from './components/MainPage'
 import InitialSetupSinglePage from './components/Settings/InitialSettingsSinglePage'
 import { ThemeProvider } from './contexts/ThemeContext'
+import useFileSearchIndex from './lib/utils/cache/fileSearchIndex'
+import { flattenFileInfoTree } from './lib/file'
 
 interface AppProps {}
 
@@ -16,7 +19,6 @@ const App: React.FC<AppProps> = () => {
   const [userHasConfiguredSettingsForIndexing, setUserHasConfiguredSettingsForIndexing] = useState<boolean | undefined>(
     undefined,
   )
-
   const [indexingProgress, setIndexingProgress] = useState<number>(0)
 
   useEffect(() => {
@@ -73,6 +75,18 @@ const App: React.FC<AppProps> = () => {
     }
 
     fetchSettings()
+  }, [])
+
+  // Cache all of the files to build a quick search index
+  useEffect(() => {
+    const hydrateIndex = async () => {
+      const files = await window.fileSystem.getFilesTreeForWindow()
+      const flat = flattenFileInfoTree(files).map((f: FileInfo) => ({
+        ...f,
+      }))
+      useFileSearchIndex.getState().hydrate(flat)
+    }
+    hydrateIndex()
   }, [])
 
   const handleAllInitialSettingsAreReady = () => {

@@ -9,7 +9,7 @@ import { StoreSchema } from '../electron-store/storeConfig'
 import { handleFileRename, updateFileInTable } from '../vector-database/tableHelperFunctions'
 
 import { GetFilesInfoTree, createFileRecursive, isHidden, GetFilesInfoListForListOfPaths } from './filesystem'
-import { FileInfoTree, WriteFileProps, RenameFileProps, FileInfoWithContent } from './types'
+import { FileInfoTree, WriteFileProps, RenameFileProps, FileInfoWithContent, FileInfo } from './types'
 import ImageStorage from './storage/ImageStore'
 import VideoStorage from './storage/VideoStore'
 
@@ -145,8 +145,10 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
     await updateFileInTable(windowInfo.dbTableClient, filePath)
   })
 
-  ipcMain.handle('create-file', async (event, filePath: string, content: string): Promise<void> => {
-    createFileRecursive(filePath, content, 'utf-8')
+  ipcMain.handle('create-file', async (event, filePath: string, content: string): Promise<FileInfo | undefined> => {
+    const fileObject = createFileRecursive(filePath, content, 'utf-8')
+    if (fileObject) return fileObject
+    return undefined
   })
 
   ipcMain.handle('create-directory', async (event, dirPath: string): Promise<void> => {
@@ -216,6 +218,17 @@ const registerFileHandlers = (store: Store<StoreSchema>, _windowsManager: Window
       filters: [{ name: 'Videos', extensions: ['mp4', 'mkv'] }],
     })
     return result.filePaths
+  })
+
+  ipcMain.handle('get-file-info', (event, absolutePath: string, parentRelativePath: string): FileInfo => {
+    const fileInfo = fs.statSync(absolutePath)
+    return {
+      name: path.basename(absolutePath),
+      path: absolutePath,
+      relativePath: parentRelativePath,
+      dateModified: fileInfo.mtime,
+      dateCreated: fileInfo.birthtime, // Add the birthtime property here
+    }
   })
 }
 

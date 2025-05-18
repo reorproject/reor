@@ -168,7 +168,8 @@
     "vaul": "^1.0.0",
     "vectordb": "0.4.10",
     "yjs": "^13.6.23",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@electron/notarize": "2.3.2",

@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react'
-import { Menu, MenuProps, MenuLabelProps } from '@mantine/core'
+import { Menu, MenuProps, MenuLabelProps, MenuDropdownProps } from '@mantine/core'
 import { useTheme } from 'tamagui'
 
 interface ThemedMenuProps {
@@ -60,6 +60,22 @@ export const ThemedLabel: React.FC<ThemedMenuProps & MenuLabelProps> = ({ childr
     >
       {children}
     </Menu.Label>
+  )
+}
+
+export const ThemedDropdown: React.FC<ThemedMenuProps & MenuDropdownProps> = ({ children, ...restProps }) => {
+  const theme = useTheme()
+
+  return (
+    <Menu.Dropdown
+      {...restProps}
+      style={{
+        backgroundColor: theme.background.val,
+        color: theme.color.val,
+      }}
+    >
+      {children}
+    </Menu.Dropdown>
   )
 }
 
