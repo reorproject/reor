@@ -7,6 +7,7 @@ export interface DBEntry {
   timeadded: Date
   filemodified: Date
   filecreated: Date
+  startPos?: number // Store position in the document
 }
 export interface DBQueryResult extends DBEntry {
   _distance: number
@@ -22,6 +23,7 @@ export enum DatabaseFields {
   TIME_ADDED = 'timeadded',
   FILE_MODIFIED = 'filemodified',
   FILE_CREATED = 'filecreated',
+  START_POS = 'startPos',
   DISTANCE = '_distance',
 }
 
@@ -34,6 +36,7 @@ const CreateDatabaseSchema = (vectorDim: number): Schema => {
     new Field(DatabaseFields.TIME_ADDED, new ArrowDate(DateUnit.MILLISECOND), false),
     new Field(DatabaseFields.FILE_MODIFIED, new ArrowDate(DateUnit.MILLISECOND), false),
     new Field(DatabaseFields.FILE_CREATED, new ArrowDate(DateUnit.MILLISECOND), false),
+    new Field(DatabaseFields.START_POS, new Float64(), true),
   ]
   const schema = new Schema(schemaFields)
   return schema

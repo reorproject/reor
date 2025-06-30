@@ -21,7 +21,6 @@ interface SearchComponentProps {
 
 export type SearchModeTypes = 'vector' | 'hybrid'
 
-// Custom toggle component
 const ToggleSwitch: React.FC<{
   isHybrid: boolean
   onChange: (searchMode: SearchModeTypes) => void
@@ -103,8 +102,9 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
   }, [searchParams.searchMode, searchParams.vectorWeight, debouncedSearch, searchQuery])
 
   const openFileSelectSearch = useCallback(
-    (path: string) => {
-      openTabContent(path)
+    (path: string, position?: number) => {
+      openTabContent(path, undefined, false, position)
+
       posthog.capture('open_file_from_search')
     },
     [openTabContent],
