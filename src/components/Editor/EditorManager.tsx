@@ -46,7 +46,7 @@ const EditorManager: React.FC = () => {
       {editor && <SearchBar editor={editor._tiptapEditor} />}
 
       <YStack
-        className={`relative h-full pt-1 pb-4 ${editorFlex ? 'flex justify-center px-24' : 'px-12'} ${showDocumentStats ? 'pb-3' : ''}`}
+        className={`relative h-full pb-4 pt-1 ${editorFlex ? 'flex justify-center px-24' : 'px-12'} ${showDocumentStats ? 'pb-3' : ''}`}
       >
         <YStack className="relative size-full">
           <NoteTimestamps />
