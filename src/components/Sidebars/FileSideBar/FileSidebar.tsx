@@ -2,8 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { FileInfoNode, FileInfoTree } from 'electron/main/filesystem/types'
 import { FixedSizeList } from 'react-window'
 import { isFileNodeDirectory } from '@shared/utils'
-import { YStack } from 'tamagui'
+import { XStack, YStack } from 'tamagui'
+import { HiOutlinePencilAlt } from 'react-icons/hi'
+import { VscNewFolder } from 'react-icons/vsc'
 import { useFileContext } from '@/contexts/FileContext'
+import { useModalOpeners } from '@/contexts/ModalContext'
+import { useContentContext } from '@/contexts/ContentContext'
 import FileItemRows from './FileItemRows'
 
 const getFilesAndIndentationsForSidebar = (
@@ -34,6 +38,8 @@ const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
   // const { state, actions } = useThemeManager()
   const [listHeight, setListHeight] = useState(lheight ?? window.innerHeight - 50)
   const { vaultFilesTree, expandedDirectories, renameFile, setSelectedDirectory } = useFileContext()
+  const { setIsNewDirectoryModalOpen } = useModalOpeners()
+  const { createUntitledNote } = useContentContext()
 
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault()
@@ -67,6 +73,26 @@ const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
   const itemCount = filesAndIndentations.length
   return (
     <YStack className="h-full grow px-1 pt-2" backgroundColor="$gray3">
+      <XStack className="mb-1 items-center justify-start gap-1 px-1">
+        <YStack
+          alignItems="center"
+          justifyContent="center"
+          hoverStyle={{ backgroundColor: '$gray7' }}
+          className="size-5 cursor-pointer rounded opacity-60 hover:opacity-90"
+          onPress={() => createUntitledNote()}
+        >
+          <HiOutlinePencilAlt className="text-gray-300" color="gray" size={16} title="New Note" />
+        </YStack>
+        <YStack
+          alignItems="center"
+          justifyContent="center"
+          hoverStyle={{ backgroundColor: '$gray7' }}
+          className="size-5 cursor-pointer rounded opacity-60 hover:opacity-90"
+          onPress={() => setIsNewDirectoryModalOpen(true)}
+        >
+          <VscNewFolder className="text-gray-300" color="gray" size={16} title="New Directory" />
+        </YStack>
+      </XStack>
       <div onDrop={handleDrop} onDragOver={handleDragOver} onClick={handleClick}>
         <FixedSizeList
           height={listHeight}
