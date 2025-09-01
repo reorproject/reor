@@ -2,14 +2,13 @@ import React, { useState } from 'react'
 
 import { GrNewWindow } from 'react-icons/gr'
 import { MdSettings } from 'react-icons/md'
-import { VscNewFolder } from 'react-icons/vsc'
-import { HiOutlinePencilAlt } from 'react-icons/hi'
+// New folder and new note icons removed from nav (moved to Files sidebar)
 
 import { Files, MessageCircle, Search, Moon, SunMoon } from '@tamagui/lucide-icons'
 import { YStack } from 'tamagui'
 import { useModalOpeners } from '../../contexts/ModalContext'
 import { useChatContext } from '@/contexts/ChatContext'
-import { useContentContext } from '@/contexts/ContentContext'
+// Removed new note action from nav; handled in Files sidebar
 import { useThemeManager } from '@/contexts/ThemeContext'
 import InitialSetupSinglePage from '../Settings/InitialSettingsSinglePage'
 
@@ -22,8 +21,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ getShortcutDescription }) =
   const [showVaultSetup, setShowVaultSetup] = useState(false)
 
   const { state, actions } = useThemeManager() // State => theme, actions => toggle, set, syncWithSystem
-  const { isSettingsModalOpen, setIsSettingsModalOpen, setIsNewDirectoryModalOpen } = useModalOpeners()
-  const { createUntitledNote } = useContentContext()
+  const { isSettingsModalOpen, setIsSettingsModalOpen } = useModalOpeners()
 
   const handleAllInitialSettingsAreReady = () => {
     setShowVaultSetup(false)
@@ -92,44 +90,7 @@ const IconsSidebar: React.FC<IconsSidebarProps> = ({ getShortcutDescription }) =
           />
         </YStack>
       </div>
-      <div
-        className="flex h-8 w-full cursor-pointer items-center justify-center border-none bg-transparent "
-        onClick={() => createUntitledNote()}
-      >
-        <YStack
-          alignItems="center"
-          hoverStyle={{
-            backgroundColor: '$gray7',
-          }}
-          className="flex size-4/5 items-center justify-center rounded"
-        >
-          <HiOutlinePencilAlt
-            className="text-gray-200"
-            color="gray"
-            size={22}
-            title={getShortcutDescription('open-new-note') || 'New Note'}
-          />
-        </YStack>
-      </div>
-      <div
-        className="mt-[2px] flex h-8 w-full cursor-pointer items-center justify-center border-none bg-transparent "
-        onClick={() => setIsNewDirectoryModalOpen(true)}
-      >
-        <YStack
-          alignItems="center"
-          hoverStyle={{
-            backgroundColor: '$gray7',
-          }}
-          className="flex size-4/5 items-center justify-center rounded"
-        >
-          <VscNewFolder
-            className="text-gray-200"
-            color="gray"
-            size={18}
-            title={getShortcutDescription('open-new-directory-modal') || 'New Directory'}
-          />
-        </YStack>
-      </div>
+      {/* New Note and New Directory actions moved into Files sidebar header */}
 
       <div className="grow border-yellow-300" />
       <div className="flex h-8 w-full cursor-pointer items-center justify-center border-none bg-transparent">
