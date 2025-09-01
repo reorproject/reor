@@ -22,7 +22,7 @@ const NoteTimestamps: React.FC = () => {
 
   return (
     <div
-      className="mt-2 mb-1 pl-4 cursor-pointer select-none text-[11px] leading-4 text-neutral-400 opacity-30 transition-opacity hover:text-neutral-300 hover:opacity-80"
+      className="mb-1 mt-2 cursor-pointer select-none pl-4 text-[11px] leading-4 text-neutral-400 opacity-30 transition-opacity hover:text-neutral-300 hover:opacity-80"
       onClick={() => setShowUpdated((prev) => !prev)}
       role="button"
       tabIndex={0}
