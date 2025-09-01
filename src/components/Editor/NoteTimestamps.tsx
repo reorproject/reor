@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
-import { useFileContext } from '@/contexts/FileContext'
 import { format } from 'date-fns'
+import { useFileContext } from '@/contexts/FileContext'
 
 const NoteTimestamps: React.FC = () => {
   const { currentlyOpenFilePath, vaultFilesFlattened } = useFileContext()
@@ -22,7 +22,7 @@ const NoteTimestamps: React.FC = () => {
 
   return (
     <div
-      className="mb-1 select-none text-[11px] leading-4 opacity-60 transition-opacity hover:opacity-90 text-neutral-400 hover:text-neutral-300 cursor-pointer"
+      className="mt-2 mb-1 pl-4 cursor-pointer select-none text-[11px] leading-4 text-neutral-400 opacity-30 transition-opacity hover:text-neutral-300 hover:opacity-80"
       onClick={() => setShowUpdated((prev) => !prev)}
       role="button"
       tabIndex={0}
@@ -36,4 +36,3 @@ const NoteTimestamps: React.FC = () => {
 }
 
 export default NoteTimestamps
-
