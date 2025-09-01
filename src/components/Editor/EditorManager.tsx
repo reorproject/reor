@@ -4,6 +4,7 @@ import InEditorBacklinkSuggestionsDisplay from './BacklinkSuggestionsDisplay'
 import { useFileContext } from '@/contexts/FileContext'
 import { BlockNoteView, FormattingToolbarPositioner, SlashMenuPositioner, SideMenuPositioner } from '@/lib/blocknote'
 import SearchBar from './Search/SearchBar'
+import NoteTimestamps from './NoteTimestamps'
 
 const EditorManager: React.FC = () => {
   const [editorFlex, setEditorFlex] = useState(true)
@@ -45,9 +46,10 @@ const EditorManager: React.FC = () => {
       {editor && <SearchBar editor={editor._tiptapEditor} />}
 
       <YStack
-        className={`relative h-full py-4 ${editorFlex ? 'flex justify-center px-24' : 'px-12'} ${showDocumentStats ? 'pb-3' : ''}`}
+        className={`relative h-full pb-4 pt-1 ${editorFlex ? 'flex justify-center px-24' : 'px-12'} ${showDocumentStats ? 'pb-3' : ''}`}
       >
         <YStack className="relative size-full">
+          <NoteTimestamps />
           {editor && (
             <BlockNoteView editor={editor}>
               <FormattingToolbarPositioner editor={editor} />

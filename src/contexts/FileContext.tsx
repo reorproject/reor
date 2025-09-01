@@ -48,6 +48,11 @@ type FileContextType = {
   deleteFile: (path: string | undefined) => Promise<boolean>
   selectedDirectory: string | null
   setSelectedDirectory: React.Dispatch<React.SetStateAction<string | null>>
+  selectedFilePaths: string[]
+  selectSingleFile: (path: string) => void
+  toggleSelectFile: (path: string) => void
+  selectRangeTo: (path: string) => void
+  clearSelection: () => void
 }
 
 export const FileContext = createContext<FileContextType | undefined>(undefined)
@@ -73,6 +78,8 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [noteToBeRenamed, setNoteToBeRenamed] = useState<string>('')
   const [fileDirToBeRenamed, setFileDirToBeRenamed] = useState<string>('')
   const [currentlyChangingFilePath, setCurrentlyChangingFilePath] = useState(false)
+  const [selectedFilePaths, setSelectedFilePaths] = useState<string[]>([])
+  const [lastSelectedFilePath, setLastSelectedFilePath] = useState<string | null>(null)
   // TODO: Add highlighting data on search
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [highlightData, setHighlightData] = useState<HighlightData>({
@@ -326,6 +333,37 @@ export const FileProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     deleteFile,
     selectedDirectory,
     setSelectedDirectory,
+    selectedFilePaths,
+    selectSingleFile: (path: string) => {
+      setSelectedFilePaths([path])
+      setLastSelectedFilePath(path)
+    },
+    toggleSelectFile: (path: string) => {
+      setSelectedFilePaths((prev) => (prev.includes(path) ? prev.filter((p) => p !== path) : [...prev, path]))
+      setLastSelectedFilePath(path)
+    },
+    selectRangeTo: (path: string) => {
+      if (!lastSelectedFilePath) {
+        setSelectedFilePaths([path])
+        setLastSelectedFilePath(path)
+        return
+      }
+      const onlyFiles = vaultFilesFlattened
+      const startIdx = onlyFiles.findIndex((f) => f.path === lastSelectedFilePath)
+      const endIdx = onlyFiles.findIndex((f) => f.path === path)
+      if (startIdx === -1 || endIdx === -1) {
+        setSelectedFilePaths([path])
+        setLastSelectedFilePath(path)
+        return
+      }
+      const [from, to] = startIdx <= endIdx ? [startIdx, endIdx] : [endIdx, startIdx]
+      const range = onlyFiles.slice(from, to + 1).map((f) => f.path)
+      setSelectedFilePaths(range)
+    },
+    clearSelection: () => {
+      setSelectedFilePaths([])
+      setLastSelectedFilePath(null)
+    },
   }
 
   const contextValuesMemo: FileContextType = React.useMemo(

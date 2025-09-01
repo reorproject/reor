@@ -3,15 +3,18 @@ import { ListChildComponentProps } from 'react-window'
 import posthog from 'posthog-js'
 import { isFileNodeDirectory } from '@shared/utils'
 import { XStack, Text } from 'tamagui'
+import { format } from 'date-fns'
 import { ChevronRight, ChevronDown } from '@tamagui/lucide-icons'
+import { toast } from 'react-toastify'
 import { useFileContext } from '@/contexts/FileContext'
-import { removeFileExtension } from '@/lib/file'
+import { getFilesInDirectory, removeFileExtension } from '@/lib/file'
 import { useContentContext } from '@/contexts/ContentContext'
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from '@/components/ui/context-menu'
 import NewDirectoryComponent from '@/components/File/NewDirectory'
 
 const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data }) => {
   const { file, indentation } = data.filesAndIndentations[index]
+  const showDates: boolean = data.showDates ?? true
 
   const {
     handleDirectoryToggle,
@@ -22,6 +25,11 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
     selectedDirectory,
     setSelectedDirectory,
     renameFile,
+    selectedFilePaths,
+    selectSingleFile,
+    toggleSelectFile,
+    selectRangeTo,
+    vaultFilesFlattened,
   } = useFileContext()
   const { openContent, createUntitledNote } = useContentContext()
   const [isNewDirectoryModalOpen, setIsNewDirectoryModalOpen] = useState(false)
@@ -29,7 +37,16 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
   const [isDragOver, setIsDragOver] = useState(false)
 
   const isDirectory = isFileNodeDirectory(file)
-  const isSelected = isDirectory ? file.path === selectedDirectory : file.path === currentlyOpenFilePath
+  const formattedDate =
+    showDates && !isDirectory && file.dateModified instanceof Date ? format(file.dateModified, 'MM-dd-yy') : ''
+  let isSelected = false
+  if (isDirectory) {
+    isSelected = selectedFilePaths.includes(file.path) || file.path === selectedDirectory
+  } else if (selectedFilePaths.length > 0) {
+    isSelected = selectedFilePaths.includes(file.path)
+  } else {
+    isSelected = file.path === currentlyOpenFilePath
+  }
 
   const indentationPadding = indentation ? 10 * indentation : 0
   const isExpanded = expandedDirectories.get(file.path)
@@ -65,17 +82,40 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
 
   const clickOnFileOrDirectory = useCallback(
     (event: any) => {
-      const e = event.nativeEvent
+      const e = event.nativeEvent || event
       if (isDirectory) {
-        handleDirectoryToggle(file.path)
-        setSelectedDirectory(file.path)
+        if (e.metaKey || e.ctrlKey) {
+          toggleSelectFile(file.path)
+        } else {
+          handleDirectoryToggle(file.path)
+          setSelectedDirectory(file.path)
+        }
+        e.stopPropagation()
+        return
+      }
+
+      if (e.shiftKey) {
+        selectRangeTo(file.path)
+      } else if (e.metaKey || e.ctrlKey) {
+        toggleSelectFile(file.path)
       } else {
+        selectSingleFile(file.path)
         openContent(file.path)
         posthog.capture('open_file_from_sidebar')
       }
+
       e.stopPropagation()
     },
-    [file.path, isDirectory, handleDirectoryToggle, openContent, setSelectedDirectory],
+    [
+      file.path,
+      isDirectory,
+      handleDirectoryToggle,
+      openContent,
+      setSelectedDirectory,
+      selectRangeTo,
+      toggleSelectFile,
+      selectSingleFile,
+    ],
   )
 
   const openNewDirectoryModal = useCallback(async () => {
@@ -108,6 +148,75 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
         New file
       </ContextMenuItem>
       <ContextMenuItem onClick={openNewDirectoryModal}>New folder</ContextMenuItem>
+      <ContextMenuItem
+        onClick={async () => {
+          try {
+            // Determine current selection scope
+            const baseSelection =
+              selectedFilePaths.length > 1 && selectedFilePaths.includes(file.path) ? selectedFilePaths : [file.path]
+
+            // Partition into directories and files
+            const dirPaths: string[] = []
+            const filePaths: string[] = []
+            for (const p of baseSelection) {
+              // eslint-disable-next-line no-await-in-loop
+              const isDir = await window.fileSystem.isDirectory(p)
+              if (isDir) dirPaths.push(p)
+              else filePaths.push(p)
+            }
+
+            // Build folder sections with H1 headers
+            const seenFiles = new Set<string>()
+            const parts: string[] = []
+            for (const dir of dirPaths) {
+              // eslint-disable-next-line no-await-in-loop
+              const folderName = await window.path.basename(dir)
+              // eslint-disable-next-line no-await-in-loop
+              const files = await getFilesInDirectory(dir, vaultFilesFlattened)
+              const folderContents: string[] = []
+              for (const f of files) {
+                if (!seenFiles.has(f.path)) {
+                  seenFiles.add(f.path)
+                  // eslint-disable-next-line no-await-in-loop
+                  const c = await window.fileSystem.readFile(f.path, 'utf-8')
+                  folderContents.push(c || '')
+                }
+              }
+              if (folderContents.length > 0) {
+                parts.push(`# Folder: ${folderName}`)
+                parts.push(folderContents.join('\n\n'))
+              }
+            }
+
+            // Add loose files not already included via folders
+            for (const p of filePaths) {
+              if (!seenFiles.has(p)) {
+                seenFiles.add(p)
+                // eslint-disable-next-line no-await-in-loop
+                const c = await window.fileSystem.readFile(p, 'utf-8')
+                parts.push(c || '')
+              }
+            }
+
+            if (parts.length === 0) {
+              toast.info('No markdown files found')
+              return
+            }
+
+            const output = parts.join('\n\n')
+            await navigator.clipboard.writeText(output)
+            const totalNotes = seenFiles.size
+            toast.success(totalNotes > 1 ? `Copied ${totalNotes} notes to clipboard` : 'Markdown copied to clipboard')
+          } catch (err) {
+            toast.error('Failed to copy markdown')
+          }
+        }}
+      >
+        {(() => {
+          const inMulti = selectedFilePaths.length > 1 && selectedFilePaths.includes(file.path)
+          return inMulti ? `Copy Markdown (${selectedFilePaths.length})` : 'Copy Markdown'
+        })()}
+      </ContextMenuItem>
       <ContextMenuItem onClick={() => setNoteToBeRenamed(file.path)}>Rename</ContextMenuItem>
       <ContextMenuItem onClick={handleDelete}>Delete</ContextMenuItem>
     </>
@@ -132,6 +241,8 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
               onPress={clickOnFileOrDirectory}
               className={itemClasses}
               overflow="hidden"
+              justifyContent="space-between"
+              width="100%"
             >
               {isDirectory && (
                 <span className="mr-2 mt-1">
@@ -144,9 +255,20 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
                   )}
                 </span>
               )}
-              <Text color="$gray11" numberOfLines={1}>
+              <Text color="$gray11" numberOfLines={1} flex={1}>
                 {isDirectory ? file.name : removeFileExtension(file.name)}
               </Text>
+              {!isDirectory && (
+                <Text
+                  color="$gray9"
+                  numberOfLines={1}
+                  flexShrink={0}
+                  textAlign="right"
+                  className="ml-2 w-14 whitespace-nowrap text-[10px] opacity-40"
+                >
+                  {formattedDate}
+                </Text>
+              )}
             </XStack>
             <NewDirectoryComponent
               isOpen={isNewDirectoryModalOpen}
