@@ -13,6 +13,7 @@ import NewDirectoryComponent from '@/components/File/NewDirectory'
 
 const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data }) => {
   const { file, indentation } = data.filesAndIndentations[index]
+  const showDates: boolean = data.showDates ?? true
 
   const {
     handleDirectoryToggle,
@@ -30,7 +31,8 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
   const [isDragOver, setIsDragOver] = useState(false)
 
   const isDirectory = isFileNodeDirectory(file)
-  const formattedDate = !isDirectory && file.dateModified instanceof Date ? format(file.dateModified, 'MM-dd-yy') : ''
+  const formattedDate =
+    showDates && !isDirectory && file.dateModified instanceof Date ? format(file.dateModified, 'MM-dd-yy') : ''
   const isSelected = isDirectory ? file.path === selectedDirectory : file.path === currentlyOpenFilePath
 
   const indentationPadding = indentation ? 10 * indentation : 0

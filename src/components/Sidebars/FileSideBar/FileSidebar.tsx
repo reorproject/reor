@@ -85,7 +85,7 @@ const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
           alignItems="center"
           justifyContent="center"
           hoverStyle={{ backgroundColor: '$gray7' }}
-          className={`h-5 w-5 cursor-pointer rounded ${showDates ? 'opacity-90' : 'opacity-30'}`}
+          className={`size-5 cursor-pointer rounded ${showDates ? 'opacity-90' : 'opacity-30'}`}
           onPress={async () => {
             const next = !showDates
             setShowDates(next)
