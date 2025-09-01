@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { FileInfoNode, FileInfoTree } from 'electron/main/filesystem/types'
 import { FixedSizeList } from 'react-window'
 import { isFileNodeDirectory } from '@shared/utils'
-import { YStack } from 'tamagui'
+import { XStack, YStack } from 'tamagui'
+import { Calendar } from '@tamagui/lucide-icons'
 import { useFileContext } from '@/contexts/FileContext'
 import FileItemRows from './FileItemRows'
 
@@ -34,6 +35,7 @@ const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
   // const { state, actions } = useThemeManager()
   const [listHeight, setListHeight] = useState(lheight ?? window.innerHeight - 50)
   const { vaultFilesTree, expandedDirectories, renameFile, setSelectedDirectory } = useFileContext()
+  const [showDates, setShowDates] = useState<boolean>(true)
 
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault()
@@ -63,10 +65,36 @@ const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
     }
   }, [lheight])
 
+  useEffect(() => {
+    const init = async () => {
+      const val = await window.electronStore.getFileIndexDateVisibility()
+      setShowDates(val)
+    }
+    init()
+
+    const handler = (_e: any, val: boolean) => setShowDates(val)
+    window.ipcRenderer.on('file-index-date-visibility-changed', handler)
+  }, [])
+
   const filesAndIndentations = getFilesAndIndentationsForSidebar(vaultFilesTree, expandedDirectories)
   const itemCount = filesAndIndentations.length
   return (
     <YStack className="h-full grow px-1 pt-2" backgroundColor="$gray3">
+      <XStack className="mb-1 items-center justify-end px-1">
+        <YStack
+          alignItems="center"
+          justifyContent="center"
+          hoverStyle={{ backgroundColor: '$gray7' }}
+          className={`size-5 cursor-pointer rounded ${showDates ? 'opacity-90' : 'opacity-30'}`}
+          onPress={async () => {
+            const next = !showDates
+            setShowDates(next)
+            await window.electronStore.setFileIndexDateVisibility(next)
+          }}
+        >
+          <Calendar size={14} color={showDates ? '$gray11' : '$gray9'} />
+        </YStack>
+      </XStack>
       <div onDrop={handleDrop} onDragOver={handleDragOver} onClick={handleClick}>
         <FixedSizeList
           height={listHeight}
@@ -75,6 +103,7 @@ const FileSidebar: React.FC<FileExplorerProps> = ({ lheight }) => {
           width="100%"
           itemData={{
             filesAndIndentations,
+            showDates,
           }}
         >
           {FileItemRows}

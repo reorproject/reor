@@ -3,6 +3,7 @@ import { ListChildComponentProps } from 'react-window'
 import posthog from 'posthog-js'
 import { isFileNodeDirectory } from '@shared/utils'
 import { XStack, Text } from 'tamagui'
+import { format } from 'date-fns'
 import { ChevronRight, ChevronDown } from '@tamagui/lucide-icons'
 import { toast } from 'react-toastify'
 import { useFileContext } from '@/contexts/FileContext'
@@ -13,6 +14,7 @@ import NewDirectoryComponent from '@/components/File/NewDirectory'
 
 const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data }) => {
   const { file, indentation } = data.filesAndIndentations[index]
+  const showDates: boolean = data.showDates ?? true
 
   const {
     handleDirectoryToggle,
@@ -35,6 +37,8 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
   const [isDragOver, setIsDragOver] = useState(false)
 
   const isDirectory = isFileNodeDirectory(file)
+  const formattedDate =
+    showDates && !isDirectory && file.dateModified instanceof Date ? format(file.dateModified, 'MM-dd-yy') : ''
   let isSelected = false
   if (isDirectory) {
     isSelected = selectedFilePaths.includes(file.path) || file.path === selectedDirectory
@@ -237,6 +241,8 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
               onPress={clickOnFileOrDirectory}
               className={itemClasses}
               overflow="hidden"
+              justifyContent="space-between"
+              width="100%"
             >
               {isDirectory && (
                 <span className="mr-2 mt-1">
@@ -249,9 +255,20 @@ const FileItemRows: React.FC<ListChildComponentProps> = ({ index, style, data })
                   )}
                 </span>
               )}
-              <Text color="$gray11" numberOfLines={1}>
+              <Text color="$gray11" numberOfLines={1} flex={1}>
                 {isDirectory ? file.name : removeFileExtension(file.name)}
               </Text>
+              {!isDirectory && (
+                <Text
+                  color="$gray9"
+                  numberOfLines={1}
+                  flexShrink={0}
+                  textAlign="right"
+                  className="ml-2 w-14 whitespace-nowrap text-[10px] opacity-40"
+                >
+                  {formattedDate}
+                </Text>
+              )}
             </XStack>
             <NewDirectoryComponent
               isOpen={isNewDirectoryModalOpen}
