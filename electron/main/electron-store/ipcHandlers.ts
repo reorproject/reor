@@ -142,6 +142,16 @@ export const registerStoreHandlers = (store: Store<StoreSchema>, windowsManager:
     return store.get(StoreKeys.showDocumentStats, false)
   })
 
+  // File index date visibility
+  ipcMain.handle('set-file-index-date-visibility', (event, showDates: boolean) => {
+    store.set(StoreKeys.ShowFileDatesInSidebar, showDates)
+    event.sender.send('file-index-date-visibility-changed', showDates)
+  })
+
+  ipcMain.handle('get-file-index-date-visibility', () => {
+    return store.get(StoreKeys.ShowFileDatesInSidebar, true)
+  })
+
   ipcMain.handle('has-user-opened-app-before', () => store.get(StoreKeys.hasUserOpenedAppBefore))
 
   ipcMain.handle('set-user-has-opened-app-before', () => {

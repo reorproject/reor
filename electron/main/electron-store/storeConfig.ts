@@ -63,6 +63,7 @@ export interface StoreSchema {
   spellCheck: string
   EditorFlexCenter: boolean
   showDocumentStats: boolean
+  showFileDatesInSidebar: boolean
   autoContext: boolean
   tamaguiTheme: TamaguiThemeTypes
   searchParams: SearchProps
@@ -86,6 +87,7 @@ export enum StoreKeys {
   SpellCheck = 'spellCheck',
   EditorFlexCenter = 'editorFlexCenter',
   showDocumentStats = 'showDocumentStats',
+  ShowFileDatesInSidebar = 'showFileDatesInSidebar',
   AutoContext = 'autoContext',
   TamaguiTheme = 'tamaguiTheme',
   SearchParams = 'searchParams',
