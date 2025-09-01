@@ -13,6 +13,7 @@ dist-ssr
 dist-electron
 release
 *.local
+AGENTS.md
 
 # Editor directories and files
 .vscode/.debug.env
